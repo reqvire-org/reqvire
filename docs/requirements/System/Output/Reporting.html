@@ -753,11 +753,16 @@ blockquote {
     end
   end
   subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
+    subgraph 3931cad9905ceff7[&quot;📄 Behaviors.md&quot;]
+      c01d2af609d2780d[&quot;Verification Coverage Philosophy Behavior&quot;];
+      class c01d2af609d2780d default;
+      click c01d2af609d2780d &quot;Behaviors.html#verification-coverage-philosophy-behavior&quot;;
+    end
     subgraph c2b8a949c0da1f4[&quot;📄 DiagramGeneration.md&quot;]
       8a76dfb4467e9e4e[&quot;Complete Model Structure Visualization&quot;];
       class 8a76dfb4467e9e4e userRequirement;
       click 8a76dfb4467e9e4e &quot;DiagramGeneration.html#complete-model-structure-visualization&quot;;
-      618f2e2c98afc9d6[&quot;Interactive Mermaid Diagrams&quot;];
+      618f2e2c98afc9d6[&quot;Interactive Mermaid Diagrams<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification&quot;];
       class 618f2e2c98afc9d6 userRequirement;
       click 618f2e2c98afc9d6 &quot;DiagramGeneration.html#interactive-mermaid-diagrams&quot;;
       db3a76dd2787dd8d[&quot;Model Visualization and Exploration&quot;];
@@ -798,7 +803,7 @@ blockquote {
       421d9d50c6e84b40[&quot;Validation Report Generator&quot;];
       class 421d9d50c6e84b40 systemRequirement;
       click 421d9d50c6e84b40 &quot;Reporting.html#validation-report-generator&quot;;
-      157f2dbe8bac3cda[&quot;Verification Coverage Report<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
+      157f2dbe8bac3cda[&quot;Verification Coverage Report<br/>📎 requirements/System/Output/Behaviors.md#verification-coverage-philosophy-behavior<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
       class 157f2dbe8bac3cda userRequirement;
       click 157f2dbe8bac3cda &quot;Reporting.html#verification-coverage-report&quot;;
       32b392250c503b21[&quot;Verification Upward Traceability&quot;];
@@ -904,6 +909,7 @@ blockquote {
   class 1261cbc7612c8952 default;
   click 1261cbc7612c8952 &quot;../../../core/src/report_coverage.rs&quot;;
   157f2dbe8bac3cda -->|satisfiedBy| 1261cbc7612c8952;
+  157f2dbe8bac3cda -->|satisfiedBy| c01d2af609d2780d;
   32b392250c503b21 -.->|deriveReqT| c4f002afe0819c7f;
   32b392250c503b21 -.->|deriveReqT| 3e62787c176807f6;
   32b392250c503b21 -.->|deriveReqT| 61e7a56e6d8e29d;
@@ -916,6 +922,7 @@ blockquote {
   click e3433ff5bc275516 &quot;../../../tests/test-model-command/test.sh&quot;;
   d1d570121d0a16e0 -->|satisfiedBy| e3433ff5bc275516;
   618f2e2c98afc9d6 -.->|deriveReqT| ab3055e037495da3;
+  618f2e2c98afc9d6 -->|satisfiedBy| efd4d3e5c9cdc0ee;
   80defdd4cbc7ee18[&quot;cli.rs&quot;];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
@@ -1181,37 +1188,27 @@ blockquote {
 </ul>
 <hr />
 <h3 id="verification-coverage-report">Verification Coverage Report</h3>
-<p>The system shall generate verification coverage reports focusing on leaf requirements (requirements that do not have forward relations to any other requirement), showing the percentage and details of verified and unverified leaf requirements, including breakdowns by file, section, and verification type.</p>
+<p>The system shall generate verification coverage reports focusing on leaf requirements, showing the percentage and details of verified and unverified requirements following clearly defined coverage philosophy.</p>
 <h4>Details</h4>
 <p>The verification coverage report shall provide:</p>
 <ul>
 <li>Total count of leaf requirements with breakdown by requirement type</li>
-<li>Count and percentage of verified leaf requirements (those with verifiedBy relations pointing to existing verification artifacts)</li>
+<li>Count and percentage of verified leaf requirements (those with verifiedBy relations)</li>
 <li>Count and percentage of unverified leaf requirements</li>
-<li>Total count of verification artifacts with breakdown by verification type (test, analysis, inspection, demonstration)</li>
-<li>Count and percentage of satisfied test-verification artifacts (those with satisfiedBy relations pointing to existing test implementations)</li>
-<li>Count and percentage of orphaned verification artifacts (those without any verify relations to requirements)</li>
-<li>Detailed list of verified leaf requirements grouped by file and section</li>
-<li>Detailed list of unverified leaf requirements with impact analysis</li>
-<li>Detailed list of orphaned verifications (flagged for attention as they may be redundant or incorrectly configured)</li>
+<li>Total count of verification artifacts with breakdown by verification type</li>
+<li>Count and percentage of satisfied test-verification artifacts</li>
+<li>Count and percentage of orphaned verification artifacts</li>
+<li>Detailed lists grouped by file and section</li>
 <li>Output in both human-readable text and machine-readable JSON formats</li>
 </ul>
-<p>The report helps track verification completeness and identify gaps in requirement verification coverage, supporting quality assurance and compliance activities.</p>
-<p><strong>Coverage Philosophy:</strong></p>
-<ul>
-<li><strong>Leaf requirements</strong> (requirements that don’t derive other requirements) MUST be verified</li>
-<li><strong>Parent/intermediate requirements</strong> MAY be verified but it’s not a hard requirement as they might be covered in verification of leaf requirements</li>
-<li>One verification may verify multiple leaf requirements (N:1 relationship)</li>
-<li>The change impact analysis system propagates changes from parent requirements down to leaf requirements and their verifications</li>
-<li>System engineers/architects are responsible for ensuring verification scopes are broad enough to cover parent requirements when there’s no dedicated parent verification</li>
-<li>AI systems can help create comprehensive verification scopes and prevent verification overlap</li>
-</ul>
+<p>The report helps track verification completeness and identify gaps in requirement verification coverage.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
+<li><a href="Behaviors.html#verification-coverage-philosophy-behavior">Verification Coverage Philosophy Behavior</a></li>
 <li><a href="Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="Specifications.html#text-output-formatting">Text Output Formatting</a></li>
 </ul>
@@ -1220,6 +1217,7 @@ blockquote {
 <li>derive: <a href="#verification-upward-traceability">Verification Upward Traceability</a></li>
 <li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
 <li>satisfiedBy: <a href="../../../core/src/report_coverage.rs">report_coverage.rs</a></li>
+<li>satisfiedBy: <a href="Behaviors.html#verification-coverage-philosophy-behavior">Verification Coverage Philosophy Behavior</a></li>
 </ul>
 <hr />
 <h3 id="verification-upward-traceability">Verification Upward Traceability</h3>

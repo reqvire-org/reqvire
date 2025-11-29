@@ -1960,6 +1960,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Short Mode Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Output/Behaviors.html#short-mode-behavior"
+                    },
+                    {
+                      "name": "Verification Coverage Philosophy Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
                     }
                   ]
                 },
@@ -1996,7 +2001,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
+                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Style Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Model Visualization and Exploration",
@@ -2011,7 +2023,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "SysML-Compatible Relationship Rendering",
                       "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering"
+                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering",
+                      "children": [
+                        {
+                          "name": "SysML Rendering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Trace Relation Non-Directional Behavior",
@@ -2117,6 +2136,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Reporting.html#verification-coverage-report",
                       "children": [
                         {
+                          "name": "Verification Coverage Philosophy Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
+                        },
+                        {
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/System/Output/Specifications.html#json-output-structure"
@@ -2169,6 +2193,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Mermaid Diagram Style Specification",
                       "type": "refinement",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "SysML Rendering Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
                     },
                     {
                       "name": "Text Output Formatting",
@@ -4376,6 +4405,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Short Mode Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Output/Behaviors.html#short-mode-behavior"
+                    },
+                    {
+                      "name": "Verification Coverage Philosophy Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
                     }
                   ]
                 },
@@ -4412,7 +4446,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
+                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Style Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Model Visualization and Exploration",
@@ -4427,7 +4468,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "SysML-Compatible Relationship Rendering",
                       "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering"
+                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering",
+                      "children": [
+                        {
+                          "name": "SysML Rendering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Trace Relation Non-Directional Behavior",
@@ -4533,6 +4581,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Reporting.html#verification-coverage-report",
                       "children": [
                         {
+                          "name": "Verification Coverage Philosophy Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
+                        },
+                        {
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/System/Output/Specifications.html#json-output-structure"
@@ -4585,6 +4638,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Mermaid Diagram Style Specification",
                       "type": "refinement",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "SysML Rendering Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
                     },
                     {
                       "name": "Text Output Formatting",

@@ -733,7 +733,7 @@ blockquote {
 <div id="view-sunburst" class="containment-view">
 <p class="view-instructions">Click on segments to zoom in. Click center circle to zoom out. Click the center name link to navigate to the element.</p>
 <p>
-<div class="d3-sunburst-container" id="d3sunburst_7f8dc6a21b20">
+<div class="d3-sunburst-container" id="d3sunburst_7fc6a84be790">
     <div class="d3-sunburst-breadcrumb"></div>
     <div class="d3-sunburst-wrapper">
         <svg class="d3-sunburst-svg"></svg>
@@ -2690,6 +2690,11 @@ blockquote {
                       "name": "Short Mode Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Output/Behaviors.html#short-mode-behavior"
+                    },
+                    {
+                      "name": "Verification Coverage Philosophy Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
                     }
                   ]
                 },
@@ -2726,7 +2731,14 @@ blockquote {
                     {
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
+                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Style Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Model Visualization and Exploration",
@@ -2741,7 +2753,14 @@ blockquote {
                     {
                       "name": "SysML-Compatible Relationship Rendering",
                       "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering"
+                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering",
+                      "children": [
+                        {
+                          "name": "SysML Rendering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Trace Relation Non-Directional Behavior",
@@ -2847,6 +2866,11 @@ blockquote {
                       "link": "requirements/System/Output/Reporting.html#verification-coverage-report",
                       "children": [
                         {
+                          "name": "Verification Coverage Philosophy Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
+                        },
+                        {
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/System/Output/Specifications.html#json-output-structure"
@@ -2899,6 +2923,11 @@ blockquote {
                       "name": "Mermaid Diagram Style Specification",
                       "type": "refinement",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "SysML Rendering Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
                     },
                     {
                       "name": "Text Output Formatting",
@@ -3148,7 +3177,7 @@ blockquote {
     }
   ]
 };
-    const container = document.getElementById("d3sunburst_7f8dc6a21b20");
+    const container = document.getElementById("d3sunburst_7fc6a84be790");
     const wrapper = container.querySelector(".d3-sunburst-wrapper");
     const svgEl = container.querySelector("svg");
     const svg = d3.select(svgEl);
@@ -3445,7 +3474,7 @@ blockquote {
 <div id="view-icicle" class="containment-view">
 <p class="view-instructions">Click on bars to zoom in. Click breadcrumb path to navigate back. Click the element link to open it.</p>
 <p>
-<div class="d3-icicle-container" id="d3icicle_7f8dc69e5b50">
+<div class="d3-icicle-container" id="d3icicle_7fc6a83327c0">
     <div class="d3-icicle-breadcrumb"></div>
     <div class="d3-icicle-wrapper">
         <svg class="d3-icicle-svg"></svg>
@@ -5402,6 +5431,11 @@ blockquote {
                       "name": "Short Mode Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Output/Behaviors.html#short-mode-behavior"
+                    },
+                    {
+                      "name": "Verification Coverage Philosophy Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
                     }
                   ]
                 },
@@ -5438,7 +5472,14 @@ blockquote {
                     {
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
+                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Style Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Model Visualization and Exploration",
@@ -5453,7 +5494,14 @@ blockquote {
                     {
                       "name": "SysML-Compatible Relationship Rendering",
                       "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering"
+                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering",
+                      "children": [
+                        {
+                          "name": "SysML Rendering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Trace Relation Non-Directional Behavior",
@@ -5559,6 +5607,11 @@ blockquote {
                       "link": "requirements/System/Output/Reporting.html#verification-coverage-report",
                       "children": [
                         {
+                          "name": "Verification Coverage Philosophy Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
+                        },
+                        {
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/System/Output/Specifications.html#json-output-structure"
@@ -5611,6 +5664,11 @@ blockquote {
                       "name": "Mermaid Diagram Style Specification",
                       "type": "refinement",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "SysML Rendering Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
                     },
                     {
                       "name": "Text Output Formatting",
@@ -5860,7 +5918,7 @@ blockquote {
     }
   ]
 };
-    const container = document.getElementById("d3icicle_7f8dc69e5b50");
+    const container = document.getElementById("d3icicle_7fc6a83327c0");
     const wrapper = container.querySelector(".d3-icicle-wrapper");
     const svgEl = container.querySelector("svg");
     const svg = d3.select(svgEl);

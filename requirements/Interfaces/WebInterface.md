@@ -202,86 +202,20 @@ The system shall make element names in the model-centric view clickable links th
 
 ### Web Interface Color Scheme
 
-The system shall implement a consistent color scheme across all HTML pages optimized for MBSE and requirements management applications.
+The system shall implement a consistent color scheme across all HTML pages following clearly defined specifications optimized for MBSE and requirements management applications.
 
 #### Details
-**Primary Colors:**
-| Color Name | Hex Code | Usage |
-|------------|----------|-------|
-| Indigo | #3F51B5 | Navigation bar background, primary branding |
-| Indigo Hover | #7986CB | Navigation hover states (lighter for visibility) |
-| Indigo Active | #303F9F | Navigation active/pressed states |
-| Off-White | #FAFAFA | Body background - reduces eye strain |
-| White | #FFFFFF | Content background, navigation text |
+The color scheme shall provide:
+- Primary branding colors for navigation and UI elements
+- Element type-specific colors for visual differentiation
+- Status indicator colors for verification and error states
+- Interactive state colors for hover effects and links
+- D3.js containment tree node styling with type-specific icons
 
-**Element Type Colors:**
-The web interface shall use consistent colors matching the diagram color scheme:
-| Element Type | Color Name | Hex Code | Usage |
-|--------------|------------|----------|-------|
-| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
-| Verification | Emerald Green | #4CAF50 | Validation criteria, testing completion |
-| Other | Cool Gray | #9E9E9E | Other element types, external dependencies |
-
-**Status Indicator Colors:**
-| Status | Color Name | Hex Code | Usage |
-|--------|------------|----------|-------|
-| Verified/Passing | Forest Green | #4CAF50 | Verified requirements, passing tests |
-| Pending/Warning | Amber | #FFB74D | Unverified items, warnings |
-| Failed/Error | Red | #F44336 | Error messages, validation errors |
-
-**Interactive State Colors:**
-| State | Color | Hex Code | Usage |
-|-------|-------|----------|-------|
-| Hover Highlight | Peach | #FFAB91 | Diagram node/edge hover effect |
-| Node Hover Shadow | Peach (70%) | rgba(255,171,145,0.7) | Soft drop-shadow on node hover |
-| Link Color | Indigo | #3F51B5 | Hyperlinks (matches nav bar, font-weight: 500) |
-| Link Hover | Indigo | #3F51B5 | Hyperlinks with underline on hover |
-| Nav Hover | Light Indigo | #7986CB | Navigation item hover background |
-
-**Border Colors:**
-| Element | Hex Code | Usage |
-|---------|----------|-------|
-| Header Borders | #EEEEEE | H1/H2 underlines |
-| Table Borders | #EEEEEE | Tables, content separation |
-| Content Border | #E0E0E0 | Content card borders |
-| Code Background | #f6f8fa | Code blocks |
-| Diagram Canvas | #FAFAFA | Mermaid diagram background |
-
-**Typography:**
-- Primary font: System font stack (sans-serif)
-- Monospace font: For code blocks and element identifiers
-- Line height: 1.6 for content readability
-- Primary text: #212121 (dark gray - headings)
-- Secondary text: #424242 (medium gray - body)
-- Muted text: #757575 (light gray - de-emphasized)
-
-**Layout:**
-- Navigation bar: Fixed position, full width, 50px height
-- Content container: Centered with max-width 95% for readability
-- Content card: White background with subtle border and shadow
-- Responsive design: Adapts to different screen sizes
-- Box shadows: rgba(0,0,0,0.08) for subtle depth
-
-**D3.js Containment Tree Colors:**
-The containment tree shall use consistent colors for node types:
-| Node Type | Color | Hex Code | Icon |
-|-----------|-------|----------|------|
-| folder | Gray | #9E9E9E | 📁 |
-| file | Yellow | #FFCA28 | 📄 |
-| user-requirement | Purple | #7E57C2 | 👤 |
-| system-requirement | Deep Purple | #673AB7 | 📐 |
-| requirement | Deep Purple | #673AB7 | 📐 |
-| verification | Green | #4CAF50 | ✅ |
-| refinement | Orange | #FF9800 | 🔧 |
-| design-document | Brown | #8D6E63 | 📝 |
-| attachment-element | Orange | #FF9800 | 🔧 |
-| attachment-file | Blue Gray | #607D8B | 📎 |
-
-**D3.js Tree Styling:**
-- Meta nodes (attachments): Smaller circles (r=4), italic 11px font, 85% opacity
-- Regular nodes: Standard circles (r=6), normal 13px font
-- Tree animations: Smooth transitions for expand/collapse
-- Node hover: Cursor pointer for interactive nodes
+The system shall ensure color consistency between:
+- HTML page styling
+- Mermaid diagram rendering
+- D3.js containment tree visualization
 
 #### Attachments
   * [Color Scheme Specification](../System/Output/Specifications.md#color-scheme-specification)
@@ -292,6 +226,7 @@ The containment tree shall use consistent colors for node types:
   * satisfiedBy: [containment.rs](../../core/src/containment.rs)
   * satisfiedBy: [html.rs](../../core/src/html.rs)
   * satisfiedBy: [base.html](../../core/templates/base.html)
+  * satisfiedBy: [Color Scheme Specification](../System/Output/Specifications.md#color-scheme-specification)
 ---
 
 ### Serve Command

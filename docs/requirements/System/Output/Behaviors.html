@@ -743,6 +743,9 @@ blockquote {
       d060375c6412e553[&quot;Short Mode Behavior&quot;];
       class d060375c6412e553 default;
       click d060375c6412e553 &quot;Behaviors.html#short-mode-behavior&quot;;
+      c01d2af609d2780d[&quot;Verification Coverage Philosophy Behavior&quot;];
+      class c01d2af609d2780d default;
+      click c01d2af609d2780d &quot;Behaviors.html#verification-coverage-philosophy-behavior&quot;;
     end
   end
 </div>
@@ -792,6 +795,42 @@ blockquote {
 <h4>Metadata</h4>
 <ul>
 <li>type: behavior</li>
+</ul>
+<hr />
+<h3 id="verification-coverage-philosophy-behavior">Verification Coverage Philosophy Behavior</h3>
+<p>Coverage evaluation philosophy for verification reporting.</p>
+<h4>Details</h4>
+<p><strong>Leaf Requirements (MUST be verified):</strong></p>
+<ul>
+<li>Requirements that don’t derive other requirements</li>
+<li>Must have verifiedBy relations to verification artifacts</li>
+<li>Verification gaps are flagged in coverage reports</li>
+</ul>
+<p><strong>Parent/Intermediate Requirements (MAY be verified):</strong></p>
+<ul>
+<li>Requirements that derive other requirements</li>
+<li>Optional verification since leaf verifications may cover them</li>
+<li>System engineers responsible for ensuring verification scopes are sufficient</li>
+</ul>
+<p><strong>Verification Relationships:</strong></p>
+<ul>
+<li>One verification may verify multiple leaf requirements (N:1)</li>
+<li>Change impact propagates from parent to leaf requirements and verifications</li>
+<li>AI systems can help create comprehensive verification scopes and prevent overlap</li>
+</ul>
+<p><strong>Roll-up Strategy:</strong></p>
+<ul>
+<li>Leaf requirement verification provides coverage for parent requirements</li>
+<li>Parent verification is redundant if all derived leaves are verified</li>
+<li>Coverage percentages focus on leaf requirement verification status</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#verification-coverage-report">Verification Coverage Report</a></li>
 </ul>
 <hr />
 

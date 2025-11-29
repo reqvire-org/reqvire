@@ -25,7 +25,7 @@ The visualization helps users understand the model's logical structure, navigate
 
 ### Interactive Mermaid Diagrams
 
-The system shall produce visual representations of relationships within the System model in the form of Mermaid diagrams, enabling users to explore relations and understand dependencies and their impact.
+The system shall produce visual representations of relationships within the System model in the form of Mermaid diagrams following clearly defined specifications, enabling users to explore relations and understand dependencies and their impact.
 
 #### Details
 Diagram generation follows a file-based approach:
@@ -33,63 +33,24 @@ Diagram generation follows a file-based approach:
 - The diagram shows all elements in the file and their relationships
 - External related resources are displayed as linked boxes to the actual resource
 
-**Containment Structure:**
-All mermaid diagrams shall use containment structure with nested subgraphs to show the physical organization of elements:
-- Folder subgraphs: `subgraph hashId["folder-icon Folder Name"]` groups files and subfolders
-- File subgraphs: `subgraph hashId["file-icon File Name"]` groups elements within files
-- Elements are rendered inside their containing file subgraph
-- This structure applies to file diagrams, model diagrams, and verification trace diagrams
-- Containment provides visual context for where elements are located in the model
-
-**Diagram Node Classes:**
-The system shall use Mermaid CSS classes to style diagram elements with differentiated colors:
-
-| Class Name | Fill Color | Stroke Color | Stroke Width | Usage |
-|------------|------------|--------------|--------------|-------|
-| userRequirement | #D1C4E9 (light purple) | #7E57C2 | 2px | Top-level user requirements |
-| systemRequirement | #E1D8EE (lighter purple) | #673AB7 | 1.5px | System-level requirements |
-| requirement | #ECEFF1 (blue-gray) | #673AB7 | 1.5px | Generic requirements |
-| verified | #D1C4E9 (light purple) | #7E57C2 | 2px | Directly verified requirements |
-| verification | #DCEDC8 (light green) | #4CAF50 | 2px | Verification elements |
-| folder | #FAFAFA (off-white) | #9E9E9E | 2-3px | Folder containers |
-| file | #FFFFFF / #FFF8E1 | #9E9E9E / #FFCA28 | 2px | File containers |
-| attachment | #EFEBE9 (warm grey) | #8D6E63 | 1.5px | Design documents in DesignDocuments folders |
-| default | #F5F5F5 (light gray) | #424242 | 1.5px | Default/fallback styling |
-
-**Element Type Color Scheme:**
-The system shall use the following color scheme for rendering diagram elements:
-
-| Element Type | Color Name | Hex Code | Usage |
-|--------------|------------|----------|-------|
-| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
-| Verification | Emerald Green | #4CAF50 | Validation criteria, testing completion |
-| Other | Cool Gray | #9E9E9E | Other element types, external references |
-
-**Relation Line Colors:**
-| Relation Type | Color | Style |
-|--------------|-------|-------|
-| Derive/DerivedFrom | #673AB7 | Dashed |
-| Verify/VerifiedBy | #4CAF50 | Dashed |
-| Satisfy/SatisfiedBy | #673AB7 | Solid |
-| Trace | #9E9E9E | Dashed |
-
-**Interactive Highlighting:**
-| Effect | Color | Implementation |
-|--------|-------|----------------|
-| Hovered node | Peach | drop-shadow(0 0 8px rgba(255,171,145,0.7)) |
-| Connected edges | Peach | stroke: #FFAB91 with increased width |
-
-**Diagram Background:**
-- Canvas background: #FAFAFA (off-white)
-- Border: 1px solid #EEEEEE
+The system shall implement diagram styling including:
+- Containment structure with nested subgraphs for physical organization
+- Element type-specific CSS classes for visual differentiation
+- Relation-specific line styles and colors
+- Interactive highlighting on hover
+- Consistent background and border styling
 
 #### Metadata
   * type: user-requirement
+
+#### Attachments
+  * [Mermaid Diagram Style Specification](Specifications.md#mermaid-diagram-style-specification)
 
 #### Relations
   * derive: [Diagram Generation](#diagram-generation)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
   * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
+  * satisfiedBy: [Mermaid Diagram Style Specification](Specifications.md#mermaid-diagram-style-specification)
 ---
 
 ### Diagram Generation
@@ -189,67 +150,24 @@ The `change-impact` command shall continue to use GitHub blob URLs by default (u
 
 ### SysML-Compatible Relationship Rendering
 
-The system shall implement a relationship rendering engine that adheres to SysML notation standards, defining specific arrow styles, line types, and visual properties for each relationship type to ensure diagram consistency and standards compliance.
+The system shall implement a relationship rendering engine that adheres to SysML notation standards following clearly defined specifications, ensuring diagram consistency and standards compliance.
 
 #### Details
-The visual representation and direction of relationships in diagrams aligns with the SysML specification.
-Each relationship is represented using SysML standard notation with a specified arrow direction.
-derive (Forward):
-- Definition: Links a parent element to child elements derived from it.
-- Notation: Dashed arrow with an open arrowhead.
-- Arrow Direction: Parent → Child (derived)
-- Used when: Parent element wants to show its derived children
+The system shall render relationships using:
+- SysML stereotypes («deriveReqt», «verify», «satisfy», «trace»)
+- Appropriate line styles (dashed or solid)
+- Open (hollow) arrowheads
+- Correct arrow directions based on hierarchy semantics
 
-derivedFrom (Backward):
-- Definition: Links a child element to the parent element it is derived from.
-- Notation: Dashed arrow with an open arrowhead.
-- Arrow Direction: Child → Parent (source)
-- Used when: Child element references its source parent
+Each relation type has specific visual properties and directional semantics defined in the specification.
 
-verify (Backward):
-- Definition: Links a verification artifact to the requirement it verifies.
-- Notation: Dashed arrow with an open arrowhead.
-- Arrow Direction: Verification → Requirement
-- Used when: Test/verification references the requirement it validates
-
-verifiedBy (Forward):
-- Definition: Links a requirement to verification artifacts.
-- Notation: Dashed arrow with an open arrowhead.
-- Arrow Direction: Requirement → Verification
-- Used when: Requirement shows how it's verified
-
-satisfy (Backward):
-- Definition: Links an implementation to the requirement it satisfies.
-- Notation: Solid arrow with an open arrowhead.
-- Arrow Direction: Implementation → Requirement
-- Used when: Implementation references the requirement it satisfies
-
-satisfiedBy (Forward):
-- Definition: Links a requirement to elements that satisfy it.
-- Notation: Solid arrow with an open arrowhead.
-- Arrow Direction: Requirement → Implementation
-- Used when: Requirement shows how it's implemented
-
-trace (Neutral):
-- Definition: Shows a general traceability relationship without implying hierarchy.
-- Notation: Dashed arrow with an open arrowhead.
-- Arrow Direction: Tracing → Traced (neutral)
-- Used when: Simple traceability connection is needed
-
-**Summary Table**
-| Relation        | Stereotype     | Line style            | Arrowhead               | Arrow Direction                   | Hierarchy Direction |
-|-----------------|----------------|-----------------------|-------------------------|-----------------------------------|-------------------- |
-| **derive**      | «deriveReqt»   | dashed dependency     | open (hollow) arrowhead | Parent → Child (derived)          | Forward             |
-| **derivedFrom** | «deriveReqt»   | dashed dependency     | open (hollow) arrowhead | Child → Parent (source)           | Backward            |
-| **satisfy**     | «satisfy»      | solid dependency      | open (hollow) arrowhead | Implementation → Requirement      | Backward            |
-| **satisfiedBy** | «satisfy»      | solid dependency      | open (hollow) arrowhead | Requirement → Implementation      | Forward             |
-| **verify**      | «verify»       | dashed dependency     | open (hollow) arrowhead | Verification → Requirement        | Backward            |
-| **verifiedBy**  | «verify»       | dashed dependency     | open (hollow) arrowhead | Requirement → Verification        | Forward             |
-| **trace**       | «trace»        | dashed dependency     | open (hollow) arrowhead | Tracing → Traced (neutral)        | Forward             |
+#### Attachments
+  * [SysML Rendering Specification](Specifications.md#sysml-rendering-specification)
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [SysML Rendering Specification](Specifications.md#sysml-rendering-specification)
 ---
 
 ### Model Visualization and Exploration

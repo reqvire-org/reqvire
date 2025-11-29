@@ -795,6 +795,13 @@ blockquote {
       click 6b3462d7df6e97c7 &quot;Verifications/WebInterfaceVerifications.html#serve-command-verification&quot;;
     end
   end
+  subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
+    subgraph d9d3d619c8b2406e[&quot;📄 Specifications.md&quot;]
+      8a232f071d3fa417[&quot;Color Scheme Specification&quot;];
+      class 8a232f071d3fa417 default;
+      click 8a232f071d3fa417 &quot;../System/Output/Specifications.html#color-scheme-specification&quot;;
+    end
+  end
   345c82cd34408acb[&quot;export.rs&quot;];
   class 345c82cd34408acb default;
   click 345c82cd34408acb &quot;../../core/src/export.rs&quot;;
@@ -860,6 +867,7 @@ blockquote {
   17774b4ce265515 -->|satisfiedBy| 2ab7d933a525a383;
   17774b4ce265515 -->|satisfiedBy| d0e6cc47b904faa5;
   17774b4ce265515 -->|satisfiedBy| 3a807a8535fb41fa;
+  17774b4ce265515 -->|satisfiedBy| 8a232f071d3fa417;
   443f72e06773b2fa[&quot;test.sh&quot;];
   class 443f72e06773b2fa default;
   click 443f72e06773b2fa &quot;../../tests/test-attachment-export/test.sh&quot;;
@@ -1094,82 +1102,21 @@ The system shall design and implement HTML pages with consistent layout, styling
 </ul>
 <hr />
 <h3 id="web-interface-color-scheme">Web Interface Color Scheme</h3>
-<p>The system shall implement a consistent color scheme across all HTML pages optimized for MBSE and requirements management applications.</p>
+<p>The system shall implement a consistent color scheme across all HTML pages following clearly defined specifications optimized for MBSE and requirements management applications.</p>
 <h4>Details</h4>
-<p><strong>Primary Colors:</strong>
-| Color Name | Hex Code | Usage |
-|————|–––––|—––|
-| Indigo | #3F51B5 | Navigation bar background, primary branding |
-| Indigo Hover | #7986CB | Navigation hover states (lighter for visibility) |
-| Indigo Active | #303F9F | Navigation active/pressed states |
-| Off-White | #FAFAFA | Body background - reduces eye strain |
-| White | #FFFFFF | Content background, navigation text |</p>
-<p><strong>Element Type Colors:</strong>
-The web interface shall use consistent colors matching the diagram color scheme:
-| Element Type | Color Name | Hex Code | Usage |
-|–––––––|————|–––––|—––|
-| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
-| Verification | Emerald Green | #4CAF50 | Validation criteria, testing completion |
-| Other | Cool Gray | #9E9E9E | Other element types, external dependencies |</p>
-<p><strong>Status Indicator Colors:</strong>
-| Status | Color Name | Hex Code | Usage |
-|––––|————|–––––|—––|
-| Verified/Passing | Forest Green | #4CAF50 | Verified requirements, passing tests |
-| Pending/Warning | Amber | #FFB74D | Unverified items, warnings |
-| Failed/Error | Red | #F44336 | Error messages, validation errors |</p>
-<p><strong>Interactive State Colors:</strong>
-| State | Color | Hex Code | Usage |
-|—––|—––|–––––|—––|
-| Hover Highlight | Peach | #FFAB91 | Diagram node/edge hover effect |
-| Node Hover Shadow | Peach (70%) | rgba(255,171,145,0.7) | Soft drop-shadow on node hover |
-| Link Color | Indigo | #3F51B5 | Hyperlinks (matches nav bar, font-weight: 500) |
-| Link Hover | Indigo | #3F51B5 | Hyperlinks with underline on hover |
-| Nav Hover | Light Indigo | #7986CB | Navigation item hover background |</p>
-<p><strong>Border Colors:</strong>
-| Element | Hex Code | Usage |
-|———|–––––|—––|
-| Header Borders | #EEEEEE | H1/H2 underlines |
-| Table Borders | #EEEEEE | Tables, content separation |
-| Content Border | #E0E0E0 | Content card borders |
-| Code Background | #f6f8fa | Code blocks |
-| Diagram Canvas | #FAFAFA | Mermaid diagram background |</p>
-<p><strong>Typography:</strong></p>
+<p>The color scheme shall provide:</p>
 <ul>
-<li>Primary font: System font stack (sans-serif)</li>
-<li>Monospace font: For code blocks and element identifiers</li>
-<li>Line height: 1.6 for content readability</li>
-<li>Primary text: #212121 (dark gray - headings)</li>
-<li>Secondary text: #424242 (medium gray - body)</li>
-<li>Muted text: #757575 (light gray - de-emphasized)</li>
+<li>Primary branding colors for navigation and UI elements</li>
+<li>Element type-specific colors for visual differentiation</li>
+<li>Status indicator colors for verification and error states</li>
+<li>Interactive state colors for hover effects and links</li>
+<li>D3.js containment tree node styling with type-specific icons</li>
 </ul>
-<p><strong>Layout:</strong></p>
+<p>The system shall ensure color consistency between:</p>
 <ul>
-<li>Navigation bar: Fixed position, full width, 50px height</li>
-<li>Content container: Centered with max-width 95% for readability</li>
-<li>Content card: White background with subtle border and shadow</li>
-<li>Responsive design: Adapts to different screen sizes</li>
-<li>Box shadows: rgba(0,0,0,0.08) for subtle depth</li>
-</ul>
-<p><strong>D3.js Containment Tree Colors:</strong>
-The containment tree shall use consistent colors for node types:
-| Node Type | Color | Hex Code | Icon |
-|———–|—––|–––––|——|
-| folder | Gray | #9E9E9E | 📁 |
-| file | Yellow | #FFCA28 | 📄 |
-| user-requirement | Purple | #7E57C2 | 👤 |
-| system-requirement | Deep Purple | #673AB7 | 📐 |
-| requirement | Deep Purple | #673AB7 | 📐 |
-| verification | Green | #4CAF50 | ✅ |
-| refinement | Orange | #FF9800 | 🔧 |
-| design-document | Brown | #8D6E63 | 📝 |
-| attachment-element | Orange | #FF9800 | 🔧 |
-| attachment-file | Blue Gray | #607D8B | 📎 |</p>
-<p><strong>D3.js Tree Styling:</strong></p>
-<ul>
-<li>Meta nodes (attachments): Smaller circles (r=4), italic 11px font, 85% opacity</li>
-<li>Regular nodes: Standard circles (r=6), normal 13px font</li>
-<li>Tree animations: Smooth transitions for expand/collapse</li>
-<li>Node hover: Cursor pointer for interactive nodes</li>
+<li>HTML page styling</li>
+<li>Mermaid diagram rendering</li>
+<li>D3.js containment tree visualization</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
@@ -1182,6 +1129,7 @@ The containment tree shall use consistent colors for node types:
 <li>satisfiedBy: <a href="../../core/src/containment.rs">containment.rs</a></li>
 <li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
 <li>satisfiedBy: <a href="../../core/templates/base.html">base.html</a></li>
+<li>satisfiedBy: <a href="../System/Output/Specifications.html#color-scheme-specification">Color Scheme Specification</a></li>
 </ul>
 <hr />
 <h3 id="serve-command">Serve Command</h3>

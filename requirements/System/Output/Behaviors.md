@@ -45,3 +45,35 @@ Short mode reduces output verbosity for quick scanning:
 #### Metadata
   * type: behavior
 ---
+
+### Verification Coverage Philosophy Behavior
+
+Coverage evaluation philosophy for verification reporting.
+
+#### Details
+**Leaf Requirements (MUST be verified):**
+- Requirements that don't derive other requirements
+- Must have verifiedBy relations to verification artifacts
+- Verification gaps are flagged in coverage reports
+
+**Parent/Intermediate Requirements (MAY be verified):**
+- Requirements that derive other requirements
+- Optional verification since leaf verifications may cover them
+- System engineers responsible for ensuring verification scopes are sufficient
+
+**Verification Relationships:**
+- One verification may verify multiple leaf requirements (N:1)
+- Change impact propagates from parent to leaf requirements and verifications
+- AI systems can help create comprehensive verification scopes and prevent overlap
+
+**Roll-up Strategy:**
+- Leaf requirement verification provides coverage for parent requirements
+- Parent verification is redundant if all derived leaves are verified
+- Coverage percentages focus on leaf requirement verification status
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Verification Coverage Report](Reporting.md#verification-coverage-report)
+---

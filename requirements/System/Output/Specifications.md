@@ -2,7 +2,7 @@
 
 ### Color Scheme Specification
 
-Color coding for terminal and HTML output.
+Comprehensive color coding for terminal output, HTML export, and diagram generation.
 
 #### Details
 **Terminal Colors (ANSI):**
@@ -14,17 +14,55 @@ Color coding for terminal and HTML output.
 | Cyan | Info | Element names, identifiers |
 | White/Default | Normal | Regular content |
 
-**HTML Export Colors:**
-| Element | Hex | Usage |
-|---------|-----|-------|
-| Requirement | #D0E0FF | Requirement elements |
-| Verification | #FFF7B3 | Verification elements |
-| Implementation | #DFFFD0 | satisfiedBy targets |
-| File node | #B8860B | File containers |
-| Folder node | #4A90D9 | Folder containers |
+**Primary Colors (HTML):**
+| Color Name | Hex Code | Usage |
+|------------|----------|-------|
+| Indigo | #3F51B5 | Navigation bar background, primary branding |
+| Indigo Hover | #7986CB | Navigation hover states |
+| Indigo Active | #303F9F | Navigation active/pressed states |
+| Off-White | #FAFAFA | Body background |
+| White | #FFFFFF | Content background, navigation text |
+
+**Element Type Colors:**
+| Element Type | Color Name | Hex Code | Usage |
+|--------------|------------|----------|-------|
+| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
+| User Requirement | Light Purple | #7E57C2 | User-level requirements |
+| Verification | Emerald Green | #4CAF50 | Validation criteria, testing |
+| Refinement | Orange | #FF9800 | Behaviors, constraints, specifications |
+| Other | Cool Gray | #9E9E9E | Other element types |
+
+**Status Indicator Colors:**
+| Status | Color Name | Hex Code | Usage |
+|--------|------------|----------|-------|
+| Verified/Passing | Forest Green | #4CAF50 | Verified requirements, passing tests |
+| Pending/Warning | Amber | #FFB74D | Unverified items, warnings |
+| Failed/Error | Red | #F44336 | Error messages, validation errors |
+
+**Interactive State Colors:**
+| State | Hex Code | Usage |
+|-------|----------|-------|
+| Hover Highlight | #FFAB91 | Diagram node/edge hover effect |
+| Node Hover Shadow | rgba(255,171,145,0.7) | Drop-shadow on node hover |
+| Link Color | #3F51B5 | Hyperlinks |
+
+**D3.js Containment Tree Colors:**
+| Node Type | Hex Code | Icon |
+|-----------|----------|------|
+| folder | #9E9E9E | 📁 |
+| file | #FFCA28 | 📄 |
+| user-requirement | #7E57C2 | 👤 |
+| requirement | #673AB7 | 📐 |
+| verification | #4CAF50 | ✅ |
+| refinement | #FF9800 | 🔧 |
+| design-document | #8D6E63 | 📝 |
+| attachment-file | #607D8B | 📎 |
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * satisfy: [Web Interface Color Scheme](../../Interfaces/WebInterface.md#web-interface-color-scheme)
 ---
 
 ### Diff Output Format Specification
@@ -157,6 +195,12 @@ Style guidelines for markdown text report output (model, coverage, traces, conta
 Styling conventions for Mermaid diagrams in CLI output and HTML export.
 
 #### Details
+**Containment Structure:**
+- Folder subgraphs: `subgraph hashId["folder-icon Folder Name"]`
+- File subgraphs: `subgraph hashId["file-icon File Name"]`
+- Elements rendered inside their containing file subgraph
+- Collapsible in interactive mode
+
 **Node Shapes:**
 | Element Type | Shape | Example |
 |--------------|-------|---------|
@@ -165,30 +209,83 @@ Styling conventions for Mermaid diagrams in CLI output and HTML export.
 | File | Folder shape | `{{File.md}}` |
 | Folder | Hexagon | `{{folder/}}` |
 
-**Edge Styles:**
-| Relation | Line Style | Arrow |
-|----------|------------|-------|
-| derivedFrom | Solid | Arrow |
-| verifiedBy | Dashed | Arrow |
-| satisfiedBy | Dotted | Arrow |
-| trace | Dotted | No arrow |
+**Diagram Node Classes (CSS):**
+| Class Name | Fill Color | Stroke Color | Usage |
+|------------|------------|--------------|-------|
+| userRequirement | #D1C4E9 | #7E57C2 | Top-level user requirements |
+| systemRequirement | #E1D8EE | #673AB7 | System-level requirements |
+| requirement | #ECEFF1 | #673AB7 | Generic requirements |
+| verified | #D1C4E9 | #7E57C2 | Directly verified requirements |
+| verification | #DCEDC8 | #4CAF50 | Verification elements |
+| folder | #FAFAFA | #9E9E9E | Folder containers |
+| file | #FFFFFF | #9E9E9E | File containers |
+| attachment | #EFEBE9 | #8D6E63 | Design documents |
+| impacted | #FFAAAA | - | Change impact nodes |
+| changed | #FFDD57 | - | Changed nodes |
 
-**Colors (CSS Classes):**
-| Class | Color | Usage |
-|-------|-------|-------|
-| requirement | #D0E0FF | Requirement nodes |
-| verification | #FFF7B3 | Verification nodes |
-| implementation | #DFFFD0 | Implementation nodes |
-| impacted | #FFAAAA | Change impact nodes |
-| changed | #FFDD57 | Changed nodes |
+**Relation Line Styles:**
+| Relation Type | Color | Line Style |
+|---------------|-------|------------|
+| Derive/DerivedFrom | #673AB7 | Dashed |
+| Verify/VerifiedBy | #4CAF50 | Dashed |
+| Satisfy/SatisfiedBy | #673AB7 | Solid |
+| Trace | #9E9E9E | Dashed |
 
-**Subgraph Styling:**
-- Folders as subgraphs with light gray background
-- Files as nested subgraphs
-- Collapsible in interactive mode
+**Interactive Highlighting:**
+| Effect | Implementation |
+|--------|----------------|
+| Hovered node | drop-shadow(0 0 8px rgba(255,171,145,0.7)) |
+| Connected edges | stroke: #FFAB91, increased width |
+
+**Diagram Background:**
+- Canvas: #FAFAFA (off-white)
+- Border: 1px solid #EEEEEE
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * satisfy: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
+---
+
+### SysML Rendering Specification
+
+SysML notation standards for relationship rendering in diagrams.
+
+#### Details
+Each relationship type is represented using SysML standard notation with specific arrow direction.
+
+**Derive Relations:**
+| Relation | Stereotype | Line Style | Arrow Direction |
+|----------|------------|------------|-----------------|
+| derive | «deriveReqt» | dashed | Parent → Child (derived) |
+| derivedFrom | «deriveReqt» | dashed | Child → Parent (source) |
+
+**Verify Relations:**
+| Relation | Stereotype | Line Style | Arrow Direction |
+|----------|------------|------------|-----------------|
+| verify | «verify» | dashed | Verification → Requirement |
+| verifiedBy | «verify» | dashed | Requirement → Verification |
+
+**Satisfy Relations:**
+| Relation | Stereotype | Line Style | Arrow Direction |
+|----------|------------|------------|-----------------|
+| satisfy | «satisfy» | solid | Implementation → Requirement |
+| satisfiedBy | «satisfy» | solid | Requirement → Implementation |
+
+**Trace Relations:**
+| Relation | Stereotype | Line Style | Arrow Direction |
+|----------|------------|------------|-----------------|
+| trace | «trace» | dashed | Tracing → Traced (neutral) |
+
+**Arrowhead Style:**
+All relation types use open (hollow) arrowheads per SysML specification.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [SysML-Compatible Relationship Rendering](DiagramGeneration.md#sysml-compatible-relationship-rendering)
 ---
 
 ### Text Output Formatting

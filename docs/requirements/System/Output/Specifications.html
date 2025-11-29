@@ -755,6 +755,9 @@ blockquote {
       efd4d3e5c9cdc0ee[&quot;Mermaid Diagram Style Specification&quot;];
       class efd4d3e5c9cdc0ee default;
       click efd4d3e5c9cdc0ee &quot;Specifications.html#mermaid-diagram-style-specification&quot;;
+      fd4205ffbc1a9490[&quot;SysML Rendering Specification&quot;];
+      class fd4205ffbc1a9490 default;
+      click fd4205ffbc1a9490 &quot;Specifications.html#sysml-rendering-specification&quot;;
       841395435f901267[&quot;Text Output Formatting&quot;];
       class 841395435f901267 default;
       click 841395435f901267 &quot;Specifications.html#text-output-formatting&quot;;
@@ -762,7 +765,7 @@ blockquote {
   end
 </div>
 <h3 id="color-scheme-specification">Color Scheme Specification</h3>
-<p>Color coding for terminal and HTML output.</p>
+<p>Comprehensive color coding for terminal output, HTML export, and diagram generation.</p>
 <h4>Details</h4>
 <p><strong>Terminal Colors (ANSI):</strong>
 | Color | Meaning | Usage |
@@ -772,17 +775,52 @@ blockquote {
 | Green | Success | Added content, passed checks |
 | Cyan | Info | Element names, identifiers |
 | White/Default | Normal | Regular content |</p>
-<p><strong>HTML Export Colors:</strong>
-| Element | Hex | Usage |
-|———|—–|—––|
-| Requirement | #D0E0FF | Requirement elements |
-| Verification | #FFF7B3 | Verification elements |
-| Implementation | #DFFFD0 | satisfiedBy targets |
-| File node | #B8860B | File containers |
-| Folder node | #4A90D9 | Folder containers |</p>
+<p><strong>Primary Colors (HTML):</strong>
+| Color Name | Hex Code | Usage |
+|————|–––––|—––|
+| Indigo | #3F51B5 | Navigation bar background, primary branding |
+| Indigo Hover | #7986CB | Navigation hover states |
+| Indigo Active | #303F9F | Navigation active/pressed states |
+| Off-White | #FAFAFA | Body background |
+| White | #FFFFFF | Content background, navigation text |</p>
+<p><strong>Element Type Colors:</strong>
+| Element Type | Color Name | Hex Code | Usage |
+|–––––––|————|–––––|—––|
+| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
+| User Requirement | Light Purple | #7E57C2 | User-level requirements |
+| Verification | Emerald Green | #4CAF50 | Validation criteria, testing |
+| Refinement | Orange | #FF9800 | Behaviors, constraints, specifications |
+| Other | Cool Gray | #9E9E9E | Other element types |</p>
+<p><strong>Status Indicator Colors:</strong>
+| Status | Color Name | Hex Code | Usage |
+|––––|————|–––––|—––|
+| Verified/Passing | Forest Green | #4CAF50 | Verified requirements, passing tests |
+| Pending/Warning | Amber | #FFB74D | Unverified items, warnings |
+| Failed/Error | Red | #F44336 | Error messages, validation errors |</p>
+<p><strong>Interactive State Colors:</strong>
+| State | Hex Code | Usage |
+|—––|–––––|—––|
+| Hover Highlight | #FFAB91 | Diagram node/edge hover effect |
+| Node Hover Shadow | rgba(255,171,145,0.7) | Drop-shadow on node hover |
+| Link Color | #3F51B5 | Hyperlinks |</p>
+<p><strong>D3.js Containment Tree Colors:</strong>
+| Node Type | Hex Code | Icon |
+|———–|–––––|——|
+| folder | #9E9E9E | 📁 |
+| file | #FFCA28 | 📄 |
+| user-requirement | #7E57C2 | 👤 |
+| requirement | #673AB7 | 📐 |
+| verification | #4CAF50 | ✅ |
+| refinement | #FF9800 | 🔧 |
+| design-document | #8D6E63 | 📝 |
+| attachment-file | #607D8B | 📎 |</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="../../Interfaces/WebInterface.html#web-interface-color-scheme">Web Interface Color Scheme</a></li>
 </ul>
 <hr />
 <h3 id="diff-output-format-specification">Diff Output Format Specification</h3>
@@ -915,6 +953,13 @@ blockquote {
 <h3 id="mermaid-diagram-style-specification">Mermaid Diagram Style Specification</h3>
 <p>Styling conventions for Mermaid diagrams in CLI output and HTML export.</p>
 <h4>Details</h4>
+<p><strong>Containment Structure:</strong></p>
+<ul>
+<li>Folder subgraphs: <code>subgraph hashId[&quot;folder-icon Folder Name&quot;]</code></li>
+<li>File subgraphs: <code>subgraph hashId[&quot;file-icon File Name&quot;]</code></li>
+<li>Elements rendered inside their containing file subgraph</li>
+<li>Collapsible in interactive mode</li>
+</ul>
 <p><strong>Node Shapes:</strong>
 | Element Type | Shape | Example |
 |–––––––|—––|———|
@@ -922,30 +967,77 @@ blockquote {
 | Verification | Stadium | <code>([Verification Name])</code> |
 | File | Folder shape | <code>{{File.md}}</code> |
 | Folder | Hexagon | <code>{{folder/}}</code> |</p>
-<p><strong>Edge Styles:</strong>
-| Relation | Line Style | Arrow |
-|–––––|————|—––|
-| derivedFrom | Solid | Arrow |
-| verifiedBy | Dashed | Arrow |
-| satisfiedBy | Dotted | Arrow |
-| trace | Dotted | No arrow |</p>
-<p><strong>Colors (CSS Classes):</strong>
-| Class | Color | Usage |
-|—––|—––|—––|
-| requirement | #D0E0FF | Requirement nodes |
-| verification | #FFF7B3 | Verification nodes |
-| implementation | #DFFFD0 | Implementation nodes |
-| impacted | #FFAAAA | Change impact nodes |
-| changed | #FFDD57 | Changed nodes |</p>
-<p><strong>Subgraph Styling:</strong></p>
+<p><strong>Diagram Node Classes (CSS):</strong>
+| Class Name | Fill Color | Stroke Color | Usage |
+|————|————|–––––––|—––|
+| userRequirement | #D1C4E9 | #7E57C2 | Top-level user requirements |
+| systemRequirement | #E1D8EE | #673AB7 | System-level requirements |
+| requirement | #ECEFF1 | #673AB7 | Generic requirements |
+| verified | #D1C4E9 | #7E57C2 | Directly verified requirements |
+| verification | #DCEDC8 | #4CAF50 | Verification elements |
+| folder | #FAFAFA | #9E9E9E | Folder containers |
+| file | #FFFFFF | #9E9E9E | File containers |
+| attachment | #EFEBE9 | #8D6E63 | Design documents |
+| impacted | #FFAAAA | - | Change impact nodes |
+| changed | #FFDD57 | - | Changed nodes |</p>
+<p><strong>Relation Line Styles:</strong>
+| Relation Type | Color | Line Style |
+|—————|—––|————|
+| Derive/DerivedFrom | #673AB7 | Dashed |
+| Verify/VerifiedBy | #4CAF50 | Dashed |
+| Satisfy/SatisfiedBy | #673AB7 | Solid |
+| Trace | #9E9E9E | Dashed |</p>
+<p><strong>Interactive Highlighting:</strong>
+| Effect | Implementation |
+|––––|––––––––|
+| Hovered node | drop-shadow(0 0 8px rgba(255,171,145,0.7)) |
+| Connected edges | stroke: #FFAB91, increased width |</p>
+<p><strong>Diagram Background:</strong></p>
 <ul>
-<li>Folders as subgraphs with light gray background</li>
-<li>Files as nested subgraphs</li>
-<li>Collapsible in interactive mode</li>
+<li>Canvas: #FAFAFA (off-white)</li>
+<li>Border: 1px solid #EEEEEE</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="sysml-rendering-specification">SysML Rendering Specification</h3>
+<p>SysML notation standards for relationship rendering in diagrams.</p>
+<h4>Details</h4>
+<p>Each relationship type is represented using SysML standard notation with specific arrow direction.</p>
+<p><strong>Derive Relations:</strong>
+| Relation | Stereotype | Line Style | Arrow Direction |
+|–––––|————|————|—————–|
+| derive | «deriveReqt» | dashed | Parent → Child (derived) |
+| derivedFrom | «deriveReqt» | dashed | Child → Parent (source) |</p>
+<p><strong>Verify Relations:</strong>
+| Relation | Stereotype | Line Style | Arrow Direction |
+|–––––|————|————|—————–|
+| verify | «verify» | dashed | Verification → Requirement |
+| verifiedBy | «verify» | dashed | Requirement → Verification |</p>
+<p><strong>Satisfy Relations:</strong>
+| Relation | Stereotype | Line Style | Arrow Direction |
+|–––––|————|————|—————–|
+| satisfy | «satisfy» | solid | Implementation → Requirement |
+| satisfiedBy | «satisfy» | solid | Requirement → Implementation |</p>
+<p><strong>Trace Relations:</strong>
+| Relation | Stereotype | Line Style | Arrow Direction |
+|–––––|————|————|—————–|
+| trace | «trace» | dashed | Tracing → Traced (neutral) |</p>
+<p><strong>Arrowhead Style:</strong>
+All relation types use open (hollow) arrowheads per SysML specification.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="DiagramGeneration.html#sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</a></li>
 </ul>
 <hr />
 <h3 id="text-output-formatting">Text Output Formatting</h3>
