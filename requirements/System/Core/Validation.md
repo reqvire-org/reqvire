@@ -161,8 +161,10 @@ The consistency validator shall verify:
 
 Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.
 
+#### Attachments
+  * [ElementIdentity.md](DesignDocuments/ElementIdentity.md)
+
 #### Relations
-  * derivedFrom: [Element Identity Model](StructureAndParsing.md#element-identity-model)
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
@@ -215,9 +217,11 @@ The system shall validate relation types and allow only supported types.
 #### Metadata
   * type: user-requirement
 
+#### Attachments
+  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
+
 #### Relations
   * derive: [Relation Element Type Validator](#relation-element-type-validator)
-  * derivedFrom: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
   * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
 ---
@@ -237,8 +241,10 @@ The validator enforces the constraints defined in the [Element Type Relation Com
 - Refinement types (`constraint`, `behavior`, `specification`) cannot have Relations subsections
 - Warnings should be issued when relation endpoints have incompatible element types
 
+#### Attachments
+  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
+
 #### Relations
-  * derivedFrom: [Element Type Relation Compatibility](ModelManagement.md#element-type-relation-compatibility)
   * derivedFrom: [Validate Relation Types](#validate-relation-types)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)

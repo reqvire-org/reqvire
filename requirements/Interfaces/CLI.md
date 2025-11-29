@@ -223,6 +223,7 @@ The command shall:
 Command output shall be written to stdout for easy redirection to files.
 
 #### Attachments
+  * [Verification Type Categories Specification](../System/Core/Specifications.md#verification-type-categories-specification)
   * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
   * [Text Output Formatting](../System/Output/Specifications.md#text-output-formatting)
 
@@ -526,6 +527,7 @@ Default output:
 - Full detail mode showing all element metadata and relations
 
 #### Attachments
+  * [Supported Element Types Specification](../System/Core/Specifications.md#supported-element-types-specification)
   * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
   * [Short Mode Behavior](../System/Output/Behaviors.md#short-mode-behavior)
   * [Text Output Formatting](../System/Output/Specifications.md#text-output-formatting)

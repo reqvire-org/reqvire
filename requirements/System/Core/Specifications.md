@@ -61,3 +61,82 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
 #### Relations
   * satisfy: [Ignore Files Integration](Configuration.md#ignore-files-integration)
 ---
+
+### Supported Element Types Specification
+
+Element types supported by the system for classification and behavior determination.
+
+#### Details
+Element types are identified through a reserved `type` metadata property in the `#### Metadata` subsection.
+
+**Requirement Types:**
+
+| Type | Description |
+|------|-------------|
+| `requirement` | System requirement (default type if not specified) |
+| `user-requirement` | User requirement representing stakeholder needs |
+
+**Verification Types:**
+
+| Type | Description |
+|------|-------------|
+| `verification` | Verification through testing (equivalent to `test-verification`) |
+| `test-verification` | Explicit verification through testing with documented test procedures |
+| `analysis-verification` | Verification through formal analysis of documentation or code |
+| `inspection-verification` | Verification through formal inspection or review |
+| `demonstration-verification` | Verification through demonstration in a realistic environment |
+
+**Refinement Types:**
+
+| Type | Description | Constraints |
+|------|-------------|-------------|
+| `constraint` | Documents constraints that limit or bound the system | Only `satisfy` relations allowed |
+| `behavior` | Documents behavior details and operational specifications | Only `satisfy` relations allowed |
+| `specification` | Documents detailed specifications and technical descriptions | Only `satisfy` relations allowed |
+
+**Other Types:**
+
+| Type | Description |
+|------|-------------|
+| `other` | Custom element types defined by users |
+
+**Usage Example:**
+To specify an element type, add a Metadata subsection with the type property:
+`* type: user-requirement`
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Supported Element Types](ModelManagement.md#supported-element-types)
+---
+
+### Verification Type Categories Specification
+
+Supported verification types and their usage guidelines.
+
+#### Details
+**Default Verification Type:**
+- `verification` - Verification through testing (equivalent to `test-verification`)
+
+**Specific Verification Types:**
+
+| Type | Description | Use When |
+|------|-------------|----------|
+| `test-verification` | Explicit verification through testing with documented test procedures | Formal test procedures with expected outcomes are required |
+| `analysis-verification` | Verification through formal analysis of documentation or code | Requirements can be verified through analysis of documentation or code |
+| `inspection-verification` | Verification through formal inspection or review | Requirements can be verified through review of artifacts |
+| `demonstration-verification` | Verification through demonstration in a realistic environment | Requirements can be verified by demonstrating functionality |
+
+**Type Selection Guidelines:**
+- **Test-verification**: Quantitative requirements, functional behavior, performance criteria
+- **Analysis-verification**: Design constraints, architectural requirements, compliance with standards
+- **Inspection-verification**: Documentation requirements, labeling, configuration settings
+- **Demonstration-verification**: User-facing features, workflow requirements, integration scenarios
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Verification Type Categories](ModelManagement.md#verification-type-categories)
+---

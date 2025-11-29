@@ -14,10 +14,12 @@ Change impact detection encompasses:
 - Refinement element content changes (hash changes) shall propagate change impact through the model via their attachment relationships
 - Attachment identifier location changes (moved/renamed Refinement elements) shall be reported but do NOT propagate impact (same behavior as relation relocations)
 
+#### Attachments
+  * [ElementIdentity.md](../Core/DesignDocuments/ElementIdentity.md)
+
 #### Relations
   * derive: [Requirements Change Propagation](#requirements-change-propagation)
   * derive: [Structural Change Analyzer](#structural-change-analyzer)
-  * derivedFrom: [Element Identity Model](../Core/StructureAndParsing.md#element-identity-model)
   * derivedFrom: [Tracing Structural Changes](../Output/Reporting.md#tracing-structural-changes)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
   * verifiedBy: [Attachments Change Impact Verification](../Core/Verifications/AttachmentsVerifications.md#attachments-change-impact-verification)

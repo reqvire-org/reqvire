@@ -174,48 +174,35 @@ The system shall define element type relation compatibility constraints.
 
 ### Supported Element Types
 
-The system shall support predefined element types for classification and behavior determination.
+The system shall support predefined element types for classification and behavior determination following clearly defined specifications.
 
-#### Details
-Element types are identified through a reserved "type" metadata property. The following types are supported:
-
-1. **requirement**: System requirement
-2. **user-requirement**: User requirement
-3. **verification**: For verification tests and validation procedures (equivalent to test-verification)
-4. **test-verification**: For verification tests and validation procedures
-5. **analysis-verification**: For verification through formal analysis of documentation or code
-6. **inspection-verification**: For verification through formal inspection or review
-7. **demonstration-verification**: For verification through demonstration in a realistic environment
-8. **constraint**: Refinement documenting constraints that limit or bound the system
-9. **behavior**: Refinement documenting behavior details and operational specifications
-10. **specification**: Refinement documenting detailed specifications and technical descriptions
-11. **other**: Custom element types defined by users
-
-**Note:** Refinement types (constraint, behavior, specification) cannot have a Relations subsection. These elements serve as detailed documentation that can be attached to other elements.
-
-**Relation constraints:** Each element type has specific constraints on which relation types it can use. See [Element Type Relation Compatibility](DesignDocuments/RelationTypes.md#element-type-relation-compatibility) for the complete compatibility matrix.
+#### Attachments
+  * [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
 
 #### Relations
   * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
   * derive: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
-  * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
   * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
   * verifiedBy: [Refinement Element Type Parsing Test](Verifications/ParsingVerifications.md#refinement-element-type-parsing-test)
 ---
 
 ### Refinement Element Structure Constraints
 
-The system shall reject Refinement elements (constraint, behavior, specification) that include a Relations subsection during validation.
+The system shall restrict Refinement elements (constraint, behavior, specification) to only allow `satisfy` relations.
 
 #### Details
-Refinement elements serve as detailed documentation that can be attached to other elements. They are not allowed to have relations because:
-- They represent atomic pieces of information without traceability relationships
-- They are referenced through the Attachments subsection of other elements
-- Their content contributes to the parent element's documentation
+Refinement elements serve as detailed documentation that can be attached to other elements. Their relation usage is restricted because:
+- They represent atomic pieces of information focused on documenting requirements
+- They are primarily referenced through the Attachments subsection of other elements
+- Their `satisfy` relation links back to the requirement they fulfill
 
-When a Refinement element contains a Relations subsection, the validator shall report an error indicating that relations are not allowed for this element type.
+When a Refinement element contains relations other than `satisfy`, the validator shall report an error indicating that only `satisfy` relations are allowed for refinement types.
+
+#### Attachments
+  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
 
 #### Relations
   * derivedFrom: [Supported Element Types](#supported-element-types)
@@ -253,26 +240,11 @@ The system discovers all available templates in the repository and allows the us
 
 ### Verification Type Categories
 
-The system shall support defined verifications categories.
+The system shall support defined verification categories following clearly defined specifications.
 
-#### Details
-The following verification types are supported:
-
-1. **Default Verification Type**
-   - `verification` - Verification through testing (equivalent to `test-verification`)
-
-2. **Specific Verification Types**
-   - `test-verification` - Explicit verification through testing with documented test procedures
-   - `analysis-verification` - Verification through formal analysis of documentation or code
-   - `inspection-verification` - Verification through formal inspection or review
-   - `demonstration-verification` - Verification through demonstration in a realistic environment
-
-The appropriate verification type should be selected based on the nature of the requirement:
-- **Test-verification**: Used when formal test procedures with expected outcomes are required
-- **Analysis-verification**: Used when requirements can be verified through analysis of documentation or code
-- **Inspection-verification**: Used when requirements can be verified through review of artifacts
-- **Demonstration-verification**: Used when requirements can be verified by demonstrating functionality
+#### Attachments
+  * [Verification Type Categories Specification](Specifications.md#verification-type-categories-specification)
 
 #### Relations
-  * derivedFrom: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
+  * satisfiedBy: [Verification Type Categories Specification](Specifications.md#verification-type-categories-specification)
 ---
