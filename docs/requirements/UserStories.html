@@ -804,7 +804,7 @@ blockquote {
       66091f40428d6d66[&quot;Element Manipulation Operations&quot;];
       class 66091f40428d6d66 userRequirement;
       click 66091f40428d6d66 &quot;System/Core/ModelManagement.html#element-manipulation-operations&quot;;
-      ba66a4ed15581f23[&quot;Git Repository as Project Root&quot;];
+      ba66a4ed15581f23[&quot;Git Repository as Project Root<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/System/Core/Behaviors.md#subdirectory-auto-detection-behavior&quot;];
       class ba66a4ed15581f23 userRequirement;
       click ba66a4ed15581f23 &quot;System/Core/ModelManagement.html#git-repository-as-project-root&quot;;
       ea8518e9205f5540[&quot;Template-Based Model Bootstrapping&quot;];
@@ -866,7 +866,7 @@ blockquote {
   end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph 76dc8a8951f1adad[&quot;📄 Formatting.md&quot;]
-      bf4135d4f544e1c[&quot;Format Consistency Enforcement&quot;];
+      bf4135d4f544e1c[&quot;Format Consistency Enforcement<br/>📎 requirements/System/Operations/Specifications.md#format-consistency-specification&quot;];
       class bf4135d4f544e1c systemRequirement;
       click bf4135d4f544e1c &quot;System/Operations/Formatting.html#format-consistency-enforcement&quot;;
       a2cb15bef87bc2ca[&quot;Model Formatting&quot;];
@@ -963,6 +963,7 @@ blockquote {
   class 8fbf4ca0471377ea default;
   click 8fbf4ca0471377ea &quot;../core/src/format.rs&quot;;
   bf4135d4f544e1c -->|satisfiedBy| 8fbf4ca0471377ea;
+  bf4135d4f544e1c -->|satisfiedBy| 5922c01ef3d62086;
   bf4135d4f544e1c -.->|verifiedBy| 723757d62c730981;
   518a35513910679a -.->|deriveReqT| ba9ff62b2514c184;
   518a35513910679a -.->|deriveReqT| 421d9d50c6e84b40;
@@ -986,8 +987,14 @@ blockquote {
   66091f40428d6d66 -.->|deriveReqT| b7a7ab53d4242be8;
   66091f40428d6d66 -.->|deriveReqT| a6593dab7ef5d521;
   66091f40428d6d66 -.->|deriveReqT| 9987f9e9ae83fba3;
-  ba66a4ed15581f23 -.->|deriveReqT| e64436de26e90ea9;
   ba66a4ed15581f23 -.->|deriveReqT| 9987f9e9ae83fba3;
+  e2fdc13fe7e53251[&quot;git_commands.rs&quot;];
+  class e2fdc13fe7e53251 default;
+  click e2fdc13fe7e53251 &quot;../core/src/git_commands.rs&quot;;
+  ba66a4ed15581f23 -->|satisfiedBy| e2fdc13fe7e53251;
+  ba66a4ed15581f23 -->|satisfiedBy| fcf8b5c885888584;
+  ba66a4ed15581f23 -->|satisfiedBy| f0239a043d4b79f1;
+  ba66a4ed15581f23 -.->|verifiedBy| 48724d283e4c3b16;
   d50a859650933e55[&quot;model.rs&quot;];
   class d50a859650933e55 default;
   click d50a859650933e55 &quot;../core/src/model.rs&quot;;
@@ -1027,7 +1034,7 @@ blockquote {
   class a581221890d15c0c default;
   click a581221890d15c0c &quot;../core/src/error.rs&quot;;
   563518e7f0f446e -->|satisfiedBy| a581221890d15c0c;
-  563518e7f0f446e -->|satisfiedBy| 30ab6c7de24796d7;
+  563518e7f0f446e -->|satisfiedBy| 7b535a46a6894d14;
   a2cb15bef87bc2ca -.->|deriveReqT| bf4135d4f544e1c;
   a2cb15bef87bc2ca -.->|deriveReqT| 151b5c7a2cdfda2f;
   a2cb15bef87bc2ca -.->|deriveReqT| 28d990cbf4db1b00;

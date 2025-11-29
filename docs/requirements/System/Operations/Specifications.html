@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refinements</title>
+    <title>Specifications</title>
     <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
     <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
@@ -735,88 +735,147 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
-    subgraph bdf2d0d4066a95c0[&quot;📄 Refinements.md&quot;]
-      e45df3681600a73c[&quot;Element Type Relation Compatibility Constraint&quot;];
-      class e45df3681600a73c default;
-      click e45df3681600a73c &quot;Refinements.html#element-type-relation-compatibility-constraint&quot;;
-      e79d4782d9a1d791[&quot;Two-Pass Validation Behavior&quot;];
-      class e79d4782d9a1d791 default;
-      click e79d4782d9a1d791 &quot;Refinements.html#two-pass-validation-behavior&quot;;
-      30ab6c7de24796d7[&quot;Validation Error Reporting Behavior&quot;];
-      class 30ab6c7de24796d7 default;
-      click 30ab6c7de24796d7 &quot;Refinements.html#validation-error-reporting-behavior&quot;;
+  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
+    subgraph 13f813da82130a33[&quot;📄 Specifications.md&quot;]
+      319b7987b8267c37[&quot;Document Structure Specification&quot;];
+      class 319b7987b8267c37 default;
+      click 319b7987b8267c37 &quot;Specifications.html#document-structure-specification&quot;;
+      5922c01ef3d62086[&quot;Format Consistency Specification&quot;];
+      class 5922c01ef3d62086 default;
+      click 5922c01ef3d62086 &quot;Specifications.html#format-consistency-specification&quot;;
+      b0ff2a4698cc55f4[&quot;Relation Ordering Specification&quot;];
+      class b0ff2a4698cc55f4 default;
+      click b0ff2a4698cc55f4 &quot;Specifications.html#relation-ordering-specification&quot;;
+      9b4a4077c4e05529[&quot;Relation Validation Specification&quot;];
+      class 9b4a4077c4e05529 default;
+      click 9b4a4077c4e05529 &quot;Specifications.html#relation-validation-specification&quot;;
     end
   end
 </div>
-<h3 id="element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</h3>
-<p>Validation rules for element type and relation type combinations.</p>
+<h3 id="document-structure-specification">Document Structure Specification</h3>
+<p>Rules for normalizing document hierarchical structure during formatting.</p>
 <h4>Details</h4>
-<p><strong>Relation Type Restrictions:</strong>
-| Relation Type | Allowed Source Types | Allowed Target Types |
-|—————|———————|———————|
-| derivedFrom/derive | requirement, user-requirement | requirement, user-requirement |
-| satisfiedBy/satisfy | requirement, user-requirement, test-verification, refinement types | InternalPath, refinement types |
-| verifiedBy/verify | requirement, user-requirement | All verification types |
-| trace | Any (except refinement types) | Any |</p>
-<p><strong>Key Constraints:</strong></p>
+<p><strong>Page Header:</strong></p>
 <ul>
-<li>derivedFrom/derive restricted to requirement types only</li>
-<li>Refinement types (constraint, behavior, specification) can only have <code>satisfy</code> relations</li>
-<li>Only test-verification can use satisfiedBy among verification types</li>
-<li>Elements with type “other” can only use trace relations</li>
+<li>Always output <code># Elements</code> as the page header (all specification files must have this header)</li>
 </ul>
+<p><strong>Section Header:</strong></p>
+<ul>
+<li>Add a default section header <code>## Elements</code> when elements exist without an explicit section header</li>
+<li>Preserve existing section headers when present (starting with <code>## </code>)</li>
+<li>Correctly distinguish between level 1 headers (<code># </code>) and level 2 or deeper headers (<code>##</code>, <code>###</code>)</li>
+</ul>
+<p><strong>Default Header Names:</strong></p>
+<ul>
+<li>Page header: Always <code># Elements</code> (required for all specification files)</li>
+<li>Section header: “Elements” (the default section name used by parser)</li>
+</ul>
+<p><strong>Normalization Rules:</strong></p>
+<ol>
+<li>If document has <code># Elements</code> then <code>###</code> (no <code>##</code>): Add section header only</li>
+<li>If document has <code># Elements</code> and <code>##</code>: No header additions needed</li>
+</ol>
 <h4>Metadata</h4>
 <ul>
-<li>type: constraint</li>
+<li>type: specification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
+<li>satisfy: <a href="Formatting.html#document-structure-normalization">Document Structure Normalization</a></li>
 </ul>
 <hr />
-<h3 id="two-pass-validation-behavior">Two-Pass Validation Behavior</h3>
-<p>Two-phase validation process for model parsing.</p>
+<h3 id="format-consistency-specification">Format Consistency Specification</h3>
+<p>Rules for detecting and fixing formatting inconsistencies in requirements documents.</p>
 <h4>Details</h4>
-<p><strong>Pass 1: Element Collection</strong></p>
+<p><strong>Excess Whitespace:</strong></p>
 <ul>
-<li>Parse all markdown files</li>
-<li>Extract elements with metadata</li>
-<li>Local validation (uniqueness, format, syntax)</li>
-<li>Report errors if found</li>
+<li>Detect and fix excess whitespace after element headers, subsection headers, and relation identifiers</li>
+<li>Maintain consistent formatting across all requirements documents</li>
 </ul>
-<p><strong>Pass 2: Graph Validation</strong></p>
+<p><strong>Inconsistent Newlines:</strong></p>
 <ul>
-<li>Build in-memory model representation from elements</li>
-<li>Validate relations (existence, type compatibility)</li>
-<li>Cross-component validation</li>
-<li>Report errors if found</li>
+<li>Detect and fix excess or missing newlines before element headers and subsection headers</li>
+<li>Normalize to exactly two newlines before subsections (e.g., “#### Details”)</li>
+</ul>
+<p><strong>Missing Separators:</strong></p>
+<ul>
+<li>Detect consecutive element sections that lack a separator line (—) between them</li>
+<li>Insert separator to maintain consistent visual separation</li>
+<li>Normalize consecutive separators to single separators</li>
+</ul>
+<p><strong>Reserved Subsections:</strong></p>
+<ul>
+<li>Identify and fix inconsistent indentation and bullet types in relation lists</li>
+<li>Ensure consistent indentation in relation lists (2-space format)</li>
+<li>Normalize relation entries to proper 2-space indentation format</li>
+</ul>
+<p><strong>Output Formatting:</strong></p>
+<ul>
+<li>Display changes with sequential line numbering that reflects final file positions</li>
+<li>Provide context lines with proper line number continuity</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
-<li>type: behavior</li>
+<li>type: specification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Validation.html#two-pass-validation-strategy">Two-Pass Validation Strategy</a></li>
+<li>satisfy: <a href="Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a></li>
 </ul>
 <hr />
-<h3 id="validation-error-reporting-behavior">Validation Error Reporting Behavior</h3>
-<p>Error message structure for validation issues.</p>
+<h3 id="relation-ordering-specification">Relation Ordering Specification</h3>
+<p>Rules for sorting relations within elements for deterministic output.</p>
 <h4>Details</h4>
+<p><strong>Sort Criteria:</strong></p>
+<ol>
+<li>Primary sort: Alphabetically by relation type name (e.g., <code>derivedFrom</code> before <code>satisfiedBy</code>, <code>trace</code> before <code>verifiedBy</code>)</li>
+<li>Secondary sort: Alphabetically by target identifier within the same relation type</li>
+</ol>
+<p><strong>Benefits:</strong></p>
 <ul>
-<li>File path and line number included</li>
-<li>Element name and relation details shown</li>
-<li>Color coding per Color Scheme Specification</li>
-<li>Actionable suggestions when possible</li>
+<li>Deterministic output regardless of parsing order or HashMap iteration order</li>
+<li>Consistent formatting across all specification files</li>
+<li>Easier diff comparison between file versions</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
-<li>type: behavior</li>
+<li>type: specification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
+<li>satisfy: <a href="Formatting.html#relation-ordering-normalization">Relation Ordering Normalization</a></li>
+</ul>
+<hr />
+<h3 id="relation-validation-specification">Relation Validation Specification</h3>
+<p>Rules for validating and normalizing relation targets during element creation and manipulation.</p>
+<h4>Details</h4>
+<p><strong>Target Format Support:</strong></p>
+<ul>
+<li>Relative paths from the target file location (e.g., <code>../UserReqs.md#requirement</code>)</li>
+<li>Paths relative to git repository root (e.g., <code>specifications/UserReqs.md#requirement</code>)</li>
+<li>Same-file references (e.g., <code>#other-requirement</code>)</li>
+</ul>
+<p><strong>Normalization Rules:</strong></p>
+<ul>
+<li>All relation targets must be normalized to git repository root relative format before insertion</li>
+<li>All relation targets must reference existing elements in the model</li>
+<li>External links (http://, https://, etc.) are allowed and not validated</li>
+</ul>
+<p><strong>Validation Behavior:</strong></p>
+<ul>
+<li>Parse relation targets from the markdown</li>
+<li>Normalize relation targets to be relative to the git repository root</li>
+<li>Validate that each relation target element exists in the model</li>
+<li>Reject the operation if any relation target does not exist</li>
+<li>Provide clear error messages indicating which relation target was not found</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
 </ul>
 <hr />
 

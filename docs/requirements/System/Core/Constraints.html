@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebInterfaceStyles</title>
+    <title>Constraints</title>
     <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
     <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
@@ -735,82 +735,38 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph c1ebd4eea0eea024[&quot;📁 requirements/Interfaces/DesignDocuments&quot;]
-    subgraph e8cb2420716de5f[&quot;📄 WebInterfaceStyles.md&quot;]
-      a49810d2b9e3039[&quot;Web Interface Navigation Behavior&quot;];
-      class a49810d2b9e3039 default;
-      click a49810d2b9e3039 &quot;WebInterfaceStyles.html#web-interface-navigation-behavior&quot;;
-      609843a3540b45d8[&quot;Web Interface Style Specification&quot;];
-      class 609843a3540b45d8 default;
-      click 609843a3540b45d8 &quot;WebInterfaceStyles.html#web-interface-style-specification&quot;;
+  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
+    subgraph 2b0b27142487cdbe[&quot;📄 Constraints.md&quot;]
+      1a01f3b1f5f4fd54[&quot;Element Type Relation Compatibility Constraint&quot;];
+      class 1a01f3b1f5f4fd54 default;
+      click 1a01f3b1f5f4fd54 &quot;Constraints.html#element-type-relation-compatibility-constraint&quot;;
     end
   end
 </div>
-<h3 id="web-interface-navigation-behavior">Web Interface Navigation Behavior</h3>
-<p>Navigation behavior in HTML export.</p>
+<h3 id="element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</h3>
+<p>Validation rules for element type and relation type combinations.</p>
 <h4>Details</h4>
-<p><strong>Inter-page Navigation:</strong></p>
+<p><strong>Relation Type Restrictions:</strong>
+| Relation Type | Allowed Source Types | Allowed Target Types |
+|—————|———————|———————|
+| derivedFrom/derive | requirement, user-requirement | requirement, user-requirement |
+| satisfiedBy/satisfy | requirement, user-requirement, test-verification, refinement types | InternalPath, refinement types |
+| verifiedBy/verify | requirement, user-requirement | All verification types |
+| trace | Any (except refinement types) | Any |</p>
+<p><strong>Key Constraints:</strong></p>
 <ul>
-<li>Element links navigate to element page with anchor</li>
-<li>File links navigate to file page</li>
-<li>External links open in new tab</li>
-</ul>
-<p><strong>Breadcrumbs:</strong></p>
-<ul>
-<li>Show path: Home &gt; File &gt; Section &gt; Element</li>
-<li>Each segment clickable</li>
-</ul>
-<p><strong>Search:</strong></p>
-<ul>
-<li>Client-side search in index page</li>
-<li>Filter by name, type, content</li>
+<li>derivedFrom/derive restricted to requirement types only</li>
+<li>Refinement types (constraint, behavior, specification) can only have <code>satisfy</code> relations</li>
+<li>Only test-verification can use satisfiedBy among verification types</li>
+<li>Elements with type “other” can only use trace relations</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
-<li>type: behavior</li>
+<li>type: constraint</li>
 </ul>
-<hr />
-<h3 id="web-interface-style-specification">Web Interface Style Specification</h3>
-<p>Styling conventions for HTML export web interface.</p>
-<h4>Details</h4>
-<p><strong>Page Layout:</strong></p>
+<h4>Relations</h4>
 <ul>
-<li>Navigation bar at top with links to views</li>
-<li>Content area with responsive width</li>
-<li>Sidebar for element tree (optional)</li>
-</ul>
-<p><strong>Typography:</strong></p>
-<ul>
-<li>System font stack for readability</li>
-<li>Monospace for code and identifiers</li>
-<li>Heading hierarchy matches markdown levels</li>
-</ul>
-<p><strong>Color Palette:</strong>
-| Usage | Light Mode | Dark Mode |
-|—––|————|———–|
-| Background | #FFFFFF | #1a1a1a |
-| Text | #333333 | #e0e0e0 |
-| Links | #0066CC | #6699FF |
-| Borders | #DDDDDD | #444444 |
-| Code background | #F5F5F5 | #2d2d2d |</p>
-<p><strong>Element Cards:</strong>
-| Element Type | Border Color | Background |
-|–––––––|–––––––|————|
-| Requirement | #0066FF | #D0E0FF |
-| User-requirement | #0066FF | #D0E0FF |
-| Verification | #CC9900 | #FFF7B3 |
-| Behavior | #9900CC | #E0D0FF |
-| Specification | #009900 | #DFFFD0 |
-| Constraint | #CC0000 | #FFD0D0 |</p>
-<p><strong>Navigation:</strong></p>
-<ul>
-<li>Breadcrumb trail for element hierarchy</li>
-<li>Clickable relation links</li>
-<li>Collapsible sections for long content</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: specification</li>
+<li>satisfy: <a href="ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
 </ul>
 <hr />
 

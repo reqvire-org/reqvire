@@ -744,16 +744,16 @@ blockquote {
   end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph 76dc8a8951f1adad[&quot;📄 Formatting.md&quot;]
-      61bb064413777e7d[&quot;Document Structure Normalization&quot;];
+      61bb064413777e7d[&quot;Document Structure Normalization<br/>📎 requirements/System/Operations/Specifications.md#document-structure-specification&quot;];
       class 61bb064413777e7d systemRequirement;
       click 61bb064413777e7d &quot;Formatting.html#document-structure-normalization&quot;;
-      a446aaa2a629e38f[&quot;Element Ordering Normalization<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      a446aaa2a629e38f[&quot;Element Ordering Normalization<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class a446aaa2a629e38f systemRequirement;
       click a446aaa2a629e38f &quot;Formatting.html#element-ordering-normalization&quot;;
       3e259233db2e4d25[&quot;File Pattern Exclusion for Format&quot;];
       class 3e259233db2e4d25 systemRequirement;
       click 3e259233db2e4d25 &quot;Formatting.html#file-pattern-exclusion-for-format&quot;;
-      bf4135d4f544e1c[&quot;Format Consistency Enforcement&quot;];
+      bf4135d4f544e1c[&quot;Format Consistency Enforcement<br/>📎 requirements/System/Operations/Specifications.md#format-consistency-specification&quot;];
       class bf4135d4f544e1c systemRequirement;
       click bf4135d4f544e1c &quot;Formatting.html#format-consistency-enforcement&quot;;
       151b5c7a2cdfda2f[&quot;Formatting Output&quot;];
@@ -768,17 +768,28 @@ blockquote {
       a2cb15bef87bc2ca[&quot;Model Formatting&quot;];
       class a2cb15bef87bc2ca userRequirement;
       click a2cb15bef87bc2ca &quot;Formatting.html#model-formatting&quot;;
-      8ef7660c853b898a[&quot;Relation Ordering Normalization&quot;];
+      8ef7660c853b898a[&quot;Relation Ordering Normalization<br/>📎 requirements/System/Operations/Specifications.md#relation-ordering-specification&quot;];
       class 8ef7660c853b898a systemRequirement;
       click 8ef7660c853b898a &quot;Formatting.html#relation-ordering-normalization&quot;;
       9ead49b4bdac9bb2[&quot;Replace Absolute Links with Relative Links&quot;];
       class 9ead49b4bdac9bb2 systemRequirement;
       click 9ead49b4bdac9bb2 &quot;Formatting.html#replace-absolute-links-with-relative-links&quot;;
     end
+    subgraph 13f813da82130a33[&quot;📄 Specifications.md&quot;]
+      319b7987b8267c37[&quot;Document Structure Specification&quot;];
+      class 319b7987b8267c37 default;
+      click 319b7987b8267c37 &quot;Specifications.html#document-structure-specification&quot;;
+      5922c01ef3d62086[&quot;Format Consistency Specification&quot;];
+      class 5922c01ef3d62086 default;
+      click 5922c01ef3d62086 &quot;Specifications.html#format-consistency-specification&quot;;
+      b0ff2a4698cc55f4[&quot;Relation Ordering Specification&quot;];
+      class b0ff2a4698cc55f4 default;
+      click b0ff2a4698cc55f4 &quot;Specifications.html#relation-ordering-specification&quot;;
+    end
   end
   subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
     subgraph 5fdb7c9d75d9c8bf[&quot;📄 FormattingVerifications.md&quot;]
-      934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 934319026295f62c verification;
       click 934319026295f62c &quot;Verifications/FormattingVerifications.html#element-ordering-verification&quot;;
       723757d62c730981[&quot;Format Command Requirements Verification&quot;];
@@ -800,6 +811,7 @@ blockquote {
   class f22d93285fcd7664 default;
   click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
   61bb064413777e7d -->|satisfiedBy| f22d93285fcd7664;
+  61bb064413777e7d -->|satisfiedBy| 319b7987b8267c37;
   61bb064413777e7d -.->|verifiedBy| 723757d62c730981;
   a446aaa2a629e38f -.->|verifiedBy| 934319026295f62c;
   3e259233db2e4d25 -.->|deriveReqT| bbe4bfafe31e5f09;
@@ -814,6 +826,7 @@ blockquote {
   class 8fbf4ca0471377ea default;
   click 8fbf4ca0471377ea &quot;../../../core/src/format.rs&quot;;
   bf4135d4f544e1c -->|satisfiedBy| 8fbf4ca0471377ea;
+  bf4135d4f544e1c -->|satisfiedBy| 5922c01ef3d62086;
   bf4135d4f544e1c -.->|verifiedBy| 723757d62c730981;
   151b5c7a2cdfda2f -.->|deriveReqT| 40923d5efba35c34;
   28d990cbf4db1b00 -.->|verifiedBy| 6d1f64516c7eb3bb;
@@ -828,6 +841,7 @@ blockquote {
   a2cb15bef87bc2ca -.->|deriveReqT| 28d990cbf4db1b00;
   a2cb15bef87bc2ca -.->|deriveReqT| 9ead49b4bdac9bb2;
   8ef7660c853b898a -->|satisfiedBy| b7c871ab64a7059a;
+  8ef7660c853b898a -->|satisfiedBy| b0ff2a4698cc55f4;
   8ef7660c853b898a -.->|verifiedBy| de9c99ddb7e13f89;
   9ead49b4bdac9bb2 -.->|verifiedBy| 723757d62c730981;
   eaf33ce1e6113c8a[&quot;test.sh&quot;];
@@ -873,36 +887,13 @@ blockquote {
 <h3 id="format-consistency-enforcement">Format Consistency Enforcement</h3>
 <p>The system shall provide formatting capability to ensure consistent formatting in requirements documents.</p>
 <h4>Details</h4>
-<p>The system shall implement the following formatting fixes:</p>
-<p><strong>Excess Whitespace:</strong></p>
 <ul>
-<li>Detect and fix excess whitespace after element headers, subsection headers, and relation identifiers</li>
-<li>Maintain consistent formatting across all requirements documents</li>
+<li>The system shall detect and fix formatting inconsistencies following clearly defined specifications</li>
+<li>The system shall maintain consistent formatting across all requirements documents</li>
 </ul>
-<p><strong>Inconsistent Newlines:</strong></p>
+<h4>Attachments</h4>
 <ul>
-<li>Detect and fix excess or missing newlines before element headers and subsection headers</li>
-<li>Normalize to exactly two newlines before subsections (e.g., “#### Details”)</li>
-<li>Maintain consistent formatting across all requirements documents</li>
-</ul>
-<p><strong>Missing Separators:</strong></p>
-<ul>
-<li>Detect consecutive element sections that lack a separator line (—) between them</li>
-<li>Insert the separator to maintain consistent visual separation in the documentation</li>
-<li>Automatically insert separator lines between elements if not already present</li>
-<li>Normalize consecutive separators to single separators</li>
-</ul>
-<p><strong>Reserved Subsections:</strong></p>
-<ul>
-<li>Identify and fix inconsistent indentation and bullet types in relation lists and other reserved subsections</li>
-<li>Ensure consistent indentation in relation lists (2-space format)</li>
-<li>Normalize relation entries to proper 2-space indentation format</li>
-<li>Standardize to a consistent format across all requirements documents</li>
-</ul>
-<p><strong>Output Formatting:</strong></p>
-<ul>
-<li>Display changes with sequential line numbering that reflects final file positions</li>
-<li>Provide context lines with proper line number continuity</li>
+<li><a href="Specifications.html#format-consistency-specification">Format Consistency Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -912,6 +903,7 @@ blockquote {
 <li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
 <li>satisfiedBy: <a href="../../../core/src/format.rs">format.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#format-consistency-specification">Format Consistency Specification</a></li>
 <li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
 </ul>
 <hr />
@@ -935,11 +927,16 @@ blockquote {
 <li>If document has <code># Elements</code> then <code>###</code> (no <code>##</code>): Add section header only</li>
 <li>If document has <code># Elements</code> and <code>##</code>: No header additions needed</li>
 </ol>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#document-structure-specification">Document Structure Specification</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#format-consistency-enforcement">Format Consistency Enforcement</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#document-structure-specification">Document Structure Specification</a></li>
 <li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
 </ul>
 <hr />
@@ -947,7 +944,7 @@ blockquote {
 <p>When formatting or persisting specification files, the system shall reorder elements following the Element Ordering Behavior.</p>
 <h4>Attachments</h4>
 <ul>
-<li><a href="Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+<li><a href="Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -969,10 +966,15 @@ blockquote {
 <li>Consistent diffs when comparing formatted files</li>
 <li>Predictable relation ordering for review and verification</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#relation-ordering-specification">Relation Ordering Specification</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#format-consistency-enforcement">Format Consistency Enforcement</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#relation-ordering-specification">Relation Ordering Specification</a></li>
 <li>verifiedBy: <a href="Verifications/FormattingVerifications.html#relation-ordering-verification">Relation Ordering Verification</a></li>
 </ul>
 <hr />

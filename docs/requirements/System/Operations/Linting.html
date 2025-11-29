@@ -746,13 +746,13 @@ blockquote {
       b131ca76ea79134d[&quot;Model Linting&quot;];
       class b131ca76ea79134d userRequirement;
       click b131ca76ea79134d &quot;Linting.html#model-linting&quot;;
-      65dd8a2e87f01d79[&quot;Multi-Branch Convergence Detection<br/>📎 requirements/System/Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction&quot;];
+      65dd8a2e87f01d79[&quot;Multi-Branch Convergence Detection<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction&quot;];
       class 65dd8a2e87f01d79 systemRequirement;
       click 65dd8a2e87f01d79 &quot;Linting.html#multi-branch-convergence-detection&quot;;
-      2bd0565cb57ff27c[&quot;Redundant Hierarchical Relations Detection<br/>📎 requirements/System/Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction&quot;];
+      2bd0565cb57ff27c[&quot;Redundant Hierarchical Relations Detection<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction&quot;];
       class 2bd0565cb57ff27c systemRequirement;
       click 2bd0565cb57ff27c &quot;Linting.html#redundant-hierarchical-relations-detection&quot;;
-      28b58286a606077a[&quot;Redundant Verify Relations Detection<br/>📎 requirements/System/Processing/DesignDocuments/VerificationTraceAlgorithm.md#verification-trace-tree-construction&quot;];
+      28b58286a606077a[&quot;Redundant Verify Relations Detection<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction&quot;];
       class 28b58286a606077a systemRequirement;
       click 28b58286a606077a &quot;Linting.html#redundant-verify-relations-detection&quot;;
       e55b28ea451e6a58[&quot;Safe Redundant Hierarchical Relations Auto-Removal&quot;];
@@ -900,7 +900,7 @@ blockquote {
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="../Processing/DesignDocuments/VerificationTraceAlgorithm.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
+<li><a href="../Processing/Specifications.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -938,7 +938,7 @@ blockquote {
 <p><strong>Note</strong>: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.</p>
 <h4>Attachments</h4>
 <ul>
-<li><a href="../Processing/DesignDocuments/VerificationTraceAlgorithm.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
+<li><a href="../Processing/Specifications.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1000,14 +1000,14 @@ Reason: D is reachable via A → B → D and A → C → D
 </ul>
 <p>Detection shall:</p>
 <ul>
-<li>Reuse the trace tree building logic from <a href="../ModelManagement/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
+<li>Reuse the trace tree building logic from <a href="../Processing/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a></li>
 <li>Identify ancestor requirements in each verification’s trace tree that are also directly verified</li>
 <li>Report these as redundant relations that add noise to the model</li>
 <li>Categorize as <strong>auto-fixable</strong> since removing them is safe and mechanical</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="../Processing/DesignDocuments/VerificationTraceAlgorithm.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
+<li><a href="../Processing/Specifications.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>

@@ -30,32 +30,11 @@ The system shall provide formatting capabilities to normalize and standardize Sy
 The system shall provide formatting capability to ensure consistent formatting in requirements documents.
 
 #### Details
-The system shall implement the following formatting fixes:
+- The system shall detect and fix formatting inconsistencies following clearly defined specifications
+- The system shall maintain consistent formatting across all requirements documents
 
-**Excess Whitespace:**
-- Detect and fix excess whitespace after element headers, subsection headers, and relation identifiers
-- Maintain consistent formatting across all requirements documents
-
-**Inconsistent Newlines:**
-- Detect and fix excess or missing newlines before element headers and subsection headers
-- Normalize to exactly two newlines before subsections (e.g., "#### Details")
-- Maintain consistent formatting across all requirements documents
-
-**Missing Separators:**
-- Detect consecutive element sections that lack a separator line (---) between them
-- Insert the separator to maintain consistent visual separation in the documentation
-- Automatically insert separator lines between elements if not already present
-- Normalize consecutive separators to single separators
-
-**Reserved Subsections:**
-- Identify and fix inconsistent indentation and bullet types in relation lists and other reserved subsections
-- Ensure consistent indentation in relation lists (2-space format)
-- Normalize relation entries to proper 2-space indentation format
-- Standardize to a consistent format across all requirements documents
-
-**Output Formatting:**
-- Display changes with sequential line numbering that reflects final file positions
-- Provide context lines with proper line number continuity
+#### Attachments
+  * [Format Consistency Specification](Specifications.md#format-consistency-specification)
 
 #### Relations
   * derive: [Document Structure Normalization](#document-structure-normalization)
@@ -64,6 +43,7 @@ The system shall implement the following formatting fixes:
   * derivedFrom: [Model Formatting](#model-formatting)
   * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
+  * satisfiedBy: [Format Consistency Specification](Specifications.md#format-consistency-specification)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
@@ -86,10 +66,14 @@ When generating formatted output, the system shall:
 1. If document has `# Elements` then `###` (no `##`): Add section header only
 2. If document has `# Elements` and `##`: No header additions needed
 
+#### Attachments
+  * [Document Structure Specification](Specifications.md#document-structure-specification)
+
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
+  * satisfiedBy: [Document Structure Specification](Specifications.md#document-structure-specification)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
@@ -119,9 +103,13 @@ This ensures:
 - Consistent diffs when comparing formatted files
 - Predictable relation ordering for review and verification
 
+#### Attachments
+  * [Relation Ordering Specification](Specifications.md#relation-ordering-specification)
+
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [Relation Ordering Specification](Specifications.md#relation-ordering-specification)
   * verifiedBy: [Relation Ordering Verification](Verifications/FormattingVerifications.md#relation-ordering-verification)
 ---
 

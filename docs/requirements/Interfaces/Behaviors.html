@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VerificationTraceAlgorithm</title>
-    <link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico">
-    <link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png">
+    <title>Behaviors</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
     
 <style>
 :root {
@@ -713,13 +713,13 @@ blockquote {
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../../../index.html" class="nav-logo"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a>
-        <a href="../../../../index.html">Containment</a>
-        <a href="../../../../model.html">Model</a>
-        <a href="../../../../traces.html">Traces</a>
-        <a href="../../../../traceflow.html">TraceFlow</a>
-        <a href="../../../../coverage.html">Coverage</a>
-        <a href="../../../../resources.html">Resources</a>
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../index.html">Containment</a>
+        <a href="../../model.html">Model</a>
+        <a href="../../traces.html">Traces</a>
+        <a href="../../traceflow.html">TraceFlow</a>
+        <a href="../../coverage.html">Coverage</a>
+        <a href="../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -735,68 +735,36 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph fe1c8bf74761dce2[&quot;📁 requirements/System/Processing/DesignDocuments&quot;]
-    subgraph dfd4f9399c53f42a[&quot;📄 VerificationTraceAlgorithm.md&quot;]
-      d5b6f9740e09a9fd[&quot;Verification Trace Tree Construction&quot;];
-      class d5b6f9740e09a9fd default;
-      click d5b6f9740e09a9fd &quot;VerificationTraceAlgorithm.html#verification-trace-tree-construction&quot;;
+  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
+    subgraph 4a8da899ce0252aa[&quot;📄 Behaviors.md&quot;]
+      9fd8793a548eb084[&quot;Web Interface Navigation Behavior&quot;];
+      class 9fd8793a548eb084 default;
+      click 9fd8793a548eb084 &quot;Behaviors.html#web-interface-navigation-behavior&quot;;
     end
   end
 </div>
-<h3 id="verification-trace-tree-construction">Verification Trace Tree Construction</h3>
-<p>Algorithm for building upward trace trees from verification elements to root requirements.</p>
+<h3 id="web-interface-navigation-behavior">Web Interface Navigation Behavior</h3>
+<p>Navigation behavior in HTML export.</p>
 <h4>Details</h4>
-<p><strong>Purpose:</strong>
-Build a tree structure showing how verifications trace upward through the requirement hierarchy to root requirements. Used for trace reports, redundancy detection, and coverage analysis.</p>
-<p><strong>Algorithm Steps:</strong></p>
-<ol>
-<li>
-<p><strong>Start from verification element</strong></p>
+<p><strong>Inter-page Navigation:</strong></p>
 <ul>
-<li>Input: verification element with <code>verify</code> relations</li>
+<li>Element links navigate to element page with anchor</li>
+<li>File links navigate to file page</li>
+<li>External links open in new tab</li>
 </ul>
-</li>
-<li>
-<p><strong>Get directly verified requirements</strong></p>
+<p><strong>Breadcrumbs:</strong></p>
 <ul>
-<li>Follow <code>verify</code> relations to get target requirements</li>
-<li>Mark these as “directly verified” in the tree</li>
+<li>Show path: Home &gt; File &gt; Section &gt; Element</li>
+<li>Each segment clickable</li>
 </ul>
-</li>
-<li>
-<p><strong>Traverse upward through derivedFrom</strong></p>
+<p><strong>Search:</strong></p>
 <ul>
-<li>For each requirement, follow <code>derivedFrom</code> relations to parent requirements</li>
-<li>Continue recursively until reaching root requirements (no parents)</li>
-</ul>
-</li>
-<li>
-<p><strong>Build tree structure</strong></p>
-<ul>
-<li>Preserve all paths (a requirement may be reached through multiple children)</li>
-<li>Merge common ancestors into single nodes with multiple incoming edges</li>
-<li>Track which nodes are directly verified vs. transitively traced</li>
-</ul>
-</li>
-<li>
-<p><strong>Mark directly verified nodes</strong></p>
-<ul>
-<li>Nodes with direct <code>verify</code> relations from the verification</li>
-<li>Distinguished from nodes reached only through parent traversal</li>
-</ul>
-</li>
-</ol>
-<p><strong>Virtual Verification Pattern:</strong>
-For hierarchical relation analysis (not verification-specific), create a virtual verification element connected to all leaf requirements. Apply the same algorithm to detect redundant hierarchical relations.</p>
-<p><strong>Usage:</strong></p>
-<ul>
-<li>Trace Report Generator: visualize verification-to-root paths</li>
-<li>Redundant Verify Detection: find ancestors that are both directly and transitively verified</li>
-<li>Redundant Hierarchical Detection: find derivedFrom relations with alternate paths</li>
+<li>Client-side search in index page</li>
+<li>Filter by name, type, content</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
-<li>type: specification</li>
+<li>type: behavior</li>
 </ul>
 <hr />
 

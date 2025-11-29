@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refinements</title>
-    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
-    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
+    <title>Specifications</title>
+    <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
     
 <style>
 :root {
@@ -713,13 +713,13 @@ blockquote {
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
-        <a href="../../../index.html">Containment</a>
-        <a href="../../../model.html">Model</a>
-        <a href="../../../traces.html">Traces</a>
-        <a href="../../../traceflow.html">TraceFlow</a>
-        <a href="../../../coverage.html">Coverage</a>
-        <a href="../../../resources.html">Resources</a>
+        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../index.html">Containment</a>
+        <a href="../../model.html">Model</a>
+        <a href="../../traces.html">Traces</a>
+        <a href="../../traceflow.html">TraceFlow</a>
+        <a href="../../coverage.html">Coverage</a>
+        <a href="../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -735,33 +735,55 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 63d7cba3f920744c[&quot;📁 requirements/System/Processing&quot;]
-    subgraph 7dc63e4061281fa[&quot;📄 Refinements.md&quot;]
-      9898ac13ad3f9d2b[&quot;Change Propagation Behavior&quot;];
-      class 9898ac13ad3f9d2b default;
-      click 9898ac13ad3f9d2b &quot;Refinements.html#change-propagation-behavior&quot;;
+  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
+    subgraph 89b3e2dd5703d487[&quot;📄 Specifications.md&quot;]
+      651069951fc8a95b[&quot;Web Interface Style Specification&quot;];
+      class 651069951fc8a95b default;
+      click 651069951fc8a95b &quot;Specifications.html#web-interface-style-specification&quot;;
     end
   end
 </div>
-<h3 id="change-propagation-behavior">Change Propagation Behavior</h3>
-<p>How changes propagate through model based on relation types.</p>
+<h3 id="web-interface-style-specification">Web Interface Style Specification</h3>
+<p>Styling conventions for HTML export web interface.</p>
 <h4>Details</h4>
-<p><strong>Propagation by Relation:</strong>
-| Relation | Propagates |
-|–––––|————|
-| derive/derivedFrom | Yes - parent to child |
-| satisfiedBy/satisfy | Yes - requirement to implementation |
-| verifiedBy/verify | Yes - requirement to verification |
-| trace | No - documentation only |
-| Attachments | Yes - if content hash changes |</p>
-<p><strong>Attachment Impact:</strong></p>
+<p><strong>Page Layout:</strong></p>
 <ul>
-<li>Content changes → propagate impact</li>
-<li>Path renames → track but no impact</li>
+<li>Navigation bar at top with links to views</li>
+<li>Content area with responsive width</li>
+<li>Sidebar for element tree (optional)</li>
+</ul>
+<p><strong>Typography:</strong></p>
+<ul>
+<li>System font stack for readability</li>
+<li>Monospace for code and identifiers</li>
+<li>Heading hierarchy matches markdown levels</li>
+</ul>
+<p><strong>Color Palette:</strong>
+| Usage | Light Mode | Dark Mode |
+|—––|————|———–|
+| Background | #FFFFFF | #1a1a1a |
+| Text | #333333 | #e0e0e0 |
+| Links | #0066CC | #6699FF |
+| Borders | #DDDDDD | #444444 |
+| Code background | #F5F5F5 | #2d2d2d |</p>
+<p><strong>Element Cards:</strong>
+| Element Type | Border Color | Background |
+|–––––––|–––––––|————|
+| Requirement | #0066FF | #D0E0FF |
+| User-requirement | #0066FF | #D0E0FF |
+| Verification | #CC9900 | #FFF7B3 |
+| Behavior | #9900CC | #E0D0FF |
+| Specification | #009900 | #DFFFD0 |
+| Constraint | #CC0000 | #FFD0D0 |</p>
+<p><strong>Navigation:</strong></p>
+<ul>
+<li>Breadcrumb trail for element hierarchy</li>
+<li>Clickable relation links</li>
+<li>Collapsible sections for long content</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
-<li>type: behavior</li>
+<li>type: specification</li>
 </ul>
 <hr />
 

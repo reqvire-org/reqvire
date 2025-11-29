@@ -737,7 +737,7 @@ blockquote {
 
   subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
     subgraph f23c409eff55fa7c[&quot;📄 Configuration.md&quot;]
-      b4fab4cd56cad6d8[&quot;Ignore Files Integration&quot;];
+      b4fab4cd56cad6d8[&quot;Ignore Files Integration<br/>📎 requirements/System/Core/Specifications.md#ignore-files-specification&quot;];
       class b4fab4cd56cad6d8 systemRequirement;
       click b4fab4cd56cad6d8 &quot;Configuration.html#ignore-files-integration&quot;;
       6921a84a17b97dda[&quot;Ignoring Unstructured Documents&quot;];
@@ -752,6 +752,11 @@ blockquote {
       533fcaf27edc0797[&quot;Structured Markdown Files Search and Detection&quot;];
       class 533fcaf27edc0797 systemRequirement;
       click 533fcaf27edc0797 &quot;Configuration.html#structured-markdown-files-search-and-detection&quot;;
+    end
+    subgraph 98d50eb6f8a292bb[&quot;📄 Specifications.md&quot;]
+      47d4dfd806994b53[&quot;Ignore Files Specification&quot;];
+      class 47d4dfd806994b53 default;
+      click 47d4dfd806994b53 &quot;Specifications.html#ignore-files-specification&quot;;
     end
     subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
       bd13cd060c399ea6[&quot;GraphRegistry as Primary Registry&quot;];
@@ -777,7 +782,7 @@ blockquote {
   end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation&quot;];
+      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification&quot;];
       class 9987f9e9ae83fba3 systemRequirement;
       click 9987f9e9ae83fba3 &quot;../Operations/ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
     end
@@ -799,6 +804,7 @@ blockquote {
   class 8419dcc77d92b609 default;
   click 8419dcc77d92b609 &quot;../../../cli/src/config.rs&quot;;
   b4fab4cd56cad6d8 -->|satisfiedBy| 8419dcc77d92b609;
+  b4fab4cd56cad6d8 -->|satisfiedBy| 47d4dfd806994b53;
   b4fab4cd56cad6d8 -.->|verifiedBy| 1413dd439a2ce574;
   6921a84a17b97dda -.->|deriveReqT| b4fab4cd56cad6d8;
   6921a84a17b97dda -.->|deriveReqT| 526d3fd6fb8c0baf;
@@ -830,7 +836,7 @@ blockquote {
   class ce2625feec883e55 default;
   click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
   9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
-  9987f9e9ae83fba3 -->|satisfiedBy| fc994be69cdad23;
+  9987f9e9ae83fba3 -->|satisfiedBy| df1f09bc9884c2de;
   9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
   7f5e53340a03365f[&quot;test.sh&quot;];
   class 7f5e53340a03365f default;
@@ -842,7 +848,7 @@ blockquote {
   bd13cd060c399ea6 -->|satisfiedBy| d50a859650933e55;
   bd13cd060c399ea6 -.->|verifiedBy| b32250e14e326cb;
   26e63d5a1bbe175 -->|satisfiedBy| d50a859650933e55;
-  26e63d5a1bbe175 -->|satisfiedBy| e79d4782d9a1d791;
+  26e63d5a1bbe175 -->|satisfiedBy| 36c28052839ab0a1;
   789c690d63402d63[&quot;test.sh&quot;];
   class 789c690d63402d63 default;
   click 789c690d63402d63 &quot;../../../tests/test-fragment-relations/test.sh&quot;;
@@ -878,42 +884,24 @@ examples/**
 </ul>
 <hr />
 <h3 id="ignore-files-integration">Ignore Files Integration</h3>
-<p>The system shall read exclusion patterns from the repository root .gitignore file and .reqvireignore file to automatically exclude files from requirement processing.</p>
+<p>The system shall integrate with Git workflows by reading exclusion patterns from .gitignore and .reqvireignore files.</p>
 <h4>Details</h4>
-<p>Reqvire integrates with Git workflows by respecting exclusion patterns from two sources:</p>
 <ul>
-<li><strong><code>.gitignore</code></strong> - Version control exclusions (files not tracked by Git)</li>
-<li><strong><code>.reqvireignore</code></strong> - Reqvire-specific exclusions (files tracked by Git but excluded from requirements processing)</li>
+<li>The system shall read exclusion patterns from repository root .gitignore and .reqvireignore files</li>
+<li>The system shall exclude files matching patterns from being parsed as structured markdown</li>
+<li>The system shall differentiate between .gitignore exclusions (complete) and .reqvireignore exclusions (parsing only)</li>
+<li>The system shall implement ignore file processing following clearly defined specifications</li>
 </ul>
-<p>Both ignore files use standard gitignore pattern syntax to exclude files from being parsed as structured markdown (requirements/verifications). However, they differ in an important way:</p>
+<h4>Attachments</h4>
 <ul>
-<li><strong><code>.gitignore</code></strong>: Files matching these patterns are <strong>completely excluded</strong> - they cannot be parsed as structured markdown AND cannot be referenced in file relations to elements</li>
-<li><strong><code>.reqvireignore</code></strong>: Files matching these patterns are excluded from structured markdown parsing BUT <strong>can still be referenced</strong> in file relations to elements (useful for design documents, diagrams, or other supporting files that you want to link to but not parse)</li>
-</ul>
-<p><strong>Rules:</strong></p>
-<ul>
-<li>ONLY the root .gitignore file shall be used (not nested .gitignore files in subdirectories)</li>
-<li>ONLY the root .reqvireignore file shall be used (not nested .reqvireignore files in subdirectories)</li>
-<li>.reqvireignore shall use the same format and syntax as .gitignore</li>
-<li>Patterns from .gitignore and .reqvireignore shall be combined</li>
-<li>Files matching ANY exclusion pattern (from .gitignore or .reqvireignore) shall be excluded from parsing as requirements</li>
-<li>Files excluded by .gitignore shall NOT be usable as relation targets (internal-path type) since they don’t exist in the repository</li>
-<li>Files excluded by .reqvireignore shall remain usable as relation targets (internal-path type) since they exist in the repository but are not parsed as requirements</li>
-<li>If .reqvireignore does not exist, the system shall process normally using only .gitignore patterns</li>
-<li>If .gitignore does not exist, the system shall process normally using only .reqvireignore patterns</li>
-</ul>
-<p><strong>Rationale:</strong></p>
-<ul>
-<li><code>.gitignore</code> integration ensures anything not tracked by version control is also excluded from requirements processing</li>
-<li><code>.reqvireignore</code> provides flexibility to exclude specific files from requirements processing while keeping them in version control (e.g., draft specifications, example files, or documentation that shouldn’t be processed as requirements)</li>
-<li>Using a <code>.reqvireignore</code> file follows the established convention that developers are familiar with from <code>.gitignore</code>, making it more intuitive</li>
-<li>File-based exclusion patterns are more maintainable than configuration-based approaches</li>
+<li><a href="Specifications.html#ignore-files-specification">Ignore Files Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="../Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
 <li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#ignore-files-specification">Ignore Files Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a></li>
 </ul>
 <hr />

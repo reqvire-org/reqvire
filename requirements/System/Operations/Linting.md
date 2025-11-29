@@ -211,7 +211,7 @@ A verify relation is redundant when:
 - Since verification traces roll up automatically through derivedFrom relations, verifying the leaf is sufficient
 
 Detection shall:
-- Reuse the trace tree building logic from [Verification Trace Builder](../ModelManagement/VerificationTraces.md#verification-trace-builder)
+- Reuse the trace tree building logic from [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder)
 - Identify ancestor requirements in each verification's trace tree that are also directly verified
 - Report these as redundant relations that add noise to the model
 - Categorize as **auto-fixable** since removing them is safe and mechanical

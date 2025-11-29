@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DiagramStyles</title>
-    <link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico">
-    <link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png">
+    <title>Specifications</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
 <style>
 :root {
@@ -713,13 +713,13 @@ blockquote {
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../../../index.html" class="nav-logo"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a>
-        <a href="../../../../index.html">Containment</a>
-        <a href="../../../../model.html">Model</a>
-        <a href="../../../../traces.html">Traces</a>
-        <a href="../../../../traceflow.html">TraceFlow</a>
-        <a href="../../../../coverage.html">Coverage</a>
-        <a href="../../../../resources.html">Resources</a>
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
+        <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -735,71 +735,85 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 8450fb687cd09c62[&quot;📁 requirements/System/Output/DesignDocuments&quot;]
-    subgraph 978f30c5dcd14254[&quot;📄 DiagramStyles.md&quot;]
-      a554ab6e9dd23fb0[&quot;Mermaid Diagram Interaction Behavior&quot;];
-      class a554ab6e9dd23fb0 default;
-      click a554ab6e9dd23fb0 &quot;DiagramStyles.html#mermaid-diagram-interaction-behavior&quot;;
-      80e6d6c5b81b8b7b[&quot;Mermaid Diagram Style Specification&quot;];
-      class 80e6d6c5b81b8b7b default;
-      click 80e6d6c5b81b8b7b &quot;DiagramStyles.html#mermaid-diagram-style-specification&quot;;
+  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
+    subgraph 98d50eb6f8a292bb[&quot;📄 Specifications.md&quot;]
+      f0239a043d4b79f1[&quot;Git Repository Scope Specification&quot;];
+      class f0239a043d4b79f1 default;
+      click f0239a043d4b79f1 &quot;Specifications.html#git-repository-scope-specification&quot;;
+      47d4dfd806994b53[&quot;Ignore Files Specification&quot;];
+      class 47d4dfd806994b53 default;
+      click 47d4dfd806994b53 &quot;Specifications.html#ignore-files-specification&quot;;
     end
   end
 </div>
-<h3 id="mermaid-diagram-interaction-behavior">Mermaid Diagram Interaction Behavior</h3>
-<p>Interactive behavior for Mermaid diagrams in HTML export.</p>
+<h3 id="git-repository-scope-specification">Git Repository Scope Specification</h3>
+<p>Path resolution and scope validation rules for Git repository-based project management.</p>
 <h4>Details</h4>
-<p><strong>Click Behavior:</strong></p>
+<p><strong>Git Root Detection:</strong></p>
 <ul>
-<li>Nodes are clickable links to element definition</li>
-<li>Links use relative paths from output location</li>
-<li>External links open in new tab</li>
+<li>Git root is detected via <code>git rev-parse --show-toplevel</code></li>
+<li>All internal paths are normalized to git-root-relative format for storage</li>
 </ul>
-<p><strong>Zoom/Pan:</strong></p>
+<p><strong>Path Resolution Rules:</strong></p>
 <ul>
-<li>Mouse wheel for zoom</li>
-<li>Click and drag for pan</li>
-<li>Reset button to restore initial view</li>
+<li>All paths are resolved relative to the current working directory</li>
+<li>When run from the git repository root: paths are relative to the git root</li>
+<li>When run from a subdirectory: paths are relative to that subdirectory</li>
 </ul>
-<h4>Metadata</h4>
+<p><strong>Processing Scope:</strong></p>
 <ul>
-<li>type: behavior</li>
+<li>When run from git root: all files in the repository are processed</li>
+<li>When run from a subdirectory: processing is limited to files within that subdirectory scope</li>
 </ul>
-<hr />
-<h3 id="mermaid-diagram-style-specification">Mermaid Diagram Style Specification</h3>
-<p>Styling conventions for Mermaid diagrams in CLI output and HTML export.</p>
-<h4>Details</h4>
-<p><strong>Node Shapes:</strong>
-| Element Type | Shape | Example |
-|–––––––|—––|———|
-| Requirement | Rectangle | <code>[Requirement Name]</code> |
-| Verification | Stadium | <code>([Verification Name])</code> |
-| File | Folder shape | <code>{{File.md}}</code> |
-| Folder | Hexagon | <code>{{folder/}}</code> |</p>
-<p><strong>Edge Styles:</strong>
-| Relation | Line Style | Arrow |
-|–––––|————|—––|
-| derivedFrom | Solid | Arrow |
-| verifiedBy | Dashed | Arrow |
-| satisfiedBy | Dotted | Arrow |
-| trace | Dotted | No arrow |</p>
-<p><strong>Colors (CSS Classes):</strong>
-| Class | Color | Usage |
-|—––|—––|—––|
-| requirement | #D0E0FF | Requirement nodes |
-| verification | #FFF7B3 | Verification nodes |
-| implementation | #DFFFD0 | Implementation nodes |
-| impacted | #FFAAAA | Change impact nodes |
-| changed | #FFDD57 | Changed nodes |</p>
-<p><strong>Subgraph Styling:</strong></p>
+<p><strong>Scope Boundary Validation:</strong></p>
 <ul>
-<li>Folders as subgraphs with light gray background</li>
-<li>Files as nested subgraphs</li>
-<li>Collapsible in interactive mode</li>
+<li>Relations referencing elements outside the subdirectory scope report missing relation target errors</li>
+<li>References using relative paths (e.g., <code>../ParentFile.md#element</code>) that escape the subdirectory result in missing relation target errors</li>
+<li>Absolute paths pointing outside the subdirectory scope generate missing relation target errors</li>
+<li>Missing relation target errors clearly identify the unreachable reference due to subdirectory scope limitations</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+</ul>
+<hr />
+<h3 id="ignore-files-specification">Ignore Files Specification</h3>
+<p>Rules for processing .gitignore and .reqvireignore exclusion patterns.</p>
+<h4>Details</h4>
+<p><strong>Pattern Sources:</strong></p>
+<ul>
+<li><code>.gitignore</code> - Version control exclusions (files not tracked by Git)</li>
+<li><code>.reqvireignore</code> - Reqvire-specific exclusions (files tracked by Git but excluded from requirements processing)</li>
+</ul>
+<p><strong>Processing Rules:</strong></p>
+<ul>
+<li>ONLY the root .gitignore file shall be used (not nested .gitignore files in subdirectories)</li>
+<li>ONLY the root .reqvireignore file shall be used (not nested .reqvireignore files in subdirectories)</li>
+<li>.reqvireignore shall use the same format and syntax as .gitignore</li>
+<li>Patterns from .gitignore and .reqvireignore shall be combined</li>
+<li>Files matching ANY exclusion pattern shall be excluded from parsing as requirements</li>
+</ul>
+<p><strong>Exclusion Behavior Differences:</strong></p>
+<ul>
+<li>Files excluded by <code>.gitignore</code>: completely excluded - cannot be parsed as structured markdown AND cannot be referenced in file relations</li>
+<li>Files excluded by <code>.reqvireignore</code>: excluded from parsing BUT can still be referenced in file relations (useful for design documents, diagrams)</li>
+</ul>
+<p><strong>Fallback Behavior:</strong></p>
+<ul>
+<li>If .reqvireignore does not exist, process normally using only .gitignore patterns</li>
+<li>If .gitignore does not exist, process normally using only .reqvireignore patterns</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
 </ul>
 <hr />
 

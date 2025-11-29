@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refinements</title>
+    <title>Constraints</title>
     <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
     <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
@@ -736,100 +736,13 @@ blockquote {
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
-    subgraph 631c66437258bda5[&quot;📄 Refinements.md&quot;]
-      912fafd5c8e43d0d[&quot;Dry-Run Mode Behavior&quot;];
-      class 912fafd5c8e43d0d default;
-      click 912fafd5c8e43d0d &quot;Refinements.html#dry-run-mode-behavior&quot;;
-      2ce04876bf450139[&quot;Element Ordering Behavior&quot;];
-      class 2ce04876bf450139 default;
-      click 2ce04876bf450139 &quot;Refinements.html#element-ordering-behavior&quot;;
-      da85bf5ae9efc0ac[&quot;File Persistence Behavior&quot;];
-      class da85bf5ae9efc0ac default;
-      click da85bf5ae9efc0ac &quot;Refinements.html#file-persistence-behavior&quot;;
-      fc994be69cdad23[&quot;Target Location Constraint&quot;];
-      class fc994be69cdad23 default;
-      click fc994be69cdad23 &quot;Refinements.html#target-location-constraint&quot;;
+    subgraph 13cfa02dc956ea20[&quot;📄 Constraints.md&quot;]
+      df1f09bc9884c2de[&quot;Target Location Constraint&quot;];
+      class df1f09bc9884c2de default;
+      click df1f09bc9884c2de &quot;Constraints.html#target-location-constraint&quot;;
     end
   end
 </div>
-<h3 id="dry-run-mode-behavior">Dry-Run Mode Behavior</h3>
-<p>Preview mode behavior for modification commands.</p>
-<h4>Details</h4>
-<ul>
-<li>Show changes without applying by default</li>
-<li>Require –fix flag to apply changes</li>
-<li>Show diff output for changes</li>
-<li>Exit 0 for successful preview</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: behavior</li>
-</ul>
-<hr />
-<h3 id="element-ordering-behavior">Element Ordering Behavior</h3>
-<p>Ordering algorithm for elements within specification files during formatting and file persistence operations.</p>
-<h4>Details</h4>
-<p><strong>Ordering Principle:</strong>
-Elements shall be ordered so that parent elements appear before their children (file-local derivedFrom hierarchy).</p>
-<p><strong>Algorithm:</strong></p>
-<ol>
-<li><strong>Identify Root Elements</strong>: Elements with no file-local <code>derivedFrom</code> relations (parents are in other files or none)</li>
-<li><strong>Group by Hierarchy</strong>: Group elements by their file-local parent chains</li>
-<li><strong>Sort Root Groups</strong>: Sort root element groups alphabetically by root element name</li>
-<li><strong>Order Within Groups</strong>: Within each group, order elements topologically:
-<ul>
-<li>Parent element first</li>
-<li>Direct children next (sorted alphabetically among siblings)</li>
-<li>Grandchildren after their parents (recursively)</li>
-</ul>
-</li>
-</ol>
-<p><strong>Example:</strong></p>
-<pre><code># Before (unordered):
-- Child B (derivedFrom: Parent A)
-- Grandchild Z (derivedFrom: Child A)
-- Parent A
-- Grandchild M (derivedFrom: Child A)
-- Child A (derivedFrom: Parent A)
-- Standalone Element
-
-# After (ordered):
-- Parent A              &lt;- Root, alphabetically first among roots with children
-- Child A               &lt;- Child of Parent A, alphabetically first sibling
-- Grandchild M          &lt;- Child of Child A, alphabetically first grandchild
-- Grandchild Z          &lt;- Child of Child A, alphabetically second grandchild
-- Child B               &lt;- Child of Parent A, alphabetically second sibling
-- Standalone Element    &lt;- Root with no children, alphabetically after Parent A
-</code></pre>
-<p><strong>Scope:</strong></p>
-<ul>
-<li>Only considers <code>derivedFrom</code> relations pointing to elements in the same file</li>
-<li>Cross-file relations do not affect ordering</li>
-<li>Elements without file-local hierarchy remain as independent roots</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: behavior</li>
-</ul>
-<hr />
-<h3 id="file-persistence-behavior">File Persistence Behavior</h3>
-<p>How element manipulation operations persist changes to files:</p>
-<ul>
-<li>Track modified files during operations</li>
-<li>Write only modified files to storage</li>
-<li>Maintain file format and structure</li>
-<li>Handle I/O errors with reporting</li>
-</ul>
-<p><strong>Synchronization:</strong></p>
-<ul>
-<li>On-disk matches in-memory after success</li>
-<li>No partial changes on error</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: behavior</li>
-</ul>
-<hr />
 <h3 id="target-location-constraint">Target Location Constraint</h3>
 <p>Validation rules for target paths in element operations.</p>
 <p><strong>Path Validation:</strong></p>

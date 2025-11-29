@@ -746,6 +746,12 @@ blockquote {
       fcf8b5c885888584[&quot;Subdirectory Auto-Detection Behavior&quot;];
       class fcf8b5c885888584 default;
       click fcf8b5c885888584 &quot;Behaviors.html#subdirectory-auto-detection-behavior&quot;;
+      36c28052839ab0a1[&quot;Two-Pass Validation Behavior&quot;];
+      class 36c28052839ab0a1 default;
+      click 36c28052839ab0a1 &quot;Behaviors.html#two-pass-validation-behavior&quot;;
+      7b535a46a6894d14[&quot;Validation Error Reporting Behavior&quot;];
+      class 7b535a46a6894d14 default;
+      click 7b535a46a6894d14 &quot;Behaviors.html#validation-error-reporting-behavior&quot;;
     end
   end
 </div>
@@ -811,12 +817,6 @@ blockquote {
 <li><strong>Limit file processing</strong>: Only process specification files within the current subdirectory</li>
 <li><strong>Validate references</strong>: References to elements outside the subdirectory scope generate missing target errors</li>
 </ol>
-<p><strong>Scope Boundary Enforcement:</strong></p>
-<ul>
-<li>References using relative paths (e.g., <code>../ParentFile.md#element</code>) that escape the subdirectory result in missing relation target errors</li>
-<li>Absolute paths pointing outside subdirectory scope generate errors</li>
-<li>Logical boundaries are maintained during subdirectory operations</li>
-</ul>
 <p><strong>When run from git root:</strong></p>
 <ul>
 <li>Process all files in the repository</li>
@@ -826,6 +826,54 @@ blockquote {
 <h4>Metadata</h4>
 <ul>
 <li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+</ul>
+<hr />
+<h3 id="two-pass-validation-behavior">Two-Pass Validation Behavior</h3>
+<p>Two-phase validation process for model parsing.</p>
+<h4>Details</h4>
+<p><strong>Pass 1: Element Collection</strong></p>
+<ul>
+<li>Parse all markdown files</li>
+<li>Extract elements with metadata</li>
+<li>Local validation (uniqueness, format, syntax)</li>
+<li>Report errors if found</li>
+</ul>
+<p><strong>Pass 2: Graph Validation</strong></p>
+<ul>
+<li>Build in-memory model representation from elements</li>
+<li>Validate relations (existence, type compatibility)</li>
+<li>Cross-component validation</li>
+<li>Report errors if found</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Validation.html#two-pass-validation-strategy">Two-Pass Validation Strategy</a></li>
+</ul>
+<hr />
+<h3 id="validation-error-reporting-behavior">Validation Error Reporting Behavior</h3>
+<p>Error message structure for validation issues.</p>
+<h4>Details</h4>
+<ul>
+<li>File path and line number included</li>
+<li>Element name and relation details shown</li>
+<li>Color coding per Color Scheme Specification</li>
+<li>Actionable suggestions when possible</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
 </ul>
 <hr />
 

@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OutputFormats</title>
-    <link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico">
-    <link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png">
+    <title>Specifications</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
 <style>
 :root {
@@ -713,13 +713,13 @@ blockquote {
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../../../index.html" class="nav-logo"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a>
-        <a href="../../../../index.html">Containment</a>
-        <a href="../../../../model.html">Model</a>
-        <a href="../../../../traces.html">Traces</a>
-        <a href="../../../../traceflow.html">TraceFlow</a>
-        <a href="../../../../coverage.html">Coverage</a>
-        <a href="../../../../resources.html">Resources</a>
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
+        <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -735,29 +735,29 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 8450fb687cd09c62[&quot;📁 requirements/System/Output/DesignDocuments&quot;]
-    subgraph 48e67d899089ad17[&quot;📄 OutputFormats.md&quot;]
-      16074ff0c3cc7caa[&quot;Color Scheme Specification&quot;];
-      class 16074ff0c3cc7caa default;
-      click 16074ff0c3cc7caa &quot;OutputFormats.html#color-scheme-specification&quot;;
-      e66c44fb8458e88e[&quot;Diff Output Format Specification&quot;];
-      class e66c44fb8458e88e default;
-      click e66c44fb8458e88e &quot;OutputFormats.html#diff-output-format-specification&quot;;
-      e67e54011d4200fa[&quot;Error Message Format Specification&quot;];
-      class e67e54011d4200fa default;
-      click e67e54011d4200fa &quot;OutputFormats.html#error-message-format-specification&quot;;
-      5be02a80c4e059cd[&quot;JSON Output Structure&quot;];
-      class 5be02a80c4e059cd default;
-      click 5be02a80c4e059cd &quot;OutputFormats.html#json-output-structure&quot;;
-      a8fb2c2e7c2a3545[&quot;Markdown Report Style Specification&quot;];
-      class a8fb2c2e7c2a3545 default;
-      click a8fb2c2e7c2a3545 &quot;OutputFormats.html#markdown-report-style-specification&quot;;
-      9826d69cbc76ee97[&quot;Short Mode Behavior&quot;];
-      class 9826d69cbc76ee97 default;
-      click 9826d69cbc76ee97 &quot;OutputFormats.html#short-mode-behavior&quot;;
-      410b79706d87b2ed[&quot;Text Output Formatting&quot;];
-      class 410b79706d87b2ed default;
-      click 410b79706d87b2ed &quot;OutputFormats.html#text-output-formatting&quot;;
+  subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
+    subgraph d9d3d619c8b2406e[&quot;📄 Specifications.md&quot;]
+      8a232f071d3fa417[&quot;Color Scheme Specification&quot;];
+      class 8a232f071d3fa417 default;
+      click 8a232f071d3fa417 &quot;Specifications.html#color-scheme-specification&quot;;
+      6c026c92dadc0fbb[&quot;Diff Output Format Specification&quot;];
+      class 6c026c92dadc0fbb default;
+      click 6c026c92dadc0fbb &quot;Specifications.html#diff-output-format-specification&quot;;
+      1ada57de60940ee9[&quot;Error Message Format Specification&quot;];
+      class 1ada57de60940ee9 default;
+      click 1ada57de60940ee9 &quot;Specifications.html#error-message-format-specification&quot;;
+      3bc36e64323d2171[&quot;JSON Output Structure&quot;];
+      class 3bc36e64323d2171 default;
+      click 3bc36e64323d2171 &quot;Specifications.html#json-output-structure&quot;;
+      b30c1e79aadc1554[&quot;Markdown Report Style Specification&quot;];
+      class b30c1e79aadc1554 default;
+      click b30c1e79aadc1554 &quot;Specifications.html#markdown-report-style-specification&quot;;
+      efd4d3e5c9cdc0ee[&quot;Mermaid Diagram Style Specification&quot;];
+      class efd4d3e5c9cdc0ee default;
+      click efd4d3e5c9cdc0ee &quot;Specifications.html#mermaid-diagram-style-specification&quot;;
+      841395435f901267[&quot;Text Output Formatting&quot;];
+      class 841395435f901267 default;
+      click 841395435f901267 &quot;Specifications.html#text-output-formatting&quot;;
     end
   end
 </div>
@@ -912,32 +912,40 @@ blockquote {
 <li>type: specification</li>
 </ul>
 <hr />
-<h3 id="short-mode-behavior">Short Mode Behavior</h3>
-<p>Behavior when <code>--short</code> flag is provided to CLI commands.</p>
+<h3 id="mermaid-diagram-style-specification">Mermaid Diagram Style Specification</h3>
+<p>Styling conventions for Mermaid diagrams in CLI output and HTML export.</p>
 <h4>Details</h4>
-<p>Short mode reduces output verbosity for quick scanning:</p>
-<p><strong>Text Output (–short without –json):</strong></p>
+<p><strong>Node Shapes:</strong>
+| Element Type | Shape | Example |
+|–––––––|—––|———|
+| Requirement | Rectangle | <code>[Requirement Name]</code> |
+| Verification | Stadium | <code>([Verification Name])</code> |
+| File | Folder shape | <code>{{File.md}}</code> |
+| Folder | Hexagon | <code>{{folder/}}</code> |</p>
+<p><strong>Edge Styles:</strong>
+| Relation | Line Style | Arrow |
+|–––––|————|—––|
+| derivedFrom | Solid | Arrow |
+| verifiedBy | Dashed | Arrow |
+| satisfiedBy | Dotted | Arrow |
+| trace | Dotted | No arrow |</p>
+<p><strong>Colors (CSS Classes):</strong>
+| Class | Color | Usage |
+|—––|—––|—––|
+| requirement | #D0E0FF | Requirement nodes |
+| verification | #FFF7B3 | Verification nodes |
+| implementation | #DFFFD0 | Implementation nodes |
+| impacted | #FFAAAA | Change impact nodes |
+| changed | #FFDD57 | Changed nodes |</p>
+<p><strong>Subgraph Styling:</strong></p>
 <ul>
-<li>One line per element: <code>[type] identifier - name</code></li>
-<li>Omit detailed content, relations, and metadata</li>
-<li>Suitable for piping to other tools</li>
-</ul>
-<p><strong>JSON Output (–short with –json):</strong></p>
-<ul>
-<li>Omit verbose fields: <code>content</code>, <code>page_content</code>, <code>attachments</code></li>
-<li>Omit computed fields: <code>element_count</code>, <code>total_elements</code>, <code>global_counters</code></li>
-<li>Retain: <code>identifier</code>, <code>name</code>, <code>type</code>, <code>file_path</code></li>
-<li>Retain: <code>relations</code> (for traceability)</li>
-</ul>
-<p><strong>Rationale:</strong></p>
-<ul>
-<li>Reduces output size for large models</li>
-<li>Faster parsing by downstream tools</li>
-<li>Maintains essential traceability information</li>
+<li>Folders as subgraphs with light gray background</li>
+<li>Files as nested subgraphs</li>
+<li>Collapsible in interactive mode</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
-<li>type: behavior</li>
+<li>type: specification</li>
 </ul>
 <hr />
 <h3 id="text-output-formatting">Text Output Formatting</h3>

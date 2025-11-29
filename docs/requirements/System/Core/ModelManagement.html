@@ -735,18 +735,21 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
-    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      e64436de26e90ea9[&quot;Subdirectory Processing Option<br/>📎 requirements/System/Core/Behaviors.md#subdirectory-auto-detection-behavior&quot;];
-      class e64436de26e90ea9 systemRequirement;
-      click e64436de26e90ea9 &quot;../../Interfaces/CLI.html#subdirectory-processing-option&quot;;
-    end
-  end
   subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
+    subgraph 585ddb96960b31b[&quot;📄 Behaviors.md&quot;]
+      fcf8b5c885888584[&quot;Subdirectory Auto-Detection Behavior&quot;];
+      class fcf8b5c885888584 default;
+      click fcf8b5c885888584 &quot;Behaviors.html#subdirectory-auto-detection-behavior&quot;;
+    end
     subgraph f23c409eff55fa7c[&quot;📄 Configuration.md&quot;]
       6921a84a17b97dda[&quot;Ignoring Unstructured Documents&quot;];
       class 6921a84a17b97dda systemRequirement;
       click 6921a84a17b97dda &quot;Configuration.html#ignoring-unstructured-documents&quot;;
+    end
+    subgraph 2b0b27142487cdbe[&quot;📄 Constraints.md&quot;]
+      1a01f3b1f5f4fd54[&quot;Element Type Relation Compatibility Constraint&quot;];
+      class 1a01f3b1f5f4fd54 default;
+      click 1a01f3b1f5f4fd54 &quot;Constraints.html#element-type-relation-compatibility-constraint&quot;;
     end
     subgraph 9ac3c1b5de6a3113[&quot;📄 ModelManagement.md&quot;]
       363332ee418d9a97[&quot;Attachment Identifier Updates<br/>📎 requirements/System/Core/Behaviors.md#attachment-identifier-crud-update-behavior&quot;];
@@ -767,7 +770,7 @@ blockquote {
       bc4b202a0bb6f50c[&quot;Element Type Relation Compatibility<br/>📎 RelationTypes.md&quot;];
       class bc4b202a0bb6f50c systemRequirement;
       click bc4b202a0bb6f50c &quot;ModelManagement.html#element-type-relation-compatibility&quot;;
-      ba66a4ed15581f23[&quot;Git Repository as Project Root&quot;];
+      ba66a4ed15581f23[&quot;Git Repository as Project Root<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/System/Core/Behaviors.md#subdirectory-auto-detection-behavior&quot;];
       class ba66a4ed15581f23 userRequirement;
       click ba66a4ed15581f23 &quot;ModelManagement.html#git-repository-as-project-root&quot;;
       ef466393e75bd0d[&quot;Refinement Element Structure Constraints&quot;];
@@ -786,10 +789,10 @@ blockquote {
       class 6d3dc4e586860761 systemRequirement;
       click 6d3dc4e586860761 &quot;ModelManagement.html#verification-type-categories&quot;;
     end
-    subgraph bdf2d0d4066a95c0[&quot;📄 Refinements.md&quot;]
-      e45df3681600a73c[&quot;Element Type Relation Compatibility Constraint&quot;];
-      class e45df3681600a73c default;
-      click e45df3681600a73c &quot;Refinements.html#element-type-relation-compatibility-constraint&quot;;
+    subgraph 98d50eb6f8a292bb[&quot;📄 Specifications.md&quot;]
+      f0239a043d4b79f1[&quot;Git Repository Scope Specification&quot;];
+      class f0239a043d4b79f1 default;
+      click f0239a043d4b79f1 &quot;Specifications.html#git-repository-scope-specification&quot;;
     end
     subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
       f7d689fafa15738b[&quot;Relation Element Type Validator&quot;];
@@ -824,32 +827,35 @@ blockquote {
       d2ba1522cae21673[&quot;Element Type Relation Compatibility Test&quot;];
       class d2ba1522cae21673 verification;
       click d2ba1522cae21673 &quot;Verifications/ValidationVerifications.html#element-type-relation-compatibility-test&quot;;
+      48724d283e4c3b16[&quot;Subdirectory Processing Verification&quot;];
+      class 48724d283e4c3b16 verification;
+      click 48724d283e4c3b16 &quot;Verifications/ValidationVerifications.html#subdirectory-processing-verification&quot;;
     end
   end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class ca74bbb037431e9b systemRequirement;
       click ca74bbb037431e9b &quot;../Operations/ElementManipulation.html#create-element-operation&quot;;
-      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior&quot;];
+      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
       class b1ed46220f447242 systemRequirement;
       click b1ed46220f447242 &quot;../Operations/ElementManipulation.html#delete-element-operation&quot;;
-      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 5e9d1888d2914fd4 systemRequirement;
       click 5e9d1888d2914fd4 &quot;../Operations/ElementManipulation.html#element-manipulation-file-persistence&quot;;
-      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 84860e94fc819efd systemRequirement;
       click 84860e94fc819efd &quot;../Operations/ElementManipulation.html#move-element-operation&quot;;
-      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint&quot;];
+      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint&quot;];
       class bbea6657a24b3f1c systemRequirement;
       click bbea6657a24b3f1c &quot;../Operations/ElementManipulation.html#move-file-operation&quot;;
       b7a7ab53d4242be8[&quot;Relation Consistency Maintenance&quot;];
       class b7a7ab53d4242be8 systemRequirement;
       click b7a7ab53d4242be8 &quot;../Operations/ElementManipulation.html#relation-consistency-maintenance&quot;;
-      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior&quot;];
+      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
       class a6593dab7ef5d521 systemRequirement;
       click a6593dab7ef5d521 &quot;../Operations/ElementManipulation.html#rename-element-operation&quot;;
-      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation&quot;];
+      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification&quot;];
       class 9987f9e9ae83fba3 systemRequirement;
       click 9987f9e9ae83fba3 &quot;../Operations/ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
     end
@@ -879,10 +885,16 @@ blockquote {
   66091f40428d6d66 -.->|deriveReqT| a6593dab7ef5d521;
   66091f40428d6d66 -.->|deriveReqT| 9987f9e9ae83fba3;
   bc4b202a0bb6f50c -.->|deriveReqT| f7d689fafa15738b;
-  bc4b202a0bb6f50c -->|satisfiedBy| e45df3681600a73c;
+  bc4b202a0bb6f50c -->|satisfiedBy| 1a01f3b1f5f4fd54;
   bc4b202a0bb6f50c -.->|verifiedBy| d2ba1522cae21673;
-  ba66a4ed15581f23 -.->|deriveReqT| e64436de26e90ea9;
   ba66a4ed15581f23 -.->|deriveReqT| 9987f9e9ae83fba3;
+  e2fdc13fe7e53251[&quot;git_commands.rs&quot;];
+  class e2fdc13fe7e53251 default;
+  click e2fdc13fe7e53251 &quot;../../../core/src/git_commands.rs&quot;;
+  ba66a4ed15581f23 -->|satisfiedBy| e2fdc13fe7e53251;
+  ba66a4ed15581f23 -->|satisfiedBy| fcf8b5c885888584;
+  ba66a4ed15581f23 -->|satisfiedBy| f0239a043d4b79f1;
+  ba66a4ed15581f23 -.->|verifiedBy| 48724d283e4c3b16;
   d50a859650933e55[&quot;model.rs&quot;];
   class d50a859650933e55 default;
   click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
@@ -942,6 +954,7 @@ blockquote {
   class ce2625feec883e55 default;
   click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
   ca74bbb037431e9b -->|satisfiedBy| ce2625feec883e55;
+  ca74bbb037431e9b -->|satisfiedBy| 9b4a4077c4e05529;
   ca74bbb037431e9b -.->|verifiedBy| e9c9cae75f37f06;
   b1ed46220f447242 -->|satisfiedBy| 80defdd4cbc7ee18;
   b1ed46220f447242 -->|satisfiedBy| ea4ba0d9ffba93a5;
@@ -965,7 +978,7 @@ blockquote {
   a6593dab7ef5d521 -->|satisfiedBy| b7c871ab64a7059a;
   9987f9e9ae83fba3 -->|satisfiedBy| b7c871ab64a7059a;
   9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
-  9987f9e9ae83fba3 -->|satisfiedBy| fc994be69cdad23;
+  9987f9e9ae83fba3 -->|satisfiedBy| df1f09bc9884c2de;
   9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
   f7d689fafa15738b -->|satisfiedBy| d50a859650933e55;
   f7d689fafa15738b -->|satisfiedBy| f22d93285fcd7664;
@@ -975,7 +988,10 @@ blockquote {
   class a62d9d7bace214e0 default;
   click a62d9d7bace214e0 &quot;../../../tests/test-element-type-relation-compatibility/test.sh&quot;;
   d2ba1522cae21673 -->|satisfiedBy| a62d9d7bace214e0;
-  e64436de26e90ea9 -->|satisfiedBy| 80defdd4cbc7ee18;
+  a565a00c1df16a79[&quot;test.sh&quot;];
+  class a565a00c1df16a79 default;
+  click a565a00c1df16a79 &quot;../../../tests/test-subdirectory-functionality/test.sh&quot;;
+  48724d283e4c3b16 -->|satisfiedBy| a565a00c1df16a79;
   83b654d72d72255 -.->|deriveReqT| f7d689fafa15738b;
   978256deec70c016 -.->|verifiedBy| 23a09f2d69fc3b23;
   978256deec70c016 -.->|verifiedBy| 92720158539bac0d;
@@ -1089,22 +1105,32 @@ blockquote {
 </ul>
 <hr />
 <h3 id="git-repository-as-project-root">Git Repository as Project Root</h3>
-<p>The system shall treat the <strong>root directory of the Git repository as the project’s base</strong> for all file and folder references, streamlining configuration and promoting a self-contained project structure.</p>
+<p>The system shall use the Git repository root as the project base for path resolution and scope management.</p>
 <h4>Details</h4>
-<p>All paths specified in Reqvire commands will be resolved relative to the current working directory:</p>
 <ul>
-<li>When run from the git repository root: paths are relative to the git root</li>
-<li>When run from a subdirectory: paths are relative to that subdirectory, and processing is limited to files within that subdirectory scope</li>
+<li>The system shall treat the root directory of the Git repository as the project’s base for all file and folder references</li>
+<li>The system shall implement path resolution following clearly defined specifications</li>
+<li>When run from git root, the system shall process all files with paths resolved relative to git root</li>
+<li>When run from a subdirectory, the system shall automatically detect the subdirectory context and limit processing scope</li>
+<li>When run from a subdirectory, the system shall validate that all references stay within scope boundaries following clearly defined specifications</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#git-repository-scope-specification">Git Repository Scope Specification</a></li>
+<li><a href="Behaviors.html#subdirectory-auto-detection-behavior">Subdirectory Auto-Detection Behavior</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="../../Interfaces/CLI.html#subdirectory-processing-option">Subdirectory Processing Option</a></li>
 <li>derive: <a href="../Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#managing-system-models">Managing System Models</a></li>
+<li>satisfiedBy: <a href="../../../core/src/git_commands.rs">git_commands.rs</a></li>
+<li>satisfiedBy: <a href="Behaviors.html#subdirectory-auto-detection-behavior">Subdirectory Auto-Detection Behavior</a></li>
+<li>satisfiedBy: <a href="Specifications.html#git-repository-scope-specification">Git Repository Scope Specification</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#subdirectory-processing-verification">Subdirectory Processing Verification</a></li>
 </ul>
 <hr />
 <h3 id="relation-types-and-behaviors">Relation Types and behaviors</h3>
@@ -1136,7 +1162,7 @@ blockquote {
 <li>derive: <a href="Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
 <li>derivedFrom: <a href="#relation-types-and-behaviors">Relation Types and behaviors</a></li>
 <li>derivedFrom: <a href="#supported-element-types">Supported Element Types</a></li>
-<li>satisfiedBy: <a href="Refinements.html#element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</a></li>
+<li>satisfiedBy: <a href="Constraints.html#element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">Element Type Relation Compatibility Test</a></li>
 </ul>
 <hr />

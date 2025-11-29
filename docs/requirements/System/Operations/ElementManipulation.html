@@ -736,36 +736,41 @@ blockquote {
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
+    subgraph 13cfa02dc956ea20[&quot;📄 Constraints.md&quot;]
+      df1f09bc9884c2de[&quot;Target Location Constraint&quot;];
+      class df1f09bc9884c2de default;
+      click df1f09bc9884c2de &quot;Constraints.html#target-location-constraint&quot;;
+    end
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class ca74bbb037431e9b systemRequirement;
       click ca74bbb037431e9b &quot;ElementManipulation.html#create-element-operation&quot;;
-      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior&quot;];
+      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
       class b1ed46220f447242 systemRequirement;
       click b1ed46220f447242 &quot;ElementManipulation.html#delete-element-operation&quot;;
-      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 5e9d1888d2914fd4 systemRequirement;
       click 5e9d1888d2914fd4 &quot;ElementManipulation.html#element-manipulation-file-persistence&quot;;
-      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 84860e94fc819efd systemRequirement;
       click 84860e94fc819efd &quot;ElementManipulation.html#move-element-operation&quot;;
-      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Refinements.md#target-location-constraint&quot;];
+      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint&quot;];
       class bbea6657a24b3f1c systemRequirement;
       click bbea6657a24b3f1c &quot;ElementManipulation.html#move-file-operation&quot;;
       b7a7ab53d4242be8[&quot;Relation Consistency Maintenance&quot;];
       class b7a7ab53d4242be8 systemRequirement;
       click b7a7ab53d4242be8 &quot;ElementManipulation.html#relation-consistency-maintenance&quot;;
-      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Refinements.md#file-persistence-behavior&quot;];
+      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
       class a6593dab7ef5d521 systemRequirement;
       click a6593dab7ef5d521 &quot;ElementManipulation.html#rename-element-operation&quot;;
-      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation&quot;];
+      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification&quot;];
       class 9987f9e9ae83fba3 systemRequirement;
       click 9987f9e9ae83fba3 &quot;ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
     end
-    subgraph 631c66437258bda5[&quot;📄 Refinements.md&quot;]
-      fc994be69cdad23[&quot;Target Location Constraint&quot;];
-      class fc994be69cdad23 default;
-      click fc994be69cdad23 &quot;Refinements.html#target-location-constraint&quot;;
+    subgraph 13f813da82130a33[&quot;📄 Specifications.md&quot;]
+      9b4a4077c4e05529[&quot;Relation Validation Specification&quot;];
+      class 9b4a4077c4e05529 default;
+      click 9b4a4077c4e05529 &quot;Specifications.html#relation-validation-specification&quot;;
     end
   end
   subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
@@ -776,7 +781,7 @@ blockquote {
       489fbf5e3ec08a53[&quot;Delete Element Test&quot;];
       class 489fbf5e3ec08a53 verification;
       click 489fbf5e3ec08a53 &quot;Verifications/ElementManipulationVerifications.html#delete-element-test&quot;;
-      9c8ea99467081d64[&quot;File Persistence Test<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      9c8ea99467081d64[&quot;File Persistence Test<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 9c8ea99467081d64 verification;
       click 9c8ea99467081d64 &quot;Verifications/ElementManipulationVerifications.html#file-persistence-test&quot;;
       3df547c544ad75b1[&quot;Move Element Test&quot;];
@@ -793,7 +798,7 @@ blockquote {
       click b6076972a6650ff1 &quot;Verifications/ElementManipulationVerifications.html#target-location-validation-test&quot;;
     end
     subgraph 5fdb7c9d75d9c8bf[&quot;📄 FormattingVerifications.md&quot;]
-      934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Refinements.md#element-ordering-behavior&quot;];
+      934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 934319026295f62c verification;
       click 934319026295f62c &quot;Verifications/FormattingVerifications.html#element-ordering-verification&quot;;
     end
@@ -822,6 +827,7 @@ blockquote {
   class ce2625feec883e55 default;
   click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
   ca74bbb037431e9b -->|satisfiedBy| ce2625feec883e55;
+  ca74bbb037431e9b -->|satisfiedBy| 9b4a4077c4e05529;
   ca74bbb037431e9b -.->|verifiedBy| e9c9cae75f37f06;
   b1ed46220f447242 -->|satisfiedBy| 80defdd4cbc7ee18;
   b1ed46220f447242 -->|satisfiedBy| ea4ba0d9ffba93a5;
@@ -845,7 +851,7 @@ blockquote {
   a6593dab7ef5d521 -->|satisfiedBy| b7c871ab64a7059a;
   9987f9e9ae83fba3 -->|satisfiedBy| b7c871ab64a7059a;
   9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
-  9987f9e9ae83fba3 -->|satisfiedBy| fc994be69cdad23;
+  9987f9e9ae83fba3 -->|satisfiedBy| df1f09bc9884c2de;
   9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
   e0536c36e7700661[&quot;test.sh&quot;];
   class e0536c36e7700661 default;
@@ -879,56 +885,26 @@ blockquote {
   b6076972a6650ff1 -->|satisfiedBy| fe344320c82b0bbf;
 </div>
 <h3 id="create-element-operation">Create Element Operation</h3>
-<p>The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file following Element Ordering Behavior.</p>
+<p>The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file.</p>
 <h4>Details</h4>
 <p>When creating a new element, the system shall:</p>
 <ul>
-<li>Accept a string containing the full element definition in Markdown format (including ### header, metadata, relations, and content)</li>
+<li>Accept a string containing the full element definition in Markdown format</li>
 <li>Accept target location: file path</li>
 <li>Validate the target location using path validation rules</li>
 <li>Create target file if it does not exist (subject to validation constraints)</li>
-<li>Parse the element definition string to extract element structure, preserving all subsections:
-<ul>
-<li>Metadata (element type and custom properties)</li>
-<li>Relations (derivedFrom, verifiedBy, satisfiedBy, verify)</li>
-<li>Details (refinement details and nested content)</li>
-<li>Attachments (links to Refinement elements and files)</li>
-</ul>
-</li>
-<li>Validate the element structure (proper subsections, valid relations, correct format)</li>
+<li>Parse and validate the element definition string</li>
 <li>Verify the element name is globally unique in the model</li>
-<li>Generate a unique element identifier based on file path and element name</li>
-<li><strong>Validate and normalize all relations in the element:</strong>
-<ul>
-<li>Parse relation targets from the markdown (may be relative paths or repo-relative paths)</li>
-<li>Normalize relation targets to be relative to the git repository root</li>
-<li>Validate that each relation target element exists in the model</li>
-<li>Reject the operation if any relation target does not exist</li>
-<li>Provide clear error messages indicating which relation target was not found</li>
-</ul>
-</li>
-<li>If validation passes, insert the element into the target file following Element Ordering Behavior</li>
-<li>If validation fails, reject the operation and report validation errors</li>
-<li>Maintain file structure and formatting after insertion</li>
-</ul>
-<p><strong>Relation Validation Rules:</strong></p>
-<ul>
-<li>Relation targets may be specified as:
-<ul>
-<li>Relative paths from the target file location (e.g., <code>../UserReqs.md#requirement</code>)</li>
-<li>Paths relative to git repository root (e.g., <code>specifications/UserReqs.md#requirement</code>)</li>
-<li>Same-file references (e.g., <code>#other-requirement</code>)</li>
-</ul>
-</li>
-<li>All relation targets must be normalized to git repository root relative format before insertion</li>
-<li>All relation targets must reference existing elements in the model</li>
-<li>External links (http://, https://, etc.) are allowed and not validated</li>
+<li>Validate and normalize all relations following clearly defined specifications</li>
+<li>Insert the element into the target file following Element Ordering Behavior</li>
+<li>Reject the operation and report validation errors if validation fails</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
-<li><a href="Refinements.html#target-location-constraint">Target Location Constraint</a></li>
-<li><a href="Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+<li><a href="Specifications.html#relation-validation-specification">Relation Validation Specification</a></li>
+<li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
+<li><a href="Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -940,6 +916,7 @@ blockquote {
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#relation-validation-specification">Relation Validation Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#create-element-test">Create Element Test</a></li>
 </ul>
 <hr />
@@ -972,7 +949,7 @@ blockquote {
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -988,8 +965,8 @@ blockquote {
 <p>The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.</p>
 <h4>Attachments</h4>
 <ul>
-<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
-<li><a href="Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+<li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1035,9 +1012,9 @@ blockquote {
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
-<li><a href="Refinements.html#target-location-constraint">Target Location Constraint</a></li>
-<li><a href="Refinements.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+<li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
+<li><a href="Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1078,8 +1055,8 @@ When the –squash flag is provided and the target file already exists, the syst
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
-<li><a href="Refinements.html#target-location-constraint">Target Location Constraint</a></li>
+<li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1130,7 +1107,7 @@ When the –squash flag is provided and the target file already exists, the syst
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="Refinements.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1144,6 +1121,10 @@ When the –squash flag is provided and the target file already exists, the syst
 <p>The system shall validate target file paths for element manipulation operations and automatically create files when they do not exist, subject to path safety constraints.</p>
 <h4>Details</h4>
 <p>The system shall define target location validation constraints.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Core/Specifications.html#git-repository-scope-specification">Git Repository Scope Specification</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
@@ -1151,7 +1132,7 @@ When the –squash flag is provided and the target file already exists, the syst
 <li>derivedFrom: <a href="../Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
-<li>satisfiedBy: <a href="Refinements.html#target-location-constraint">Target Location Constraint</a></li>
+<li>satisfiedBy: <a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#target-location-validation-test">Target Location Validation Test</a></li>
 </ul>
 <hr />

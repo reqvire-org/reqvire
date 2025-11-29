@@ -33,24 +33,43 @@ The attachment commands manage entries in the Attachments subsection of elements
 The CLI interface shall implement the clear `[OPTIONS] <COMMAND> [COMMAND OPTIONS]` structure.
 
 #### Details
-The CLI must display all commands and options and command's options flattened in the main help output which must also be a default commnad:
+The CLI must display all commands and options and command's options flattened in the main help output which must also be a default command:
 ```
-Reqvire requirements & treacibility management tool
+Reqvire requirements & traceability management tool
 
 Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
 
 Commands:
-  format             Format and normalize requirements files. By default, shows preview without applying changes
-  validate           Validate model
-  help               Print this message or the help of the given subcommand(s)
+  export            Export model to browsable HTML documentation
+  serve             Serve model as browsable HTML documentation via HTTP server
+  format            Format and normalize requirements files
+  validate          Validate model
+  search            Search and filter model elements
+  change-impact     Analyze change impact and provide report
+  traces            Generate verification traces
+  coverage          Generate verification coverage report
+  model             Generate model-centric structure diagram
+  lint              Analyze model quality and detect issues
+  add               Add new element to model
+  rm                Remove element from model
+  mv                Move element to different location
+  rename            Rename element
+  mv-file           Move entire specification file
+  attach            Attach document or Refinement element
+  detach            Detach document or Refinement element
+  mv-asset          Move/rename asset file and update references
+  rm-asset          Remove asset file and remove references
+  containment       Generate containment view
+  resources         Generate resources report
+  help              Print help for commands
 
 Options:
   -h, --help               Print help
   -V, --version            Print version
 
-FORMAT OPTIONS:
-      --fix      Apply formatting changes to files
-      --json     Output results in JSON format
+<COMMAND OPTIONS>:
+  Each command has its own options displayed in a flattened section
+  (e.g., FORMAT OPTIONS, VALIDATE OPTIONS, etc.)
 ```
 
 #### Relations
@@ -183,7 +202,7 @@ The markdown output shall include:
 
 ### CLI Coverage Command
 
-The system shall implement a `coverage` subcommand under the main `verifications` command that generates verification coverage reports focusing on leaf requirements, test-verification satisfaction status, and orphaned verifications.
+The system shall provide a `coverage` command that generates verification coverage reports focusing on leaf requirements, test-verification satisfaction status, and orphaned verifications.
 
 #### Details
 The command shall:
@@ -195,7 +214,7 @@ The command shall:
 - Include breakdowns by file, section, and verification type
 - Show satisfaction status of test-verification elements (those with satisfiedBy relations)
 - Show orphaned verifications (verification elements without any verify relations to requirements)
-- Follow [Verification Roll-up Strategy](../ModelManagement/VerificationTraces.md#verification-roll-up-strategy)
+- Follow [Verification Roll-up Strategy](../System/Processing/VerificationTraces.md#verification-roll-up-strategy)
 - Test-verification elements require satisfiedBy relations to be considered satisfied
 - Analysis, inspection, and demonstration verification elements are considered satisfied by default
 - Exit with status code 0 on success
@@ -284,7 +303,6 @@ The `mv-asset` command shall:
 - Apply changes immediately by default
 - Support `--dry-run` flag to preview changes without applying
 - Output git-style diff showing all affected files
-- Support `--json` flag for structured output
 - Report all affected elements and relation updates
 - Exit with code 0 on success, non-zero on error
 
@@ -292,7 +310,6 @@ The `mv-asset` command shall:
   * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -377,7 +394,6 @@ The `rm-asset` command shall:
 - Apply changes immediately by default
 - Support `--dry-run` flag to preview changes without applying
 - Output git-style diff showing all affected files
-- Support `--json` flag for structured output
 - Report all affected elements and removed relations
 - Exit with code 0 on success, non-zero on error
 
@@ -385,7 +401,6 @@ The `rm-asset` command shall:
   * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -525,7 +540,7 @@ Default output:
 
 ### CLI Traces Command
 
-The system shall implement a `traces` subcommand under the main `verifications` command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy from verifications to root requirements.
+The system shall provide a `traces` command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy from verifications to root requirements.
 
 #### Details
 The command shall:

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Refinements</title>
+    <title>Behaviors</title>
     <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
     <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
@@ -735,32 +735,96 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1d4bb727b3ab4a6c[&quot;📁 requirements/System/Integration&quot;]
-    subgraph 38e46b81f6dca385[&quot;📄 Refinements.md&quot;]
-      1927c0ce6e116270[&quot;Comment Style Specification&quot;];
-      class 1927c0ce6e116270 default;
-      click 1927c0ce6e116270 &quot;Refinements.html#comment-style-specification&quot;;
+  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
+    subgraph 74d2c337dc5bdc2b[&quot;📄 Behaviors.md&quot;]
+      e02c812c8e81c986[&quot;Dry-Run Mode Behavior&quot;];
+      class e02c812c8e81c986 default;
+      click e02c812c8e81c986 &quot;Behaviors.html#dry-run-mode-behavior&quot;;
+      49f4fc3d7df8c797[&quot;Element Ordering Behavior&quot;];
+      class 49f4fc3d7df8c797 default;
+      click 49f4fc3d7df8c797 &quot;Behaviors.html#element-ordering-behavior&quot;;
+      319832f410de9f37[&quot;File Persistence Behavior&quot;];
+      class 319832f410de9f37 default;
+      click 319832f410de9f37 &quot;Behaviors.html#file-persistence-behavior&quot;;
     end
   end
 </div>
-<h3 id="comment-style-specification">Comment Style Specification</h3>
-<p>Comment syntax for code traceability markers by file extension.</p>
+<h3 id="dry-run-mode-behavior">Dry-Run Mode Behavior</h3>
+<p>Preview mode behavior for modification commands.</p>
 <h4>Details</h4>
-<table><thead><tr><th>Extension</th><th>Comment Style</th><th>Example</th></tr></thead><tbody>
-<tr><td><code>.bat</code>, <code>.cmd</code></td><td><code>REM</code></td><td><code>REM [reqvire::satisfies: Req1] START</code></td></tr>
-<tr><td><code>.py</code>, <code>.sh</code>, <code>.rb</code>, <code>.yml</code></td><td><code>#</code></td><td><code># [reqvire::satisfies: Req1] START</code></td></tr>
-<tr><td><code>.sql</code></td><td><code>--</code></td><td><code>-- [reqvire::satisfies: Req1] START</code></td></tr>
-<tr><td><code>.css</code>, <code>.scss</code></td><td><code>/* */</code></td><td><code>/* [reqvire::satisfies: Req1] START */</code></td></tr>
-<tr><td><code>.html</code>, <code>.xml</code>, <code>.xsl</code></td><td><code>&lt;!-- --&gt;</code></td><td><code>&lt;!-- [reqvire::satisfies: Req1] START --&gt;</code></td></tr>
-<tr><td><code>.c</code>, <code>.cpp</code>, <code>.cs</code>, <code>.java</code>, <code>.js</code>, <code>.ts</code>, <code>.rs</code></td><td><code>//</code></td><td><code>// [reqvire::satisfies: Req1] START</code></td></tr>
-</tbody></table>
+<ul>
+<li>Show changes without applying by default</li>
+<li>Require –fix flag to apply changes</li>
+<li>Show diff output for changes</li>
+<li>Exit 0 for successful preview</li>
+</ul>
 <h4>Metadata</h4>
 <ul>
-<li>type: specification</li>
+<li>type: behavior</li>
 </ul>
-<h4>Relations</h4>
+<hr />
+<h3 id="element-ordering-behavior">Element Ordering Behavior</h3>
+<p>Ordering algorithm for elements within specification files during formatting and file persistence operations.</p>
+<h4>Details</h4>
+<p><strong>Ordering Principle:</strong>
+Elements shall be ordered so that parent elements appear before their children (file-local derivedFrom hierarchy).</p>
+<p><strong>Algorithm:</strong></p>
+<ol>
+<li><strong>Identify Root Elements</strong>: Elements with no file-local <code>derivedFrom</code> relations (parents are in other files or none)</li>
+<li><strong>Group by Hierarchy</strong>: Group elements by their file-local parent chains</li>
+<li><strong>Sort Root Groups</strong>: Sort root element groups alphabetically by root element name</li>
+<li><strong>Order Within Groups</strong>: Within each group, order elements topologically:
 <ul>
-<li>satisfy: <a href="CodeAlignment.html#comment-style-by-file-extension">Comment Style by File Extension</a></li>
+<li>Parent element first</li>
+<li>Direct children next (sorted alphabetically among siblings)</li>
+<li>Grandchildren after their parents (recursively)</li>
+</ul>
+</li>
+</ol>
+<p><strong>Example:</strong></p>
+<pre><code># Before (unordered):
+- Child B (derivedFrom: Parent A)
+- Grandchild Z (derivedFrom: Child A)
+- Parent A
+- Grandchild M (derivedFrom: Child A)
+- Child A (derivedFrom: Parent A)
+- Standalone Element
+
+# After (ordered):
+- Parent A              &lt;- Root, alphabetically first among roots with children
+- Child A               &lt;- Child of Parent A, alphabetically first sibling
+- Grandchild M          &lt;- Child of Child A, alphabetically first grandchild
+- Grandchild Z          &lt;- Child of Child A, alphabetically second grandchild
+- Child B               &lt;- Child of Parent A, alphabetically second sibling
+- Standalone Element    &lt;- Root with no children, alphabetically after Parent A
+</code></pre>
+<p><strong>Scope:</strong></p>
+<ul>
+<li>Only considers <code>derivedFrom</code> relations pointing to elements in the same file</li>
+<li>Cross-file relations do not affect ordering</li>
+<li>Elements without file-local hierarchy remain as independent roots</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<hr />
+<h3 id="file-persistence-behavior">File Persistence Behavior</h3>
+<p>How element manipulation operations persist changes to files:</p>
+<ul>
+<li>Track modified files during operations</li>
+<li>Write only modified files to storage</li>
+<li>Maintain file format and structure</li>
+<li>Handle I/O errors with reporting</li>
+</ul>
+<p><strong>Synchronization:</strong></p>
+<ul>
+<li>On-disk matches in-memory after success</li>
+<li>No partial changes on error</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
 </ul>
 <hr />
 

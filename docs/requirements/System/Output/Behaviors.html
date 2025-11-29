@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebInterface</title>
-    <link rel="icon" type="image/x-icon" href="../../assets/favicon.ico">
-    <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
+    <title>Behaviors</title>
+    <link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png">
     
 <style>
 :root {
@@ -713,13 +713,13 @@ blockquote {
 </head>
 <body>
     <nav class="reqvire-nav">
-        <a href="../../index.html" class="nav-logo"><img src="../../assets/logo.png" alt="Reqvire" height="24"></a>
-        <a href="../../index.html">Containment</a>
-        <a href="../../model.html">Model</a>
-        <a href="../../traces.html">Traces</a>
-        <a href="../../traceflow.html">TraceFlow</a>
-        <a href="../../coverage.html">Coverage</a>
-        <a href="../../resources.html">Resources</a>
+        <a href="../../../index.html" class="nav-logo"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../index.html">Containment</a>
+        <a href="../../../model.html">Model</a>
+        <a href="../../../traces.html">Traces</a>
+        <a href="../../../traceflow.html">TraceFlow</a>
+        <a href="../../../coverage.html">Coverage</a>
+        <a href="../../../resources.html">Resources</a>
     </nav>
     <div class="reqvire-nav-spacer"></div>
     <div class="container">
@@ -735,476 +735,63 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
-    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      a867b4bb3e22cabf[&quot;Validate Command<br/>📎 requirements/System/Core/Behaviors.md#two-pass-validation-behavior<br/>📎 requirements/System/Core/Behaviors.md#validation-error-reporting-behavior<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#error-message-format-specification&quot;];
-      class a867b4bb3e22cabf systemRequirement;
-      click a867b4bb3e22cabf &quot;CLI.html#validate-command&quot;;
-    end
-    subgraph ca2dd19eaaf80aea[&quot;📄 WebInterface.md&quot;]
-      9548618d67bf80fd[&quot;Attachment Export&quot;];
-      class 9548618d67bf80fd systemRequirement;
-      click 9548618d67bf80fd &quot;WebInterface.html#attachment-export&quot;;
-      7b6511f887489bc1[&quot;Containment View Attachment Links&quot;];
-      class 7b6511f887489bc1 systemRequirement;
-      click 7b6511f887489bc1 &quot;WebInterface.html#containment-view-attachment-links&quot;;
-      a12088ce3af75577[&quot;Diagram Attachment Display<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification&quot;];
-      class a12088ce3af75577 systemRequirement;
-      click a12088ce3af75577 &quot;WebInterface.html#diagram-attachment-display&quot;;
-      7cee348e5d230f20[&quot;HTML Export<br/>📎 requirements/Interfaces/Specifications.md#web-interface-style-specification<br/>📎 requirements/Interfaces/Behaviors.md#web-interface-navigation-behavior&quot;];
-      class 7cee348e5d230f20 systemRequirement;
-      click 7cee348e5d230f20 &quot;WebInterface.html#html-export&quot;;
-      287f6140c4c9ba05[&quot;Model-Centric View Generation<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification&quot;];
-      class 287f6140c4c9ba05 systemRequirement;
-      click 287f6140c4c9ba05 &quot;WebInterface.html#model-centric-view-generation&quot;;
-      f2578977bd9395ad[&quot;Model View Element Navigation&quot;];
-      class f2578977bd9395ad systemRequirement;
-      click f2578977bd9395ad &quot;WebInterface.html#model-view-element-navigation&quot;;
-      7afe0ab429e8f97f[&quot;Serve Command&quot;];
-      class 7afe0ab429e8f97f systemRequirement;
-      click 7afe0ab429e8f97f &quot;WebInterface.html#serve-command&quot;;
-      17774b4ce265515[&quot;Web Interface Color Scheme<br/>📎 requirements/System/Output/Specifications.md#color-scheme-specification<br/>📎 requirements/Interfaces/Specifications.md#web-interface-style-specification&quot;];
-      class 17774b4ce265515 systemRequirement;
-      click 17774b4ce265515 &quot;WebInterface.html#web-interface-color-scheme&quot;;
+  subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
+    subgraph 3931cad9905ceff7[&quot;📄 Behaviors.md&quot;]
+      5395e7834d9c0941[&quot;Mermaid Diagram Interaction Behavior&quot;];
+      class 5395e7834d9c0941 default;
+      click 5395e7834d9c0941 &quot;Behaviors.html#mermaid-diagram-interaction-behavior&quot;;
+      d060375c6412e553[&quot;Short Mode Behavior&quot;];
+      class d060375c6412e553 default;
+      click d060375c6412e553 &quot;Behaviors.html#short-mode-behavior&quot;;
     end
   end
-  subgraph ebbb5ee2da6c145b[&quot;📁 requirements/Interfaces/Verifications&quot;]
-    subgraph a6e0b4f1b51d1969[&quot;📄 CLIVerifications.md&quot;]
-      7ce243221ec8f143[&quot;CLI Help Structure Verification&quot;];
-      class 7ce243221ec8f143 verification;
-      click 7ce243221ec8f143 &quot;Verifications/CLIVerifications.html#cli-help-structure-verification&quot;;
-    end
-    subgraph 565c15260ba3d352[&quot;📄 WebInterfaceVerifications.md&quot;]
-      6b82beacdfe5cb16[&quot;Attachment Export Verification&quot;];
-      class 6b82beacdfe5cb16 verification;
-      click 6b82beacdfe5cb16 &quot;Verifications/WebInterfaceVerifications.html#attachment-export-verification&quot;;
-      3eba0fc81a8f5376[&quot;Containment Attachment Links Verification&quot;];
-      class 3eba0fc81a8f5376 verification;
-      click 3eba0fc81a8f5376 &quot;Verifications/WebInterfaceVerifications.html#containment-attachment-links-verification&quot;;
-      22440e2b04a21e0d[&quot;Diagram Attachment Display Verification&quot;];
-      class 22440e2b04a21e0d verification;
-      click 22440e2b04a21e0d &quot;Verifications/WebInterfaceVerifications.html#diagram-attachment-display-verification&quot;;
-      3b945d4fc7ba69e7[&quot;HTML Export Verification&quot;];
-      class 3b945d4fc7ba69e7 verification;
-      click 3b945d4fc7ba69e7 &quot;Verifications/WebInterfaceVerifications.html#html-export-verification&quot;;
-      991bc25b76f8f4a3[&quot;Model View Element Navigation Test&quot;];
-      class 991bc25b76f8f4a3 verification;
-      click 991bc25b76f8f4a3 &quot;Verifications/WebInterfaceVerifications.html#model-view-element-navigation-test&quot;;
-      6b3462d7df6e97c7[&quot;Serve Command Verification&quot;];
-      class 6b3462d7df6e97c7 verification;
-      click 6b3462d7df6e97c7 &quot;Verifications/WebInterfaceVerifications.html#serve-command-verification&quot;;
-    end
-  end
-  345c82cd34408acb[&quot;export.rs&quot;];
-  class 345c82cd34408acb default;
-  click 345c82cd34408acb &quot;../../core/src/export.rs&quot;;
-  9548618d67bf80fd -->|satisfiedBy| 345c82cd34408acb;
-  9548618d67bf80fd -.->|verifiedBy| 6b82beacdfe5cb16;
-  2ab7d933a525a383[&quot;containment.rs&quot;];
-  class 2ab7d933a525a383 default;
-  click 2ab7d933a525a383 &quot;../../core/src/containment.rs&quot;;
-  7b6511f887489bc1 -->|satisfiedBy| 2ab7d933a525a383;
-  7b6511f887489bc1 -.->|verifiedBy| 3eba0fc81a8f5376;
-  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
-  class dad7eeb932afdb92 default;
-  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
-  a12088ce3af75577 -->|satisfiedBy| dad7eeb932afdb92;
-  a12088ce3af75577 -.->|verifiedBy| 22440e2b04a21e0d;
-  7cee348e5d230f20 -.->|deriveReqT| 9548618d67bf80fd;
-  7cee348e5d230f20 -.->|deriveReqT| 7b6511f887489bc1;
-  7cee348e5d230f20 -.->|deriveReqT| a12088ce3af75577;
-  7cee348e5d230f20 -.->|deriveReqT| 287f6140c4c9ba05;
-  7cee348e5d230f20 -.->|deriveReqT| 17774b4ce265515;
-  80defdd4cbc7ee18[&quot;cli.rs&quot;];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| 80defdd4cbc7ee18;
-  7cee348e5d230f20 -->|satisfiedBy| 345c82cd34408acb;
-  d0e6cc47b904faa5[&quot;html.rs&quot;];
-  class d0e6cc47b904faa5 default;
-  click d0e6cc47b904faa5 &quot;../../core/src/html.rs&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| d0e6cc47b904faa5;
-  c3d63c5d4133e346[&quot;html_export.rs&quot;];
-  class c3d63c5d4133e346 default;
-  click c3d63c5d4133e346 &quot;../../core/src/html_export.rs&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| c3d63c5d4133e346;
-  1a173441705701a0[&quot;index_generator.rs&quot;];
-  class 1a173441705701a0 default;
-  click 1a173441705701a0 &quot;../../core/src/index_generator.rs&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| 1a173441705701a0;
-  3a807a8535fb41fa[&quot;base.html&quot;];
-  class 3a807a8535fb41fa default;
-  click 3a807a8535fb41fa &quot;../../core/templates/base.html&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| 3a807a8535fb41fa;
-  c196fa9b3e2c2258[&quot;model.html&quot;];
-  class c196fa9b3e2c2258 default;
-  click c196fa9b3e2c2258 &quot;../../core/templates/model.html&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| c196fa9b3e2c2258;
-  7cee348e5d230f20 -.->|verifiedBy| 7ce243221ec8f143;
-  7cee348e5d230f20 -.->|verifiedBy| 3b945d4fc7ba69e7;
-  287f6140c4c9ba05 -.->|deriveReqT| f2578977bd9395ad;
-  287f6140c4c9ba05 -->|satisfiedBy| 345c82cd34408acb;
-  ee222ed1a55fa477[&quot;report_model.rs&quot;];
-  class ee222ed1a55fa477 default;
-  click ee222ed1a55fa477 &quot;../../core/src/report_model.rs&quot;;
-  287f6140c4c9ba05 -->|satisfiedBy| ee222ed1a55fa477;
-  f2578977bd9395ad -->|satisfiedBy| ee222ed1a55fa477;
-  f2578977bd9395ad -.->|verifiedBy| 991bc25b76f8f4a3;
-  7afe0ab429e8f97f -->|satisfiedBy| 80defdd4cbc7ee18;
-  e313808f7a755f6[&quot;serve.rs&quot;];
-  class e313808f7a755f6 default;
-  click e313808f7a755f6 &quot;../../cli/src/serve.rs&quot;;
-  7afe0ab429e8f97f -->|satisfiedBy| e313808f7a755f6;
-  7afe0ab429e8f97f -.->|trace| a867b4bb3e22cabf;
-  7afe0ab429e8f97f -.->|verifiedBy| 6b3462d7df6e97c7;
-  17774b4ce265515 -->|satisfiedBy| 2ab7d933a525a383;
-  17774b4ce265515 -->|satisfiedBy| d0e6cc47b904faa5;
-  17774b4ce265515 -->|satisfiedBy| 3a807a8535fb41fa;
-  443f72e06773b2fa[&quot;test.sh&quot;];
-  class 443f72e06773b2fa default;
-  click 443f72e06773b2fa &quot;../../tests/test-attachment-export/test.sh&quot;;
-  6b82beacdfe5cb16 -->|satisfiedBy| 443f72e06773b2fa;
-  3eba0fc81a8f5376 -->|satisfiedBy| 443f72e06773b2fa;
-  22440e2b04a21e0d -->|satisfiedBy| 443f72e06773b2fa;
-  6fb925575a1602f1[&quot;test.sh&quot;];
-  class 6fb925575a1602f1 default;
-  click 6fb925575a1602f1 &quot;../../tests/test-cli-help-structure/test.sh&quot;;
-  7ce243221ec8f143 -->|satisfiedBy| 6fb925575a1602f1;
-  8899a52ea9866d8b[&quot;test.sh&quot;];
-  class 8899a52ea9866d8b default;
-  click 8899a52ea9866d8b &quot;../../tests/test-html-export/test.sh&quot;;
-  3b945d4fc7ba69e7 -->|satisfiedBy| 8899a52ea9866d8b;
-  e3433ff5bc275516[&quot;test.sh&quot;];
-  class e3433ff5bc275516 default;
-  click e3433ff5bc275516 &quot;../../tests/test-model-command/test.sh&quot;;
-  991bc25b76f8f4a3 -->|satisfiedBy| e3433ff5bc275516;
-  a867b4bb3e22cabf -->|satisfiedBy| 80defdd4cbc7ee18;
-  a867b4bb3e22cabf -.->|verifiedBy| 7ce243221ec8f143;
-  a867b4bb3e22cabf -.->|verifiedBy| 23a09f2d69fc3b23;
-  dd6732f292fab4eb[&quot;test.sh&quot;];
-  class dd6732f292fab4eb default;
-  click dd6732f292fab4eb &quot;../../tests/test-serve-command/test.sh&quot;;
-  6b3462d7df6e97c7 -->|satisfiedBy| dd6732f292fab4eb;
 </div>
-<h3 id="html-export">HTML Export</h3>
-<p>The system SHALL generate comprehensive HTML documentation with all model artifacts by creating a temporary working copy, generating all reports in that copy, and exporting to the output directory.</p>
+<h3 id="mermaid-diagram-interaction-behavior">Mermaid Diagram Interaction Behavior</h3>
+<p>Interactive behavior for Mermaid diagrams in HTML export.</p>
 <h4>Details</h4>
-<p><strong>Working Directory Setup:</strong></p>
+<p><strong>Click Behavior:</strong></p>
 <ul>
-<li>Create temporary working directory (e.g., in /tmp)</li>
-<li>Generate markdown files from registry with full relations (user-created and auto-generated inverse relations)</li>
-<li>Copy all related system elements (following satisfiedBy and other relations)</li>
-<li>Copy all attachment files to temporary directory preserving structure</li>
+<li>Nodes are clickable links to element definition</li>
+<li>Links use relative paths from output location</li>
+<li>External links open in new tab</li>
 </ul>
-<p><strong>Generation Pipeline (in temporary directory):</strong>
-Execute all generation commands treating temporary directory as repository root:</p>
-<ol>
-<li>Generate all Mermaid diagrams in markdown files</li>
-<li>Generate index.md (interactive D3.js tree showing containment hierarchy - main entry point)</li>
-<li>Generate model.md (model-centric visualization with nested relations from root requirements)</li>
-<li>Generate traces.md (verification upward traceability)</li>
-<li>Generate coverage.md (verification coverage report)</li>
-</ol>
-<p><strong>HTML Conversion:</strong></p>
+<p><strong>Zoom/Pan:</strong></p>
 <ul>
-<li>Convert all markdown files to HTML with embedded styles</li>
-<li>Process Mermaid diagrams for web rendering</li>
-<li>Convert internal .md links to .html links</li>
-<li>Preserve directory structure</li>
+<li>Mouse wheel for zoom</li>
+<li>Click and drag for pan</li>
+<li>Reset button to restore initial view</li>
 </ul>
-<p><strong>Output:</strong></p>
+<h4>Metadata</h4>
 <ul>
-<li>Accept optional <code>--output</code> option to specify output directory</li>
-<li>When <code>--output</code> is not specified, export to a temporary directory and print the path</li>
-<li>When <code>--output</code> is specified, create output folder if not existing</li>
-<li>Copy generated HTML and all artifacts from temp directory to output directory</li>
-<li>Clean up temporary working directory (except when output is temp directory)</li>
-</ul>
-<p><strong>Source Protection:</strong></p>
-<ul>
-<li>Never modify original repository files</li>
-<li>All generation happens in isolated temporary directory</li>
-</ul>
-<p><strong>Git Directory Exclusion:</strong></p>
-<ul>
-<li>The .git directory shall never be exported to the output folder</li>
-<li>This prevents internal git metadata from polluting the exported documentation</li>
-</ul>
-<p><strong>Export Related System Elements:</strong></p>
-<ul>
-<li>Ensure that any related system elements are also copied into output folder to ensure consistency of exported model</li>
-</ul>
-<p><strong>Containment Generation (D3.js Tree):</strong>
-The containment page (containment.html) shall display an interactive D3.js collapsible tree showing the containment hierarchy:</p>
-<ol>
-<li>Root node representing the model root</li>
-<li>Folder nodes that can be expanded/collapsed</li>
-<li>File nodes containing element children</li>
-<li>Element nodes with type-specific icons and colors</li>
-<li>Attachment nodes as children of elements (element and file attachments)</li>
-<li>Clickable elements that navigate to their definitions</li>
-<li>Expand All / Collapse All buttons for tree control</li>
-</ol>
-<p>The containment view serves as the primary entry point for HTML documentation, providing an interactive visual overview of the model structure.</p>
-<p><strong>HTML Navigation Bar:</strong>
-The system shall provide a fixed navigation bar in all HTML pages with links to key model artifacts for easy access.</p>
-<p>The navigation bar must include (left to right):</p>
-<ul>
-<li>Containment: Link to containment.html (interactive D3.js tree - main entry point)</li>
-<li>Model: Link to model.html (model-centric view with nested relations)</li>
-<li>Traces: Link to traces.html (verification upward traceability report)</li>
-<li>Coverage: Link to coverage.html (verification coverage report)</li>
-</ul>
-<p>The navigation bar must be:</p>
-<ul>
-<li>Always visible (fixed position) while scrolling</li>
-<li>Consistent across all HTML pages</li>
-<li>Clearly visible and accessible</li>
-</ul>
-<p><strong>HTML Design:</strong>
-The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.</p>
-<p><strong>Logo and Branding:</strong></p>
-<ul>
-<li>The navigation bar shall display the Reqvire logo on the left side before the navigation links</li>
-<li>A favicon shall be included for browser tab identification</li>
-<li>Apple touch icons shall be included for mobile device support</li>
-<li>All brand assets shall be exported to an assets folder during HTML export</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="Specifications.html#web-interface-style-specification">Web Interface Style Specification</a></li>
-<li><a href="Behaviors.html#web-interface-navigation-behavior">Web Interface Navigation Behavior</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derive: <a href="#attachment-export">Attachment Export</a></li>
-<li>derive: <a href="#containment-view-attachment-links">Containment View Attachment Links</a></li>
-<li>derive: <a href="#diagram-attachment-display">Diagram Attachment Display</a></li>
-<li>derive: <a href="#model-centric-view-generation">Model-Centric View Generation</a></li>
-<li>derive: <a href="#web-interface-color-scheme">Web Interface Color Scheme</a></li>
-<li>derivedFrom: <a href="Interfaces.html#web-interface">Web Interface</a></li>
-<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/html_export.rs">html_export.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/index_generator.rs">index_generator.rs</a></li>
-<li>satisfiedBy: <a href="../../core/templates/base.html">base.html</a></li>
-<li>satisfiedBy: <a href="../../core/templates/model.html">model.html</a></li>
-<li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#html-export-verification">HTML Export Verification</a></li>
+<li>type: behavior</li>
 </ul>
 <hr />
-<h3 id="attachment-export">Attachment Export</h3>
-<p>The system shall copy all attachment files referenced by elements during HTML export to preserve document completeness and enable navigation.</p>
+<h3 id="short-mode-behavior">Short Mode Behavior</h3>
+<p>Behavior when <code>--short</code> flag is provided to CLI commands.</p>
 <h4>Details</h4>
-<p>During HTML export, the system shall:</p>
+<p>Short mode reduces output verbosity for quick scanning:</p>
+<p><strong>Text Output (–short without –json):</strong></p>
 <ul>
-<li>Identify all attachments from element.attachments across the model</li>
-<li>Copy each attachment file to the output directory preserving relative paths</li>
-<li>Skip duplicate attachments (same file referenced by multiple elements)</li>
-<li>Log attachment copying progress</li>
+<li>One line per element: <code>[type] identifier - name</code></li>
+<li>Omit detailed content, relations, and metadata</li>
+<li>Suitable for piping to other tools</li>
 </ul>
-<p>This ensures exported documentation includes all referenced external documents (PDFs, design documents, etc.) for complete offline browsing.</p>
-<h4>Relations</h4>
+<p><strong>JSON Output (–short with –json):</strong></p>
 <ul>
-<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#attachment-export-verification">Attachment Export Verification</a></li>
+<li>Omit verbose fields: <code>content</code>, <code>page_content</code>, <code>attachments</code></li>
+<li>Omit computed fields: <code>element_count</code>, <code>total_elements</code>, <code>global_counters</code></li>
+<li>Retain: <code>identifier</code>, <code>name</code>, <code>type</code>, <code>file_path</code></li>
+<li>Retain: <code>relations</code> (for traceability)</li>
 </ul>
-<hr />
-<h3 id="containment-view-attachment-links">Containment View Attachment Links</h3>
-<p>The system shall display attachment links as children of elements in the containment D3.js tree to provide quick access to associated documents.</p>
-<h4>Details</h4>
-<p>For each element with attachments:</p>
+<p><strong>Rationale:</strong></p>
 <ul>
-<li>Display attachments as child nodes in the D3.js tree</li>
-<li>Element attachments use wrench icon (🔧) with type <code>attachment-element</code></li>
-<li>File attachments use paperclip icon (📎) with type <code>attachment-file</code></li>
-<li>Element attachments are clickable and navigate to the referenced element</li>
-<li>File attachments show filename and path for reference</li>
+<li>Reduces output size for large models</li>
+<li>Faster parsing by downstream tools</li>
+<li>Maintains essential traceability information</li>
 </ul>
-<h4>Relations</h4>
+<h4>Metadata</h4>
 <ul>
-<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>satisfiedBy: <a href="../../core/src/containment.rs">containment.rs</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#containment-attachment-links-verification">Containment Attachment Links Verification</a></li>
-</ul>
-<hr />
-<h3 id="diagram-attachment-display">Diagram Attachment Display</h3>
-<p>The system shall display attachment links within element boxes in generated diagrams to show document associations visually.</p>
-<h4>Details</h4>
-<p>In Mermaid diagrams:</p>
-<ul>
-<li>Element boxes shall include attachment links below the element name</li>
-<li>Use paperclip icon (📎) prefix for each attachment</li>
-<li>Show filename only (not full path) for space efficiency</li>
-<li>Make attachment links clickable to open the document</li>
-<li>Format using Mermaid’s multiline label syntax (<code>&lt;br/&gt;</code>)</li>
-</ul>
-<p>Example Mermaid node:</p>
-<pre><code>elementId[&quot;Element Name&lt;br/&gt;📎 DesignDoc.md&quot;]
-</code></pre>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../System/Output/Specifications.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>satisfiedBy: <a href="../../core/src/diagrams.rs">diagrams.rs</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#diagram-attachment-display-verification">Diagram Attachment Display Verification</a></li>
-</ul>
-<hr />
-<h3 id="model-centric-view-generation">Model-Centric View Generation</h3>
-<p>The system shall generate a model-centric visualization during HTML export showing root requirements with nested relations containing full element details.</p>
-<h4>Details</h4>
-<ul>
-<li>Display root requirements (no hierarchical parent) as top-level entries</li>
-<li>Show relations nested inside elements with full target details recursively</li>
-<li>Include metadata about total elements and relations</li>
-<li>Generate mermaid diagrams showing all nested relations</li>
-<li>Output as markdown with embedded visualizations (model.html)</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../System/Output/Specifications.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derive: <a href="#model-view-element-navigation">Model View Element Navigation</a></li>
-<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>satisfiedBy: <a href="../../core/src/export.rs">export.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/report_model.rs">report_model.rs</a></li>
-</ul>
-<hr />
-<h3 id="model-view-element-navigation">Model View Element Navigation</h3>
-<p>The system shall make element names in the model-centric view clickable links that navigate to the element’s definition in its source file.</p>
-<h4>Details</h4>
-<ul>
-<li>Element names displayed as headers shall be hyperlinks</li>
-<li>Links shall point to the element’s source file with fragment identifier</li>
-<li>Format: <code>[Element Name](file_path#element-fragment)</code></li>
-<li>Enables direct navigation from model view to element definition</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#model-centric-view-generation">Model-Centric View Generation</a></li>
-<li>satisfiedBy: <a href="../../core/src/report_model.rs">report_model.rs</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#model-view-element-navigation-test">Model View Element Navigation Test</a></li>
-</ul>
-<hr />
-<h3 id="web-interface-color-scheme">Web Interface Color Scheme</h3>
-<p>The system shall implement a consistent color scheme across all HTML pages optimized for MBSE and requirements management applications.</p>
-<h4>Details</h4>
-<p><strong>Primary Colors:</strong>
-| Color Name | Hex Code | Usage |
-|————|–––––|—––|
-| Indigo | #3F51B5 | Navigation bar background, primary branding |
-| Indigo Hover | #7986CB | Navigation hover states (lighter for visibility) |
-| Indigo Active | #303F9F | Navigation active/pressed states |
-| Off-White | #FAFAFA | Body background - reduces eye strain |
-| White | #FFFFFF | Content background, navigation text |</p>
-<p><strong>Element Type Colors:</strong>
-The web interface shall use consistent colors matching the diagram color scheme:
-| Element Type | Color Name | Hex Code | Usage |
-|–––––––|————|–––––|—––|
-| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
-| Verification | Emerald Green | #4CAF50 | Validation criteria, testing completion |
-| Other | Cool Gray | #9E9E9E | Other element types, external dependencies |</p>
-<p><strong>Status Indicator Colors:</strong>
-| Status | Color Name | Hex Code | Usage |
-|––––|————|–––––|—––|
-| Verified/Passing | Forest Green | #4CAF50 | Verified requirements, passing tests |
-| Pending/Warning | Amber | #FFB74D | Unverified items, warnings |
-| Failed/Error | Red | #F44336 | Error messages, validation errors |</p>
-<p><strong>Interactive State Colors:</strong>
-| State | Color | Hex Code | Usage |
-|—––|—––|–––––|—––|
-| Hover Highlight | Peach | #FFAB91 | Diagram node/edge hover effect |
-| Node Hover Shadow | Peach (70%) | rgba(255,171,145,0.7) | Soft drop-shadow on node hover |
-| Link Color | Indigo | #3F51B5 | Hyperlinks (matches nav bar, font-weight: 500) |
-| Link Hover | Indigo | #3F51B5 | Hyperlinks with underline on hover |
-| Nav Hover | Light Indigo | #7986CB | Navigation item hover background |</p>
-<p><strong>Border Colors:</strong>
-| Element | Hex Code | Usage |
-|———|–––––|—––|
-| Header Borders | #EEEEEE | H1/H2 underlines |
-| Table Borders | #EEEEEE | Tables, content separation |
-| Content Border | #E0E0E0 | Content card borders |
-| Code Background | #f6f8fa | Code blocks |
-| Diagram Canvas | #FAFAFA | Mermaid diagram background |</p>
-<p><strong>Typography:</strong></p>
-<ul>
-<li>Primary font: System font stack (sans-serif)</li>
-<li>Monospace font: For code blocks and element identifiers</li>
-<li>Line height: 1.6 for content readability</li>
-<li>Primary text: #212121 (dark gray - headings)</li>
-<li>Secondary text: #424242 (medium gray - body)</li>
-<li>Muted text: #757575 (light gray - de-emphasized)</li>
-</ul>
-<p><strong>Layout:</strong></p>
-<ul>
-<li>Navigation bar: Fixed position, full width, 50px height</li>
-<li>Content container: Centered with max-width 95% for readability</li>
-<li>Content card: White background with subtle border and shadow</li>
-<li>Responsive design: Adapts to different screen sizes</li>
-<li>Box shadows: rgba(0,0,0,0.08) for subtle depth</li>
-</ul>
-<p><strong>D3.js Containment Tree Colors:</strong>
-The containment tree shall use consistent colors for node types:
-| Node Type | Color | Hex Code | Icon |
-|———–|—––|–––––|——|
-| folder | Gray | #9E9E9E | 📁 |
-| file | Yellow | #FFCA28 | 📄 |
-| user-requirement | Purple | #7E57C2 | 👤 |
-| system-requirement | Deep Purple | #673AB7 | 📐 |
-| requirement | Deep Purple | #673AB7 | 📐 |
-| verification | Green | #4CAF50 | ✅ |
-| refinement | Orange | #FF9800 | 🔧 |
-| design-document | Brown | #8D6E63 | 📝 |
-| attachment-element | Orange | #FF9800 | 🔧 |
-| attachment-file | Blue Gray | #607D8B | 📎 |</p>
-<p><strong>D3.js Tree Styling:</strong></p>
-<ul>
-<li>Meta nodes (attachments): Smaller circles (r=4), italic 11px font, 85% opacity</li>
-<li>Regular nodes: Standard circles (r=6), normal 13px font</li>
-<li>Tree animations: Smooth transitions for expand/collapse</li>
-<li>Node hover: Cursor pointer for interactive nodes</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../System/Output/Specifications.html#color-scheme-specification">Color Scheme Specification</a></li>
-<li><a href="Specifications.html#web-interface-style-specification">Web Interface Style Specification</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#html-export">HTML Export</a></li>
-<li>satisfiedBy: <a href="../../core/src/containment.rs">containment.rs</a></li>
-<li>satisfiedBy: <a href="../../core/src/html.rs">html.rs</a></li>
-<li>satisfiedBy: <a href="../../core/templates/base.html">base.html</a></li>
-</ul>
-<hr />
-<h3 id="serve-command">Serve Command</h3>
-<p>The system SHALL provide a serve command that exports comprehensive HTML documentation and serves it via an HTTP server for browsing.</p>
-<h4>Details</h4>
-<p><code>serve</code> command shall:</p>
-<ul>
-<li>Accept <code>--host &lt;HOST&gt;</code> option to specify the bind address (default: localhost)</li>
-<li>Accept <code>--port &lt;PORT&gt;</code> option to specify the server port (default: 8080)</li>
-<li>Use a random temporary directory for HTML export</li>
-<li>Run HTML Export to generate complete documentation in temporary directory</li>
-<li>Start an HTTP server serving static files from the temporary directory</li>
-<li>Display clickable server URL for user to open in browser</li>
-<li>Display instructions to press Ctrl-C to stop server</li>
-<li>Continue serving until terminated by the user (Ctrl-C)</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="Interfaces.html#web-interface">Web Interface</a></li>
-<li>satisfiedBy: <a href="../../cli/src/cli.rs">cli.rs</a></li>
-<li>satisfiedBy: <a href="../../cli/src/serve.rs">serve.rs</a></li>
-<li>trace: <a href="CLI.html#validate-command">Validate Command</a></li>
-<li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#serve-command-verification">Serve Command Verification</a></li>
+<li>type: behavior</li>
 </ul>
 <hr />
 
