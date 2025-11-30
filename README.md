@@ -25,7 +25,7 @@ Reqvire seamlessly blends architecture and system modeling, requirements managem
 ## Reqvire unlocks
 
 - **Requirements-as-Context**: Establish a single source of truth that structures project context. Reqvire ensures AI tools can retrieve and manage precise information, guiding them to understand precisely what needs to be built, where to make changes, and how all system components connect.
-- **Requirements as Code**: Transform requirements from static documents into living, version-controlled assets that evolve with your codebase, ensuring that the foundational system model remains intact and accessible over time, rather than getting lost in transient task documents
+- **Requirements-as-Code**: Transform requirements from static documents into living, version-controlled assets that evolve with your codebase, ensuring that the foundational system model remains intact and accessible over time, rather than getting lost in transient task documents
 - **Intelligent Engineering**: 
   - **Context-Aware Generation**: Understand the "why" behind every component through Reqvire's traceability structure.
   - **Specification-Driven Coding**: Generate code directly tied to specific requirements, reducing guesswork and misinterpretation.
