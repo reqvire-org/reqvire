@@ -22,7 +22,15 @@
 
 Reqvire seamlessly blends architecture and system modeling, requirements management, and AI-assisted development, empowering teams to deliver better products faster with complete traceability and intelligent automation.
 
-## Reqvire unlocks
+## 🤖 Now Available for Claude Code
+
+Reqvire is now available as a plugin for Claude Code! Get AI-assisted requirements engineering with specialized skills and commands directly in your Claude Code workflow.
+
+**[Install and learn more →](https://www.reqvire.org/claude_plugin)**
+
+---
+
+## Key Features
 
 - **Requirements-as-Context**: Establish a single source of truth that structures project context. Reqvire ensures AI tools can retrieve and manage precise information, guiding them to understand precisely what needs to be built, where to make changes, and how all system components connect.
 - **Requirements-as-Code**: Transform requirements from static documents into living, version-controlled assets that evolve with your codebase, ensuring that the foundational system model remains intact and accessible over time, rather than getting lost in transient task documents
@@ -32,15 +40,12 @@ Reqvire seamlessly blends architecture and system modeling, requirements managem
   - **Verification-Backed Validation**: Refer to defined verifications to ensure implementation meets intended behavior.
   - **Trace-Based Refactoring**: Assist in propagating requirement changes efficiently through the codebase and related artifacts.  
   - **Effortless Integration**: Plug seamlessly into your existing workflow with Git branches, pull requests, and CI/CD pipelines—no disruption, just enhancement
-
-## 🤖 Now Available for Claude Code
-
-Reqvire is now available as a plugin for Claude Code! Get AI-assisted requirements engineering with specialized skills and commands directly in your Claude Code workflow.
-
-**[Install and learn more →](https://www.reqvire.org/claude_plugin)**
-
----
-
+- **Model-Based Systems Engineering practices**-
+   - Maintain requirements-code traceability
+   - Enforce requirements-first development
+   - Validate verification coverage
+   - Track change propagation
+   
 ## Get Started
 
 ### Installation
