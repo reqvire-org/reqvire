@@ -20,7 +20,7 @@
 
 **Reqvire** is a lightweight, Git-native **Requirements-as-Context** framework that transforms how modern engineering teams build software. 
 
-Reqvire seamlessly blends system modeling, requirements management, and AI-assisted development, empowering teams to deliver better products faster with complete traceability and intelligent automation.
+Reqvire seamlessly blends architecture and system modeling, requirements management, and AI-assisted development, empowering teams to deliver better products faster with complete traceability and intelligent automation.
 
 ## Reqvire unlocks
 
@@ -32,8 +32,6 @@ Reqvire seamlessly blends system modeling, requirements management, and AI-assis
   - **Verification-Backed Validation**: Refer to defined verifications to ensure implementation meets intended behavior.
   - **Trace-Based Refactoring**: Assist in propagating requirement changes efficiently through the codebase and related artifacts.  
   - **Effortless Integration**: Plug seamlessly into your existing workflow with Git branches, pull requests, and CI/CD pipelines—no disruption, just enhancement
-- **Smart Automation**: Automatically generates diagrams, traceability matrices, and impact analysis—keeping documentation synchronized with your requirements
-
 
 ## 🤖 Now Available for Claude Code
 
@@ -63,7 +61,6 @@ For detailed installation options (from source, pre-built binaries, etc.), see t
 
 - **[Documentation](https://www.reqvire.org)** - Learn how to use Reqvire
 - **[Browse Model](https://reqvire-org.github.io/reqvire/)** - Explore Reqvire's own specifications
-- **[Use Cases](./requirements/Usecases.md)** - See Reqvire in action
 
 ---
 
