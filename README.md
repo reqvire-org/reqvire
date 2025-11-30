@@ -22,11 +22,9 @@
 
 It unifies system modeling, requirements management, and AI-assisted development into a single workflow—providing complete traceability, intelligent automation, and faster delivery while staying fully aligned with your codebase.
 
-## 🤖 Now Available for Claude Code
+#### 🤖 Now Available for Claude Code
 
-Reqvire is now available as a plugin for Claude Code! Get AI-assisted requirements engineering with specialized skills and commands directly in your Claude Code workflow.
-
-**[Install and learn more →](https://www.reqvire.org/claude_plugin)**
+Use Reqvire inside Claude Code with specialized commands and AI-assisted engineering tools: **[Install and get started →](#install)**
 
 ---
 
@@ -61,13 +59,40 @@ Bring Model-Based Systems Engineering (MBSE) directly into your Git workflow:
 
 ## Get Started
 
+
 ### Installation
+
+#### Prerequisites
+
+To install the Reqvire CLI:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash
 ```
 
-For detailed installation options (from source, pre-built binaries, etc.), see the [Installation Guide](https://www.reqvire.org/user_guide#installation).
+For detailed CLI installation options, see the [Installation Guide](https://www.reqvire.org/user_guide#installation).
+
+#### Installing the Claude Code Plugin
+
+Before installing the plugin, ensure you have:
+1. **Claude Code** installed (available at [claude.com/claude-code](https://claude.com/claude-code))
+
+
+The Reqvire plugin is available through the reqvire-org marketplace for Claude Code:
+
+1. **Add the marketplace** - In Claude Code, run:
+   ```
+   /plugin marketplace add https://github.com/reqvire-org/reqvire
+   ```
+
+2. **Install the plugin** - Then run:
+   ```
+   /plugin install reqvire@reqvire-org
+   ```
+
+3. Restart Claude Code to activate the plugin
+
+To read more about plugin usage see the [Claude Plugin](https://www.reqvire.org/claude_plugin.html).
 
 ### Next Steps
 
