@@ -20,6 +20,8 @@ Commands:
   mv-file           Move entire specification file with all its elements
   attach            Attach external document or Refinement element to element
   detach            Detach external document or Refinement element from element
+  link              Add relation between elements
+  unlink            Remove relation between elements
   mv-asset          Move/rename asset file and update all references (Attachments and Relations)
   rm-asset          Remove asset file and remove all references (Attachments and Relations)
   containment       Generate containment view showing folder/file/element hierarchy
@@ -120,6 +122,18 @@ ATTACH OPTIONS:
 DETACH OPTIONS:
        <ELEMENT_NAME>           Name of element to detach from
        <ATTACHMENT_PATH>        File path OR Refinement element name (auto-detected)
+      --dry-run                 Preview changes without applying
+
+LINK OPTIONS:
+       <SOURCE>                 Element name OR internal file path (auto-detected)
+       <RELATION_TYPE>          Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
+       <TARGET>                 Target element name
+      --dry-run                 Preview changes without applying
+
+UNLINK OPTIONS:
+       <SOURCE>                 Element name OR internal file path (auto-detected)
+       <RELATION_TYPE>          Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
+       <TARGET>                 Target element name
       --dry-run                 Preview changes without applying
 
 MV ASSET OPTIONS:

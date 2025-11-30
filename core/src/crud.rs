@@ -1309,3 +1309,383 @@ fn remove_all_empty_attachments_sections(content: &str) -> String {
 
     result
 }
+
+/// Link a relation between two elements
+///
+/// # Arguments
+/// * `model_manager` - The model manager
+/// * `source` - Source element name or file path (auto-detected)
+/// * `relation_type` - The relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
+/// * `target_name` - Target element name
+/// * `git_root` - Git root directory
+/// * `dry_run` - If true, don't write changes to disk
+pub fn link(
+    model_manager: &mut ModelManager,
+    source: &str,
+    relation_type: &str,
+    target_name: &str,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    use std::fs;
+    use crate::relation::RELATION_TYPES;
+
+    // Validate relation type
+    if !RELATION_TYPES.contains_key(relation_type) {
+        return Err(ReqvireError::UnsupportedRelationType(
+            format!("Invalid relation type '{}'. Supported types: derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace", relation_type)
+        ));
+    }
+
+    // Resolve source element by name
+    let source_element = model_manager.graph_registry.get_element_by_name(source)
+        .ok_or_else(|| ReqvireError::ElementNotFound(
+            format!("Source element '{}' not found", source)
+        ))?;
+
+    let source_id = source_element.identifier.clone();
+    let source_name = source_element.name.clone();
+    let source_file_path = source_element.file_path.clone();
+
+    // Resolve target element by name
+    let target_element = model_manager.graph_registry.get_element_by_name(target_name)
+        .ok_or_else(|| ReqvireError::ElementNotFound(
+            format!("Target element '{}' not found", target_name)
+        ))?;
+
+    let target_id = target_element.identifier.clone();
+    let target_display_name = target_element.name.clone();
+    let target_file_path = target_element.file_path.clone();
+
+    // Check if relation already exists (idempotent) - only check user_created relations
+    let relation_exists = source_element.relations.iter().any(|r| {
+        r.user_created && r.relation_type.name == relation_type && r.target.link.as_str() == target_id
+    });
+
+    if relation_exists {
+        return Ok(CrudResult {
+            operation: CrudOperation::Update,
+            element_id: source_id.clone(),
+            element_name: format!("Relation already exists: {} {} {}", source_name, relation_type, target_name),
+            diffs: vec![],
+            dry_run,
+        });
+    }
+
+    // Read current file content
+    let absolute_file_path = git_root.join(&source_file_path);
+    let content = fs::read_to_string(&absolute_file_path)
+        .map_err(|e| ReqvireError::IoError(e))?;
+
+    // Calculate relative identifier from source element's file to target element
+    let source_file_path_buf = std::path::PathBuf::from(&source_file_path);
+    let source_folder = source_file_path_buf.parent()
+        .unwrap_or_else(|| std::path::Path::new("."))
+        .to_path_buf();
+
+    let relation_target = if source_file_path == target_file_path {
+        // Same file - use just the fragment
+        let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
+        let fragment = fragment_opt.unwrap_or(&target_id);
+        format!("#{}", fragment)
+    } else {
+        // Different files - calculate relative path
+        crate::utils::to_relative_identifier(
+            &target_id,
+            &source_folder,
+            true
+        ).unwrap_or_else(|_| target_id.clone())
+    };
+
+    // Add relation to element
+    let new_content = add_relation_to_element(&content, &source_name, relation_type, &target_display_name, &relation_target)?;
+
+    // Generate diff
+    let diff = generate_file_diff(&source_file_path, &content, &new_content);
+
+    // Write to file if not dry run
+    if !dry_run {
+        fs::write(&absolute_file_path, &new_content)
+            .map_err(|e| ReqvireError::IoError(e))?;
+
+        // Mark file as modified for re-parsing
+        model_manager.graph_registry.modified_files.insert(source_file_path.clone());
+    }
+
+    Ok(CrudResult {
+        operation: CrudOperation::Update,
+        element_id: source_id,
+        element_name: format!("Linked {} {} {}", source_name, relation_type, target_name),
+        diffs: vec![diff],
+        dry_run,
+    })
+}
+
+/// Unlink a relation between two elements
+///
+/// # Arguments
+/// * `model_manager` - The model manager
+/// * `source` - Source element name or file path (auto-detected)
+/// * `relation_type` - The relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
+/// * `target_name` - Target element name
+/// * `git_root` - Git root directory
+/// * `dry_run` - If true, don't write changes to disk
+pub fn unlink(
+    model_manager: &mut ModelManager,
+    source: &str,
+    relation_type: &str,
+    target_name: &str,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    use std::fs;
+    use crate::relation::RELATION_TYPES;
+
+    // Validate relation type
+    if !RELATION_TYPES.contains_key(relation_type) {
+        return Err(ReqvireError::UnsupportedRelationType(
+            format!("Invalid relation type '{}'. Supported types: derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace", relation_type)
+        ));
+    }
+
+    // Resolve source element by name
+    let source_element = model_manager.graph_registry.get_element_by_name(source)
+        .ok_or_else(|| ReqvireError::ElementNotFound(
+            format!("Source element '{}' not found", source)
+        ))?;
+
+    let source_id = source_element.identifier.clone();
+    let source_name = source_element.name.clone();
+    let source_file_path = source_element.file_path.clone();
+
+    // Resolve target element by name
+    let target_element = model_manager.graph_registry.get_element_by_name(target_name)
+        .ok_or_else(|| ReqvireError::ElementNotFound(
+            format!("Target element '{}' not found", target_name)
+        ))?;
+
+    let target_id = target_element.identifier.clone();
+    let target_display_name = target_element.name.clone();
+
+    // Check if relation exists - only check user_created relations
+    let relation_exists = source_element.relations.iter().any(|r| {
+        r.user_created && r.relation_type.name == relation_type && r.target.link.as_str() == target_id
+    });
+
+    if !relation_exists {
+        return Err(ReqvireError::RelationError(
+            format!("Relation '{}' from '{}' to '{}' does not exist", relation_type, source_name, target_name)
+        ));
+    }
+
+    // Read current file content
+    let absolute_file_path = git_root.join(&source_file_path);
+    let content = fs::read_to_string(&absolute_file_path)
+        .map_err(|e| ReqvireError::IoError(e))?;
+
+    // Remove relation from element
+    let new_content = remove_relation_from_element(&content, &source_name, relation_type, &target_display_name)?;
+
+    // Generate diff
+    let diff = generate_file_diff(&source_file_path, &content, &new_content);
+
+    // Write to file if not dry run
+    if !dry_run {
+        fs::write(&absolute_file_path, &new_content)
+            .map_err(|e| ReqvireError::IoError(e))?;
+
+        // Mark file as modified for re-parsing
+        model_manager.graph_registry.modified_files.insert(source_file_path.clone());
+    }
+
+    Ok(CrudResult {
+        operation: CrudOperation::Update,
+        element_id: source_id,
+        element_name: format!("Unlinked {} {} {}", source_name, relation_type, target_name),
+        diffs: vec![diff],
+        dry_run,
+    })
+}
+
+/// Helper function to add a relation to an element in markdown content
+fn add_relation_to_element(content: &str, element_name: &str, relation_type: &str, target_name: &str, target_path: &str) -> Result<String, ReqvireError> {
+    let mut result = String::new();
+    let mut in_target_element = false;
+    let mut inserted = false;
+    let mut lines_iter = content.lines().peekable();
+
+    let relation_line = format!("  * {}: [{}]({})", relation_type, target_name, target_path);
+
+    while let Some(line) = lines_iter.next() {
+        let trimmed = line.trim();
+
+        // Check if we're entering the target element
+        if trimmed.starts_with("### ") {
+            let name = trimmed.trim_start_matches("### ").trim();
+            in_target_element = name == element_name;
+        }
+
+        // Check for Relations subsection
+        if in_target_element && trimmed == "#### Relations" {
+            result.push_str(line);
+            result.push('\n');
+
+            // Add the new relation after existing ones
+            while let Some(next_line) = lines_iter.peek() {
+                let next_trimmed = next_line.trim();
+                if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
+                    result.push_str(lines_iter.next().unwrap());
+                    result.push('\n');
+                } else if next_trimmed.is_empty() {
+                    result.push_str(lines_iter.next().unwrap());
+                    result.push('\n');
+                } else {
+                    break;
+                }
+            }
+
+            // Add our new relation
+            result.push_str(&relation_line);
+            result.push('\n');
+            inserted = true;
+            continue;
+        }
+
+        // Check for separator (end of element) - insert Relations section if not found
+        if in_target_element && !inserted && trimmed == "---" {
+            // Need to add Relations section before the separator
+            result.push_str("\n#### Relations\n");
+            result.push_str(&relation_line);
+            result.push('\n');
+            inserted = true;
+        }
+
+        result.push_str(line);
+        result.push('\n');
+    }
+
+    if !inserted {
+        return Err(ReqvireError::ElementNotFound(
+            format!("Could not find element '{}' to add relation", element_name)
+        ));
+    }
+
+    Ok(result)
+}
+
+/// Helper function to remove a relation from an element in markdown content
+fn remove_relation_from_element(content: &str, element_name: &str, relation_type: &str, target_name: &str) -> Result<String, ReqvireError> {
+    let mut result = String::new();
+    let mut in_target_element = false;
+    let mut in_relations_section = false;
+    let mut removed = false;
+    let mut remaining_relations_count = 0;
+
+    // Match pattern like: * derivedFrom: [Target Name](path)
+    let relation_pattern = format!("{}: [{}]", relation_type, target_name);
+
+    for line in content.lines() {
+        let trimmed = line.trim();
+
+        // Check if we're entering a new element
+        if trimmed.starts_with("### ") {
+            let name = trimmed.trim_start_matches("### ").trim();
+            if name == element_name {
+                in_target_element = true;
+            } else if in_target_element {
+                in_target_element = false;
+            }
+            in_relations_section = false;
+        }
+
+        // Check for Relations subsection
+        if in_target_element && trimmed == "#### Relations" {
+            in_relations_section = true;
+        }
+
+        // Check for end of Relations section (another h4 header or element separator)
+        if in_relations_section && ((trimmed.starts_with("####") && trimmed != "#### Relations") || trimmed == "---") {
+            in_relations_section = false;
+        }
+
+        // Skip the relation line we want to remove
+        if in_target_element && in_relations_section {
+            if (trimmed.starts_with("* ") || trimmed.starts_with("- ")) && trimmed.contains(&relation_pattern) {
+                removed = true;
+                continue; // Skip this line
+            }
+            if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
+                remaining_relations_count += 1;
+            }
+        }
+
+        result.push_str(line);
+        result.push('\n');
+    }
+
+    if !removed {
+        return Err(ReqvireError::RelationError(
+            format!("Could not find relation '{}' to '{}' in element '{}'", relation_type, target_name, element_name)
+        ));
+    }
+
+    // If we removed the last relation, clean up the empty Relations section
+    if remaining_relations_count == 0 {
+        result = remove_empty_relations_section(&result, element_name);
+    }
+
+    Ok(result)
+}
+
+/// Helper function to remove empty Relations section from markdown content
+fn remove_empty_relations_section(content: &str, element_name: &str) -> String {
+    let mut result = String::new();
+    let mut in_target_element = false;
+    let mut lines_iter = content.lines().peekable();
+
+    while let Some(line) = lines_iter.next() {
+        let trimmed = line.trim();
+
+        // Check if we're entering a new element
+        if trimmed.starts_with("### ") {
+            let name = trimmed.trim_start_matches("### ").trim();
+            in_target_element = name == element_name;
+        }
+
+        // Check for Relations subsection header
+        if in_target_element && trimmed == "#### Relations" {
+            // Check if there are any relations following
+            let mut has_relations = false;
+            let mut temp_lines: Vec<&str> = Vec::new();
+
+            while let Some(next_line) = lines_iter.peek() {
+                let next_trimmed = next_line.trim();
+                if next_trimmed.is_empty() {
+                    temp_lines.push(lines_iter.next().unwrap());
+                } else if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
+                    has_relations = true;
+                    break;
+                } else {
+                    break;
+                }
+            }
+
+            if has_relations {
+                // Keep the header and empty lines
+                result.push_str(line);
+                result.push('\n');
+                for temp in temp_lines {
+                    result.push_str(temp);
+                    result.push('\n');
+                }
+            }
+            // If no relations, skip the header
+            continue;
+        }
+
+        result.push_str(line);
+        result.push('\n');
+    }
+
+    result
+}

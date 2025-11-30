@@ -22,6 +22,11 @@ The attachment commands manage entries in the Attachments subsection of elements
 - Trigger change impact on element
 - Support dry-run mode for preview
 
+#### Attachments
+  * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+
 #### Relations
   * derivedFrom: [Reserved Subsections Support](../System/Core/StructureAndParsing.md#reserved-subsections-support)
   * verifiedBy: [Attach Command Verification](../System/Core/Verifications/AttachmentsVerifications.md#attach-command-verification)
@@ -57,6 +62,8 @@ Commands:
   mv-file           Move entire specification file
   attach            Attach document or Refinement element
   detach            Detach document or Refinement element
+  link              Add relation between elements
+  unlink            Remove relation between elements
   mv-asset          Move/rename asset file and update references
   rm-asset          Remove asset file and remove references
   containment       Generate containment view
@@ -698,4 +705,31 @@ The system shall implement detailed error handling and logging throughout the ap
   * derive: [Validation Error Handling](../System/Core/Validation.md#validation-error-handling)
   * derivedFrom: [Enhanced Validation Error Reporting](../System/Core/Validation.md#enhanced-validation-error-reporting)
   * satisfiedBy: [error.rs](../../core/src/error.rs)
+---
+
+### Relation Commands
+
+The system shall provide CLI commands for relation management: link and unlink.
+
+#### Details
+The `link` command shall:
+- Accept syntax: `reqvire link <source> <relation-type> <target-element>`
+- Source: existing element name or internal file path
+- Target: existing element name
+- Support `--dry-run` flag for preview
+
+The `unlink` command shall:
+- Accept syntax: `reqvire unlink <source> <relation-type> <target-element>`
+- Source: existing element name or internal file path
+- Target: existing element name
+- Support `--dry-run` flag for preview
+
+#### Attachments
+  * [Relation Operations Specification](../System/Operations/Specifications.md#relation-operations-specification)
+  * [RelationTypes.md](../System/Core/DesignDocuments/RelationTypes.md)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
 ---

@@ -147,11 +147,37 @@ The system shall implement relations following clearly defined specifications fo
 
 #### Relations
   * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
+  * derive: [Relation Management Operations](#relation-management-operations)
   * derive: [Validate Relation Types](Validation.md#validate-relation-types)
   * derive: [Trace Relation Non-Directional Behavior](../Output/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
+---
+
+### Relation Management Operations
+
+The system shall provide programmatic manipulation of element relations through link and unlink operations while maintaining model integrity.
+
+#### Details
+When linking, the system shall:
+- Add a relation entry to the element's Relations subsection
+- Create the Relations subsection if it does not exist
+- Validate the relation type and element type compatibility
+- Skip if relation already exists (idempotent operation)
+
+When unlinking, the system shall:
+- Remove the relation entry from the element's Relations subsection
+- Remove the Relations subsection if no relations remain
+
+#### Attachments
+  * [Relation Operations Specification](../Operations/Specifications.md#relation-operations-specification)
+  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
+
+#### Relations
+  * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
+  * verifiedBy: [Link Command Verification](../Operations/Verifications/ElementManipulationVerifications.md#link-command-verification)
+  * verifiedBy: [Unlink Command Verification](../Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification)
 ---
 
 ### Element Type Relation Compatibility

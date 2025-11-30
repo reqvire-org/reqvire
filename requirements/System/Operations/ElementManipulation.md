@@ -15,12 +15,15 @@ When creating a new element, the system shall:
 - Validate and normalize all relations following clearly defined specifications
 - Insert the element into the target file following Element Ordering Behavior
 - Reject the operation and report validation errors if validation fails
+- Provide updates report following Diff Output Format Specification
 
 #### Attachments
   * [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
+  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -47,7 +50,7 @@ When deleting an element, the system shall:
 - Identify all relations from the deleted element (outgoing relations)
 - Remove the complete element section including separators
 - Maintain file structure and formatting after deletion
-- Provide a report of all relations that were affected by the deletion
+- Provide updates report following Diff Output Format Specification
 
 **Empty File Cleanup:**
 - After deleting the element, check if the source file contains any remaining elements
@@ -63,6 +66,8 @@ When deleting an element, the system shall:
 
 #### Attachments
   * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -105,7 +110,7 @@ When moving an element, the system shall:
 - Update all relations that reference the moved element with the new identifier
 - Maintain file structure and formatting in both source and target files
 - Ensure the element name is globally unique in the model
-- Provide a report of all relations that were updated
+- Provide updates report following Diff Output Format Specification
 
 **Empty Source File Cleanup:**
 - After moving the element, check if the source file contains any remaining elements
@@ -124,6 +129,8 @@ When moving an element, the system shall:
   * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
+  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -148,6 +155,7 @@ When moving a file, the system shall:
 - Update all element identifiers within the file to reflect the new file path
 - Update all relation references (both forward and backward) throughout the model that point to any element in the moved file
 - Preserve all file content, structure, and formatting
+- Provide updates report following Diff Output Format Specification
 
 The system shall reject the operation with a clear error message if:
 - The source file does not exist
@@ -163,6 +171,8 @@ When the --squash flag is provided and the target file already exists, the syste
 #### Attachments
   * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](Constraints.md#target-location-constraint)
+  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -204,6 +214,7 @@ When renaming an element, the system shall:
 - Update the element's heading text in the markdown file
 - Update all relation references (both forward and backward) to use the new element identifier
 - Update the element identifier in the registry
+- Provide updates report following Diff Output Format Specification
 
 The system shall reject the operation with a clear error message if:
 - The element does not exist
@@ -211,6 +222,8 @@ The system shall reject the operation with a clear error message if:
 
 #### Attachments
   * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)

@@ -740,3 +740,129 @@ The test shall verify that target file path validation and auto-creation work co
   * satisfiedBy: [test.sh](../../../../tests/test-crud-target-location-validation/test.sh)
   * verify: [Target Location Validation and Auto-Creation](../ElementManipulation.md#target-location-validation-and-auto-creation)
 ---
+
+### Link Command Verification
+
+The test shall verify that the `link` command adds relations to elements following the Relation Operations Specification.
+
+#### Details
+**Test Setup:**
+- Create test model with multiple elements of different types
+- Prepare source elements (by name and by file path)
+- Prepare target elements
+- Document valid and invalid relation type combinations
+
+**Test Steps - Basic Link:**
+1. Run `reqvire link <source-element-name> <relation-type> <target-element-name>`
+2. Verify relation entry is added to source element's Relations subsection
+3. Verify relation format: `* <relation-type>: [target-name](target-path)`
+4. Verify model validates after link
+
+**Test Steps - Source Resolution:**
+1. Link using element name as source
+2. Verify element is found by name in registry
+3. Link using internal file path as source
+4. Verify file is found first, then element resolved
+5. Link with source that matches both file and element name
+6. Verify file path takes priority over element name
+
+**Test Steps - Relations Subsection Creation:**
+1. Link to element without existing Relations subsection
+2. Verify Relations subsection is created
+3. Verify relation entry is added
+
+**Test Steps - Idempotent Behavior:**
+1. Link same relation twice
+2. Verify relation is not duplicated
+3. Verify operation succeeds (no error)
+
+**Test Steps - Dry Run:**
+1. Run `reqvire link --dry-run <source> <relation-type> <target>`
+2. Verify diff is shown
+3. Verify no changes are applied
+
+**Test Steps - Validation:**
+1. Link with invalid relation type
+2. Verify error is reported
+3. Link with incompatible element types
+4. Verify warning is reported
+5. Link to non-existent target
+6. Verify error is reported
+7. Link from non-existent source
+8. Verify error is reported
+
+**Success Criteria:**
+- Adds relation to source element's Relations subsection
+- Creates Relations subsection if missing
+- Source resolves by file path first, then element name
+- Target must be existing element name
+- Idempotent (no duplicates)
+- Validates relation type against supported types
+- Validates element type compatibility
+- Supports --dry-run preview
+- Reports errors for invalid inputs
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Relation Commands](../../../Interfaces/CLI.md#relation-commands)
+  * verify: [Relation Management Operations](../../Core/ModelManagement.md#relation-management-operations)
+---
+
+### Unlink Command Verification
+
+The test shall verify that the `unlink` command removes relations from elements following the Relation Operations Specification.
+
+#### Details
+**Test Setup:**
+- Create test model with elements having various relations
+- Prepare source elements with relations to remove
+- Document expected state after unlink
+
+**Test Steps - Basic Unlink:**
+1. Run `reqvire unlink <source-element-name> <relation-type> <target-element-name>`
+2. Verify relation entry is removed from source element's Relations subsection
+3. Verify model validates after unlink
+
+**Test Steps - Source Resolution:**
+1. Unlink using element name as source
+2. Verify element is found by name in registry
+3. Unlink using internal file path as source
+4. Verify file is found first, then element resolved
+
+**Test Steps - Relations Subsection Cleanup:**
+1. Unlink last relation from element
+2. Verify Relations subsection is removed
+3. Unlink from element with multiple relations
+4. Verify only specified relation is removed, others preserved
+
+**Test Steps - Dry Run:**
+1. Run `reqvire unlink --dry-run <source> <relation-type> <target>`
+2. Verify diff is shown
+3. Verify no changes are applied
+
+**Test Steps - Error Cases:**
+1. Unlink non-existent relation
+2. Verify error is reported
+3. Unlink from non-existent source
+4. Verify error is reported
+5. Unlink to non-existent target
+6. Verify error is reported
+
+**Success Criteria:**
+- Removes relation from source element's Relations subsection
+- Removes Relations subsection when empty
+- Source resolves by file path first, then element name
+- Target must be existing element name
+- Supports --dry-run preview
+- Reports errors for non-existent relations
+- Reports errors for invalid source/target
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Relation Commands](../../../Interfaces/CLI.md#relation-commands)
+  * verify: [Relation Management Operations](../../Core/ModelManagement.md#relation-management-operations)
+---

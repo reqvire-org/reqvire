@@ -94,6 +94,21 @@ reqvire attach "Constraint Element Name" "Feature Requirement"
 reqvire detach "<element-name>" "<attachment-path>"
 ```
 
+### Link/Unlink Relations
+```bash
+# Link two elements with a relation
+reqvire link "<source-element>" "<relation-type>" "<target-element>"
+reqvire link "Feature Requirement" "derivedFrom" "User Story"
+reqvire link "System Requirement" "derive" "Feature Requirement"
+reqvire link "Requirement" "verifiedBy" "Test Case"
+
+# Unlink a relation between elements
+reqvire unlink "<source-element>" "<relation-type>" "<target-element>"
+reqvire unlink "Feature Requirement" "derivedFrom" "User Story"
+```
+
+Supported relation types: `derivedFrom`, `derive`, `verifiedBy`, `verify`, `satisfiedBy`, `satisfy`, `trace`
+
 ## Validation and Analysis
 
 ### Validate Model
@@ -208,4 +223,6 @@ reqvire rm "Element Name" --dry-run
 reqvire mv "Element" "target.md" --dry-run
 reqvire mv-file "source.md" "target.md" --dry-run
 reqvire attach "file.pdf" "Element" --dry-run
+reqvire link "Element" "derivedFrom" "Parent" --dry-run
+reqvire unlink "Element" "derivedFrom" "Parent" --dry-run
 ```
