@@ -83,31 +83,31 @@ reqvire rm-asset "<file-path>"
 reqvire rm-asset "docs/obsolete.pdf"
 ```
 
-### Attach/Detach
-```bash
-# Attach file or refinement element
-reqvire attach "<attachment-path>" "<element-name>"
-reqvire attach "docs/spec.pdf" "Feature Requirement"
-reqvire attach "Constraint Element Name" "Feature Requirement"
-
-# Detach
-reqvire detach "<element-name>" "<attachment-path>"
-```
-
-### Link/Unlink Relations
+### Link/Unlink (Relations and Attachments)
 ```bash
 # Link two elements with a relation
-reqvire link "<source-element>" "<relation-type>" "<target-element>"
+reqvire link "<source>" "<relation-type>" "<target>"
 reqvire link "Feature Requirement" "derivedFrom" "User Story"
 reqvire link "System Requirement" "derive" "Feature Requirement"
 reqvire link "Requirement" "verifiedBy" "Test Case"
 
-# Unlink a relation between elements
-reqvire unlink "<source-element>" "<relation-type>" "<target-element>"
-reqvire unlink "Feature Requirement" "derivedFrom" "User Story"
+# Link to implementation file or external URL
+reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
+reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
+
+# Attach file or refinement element (use 'attaching' keyword)
+reqvire link "<element>" attaching "<path-or-refinement>"
+reqvire link "Feature Requirement" attaching "docs/spec.pdf"
+reqvire link "System Requirement" attaching "Performance Constraint"
+
+# Unlink (auto-detects relation vs attachment)
+reqvire unlink "<source>" "<target>"
+reqvire unlink "Feature Requirement" "User Story"
+reqvire unlink "Feature Requirement" "docs/spec.pdf"
 ```
 
-Supported relation types: `derivedFrom`, `derive`, `verifiedBy`, `verify`, `satisfiedBy`, `satisfy`, `trace`
+Relation types: `derivedFrom`, `derive`, `verifiedBy`, `verify`, `satisfiedBy`, `satisfy`, `trace`
+For attachments: use `attaching` keyword instead of relation type
 
 ## Validation and Analysis
 
@@ -222,7 +222,7 @@ Most manipulation commands support `--dry-run` to preview changes:
 reqvire rm "Element Name" --dry-run
 reqvire mv "Element" "target.md" --dry-run
 reqvire mv-file "source.md" "target.md" --dry-run
-reqvire attach "file.pdf" "Element" --dry-run
 reqvire link "Element" "derivedFrom" "Parent" --dry-run
-reqvire unlink "Element" "derivedFrom" "Parent" --dry-run
+reqvire link "Element" attaching "docs/spec.pdf" --dry-run
+reqvire unlink "Element" "Parent" --dry-run
 ```

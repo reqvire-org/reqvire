@@ -79,11 +79,11 @@ echo "Test 4 passed"
 echo ""
 
 # ==================================
-# Test 5: Unlink command
+# Test 5: Unlink command (auto-detects relation type)
 # ==================================
 echo "Test 5: Unlink command..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Feature Requirement" "derivedFrom" "Another Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Feature Requirement" "Another Requirement" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md" "File content after unlink does not match expected"
 
@@ -95,8 +95,8 @@ echo ""
 # ==================================
 echo "Test 6: Unlink removes derive relation..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "System Requirements" "derive" "No Relations Requirement" > /dev/null 2>&1
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "No Relations Requirement" "derivedFrom" "System Requirements" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "System Requirements" "No Relations Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "No Relations Requirement" "System Requirements" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/06-unlink-removes-subsection.md" "$TEST_DIR/specifications/Requirements.md" "Unlink should remove relation"
 
@@ -155,12 +155,12 @@ echo "Test 8 passed"
 echo ""
 
 # ==================================
-# Test 9: Unlink non-existent relation fails
+# Test 9: Unlink non-existent relation/attachment fails
 # ==================================
 echo "Test 9: Unlink non-existent relation fails..."
 
 set +e
-UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Feature Requirement" "satisfiedBy" "Another Requirement" 2>&1)
+UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Feature Requirement" "Nonexistent Element XYZ" 2>&1)
 UNLINK_EXIT=$?
 set -e
 
@@ -169,7 +169,7 @@ if [ $UNLINK_EXIT -eq 0 ]; then
   exit 1
 fi
 
-if ! echo "$UNLINK_OUTPUT" | grep -qi "not found\|does not exist\|error"; then
+if ! echo "$UNLINK_OUTPUT" | grep -qi "not found\|does not exist\|error\|no relation"; then
   echo "FAILED: Error message should indicate relation not found"
   echo "$UNLINK_OUTPUT"
   exit 1
@@ -192,6 +192,18 @@ cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "trace" "Another Req
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md" "Dry-run mode should not modify the file"
 
 echo "Test 10 passed"
+echo ""
+
+# ==================================
+# Test 11: Link trace to external URL
+# ==================================
+echo "Test 11: Link trace to external URL..."
+
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "trace" "https://example.com/spec.html" > /dev/null 2>&1
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/11-link-external-url.md" "$TEST_DIR/specifications/Requirements.md" "Link to external URL does not match expected"
+
+echo "Test 11 passed"
 echo ""
 
 echo "===================================="

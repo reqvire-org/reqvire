@@ -1,13 +1,13 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
-argument-hint: <source> <relation-type> <target>
-description: Remove a relation between two elements
+argument-hint: <source> <target>
+description: Remove a relation or attachment (auto-detects type)
 model: claude-sonnet-4-5-20250929
 ---
 
 # Unlink Elements
 
-Remove an existing relation between two model elements.
+Remove an existing relation or attachment between elements. The command auto-detects whether the target is a relation or attachment.
 
 ## Current Model Context
 
@@ -16,36 +16,35 @@ Remove an existing relation between two model elements.
 ## User Request
 
 ${1:+Source element: $1}
-${2:+Relation type: $2}
-${3:+Target element: $3}
-${1:-The user will provide source element, relation type, and target element.}
+${2:+Target: $2}
+${1:-The user will provide source element and target.}
 
 ## Steps
 
 1. **Understand the context:**
    - Identify the source element (by name)
-   - Identify the target element (by name)
-   - Determine the relation type to remove
-   - Verify the relation exists
+   - Identify the target (element name or file path)
+   - The command will auto-detect if it's a relation or attachment
 
 2. **Preview the unlink operation:**
    ```bash
-   reqvire unlink "<source-element>" "<relation-type>" "<target-element>" --dry-run
+   reqvire unlink "<source-element>" "<target>" --dry-run
    ```
 
    This shows:
    - Which file will be modified
-   - The relation that will be removed
+   - The relation/attachment that will be removed
    - Git-style diff for the affected file
 
 3. **Apply the unlink:**
    ```bash
-   reqvire unlink "<source-element>" "<relation-type>" "<target-element>"
+   reqvire unlink "<source-element>" "<target>"
    ```
 
    The unlink command automatically:
-   - Removes the relation from the source element's Relations section
-   - Cleans up the Relations section if it becomes empty
+   - Searches relations first, then attachments
+   - Removes the relation/attachment from the source element
+   - Cleans up empty sections automatically
    - Maintains model consistency
 
 4. **Verify the changes:**
@@ -53,56 +52,53 @@ ${1:-The user will provide source element, relation type, and target element.}
    reqvire validate
    ```
 
-## Supported Relation Types
+## Auto-Detection Behavior
 
-| Relation Type | Description |
-|---------------|-------------|
-| `derivedFrom` | Source derives from target |
-| `derive` | Source has derived target |
-| `verifiedBy` | Source is verified by target |
-| `verify` | Source verifies target |
-| `satisfiedBy` | Source is satisfied by target |
-| `satisfy` | Source satisfies target |
-| `trace` | General traceability link |
+The unlink command auto-detects the type:
+1. **First**: Searches for a relation from source to target element
+2. **Then**: If no relation found, searches for an attachment matching the target
+3. Only one relation per source-target pair is allowed, so no ambiguity
 
 ## Important Notes
 
+- **Auto-detection**: No need to specify relation type - the command finds it automatically
 - **Explicit relations only**: Only removes user-created relations (not auto-generated inverse relations)
 - **Element names**: Use the exact element name as it appears in the heading
-- **Cleanup**: Empty Relations sections are removed automatically
+- **Cleanup**: Empty Relations/Attachments sections are removed automatically
 - **Validation**: Consider model validity after unlinking (orphaned elements may cause validation errors)
 
 ## Unlink Options
 
 - `<source>`: Name of source element (required)
-- `<relation-type>`: Type of relation (required)
-- `<target>`: Name of target element (required)
+- `<target>`: Element name or file path (required)
 - `--dry-run`: Preview changes without applying
-- `--json`: Output results in JSON format
 
 ## Error Cases
 
 The unlink operation will fail with a clear error if:
 - The source element does not exist
-- The target element does not exist
-- The specified relation does not exist
-- The relation type is invalid
+- No relation or attachment found from source to target
 
 ## Examples
 
-**Remove derivation link:**
+**Remove a relation (auto-detected):**
 ```bash
-reqvire unlink "Feature Requirement" "derivedFrom" "User Story"
+reqvire unlink "Feature Requirement" "User Story"
 ```
 
-**Remove verification link:**
+**Remove an attachment file:**
 ```bash
-reqvire unlink "Requirement" "verifiedBy" "Test Case"
+reqvire unlink "System Requirement" "docs/SLA.pdf"
+```
+
+**Remove an attached element:**
+```bash
+reqvire unlink "System Requirement" "Performance Constraint"
 ```
 
 **Preview before unlinking:**
 ```bash
-reqvire unlink "Feature X" "trace" "Feature Y" --dry-run
+reqvire unlink "Feature X" "Feature Y" --dry-run
 ```
 
 ## When to Use unlink
@@ -112,9 +108,11 @@ Use unlink when:
 - Refactoring requirement hierarchies
 - Disconnecting deprecated verifications
 - Cleaning up obsolete trace relations
+- Detaching documents or files
+- Removing attached refinement elements
 
 ## Related Commands
 
-- **Link elements**: `reqvire link <source> <relation-type> <target>`
-- **Detach files**: `reqvire detach <element> <path>`
+- **Link elements**: `reqvire link <source> <relation-type-or-attaching> <target>`
 - **Search relations**: `reqvire search --have-relations="derivedFrom"`
+- **Search attachments**: `reqvire search --has-attachments`

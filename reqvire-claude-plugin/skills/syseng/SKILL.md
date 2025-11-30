@@ -1,7 +1,7 @@
 ---
 name: System Engineer
 description: Expert MBSE engineer for system models and architectures. Use for exploring requirements, refactoring model structure, adding features, and verification management.
-version: 1.0.0
+version: 1.0.1
 ---
 
 # System and Requirements Engineer Skill

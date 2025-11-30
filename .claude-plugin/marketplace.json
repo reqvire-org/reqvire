@@ -9,7 +9,7 @@
     },
     "plugins": [
         {
-            "version": "1.2.1",
+            "version": "1.3.0",
             "name": "reqvire",
             "description": "The Requirements As Code framework for Modern Engineering Teams. Includes specialized skills for requirements and context engineering and task planning.",
             "author": {
@@ -30,7 +30,7 @@
                 "rust"
             ],
             "commands": [
-                "./commands/setup.md",            
+                "./commands/setup.md",
                 "./commands/add-feature.md",
                 "./commands/analyze-model.md",
                 "./commands/lint-model.md",
@@ -45,7 +45,9 @@
                 "./commands/rename-element.md",
                 "./commands/analyze-impact.md",
                 "./commands/generate-tasks.md",
-                "./commands/rm.md"
+                "./commands/rm.md",
+                "./commands/link.md",
+                "./commands/unlink.md"
             ],
             "source": "./reqvire-claude-plugin",
             "strict": false

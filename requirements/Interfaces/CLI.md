@@ -2,21 +2,25 @@
 
 ### Attachment Commands
 
-The system shall provide CLI commands for attachment management: attach and detach.
+**DEPRECATED**: Attachment functionality has been unified into the `link` and `unlink` commands. Use `reqvire link <element> attaching <target>` and `reqvire unlink <element> <target>` instead.
+
+The system shall provide attachment management through the unified link/unlink commands using the 'attaching' keyword.
 
 #### Details
-The attachment commands manage entries in the Attachments subsection of elements. Attachments can be either InternalPath files (PDFs, images, scripts) or Identifier references to refinement elements (behaviors, constraints, specifications).
+Attachment management has been consolidated into the Relation Commands. The attach/detach commands are superseded by:
 
-**Attach Command:**
-- Syntax: `reqvire attach <attachment-path> <element-name> [--dry-run]`
+**Attach (via link):**
+- Syntax: `reqvire link <element-name> attaching <target> [--dry-run]`
+- Target: internal file path OR Refinement element name (auto-detected)
 - Create Attachments subsection if doesn't exist
 - Add link to subsection with format `* [display-name](path)`
 - Skip if already attached (idempotent)
 - Support many-to-many (same attachment to multiple elements)
 - Support dry-run mode for preview
 
-**Detach Command:**
-- Syntax: `reqvire detach <element-name> <attachment-path> [--dry-run]`
+**Detach (via unlink):**
+- Syntax: `reqvire unlink <element-name> <target> [--dry-run]`
+- Auto-detects whether target is relation or attachment
 - Remove link from Attachments subsection
 - Remove subsection if no attachments remain
 - Trigger change impact on element
@@ -60,10 +64,8 @@ Commands:
   mv                Move element to different location
   rename            Rename element
   mv-file           Move entire specification file
-  attach            Attach document or Refinement element
-  detach            Detach document or Refinement element
-  link              Add relation between elements
-  unlink            Remove relation between elements
+  link              Add relation or attachment between elements
+  unlink            Remove relation or attachment (auto-detects)
   mv-asset          Move/rename asset file and update references
   rm-asset          Remove asset file and remove references
   containment       Generate containment view
@@ -709,19 +711,23 @@ The system shall implement detailed error handling and logging throughout the ap
 
 ### Relation Commands
 
-The system shall provide CLI commands for relation management: link and unlink.
+The system shall provide unified CLI commands for relation and attachment management: link and unlink.
 
 #### Details
 The `link` command shall:
-- Accept syntax: `reqvire link <source> <relation-type> <target-element>`
-- Source: existing element name or internal file path
-- Target: existing element name
+- Accept syntax: `reqvire link <source> <relation-type-or-attaching> <target>`
+- Source: existing element name
+- Relation-type: one of derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace, OR 'attaching'
+- Target types for relations: element name, internal file path, or external URL (http/https)
+- Target types for attaching: internal file path or Refinement element name
 - Support `--dry-run` flag for preview
 
 The `unlink` command shall:
-- Accept syntax: `reqvire unlink <source> <relation-type> <target-element>`
-- Source: existing element name or internal file path
-- Target: existing element name
+- Accept syntax: `reqvire unlink <source> <target>`
+- Auto-detect: searches relations first, then attachments
+- Only one relation per source-target pair is allowed
+- Source: existing element name
+- Target: element name or file path
 - Support `--dry-run` flag for preview
 
 #### Attachments
@@ -732,4 +738,6 @@ The `unlink` command shall:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * verifiedBy: [Link Command Verification](../System/Operations/Verifications/ElementManipulationVerifications.md#link-command-verification)
+  * verifiedBy: [Unlink Command Verification](../System/Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification)
 ---

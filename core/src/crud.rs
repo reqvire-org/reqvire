@@ -1310,20 +1310,20 @@ fn remove_all_empty_attachments_sections(content: &str) -> String {
     result
 }
 
-/// Link a relation between two elements
+/// Link a relation between two elements or to external URLs/internal paths
 ///
 /// # Arguments
 /// * `model_manager` - The model manager
-/// * `source` - Source element name or file path (auto-detected)
+/// * `source` - Source element name
 /// * `relation_type` - The relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
-/// * `target_name` - Target element name
+/// * `target` - Target element name, internal file path, or external URL
 /// * `git_root` - Git root directory
 /// * `dry_run` - If true, don't write changes to disk
 pub fn link(
     model_manager: &mut ModelManager,
     source: &str,
     relation_type: &str,
-    target_name: &str,
+    target: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
@@ -1347,26 +1347,80 @@ pub fn link(
     let source_name = source_element.name.clone();
     let source_file_path = source_element.file_path.clone();
 
-    // Resolve target element by name
-    let target_element = model_manager.graph_registry.get_element_by_name(target_name)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Target element '{}' not found", target_name)
-        ))?;
+    // Determine target type: element name, external URL, or internal path
+    let is_external_url = target.starts_with("http://") || target.starts_with("https://");
+    let is_internal_path = !is_external_url && (
+        target.ends_with(".md") ||
+        target.contains('/') ||
+        git_root.join(target).exists()
+    );
 
-    let target_id = target_element.identifier.clone();
-    let target_display_name = target_element.name.clone();
-    let target_file_path = target_element.file_path.clone();
+    let (target_display_name, relation_target, target_id_for_check) = if is_external_url {
+        // External URL - use as-is
+        (target.to_string(), target.to_string(), target.to_string())
+    } else if is_internal_path {
+        // Internal file path - use as satisfiedBy target
+        let source_file_path_buf = std::path::PathBuf::from(&source_file_path);
+        let source_folder = source_file_path_buf.parent()
+            .unwrap_or_else(|| std::path::Path::new("."))
+            .to_path_buf();
+
+        // Calculate relative path from source file to target
+        let target_path = std::path::PathBuf::from(target);
+        let relative_path = pathdiff::diff_paths(&target_path, &source_folder)
+            .unwrap_or_else(|| target_path.clone());
+        let relative_str = relative_path.to_string_lossy().to_string();
+
+        // Extract filename for display name
+        let display = target_path.file_name()
+            .map(|n| n.to_string_lossy().to_string())
+            .unwrap_or_else(|| target.to_string());
+
+        (display, relative_str, target.to_string())
+    } else {
+        // Element name - resolve to get identifier
+        let target_element = model_manager.graph_registry.get_element_by_name(target)
+            .ok_or_else(|| ReqvireError::ElementNotFound(
+                format!("Target element '{}' not found", target)
+            ))?;
+
+        let target_id = target_element.identifier.clone();
+        let target_display_name = target_element.name.clone();
+        let target_file_path = target_element.file_path.clone();
+
+        // Calculate relative identifier from source element's file to target element
+        let source_file_path_buf = std::path::PathBuf::from(&source_file_path);
+        let source_folder = source_file_path_buf.parent()
+            .unwrap_or_else(|| std::path::Path::new("."))
+            .to_path_buf();
+
+        let relation_target = if source_file_path == target_file_path {
+            // Same file - use just the fragment
+            let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
+            let fragment = fragment_opt.unwrap_or(&target_id);
+            format!("#{}", fragment)
+        } else {
+            // Different files - calculate relative path
+            crate::utils::to_relative_identifier(
+                &target_id,
+                &source_folder,
+                true
+            ).unwrap_or_else(|_| target_id.clone())
+        };
+
+        (target_display_name, relation_target, target_id)
+    };
 
     // Check if relation already exists (idempotent) - only check user_created relations
     let relation_exists = source_element.relations.iter().any(|r| {
-        r.user_created && r.relation_type.name == relation_type && r.target.link.as_str() == target_id
+        r.user_created && r.relation_type.name == relation_type && r.target.link.as_str() == target_id_for_check
     });
 
     if relation_exists {
         return Ok(CrudResult {
             operation: CrudOperation::Update,
             element_id: source_id.clone(),
-            element_name: format!("Relation already exists: {} {} {}", source_name, relation_type, target_name),
+            element_name: format!("Relation already exists: {} {} {}", source_name, relation_type, target),
             diffs: vec![],
             dry_run,
         });
@@ -1376,26 +1430,6 @@ pub fn link(
     let absolute_file_path = git_root.join(&source_file_path);
     let content = fs::read_to_string(&absolute_file_path)
         .map_err(|e| ReqvireError::IoError(e))?;
-
-    // Calculate relative identifier from source element's file to target element
-    let source_file_path_buf = std::path::PathBuf::from(&source_file_path);
-    let source_folder = source_file_path_buf.parent()
-        .unwrap_or_else(|| std::path::Path::new("."))
-        .to_path_buf();
-
-    let relation_target = if source_file_path == target_file_path {
-        // Same file - use just the fragment
-        let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
-        let fragment = fragment_opt.unwrap_or(&target_id);
-        format!("#{}", fragment)
-    } else {
-        // Different files - calculate relative path
-        crate::utils::to_relative_identifier(
-            &target_id,
-            &source_folder,
-            true
-        ).unwrap_or_else(|_| target_id.clone())
-    };
 
     // Add relation to element
     let new_content = add_relation_to_element(&content, &source_name, relation_type, &target_display_name, &relation_target)?;
@@ -1415,38 +1449,30 @@ pub fn link(
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id: source_id,
-        element_name: format!("Linked {} {} {}", source_name, relation_type, target_name),
+        element_name: format!("Linked {} {} {}", source_name, relation_type, target),
         diffs: vec![diff],
         dry_run,
     })
 }
 
-/// Unlink a relation between two elements
+/// Unlink a relation or attachment between two elements (auto-detects type)
+///
+/// Searches relations first, then attachments. Only one relation per source-target pair is allowed.
 ///
 /// # Arguments
 /// * `model_manager` - The model manager
-/// * `source` - Source element name or file path (auto-detected)
-/// * `relation_type` - The relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
-/// * `target_name` - Target element name
+/// * `source` - Source element name
+/// * `target` - Target element name or file path
 /// * `git_root` - Git root directory
 /// * `dry_run` - If true, don't write changes to disk
 pub fn unlink(
     model_manager: &mut ModelManager,
     source: &str,
-    relation_type: &str,
-    target_name: &str,
+    target: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use std::fs;
-    use crate::relation::RELATION_TYPES;
-
-    // Validate relation type
-    if !RELATION_TYPES.contains_key(relation_type) {
-        return Err(ReqvireError::UnsupportedRelationType(
-            format!("Invalid relation type '{}'. Supported types: derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace", relation_type)
-        ));
-    }
 
     // Resolve source element by name
     let source_element = model_manager.graph_registry.get_element_by_name(source)
@@ -1458,53 +1484,84 @@ pub fn unlink(
     let source_name = source_element.name.clone();
     let source_file_path = source_element.file_path.clone();
 
-    // Resolve target element by name
-    let target_element = model_manager.graph_registry.get_element_by_name(target_name)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Target element '{}' not found", target_name)
-        ))?;
+    // Step 1: Try to find a relation from source to target (by element name)
+    // First, try to resolve target as element name
+    if let Some(target_element) = model_manager.graph_registry.get_element_by_name(target) {
+        let target_id = target_element.identifier.clone();
+        let target_display_name = target_element.name.clone();
 
-    let target_id = target_element.identifier.clone();
-    let target_display_name = target_element.name.clone();
+        // Look for any user_created relation to this target
+        let relation_match = source_element.relations.iter().find(|r| {
+            r.user_created && r.target.link.as_str() == target_id
+        });
 
-    // Check if relation exists - only check user_created relations
-    let relation_exists = source_element.relations.iter().any(|r| {
-        r.user_created && r.relation_type.name == relation_type && r.target.link.as_str() == target_id
+        if let Some(relation) = relation_match {
+            let relation_type = relation.relation_type.name.to_string();
+
+            // Read current file content
+            let absolute_file_path = git_root.join(&source_file_path);
+            let content = fs::read_to_string(&absolute_file_path)
+                .map_err(|e| ReqvireError::IoError(e))?;
+
+            // Remove relation from element
+            let new_content = remove_relation_from_element(&content, &source_name, &relation_type, &target_display_name)?;
+
+            // Generate diff
+            let diff = generate_file_diff(&source_file_path, &content, &new_content);
+
+            // Write to file if not dry run
+            if !dry_run {
+                fs::write(&absolute_file_path, &new_content)
+                    .map_err(|e| ReqvireError::IoError(e))?;
+
+                // Mark file as modified for re-parsing
+                model_manager.graph_registry.modified_files.insert(source_file_path.clone());
+            }
+
+            return Ok(CrudResult {
+                operation: CrudOperation::Update,
+                element_id: source_id,
+                element_name: format!("Unlinked {} {} {}", source_name, relation_type, target),
+                diffs: vec![diff],
+                dry_run,
+            });
+        }
+
+        // No relation found, check if target element is an attachment
+        let attachment_match = source_element.attachments.iter().find(|a| {
+            a.target.as_str() == target_id
+        });
+
+        if attachment_match.is_some() {
+            // Detach the element attachment
+            return detach_element(model_manager, source, target, git_root, dry_run);
+        }
+    }
+
+    // Step 2: Try to find target as file attachment
+    // Check if target is a file path attachment
+    let cwd = std::env::current_dir().unwrap_or_default();
+    let file_exists_cwd = cwd.join(target).exists();
+    let file_exists_git_root = git_root.join(target).exists();
+
+    if file_exists_cwd || file_exists_git_root {
+        // It's a file - use file detachment logic
+        return detach(model_manager, source, target, git_root, dry_run);
+    }
+
+    // Step 3: Check attachments by path string (even if file doesn't exist anymore)
+    let attachment_by_path = source_element.attachments.iter().find(|a| {
+        a.target.as_str() == target || a.target.as_str().ends_with(target)
     });
 
-    if !relation_exists {
-        return Err(ReqvireError::RelationError(
-            format!("Relation '{}' from '{}' to '{}' does not exist", relation_type, source_name, target_name)
-        ));
+    if attachment_by_path.is_some() {
+        return detach(model_manager, source, target, git_root, dry_run);
     }
 
-    // Read current file content
-    let absolute_file_path = git_root.join(&source_file_path);
-    let content = fs::read_to_string(&absolute_file_path)
-        .map_err(|e| ReqvireError::IoError(e))?;
-
-    // Remove relation from element
-    let new_content = remove_relation_from_element(&content, &source_name, relation_type, &target_display_name)?;
-
-    // Generate diff
-    let diff = generate_file_diff(&source_file_path, &content, &new_content);
-
-    // Write to file if not dry run
-    if !dry_run {
-        fs::write(&absolute_file_path, &new_content)
-            .map_err(|e| ReqvireError::IoError(e))?;
-
-        // Mark file as modified for re-parsing
-        model_manager.graph_registry.modified_files.insert(source_file_path.clone());
-    }
-
-    Ok(CrudResult {
-        operation: CrudOperation::Update,
-        element_id: source_id,
-        element_name: format!("Unlinked {} {} {}", source_name, relation_type, target_name),
-        diffs: vec![diff],
-        dry_run,
-    })
+    // Nothing found
+    Err(ReqvireError::RelationError(
+        format!("No relation or attachment found from '{}' to '{}'", source, target)
+    ))
 }
 
 /// Helper function to add a relation to an element in markdown content

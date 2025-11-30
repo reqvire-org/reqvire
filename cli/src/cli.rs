@@ -311,44 +311,16 @@ pub enum Commands {
         json: bool,
     },
 
-    /// Attach external document or Refinement element to element
-    #[clap(name = "attach", override_help = "Attach external document or Refinement element to element\n\nATTACH OPTIONS:\n       <ATTACHMENT>             File path OR Refinement element name (auto-detected)\n       <ELEMENT_NAME>           Name of element to attach to\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if attachment exists as file (file path priority)\n    2. If no file found, looks up element by name (must be Refinement type)\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire attach docs/SLO.pdf \"System Performance Requirements\"\n    reqvire attach \"My Constraint Element\" \"System Performance Requirements\"")]
-    Attach {
-        /// File path OR Refinement element name (auto-detected)
-        attachment_path: String,
-
-        /// Name of element to attach to
-        element_name: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "ATTACH OPTIONS")]
-        dry_run: bool,
-    },
-
-    /// Detach external document or Refinement element from element
-    #[clap(name = "detach", override_help = "Detach external document or Refinement element from element\n\nDETACH OPTIONS:\n       <ELEMENT_NAME>           Name of element to detach from\n       <ATTACHMENT>             File path OR Refinement element name (auto-detected)\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if attachment exists as file (file path priority)\n    2. If no file found, looks up element by name\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire detach \"System Performance Requirements\" docs/SLO.pdf\n    reqvire detach \"System Performance Requirements\" \"My Constraint Element\"")]
-    Detach {
-        /// Name of element to detach from
-        element_name: String,
-
-        /// File path OR Refinement element name (auto-detected)
-        attachment_path: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "DETACH OPTIONS")]
-        dry_run: bool,
-    },
-
-    /// Add relation between elements
-    #[clap(name = "link", override_help = "Add relation between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Element name OR internal file path (auto-detected)\n       <RELATION_TYPE>          Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)\n       <TARGET>                 Target element name\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if source exists as internal file path\n    2. If no file found, looks up element by name in registry\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire link \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire link \"Test Verification\" verify \"Feature Requirement\"")]
+    /// Add relation or attachment between elements
+    #[clap(name = "link", override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n\nRELATION TYPES:\n    derivedFrom  - Source is derived from target (parent traceability)\n    derive       - Source derives target (child traceability)\n    satisfiedBy  - Source requirement is satisfied by target implementation\n    satisfy      - Source implementation satisfies target requirement\n    verifiedBy   - Source requirement is verified by target verification\n    verify       - Source verification verifies target requirement\n    trace        - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach file or Refinement element to source\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: internal file path or Refinement element name\n\nUSAGE:\n    reqvire link \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire link \"Test Verification\" verify \"Feature Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"System Requirement\" attaching docs/SLO.pdf\n    reqvire link \"System Requirement\" attaching \"My Constraint Element\"")]
     Link {
-        /// Element name OR internal file path (auto-detected)
+        /// Source element name
         source: String,
 
-        /// Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
+        /// Relation type (derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace) OR 'attaching'
         relation_type: String,
 
-        /// Target element name
+        /// Target: element name, internal path, or external URL (for relations); file path or element name (for attaching)
         target: String,
 
         /// Preview changes without applying
@@ -356,16 +328,13 @@ pub enum Commands {
         dry_run: bool,
     },
 
-    /// Remove relation between elements
-    #[clap(name = "unlink", override_help = "Remove relation between elements\n\nUNLINK OPTIONS:\n       <SOURCE>                 Element name OR internal file path (auto-detected)\n       <RELATION_TYPE>          Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)\n       <TARGET>                 Target element name\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if source exists as internal file path\n    2. If no file found, looks up element by name in registry\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire unlink \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire unlink \"Test Verification\" verify \"Feature Requirement\"")]
+    /// Remove relation or attachment between elements (auto-detects type)
+    #[clap(name = "unlink", override_help = "Remove relation or attachment between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    Searches relations first, then attachments.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Feature Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\"")]
     Unlink {
-        /// Element name OR internal file path (auto-detected)
+        /// Source element name
         source: String,
 
-        /// Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
-        relation_type: String,
-
-        /// Target element name
+        /// Target element name OR file path
         target: String,
 
         /// Preview changes without applying
@@ -1032,89 +1001,56 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Attach { attachment_path, element_name, dry_run }) => {
-            let git_root = git_commands::get_git_root_dir()?;
-
-            // Auto-detect: check if attachment_path is a file or element name
-            // Priority: file path first, then element name lookup
-            let cwd = std::env::current_dir().unwrap_or_default();
-            let file_exists_cwd = cwd.join(&attachment_path).exists();
-            let file_exists_git_root = git_root.join(&attachment_path).exists();
-
-            if file_exists_cwd || file_exists_git_root {
-                // It's a file path - use existing file attachment logic
-                let result = reqvire::crud::attach(
-                    &mut model_manager,
-                    &element_name,
-                    &attachment_path,
-                    &git_root,
-                    dry_run,
-                )?;
-                render_crud_result(&result);
-            } else {
-                // Not a file - try to resolve as element name
-                let result = reqvire::crud::attach_element(
-                    &mut model_manager,
-                    &element_name,
-                    &attachment_path, // This is actually the element name to attach
-                    &git_root,
-                    dry_run,
-                )?;
-                render_crud_result(&result);
-            }
-            return Ok(0);
-        },
-        Some(Commands::Detach { element_name, attachment_path, dry_run }) => {
-            let git_root = git_commands::get_git_root_dir()?;
-
-            // Auto-detect: check if attachment_path is a file or element name
-            // Priority: file path first, then element name lookup
-            let cwd = std::env::current_dir().unwrap_or_default();
-            let file_exists_cwd = cwd.join(&attachment_path).exists();
-            let file_exists_git_root = git_root.join(&attachment_path).exists();
-
-            if file_exists_cwd || file_exists_git_root {
-                // It's a file path - use existing file detachment logic
-                let result = reqvire::crud::detach(
-                    &mut model_manager,
-                    &element_name,
-                    &attachment_path,
-                    &git_root,
-                    dry_run,
-                )?;
-                render_crud_result(&result);
-            } else {
-                // Not a file - try to resolve as element name
-                let result = reqvire::crud::detach_element(
-                    &mut model_manager,
-                    &element_name,
-                    &attachment_path, // This is actually the element name to detach
-                    &git_root,
-                    dry_run,
-                )?;
-                render_crud_result(&result);
-            }
-            return Ok(0);
-        },
         Some(Commands::Link { source, relation_type, target, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
-            let result = reqvire::crud::link(
-                &mut model_manager,
-                &source,
-                &relation_type,
-                &target,
-                &git_root,
-                dry_run,
-            )?;
-            render_crud_result(&result);
+
+            // Check if relation_type is 'attaching' - special keyword for attachments
+            if relation_type == "attaching" {
+                // Auto-detect: check if target is a file or element name
+                let cwd = std::env::current_dir().unwrap_or_default();
+                let file_exists_cwd = cwd.join(&target).exists();
+                let file_exists_git_root = git_root.join(&target).exists();
+
+                if file_exists_cwd || file_exists_git_root {
+                    // It's a file path - use file attachment logic
+                    let result = reqvire::crud::attach(
+                        &mut model_manager,
+                        &source,
+                        &target,
+                        &git_root,
+                        dry_run,
+                    )?;
+                    render_crud_result(&result);
+                } else {
+                    // Not a file - try to resolve as element name
+                    let result = reqvire::crud::attach_element(
+                        &mut model_manager,
+                        &source,
+                        &target,
+                        &git_root,
+                        dry_run,
+                    )?;
+                    render_crud_result(&result);
+                }
+            } else {
+                // Regular relation link
+                let result = reqvire::crud::link(
+                    &mut model_manager,
+                    &source,
+                    &relation_type,
+                    &target,
+                    &git_root,
+                    dry_run,
+                )?;
+                render_crud_result(&result);
+            }
             return Ok(0);
         },
-        Some(Commands::Unlink { source, relation_type, target, dry_run }) => {
+        Some(Commands::Unlink { source, target, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
             let result = reqvire::crud::unlink(
                 &mut model_manager,
                 &source,
-                &relation_type,
                 &target,
                 &git_root,
                 dry_run,
