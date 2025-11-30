@@ -737,7 +737,7 @@ blockquote {
 
   subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
     subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      1096aca658ce4572[&quot;Attachment Commands&quot;];
+      1096aca658ce4572[&quot;Attachment Commands<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class 1096aca658ce4572 systemRequirement;
       click 1096aca658ce4572 &quot;../../Interfaces/CLI.html#attachment-commands&quot;;
     end
@@ -747,10 +747,10 @@ blockquote {
       4f7fa84403776a06[&quot;Relation Types and behaviors<br/>📎 RelationTypes.md&quot;];
       class 4f7fa84403776a06 systemRequirement;
       click 4f7fa84403776a06 &quot;ModelManagement.html#relation-types-and-behaviors&quot;;
-      661a84b5a9ab68c5[&quot;Supported Element Types&quot;];
+      661a84b5a9ab68c5[&quot;Supported Element Types<br/>📎 requirements/System/Core/Specifications.md#supported-element-types-specification&quot;];
       class 661a84b5a9ab68c5 systemRequirement;
       click 661a84b5a9ab68c5 &quot;ModelManagement.html#supported-element-types&quot;;
-      6d3dc4e586860761[&quot;Verification Type Categories&quot;];
+      6d3dc4e586860761[&quot;Verification Type Categories<br/>📎 requirements/System/Core/Specifications.md#verification-type-categories-specification&quot;];
       class 6d3dc4e586860761 systemRequirement;
       click 6d3dc4e586860761 &quot;ModelManagement.html#verification-type-categories&quot;;
     end
@@ -775,7 +775,7 @@ blockquote {
       click 30b02d327e563ceb &quot;StructureAndParsing.html#structure-and-addressing-in-markdown-documents&quot;;
     end
     subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
-      6d54be5a9e9637e2[&quot;Internal Consistency Validator&quot;];
+      6d54be5a9e9637e2[&quot;Internal Consistency Validator<br/>📎 ElementIdentity.md&quot;];
       class 6d54be5a9e9637e2 systemRequirement;
       click 6d54be5a9e9637e2 &quot;Validation.html#internal-consistency-validator&quot;;
     end
@@ -814,7 +814,7 @@ blockquote {
   end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
+      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class ca74bbb037431e9b systemRequirement;
       click ca74bbb037431e9b &quot;../Operations/ElementManipulation.html#create-element-operation&quot;;
     end
@@ -828,7 +828,7 @@ blockquote {
   end
   subgraph 63d7cba3f920744c[&quot;📁 requirements/System/Processing&quot;]
     subgraph 263fc0b0a2043fc1[&quot;📄 ChangeImpact.md&quot;]
-      87b7ea665c0ec9c2[&quot;Change Impact Detection&quot;];
+      87b7ea665c0ec9c2[&quot;Change Impact Detection<br/>📎 ElementIdentity.md&quot;];
       class 87b7ea665c0ec9c2 systemRequirement;
       click 87b7ea665c0ec9c2 &quot;../Processing/ChangeImpact.html#change-impact-detection&quot;;
     end
@@ -904,6 +904,7 @@ blockquote {
   click 494239c0f3861cb5 &quot;../../../tests/test-parsing-functionality/test.sh&quot;;
   4b3aefbc8964bef0 -->|satisfiedBy| 494239c0f3861cb5;
   4f7fa84403776a06 -.->|deriveReqT| bc4b202a0bb6f50c;
+  4f7fa84403776a06 -.->|deriveReqT| 12efff2e84f6c077;
   4f7fa84403776a06 -.->|deriveReqT| 83b654d72d72255;
   4f7fa84403776a06 -.->|deriveReqT| 978256deec70c016;
   4f7fa84403776a06 -->|satisfiedBy| 9450d4313f47ef36;
@@ -914,8 +915,10 @@ blockquote {
   661a84b5a9ab68c5 -.->|deriveReqT| ef466393e75bd0d;
   661a84b5a9ab68c5 -->|satisfiedBy| a814c4935e1a0449;
   661a84b5a9ab68c5 -->|satisfiedBy| f22d93285fcd7664;
+  661a84b5a9ab68c5 -->|satisfiedBy| 11d73b2bad3ddf0a;
   661a84b5a9ab68c5 -.->|verifiedBy| e21f26d3f283ac80;
   661a84b5a9ab68c5 -.->|verifiedBy| a6a558a9f2daccdd;
+  6d3dc4e586860761 -->|satisfiedBy| aba468c74b8190dc;
   80defdd4cbc7ee18[&quot;cli.rs&quot;];
   class 80defdd4cbc7ee18 default;
   click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;

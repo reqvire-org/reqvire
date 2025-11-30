@@ -339,6 +339,40 @@ pub enum Commands {
         dry_run: bool,
     },
 
+    /// Add relation between elements
+    #[clap(name = "link", override_help = "Add relation between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Element name OR internal file path (auto-detected)\n       <RELATION_TYPE>          Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)\n       <TARGET>                 Target element name\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if source exists as internal file path\n    2. If no file found, looks up element by name in registry\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire link \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire link \"Test Verification\" verify \"Feature Requirement\"")]
+    Link {
+        /// Element name OR internal file path (auto-detected)
+        source: String,
+
+        /// Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
+        relation_type: String,
+
+        /// Target element name
+        target: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "LINK OPTIONS")]
+        dry_run: bool,
+    },
+
+    /// Remove relation between elements
+    #[clap(name = "unlink", override_help = "Remove relation between elements\n\nUNLINK OPTIONS:\n       <SOURCE>                 Element name OR internal file path (auto-detected)\n       <RELATION_TYPE>          Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)\n       <TARGET>                 Target element name\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if source exists as internal file path\n    2. If no file found, looks up element by name in registry\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire unlink \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire unlink \"Test Verification\" verify \"Feature Requirement\"")]
+    Unlink {
+        /// Element name OR internal file path (auto-detected)
+        source: String,
+
+        /// Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
+        relation_type: String,
+
+        /// Target element name
+        target: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "UNLINK OPTIONS")]
+        dry_run: bool,
+    },
+
     /// Move/rename asset file and update all references (Attachments and Relations)
     #[clap(name = "mv-asset", override_help = "Move/rename asset file and update all references\n\nMV-ASSET OPTIONS:\n       <OLD_PATH>               Current file path\n       <NEW_PATH>               New file path\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire mv-asset docs/old.pdf docs/new.pdf")]
     MvAsset {
@@ -1060,6 +1094,32 @@ pub fn handle_command(
                 )?;
                 render_crud_result(&result);
             }
+            return Ok(0);
+        },
+        Some(Commands::Link { source, relation_type, target, dry_run }) => {
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = reqvire::crud::link(
+                &mut model_manager,
+                &source,
+                &relation_type,
+                &target,
+                &git_root,
+                dry_run,
+            )?;
+            render_crud_result(&result);
+            return Ok(0);
+        },
+        Some(Commands::Unlink { source, relation_type, target, dry_run }) => {
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = reqvire::crud::unlink(
+                &mut model_manager,
+                &source,
+                &relation_type,
+                &target,
+                &git_root,
+                dry_run,
+            )?;
+            render_crud_result(&result);
             return Ok(0);
         },
         Some(Commands::MvAsset { old_path, new_path, dry_run }) => {

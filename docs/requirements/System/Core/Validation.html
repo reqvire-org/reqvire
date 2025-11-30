@@ -767,13 +767,13 @@ blockquote {
       ba9ff62b2514c184[&quot;Integrated Validation&quot;];
       class ba9ff62b2514c184 systemRequirement;
       click ba9ff62b2514c184 &quot;Validation.html#integrated-validation&quot;;
-      6d54be5a9e9637e2[&quot;Internal Consistency Validator&quot;];
+      6d54be5a9e9637e2[&quot;Internal Consistency Validator<br/>📎 ElementIdentity.md&quot;];
       class 6d54be5a9e9637e2 systemRequirement;
       click 6d54be5a9e9637e2 &quot;Validation.html#internal-consistency-validator&quot;;
       a0356ecbac250219[&quot;Markdown Structure Validator&quot;];
       class a0356ecbac250219 systemRequirement;
       click a0356ecbac250219 &quot;Validation.html#markdown-structure-validator&quot;;
-      f7d689fafa15738b[&quot;Relation Element Type Validator&quot;];
+      f7d689fafa15738b[&quot;Relation Element Type Validator<br/>📎 RelationTypes.md&quot;];
       class f7d689fafa15738b systemRequirement;
       click f7d689fafa15738b &quot;Validation.html#relation-element-type-validator&quot;;
       c741649b0d9ace74[&quot;Relation Type Validation&quot;];
@@ -794,7 +794,7 @@ blockquote {
       275994f9e5e5407b[&quot;Validate Markdown Structure&quot;];
       class 275994f9e5e5407b userRequirement;
       click 275994f9e5e5407b &quot;Validation.html#validate-markdown-structure&quot;;
-      83b654d72d72255[&quot;Validate Relation Types&quot;];
+      83b654d72d72255[&quot;Validate Relation Types<br/>📎 RelationTypes.md&quot;];
       class 83b654d72d72255 userRequirement;
       click 83b654d72d72255 &quot;Validation.html#validate-relation-types&quot;;
       af52a97918701e2b[&quot;Validation Error Handling&quot;];
@@ -1056,6 +1056,10 @@ blockquote {
 <li><strong>Inconsistent Patterns</strong>: Detect relationship patterns that violate model constraints</li>
 </ul>
 <p>Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/ElementIdentity.html">ElementIdentity.html</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
@@ -1107,6 +1111,10 @@ blockquote {
 <ul>
 <li>type: user-requirement</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#relation-element-type-validator">Relation Element Type Validator</a></li>
@@ -1127,6 +1135,10 @@ blockquote {
 <li><code>trace</code> relations are always allowed for any non-refinement element type</li>
 <li>Refinement types (<code>constraint</code>, <code>behavior</code>, <code>specification</code>) cannot have Relations subsections</li>
 <li>Warnings should be issued when relation endpoints have incompatible element types</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>

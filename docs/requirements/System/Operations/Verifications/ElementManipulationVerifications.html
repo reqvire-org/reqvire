@@ -761,6 +761,9 @@ blockquote {
       9c8ea99467081d64[&quot;File Persistence Test<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 9c8ea99467081d64 verification;
       click 9c8ea99467081d64 &quot;ElementManipulationVerifications.html#file-persistence-test&quot;;
+      5ece3922e0118169[&quot;Link Command Verification&quot;];
+      class 5ece3922e0118169 verification;
+      click 5ece3922e0118169 &quot;ElementManipulationVerifications.html#link-command-verification&quot;;
       3df547c544ad75b1[&quot;Move Element Test&quot;];
       class 3df547c544ad75b1 verification;
       click 3df547c544ad75b1 &quot;ElementManipulationVerifications.html#move-element-test&quot;;
@@ -773,6 +776,9 @@ blockquote {
       b6076972a6650ff1[&quot;Target Location Validation Test&quot;];
       class b6076972a6650ff1 verification;
       click b6076972a6650ff1 &quot;ElementManipulationVerifications.html#target-location-validation-test&quot;;
+      897572739649eed7[&quot;Unlink Command Verification&quot;];
+      class 897572739649eed7 verification;
+      click 897572739649eed7 &quot;ElementManipulationVerifications.html#unlink-command-verification&quot;;
     end
   end
   e0536c36e7700661[&quot;test.sh&quot;];
@@ -1369,6 +1375,83 @@ blockquote {
 <li>verify: <a href="../ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
 </ul>
 <hr />
+<h3 id="link-command-verification">Link Command Verification</h3>
+<p>The test shall verify that the <code>link</code> command adds relations to elements following the Relation Operations Specification.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create test model with multiple elements of different types</li>
+<li>Prepare source elements (by name and by file path)</li>
+<li>Prepare target elements</li>
+<li>Document valid and invalid relation type combinations</li>
+</ul>
+<p><strong>Test Steps - Basic Link:</strong></p>
+<ol>
+<li>Run <code>reqvire link &lt;source-element-name&gt; &lt;relation-type&gt; &lt;target-element-name&gt;</code></li>
+<li>Verify relation entry is added to source element’s Relations subsection</li>
+<li>Verify relation format: <code>* &lt;relation-type&gt;: [target-name](target-path)</code></li>
+<li>Verify model validates after link</li>
+</ol>
+<p><strong>Test Steps - Source Resolution:</strong></p>
+<ol>
+<li>Link using element name as source</li>
+<li>Verify element is found by name in registry</li>
+<li>Link using internal file path as source</li>
+<li>Verify file is found first, then element resolved</li>
+<li>Link with source that matches both file and element name</li>
+<li>Verify file path takes priority over element name</li>
+</ol>
+<p><strong>Test Steps - Relations Subsection Creation:</strong></p>
+<ol>
+<li>Link to element without existing Relations subsection</li>
+<li>Verify Relations subsection is created</li>
+<li>Verify relation entry is added</li>
+</ol>
+<p><strong>Test Steps - Idempotent Behavior:</strong></p>
+<ol>
+<li>Link same relation twice</li>
+<li>Verify relation is not duplicated</li>
+<li>Verify operation succeeds (no error)</li>
+</ol>
+<p><strong>Test Steps - Dry Run:</strong></p>
+<ol>
+<li>Run <code>reqvire link --dry-run &lt;source&gt; &lt;relation-type&gt; &lt;target&gt;</code></li>
+<li>Verify diff is shown</li>
+<li>Verify no changes are applied</li>
+</ol>
+<p><strong>Test Steps - Validation:</strong></p>
+<ol>
+<li>Link with invalid relation type</li>
+<li>Verify error is reported</li>
+<li>Link with incompatible element types</li>
+<li>Verify warning is reported</li>
+<li>Link to non-existent target</li>
+<li>Verify error is reported</li>
+<li>Link from non-existent source</li>
+<li>Verify error is reported</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Adds relation to source element’s Relations subsection</li>
+<li>Creates Relations subsection if missing</li>
+<li>Source resolves by file path first, then element name</li>
+<li>Target must be existing element name</li>
+<li>Idempotent (no duplicates)</li>
+<li>Validates relation type against supported types</li>
+<li>Validates element type compatibility</li>
+<li>Supports –dry-run preview</li>
+<li>Reports errors for invalid inputs</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../../../Interfaces/CLI.html#relation-commands">Relation Commands</a></li>
+<li>verify: <a href="../../Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a></li>
+</ul>
+<hr />
 <h3 id="move-element-test">Move Element Test</h3>
 <p>The test shall verify that existing model elements can be moved to different locations, all relations referencing the moved element are automatically updated, target locations are created if needed, and empty source files are removed when no elements remain.</p>
 <h4>Details</h4>
@@ -1623,6 +1706,70 @@ blockquote {
 <ul>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-target-location-validation/test.sh">test.sh</a></li>
 <li>verify: <a href="../ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+</ul>
+<hr />
+<h3 id="unlink-command-verification">Unlink Command Verification</h3>
+<p>The test shall verify that the <code>unlink</code> command removes relations from elements following the Relation Operations Specification.</p>
+<h4>Details</h4>
+<p><strong>Test Setup:</strong></p>
+<ul>
+<li>Create test model with elements having various relations</li>
+<li>Prepare source elements with relations to remove</li>
+<li>Document expected state after unlink</li>
+</ul>
+<p><strong>Test Steps - Basic Unlink:</strong></p>
+<ol>
+<li>Run <code>reqvire unlink &lt;source-element-name&gt; &lt;relation-type&gt; &lt;target-element-name&gt;</code></li>
+<li>Verify relation entry is removed from source element’s Relations subsection</li>
+<li>Verify model validates after unlink</li>
+</ol>
+<p><strong>Test Steps - Source Resolution:</strong></p>
+<ol>
+<li>Unlink using element name as source</li>
+<li>Verify element is found by name in registry</li>
+<li>Unlink using internal file path as source</li>
+<li>Verify file is found first, then element resolved</li>
+</ol>
+<p><strong>Test Steps - Relations Subsection Cleanup:</strong></p>
+<ol>
+<li>Unlink last relation from element</li>
+<li>Verify Relations subsection is removed</li>
+<li>Unlink from element with multiple relations</li>
+<li>Verify only specified relation is removed, others preserved</li>
+</ol>
+<p><strong>Test Steps - Dry Run:</strong></p>
+<ol>
+<li>Run <code>reqvire unlink --dry-run &lt;source&gt; &lt;relation-type&gt; &lt;target&gt;</code></li>
+<li>Verify diff is shown</li>
+<li>Verify no changes are applied</li>
+</ol>
+<p><strong>Test Steps - Error Cases:</strong></p>
+<ol>
+<li>Unlink non-existent relation</li>
+<li>Verify error is reported</li>
+<li>Unlink from non-existent source</li>
+<li>Verify error is reported</li>
+<li>Unlink to non-existent target</li>
+<li>Verify error is reported</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Removes relation from source element’s Relations subsection</li>
+<li>Removes Relations subsection when empty</li>
+<li>Source resolves by file path first, then element name</li>
+<li>Target must be existing element name</li>
+<li>Supports –dry-run preview</li>
+<li>Reports errors for non-existent relations</li>
+<li>Reports errors for invalid source/target</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../../../Interfaces/CLI.html#relation-commands">Relation Commands</a></li>
+<li>verify: <a href="../../Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a></li>
 </ul>
 <hr />
 

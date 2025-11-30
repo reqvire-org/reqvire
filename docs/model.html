@@ -707,7 +707,7 @@ blockquote {
             <h1 id="model">Model</h1>
 <p>The model view displays the logical structure starting from root requirements—requirements without parent derivations. Each element shows its complete relation tree: derived child requirements, verifications, and implementations. This follows MBSE principles where stakeholder needs flow down through requirement hierarchies to verifiable, implementable specifications.</p>
 <p><strong>Total Elements</strong>: 10
-<strong>Total Relations</strong>: 500</p>
+<strong>Total Relations</strong>: 509</p>
 <h2><a href="requirements/UserStories.html#align-with-industry-standards">Align with Industry Standards</a></h2>
 <p><strong>Type</strong>: user-requirement
 <strong>File</strong>: <a href="requirements/UserStories.html">requirements/UserStories.html</a></p>
@@ -745,13 +745,13 @@ blockquote {
       ba9ff62b2514c184[&quot;Integrated Validation&quot;];
       class ba9ff62b2514c184 systemRequirement;
       click ba9ff62b2514c184 &quot;requirements/System/Core/Validation.html#integrated-validation&quot;;
-      6d54be5a9e9637e2[&quot;Internal Consistency Validator&quot;];
+      6d54be5a9e9637e2[&quot;Internal Consistency Validator<br/>📎 requirements/System/Core/DesignDocuments/ElementIdentity.md&quot;];
       class 6d54be5a9e9637e2 systemRequirement;
       click 6d54be5a9e9637e2 &quot;requirements/System/Core/Validation.html#internal-consistency-validator&quot;;
       a0356ecbac250219[&quot;Markdown Structure Validator&quot;];
       class a0356ecbac250219 systemRequirement;
       click a0356ecbac250219 &quot;requirements/System/Core/Validation.html#markdown-structure-validator&quot;;
-      f7d689fafa15738b[&quot;Relation Element Type Validator&quot;];
+      f7d689fafa15738b[&quot;Relation Element Type Validator<br/>📎 requirements/System/Core/DesignDocuments/RelationTypes.md&quot;];
       class f7d689fafa15738b systemRequirement;
       click f7d689fafa15738b &quot;requirements/System/Core/Validation.html#relation-element-type-validator&quot;;
       26e63d5a1bbe175[&quot;Two-Pass Validation Strategy&quot;];
@@ -766,7 +766,7 @@ blockquote {
       275994f9e5e5407b[&quot;Validate Markdown Structure&quot;];
       class 275994f9e5e5407b userRequirement;
       click 275994f9e5e5407b &quot;requirements/System/Core/Validation.html#validate-markdown-structure&quot;;
-      83b654d72d72255[&quot;Validate Relation Types&quot;];
+      83b654d72d72255[&quot;Validate Relation Types<br/>📎 requirements/System/Core/DesignDocuments/RelationTypes.md&quot;];
       class 83b654d72d72255 userRequirement;
       click 83b654d72d72255 &quot;requirements/System/Core/Validation.html#validate-relation-types&quot;;
       af52a97918701e2b[&quot;Validation Error Handling&quot;];
@@ -1185,7 +1185,7 @@ blockquote {
   end
   subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
     subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      1096aca658ce4572[&quot;Attachment Commands&quot;];
+      1096aca658ce4572[&quot;Attachment Commands<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class 1096aca658ce4572 systemRequirement;
       click 1096aca658ce4572 &quot;requirements/Interfaces/CLI.html#attachment-commands&quot;;
       e7cad857e370c39f[&quot;CLI Add Element Command<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure&quot;];
@@ -1197,7 +1197,7 @@ blockquote {
       d14547a0f9bdbe39[&quot;CLI Containment Command<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Behaviors.md#short-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 requirements/System/Output/DesignDocuments/ContainmentView.md&quot;];
       class d14547a0f9bdbe39 systemRequirement;
       click d14547a0f9bdbe39 &quot;requirements/Interfaces/CLI.html#cli-containment-command&quot;;
-      ea0b85acf2bdcccc[&quot;CLI Coverage Command<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
+      ea0b85acf2bdcccc[&quot;CLI Coverage Command<br/>📎 requirements/System/Core/Specifications.md#verification-type-categories-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
       class ea0b85acf2bdcccc systemRequirement;
       click ea0b85acf2bdcccc &quot;requirements/Interfaces/CLI.html#cli-coverage-command&quot;;
       e07bdd5602fc7d2c[&quot;CLI Interface Structure&quot;];
@@ -1230,7 +1230,7 @@ blockquote {
       d4c826848975e006[&quot;CLI Resources Command&quot;];
       class d4c826848975e006 systemRequirement;
       click d4c826848975e006 &quot;requirements/Interfaces/CLI.html#cli-resources-command&quot;;
-      da4e8889496fb531[&quot;CLI Search Command<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Behaviors.md#short-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
+      da4e8889496fb531[&quot;CLI Search Command<br/>📎 requirements/System/Core/Specifications.md#supported-element-types-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Behaviors.md#short-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
       class da4e8889496fb531 systemRequirement;
       click da4e8889496fb531 &quot;requirements/Interfaces/CLI.html#cli-search-command&quot;;
       71bccd7851730351[&quot;CLI Traces Command<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification&quot;];
@@ -1239,6 +1239,9 @@ blockquote {
       5f9df693c47e2e9f[&quot;Format Command<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure&quot;];
       class 5f9df693c47e2e9f systemRequirement;
       click 5f9df693c47e2e9f &quot;requirements/Interfaces/CLI.html#format-command&quot;;
+      ba0ea7508d97f005[&quot;Relation Commands<br/>📎 requirements/System/Operations/Specifications.md#relation-operations-specification<br/>📎 requirements/System/Core/DesignDocuments/RelationTypes.md<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
+      class ba0ea7508d97f005 systemRequirement;
+      click ba0ea7508d97f005 &quot;requirements/Interfaces/CLI.html#relation-commands&quot;;
       a867b4bb3e22cabf[&quot;Validate Command<br/>📎 requirements/System/Core/Behaviors.md#two-pass-validation-behavior<br/>📎 requirements/System/Core/Behaviors.md#validation-error-reporting-behavior<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#error-message-format-specification&quot;];
       class a867b4bb3e22cabf systemRequirement;
       click a867b4bb3e22cabf &quot;requirements/Interfaces/CLI.html#validate-command&quot;;
@@ -1364,19 +1367,22 @@ blockquote {
       ba66a4ed15581f23[&quot;Git Repository as Project Root<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/System/Core/Behaviors.md#subdirectory-auto-detection-behavior&quot;];
       class ba66a4ed15581f23 userRequirement;
       click ba66a4ed15581f23 &quot;requirements/System/Core/ModelManagement.html#git-repository-as-project-root&quot;;
-      ef466393e75bd0d[&quot;Refinement Element Structure Constraints&quot;];
+      ef466393e75bd0d[&quot;Refinement Element Structure Constraints<br/>📎 requirements/System/Core/DesignDocuments/RelationTypes.md&quot;];
       class ef466393e75bd0d systemRequirement;
       click ef466393e75bd0d &quot;requirements/System/Core/ModelManagement.html#refinement-element-structure-constraints&quot;;
+      12efff2e84f6c077[&quot;Relation Management Operations<br/>📎 requirements/System/Operations/Specifications.md#relation-operations-specification<br/>📎 requirements/System/Core/DesignDocuments/RelationTypes.md&quot;];
+      class 12efff2e84f6c077 systemRequirement;
+      click 12efff2e84f6c077 &quot;requirements/System/Core/ModelManagement.html#relation-management-operations&quot;;
       4f7fa84403776a06[&quot;Relation Types and behaviors<br/>📎 requirements/System/Core/DesignDocuments/RelationTypes.md&quot;];
       class 4f7fa84403776a06 systemRequirement;
       click 4f7fa84403776a06 &quot;requirements/System/Core/ModelManagement.html#relation-types-and-behaviors&quot;;
-      661a84b5a9ab68c5[&quot;Supported Element Types&quot;];
+      661a84b5a9ab68c5[&quot;Supported Element Types<br/>📎 requirements/System/Core/Specifications.md#supported-element-types-specification&quot;];
       class 661a84b5a9ab68c5 systemRequirement;
       click 661a84b5a9ab68c5 &quot;requirements/System/Core/ModelManagement.html#supported-element-types&quot;;
       ea8518e9205f5540[&quot;Template-Based Model Bootstrapping&quot;];
       class ea8518e9205f5540 userRequirement;
       click ea8518e9205f5540 &quot;requirements/System/Core/ModelManagement.html#template-based-model-bootstrapping&quot;;
-      6d3dc4e586860761[&quot;Verification Type Categories&quot;];
+      6d3dc4e586860761[&quot;Verification Type Categories<br/>📎 requirements/System/Core/Specifications.md#verification-type-categories-specification&quot;];
       class 6d3dc4e586860761 systemRequirement;
       click 6d3dc4e586860761 &quot;requirements/System/Core/ModelManagement.html#verification-type-categories&quot;;
     end
@@ -1387,6 +1393,12 @@ blockquote {
       47d4dfd806994b53[&quot;Ignore Files Specification&quot;];
       class 47d4dfd806994b53 default;
       click 47d4dfd806994b53 &quot;requirements/System/Core/Specifications.html#ignore-files-specification&quot;;
+      11d73b2bad3ddf0a[&quot;Supported Element Types Specification&quot;];
+      class 11d73b2bad3ddf0a default;
+      click 11d73b2bad3ddf0a &quot;requirements/System/Core/Specifications.html#supported-element-types-specification&quot;;
+      aba468c74b8190dc[&quot;Verification Type Categories Specification&quot;];
+      class aba468c74b8190dc default;
+      click aba468c74b8190dc &quot;requirements/System/Core/Specifications.html#verification-type-categories-specification&quot;;
     end
     subgraph 64f96f92d9fb9141[&quot;📄 StructureAndParsing.md&quot;]
       d095766b4b7d0f74[&quot;Attachment Target Validation&quot;];
@@ -1498,25 +1510,25 @@ blockquote {
       click df1f09bc9884c2de &quot;requirements/System/Operations/Constraints.html#target-location-constraint&quot;;
     end
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
+      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class ca74bbb037431e9b systemRequirement;
       click ca74bbb037431e9b &quot;requirements/System/Operations/ElementManipulation.html#create-element-operation&quot;;
-      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
+      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class b1ed46220f447242 systemRequirement;
       click b1ed46220f447242 &quot;requirements/System/Operations/ElementManipulation.html#delete-element-operation&quot;;
       5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 5e9d1888d2914fd4 systemRequirement;
       click 5e9d1888d2914fd4 &quot;requirements/System/Operations/ElementManipulation.html#element-manipulation-file-persistence&quot;;
-      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
+      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class 84860e94fc819efd systemRequirement;
       click 84860e94fc819efd &quot;requirements/System/Operations/ElementManipulation.html#move-element-operation&quot;;
-      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint&quot;];
+      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class bbea6657a24b3f1c systemRequirement;
       click bbea6657a24b3f1c &quot;requirements/System/Operations/ElementManipulation.html#move-file-operation&quot;;
       b7a7ab53d4242be8[&quot;Relation Consistency Maintenance&quot;];
       class b7a7ab53d4242be8 systemRequirement;
       click b7a7ab53d4242be8 &quot;requirements/System/Operations/ElementManipulation.html#relation-consistency-maintenance&quot;;
-      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
+      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class a6593dab7ef5d521 systemRequirement;
       click a6593dab7ef5d521 &quot;requirements/System/Operations/ElementManipulation.html#rename-element-operation&quot;;
       9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification&quot;];
@@ -1534,6 +1546,9 @@ blockquote {
       click 4ea9fd0cb008a7d1 &quot;requirements/System/Operations/Linting.html#lint-auto-fix-capability&quot;;
     end
     subgraph 13f813da82130a33[&quot;📄 Specifications.md&quot;]
+      39fbf7f67a590dcf[&quot;Relation Operations Specification<br/>📎 requirements/System/Core/DesignDocuments/RelationTypes.md<br/>📎 requirements/System/Core/Constraints.md#element-type-relation-compatibility-constraint<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification&quot;];
+      class 39fbf7f67a590dcf default;
+      click 39fbf7f67a590dcf &quot;requirements/System/Operations/Specifications.html#relation-operations-specification&quot;;
       9b4a4077c4e05529[&quot;Relation Validation Specification&quot;];
       class 9b4a4077c4e05529 default;
       click 9b4a4077c4e05529 &quot;requirements/System/Operations/Specifications.html#relation-validation-specification&quot;;
@@ -1565,6 +1580,9 @@ blockquote {
       9c8ea99467081d64[&quot;File Persistence Test<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 9c8ea99467081d64 verification;
       click 9c8ea99467081d64 &quot;requirements/System/Operations/Verifications/ElementManipulationVerifications.html#file-persistence-test&quot;;
+      5ece3922e0118169[&quot;Link Command Verification&quot;];
+      class 5ece3922e0118169 verification;
+      click 5ece3922e0118169 &quot;requirements/System/Operations/Verifications/ElementManipulationVerifications.html#link-command-verification&quot;;
       3df547c544ad75b1[&quot;Move Element Test&quot;];
       class 3df547c544ad75b1 verification;
       click 3df547c544ad75b1 &quot;requirements/System/Operations/Verifications/ElementManipulationVerifications.html#move-element-test&quot;;
@@ -1577,6 +1595,9 @@ blockquote {
       b6076972a6650ff1[&quot;Target Location Validation Test&quot;];
       class b6076972a6650ff1 verification;
       click b6076972a6650ff1 &quot;requirements/System/Operations/Verifications/ElementManipulationVerifications.html#target-location-validation-test&quot;;
+      897572739649eed7[&quot;Unlink Command Verification&quot;];
+      class 897572739649eed7 verification;
+      click 897572739649eed7 &quot;requirements/System/Operations/Verifications/ElementManipulationVerifications.html#unlink-command-verification&quot;;
     end
     subgraph 5fdb7c9d75d9c8bf[&quot;📄 FormattingVerifications.md&quot;]
       6d1f64516c7eb3bb[&quot;Full Relations Insertion Verification&quot;];
@@ -1591,7 +1612,7 @@ blockquote {
   end
   subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
     subgraph c2b8a949c0da1f4[&quot;📄 DiagramGeneration.md&quot;]
-      978256deec70c016[&quot;Trace Relation Non-Directional Behavior&quot;];
+      978256deec70c016[&quot;Trace Relation Non-Directional Behavior<br/>📎 requirements/System/Core/DesignDocuments/RelationTypes.md&quot;];
       class 978256deec70c016 systemRequirement;
       click 978256deec70c016 &quot;requirements/System/Output/DiagramGeneration.html#trace-relation-non-directional-behavior&quot;;
     end
@@ -1622,7 +1643,7 @@ blockquote {
   end
   subgraph 63d7cba3f920744c[&quot;📁 requirements/System/Processing&quot;]
     subgraph 263fc0b0a2043fc1[&quot;📄 ChangeImpact.md&quot;]
-      87b7ea665c0ec9c2[&quot;Change Impact Detection&quot;];
+      87b7ea665c0ec9c2[&quot;Change Impact Detection<br/>📎 requirements/System/Core/DesignDocuments/ElementIdentity.md&quot;];
       class 87b7ea665c0ec9c2 systemRequirement;
       click 87b7ea665c0ec9c2 &quot;requirements/System/Processing/ChangeImpact.html#change-impact-detection&quot;;
       1db62a3344255ecc[&quot;Requirements Change Propagation<br/>📎 requirements/System/Processing/DesignDocuments/ChangePropagation.md&quot;];
@@ -1875,15 +1896,18 @@ blockquote {
   class 37b7b7e0d414e1ff default;
   click 37b7b7e0d414e1ff &quot;tests/test-format-full-relations/test.sh&quot;;
   6d1f64516c7eb3bb -->|satisfiedBy| 37b7b7e0d414e1ff;
+  e07bdd5602fc7d2c -->|derive| ba0ea7508d97f005;
+  ba0ea7508d97f005 -->|verifiedBy| 5ece3922e0118169;
+  ba0ea7508d97f005 -->|verifiedBy| 897572739649eed7;
   e07bdd5602fc7d2c -->|derive| a867b4bb3e22cabf;
   97b64413fe8f7d7b[&quot;cli/src/cli.rs&quot;];
   class 97b64413fe8f7d7b default;
   click 97b64413fe8f7d7b &quot;cli/src/cli.rs&quot;;
   a867b4bb3e22cabf -->|satisfiedBy| 97b64413fe8f7d7b;
-  8a4cd1536d02d6b3[&quot;cli/src/cli.rs&quot;];
-  class 8a4cd1536d02d6b3 default;
-  click 8a4cd1536d02d6b3 &quot;cli/src/cli.rs&quot;;
-  e07bdd5602fc7d2c -->|satisfiedBy| 8a4cd1536d02d6b3;
+  e69fb001e3773db3[&quot;cli/src/cli.rs&quot;];
+  class e69fb001e3773db3 default;
+  click e69fb001e3773db3 &quot;cli/src/cli.rs&quot;;
+  e07bdd5602fc7d2c -->|satisfiedBy| e69fb001e3773db3;
   cd3a39ba9afe827b -->|derive| 8a608b4292b82398;
   8a608b4292b82398 -->|derive| 7cee348e5d230f20;
   7cee348e5d230f20 -->|derive| 9548618d67bf80fd;
@@ -2255,16 +2279,18 @@ blockquote {
   d60acacd6d99991a -->|derive| 4f7fa84403776a06;
   4f7fa84403776a06 -->|derive| bc4b202a0bb6f50c;
   bc4b202a0bb6f50c -->|satisfiedBy| 1a01f3b1f5f4fd54;
+  4f7fa84403776a06 -->|derive| 12efff2e84f6c077;
+  12efff2e84f6c077 -->|satisfiedBy| 39fbf7f67a590dcf;
   4f7fa84403776a06 -->|derive| 978256deec70c016;
   978256deec70c016 -->|verifiedBy| 92720158539bac0d;
   e9404ccde75d332c[&quot;tests/test-trace-no-cycles/test.sh&quot;];
   class e9404ccde75d332c default;
   click e9404ccde75d332c &quot;tests/test-trace-no-cycles/test.sh&quot;;
   92720158539bac0d -->|satisfiedBy| e9404ccde75d332c;
-  fce4b8c65ec8148f[&quot;core/src/relation.rs&quot;];
-  class fce4b8c65ec8148f default;
-  click fce4b8c65ec8148f &quot;core/src/relation.rs&quot;;
-  4f7fa84403776a06 -->|satisfiedBy| fce4b8c65ec8148f;
+  ab67f70f37a609fa[&quot;core/src/relation.rs&quot;];
+  class ab67f70f37a609fa default;
+  click ab67f70f37a609fa &quot;core/src/relation.rs&quot;;
+  4f7fa84403776a06 -->|satisfiedBy| ab67f70f37a609fa;
   9af25a862437f82[&quot;core/src/relation.rs&quot;];
   class 9af25a862437f82 default;
   click 9af25a862437f82 &quot;core/src/relation.rs&quot;;
@@ -2334,8 +2360,10 @@ blockquote {
   class 6af4d9128edca875 default;
   click 6af4d9128edca875 &quot;core/src/parser.rs&quot;;
   661a84b5a9ab68c5 -->|satisfiedBy| 6af4d9128edca875;
+  661a84b5a9ab68c5 -->|satisfiedBy| 11d73b2bad3ddf0a;
   661a84b5a9ab68c5 -->|verifiedBy| a6a558a9f2daccdd;
   d16211b28032c37b -->|derive| 6d3dc4e586860761;
+  6d3dc4e586860761 -->|satisfiedBy| aba468c74b8190dc;
   d16211b28032c37b -->|derive| d095766b4b7d0f74;
   bdc4770270e8bbef[&quot;core/src/model.rs&quot;];
   class bdc4770270e8bbef default;
@@ -2502,13 +2530,13 @@ blockquote {
       95bfb296ccbcfb1c[&quot;Resources Report&quot;];
       class 95bfb296ccbcfb1c userRequirement;
       click 95bfb296ccbcfb1c &quot;requirements/System/Output/Reporting.html#resources-report&quot;;
-      a4cab2effeab3574[&quot;Search Report Generator<br/>📎 requirements/System/Output/DesignDocuments/SearchFiltering.md<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
+      a4cab2effeab3574[&quot;Search Report Generator<br/>📎 requirements/System/Output/DesignDocuments/SearchFiltering.md<br/>📎 requirements/System/Core/Specifications.md#supported-element-types-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
       class a4cab2effeab3574 systemRequirement;
       click a4cab2effeab3574 &quot;requirements/System/Output/Reporting.html#search-report-generator&quot;;
       c4f002afe0819c7f[&quot;TraceFlow View Report Generation<br/>📎 requirements/System/Output/DesignDocuments/TraceFlowView.md&quot;];
       class c4f002afe0819c7f systemRequirement;
       click c4f002afe0819c7f &quot;requirements/System/Output/Reporting.html#traceflow-view-report-generation&quot;;
-      157f2dbe8bac3cda[&quot;Verification Coverage Report<br/>📎 requirements/System/Output/Behaviors.md#verification-coverage-philosophy-behavior<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
+      157f2dbe8bac3cda[&quot;Verification Coverage Report<br/>📎 requirements/System/Output/Behaviors.md#verification-coverage-philosophy-behavior<br/>📎 requirements/System/Core/Specifications.md#verification-type-categories-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
       class 157f2dbe8bac3cda userRequirement;
       click 157f2dbe8bac3cda &quot;requirements/System/Output/Reporting.html#verification-coverage-report&quot;;
       32b392250c503b21[&quot;Verification Upward Traceability&quot;];

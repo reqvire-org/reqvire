@@ -737,7 +737,7 @@ blockquote {
 
   subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
     subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      1096aca658ce4572[&quot;Attachment Commands&quot;];
+      1096aca658ce4572[&quot;Attachment Commands<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class 1096aca658ce4572 systemRequirement;
       click 1096aca658ce4572 &quot;CLI.html#attachment-commands&quot;;
       e7cad857e370c39f[&quot;CLI Add Element Command<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure&quot;];
@@ -749,7 +749,7 @@ blockquote {
       d14547a0f9bdbe39[&quot;CLI Containment Command<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Behaviors.md#short-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 ContainmentView.md&quot;];
       class d14547a0f9bdbe39 systemRequirement;
       click d14547a0f9bdbe39 &quot;CLI.html#cli-containment-command&quot;;
-      ea0b85acf2bdcccc[&quot;CLI Coverage Command<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
+      ea0b85acf2bdcccc[&quot;CLI Coverage Command<br/>📎 requirements/System/Core/Specifications.md#verification-type-categories-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
       class ea0b85acf2bdcccc systemRequirement;
       click ea0b85acf2bdcccc &quot;CLI.html#cli-coverage-command&quot;;
       e07bdd5602fc7d2c[&quot;CLI Interface Structure&quot;];
@@ -782,7 +782,7 @@ blockquote {
       d4c826848975e006[&quot;CLI Resources Command&quot;];
       class d4c826848975e006 systemRequirement;
       click d4c826848975e006 &quot;CLI.html#cli-resources-command&quot;;
-      da4e8889496fb531[&quot;CLI Search Command<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Behaviors.md#short-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
+      da4e8889496fb531[&quot;CLI Search Command<br/>📎 requirements/System/Core/Specifications.md#supported-element-types-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Behaviors.md#short-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting&quot;];
       class da4e8889496fb531 systemRequirement;
       click da4e8889496fb531 &quot;CLI.html#cli-search-command&quot;;
       71bccd7851730351[&quot;CLI Traces Command<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification&quot;];
@@ -794,6 +794,9 @@ blockquote {
       5f9df693c47e2e9f[&quot;Format Command<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure&quot;];
       class 5f9df693c47e2e9f systemRequirement;
       click 5f9df693c47e2e9f &quot;CLI.html#format-command&quot;;
+      ba0ea7508d97f005[&quot;Relation Commands<br/>📎 requirements/System/Operations/Specifications.md#relation-operations-specification<br/>📎 RelationTypes.md<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
+      class ba0ea7508d97f005 systemRequirement;
+      click ba0ea7508d97f005 &quot;CLI.html#relation-commands&quot;;
       a867b4bb3e22cabf[&quot;Validate Command<br/>📎 requirements/System/Core/Behaviors.md#two-pass-validation-behavior<br/>📎 requirements/System/Core/Behaviors.md#validation-error-reporting-behavior<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#error-message-format-specification&quot;];
       class a867b4bb3e22cabf systemRequirement;
       click a867b4bb3e22cabf &quot;CLI.html#validate-command&quot;;
@@ -876,6 +879,12 @@ blockquote {
       af7f2d098afce076[&quot;CLI Rename Element Test&quot;];
       class af7f2d098afce076 verification;
       click af7f2d098afce076 &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#cli-rename-element-test&quot;;
+      5ece3922e0118169[&quot;Link Command Verification&quot;];
+      class 5ece3922e0118169 verification;
+      click 5ece3922e0118169 &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#link-command-verification&quot;;
+      897572739649eed7[&quot;Unlink Command Verification&quot;];
+      class 897572739649eed7 verification;
+      click 897572739649eed7 &quot;../System/Operations/Verifications/ElementManipulationVerifications.html#unlink-command-verification&quot;;
     end
     subgraph 5fdb7c9d75d9c8bf[&quot;📄 FormattingVerifications.md&quot;]
       934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
@@ -962,6 +971,7 @@ blockquote {
   e07bdd5602fc7d2c -.->|deriveReqT| da4e8889496fb531;
   e07bdd5602fc7d2c -.->|deriveReqT| 71bccd7851730351;
   e07bdd5602fc7d2c -.->|deriveReqT| 5f9df693c47e2e9f;
+  e07bdd5602fc7d2c -.->|deriveReqT| ba0ea7508d97f005;
   e07bdd5602fc7d2c -.->|deriveReqT| a867b4bb3e22cabf;
   e07bdd5602fc7d2c -.->|deriveReqT| ba9ff62b2514c184;
   e07bdd5602fc7d2c -->|satisfiedBy| 80defdd4cbc7ee18;
@@ -1004,6 +1014,8 @@ blockquote {
   5f9df693c47e2e9f -.->|verifiedBy| 934319026295f62c;
   5f9df693c47e2e9f -.->|verifiedBy| 723757d62c730981;
   5f9df693c47e2e9f -.->|verifiedBy| 6d1f64516c7eb3bb;
+  ba0ea7508d97f005 -.->|verifiedBy| 5ece3922e0118169;
+  ba0ea7508d97f005 -.->|verifiedBy| 897572739649eed7;
   a867b4bb3e22cabf -->|satisfiedBy| 80defdd4cbc7ee18;
   a867b4bb3e22cabf -.->|verifiedBy| 7ce243221ec8f143;
   a867b4bb3e22cabf -.->|verifiedBy| 23a09f2d69fc3b23;
@@ -1112,6 +1124,12 @@ blockquote {
 <li>Trigger change impact on element</li>
 <li>Support dry-run mode for preview</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../System/Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="../System/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
+<li><a href="../System/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../System/Core/StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
@@ -1145,6 +1163,8 @@ Commands:
   mv-file           Move entire specification file
   attach            Attach document or Refinement element
   detach            Detach document or Refinement element
+  link              Add relation between elements
+  unlink            Remove relation between elements
   mv-asset          Move/rename asset file and update references
   rm-asset          Remove asset file and remove references
   containment       Generate containment view
@@ -1177,6 +1197,7 @@ Options:
 <li>derive: <a href="#cli-search-command">CLI Search Command</a></li>
 <li>derive: <a href="#cli-traces-command">CLI Traces Command</a></li>
 <li>derive: <a href="#format-command">Format Command</a></li>
+<li>derive: <a href="#relation-commands">Relation Commands</a></li>
 <li>derive: <a href="#validate-command">Validate Command</a></li>
 <li>derive: <a href="../System/Core/Validation.html#integrated-validation">Integrated Validation</a></li>
 <li>derivedFrom: <a href="Interfaces.html#cli-interface">CLI interface</a></li>
@@ -1315,6 +1336,7 @@ Options:
 <p>Command output shall be written to stdout for easy redirection to files.</p>
 <h4>Attachments</h4>
 <ul>
+<li><a href="../System/Core/Specifications.html#verification-type-categories-specification">Verification Type Categories Specification</a></li>
 <li><a href="../System/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../System/Output/Specifications.html#text-output-formatting">Text Output Formatting</a></li>
 </ul>
@@ -1640,6 +1662,7 @@ Options:
 </ul>
 <h4>Attachments</h4>
 <ul>
+<li><a href="../System/Core/Specifications.html#supported-element-types-specification">Supported Element Types Specification</a></li>
 <li><a href="../System/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../System/Output/Behaviors.html#short-mode-behavior">Short Mode Behavior</a></li>
 <li><a href="../System/Output/Specifications.html#text-output-formatting">Text Output Formatting</a></li>
@@ -1765,6 +1788,37 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 <li>verifiedBy: <a href="../System/Operations/Verifications/FormattingVerifications.html#element-ordering-verification">Element Ordering Verification</a></li>
 <li>verifiedBy: <a href="../System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
 <li>verifiedBy: <a href="../System/Operations/Verifications/FormattingVerifications.html#full-relations-insertion-verification">Full Relations Insertion Verification</a></li>
+</ul>
+<hr />
+<h3 id="relation-commands">Relation Commands</h3>
+<p>The system shall provide CLI commands for relation management: link and unlink.</p>
+<h4>Details</h4>
+<p>The <code>link</code> command shall:</p>
+<ul>
+<li>Accept syntax: <code>reqvire link &lt;source&gt; &lt;relation-type&gt; &lt;target-element&gt;</code></li>
+<li>Source: existing element name or internal file path</li>
+<li>Target: existing element name</li>
+<li>Support <code>--dry-run</code> flag for preview</li>
+</ul>
+<p>The <code>unlink</code> command shall:</p>
+<ul>
+<li>Accept syntax: <code>reqvire unlink &lt;source&gt; &lt;relation-type&gt; &lt;target-element&gt;</code></li>
+<li>Source: existing element name or internal file path</li>
+<li>Target: existing element name</li>
+<li>Support <code>--dry-run</code> flag for preview</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../System/Operations/Specifications.html#relation-operations-specification">Relation Operations Specification</a></li>
+<li><a href="../System/Core/DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+<li><a href="../System/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
+<li><a href="../System/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>verifiedBy: <a href="../System/Operations/Verifications/ElementManipulationVerifications.html#link-command-verification">Link Command Verification</a></li>
+<li>verifiedBy: <a href="../System/Operations/Verifications/ElementManipulationVerifications.html#unlink-command-verification">Unlink Command Verification</a></li>
 </ul>
 <hr />
 <h3 id="validate-command">Validate Command</h3>

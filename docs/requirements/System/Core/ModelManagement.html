@@ -773,19 +773,22 @@ blockquote {
       ba66a4ed15581f23[&quot;Git Repository as Project Root<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/System/Core/Behaviors.md#subdirectory-auto-detection-behavior&quot;];
       class ba66a4ed15581f23 userRequirement;
       click ba66a4ed15581f23 &quot;ModelManagement.html#git-repository-as-project-root&quot;;
-      ef466393e75bd0d[&quot;Refinement Element Structure Constraints&quot;];
+      ef466393e75bd0d[&quot;Refinement Element Structure Constraints<br/>📎 RelationTypes.md&quot;];
       class ef466393e75bd0d systemRequirement;
       click ef466393e75bd0d &quot;ModelManagement.html#refinement-element-structure-constraints&quot;;
+      12efff2e84f6c077[&quot;Relation Management Operations<br/>📎 requirements/System/Operations/Specifications.md#relation-operations-specification<br/>📎 RelationTypes.md&quot;];
+      class 12efff2e84f6c077 systemRequirement;
+      click 12efff2e84f6c077 &quot;ModelManagement.html#relation-management-operations&quot;;
       4f7fa84403776a06[&quot;Relation Types and behaviors<br/>📎 RelationTypes.md&quot;];
       class 4f7fa84403776a06 systemRequirement;
       click 4f7fa84403776a06 &quot;ModelManagement.html#relation-types-and-behaviors&quot;;
-      661a84b5a9ab68c5[&quot;Supported Element Types&quot;];
+      661a84b5a9ab68c5[&quot;Supported Element Types<br/>📎 requirements/System/Core/Specifications.md#supported-element-types-specification&quot;];
       class 661a84b5a9ab68c5 systemRequirement;
       click 661a84b5a9ab68c5 &quot;ModelManagement.html#supported-element-types&quot;;
       ea8518e9205f5540[&quot;Template-Based Model Bootstrapping&quot;];
       class ea8518e9205f5540 userRequirement;
       click ea8518e9205f5540 &quot;ModelManagement.html#template-based-model-bootstrapping&quot;;
-      6d3dc4e586860761[&quot;Verification Type Categories&quot;];
+      6d3dc4e586860761[&quot;Verification Type Categories<br/>📎 requirements/System/Core/Specifications.md#verification-type-categories-specification&quot;];
       class 6d3dc4e586860761 systemRequirement;
       click 6d3dc4e586860761 &quot;ModelManagement.html#verification-type-categories&quot;;
     end
@@ -793,12 +796,18 @@ blockquote {
       f0239a043d4b79f1[&quot;Git Repository Scope Specification&quot;];
       class f0239a043d4b79f1 default;
       click f0239a043d4b79f1 &quot;Specifications.html#git-repository-scope-specification&quot;;
+      11d73b2bad3ddf0a[&quot;Supported Element Types Specification&quot;];
+      class 11d73b2bad3ddf0a default;
+      click 11d73b2bad3ddf0a &quot;Specifications.html#supported-element-types-specification&quot;;
+      aba468c74b8190dc[&quot;Verification Type Categories Specification&quot;];
+      class aba468c74b8190dc default;
+      click aba468c74b8190dc &quot;Specifications.html#verification-type-categories-specification&quot;;
     end
     subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
-      f7d689fafa15738b[&quot;Relation Element Type Validator&quot;];
+      f7d689fafa15738b[&quot;Relation Element Type Validator<br/>📎 RelationTypes.md&quot;];
       class f7d689fafa15738b systemRequirement;
       click f7d689fafa15738b &quot;Validation.html#relation-element-type-validator&quot;;
-      83b654d72d72255[&quot;Validate Relation Types&quot;];
+      83b654d72d72255[&quot;Validate Relation Types<br/>📎 RelationTypes.md&quot;];
       class 83b654d72d72255 userRequirement;
       click 83b654d72d72255 &quot;Validation.html#validate-relation-types&quot;;
     end
@@ -834,35 +843,50 @@ blockquote {
   end
   subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
+      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class ca74bbb037431e9b systemRequirement;
       click ca74bbb037431e9b &quot;../Operations/ElementManipulation.html#create-element-operation&quot;;
-      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
+      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class b1ed46220f447242 systemRequirement;
       click b1ed46220f447242 &quot;../Operations/ElementManipulation.html#delete-element-operation&quot;;
       5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 5e9d1888d2914fd4 systemRequirement;
       click 5e9d1888d2914fd4 &quot;../Operations/ElementManipulation.html#element-manipulation-file-persistence&quot;;
-      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
+      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class 84860e94fc819efd systemRequirement;
       click 84860e94fc819efd &quot;../Operations/ElementManipulation.html#move-element-operation&quot;;
-      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint&quot;];
+      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class bbea6657a24b3f1c systemRequirement;
       click bbea6657a24b3f1c &quot;../Operations/ElementManipulation.html#move-file-operation&quot;;
       b7a7ab53d4242be8[&quot;Relation Consistency Maintenance&quot;];
       class b7a7ab53d4242be8 systemRequirement;
       click b7a7ab53d4242be8 &quot;../Operations/ElementManipulation.html#relation-consistency-maintenance&quot;;
-      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
+      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class a6593dab7ef5d521 systemRequirement;
       click a6593dab7ef5d521 &quot;../Operations/ElementManipulation.html#rename-element-operation&quot;;
       9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification&quot;];
       class 9987f9e9ae83fba3 systemRequirement;
       click 9987f9e9ae83fba3 &quot;../Operations/ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
     end
+    subgraph 13f813da82130a33[&quot;📄 Specifications.md&quot;]
+      39fbf7f67a590dcf[&quot;Relation Operations Specification<br/>📎 RelationTypes.md<br/>📎 requirements/System/Core/Constraints.md#element-type-relation-compatibility-constraint<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification&quot;];
+      class 39fbf7f67a590dcf default;
+      click 39fbf7f67a590dcf &quot;../Operations/Specifications.html#relation-operations-specification&quot;;
+    end
+  end
+  subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
+    subgraph d274cf61b3f74735[&quot;📄 ElementManipulationVerifications.md&quot;]
+      5ece3922e0118169[&quot;Link Command Verification&quot;];
+      class 5ece3922e0118169 verification;
+      click 5ece3922e0118169 &quot;../Operations/Verifications/ElementManipulationVerifications.html#link-command-verification&quot;;
+      897572739649eed7[&quot;Unlink Command Verification&quot;];
+      class 897572739649eed7 verification;
+      click 897572739649eed7 &quot;../Operations/Verifications/ElementManipulationVerifications.html#unlink-command-verification&quot;;
+    end
   end
   subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
     subgraph c2b8a949c0da1f4[&quot;📄 DiagramGeneration.md&quot;]
-      978256deec70c016[&quot;Trace Relation Non-Directional Behavior&quot;];
+      978256deec70c016[&quot;Trace Relation Non-Directional Behavior<br/>📎 RelationTypes.md&quot;];
       class 978256deec70c016 systemRequirement;
       click 978256deec70c016 &quot;../Output/DiagramGeneration.html#trace-relation-non-directional-behavior&quot;;
     end
@@ -900,7 +924,11 @@ blockquote {
   click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
   ef466393e75bd0d -->|satisfiedBy| d50a859650933e55;
   ef466393e75bd0d -.->|verifiedBy| 11bcef2a220fa0c8;
+  12efff2e84f6c077 -->|satisfiedBy| 39fbf7f67a590dcf;
+  12efff2e84f6c077 -.->|verifiedBy| 5ece3922e0118169;
+  12efff2e84f6c077 -.->|verifiedBy| 897572739649eed7;
   4f7fa84403776a06 -.->|deriveReqT| bc4b202a0bb6f50c;
+  4f7fa84403776a06 -.->|deriveReqT| 12efff2e84f6c077;
   4f7fa84403776a06 -.->|deriveReqT| 83b654d72d72255;
   4f7fa84403776a06 -.->|deriveReqT| 978256deec70c016;
   9450d4313f47ef36[&quot;relation.rs&quot;];
@@ -918,8 +946,10 @@ blockquote {
   class f22d93285fcd7664 default;
   click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
   661a84b5a9ab68c5 -->|satisfiedBy| f22d93285fcd7664;
+  661a84b5a9ab68c5 -->|satisfiedBy| 11d73b2bad3ddf0a;
   661a84b5a9ab68c5 -.->|verifiedBy| e21f26d3f283ac80;
   661a84b5a9ab68c5 -.->|verifiedBy| a6a558a9f2daccdd;
+  6d3dc4e586860761 -->|satisfiedBy| aba468c74b8190dc;
   6921a84a17b97dda -.->|deriveReqT| b4fab4cd56cad6d8;
   6921a84a17b97dda -.->|deriveReqT| 526d3fd6fb8c0baf;
   6921a84a17b97dda -.->|deriveReqT| 7b1990b8b1329152;
@@ -1142,6 +1172,7 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
+<li>derive: <a href="#relation-management-operations">Relation Management Operations</a></li>
 <li>derive: <a href="Validation.html#validate-relation-types">Validate Relation Types</a></li>
 <li>derive: <a href="../Output/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></li>
 <li>derivedFrom: <a href="StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a></li>
@@ -1166,25 +1197,40 @@ blockquote {
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">Element Type Relation Compatibility Test</a></li>
 </ul>
 <hr />
-<h3 id="supported-element-types">Supported Element Types</h3>
-<p>The system shall support predefined element types for classification and behavior determination.</p>
+<h3 id="relation-management-operations">Relation Management Operations</h3>
+<p>The system shall provide programmatic manipulation of element relations through link and unlink operations while maintaining model integrity.</p>
 <h4>Details</h4>
-<p>Element types are identified through a reserved “type” metadata property. The following types are supported:</p>
-<ol>
-<li><strong>requirement</strong>: System requirement</li>
-<li><strong>user-requirement</strong>: User requirement</li>
-<li><strong>verification</strong>: For verification tests and validation procedures (equivalent to test-verification)</li>
-<li><strong>test-verification</strong>: For verification tests and validation procedures</li>
-<li><strong>analysis-verification</strong>: For verification through formal analysis of documentation or code</li>
-<li><strong>inspection-verification</strong>: For verification through formal inspection or review</li>
-<li><strong>demonstration-verification</strong>: For verification through demonstration in a realistic environment</li>
-<li><strong>constraint</strong>: Refinement documenting constraints that limit or bound the system</li>
-<li><strong>behavior</strong>: Refinement documenting behavior details and operational specifications</li>
-<li><strong>specification</strong>: Refinement documenting detailed specifications and technical descriptions</li>
-<li><strong>other</strong>: Custom element types defined by users</li>
-</ol>
-<p><strong>Note:</strong> Refinement types (constraint, behavior, specification) cannot have a Relations subsection. These elements serve as detailed documentation that can be attached to other elements.</p>
-<p><strong>Relation constraints:</strong> Each element type has specific constraints on which relation types it can use. See <a href="DesignDocuments/RelationTypes.html#element-type-relation-compatibility">Element Type Relation Compatibility</a> for the complete compatibility matrix.</p>
+<p>When linking, the system shall:</p>
+<ul>
+<li>Add a relation entry to the element’s Relations subsection</li>
+<li>Create the Relations subsection if it does not exist</li>
+<li>Validate the relation type and element type compatibility</li>
+<li>Skip if relation already exists (idempotent operation)</li>
+</ul>
+<p>When unlinking, the system shall:</p>
+<ul>
+<li>Remove the relation entry from the element’s Relations subsection</li>
+<li>Remove the Relations subsection if no relations remain</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Operations/Specifications.html#relation-operations-specification">Relation Operations Specification</a></li>
+<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>satisfiedBy: <a href="../Operations/Specifications.html#relation-operations-specification">Relation Operations Specification</a></li>
+<li>verifiedBy: <a href="../Operations/Verifications/ElementManipulationVerifications.html#link-command-verification">Link Command Verification</a></li>
+<li>verifiedBy: <a href="../Operations/Verifications/ElementManipulationVerifications.html#unlink-command-verification">Unlink Command Verification</a></li>
+</ul>
+<hr />
+<h3 id="supported-element-types">Supported Element Types</h3>
+<p>The system shall support predefined element types for classification and behavior determination following clearly defined specifications.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#supported-element-types-specification">Supported Element Types Specification</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
@@ -1192,20 +1238,25 @@ blockquote {
 <li>derivedFrom: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
 <li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#supported-element-types-specification">Supported Element Types Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></li>
 <li>verifiedBy: <a href="Verifications/ParsingVerifications.html#refinement-element-type-parsing-test">Refinement Element Type Parsing Test</a></li>
 </ul>
 <hr />
 <h3 id="refinement-element-structure-constraints">Refinement Element Structure Constraints</h3>
-<p>The system shall reject Refinement elements (constraint, behavior, specification) that include a Relations subsection during validation.</p>
+<p>The system shall restrict Refinement elements (constraint, behavior, specification) to only allow <code>satisfy</code> relations.</p>
 <h4>Details</h4>
-<p>Refinement elements serve as detailed documentation that can be attached to other elements. They are not allowed to have relations because:</p>
+<p>Refinement elements serve as detailed documentation that can be attached to other elements. Their relation usage is restricted because:</p>
 <ul>
-<li>They represent atomic pieces of information without traceability relationships</li>
-<li>They are referenced through the Attachments subsection of other elements</li>
-<li>Their content contributes to the parent element’s documentation</li>
+<li>They represent atomic pieces of information focused on documenting requirements</li>
+<li>They are primarily referenced through the Attachments subsection of other elements</li>
+<li>Their <code>satisfy</code> relation links back to the requirement they fulfill</li>
 </ul>
-<p>When a Refinement element contains a Relations subsection, the validator shall report an error indicating that relations are not allowed for this element type.</p>
+<p>When a Refinement element contains relations other than <code>satisfy</code>, the validator shall report an error indicating that only <code>satisfy</code> relations are allowed for refinement types.</p>
+<h4>Attachments</h4>
+<ul>
+<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#supported-element-types">Supported Element Types</a></li>
@@ -1238,36 +1289,15 @@ blockquote {
 </ul>
 <hr />
 <h3 id="verification-type-categories">Verification Type Categories</h3>
-<p>The system shall support defined verifications categories.</p>
-<h4>Details</h4>
-<p>The following verification types are supported:</p>
-<ol>
-<li>
-<p><strong>Default Verification Type</strong></p>
+<p>The system shall support defined verification categories following clearly defined specifications.</p>
+<h4>Attachments</h4>
 <ul>
-<li><code>verification</code> - Verification through testing (equivalent to <code>test-verification</code>)</li>
-</ul>
-</li>
-<li>
-<p><strong>Specific Verification Types</strong></p>
-<ul>
-<li><code>test-verification</code> - Explicit verification through testing with documented test procedures</li>
-<li><code>analysis-verification</code> - Verification through formal analysis of documentation or code</li>
-<li><code>inspection-verification</code> - Verification through formal inspection or review</li>
-<li><code>demonstration-verification</code> - Verification through demonstration in a realistic environment</li>
-</ul>
-</li>
-</ol>
-<p>The appropriate verification type should be selected based on the nature of the requirement:</p>
-<ul>
-<li><strong>Test-verification</strong>: Used when formal test procedures with expected outcomes are required</li>
-<li><strong>Analysis-verification</strong>: Used when requirements can be verified through analysis of documentation or code</li>
-<li><strong>Inspection-verification</strong>: Used when requirements can be verified through review of artifacts</li>
-<li><strong>Demonstration-verification</strong>: Used when requirements can be verified by demonstrating functionality</li>
+<li><a href="Specifications.html#verification-type-categories-specification">Verification Type Categories Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>satisfiedBy: <a href="Specifications.html#verification-type-categories-specification">Verification Type Categories Specification</a></li>
 </ul>
 <hr />
 

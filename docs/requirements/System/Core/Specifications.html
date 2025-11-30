@@ -743,6 +743,12 @@ blockquote {
       47d4dfd806994b53[&quot;Ignore Files Specification&quot;];
       class 47d4dfd806994b53 default;
       click 47d4dfd806994b53 &quot;Specifications.html#ignore-files-specification&quot;;
+      11d73b2bad3ddf0a[&quot;Supported Element Types Specification&quot;];
+      class 11d73b2bad3ddf0a default;
+      click 11d73b2bad3ddf0a &quot;Specifications.html#supported-element-types-specification&quot;;
+      aba468c74b8190dc[&quot;Verification Type Categories Specification&quot;];
+      class aba468c74b8190dc default;
+      click aba468c74b8190dc &quot;Specifications.html#verification-type-categories-specification&quot;;
     end
   end
 </div>
@@ -814,6 +820,75 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>satisfy: <a href="Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
+</ul>
+<hr />
+<h3 id="supported-element-types-specification">Supported Element Types Specification</h3>
+<p>Element types supported by the system for classification and behavior determination.</p>
+<h4>Details</h4>
+<p>Element types are identified through a reserved <code>type</code> metadata property in the <code>#### Metadata</code> subsection.</p>
+<p><strong>Requirement Types:</strong></p>
+<table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>requirement</code></td><td>System requirement (default type if not specified)</td></tr>
+<tr><td><code>user-requirement</code></td><td>User requirement representing stakeholder needs</td></tr>
+</tbody></table>
+<p><strong>Verification Types:</strong></p>
+<table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>verification</code></td><td>Verification through testing (equivalent to <code>test-verification</code>)</td></tr>
+<tr><td><code>test-verification</code></td><td>Explicit verification through testing with documented test procedures</td></tr>
+<tr><td><code>analysis-verification</code></td><td>Verification through formal analysis of documentation or code</td></tr>
+<tr><td><code>inspection-verification</code></td><td>Verification through formal inspection or review</td></tr>
+<tr><td><code>demonstration-verification</code></td><td>Verification through demonstration in a realistic environment</td></tr>
+</tbody></table>
+<p><strong>Refinement Types:</strong></p>
+<table><thead><tr><th>Type</th><th>Description</th><th>Constraints</th></tr></thead><tbody>
+<tr><td><code>constraint</code></td><td>Documents constraints that limit or bound the system</td><td>Only <code>satisfy</code> relations allowed</td></tr>
+<tr><td><code>behavior</code></td><td>Documents behavior details and operational specifications</td><td>Only <code>satisfy</code> relations allowed</td></tr>
+<tr><td><code>specification</code></td><td>Documents detailed specifications and technical descriptions</td><td>Only <code>satisfy</code> relations allowed</td></tr>
+</tbody></table>
+<p><strong>Other Types:</strong></p>
+<table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td><code>other</code></td><td>Custom element types defined by users</td></tr>
+</tbody></table>
+<p><strong>Usage Example:</strong>
+To specify an element type, add a Metadata subsection with the type property:
+<code>* type: user-requirement</code></p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ModelManagement.html#supported-element-types">Supported Element Types</a></li>
+</ul>
+<hr />
+<h3 id="verification-type-categories-specification">Verification Type Categories Specification</h3>
+<p>Supported verification types and their usage guidelines.</p>
+<h4>Details</h4>
+<p><strong>Default Verification Type:</strong></p>
+<ul>
+<li><code>verification</code> - Verification through testing (equivalent to <code>test-verification</code>)</li>
+</ul>
+<p><strong>Specific Verification Types:</strong></p>
+<table><thead><tr><th>Type</th><th>Description</th><th>Use When</th></tr></thead><tbody>
+<tr><td><code>test-verification</code></td><td>Explicit verification through testing with documented test procedures</td><td>Formal test procedures with expected outcomes are required</td></tr>
+<tr><td><code>analysis-verification</code></td><td>Verification through formal analysis of documentation or code</td><td>Requirements can be verified through analysis of documentation or code</td></tr>
+<tr><td><code>inspection-verification</code></td><td>Verification through formal inspection or review</td><td>Requirements can be verified through review of artifacts</td></tr>
+<tr><td><code>demonstration-verification</code></td><td>Verification through demonstration in a realistic environment</td><td>Requirements can be verified by demonstrating functionality</td></tr>
+</tbody></table>
+<p><strong>Type Selection Guidelines:</strong></p>
+<ul>
+<li><strong>Test-verification</strong>: Quantitative requirements, functional behavior, performance criteria</li>
+<li><strong>Analysis-verification</strong>: Design constraints, architectural requirements, compliance with standards</li>
+<li><strong>Inspection-verification</strong>: Documentation requirements, labeling, configuration settings</li>
+<li><strong>Demonstration-verification</strong>: User-facing features, workflow requirements, integration scenarios</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ModelManagement.html#verification-type-categories">Verification Type Categories</a></li>
 </ul>
 <hr />
 

@@ -743,6 +743,9 @@ blockquote {
       5922c01ef3d62086[&quot;Format Consistency Specification&quot;];
       class 5922c01ef3d62086 default;
       click 5922c01ef3d62086 &quot;Specifications.html#format-consistency-specification&quot;;
+      39fbf7f67a590dcf[&quot;Relation Operations Specification<br/>📎 RelationTypes.md<br/>📎 requirements/System/Core/Constraints.md#element-type-relation-compatibility-constraint<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification&quot;];
+      class 39fbf7f67a590dcf default;
+      click 39fbf7f67a590dcf &quot;Specifications.html#relation-operations-specification&quot;;
       b0ff2a4698cc55f4[&quot;Relation Ordering Specification&quot;];
       class b0ff2a4698cc55f4 default;
       click b0ff2a4698cc55f4 &quot;Specifications.html#relation-ordering-specification&quot;;
@@ -821,6 +824,50 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>satisfy: <a href="Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a></li>
+</ul>
+<hr />
+<h3 id="relation-operations-specification">Relation Operations Specification</h3>
+<p>Technical specification for relation link and unlink operations.</p>
+<h4>Details</h4>
+<p><strong>Source Resolution:</strong></p>
+<ul>
+<li>Source parameter accepts either an existing internal file path OR an element name</li>
+<li>Resolution order: first check if source exists as internal file path, if not search for element by name in registry</li>
+<li>Source must resolve to an existing element or file; report error if not found</li>
+</ul>
+<p><strong>Target Resolution:</strong></p>
+<ul>
+<li>Target parameter must always be an existing element name</li>
+<li>Target must exist in the element registry; report error if not found</li>
+</ul>
+<p><strong>Link Operation:</strong></p>
+<ul>
+<li>Create Relations subsection in source element if doesn’t exist</li>
+<li>Add relation entry with format <code>* &lt;relation-type&gt;: [target-name](target-path)</code></li>
+<li>Validate relation type against supported types</li>
+<li>Validate element type compatibility for the relation</li>
+<li>Skip if relation already exists (idempotent)</li>
+</ul>
+<p><strong>Unlink Operation:</strong></p>
+<ul>
+<li>Remove relation entry from source element’s Relations subsection</li>
+<li>Remove Relations subsection if no relations remain</li>
+<li>Report error if relation doesn’t exist</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Core/DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+<li><a href="../Core/Constraints.html#element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</a></li>
+<li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Specifications.html#relation-validation-specification">Relation Validation Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="../Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a></li>
 </ul>
 <hr />
 <h3 id="relation-ordering-specification">Relation Ordering Specification</h3>

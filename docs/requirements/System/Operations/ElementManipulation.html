@@ -742,25 +742,25 @@ blockquote {
       click df1f09bc9884c2de &quot;Constraints.html#target-location-constraint&quot;;
     end
     subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
+      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class ca74bbb037431e9b systemRequirement;
       click ca74bbb037431e9b &quot;ElementManipulation.html#create-element-operation&quot;;
-      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
+      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class b1ed46220f447242 systemRequirement;
       click b1ed46220f447242 &quot;ElementManipulation.html#delete-element-operation&quot;;
       5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
       class 5e9d1888d2914fd4 systemRequirement;
       click 5e9d1888d2914fd4 &quot;ElementManipulation.html#element-manipulation-file-persistence&quot;;
-      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
+      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class 84860e94fc819efd systemRequirement;
       click 84860e94fc819efd &quot;ElementManipulation.html#move-element-operation&quot;;
-      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint&quot;];
+      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class bbea6657a24b3f1c systemRequirement;
       click bbea6657a24b3f1c &quot;ElementManipulation.html#move-file-operation&quot;;
       b7a7ab53d4242be8[&quot;Relation Consistency Maintenance&quot;];
       class b7a7ab53d4242be8 systemRequirement;
       click b7a7ab53d4242be8 &quot;ElementManipulation.html#relation-consistency-maintenance&quot;;
-      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior&quot;];
+      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
       class a6593dab7ef5d521 systemRequirement;
       click a6593dab7ef5d521 &quot;ElementManipulation.html#rename-element-operation&quot;;
       9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification&quot;];
@@ -898,6 +898,7 @@ blockquote {
 <li>Validate and normalize all relations following clearly defined specifications</li>
 <li>Insert the element into the target file following Element Ordering Behavior</li>
 <li>Reject the operation and report validation errors if validation fails</li>
+<li>Provide updates report following Diff Output Format Specification</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
@@ -905,6 +906,8 @@ blockquote {
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 <li><a href="Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+<li><a href="Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
+<li><a href="../Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -931,7 +934,7 @@ blockquote {
 <li>Identify all relations from the deleted element (outgoing relations)</li>
 <li>Remove the complete element section including separators</li>
 <li>Maintain file structure and formatting after deletion</li>
-<li>Provide a report of all relations that were affected by the deletion</li>
+<li>Provide updates report following Diff Output Format Specification</li>
 </ul>
 <p><strong>Empty File Cleanup:</strong></p>
 <ul>
@@ -950,6 +953,8 @@ blockquote {
 <h4>Attachments</h4>
 <ul>
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
+<li><a href="../Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -992,7 +997,7 @@ blockquote {
 <li>Update all relations that reference the moved element with the new identifier</li>
 <li>Maintain file structure and formatting in both source and target files</li>
 <li>Ensure the element name is globally unique in the model</li>
-<li>Provide a report of all relations that were updated</li>
+<li>Provide updates report following Diff Output Format Specification</li>
 </ul>
 <p><strong>Empty Source File Cleanup:</strong></p>
 <ul>
@@ -1015,6 +1020,8 @@ blockquote {
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 <li><a href="Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+<li><a href="Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
+<li><a href="../Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1039,6 +1046,7 @@ blockquote {
 <li>Update all element identifiers within the file to reflect the new file path</li>
 <li>Update all relation references (both forward and backward) throughout the model that point to any element in the moved file</li>
 <li>Preserve all file content, structure, and formatting</li>
+<li>Provide updates report following Diff Output Format Specification</li>
 </ul>
 <p>The system shall reject the operation with a clear error message if:</p>
 <ul>
@@ -1057,6 +1065,8 @@ When the –squash flag is provided and the target file already exists, the syst
 <ul>
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
+<li><a href="Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
+<li><a href="../Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1099,6 +1109,7 @@ When the –squash flag is provided and the target file already exists, the syst
 <li>Update the element’s heading text in the markdown file</li>
 <li>Update all relation references (both forward and backward) to use the new element identifier</li>
 <li>Update the element identifier in the registry</li>
+<li>Provide updates report following Diff Output Format Specification</li>
 </ul>
 <p>The system shall reject the operation with a clear error message if:</p>
 <ul>
@@ -1108,6 +1119,8 @@ When the –squash flag is provided and the target file already exists, the syst
 <h4>Attachments</h4>
 <ul>
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
+<li><a href="../Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
