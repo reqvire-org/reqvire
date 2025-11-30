@@ -24,7 +24,7 @@ It unifies system modeling, requirements management, and AI-assisted development
 
 #### 🤖 Now Available for Claude Code
 
-Use Reqvire inside Claude Code with specialized commands and AI-assisted engineering tools: **[Install and get started →](#install)**
+Use Reqvire inside Claude Code with specialized commands and AI-assisted engineering tools: **[Install and get started →](#installation)**
 
 ---
 
