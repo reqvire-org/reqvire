@@ -18,9 +18,9 @@
 
 ## What is Reqvire?
 
-**Reqvire** is a lightweight, Git-native **Requirements-as-Context** framework that transforms how modern engineering teams build software. 
+**Reqvire** is a lightweight, Git-native **Requirements-as-Context** framework that redefines how modern engineering teams design, build, and maintain software.
 
-Reqvire seamlessly blends architecture and system modeling, requirements management, and AI-assisted development, empowering teams to deliver better products faster with complete traceability and intelligent automation.
+It unifies system modeling, requirements management, and AI-assisted development into a single workflow—providing complete traceability, intelligent automation, and faster delivery while staying fully aligned with your codebase.
 
 ## 🤖 Now Available for Claude Code
 
@@ -32,20 +32,33 @@ Reqvire is now available as a plugin for Claude Code! Get AI-assisted requiremen
 
 ## Key Features
 
-- **Requirements-as-Context**: Establish a single source of truth that structures project context. Reqvire ensures AI tools can retrieve and manage precise information, guiding them to understand precisely what needs to be built, where to make changes, and how all system components connect.
-- **Requirements-as-Code**: Transform requirements from static documents into living, version-controlled assets that evolve with your codebase, ensuring that the foundational system model remains intact and accessible over time, rather than getting lost in transient task documents
-- **Intelligent Engineering**: 
-  - **Context-Aware Generation**: Understand the "why" behind every component through Reqvire's traceability structure.
-  - **Specification-Driven Coding**: Generate code directly tied to specific requirements, reducing guesswork and misinterpretation.
-  - **Verification-Backed Validation**: Refer to defined verifications to ensure implementation meets intended behavior.
-  - **Trace-Based Refactoring**: Assist in propagating requirement changes efficiently through the codebase and related artifacts.  
-  - **Effortless Integration**: Plug seamlessly into your existing workflow with Git branches, pull requests, and CI/CD pipelines—no disruption, just enhancement
-- **Model-Based Systems Engineering practices**-
-   - Maintain requirements-code traceability
-   - Enforce requirements-first development
-   - Validate verification coverage
-   - Track change propagation
-   
+### **Requirements-as-Context**
+Create a structured, canonical source of truth for your project.  
+Reqvire provides a consistent context layer that AI tools can reliably query—so they always understand what needs to be built, where changes belong, and how system components fit together.
+
+### **Requirements-as-Code**
+Evolve requirements from static documents into version-controlled, executable artifacts.  
+Reqvire keeps your system model alive in Git—no more lost specs, outdated docs, or knowledge locked in transient tickets.
+
+### **Intelligent Engineering**
+Bring Model-Based Systems Engineering (MBSE) directly into your Git workflow:
+
+- **Specification-Driven Development**  
+  Develop from requirements. Enforce clear specifications and generate code that stays tied to its originating requirements.
+
+- **Automated Traceability**  
+  Maintain instant, bidirectional links between requirements, code, tests, and artifacts.
+
+- **Verification & Validation**  
+  Track verifications, ensure coverage, and validate that implementations meet intended behavior.
+
+- **Smart Change Propagation**  
+  Identify impacted parts of the system and help propagate requirement changes consistently across the model and codebase.
+
+- **Seamless Integration**  
+  Works naturally with branches, pull requests, reviews, and CI/CD. No workflow disruption—just added intelligence.
+
+
 ## Get Started
 
 ### Installation
