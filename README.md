@@ -39,14 +39,8 @@ Reqvire is now available as a plugin for Claude Code! Get AI-assisted requiremen
 
 **[Install and learn more →](https://www.reqvire.org/claude_plugin)**
 
-[Learn more in our documentation →](https://www.reqvire.org/user_guide)
-
 ---
 
-<sub>Figure 1: Example Diagram (click to enlarge)</sub>
-[![Example Diagram](doc/diagram_1.png)](https://raw.githubusercontent.com/Reqvire/reqvire/main/doc/diagram_1.png)
-
----
 ## Get Started
 
 ### Installation
