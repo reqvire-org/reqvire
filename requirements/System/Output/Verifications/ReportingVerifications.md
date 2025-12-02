@@ -931,6 +931,73 @@ This test verifies that the verification-traces command filter options work corr
   * verify: [CLI Traces Command](../../../Interfaces/CLI.md#cli-traces-command)
 ---
 
+### CLI Collect Command Test
+
+This test verifies that the collect command aggregates content from a requirement chain with proper source citations.
+
+#### Details
+
+##### Acceptance Criteria
+- System shall provide CLI command `collect` that aggregates content from requirement chains
+- Command shall accept requirement element name as positional argument
+- Command shall support `--json` flag for JSON output format
+- Command shall traverse derivedFrom relations in reverse direction (child to parents)
+- Command shall collect element content and attachment contents
+- Command shall output with source citations
+- Command shall reject non-requirement element types with error
+
+##### Test Criteria
+1. **Basic Text Output**
+   Command: `reqvire collect <requirement-name>`
+   - exits code **0**
+   - output contains content from starting requirement
+   - output contains content from ancestor requirements
+   - each content block followed by source citation
+   - citation format: `— Source: [Element Name](identifier)`
+
+2. **JSON Output Structure**
+   Command: `reqvire collect <requirement-name> --json`
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON contains `starting_element` field
+   - JSON contains `items` array with collected content
+   - JSON contains `metadata` with counts
+   - each item has: name, identifier, file_path, element_type, content, depth, source_type
+
+3. **Ancestor Chain Collection**
+   - Starting from leaf requirement
+   - Collects content from all derivedFrom ancestors
+   - Ancestors ordered by depth (root first, depth 0)
+   - Same-level elements sorted alphabetically
+
+4. **Attachment Content Collection**
+   - .md file attachments: content read and included
+   - other file types: included as markdown link
+   - element identifier attachments: referenced element content included
+
+5. **Error Handling - Element Not Found**
+   Command: `reqvire collect non-existent-element`
+   - exits non-zero
+   - error message indicates element not found
+
+6. **Error Handling - Non-Requirement Type**
+   Command: `reqvire collect <verification-name>`
+   - exits non-zero
+   - error message indicates element must be requirement type
+
+7. **Output Ordering**
+   - Flat list structure
+   - Ancestors first (depth 0 = root)
+   - Same-depth elements sorted alphabetically by name
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-collect-command/test.sh)
+  * verify: [CLI Collect Command](../../../Interfaces/CLI.md#cli-collect-command)
+---
+
 ### Verification Traces From-Folder Test
 
 This test verifies that the --from-folder option correctly generates relative links in verification traces output when the output file will be saved in a specific folder location.

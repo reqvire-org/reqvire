@@ -15,6 +15,7 @@ use reqvire::git_commands;
 use reqvire::verification_trace;
 use crate::serve;
 use reqvire::lint;
+use reqvire::report_collect;
 use reqvire::report_resources;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::Page;
@@ -418,6 +419,17 @@ pub enum Commands {
     Resources {
         /// Output results in JSON format
         #[clap(long, help_heading = "RESOURCES OPTIONS")]
+        json: bool,
+    },
+
+    /// Collect content from requirement chain via derivedFrom relations
+    #[clap(override_help = "Collect content from requirement chain via derivedFrom relations\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>    Name of the requirement element to collect from\n      --json            Output results in JSON format")]
+    Collect {
+        /// Name of the requirement element to collect from
+        element_name: String,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "COLLECT OPTIONS")]
         json: bool,
     },
 
@@ -1170,6 +1182,17 @@ pub fn handle_command(
         Some(Commands::Resources { json }) => {
             let report = report_resources::generate_resources_report(&model_manager.graph_registry);
             report.print(json);
+            return Ok(0);
+        },
+        Some(Commands::Collect { element_name, json }) => {
+            let git_root = git_commands::get_git_root_dir()?;
+            let output = report_collect::generate_collect_report(
+                &model_manager.graph_registry,
+                &element_name,
+                &git_root,
+                json,
+            )?;
+            println!("{}", output);
             return Ok(0);
         },
         Some(Commands::Shell) => {

@@ -288,6 +288,118 @@ All relation types use open (hollow) arrowheads per SysML specification.
   * satisfy: [SysML-Compatible Relationship Rendering](DiagramGeneration.md#sysml-compatible-relationship-rendering)
 ---
 
+### Collect Content Specification
+
+Technical specification for content collection from requirement chains.
+
+#### Details
+**Input Validation:**
+- Element name is required positional argument
+- Element must exist in the model
+- Element must be a requirement type (requirement or user-requirement)
+- Error with non-zero exit if element not found or invalid type
+
+**Traversal Rules:**
+- Start from specified requirement element
+- Traverse derivedFrom relations in reverse direction (child to parents)
+- Continue until root ancestors reached (elements with no derivedFrom)
+- Include the starting element in output
+
+**Content Collection:**
+- Collect element content field (main body text including Details section)
+- For each attachment:
+  - FilePath pointing to .md file: Read and include file content
+  - FilePath pointing to other file types: Include as markdown link
+  - ElementIdentifier: Include referenced element's content
+- Skip external URL attachments
+
+**Output Ordering:**
+- Flat list structure (no nesting)
+- Ancestors first (depth 0 = root), then descendants
+- Same-level elements sorted alphabetically by name or file path
+
+**Error Handling:**
+- Element not found: Error with message
+- Element not a requirement type: Error with message
+- Attachment file not found: Warning, continue with other content
+- Circular reference: Detect and break cycle
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Collect Content from Requirement Chain](Reporting.md#collect-content-from-requirement-chain)
+---
+
+### Collect Output Format Specification
+
+Output format specification for collect command text and JSON modes.
+
+#### Details
+**Text Format:**
+Each collected content block followed by source citation and separator:
+
+```
+[Content from element or attachment]
+
+— Source: [Element Name](file.md#element-id)
+
+---
+
+```
+
+**Citation Formats:**
+| Source Type | Citation Format |
+|-------------|-----------------|
+| Element | `— Source: [Element Name](file.md#element-id)` |
+| Attachment File | `— Source: [filename.md](path/to/file.md) attached to [Element Name](file.md#element-id)` |
+| Refinement Element | `— Source: [Refinement Name](file.md#refinement-id) satisfying [Element Name](file.md#element-id)` |
+
+**JSON Format:**
+```json
+{
+  "starting_element": "file.md#element-id",
+  "items": [
+    {
+      "name": "Element Name",
+      "identifier": "file.md#element-id",
+      "file_path": "path/to/file.md",
+      "element_type": "requirement",
+      "content": "The collected content...",
+      "depth": 0,
+      "source_type": "element"
+    },
+    {
+      "name": "Attached File",
+      "identifier": "path/to/attachment.md",
+      "file_path": "path/to/attachment.md",
+      "element_type": "attachment",
+      "content": "Content from attachment file...",
+      "depth": 0,
+      "source_type": "attachment_file",
+      "attached_to": "file.md#element-id"
+    }
+  ],
+  "metadata": {
+    "element_count": 5,
+    "attachment_count": 2,
+    "total_items": 7
+  }
+}
+```
+
+**Source Type Values:**
+- `element` - Content from model element
+- `attachment_file` - Content from attached file
+- `attachment_element` - Content from attached refinement element
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Collect Content from Requirement Chain](Reporting.md#collect-content-from-requirement-chain)
+---
+
 ### Text Output Formatting
 
 Human-readable text output conventions for CLI commands.
