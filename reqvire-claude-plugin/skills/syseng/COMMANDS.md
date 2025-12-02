@@ -173,6 +173,14 @@ reqvire resources [--json]
 ```
 Lists all files referenced by model (implementations, design docs).
 
+### Collect Content
+```bash
+reqvire collect "<requirement-name>" [--json]
+reqvire collect "Feature Requirement"
+reqvire collect "System Requirement" --json
+```
+Collects and consolidates content from a requirement element and all its ancestors via derivedFrom relations. Includes attachment contents with source citations. Only works with requirement types.
+
 ### Lint Model
 ```bash
 reqvire lint [--json]              # Show issues
