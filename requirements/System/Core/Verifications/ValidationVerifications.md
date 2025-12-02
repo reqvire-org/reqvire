@@ -1,5 +1,24 @@
 # Elements
 
+### Cross-Section Duplicate Validation Test
+
+Test verifies that validation detects and reports cross-section duplicates.
+
+#### Details
+Test cases:
+1. Element with same target in both Relations (as satisfiedBy) and Attachments
+2. Run `reqvire validate`
+3. Verify validation fails with error mentioning "cross-section duplicate" or similar
+4. Verify error identifies the element and the duplicate target
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
+  * verify: [Cross-Section Duplicate Validation](../Validation.md#cross-section-duplicate-validation)
+---
+
 ### Default Element Type Assignment Test
 
 This test verifies that the system assigns the default type 'requirement' to all elements without explicit type metadata, regardless of their file location within the repository.
@@ -104,6 +123,8 @@ This test verifies that the system correctly validates relation types based on e
    - Create behavior element with `derivedFrom` relation - FAIL with error
    - Create specification element with `satisfiedBy` relation - FAIL with error
    - Verify error messages indicate refinement types can only have satisfy relations
+   - Create constraint element with Attachments subsection - FAIL with error
+   - Verify error message indicates refinement types cannot have attachments
 
 4. **trace relation permissiveness tests:**
    - Create requirement with `trace` to verification - PASS
@@ -379,51 +400,6 @@ This test verifies that the system correctly processes only files within the cur
   * verify: [CLI Move File Command](../../../Interfaces/CLI.md#cli-move-file-command)
 ---
 
-### Unstructured Documents Test
-
-This test verifies that the system correctly validates relations to excluded files.
-
-#### Details
-
-##### Acceptance Criteria
-- System shall allow referencing unstructured documents (text files, code files)
-- System shall not attempt to parse unstructured documents as requirements
-- System shall validate that referenced unstructured documents exist
-- System shall not report validation errors for valid references to unstructured documents
-
-##### Test Criteria
-- Relations referencing unstructured documents are treated as valid
-- No attempt is made to extract elements from unstructured documents
-- Validation succeeds when referenced unstructured documents exist
-- Validation fails when referenced unstructured documents don't exist
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
-  * verify: [Excluded File Relation Validation](../Validation.md#excluded-file-relation-validation)
----
-
-### Cross-Section Duplicate Validation Test
-
-Test verifies that validation detects and reports cross-section duplicates.
-
-#### Details
-Test cases:
-1. Element with same target in both Relations (as satisfiedBy) and Attachments
-2. Run `reqvire validate`
-3. Verify validation fails with error mentioning "cross-section duplicate" or similar
-4. Verify error identifies the element and the duplicate target
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
-  * verify: [Cross-Section Duplicate Validation](../Validation.md#cross-section-duplicate-validation)
----
-
 ### Type Validation Errors Test
 
 Test verifies that type validation errors include helpful type lists.
@@ -452,4 +428,30 @@ Test verifies that type validation errors include helpful type lists.
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-type-validation-errors/test.sh)
   * verify: [Type Validation Error Requirement](../Validation.md#type-validation-error-requirement)
+---
+
+### Unstructured Documents Test
+
+This test verifies that the system correctly validates relations to excluded files.
+
+#### Details
+
+##### Acceptance Criteria
+- System shall allow referencing unstructured documents (text files, code files)
+- System shall not attempt to parse unstructured documents as requirements
+- System shall validate that referenced unstructured documents exist
+- System shall not report validation errors for valid references to unstructured documents
+
+##### Test Criteria
+- Relations referencing unstructured documents are treated as valid
+- No attempt is made to extract elements from unstructured documents
+- Validation succeeds when referenced unstructured documents exist
+- Validation fails when referenced unstructured documents don't exist
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
+  * verify: [Excluded File Relation Validation](../Validation.md#excluded-file-relation-validation)
 ---

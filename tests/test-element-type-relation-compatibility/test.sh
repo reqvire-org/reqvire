@@ -155,4 +155,25 @@ if [ $EXIT_CODE_REFINEMENT_SATISFY -ne 0 ]; then
   exit 1
 fi
 
+# Test 8: Refinement types with attachments should fail
+echo "Test 8: Refinement types with attachments"
+
+set +e
+OUTPUT_REFINEMENT_ATTACH=$(cd "${TEST_DIR}/invalid-refinement-attachment" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_REFINEMENT_ATTACH=$?
+set -e
+
+if [ $EXIT_CODE_REFINEMENT_ATTACH -eq 0 ]; then
+  echo "FAILED: Refinement types with attachments should fail validation but returned success"
+  echo "Output: $OUTPUT_REFINEMENT_ATTACH"
+  exit 1
+fi
+
+# Check for refinement attachment error
+if ! echo "$OUTPUT_REFINEMENT_ATTACH" | grep -qi "refinement.*cannot have attachments\|cannot.*attachment"; then
+  echo "FAILED: Expected error message about refinement types not allowed to have attachments"
+  echo "Output: $OUTPUT_REFINEMENT_ATTACH"
+  exit 1
+fi
+
 exit 0

@@ -44,22 +44,6 @@ The system shall provide formatting capability to ensure consistent formatting i
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
-### Format Duplicate Removal
-
-The system shall remove duplicate entries within the same subsection during format fix operations.
-
-#### Details
-A behavior defines the detailed deduplication rules.
-
-This operation only removes within-section duplicates (entries repeated in the same Relations or Attachments subsection). Cross-section duplicates are semantic errors that require user resolution.
-
-#### Relations
-  * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * satisfiedBy: [format.rs](../../../core/src/format.rs)
-  * satisfiedBy: [Format Duplicate Removal Behavior](Behaviors.md#format-duplicate-removal-behavior)
-  * verifiedBy: [Format Duplicate Removal Test](Verifications/FormattingVerifications.md#format-duplicate-removal-test)
----
-
 ### Document Structure Normalization
 
 When generating formatted output, the system shall ensure all documents follow a consistent hierarchical structure.
@@ -97,6 +81,22 @@ When formatting or persisting specification files, the system shall reorder elem
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
   * verifiedBy: [Element Ordering Verification](Verifications/FormattingVerifications.md#element-ordering-verification)
+---
+
+### Format Duplicate Removal
+
+The system shall remove duplicate entries within the same subsection during format fix operations.
+
+#### Details
+A behavior defines the detailed deduplication rules.
+
+This operation only removes within-section duplicates (entries repeated in the same Relations or Attachments subsection). Cross-section duplicates are semantic errors that require user resolution.
+
+#### Relations
+  * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
+  * satisfiedBy: [format.rs](../../../core/src/format.rs)
+  * satisfiedBy: [Format Duplicate Removal Behavior](Behaviors.md#format-duplicate-removal-behavior)
+  * verifiedBy: [Format Duplicate Removal Test](Verifications/FormattingVerifications.md#format-duplicate-removal-test)
 ---
 
 ### Relation Ordering Normalization

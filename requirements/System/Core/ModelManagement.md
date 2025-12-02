@@ -154,6 +154,21 @@ The system shall implement relations following clearly defined specifications fo
   * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
 ---
 
+### Element Type Relation Compatibility
+
+The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.
+
+#### Details
+The system shall define element type relation compatibility constraints.
+
+#### Relations
+  * derive: [Relation Element Type Validator](Validation.md#relation-element-type-validator)
+  * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
+  * derivedFrom: [Supported Element Types](#supported-element-types)
+  * satisfiedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
+  * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
+---
+
 ### Relation Management Operations
 
 The system shall provide programmatic manipulation of element relations through link and unlink operations while maintaining model integrity.
@@ -171,30 +186,11 @@ When unlinking, the system shall:
 
 #### Attachments
   * [Relation Operations Specification](../Operations/Specifications.md#relation-operations-specification)
-  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
 
 #### Relations
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * verifiedBy: [Link Command Verification](../Operations/Verifications/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification)
----
-
-### Element Type Relation Compatibility
-
-The system shall enforce element type constraints for relation types, ensuring that only valid combinations of source and target element types are allowed for each relation type.
-
-#### Details
-The system shall define element type relation compatibility constraints.
-
-#### Attachments
-  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
-
-#### Relations
-  * derive: [Relation Element Type Validator](Validation.md#relation-element-type-validator)
-  * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * derivedFrom: [Supported Element Types](#supported-element-types)
-  * satisfiedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
-  * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 
 ### Supported Element Types

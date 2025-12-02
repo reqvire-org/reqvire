@@ -497,7 +497,8 @@ impl GraphRegistry {
     }
 
     /// Validate Refinement element constraints
-    /// Refinement elements (constraint, behavior, specification) can only have satisfy relations.
+    /// Refinement elements (constraint, behavior, specification) can only have satisfy relations
+    /// and cannot have attachments.
     fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating Refinement element constraints...");
         let mut errors = Vec::new();
@@ -524,6 +525,18 @@ impl GraphRegistry {
                             element.name,
                             element.element_type.as_str(),
                             invalid_types
+                        ),
+                    ));
+                }
+
+                // Refinement elements cannot have attachments
+                if !element.attachments.is_empty() {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(
+                        format!(
+                            "File {}: Refinement element '{}' (type: {}) cannot have attachments. Refinement elements are atomic documentation units meant to be attached to requirements.",
+                            element.file_path,
+                            element.name,
+                            element.element_type.as_str(),
                         ),
                     ));
                 }
@@ -2183,6 +2196,29 @@ impl GraphRegistry {
         }
 
         Ok(())
+    }
+
+    /// Remove an attachment from an element
+    pub fn remove_element_attachment(&mut self, element_id: &str, attachment: &str) -> Result<(), ReqvireError> {
+        if let Some(node) = self.nodes.get_mut(element_id) {
+            let original_len = node.element.attachments.len();
+            node.element.attachments.retain(|a| {
+                a.target.as_str() != attachment
+            });
+
+            if node.element.attachments.len() < original_len {
+                self.modified_files.insert(node.element.file_path.clone());
+                Ok(())
+            } else {
+                Err(ReqvireError::ProcessError(format!(
+                    "Attachment '{}' not found on element '{}'", attachment, element_id
+                )))
+            }
+        } else {
+            Err(ReqvireError::ProcessError(format!(
+                "Element '{}' not found", element_id
+            )))
+        }
     }
 
     /// Lists all relations for a given element

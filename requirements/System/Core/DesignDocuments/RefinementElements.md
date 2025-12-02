@@ -126,7 +126,10 @@ Refinement elements may contain:
 - `#### Metadata` - Required for type specification
 - `#### Relations` - Optional, only `satisfy` relations allowed
 - `#### Details` - Optional additional information
-- `#### Attachments` - Optional file attachments
+
+### No Attachments Allowed
+
+Refinement elements shall not have an Attachments subsection. Refinement elements are atomic documentation units meant to be attached to requirements, not to have their own attachments. If additional files need to be associated with a refinement, they should be attached to the parent requirement that uses the refinement.
 
 ## Attaching Refinement Elements
 

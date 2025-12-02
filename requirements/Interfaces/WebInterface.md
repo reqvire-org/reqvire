@@ -217,9 +217,6 @@ The system shall ensure color consistency between:
 - Mermaid diagram rendering
 - D3.js containment tree visualization
 
-#### Attachments
-  * [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
-
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [containment.rs](../../core/src/containment.rs)

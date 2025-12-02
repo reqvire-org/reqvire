@@ -279,6 +279,32 @@ Command output shall be written to stdout for easy redirection to files.
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
+### CLI Merge Element Command
+
+The system shall provide a `merge` command to combine multiple elements into a target element.
+
+#### Details
+The `merge` command shall:
+- Accept target element name as first required positional argument
+- Accept one or more source element names as subsequent required arguments
+- Support command syntax: `reqvire merge <target> <source1> [source2...]`
+- Apply changes immediately by default
+- Support `--dry-run` flag to preview changes without applying
+- Output git-style diff showing all affected files by default
+- Support `--json` flag for structured output
+- Exit with code 0 on success, non-zero on error
+
+#### Attachments
+  * [Merge Content Transformation Behavior](../System/Operations/Behaviors.md#merge-content-transformation-behavior)
+  * [Merge Type Compatibility Constraint](../System/Operations/Constraints.md#merge-type-compatibility-constraint)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * derivedFrom: [Merge Element Operation](../System/Operations/ElementManipulation.md#merge-element-operation)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+---
+
 ### CLI Model Diagram Command
 
 System shall provide CLI command to generate model diagrams with optional filtering and output format selection.
@@ -396,34 +422,6 @@ The `mv-file` command shall:
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * verifiedBy: [Subdirectory Processing Verification](../System/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification)
   * verifiedBy: [CLI Move File Test](../System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test)
----
-
-### CLI Merge Element Command
-
-The system shall provide a `merge` command to combine multiple elements into a target element.
-
-#### Details
-The `merge` command shall:
-- Accept target element name as first required positional argument
-- Accept one or more source element names as subsequent required arguments
-- Support command syntax: `reqvire merge <target> <source1> [source2...]`
-- Apply changes immediately by default
-- Support `--dry-run` flag to preview changes without applying
-- Output git-style diff showing all affected files by default
-- Support `--json` flag for structured output
-- Exit with code 0 on success, non-zero on error
-
-#### Attachments
-  * [Merge Content Transformation Behavior](../System/Operations/Behaviors.md#merge-content-transformation-behavior)
-  * [Merge Type Compatibility Constraint](../System/Operations/Constraints.md#merge-type-compatibility-constraint)
-  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
-  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
-
-#### Relations
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * derivedFrom: [Merge Element Operation](../System/Operations/ElementManipulation.md#merge-element-operation)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
 ### CLI Remove Asset Command
@@ -704,6 +702,41 @@ Additional behavior:
   * verifiedBy: [Full Relations Insertion Verification](../System/Operations/Verifications/FormattingVerifications.md#full-relations-insertion-verification)
 ---
 
+### Relation Commands
+
+The system shall provide unified CLI commands for relation and attachment management: link and unlink.
+
+#### Details
+The `link` command shall:
+- Accept syntax: `reqvire link <source> <relation-type-or-attaching> <target>`
+- Source: existing element name
+- Relation-type: one of derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace, OR 'attaching'
+- Target types for relations: element name, internal file path, or external URL (http/https)
+- Target types for attaching: internal file path or Refinement element name (external URLs NOT allowed)
+- When 'attaching' is used with an external URL, reject with error suggesting to use 'trace' relation instead
+- When relation or attachment already exists, return error with clear message
+- Support `--dry-run` flag for preview
+
+The `unlink` command shall:
+- Accept syntax: `reqvire unlink <source> <target>`
+- Auto-detect: searches relations first, then attachments
+- Only one relation per source-target pair is allowed
+- Source: existing element name
+- Target: element name or file path
+- Support `--dry-run` flag for preview
+
+#### Attachments
+  * [Relation Operations Specification](../System/Operations/Specifications.md#relation-operations-specification)
+  * [RelationTypes.md](../System/Core/DesignDocuments/RelationTypes.md)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * verifiedBy: [Link Command Verification](../System/Operations/Verifications/ElementManipulationVerifications.md#link-command-verification)
+  * verifiedBy: [Unlink Command Verification](../System/Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification)
+---
+
 ### Validate Command
 
 The system shall provide a validation command that executes model validation and reports any issues found.
@@ -746,39 +779,4 @@ The system shall implement detailed error handling and logging throughout the ap
   * derive: [Validation Error Handling](../System/Core/Validation.md#validation-error-handling)
   * derivedFrom: [Enhanced Validation Error Reporting](../System/Core/Validation.md#enhanced-validation-error-reporting)
   * satisfiedBy: [error.rs](../../core/src/error.rs)
----
-
-### Relation Commands
-
-The system shall provide unified CLI commands for relation and attachment management: link and unlink.
-
-#### Details
-The `link` command shall:
-- Accept syntax: `reqvire link <source> <relation-type-or-attaching> <target>`
-- Source: existing element name
-- Relation-type: one of derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace, OR 'attaching'
-- Target types for relations: element name, internal file path, or external URL (http/https)
-- Target types for attaching: internal file path or Refinement element name (external URLs NOT allowed)
-- When 'attaching' is used with an external URL, reject with error suggesting to use 'trace' relation instead
-- When relation or attachment already exists, return error with clear message
-- Support `--dry-run` flag for preview
-
-The `unlink` command shall:
-- Accept syntax: `reqvire unlink <source> <target>`
-- Auto-detect: searches relations first, then attachments
-- Only one relation per source-target pair is allowed
-- Source: existing element name
-- Target: element name or file path
-- Support `--dry-run` flag for preview
-
-#### Attachments
-  * [Relation Operations Specification](../System/Operations/Specifications.md#relation-operations-specification)
-  * [RelationTypes.md](../System/Core/DesignDocuments/RelationTypes.md)
-  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
-
-#### Relations
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * verifiedBy: [Link Command Verification](../System/Operations/Verifications/ElementManipulationVerifications.md#link-command-verification)
-  * verifiedBy: [Unlink Command Verification](../System/Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification)
 ---

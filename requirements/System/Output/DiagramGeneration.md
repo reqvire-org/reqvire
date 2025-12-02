@@ -235,9 +235,6 @@ The trace relation behavior shall include:
 
 This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.
 
-#### Attachments
-  * [RelationTypes.md](../Core/DesignDocuments/RelationTypes.md)
-
 #### Relations
   * verifiedBy: [Invalid Relations Test](../Core/Verifications/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [Trace Relations No Cycles Verification](../Processing/Verifications/TraceVerifications.md#trace-relations-no-cycles-verification)

@@ -94,23 +94,6 @@ Two-phase validation process for model parsing.
   * satisfy: [Two-Pass Validation Strategy](Validation.md#two-pass-validation-strategy)
 ---
 
-### Validation Error Reporting Behavior
-
-Error message structure for validation issues.
-
-#### Details
-- File path and line number included
-- Element name and relation details shown
-- Color coding per Color Scheme Specification
-- Actionable suggestions when possible
-
-#### Metadata
-  * type: behavior
-
-#### Relations
-  * satisfy: [Enhanced Validation Error Reporting](Validation.md#enhanced-validation-error-reporting)
----
-
 ### Type Validation Error Behavior
 
 Error messages for invalid types shall include the list of valid types.
@@ -134,4 +117,21 @@ This enables users to quickly identify and fix type errors without consulting do
 
 #### Relations
   * satisfy: [Type Validation Error Requirement](Validation.md#type-validation-error-requirement)
+---
+
+### Validation Error Reporting Behavior
+
+Error message structure for validation issues.
+
+#### Details
+- File path and line number included
+- Element name and relation details shown
+- Color coding per Color Scheme Specification
+- Actionable suggestions when possible
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Enhanced Validation Error Reporting](Validation.md#enhanced-validation-error-reporting)
 ---

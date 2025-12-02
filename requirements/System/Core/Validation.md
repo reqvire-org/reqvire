@@ -179,9 +179,6 @@ The consistency validator shall verify:
 
 Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.
 
-#### Attachments
-  * [ElementIdentity.md](DesignDocuments/ElementIdentity.md)
-
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
@@ -253,9 +250,6 @@ The system shall validate relation types and allow only supported types.
 #### Metadata
   * type: user-requirement
 
-#### Attachments
-  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
-
 #### Relations
   * derive: [Relation Element Type Validator](#relation-element-type-validator)
   * derivedFrom: [Align with Industry Standards](../../UserStories.md#align-with-industry-standards)
@@ -274,11 +268,8 @@ The validator enforces the constraints defined in the [Element Type Relation Com
 - For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a requirement or test-verification element and the other is an implementation element
 - For verification elements with `satisfiedBy` relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)
 - `trace` relations are always allowed for any non-refinement element type
-- Refinement types (`constraint`, `behavior`, `specification`) cannot have Relations subsections
+- Refinement types (`constraint`, `behavior`, `specification`) can only have `satisfy` relations and cannot have Attachments subsections
 - Warnings should be issued when relation endpoints have incompatible element types
-
-#### Attachments
-  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
 
 #### Relations
   * derivedFrom: [Validate Relation Types](#validate-relation-types)

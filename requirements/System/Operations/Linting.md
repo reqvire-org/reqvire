@@ -9,6 +9,7 @@ Auto-fix shall:
 - Only apply fixes for issues categorized as auto-fixable
 - Modify the affected markdown files directly
 - Remove redundant verify relations from verification elements
+- Remove redundant hierarchical attachments from child elements
 - Preserve all other content and formatting in the files
 - Report all changes made (files modified, relations removed)
 - Skip issues categorized as needing manual review
@@ -36,6 +37,7 @@ The linting capability should:
 #### Relations
   * derive: [Lint Output Formatting](#lint-output-formatting)
   * derive: [Multi-Branch Convergence Detection](#multi-branch-convergence-detection)
+  * derive: [Redundant Hierarchical Attachment Detection](#redundant-hierarchical-attachment-detection)
   * derive: [Redundant Hierarchical Relations Detection](#redundant-hierarchical-relations-detection)
   * derive: [Redundant Verify Relations Detection](#redundant-verify-relations-detection)
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
@@ -112,6 +114,33 @@ This enables the model author to review and decide:
   * derivedFrom: [Model Linting](#model-linting)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
+---
+
+### Redundant Hierarchical Attachment Detection
+
+The system shall detect attachments that are duplicated between child elements and their ancestors in the derivedFrom hierarchy, flagging the child's attachment as redundant and auto-fixable.
+
+#### Details
+An attachment is redundant when:
+- A child element has an attachment (file or refinement element)
+- An ancestor element (via derivedFrom chain) has the same attachment
+- The attachment is already accessible through the ancestor
+
+Detection shall:
+- Traverse the derivedFrom hierarchy for each element with attachments
+- Check if any ancestor has the same attachment
+- Report the first (topmost) ancestor with the attachment
+- Categorize as **auto-fixable** since the child's duplicate adds no value
+
+Auto-fix behavior:
+- Remove the redundant attachment from the child element
+- Preserve the attachment on the ancestor (topmost stays)
+- Report all removals for transparency
+
+#### Relations
+  * derivedFrom: [Model Linting](#model-linting)
+  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
+  * verifiedBy: [Redundant Hierarchical Attachment Test](Verifications/LintingVerifications.md#redundant-hierarchical-attachment-test)
 ---
 
 ### Redundant Hierarchical Relations Detection

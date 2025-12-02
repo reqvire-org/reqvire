@@ -34,8 +34,8 @@ When creating a new element, the system shall:
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
-  * satisfiedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * satisfiedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
+  * satisfiedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * verifiedBy: [Create Element Test](Verifications/ElementManipulationVerifications.md#create-element-test)
 ---
 
@@ -93,6 +93,43 @@ The system shall persist all element manipulation operations to the source files
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [File Persistence Test](Verifications/ElementManipulationVerifications.md#file-persistence-test)
   * verifiedBy: [Element Ordering Verification](Verifications/FormattingVerifications.md#element-ordering-verification)
+---
+
+### Merge Element Operation
+
+The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and attachments while enforcing type compatibility and removing source elements after successful merge.
+
+#### Details
+When merging elements, the system shall:
+- Accept target element name (must exist in the model)
+- Accept one or more source element names (must exist in the model)
+- Validate type compatibility following clearly defined rules in Merge Type Compatibility Constraint
+- Transform and merge content following clearly defined rules in Merge Content Transformation Behavior
+- Preserve target element's metadata (discard source metadata)
+- Delete source elements after successful merge
+- Update all relations pointing to source elements to point to target
+- Remove empty source files when no elements remain
+- Provide updates report following Diff Output Format Specification
+
+The system shall reject the operation with a clear error message if:
+- The target element does not exist
+- Any source element does not exist
+- Source and target element types are incompatible per Merge Type Compatibility Constraint
+- Merged result would have cross-section duplicates per Merge Content Transformation Behavior
+
+#### Attachments
+  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
+
+#### Relations
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [Merge Content Transformation Behavior](Behaviors.md#merge-content-transformation-behavior)
+  * satisfiedBy: [Merge Type Compatibility Constraint](Constraints.md#merge-type-compatibility-constraint)
+  * verifiedBy: [Merge Elements Test](Verifications/ElementManipulationVerifications.md#merge-elements-test)
 ---
 
 ### Move Element Operation
@@ -178,43 +215,6 @@ When the --squash flag is provided and the target file already exists, the syste
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * verifiedBy: [Move File Squash Test](Verifications/ElementManipulationVerifications.md#move-file-squash-test)
----
-
-### Merge Element Operation
-
-The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and attachments while enforcing type compatibility and removing source elements after successful merge.
-
-#### Details
-When merging elements, the system shall:
-- Accept target element name (must exist in the model)
-- Accept one or more source element names (must exist in the model)
-- Validate type compatibility following clearly defined rules in Merge Type Compatibility Constraint
-- Transform and merge content following clearly defined rules in Merge Content Transformation Behavior
-- Preserve target element's metadata (discard source metadata)
-- Delete source elements after successful merge
-- Update all relations pointing to source elements to point to target
-- Remove empty source files when no elements remain
-- Provide updates report following Diff Output Format Specification
-
-The system shall reject the operation with a clear error message if:
-- The target element does not exist
-- Any source element does not exist
-- Source and target element types are incompatible per Merge Type Compatibility Constraint
-- Merged result would have cross-section duplicates per Merge Content Transformation Behavior
-
-#### Attachments
-  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
-
-#### Relations
-  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
-  * satisfiedBy: [Merge Content Transformation Behavior](Behaviors.md#merge-content-transformation-behavior)
-  * satisfiedBy: [Merge Type Compatibility Constraint](Constraints.md#merge-type-compatibility-constraint)
-  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
-  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * verifiedBy: [Merge Elements Test](Verifications/ElementManipulationVerifications.md#merge-elements-test)
 ---
 
 ### Relation Consistency Maintenance

@@ -62,6 +62,39 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
   * satisfy: [Format Consistency Enforcement](Formatting.md#format-consistency-enforcement)
 ---
 
+### Relation Operations Specification
+
+Technical specification for relation link and unlink operations.
+
+#### Details
+**Source Resolution:**
+- Source parameter accepts either an existing internal file path OR an element name
+- Resolution order: first check if source exists as internal file path, if not search for element by name in registry
+- Source must resolve to an existing element or file; report error if not found
+
+**Target Resolution:**
+- Target parameter must always be an existing element name
+- Target must exist in the element registry; report error if not found
+
+**Link Operation:**
+- Create Relations subsection in source element if doesn't exist
+- Add relation entry with format `* <relation-type>: [target-name](target-path)`
+- Validate relation type against supported types
+- Validate element type compatibility for the relation
+- Skip if relation already exists (idempotent)
+
+**Unlink Operation:**
+- Remove relation entry from source element's Relations subsection
+- Remove Relations subsection if no relations remain
+- Report error if relation doesn't exist
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Relation Management Operations](../Core/ModelManagement.md#relation-management-operations)
+---
+
 ### Relation Ordering Specification
 
 Rules for sorting relations within elements for deterministic output.
@@ -110,43 +143,4 @@ Rules for validating and normalizing relation targets during element creation an
 
 #### Relations
   * satisfy: [Create Element Operation](ElementManipulation.md#create-element-operation)
----
-
-### Relation Operations Specification
-
-Technical specification for relation link and unlink operations.
-
-#### Details
-**Source Resolution:**
-- Source parameter accepts either an existing internal file path OR an element name
-- Resolution order: first check if source exists as internal file path, if not search for element by name in registry
-- Source must resolve to an existing element or file; report error if not found
-
-**Target Resolution:**
-- Target parameter must always be an existing element name
-- Target must exist in the element registry; report error if not found
-
-**Link Operation:**
-- Create Relations subsection in source element if doesn't exist
-- Add relation entry with format `* <relation-type>: [target-name](target-path)`
-- Validate relation type against supported types
-- Validate element type compatibility for the relation
-- Skip if relation already exists (idempotent)
-
-**Unlink Operation:**
-- Remove relation entry from source element's Relations subsection
-- Remove Relations subsection if no relations remain
-- Report error if relation doesn't exist
-
-#### Metadata
-  * type: specification
-
-#### Attachments
-  * [RelationTypes.md](../Core/DesignDocuments/RelationTypes.md)
-  * [Element Type Relation Compatibility Constraint](../Core/Constraints.md#element-type-relation-compatibility-constraint)
-  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
-  * [Relation Validation Specification](#relation-validation-specification)
-
-#### Relations
-  * satisfy: [Relation Management Operations](../Core/ModelManagement.md#relation-management-operations)
 ---

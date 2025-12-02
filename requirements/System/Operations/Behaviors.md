@@ -1,5 +1,20 @@
 # Elements
 
+### Create Element Override Behavior
+
+When the create element operation is invoked with override mode:
+1. The system shall extract the element name from the markdown input (### Element Name pattern)
+2. If an element with that name exists in the model, the system shall remove it first
+3. The system shall then add the new element content to the target file
+4. The operation shall be reported as "Update" rather than "Add"
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Create Element Operation](ElementManipulation.md#create-element-operation)
+---
+
 ### Dry-Run Mode Behavior
 
 Preview mode behavior for modification commands.
@@ -12,26 +27,6 @@ Preview mode behavior for modification commands.
 
 #### Metadata
   * type: behavior
----
-
-### Format Duplicate Removal Behavior
-
-Deduplication rules for format fix operations.
-
-**Relations subsection:**
-- Duplicate relations (same relation_type + same target) are removed, keeping first occurrence
-- Different relation types to same target are NOT duplicates (e.g., `derivedFrom: A` and `trace: A` are both kept)
-
-**Attachments subsection:**
-- Duplicate attachments (same target path or identifier) are removed, keeping first occurrence
-
-**Cross-section duplicates are NOT removed** - these require user decision and are reported by validation.
-
-#### Metadata
-  * type: behavior
-
-#### Relations
-  * satisfy: [Format Duplicate Removal](Formatting.md#format-duplicate-removal)
 ---
 
 ### Element Ordering Behavior
@@ -79,6 +74,42 @@ Elements shall be ordered so that parent elements appear before their children (
   * type: behavior
 ---
 
+### File Persistence Behavior
+
+How element manipulation operations persist changes to files:
+- Track modified files during operations
+- Write only modified files to storage
+- Maintain file format and structure
+- Handle I/O errors with reporting
+
+**Synchronization:**
+- On-disk matches in-memory after success
+- No partial changes on error
+
+#### Metadata
+  * type: behavior
+---
+
+### Format Duplicate Removal Behavior
+
+Deduplication rules for format fix operations.
+
+**Relations subsection:**
+- Duplicate relations (same relation_type + same target) are removed, keeping first occurrence
+- Different relation types to same target are NOT duplicates (e.g., `derivedFrom: A` and `trace: A` are both kept)
+
+**Attachments subsection:**
+- Duplicate attachments (same target path or identifier) are removed, keeping first occurrence
+
+**Cross-section duplicates are NOT removed** - these require user decision and are reported by validation.
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Format Duplicate Removal](Formatting.md#format-duplicate-removal)
+---
+
 ### Merge Content Transformation Behavior
 
 Content transformation rules for the merge elements operation.
@@ -115,35 +146,4 @@ Content transformation rules for the merge elements operation.
 
 #### Relations
   * satisfy: [Merge Element Operation](ElementManipulation.md#merge-element-operation)
----
-
-### File Persistence Behavior
-
-How element manipulation operations persist changes to files:
-- Track modified files during operations
-- Write only modified files to storage
-- Maintain file format and structure
-- Handle I/O errors with reporting
-
-**Synchronization:**
-- On-disk matches in-memory after success
-- No partial changes on error
-
-#### Metadata
-  * type: behavior
----
-
-### Create Element Override Behavior
-
-When the create element operation is invoked with override mode:
-1. The system shall extract the element name from the markdown input (### Element Name pattern)
-2. If an element with that name exists in the model, the system shall remove it first
-3. The system shall then add the new element content to the target file
-4. The operation shall be reported as "Update" rather than "Add"
-
-#### Metadata
-  * type: behavior
-
-#### Relations
-  * satisfy: [Create Element Operation](ElementManipulation.md#create-element-operation)
 ---

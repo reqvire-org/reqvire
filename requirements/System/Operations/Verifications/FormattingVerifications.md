@@ -191,6 +191,24 @@ This test verifies the format command requirements from SystemRequirements and U
   * verify: [Replace Absolute Links with Relative Links](../Formatting.md#replace-absolute-links-with-relative-links)
 ---
 
+### Format Duplicate Removal Test
+
+Test verifies that format removes within-section duplicates but not cross-section.
+
+#### Details
+Test cases:
+1. File with duplicate relations -> `format --fix` -> Duplicates removed
+2. File with duplicate attachments -> `format --fix` -> Duplicates removed
+3. File with cross-section duplicate -> `format --fix` -> No change (validation error, not format issue)
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
+  * verify: [Format Duplicate Removal](../Formatting.md#format-duplicate-removal)
+---
+
 ### Full Relations Insertion Verification
 
 This test verifies that the --with-full-relations flag correctly inserts all registered relations (user-created and auto-generated) into elements during formatting.
@@ -293,22 +311,4 @@ This test verifies that the format command sorts relations alphabetically for de
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
   * verify: [Relation Ordering Normalization](../Formatting.md#relation-ordering-normalization)
----
-
-### Format Duplicate Removal Test
-
-Test verifies that format removes within-section duplicates but not cross-section.
-
-#### Details
-Test cases:
-1. File with duplicate relations -> `format --fix` -> Duplicates removed
-2. File with duplicate attachments -> `format --fix` -> Duplicates removed
-3. File with cross-section duplicate -> `format --fix` -> No change (validation error, not format issue)
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
-  * verify: [Format Duplicate Removal](../Formatting.md#format-duplicate-removal)
 ---
