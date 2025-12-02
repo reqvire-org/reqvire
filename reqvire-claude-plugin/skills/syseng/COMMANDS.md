@@ -39,7 +39,19 @@ Content here.
 
 # Add at specific position (0-based index)
 echo '...' | reqvire add requirements/File.md 2
+
+# Override existing element (replace by name)
+reqvire add <file> --override <<'EOF'
+### Existing Element Name
+
+Updated content.
+
+#### Metadata
+  * type: requirement
+---
+EOF
 ```
+Use `--override` to replace an existing element with the same name. Useful for cleanup after `reqvire merge`.
 
 ### Remove Element
 ```bash
@@ -68,6 +80,23 @@ reqvire mv-file --squash "requirements/Source.md" "requirements/Target.md"
 reqvire rename "<current-name>" "<new-name>"
 reqvire rename "Old Feature Name" "New Feature Name"
 ```
+
+### Merge Elements
+```bash
+reqvire merge "<target>" "<source>" [<source2>...] [--dry-run] [--json]
+reqvire merge "Parent Requirement" "Child Requirement"
+reqvire merge "Main Feature" "Feature Part A" "Feature Part B" --dry-run
+```
+Combines source elements into target:
+- Source content → target's Details section
+- Source Details → "Merged Details (source name)" subsection
+- Relations merged and deduplicated
+- All references to sources redirected to target
+- Source elements deleted after merge
+
+Type compatibility: requirements merge with requirements, verifications with verifications, refinements with refinements.
+
+For intelligent cleanup after merge (removing "Merged Details" artifacts), use `/reqvire:consolidate`.
 
 ### Move/Rename Asset
 ```bash
@@ -222,6 +251,7 @@ Most manipulation commands support `--dry-run` to preview changes:
 reqvire rm "Element Name" --dry-run
 reqvire mv "Element" "target.md" --dry-run
 reqvire mv-file "source.md" "target.md" --dry-run
+reqvire merge "Target" "Source" --dry-run
 reqvire link "Element" "derivedFrom" "Parent" --dry-run
 reqvire link "Element" attaching "docs/spec.pdf" --dry-run
 reqvire unlink "Element" "Parent" --dry-run

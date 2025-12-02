@@ -18,6 +18,7 @@ use std::path::Path;
 /// * `current_dir` - Current working directory (where command was invoked)
 /// * `git_root` - Git root directory
 /// * `dry_run` - If true, don't write changes to disk
+/// * `override_existing` - If true, replace existing element with same name
 pub fn add_element(
     model_manager: &mut ModelManager,
     element_markdown: &str,
@@ -26,6 +27,7 @@ pub fn add_element(
     current_dir: &Path,
     git_root: &Path,
     dry_run: bool,
+    override_existing: bool,
 ) -> Result<CrudResult, ReqvireError> {
     // Normalize target_file: convert from CWD-relative to git-root-relative
     use crate::utils;
@@ -33,6 +35,19 @@ pub fn add_element(
     let target_file_normalized = utils::get_relative_path(&absolute_target)?
         .to_string_lossy()
         .to_string();
+
+    // If override is requested, extract element name and remove existing element first
+    if override_existing {
+        // Extract element name from markdown (looks for ### Element Name pattern)
+        let element_name = extract_element_name_from_markdown(element_markdown)?;
+
+        // Check if element exists and remove it
+        if let Some(existing_element) = model_manager.graph_registry.get_element_by_name(&element_name) {
+            let existing_id = existing_element.identifier.clone();
+            model_manager.graph_registry.remove_element_with_cleanup(&existing_id)?;
+        }
+    }
+
     // Track which files were modified before the operation
     let modified_before: Vec<String> = model_manager.graph_registry.modified_files
         .iter()
@@ -67,13 +82,36 @@ pub fn add_element(
     }
 
     // Create result structure
+    let operation = if override_existing {
+        CrudOperation::Update
+    } else {
+        CrudOperation::Add
+    };
+
     Ok(CrudResult {
-        operation: CrudOperation::Add,
+        operation,
         element_id: element.identifier.clone(),
         element_name: element.name.clone(),
         diffs,
         dry_run,
     })
+}
+
+/// Extract element name from markdown content
+/// Looks for pattern: ### Element Name
+fn extract_element_name_from_markdown(markdown: &str) -> Result<String, ReqvireError> {
+    for line in markdown.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with("### ") && !trimmed.starts_with("#### ") {
+            let name = trimmed.trim_start_matches("### ").trim();
+            if !name.is_empty() {
+                return Ok(name.to_string());
+            }
+        }
+    }
+    Err(ReqvireError::InvalidMarkdownStructure(
+        "Could not find element name in markdown. Expected '### Element Name' pattern.".to_string()
+    ))
 }
 
 /// Remove an element from the model
@@ -890,6 +928,96 @@ pub fn rm_asset(
         element_name: format!("Removed {} ({} attachment(s), {} relation(s) from {} file(s))",
             file_path_arg, attachment_count, relation_count, affected_files.len()),
         diffs: all_diffs,
+        dry_run,
+    })
+}
+
+/// Merge multiple source elements into a target element
+///
+/// # Arguments
+/// * `model_manager` - The model manager
+/// * `target_name` - Name of the target element (receives merged content)
+/// * `source_names` - Names of source elements to merge into target
+/// * `git_root` - Git root directory
+/// * `dry_run` - If true, don't write changes to disk
+pub fn merge_elements(
+    model_manager: &mut ModelManager,
+    target_name: &str,
+    source_names: &[String],
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    // Resolve target element by name
+    let target_element = model_manager.graph_registry.get_element_by_name(target_name)
+        .ok_or_else(|| ReqvireError::ElementNotFound(
+            format!("Target element '{}' not found", target_name)
+        ))?;
+    let target_id = target_element.identifier.clone();
+    let target_type = target_element.element_type.clone();
+
+    // Resolve all source elements and validate type compatibility
+    let mut source_ids = Vec::new();
+    for source_name in source_names {
+        let source_element = model_manager.graph_registry.get_element_by_name(source_name)
+            .ok_or_else(|| ReqvireError::ElementNotFound(
+                format!("Source element '{}' not found", source_name)
+            ))?;
+
+        // Check if source would merge into itself
+        if source_element.identifier == target_id {
+            return Err(ReqvireError::InvalidOperation(
+                "Cannot merge element into itself".to_string()
+            ));
+        }
+
+        // Check type compatibility
+        if !target_type.is_merge_compatible(&source_element.element_type) {
+            return Err(ReqvireError::MergeTypeMismatch(format!(
+                "Cannot merge '{}' ({}) into '{}' ({}): type mismatch. \
+                 Elements must be in the same category (requirement/verification/refinement/other).",
+                source_name, source_element.element_type.as_str(),
+                target_name, target_type.as_str()
+            )));
+        }
+
+        source_ids.push(source_element.identifier.clone());
+    }
+
+    // Track which files were modified before the operation
+    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
+        .iter()
+        .cloned()
+        .collect();
+
+    // Perform the merge in graph_registry
+    model_manager.graph_registry.merge_elements(&target_id, &source_ids)?;
+
+    // Get list of newly modified files (sorted for deterministic output)
+    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
+        .iter()
+        .filter(|f| !modified_before.contains(f))
+        .cloned()
+        .collect();
+    modified_files.sort();
+
+    // Generate diffs for output
+    let diffs = generate_crud_diffs(
+        &model_manager.graph_registry,
+        &modified_files,
+        git_root,
+    )?;
+
+    // Flush changes if not dry-run
+    if !dry_run {
+        model_manager.graph_registry.flush_modified_files(git_root)?;
+    }
+
+    // Create result structure
+    Ok(CrudResult {
+        operation: CrudOperation::Merge,
+        element_id: target_id,
+        element_name: format!("Merged {} element(s) into '{}'", source_names.len(), target_name),
+        diffs,
         dry_run,
     })
 }

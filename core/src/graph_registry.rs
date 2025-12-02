@@ -2369,6 +2369,206 @@ impl GraphRegistry {
         Ok((new_identifier, modified_files))
     }
 
+    /// Merge multiple source elements into a target element
+    ///
+    /// # Arguments
+    /// * `target_id` - Identifier of the target element (must exist)
+    /// * `source_ids` - Identifiers of source elements to merge into target (must exist)
+    ///
+    /// # Behavior
+    /// - Source content is appended to target's Details section
+    /// - Source Details sections become "Merged Details (source name)" subsections
+    /// - Relations and attachments are merged with deduplication
+    /// - Source elements are deleted after successful merge
+    /// - Relations pointing to source elements are redirected to target
+    pub fn merge_elements(
+        &mut self,
+        target_id: &str,
+        source_ids: &[String],
+    ) -> Result<(), ReqvireError> {
+        // Validate target exists
+        if !self.nodes.contains_key(target_id) {
+            return Err(ReqvireError::ElementNotFound(
+                format!("Target element '{}' not found", target_id)
+            ));
+        }
+
+        // Validate all sources exist and collect their data
+        let mut source_data: Vec<(String, String, String, Vec<crate::relation::Relation>, Vec<crate::element::Attachment>)> = Vec::new();
+        for source_id in source_ids {
+            let source_node = self.nodes.get(source_id)
+                .ok_or_else(|| ReqvireError::ElementNotFound(
+                    format!("Source element '{}' not found", source_id)
+                ))?;
+
+            let source_element = &source_node.element;
+            source_data.push((
+                source_id.clone(),
+                source_element.name.clone(),
+                source_element.content.clone(),
+                source_element.relations.iter()
+                    .filter(|r| r.user_created)
+                    .cloned()
+                    .collect(),
+                source_element.attachments.clone(),
+            ));
+        }
+
+        // Get target element data
+        let target_node = self.nodes.get(target_id).unwrap();
+        let target_file_path = target_node.element.file_path.clone();
+        let mut merged_content = String::new();
+        let mut merged_relations: Vec<crate::relation::Relation> = target_node.element.relations.iter()
+            .filter(|r| r.user_created)
+            .cloned()
+            .collect();
+        let mut merged_attachments: Vec<crate::element::Attachment> = target_node.element.attachments.clone();
+
+        // Process each source element
+        for (source_id, source_name, source_content, source_relations, source_attachments) in &source_data {
+            // Extract main content and details from source
+            let (main_content, details_content) = extract_content_parts(source_content);
+
+            // Add main content to merged content (will go into target's Details)
+            if !main_content.trim().is_empty() {
+                merged_content.push_str(&format!("\n{}\n", main_content.trim()));
+            }
+
+            // Add details to "Merged Details (element name)" subsection
+            if !details_content.trim().is_empty() {
+                merged_content.push_str(&format!(
+                    "\n#### Merged Details ({})\n{}\n",
+                    source_name, details_content.trim()
+                ));
+            }
+
+            // Collect relations
+            for rel in source_relations {
+                merged_relations.push(rel.clone());
+            }
+
+            // Collect attachments
+            for att in source_attachments {
+                merged_attachments.push(att.clone());
+            }
+
+            // Track source file as modified
+            let source_file = self.nodes.get(source_id).unwrap().element.file_path.clone();
+            self.modified_files.insert(source_file);
+        }
+
+        // Deduplicate relations by (relation_type, target)
+        let mut seen_relations: HashSet<(String, String)> = HashSet::new();
+        merged_relations.retain(|r| {
+            let key = (r.relation_type.name.to_string(), r.target.link.as_str().to_string());
+            if seen_relations.contains(&key) {
+                false
+            } else {
+                seen_relations.insert(key);
+                true
+            }
+        });
+
+        // Deduplicate attachments by target
+        let mut seen_attachments: HashSet<String> = HashSet::new();
+        merged_attachments.retain(|a| {
+            let key = a.target.as_str().to_string();
+            if seen_attachments.contains(&key) {
+                false
+            } else {
+                seen_attachments.insert(key);
+                true
+            }
+        });
+
+        // Check for cross-section duplicates
+        let relation_targets: HashSet<String> = merged_relations.iter()
+            .map(|r| r.target.link.as_str().to_string())
+            .collect();
+
+        for attachment in &merged_attachments {
+            let target = attachment.target.as_str();
+            if relation_targets.contains(&target) {
+                return Err(ReqvireError::MergeCrossSectionDuplicate(format!(
+                    "Target '{}' would appear in both Relations and Attachments after merge. Remove one before merging.",
+                    target
+                )));
+            }
+        }
+
+        // Update target element with merged data
+        {
+            let target_node = self.nodes.get_mut(target_id).unwrap();
+            let target_element = &mut target_node.element;
+
+            // Merge content into target's Details section
+            if !merged_content.trim().is_empty() {
+                target_element.content = merge_content_into_details(&target_element.content, &merged_content);
+            }
+
+            target_element.relations = merged_relations;
+            target_element.attachments = merged_attachments;
+        }
+
+        self.modified_files.insert(target_file_path);
+
+        // Redirect relations from other elements pointing to sources to point to target
+        for (source_id, _, _, _, _) in &source_data {
+            self.redirect_relations_to_target(source_id, target_id)?;
+        }
+
+        // Remove source elements (this also removes them from the graph)
+        for (source_id, _, _, _, _) in &source_data {
+            self.remove_element(source_id)?;
+        }
+
+        Ok(())
+    }
+
+    /// Redirect all relations pointing to source_id to point to target_id
+    fn redirect_relations_to_target(
+        &mut self,
+        source_id: &str,
+        target_id: &str,
+    ) -> Result<(), ReqvireError> {
+        // Find all nodes with relations pointing to source_id
+        let nodes_to_update: Vec<String> = self.nodes.iter()
+            .filter(|(id, node)| {
+                *id != source_id && *id != target_id &&
+                node.element.relations.iter().any(|r| {
+                    match &r.target.link {
+                        LinkType::Identifier(ref id) => {
+                            id == source_id || id.ends_with(&format!("#{}", source_id))
+                        },
+                        _ => false,
+                    }
+                })
+            })
+            .map(|(id, _)| id.clone())
+            .collect();
+
+        for node_id in nodes_to_update {
+            if let Some(node) = self.nodes.get_mut(&node_id) {
+                let file_path = node.element.file_path.clone();
+                for relation in &mut node.element.relations {
+                    if let LinkType::Identifier(ref id) = relation.target.link {
+                        if id == source_id || id.ends_with(&format!("#{}", source_id)) {
+                            // Update to point to target
+                            relation.target = crate::relation::RelationTarget {
+                                text: target_id.to_string(),
+                                link: LinkType::Identifier(target_id.to_string()),
+                                element_id: Some(target_id.to_string()),
+                            };
+                        }
+                    }
+                }
+                self.modified_files.insert(file_path);
+            }
+        }
+
+        Ok(())
+    }
+
     /// Flushes only modified files to directory (optimization)
     pub fn flush_modified_files(&self, directory: &Path) -> Result<(), ReqvireError> {
         if self.modified_files.is_empty() {
@@ -2398,6 +2598,55 @@ impl GraphRegistry {
     /// Clears the modified files tracking
     pub fn clear_modified_files(&mut self) {
         self.modified_files.clear();
+    }
+}
+
+/// Extract main content and details section from element content
+///
+/// Returns (main_content, details_content) where:
+/// - main_content: Everything before the first "#### Details" header
+/// - details_content: Everything after "#### Details" header until the next #### section
+fn extract_content_parts(content: &str) -> (String, String) {
+    let details_marker = "#### Details";
+    if let Some(pos) = content.find(details_marker) {
+        let main = content[..pos].to_string();
+        let after_marker = pos + details_marker.len();
+        let rest = &content[after_marker..];
+
+        // Find end of details (next #### or end)
+        let details_end = rest.find("\n#### ")
+            .map(|p| p)
+            .unwrap_or(rest.len());
+
+        (main, rest[..details_end].to_string())
+    } else {
+        (content.to_string(), String::new())
+    }
+}
+
+/// Merge additional content into the Details section of target content
+fn merge_content_into_details(target_content: &str, additional: &str) -> String {
+    if additional.trim().is_empty() {
+        return target_content.to_string();
+    }
+
+    let details_marker = "#### Details";
+    if let Some(pos) = target_content.find(details_marker) {
+        // Find end of existing details
+        let after_marker = pos + details_marker.len();
+        let rest = &target_content[after_marker..];
+        let details_end = rest.find("\n#### ")
+            .map(|p| after_marker + p)
+            .unwrap_or(target_content.len());
+
+        // Insert additional content at end of Details
+        let mut result = target_content[..details_end].to_string();
+        result.push_str(additional);
+        result.push_str(&target_content[details_end..]);
+        result
+    } else {
+        // No Details section - create one
+        format!("{}\n#### Details\n{}", target_content.trim_end(), additional)
     }
 }
 

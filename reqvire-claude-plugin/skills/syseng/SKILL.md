@@ -124,6 +124,16 @@ Use for requirement statements:
 4. Validate after each significant change
 5. When reading requirements, always check for **attachments** (documents, diagrams, images)
 
+## Model Optimization
+
+When the model becomes cluttered with duplicate or over-fragmented requirements:
+
+- **Merge duplicates**: Use `reqvire merge` to combine overlapping elements
+- **Consolidate children**: Use `/reqvire:consolidate` for intelligent merge + cleanup workflow
+- **Squash files**: Use `reqvire mv-file --squash` to combine specification files
+
+See [REFACTOR.md](REFACTOR.md) for complete refactoring and optimization guidance.
+
 ## Task-Specific References
 
 Load the appropriate reference file based on the task:

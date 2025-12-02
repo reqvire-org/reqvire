@@ -17,6 +17,7 @@ Commands:
   rm                Remove element from model
   mv                Move element to different location
   rename            Rename element
+  merge             Merge multiple elements into target element
   mv-file           Move entire specification file with all its elements
   link              Add relation or attachment between elements
   unlink            Remove relation or attachment between elements (auto-detects type)
@@ -85,6 +86,7 @@ LINT OPTIONS:
 
 ADD OPTIONS:
        <FILE>                   Target file path (relative to git repository root)
+      --override                Replace existing element with same name
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
 
@@ -102,6 +104,12 @@ MV OPTIONS:
 RENAME OPTIONS:
        <ELEMENT_NAME>           Current element name
        <NEW_NAME>               New element name
+      --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+
+MERGE OPTIONS:
+       <TARGET>                 Target element name (receives merged content)
+       <SOURCES>                One or more source element names to merge into target
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
 

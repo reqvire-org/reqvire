@@ -21,3 +21,29 @@ Validation rules for target paths in element operations.
 #### Relations
   * satisfy: [Target Location Validation and Auto-Creation](ElementManipulation.md#target-location-validation-and-auto-creation)
 ---
+
+### Merge Type Compatibility Constraint
+
+Type compatibility rules for merging elements.
+
+#### Details
+**Main Type Categories:**
+- **Requirement types**: `requirement`, `user-requirement`
+- **Verification types**: `test-verification`, `analysis-verification`, `inspection-verification`, `demonstration-verification`
+- **Refinement types**: `constraint`, `behavior`, `specification`
+- **Other**: Any element type not in above categories
+
+**Compatibility Rules:**
+- Source and target must be in the same main type category
+- Subtype differences within a category are allowed (e.g., `user-requirement` can merge into `requirement`)
+- Merging across categories is forbidden (e.g., requirement cannot merge into verification)
+
+**Error Messages:**
+- When incompatible: "Cannot merge {source_type} into {target_type}: type mismatch"
+
+#### Metadata
+  * type: constraint
+
+#### Relations
+  * satisfy: [Merge Element Operation](ElementManipulation.md#merge-element-operation)
+---

@@ -63,6 +63,7 @@ Commands:
   rm                Remove element from model
   mv                Move element to different location
   rename            Rename element
+  merge             Merge multiple elements into target element
   mv-file           Move entire specification file
   link              Add relation or attachment between elements
   unlink            Remove relation or attachment (auto-detects)
@@ -87,6 +88,7 @@ Options:
   * derive: [CLI Containment Command](#cli-containment-command)
   * derive: [CLI Coverage Command](#cli-coverage-command)
   * derive: [CLI Lint Command](#cli-lint-command)
+  * derive: [CLI Merge Element Command](#cli-merge-element-command)
   * derive: [CLI Model Diagram Command](#cli-model-diagram-command)
   * derive: [CLI Move Asset Command](#cli-move-asset-command)
   * derive: [CLI Move Element Command](#cli-move-element-command)
@@ -387,6 +389,34 @@ The `mv-file` command shall:
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * verifiedBy: [Subdirectory Processing Verification](../System/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification)
   * verifiedBy: [CLI Move File Test](../System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test)
+---
+
+### CLI Merge Element Command
+
+The system shall provide a `merge` command to combine multiple elements into a target element.
+
+#### Details
+The `merge` command shall:
+- Accept target element name as first required positional argument
+- Accept one or more source element names as subsequent required arguments
+- Support command syntax: `reqvire merge <target> <source1> [source2...]`
+- Apply changes immediately by default
+- Support `--dry-run` flag to preview changes without applying
+- Output git-style diff showing all affected files by default
+- Support `--json` flag for structured output
+- Exit with code 0 on success, non-zero on error
+
+#### Attachments
+  * [Merge Content Transformation Behavior](../System/Operations/Behaviors.md#merge-content-transformation-behavior)
+  * [Merge Type Compatibility Constraint](../System/Operations/Constraints.md#merge-type-compatibility-constraint)
+  * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * derivedFrom: [Merge Element Operation](../System/Operations/ElementManipulation.md#merge-element-operation)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 
 ### CLI Remove Asset Command

@@ -224,10 +224,14 @@ pub enum Commands {
     },
 
     /// Add new element to model from Markdown definition
-    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>  # reads element from stdin")]
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --override                 Replace existing element with same name\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>  # reads element from stdin")]
     Add {
         /// Target file path (relative to git repository root)
         file: String,
+
+        /// Replace existing element with same name
+        #[clap(long = "override", help_heading = "ADD OPTIONS")]
+        override_existing: bool,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "ADD OPTIONS")]
@@ -286,6 +290,25 @@ pub enum Commands {
 
         /// Output results in JSON format
         #[clap(long, help_heading = "RENAME OPTIONS")]
+        json: bool,
+    },
+
+    /// Merge multiple elements into target element
+    #[clap(override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and attachments are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Verifications can merge into verifications (of any subtype)\n    - Refinements can merge into refinements (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Feature A\" \"Feature B\" --dry-run")]
+    Merge {
+        /// Target element name (receives merged content)
+        target: String,
+
+        /// One or more source element names to merge into target
+        #[clap(required = true, num_args = 1..)]
+        sources: Vec<String>,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "MERGE OPTIONS")]
+        dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MERGE OPTIONS")]
         json: bool,
     },
 
@@ -878,7 +901,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Add { file, dry_run, json }) => {
+        Some(Commands::Add { file, override_existing, dry_run, json }) => {
             // Read element markdown from stdin
             use std::io::Read;
             let mut element_markdown = String::new();
@@ -900,6 +923,7 @@ pub fn handle_command(
                 &current_dir,
                 &git_root,
                 dry_run,
+                override_existing,
             )?;
 
             // Output result
@@ -968,6 +992,26 @@ pub fn handle_command(
                 &mut model_manager,
                 &element_id,
                 &new_name,
+                &git_root,
+                dry_run,
+            )?;
+
+            // Output result
+            if json {
+                println!("{}", render_crud_json(&result));
+            } else {
+                render_crud_result(&result);
+            }
+
+            return Ok(0);
+        },
+        Some(Commands::Merge { target, sources, dry_run, json }) => {
+            // Call CRUD operation
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = crud::merge_elements(
+                &mut model_manager,
+                &target,
+                &sources,
                 &git_root,
                 dry_run,
             )?;

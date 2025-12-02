@@ -167,6 +167,23 @@ impl ElementType {
     pub fn is_refinement(&self) -> bool {
         matches!(self, ElementType::Refinement(_))
     }
+
+    /// Returns the main type category for merge compatibility
+    pub fn main_category(&self) -> &'static str {
+        match self {
+            ElementType::Requirement(_) => "requirement",
+            ElementType::Verification(_) => "verification",
+            ElementType::Refinement(_) => "refinement",
+            ElementType::File => "file",
+            ElementType::Other(_) => "other",
+        }
+    }
+
+    /// Check if two element types are merge-compatible
+    /// Elements are merge-compatible if they belong to the same main type category
+    pub fn is_merge_compatible(&self, other: &ElementType) -> bool {
+        self.main_category() == other.main_category()
+    }
 }
 
 #[derive(Debug, Clone, Serialize)]

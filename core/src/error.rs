@@ -141,4 +141,16 @@ pub enum ReqvireError {
     #[error("Element not found: {0}")]
     ElementNotFound(String),
 
+    #[allow(dead_code)]
+    #[error("Merge type mismatch: {0}")]
+    MergeTypeMismatch(String),
+
+    #[allow(dead_code)]
+    #[error("Merge cross-section duplicate: {0}")]
+    MergeCrossSectionDuplicate(String),
+
+    #[allow(dead_code)]
+    #[error("Invalid operation: {0}")]
+    InvalidOperation(String),
+
 }

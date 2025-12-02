@@ -79,6 +79,44 @@ Elements shall be ordered so that parent elements appear before their children (
   * type: behavior
 ---
 
+### Merge Content Transformation Behavior
+
+Content transformation rules for the merge elements operation.
+
+#### Details
+**Content Merging:**
+1. For each source element in order:
+   - If source has main content (before any #### subsection): append to target's `#### Details`
+   - If source has `#### Details`: create `#### Merged Details (Source Name)` with that content
+2. Preserve target's original content structure
+3. Merged content appears after target's existing Details section (or creates one)
+
+**Relation Deduplication:**
+- Relations are deduplicated by (relation_type, target) pair
+- First occurrence is kept (target's relations take precedence)
+- Different relation types to same target are NOT duplicates
+
+**Attachment Deduplication:**
+- Attachments are deduplicated by target identifier/path
+- First occurrence is kept (target's attachments take precedence)
+
+**Cross-Section Duplicate Check:**
+- Before merge completes, validate no target appears in both Relations AND Attachments
+- If cross-section duplicate detected, abort merge with error listing duplicates
+- User must resolve by removing one of the duplicates before retrying
+
+**Relation Redirection:**
+- Find all elements with relations pointing to source elements
+- Update those relations to point to target element's identifier
+- This includes both forward and backward relations
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Merge Element Operation](ElementManipulation.md#merge-element-operation)
+---
+
 ### File Persistence Behavior
 
 How element manipulation operations persist changes to files:

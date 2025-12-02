@@ -649,6 +649,30 @@ The test shall verify that the `mv-file --squash` command moves all elements fro
   * verify: [Move File Operation](../ElementManipulation.md#move-file-operation)
 ---
 
+### Merge Elements Test
+
+Test verifies that the merge command correctly combines elements.
+
+#### Details
+Test cases:
+1. **Basic merge**: Merge two requirements, verify content consolidation
+2. **Multi-element merge**: Merge 3+ elements into target
+3. **Cross-file merge**: Merge elements from different files
+4. **Relation merging**: Verify relations are merged and deduplicated
+5. **Attachment merging**: Verify attachments are merged and deduplicated
+6. **Type compatibility**: Verify error when merging incompatible types
+7. **Cross-section duplicate**: Verify error when merged result has cross-section duplicate
+8. **Relation redirection**: Verify relations pointing to source are updated to target
+9. **Source deletion**: Verify source elements are removed after merge
+10. **Dry-run mode**: Verify no changes when --dry-run is used
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Merge Element Operation](../ElementManipulation.md#merge-element-operation)
+---
+
 ### Relation Consistency Test
 
 The test shall verify that bidirectional relation consistency is maintained when elements are manipulated.

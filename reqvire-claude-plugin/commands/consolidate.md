@@ -1,12 +1,12 @@
 ---
-allowed-tools: Read, Edit, Bash(reqvire:*)
-description: Consolidate refinement-only child requirements into their parent requirements' Details sections to improve model organization
+allowed-tools: Read, Bash(reqvire:*)
+description: Consolidate elements using automated merge + intelligent cleanup workflow
 model: claude-sonnet-4-5-20250929
 ---
 
 # Consolidate Requirements Model
 
-Consolidate child requirements that only refine their parents (without introducing new capabilities) into the parent requirement's Details section. This improves model readability by merging implementation-level details into their conceptual parents while maintaining full traceability.
+Consolidate child requirements that only refine their parents (without introducing new capabilities) into the parent requirement. This uses a two-phase workflow: automated merge followed by intelligent content cleanup.
 
 ## When to Use
 
@@ -15,6 +15,10 @@ Use this command when:
 - Child requirements only elaborate on implementation details of parents
 - You want to reduce model clutter while preserving all information
 - Requirements are split via derivedFrom relations but don't add new capabilities
+
+**When to use consolidate vs direct merge:**
+- **Direct merge** (`reqvire merge`): Quick merge when raw output is acceptable, or when merging duplicates
+- **Consolidate** (`/reqvire:consolidate`): When content needs intelligent restructuring - AI reads merged element, fixes the body, and overrides with clean version
 
 ## Consolidation Heuristics
 
@@ -30,25 +34,26 @@ A child requirement is a candidate for consolidation if it meets **multiple** of
 
 ## Process Overview
 
-The consolidation follows this systematic approach:
+The consolidation follows a **two-phase** approach:
 
-1. **Identify Candidates**: Find parent-child pairs where child is refinement-only
-2. **Merge Content**: Move child requirement content into parent's Details section
-3. **Move Relations**: Transfer all child relations (satisfiedBy, verifiedBy, etc.) to parent
-4. **Remove Child**: Delete the child requirement element entirely
-5. **Update References**: Find and update all references to child to point to parent
-6. **Validate**: Ensure no broken relations after consolidation
+**Phase 1: Automated Merge**
+Use `reqvire merge` to combine elements. This automatically:
+- Appends source content to target's Details section
+- Creates "Merged Details (Source Name)" subsections
+- Merges and deduplicates relations
+- Redirects all references to sources to point to target
+- Deletes source elements
+
+**Phase 2: Intelligent Cleanup (CRITICAL)**
+Read the merged element, restructure its content to remove merge artifacts, and override with the clean version using `reqvire add --override`.
 
 ## Steps
 
-### 1. Analyze Model for Candidates
+### Step 1: Analyze Model for Candidates
 
 First, analyze the model to identify consolidation candidates:
 
 ```bash
-# Remove diagrams to save tokens
-reqvire remove-diagrams
-
 # Get model structure
 reqvire search --short --json > /tmp/search.json
 ```
@@ -59,250 +64,224 @@ Review the model structure and identify parent-child requirement pairs based on:
 - Content length and complexity
 - Presence of verifications
 
-### 2. Review and Prioritize Candidates
+### Step 2: Execute Merge
 
-For each candidate family, document:
-- **Parent requirement**: File location, section, heading
-- **Child requirements**: List of elements to consolidate
-- **Justification**: Which heuristics apply (similar names, short content, etc.)
-- **Relations to move**: All satisfiedBy, verifiedBy, trace relations from children
-- **References to update**: Other elements that reference the children
-
-Prioritize by:
-- **High priority**: Clear refinement patterns, minimal relations, obvious implementation details
-- **Medium priority**: Mixed signals, moderate impact
-- **Low priority**: Substantial content, many verifications, borderline cases
-
-### 3. Execute Consolidation (Per Requirement Family)
-
-For each requirement family to consolidate:
-
-#### 3.1 Read Parent and Children
+Once candidates are identified, execute the merge:
 
 ```bash
-# Read the parent requirement file
-Read requirements/path/to/ParentFile.md
+# Preview the merge first (recommended)
+reqvire merge "<target-element>" "<source1>" "<source2>" --dry-run
 
-# Read sections containing children if in different files
-Read requirements/path/to/ChildFile.md
-```
-
-#### 3.2 Create Enhanced Parent Details
-
-Edit the parent requirement to add consolidated content from children:
-
-**Structure for consolidated Details section:**
-```markdown
-#### Details
-
-[Existing parent details content]
-
-**[Child 1 Heading]:**
-[Child 1 description and key details]
-
-[Child 1 specific details as subsections or bullets]
-
-**[Child 2 Heading]:**
-[Child 2 description and key details]
-
-[Child 2 specific details as subsections or bullets]
+# Execute the merge
+reqvire merge "<target-element>" "<source1>" "<source2>"
 ```
 
 **Example:**
+```bash
+# Merge two child refinements into parent
+reqvire merge "Format Consistency Enforcement" "Excess Whitespace Format" "Missing Separators Format"
+```
+
+### Step 3: Read Merged Element (CRITICAL)
+
+After merge, read the merged element to see the raw output:
+
+```bash
+# Read the merged element to see what needs cleanup
+reqvire search --filter-name="<target-name>" --json
+```
+
+The merged element will have **artifacts that need cleanup**:
+- `#### Merged Details (Source Name)` subsections for each merged source
+- Potentially duplicated content
+- Awkward structure from concatenation
+- Multiple "Details" sections or subsections
+
+**Example of merge artifacts:**
 ```markdown
-#### Details
+### Format Consistency Enforcement
 
 The system shall provide formatting capability...
+
+#### Details
+
+[Original parent details]
+
+#### Merged Details (Excess Whitespace Format)
+
+Detect and fix excess whitespace after element headers...
+
+#### Merged Details (Missing Separators Format)
+
+Detect consecutive element sections...
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Model Formatting]
+  * satisfiedBy: [format.rs]
+```
+
+### Step 4: Prepare Fixed Element Body (CRITICAL)
+
+Analyze the merged content and create a **clean, restructured version**:
+
+1. **Remove all `#### Merged Details (X)` subsection headers** - These are merge artifacts
+2. **Integrate all content logically into a single `#### Details` section** - Combine related information
+3. **Remove duplicate information** - Merge may have introduced redundancy
+4. **Ensure proper EARS statement structure** - Main content should be clear requirement statement
+5. **Maintain all Relations** - These are already correctly merged, keep them intact
+6. **Keep Metadata and Attachments** - Preserve these unchanged
+
+**Example of clean, restructured content:**
+```markdown
+### Format Consistency Enforcement
+
+The system shall provide formatting capability for maintaining consistent document structure.
+
+#### Details
 
 **Excess Whitespace:**
 - Detect and fix excess whitespace after element headers
 - Maintain consistent formatting across all requirements documents
 
-**Inconsistent Newlines:**
-- Detect and fix excess or missing newlines before element headers
-- Normalize to exactly two newlines before subsections
-```
+**Missing Separators:**
+- Detect consecutive element sections that lack separators
+- Insert separators to maintain consistent visual separation
 
-#### 3.3 Merge Relations to Parent
+#### Metadata
+  * type: requirement
 
-Add all relations from children to the parent's Relations section:
-
-```markdown
 #### Relations
-  * derivedFrom: [Existing Parent Relations]
-  * satisfiedBy: [parent-file.rs]
-  * satisfiedBy: [child1-file.rs]  # Moved from Child 1
-  * satisfiedBy: [child2-file.rs]  # Moved from Child 2
-  * verifiedBy: [Parent Verification]
-  * verifiedBy: [Child Verification]  # Moved from Child 1
+  * derivedFrom: [Model Formatting](../ModelFormatting.md#model-formatting)
+  * satisfiedBy: [format.rs](../../core/src/format.rs)
 ```
 
-#### 3.4 Remove Child Requirements
+### Step 5: Override with Fixed Content (CRITICAL)
 
-Delete each child requirement entirely (full H3 section including heading, content, metadata, relations, separator):
-
-```markdown
-### Child Requirement Name
-
-[DELETE THIS ENTIRE SECTION]
-
----
-```
-
-#### 3.5 Update References to Children
-
-Search for any elements that reference the removed children:
+Replace the merged element with the clean version:
 
 ```bash
-# Search for references to the child
-reqvire search --filter-name="Child.*Name" --json
-```
+reqvire add "<file-path>" --override <<'EOF'
+### <Element Name>
 
-For each reference found, update it to point to the parent:
-
-**Before:**
-```markdown
-* verifiedBy: [Child Requirement](File.md#child-requirement)
-```
-
-**After:**
-```markdown
-* verifiedBy: [Parent Requirement](File.md#parent-requirement)
-```
-
-#### 3.6 Validate After Each Family
-
-```bash
-# Validate model after consolidating each family
-reqvire validate
-
-# If validation passes, continue to next family
-# If validation fails, fix broken references before continuing
-```
-
-### 4. Final Validation and Formatting
-
-After all consolidations:
-
-```bash
-# Validate entire model
-reqvire validate
-
-# Format all files
-reqvire format --fix
-
-# Regenerate diagrams
-reqvire generate-diagrams
-
-# Final validation
-reqvire validate
-```
-
-## Consolidation Examples
-
-### Example 1: Format Implementation Family
-
-**Before Consolidation:**
-```markdown
-### Format Consistency Enforcement
-The system shall provide formatting capability...
-#### Relations
-  * derivedFrom: [Model Formatting]
-
----
-
-### Excess Whitespace Format Implementation
-Detect and fix excess whitespace...
-#### Relations
-  * derivedFrom: [Format Consistency Enforcement]
-  * satisfiedBy: [format.rs]
-
----
-
-### Missing Separators Format Implementation
-Detect consecutive element sections...
-#### Relations
-  * derivedFrom: [Format Consistency Enforcement]
-  * satisfiedBy: [format.rs]
-```
-
-**After Consolidation:**
-```markdown
-### Format Consistency Enforcement
-The system shall provide formatting capability...
+<Clean main content - EARS statement>
 
 #### Details
+
+<Consolidated details - all merged content properly integrated>
+
+#### Metadata
+  * type: <type>
+
+#### Relations
+  * <all merged relations - copy exactly from merged element>
+---
+EOF
+```
+
+**Example:**
+```bash
+reqvire add "requirements/SystemRequirements/Formatting.md" --override <<'EOF'
+### Format Consistency Enforcement
+
+The system shall provide formatting capability for maintaining consistent document structure.
+
+#### Details
+
 **Excess Whitespace:**
 - Detect and fix excess whitespace after element headers
-- Maintain consistent formatting
+- Maintain consistent formatting across all requirements documents
 
 **Missing Separators:**
 - Detect consecutive element sections that lack separators
 - Insert separators to maintain consistent visual separation
 
+#### Metadata
+  * type: requirement
+
 #### Relations
-  * derivedFrom: [Model Formatting]
-  * satisfiedBy: [format.rs]
+  * derivedFrom: [Model Formatting](../ModelFormatting.md#model-formatting)
+  * satisfiedBy: [format.rs](../../core/src/format.rs)
+---
+EOF
 ```
 
-### Example 2: CLI Options Family
+### Step 6: Validate
 
-**Before:**
-```markdown
-### CLI Traces Command
-The system shall implement traces subcommand...
-#### Relations
-  * derivedFrom: [Verification Trace Builder]
+After cleanup, validate the model:
 
----
+```bash
+# Validate model
+reqvire validate
 
-### CLI Traces Filter Options
-Support filtering verification traces...
-#### Relations
-  * derivedFrom: [CLI Traces Command]
-
----
-
-### CLI Traces From-Folder Option
-Support --from-folder option...
-#### Relations
-  * derivedFrom: [CLI Traces Command]
+# If validation passes, continue to next consolidation
+# If validation fails, fix issues before continuing
 ```
 
-**After:**
-```markdown
+### Step 7: Format and Final Validation
+
+After all consolidations:
+
+```bash
+# Format all files
+reqvire format --fix
+
+# Final validation
+reqvire validate
+```
+
+## Complete Workflow Example
+
+Here's a complete example consolidating CLI option children into parent:
+
+```bash
+# 1. Identify candidates
+reqvire search --filter-name="CLI Traces" --short
+# Found: CLI Traces Command, CLI Traces Filter Options, CLI Traces From-Folder Option
+
+# 2. Execute merge
+reqvire merge "CLI Traces Command" "CLI Traces Filter Options" "CLI Traces From-Folder Option"
+
+# 3. Read merged element
+reqvire search --filter-name="CLI Traces Command" --json
+# Shows element with "Merged Details" sections
+
+# 4. Prepare and override with clean version
+reqvire add "requirements/CLI/Commands.md" --override <<'EOF'
 ### CLI Traces Command
-The system shall implement traces subcommand...
+
+The system shall implement traces subcommand for generating verification trace reports.
 
 #### Details
-[Original command details]
+
+The traces command outputs verification traces showing upward paths from verifications to root requirements.
 
 **Filter Options:**
 The system shall support filtering verification traces by:
-- --filter-id=<id>: Filter by verification element ID
-- --filter-name=<regex>: Filter by name pattern
-- --filter-type=<type>: Filter by verification type
+- `--filter-id=<id>`: Filter by verification element ID
+- `--filter-name=<regex>`: Filter by name pattern
+- `--filter-type=<type>`: Filter by verification type
 
 **From-Folder Option:**
-Support --from-folder option that specifies relative path for portable links:
+Support `--from-folder` option that specifies relative path for portable links:
 - Accept relative path parameter
 - Adjust clickable links in diagrams to be relative
 - Work with both Markdown and JSON output
 
+#### Metadata
+  * type: requirement
+
 #### Relations
-  * derivedFrom: [Verification Trace Builder]
-  * satisfiedBy: [cli.rs]
+  * derivedFrom: [Verification Trace Builder](../Features.md#verification-trace-builder)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+---
+EOF
+
+# 5. Validate
+reqvire validate
 ```
-
-## Best Practices
-
-1. **Work incrementally**: Consolidate one requirement family at a time
-2. **Validate frequently**: Run `reqvire validate` after each consolidation
-3. **Preserve all information**: Don't lose any technical details during consolidation
-4. **Maintain traceability**: Move ALL relations from children to parent
-5. **Update references**: Search and fix all references to removed children
-6. **Test thoroughly**: Ensure model validates and all links work after consolidation
-7. **Document decisions**: Keep notes on which families were consolidated and why
 
 ## Anti-Patterns (When NOT to Consolidate)
 
@@ -326,9 +305,8 @@ After consolidation, the model will have:
 ## Verification
 
 After consolidation is complete, verify:
-- ✅ Model validates with no errors: `reqvire validate`
-- ✅ All relations are preserved (no missing targets)
-- ✅ Verification coverage percentage unchanged or improved
-- ✅ Test verifications still link correctly to requirements
-- ✅ Diagrams generate without errors: `reqvire generate-diagrams`
-- ✅ Documentation exports correctly: `reqvire export --html`
+- Model validates with no errors: `reqvire validate`
+- All relations are preserved (no missing targets)
+- Verification coverage percentage unchanged or improved
+- Test verifications still link correctly to requirements
+- Documentation exports correctly: `reqvire export`

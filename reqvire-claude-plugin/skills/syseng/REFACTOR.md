@@ -99,12 +99,36 @@ Look for specification elements with empty relations. For each:
 
 ## Merging Duplicate Requirements
 
-When you find overlapping requirements:
+When you find overlapping requirements, use `reqvire merge`:
 
-1. Identify the more comprehensive requirement
-2. Merge details from the duplicate into the main requirement
-3. Move relations (verifiedBy, derivedFrom) to the merged requirement
-4. Delete the duplicate using `reqvire rm "Element Name"`
+```bash
+# Preview the merge
+reqvire merge "Primary Requirement" "Duplicate Requirement" --dry-run
+
+# Execute the merge
+reqvire merge "Primary Requirement" "Duplicate Requirement"
+
+# Merge multiple sources at once
+reqvire merge "Main Feature" "Feature Part A" "Feature Part B"
+```
+
+The merge command:
+1. Consolidates content from duplicate into primary's Details section
+2. Merges all relations (verifiedBy, derivedFrom, etc.) with deduplication
+3. Updates all references pointing to duplicate to point to primary
+4. Deletes the duplicate element
+
+**Type compatibility:**
+- Requirements merge with requirements (all subtypes compatible)
+- Verifications merge with verifications
+- Refinements (constraint, behavior, specification) merge with each other
+
+**When to merge vs when to link:**
+- **Merge**: Elements express the same capability (duplicates)
+- **Link (derivedFrom)**: Elements have hierarchical relationship (parent/child)
+- **Link (trace)**: Elements are related but represent distinct capabilities
+
+**Post-merge cleanup**: If the merged result needs content restructuring (removing "Merged Details" artifacts), use `/reqvire:consolidate` to read, fix, and override with clean content.
 
 ## When to Split Requirements (using derivedFrom)
 
