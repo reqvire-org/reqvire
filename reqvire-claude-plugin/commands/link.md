@@ -81,7 +81,8 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 
 ## Important Notes
 
-- **Idempotent**: Running the same link command twice has no effect (no duplicates)
+- **Duplicate detection**: The link command fails with an error if the relation or attachment already exists
+- **Cross-section duplicates**: Cannot add a relation to a target that already exists as an attachment (and vice versa) - this is a validation error
 - **Element names**: Use the exact element name as it appears in the heading
 - **Cross-file links**: Relative paths are calculated automatically
 - **Inverse relations**: Reqvire auto-generates inverse relations (e.g., derive from derivedFrom)
@@ -101,6 +102,8 @@ The link operation will fail with a clear error if:
 - The target element does not exist (for element relations)
 - The relation type is invalid
 - For attaching: the target element is not a Refinement type
+- The relation or attachment already exists (duplicate)
+- The target already exists in the other section (cross-section duplicate)
 
 ## Examples
 
