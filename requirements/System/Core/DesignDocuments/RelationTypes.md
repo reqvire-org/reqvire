@@ -14,30 +14,36 @@ A relation type in Reqvire:
 
 Relations are categorized by their usage in different system functions:
 
-1. **Diagram Rendering** - Relations that are rendered in visual diagrams to avoid duplicate arrows
+1. **Diagram Rendering (Forward)** - Relations that are rendered in visual diagrams to avoid duplicate arrows
    - Only one relation from each opposite pair is shown (e.g., `derive` but not `derivedFrom`)
+   - Used for forward traversal (root to leaf) in model views
    - Those are: `derive`, `satisfiedBy`, `verifiedBy`, `trace`
 
-2. **Change Propagation** - Relations through which changes propagate to dependent elements
+2. **Reverse Traversal (Backward)** - Relations used for leaf-to-root traversal
+   - Opposite of diagram rendering relations
+   - Used for reverse model views and upward traceability
+   - Those are: `derivedFrom`, `satisfy`, `verify`
+
+3. **Change Propagation** - Relations through which changes propagate to dependent elements
    - When an element changes, impact flows through these relation types
    - Those are: `derive`, `satisfiedBy`, `verifiedBy`
 
-3. **Verification traces**: Relations through which propagation from the verification element to requirements in traced (verification roll-up)
+4. **Verification traces**: Relations through which propagation from the verification element to requirements in traced (verification roll-up)
    - Trace which requirements verification verifies: directly or indirecty
      - Parents inherit status from children via derive (e.g., ALL children verified => parent Verified).
    - Those are: `derivedFrom`
 
 ## Comprehensive Relation Type Table
 
-| Relation Type | Opposite Type | Diagram Rendering | Change Propagation | Description |
-|---------------|---------------|-------------------|-------------------|-------------|
-| **derivedFrom** | derive | No | No | Links a child element to the parent element it is derived from |
-| **derive** | derivedFrom | Yes | Yes | Links a parent element to child elements derived from it |
-| **satisfiedBy** | satisfy | Yes | Yes | Links a requirement to elements that satisfy it |
-| **satisfy** | satisfiedBy | No | No | Links an implementation to the requirement it satisfies |
-| **verifiedBy** | verify | Yes | Yes | Links a requirement to verification artifacts |
-| **verify** | verifiedBy | No | No | Links a verification artifact to the requirement it verifies |
-| **trace** | None | Yes | No | Establishes a trace relationship without change propagation |
+| Relation Type | Opposite Type | Forward Traversal | Reverse Traversal | Change Propagation | Description |
+|---------------|---------------|-------------------|-------------------|-------------------|-------------|
+| **derivedFrom** | derive | No | Yes | No | Links a child element to the parent element it is derived from |
+| **derive** | derivedFrom | Yes | No | Yes | Links a parent element to child elements derived from it |
+| **satisfiedBy** | satisfy | Yes | No | Yes | Links a requirement to elements that satisfy it |
+| **satisfy** | satisfiedBy | No | Yes | No | Links an implementation to the requirement it satisfies |
+| **verifiedBy** | verify | Yes | No | Yes | Links a requirement to verification artifacts |
+| **verify** | verifiedBy | No | Yes | No | Links a verification artifact to the requirement it verifies |
+| **trace** | None | Yes | No | No | Establishes a trace relationship without change propagation |
 
 ## Relation Categories
 

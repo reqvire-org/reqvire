@@ -259,23 +259,24 @@ fi
 rm -rf "${TEMP_NO_CUSTOM}"
 
 # Test 6: Filter Interaction - Verify custom type counts with filters
+# Custom types must be filtered using the pattern "other-TYPENAME"
 echo "Test 6: Verifying custom type counts with filter-type" >> "${TEST_DIR}/test_results.log"
 
-# Filter to show only use-case custom type elements
+# Filter to show only use-case custom type elements using "other-use-case" pattern
 set +e
-OUTPUT_FILTERED_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="use-case" 2>&1)
+OUTPUT_FILTERED_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="other-use-case" 2>&1)
 EXIT_CODE=$?
 set -e
 
 if [ $EXIT_CODE -ne 0 ]; then
-    echo "FAILED: search --json --filter-type=use-case exited with code $EXIT_CODE"
+    echo "FAILED: search --json --filter-type=other-use-case exited with code $EXIT_CODE"
     exit 1
 fi
 
 # Total elements should be 3 (only use-case elements)
 FILTERED_TOTAL=$(echo "$OUTPUT_FILTERED_JSON" | jq '.global_counters.total_elements')
 if [ "$FILTERED_TOTAL" -ne 3 ]; then
-    echo "FAILED: Expected 3 elements with filter-type=use-case, got: $FILTERED_TOTAL"
+    echo "FAILED: Expected 3 elements with filter-type=other-use-case, got: $FILTERED_TOTAL"
     exit 1
 fi
 

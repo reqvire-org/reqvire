@@ -99,6 +99,14 @@ pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
     "verifiedBy",    // Requirement changes invalidate verifications
 ];
 
+/// Backward relations for reverse model traversal (opposite of DIAGRAM_RELATIONS)
+/// These traverse from leaves upward to roots
+pub const BACKWARD_RELATIONS: &[&str] = &[
+    "derivedFrom",   // Opposite of derive
+    "satisfy",       // Opposite of satisfiedBy
+    "verify",        // Opposite of verifiedBy
+];
+
 
 /// Relation type for verification
 pub const VERIFY_RELATION: &str = "verify";
@@ -293,6 +301,13 @@ pub fn needs_review(relation_type: &str) -> bool {
 /// Get the list of all supported relation types
 pub fn get_supported_relation_types() -> Vec<&'static str> {
     RELATION_TYPES.keys().cloned().collect()
+}
+
+/// Get a formatted string of all supported relation types for error messages
+pub fn supported_relation_types_list() -> String {
+    let mut types: Vec<&str> = RELATION_TYPES.keys().cloned().collect();
+    types.sort();
+    types.join(", ")
 }
 
 /// Get the list of general parent relation types (backward dependencies).

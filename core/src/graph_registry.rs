@@ -920,6 +920,67 @@ impl GraphRegistry {
         roots
     }
 
+    /// Find leaf elements for reverse traversal
+    /// Leaf elements are those that:
+    /// 1. Have backward relations (derivedFrom, satisfy, verify) - they trace upward to something
+    /// 2. Have no outgoing forward relations to other elements - nothing derives from them
+    /// Optionally filter by element types
+    pub fn find_leaf_elements(&self, type_filter: Option<&[&str]>) -> Vec<String> {
+        let mut leaves: Vec<String> = self.nodes.values()
+            .map(|node| &node.element)
+            .filter(|element| {
+                // Apply type filter if provided
+                if let Some(types) = type_filter {
+                    let element_type_str = element.element_type.as_str();
+                    if !types.iter().any(|t| *t == element_type_str) {
+                        return false;
+                    }
+                }
+
+                // Must have at least one backward relation (to trace upward)
+                let has_backward_relations = element.relations.iter()
+                    .any(|r| {
+                        relation::BACKWARD_RELATIONS.contains(&r.relation_type.name) &&
+                        matches!(r.target.link, relation::LinkType::Identifier(_))
+                    });
+
+                if !has_backward_relations {
+                    return false;
+                }
+
+                // Must NOT have outgoing forward relations to elements (nothing derives from it)
+                let has_forward_children = element.relations.iter()
+                    .any(|r| {
+                        relation::DIAGRAM_RELATIONS.contains(&r.relation_type.name) &&
+                        matches!(r.target.link, relation::LinkType::Identifier(_))
+                    });
+
+                !has_forward_children
+            })
+            .map(|e| e.identifier.clone())
+            .collect();
+
+        // Sort for deterministic output
+        leaves.sort();
+        leaves
+    }
+
+    /// Find starting elements filtered by type (for both forward and reverse traversal)
+    pub fn find_elements_by_type(&self, type_filter: &[&str]) -> Vec<String> {
+        let mut elements: Vec<String> = self.nodes.values()
+            .map(|node| &node.element)
+            .filter(|element| {
+                let element_type_str = element.element_type.as_str();
+                type_filter.iter().any(|t| *t == element_type_str)
+            })
+            .map(|e| e.identifier.clone())
+            .collect();
+
+        // Sort for deterministic output
+        elements.sort();
+        elements
+    }
+
     /// Collects all InternalPath targets from element relations
     pub fn get_internal_path_targets(&self) -> HashSet<PathBuf> {
         self.collect_internal_path_targets()

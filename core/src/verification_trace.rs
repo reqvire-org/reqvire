@@ -578,6 +578,14 @@ impl<'a> VerificationTraceGenerator<'a> {
     }
 }
 
+/// Valid verification types for --filter-type in traces command
+pub const VERIFICATION_TYPES: &[&str] = &[
+    "test-verification",
+    "analysis-verification",
+    "inspection-verification",
+    "demonstration-verification",
+];
+
 /// Apply filters to verification traces report
 pub fn apply_filters(
     mut report: VerificationTracesReport,
@@ -586,6 +594,17 @@ pub fn apply_filters(
     filter_type: Option<&str>,
 ) -> Result<VerificationTracesReport, crate::error::ReqvireError> {
     use regex::Regex;
+
+    // Validate verification type if provided
+    if let Some(vtype) = filter_type {
+        if !VERIFICATION_TYPES.contains(&vtype.to_lowercase().as_str()) {
+            return Err(crate::error::ReqvireError::ProcessError(format!(
+                "Invalid verification type '{}'. Valid types: {}",
+                vtype,
+                VERIFICATION_TYPES.join(", ")
+            )));
+        }
+    }
 
     // Compile regex if name filter is provided
     let name_regex = if let Some(pattern) = filter_name {

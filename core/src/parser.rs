@@ -1,5 +1,5 @@
 use crate::element::{Element, SubSection, ElementType, RequirementType, Attachment, AttachmentTarget};
-use crate::relation::Relation;
+use crate::relation::{self, Relation};
 use crate::error::ReqvireError;
 use crate::utils;
 use log::debug;
@@ -606,8 +606,9 @@ pub fn parse_elements(
                                                 }
                                                 Err(_) => {
                                                     let msg = format!(
-                                                        "'{}' in element '{}': (file: {}, line {})",
-                                                        relation_type, element.name, file, line_num + 1
+                                                        "'{}' in element '{}': (file: {}, line {}). Valid types: {}",
+                                                        relation_type, element.name, file, line_num + 1,
+                                                        relation::supported_relation_types_list()
                                                     );
                                                     errors.push(ReqvireError::UnsupportedRelationType(msg.clone()));
                                                     debug!("Error: {}", msg);

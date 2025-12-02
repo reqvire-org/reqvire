@@ -964,3 +964,46 @@ This test verifies that the --from-folder option correctly generates relative li
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
   * verify: [CLI Traces Command](../../../Interfaces/CLI.md#cli-traces-command)
 ---
+
+### Reverse Model Traversal Test
+
+Test verifies reverse relation traversal functionality:
+
+1. Create model with hierarchical structure (root -> mid -> leaf)
+2. Run model command with reverse mode enabled
+3. Verify output starts from leaf elements
+4. Verify relations shown are backward (derivedFrom, satisfy, verify)
+5. Verify tree structure builds upward to roots
+6. Run model command with reverse mode and specific starting element
+7. Verify traversal starts from specified element going upward
+
+#### Metadata
+  * type: test-verification
+
+#### Attachments
+  * [Reverse Relation Traversal Behavior](../Behaviors.md#reverse-relation-traversal-behavior)
+
+#### Relations
+  * verify: [Reverse Relation Traversal](../Reporting.md#reverse-relation-traversal)
+---
+
+### Start Type Filter Test
+
+Test verifies start element type filtering functionality:
+
+1. Create model with mixed element types (requirements, verifications)
+2. Run model command with type filter for verification elements
+3. Verify only verification elements are used as roots
+4. Run model command with reverse mode and verification type filter
+5. Verify verifications are starting points for upward traversal
+6. Verify this produces traces-like output
+
+#### Metadata
+  * type: test-verification
+
+#### Attachments
+  * [Start Element Type Filter Behavior](../Behaviors.md#start-element-type-filter-behavior)
+
+#### Relations
+  * verify: [Start Element Type Filtering](../Reporting.md#start-element-type-filtering)
+---

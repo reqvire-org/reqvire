@@ -4,6 +4,7 @@
 
 use crate::error::ReqvireError;
 use crate::model::ModelManager;
+use crate::relation;
 use crate::diff::{CrudResult, CrudOperation, generate_crud_diffs, generate_file_diff};
 use globset::GlobSet;
 use std::path::Path;
@@ -1475,7 +1476,7 @@ pub fn link(
     // Validate relation type
     if !RELATION_TYPES.contains_key(relation_type) {
         return Err(ReqvireError::UnsupportedRelationType(
-            format!("Invalid relation type '{}'. Supported types: derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace", relation_type)
+            format!("Invalid relation type '{}'. Valid types: {}", relation_type, relation::supported_relation_types_list())
         ));
     }
 

@@ -51,7 +51,7 @@ SEARCH OPTIONS:
       --short                   Output abbreviated format (one-line per element in text, omit fields in JSON)
       --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
       --filter-name <REGEX>     Only include elements whose name matches this regular expression
-      --filter-type <TYPE>      Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`
+      --filter-type <TYPE>      Only include elements of the given type. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
       --filter-content <REGEX>  Only include elements whose content matches this regular expression
       --filter-page-content <REGEX> Only include elements whose parent file page content matches this regular expression
       --have-relations <LIST>   Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")
@@ -69,13 +69,15 @@ TRACES OPTIONS:
       --links-with-blobs        Use GitHub blob URLs in diagram links instead of relative paths
       --filter-id <ID>          Only include verification with this specific identifier
       --filter-name <REGEX>     Only include verifications whose name matches this regular expression
-      --filter-type <TYPE>      Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
+      --filter-type <TYPE>      Only include verifications of the given type. Valid: test-verification, analysis-verification, inspection-verification, demonstration-verification
 
 COVERAGE OPTIONS:
       --json                    Output results in JSON format
 
 MODEL OPTIONS:
       --from <NAME>             Start from specific element by name
+      --reverse                 Traverse from leaves to roots (follow backward relations)
+      --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
       --json                    Output results in JSON format (nested structure)
 
 LINT OPTIONS:

@@ -90,3 +90,43 @@ Expected files:
   * verify: [JSON Output Format](../SystemRequirements.md#json-output-format)
 
 ---
+
+### Reverse Traversal Test
+
+Test verifies --reverse flag traverses from leaves to roots.
+
+#### Details
+Test procedure:
+1. Run model command with --reverse flag and --json
+2. Verify output starts from leaf elements
+3. Verify metadata.direction shows "Reverse"
+4. Verify relations use backward relation types (derivedFrom, satisfy, verify)
+5. Verify traversal goes from verification/leaf toward root requirements
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Forward Relation Traversal](../SystemRequirements.md#forward-relation-traversal)
+
+---
+
+### Filter Type Test
+
+Test verifies --filter-type flag filters starting elements by type.
+
+#### Details
+Test procedure:
+1. Run model command with --filter-type=test-verification and --json
+2. Verify only test-verification elements appear at top level
+3. Verify metadata.type_filter contains the specified types
+4. Run model command with --reverse --filter-type=test-verification
+5. Verify verifications are starting points for upward traversal
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Model Filtering Capability](../SystemRequirements.md#model-filtering-capability)
+
+---

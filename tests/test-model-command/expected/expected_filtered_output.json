@@ -86,8 +86,32 @@
                         "relations": [],
                         "attachments": []
                       }
+                    },
+                    {
+                      "relation_type": "verifiedBy",
+                      "element": {
+                        "identifier": "specifications/Verifications/Tests.md#reverse-traversal-test",
+                        "name": "Reverse Traversal Test",
+                        "element_type": "test-verification",
+                        "file_path": "specifications/Verifications/Tests.md",
+                        "file_order_index": 4,
+                        "relations": [],
+                        "attachments": []
+                      }
                     }
                   ],
+                  "attachments": []
+                }
+              },
+              {
+                "relation_type": "verifiedBy",
+                "element": {
+                  "identifier": "specifications/Verifications/Tests.md#filter-type-test",
+                  "name": "Filter Type Test",
+                  "element_type": "test-verification",
+                  "file_path": "specifications/Verifications/Tests.md",
+                  "file_order_index": 5,
+                  "relations": [],
                   "attachments": []
                 }
               }
@@ -113,7 +137,8 @@
   ],
   "metadata": {
     "total_elements": 1,
-    "total_relations": 9,
-    "filtered_from": "Model Diagram Generation"
+    "total_relations": 11,
+    "filtered_from": "Model Diagram Generation",
+    "direction": "Forward"
   }
 }

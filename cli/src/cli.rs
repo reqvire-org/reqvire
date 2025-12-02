@@ -89,7 +89,7 @@ pub enum Commands {
     
 
     /// Search and filter model elements with comprehensive filtering options
-    #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
+    #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
     Search {
         /// Output results in JSON format
         #[clap(long, help_heading = "SEARCH OPTIONS")]
@@ -107,7 +107,7 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_name: Option<String>,
 
-        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`
+        /// Only include elements of the given type. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE", help_heading = "SEARCH OPTIONS")]
         filter_type: Option<String>,
 
@@ -149,7 +149,7 @@ pub enum Commands {
     },
 
     /// Generate verification traces showing upward paths from verifications to root requirements
-    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
+    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type. Valid types: test-verification, analysis-verification, inspection-verification, demonstration-verification")]
     Traces {
         /// Output results in JSON format
         #[clap(long, help_heading = "TRACES OPTIONS")]
@@ -171,7 +171,7 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "TRACES OPTIONS")]
         filter_name: Option<String>,
 
-        /// Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
+        /// Only include verifications of the given type. Valid: test-verification, analysis-verification, inspection-verification, demonstration-verification
         #[clap(long, value_name = "TYPE", help_heading = "TRACES OPTIONS")]
         filter_type: Option<String>,
     },
@@ -188,15 +188,24 @@ pub enum Commands {
     ///
     /// By default, shows root requirements (no hierarchical parent).
     /// Use --from <NAME> to start from specific element.
+    /// Use --reverse for leaf-to-root traversal.
     ///
     /// Output formats:
     /// - JSON: Nested structure with element details in relations
     /// - Markdown: Mermaid diagrams with all nested relationships
-    #[clap(override_help = "Generate model-centric structure with nested relations\n\nBy default, shows root requirements (no hierarchical parent).\nUse --from <NAME> to start from specific element.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --json                      Output results in JSON format (nested structure)")]
+    #[clap(override_help = "Generate model-centric structure with nested relations\n\nBy default, shows root requirements (no hierarchical parent).\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)")]
     Model {
         /// Start from specific element by name
         #[clap(long, value_name = "NAME", help_heading = "MODEL OPTIONS")]
         from: Option<String>,
+
+        /// Traverse from leaves to roots (follow backward relations)
+        #[clap(long, help_heading = "MODEL OPTIONS")]
+        reverse: bool,
+
+        /// Filter starting elements by type (comma-separated). Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
+        #[clap(long, value_name = "TYPE", help_heading = "MODEL OPTIONS")]
+        filter_type: Option<String>,
 
         /// Output results in JSON format (nested structure)
         #[clap(long, help_heading = "MODEL OPTIONS")]
@@ -794,11 +803,18 @@ pub fn handle_command(
             coverage_report.print(json);
             return Ok(0);
         },
-        Some(Commands::Model { from, json }) => {
+        Some(Commands::Model { from, reverse, filter_type, json }) => {
+            // Parse filter types if provided
+            let type_filter: Option<Vec<&str>> = filter_type.as_ref().map(|s| {
+                s.split(',').map(|t| t.trim()).collect()
+            });
+
             // Generate model-centric report with optional filtering
             let output = report_model::generate_model_report(
                 &model_manager.graph_registry,
                 from.as_deref(),
+                reverse,
+                type_filter,
                 json,
                 "LR"  // Left-to-right diagrams for markdown output
             )?;

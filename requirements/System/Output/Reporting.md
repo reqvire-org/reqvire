@@ -123,6 +123,28 @@ When filtering by root element, system shall traverse only forward relations dow
   * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
 ---
 
+### Reverse Relation Traversal
+
+The system shall support reverse relation traversal for model views, following defined rules in Reverse Relation Traversal Behavior.
+
+#### Relations
+  * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
+  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [Reverse Relation Traversal Behavior](Behaviors.md#reverse-relation-traversal-behavior)
+  * verifiedBy: [Reverse Model Traversal Test](Verifications/ReportingVerifications.md#reverse-model-traversal-test)
+---
+
+### Start Element Type Filtering
+
+The system shall support filtering starting elements by type for model traversal, following defined rules in Start Element Type Filter Behavior.
+
+#### Relations
+  * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
+  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
+  * satisfiedBy: [Start Element Type Filter Behavior](Behaviors.md#start-element-type-filter-behavior)
+  * verifiedBy: [Start Type Filter Test](Verifications/ReportingVerifications.md#start-type-filter-test)
+---
+
 ### Search Report Generator
 
 The system shall implement a search report generator with comprehensive filtering and element type tracking.

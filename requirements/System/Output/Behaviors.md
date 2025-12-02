@@ -77,3 +77,35 @@ Coverage evaluation philosophy for verification reporting.
 #### Relations
   * satisfy: [Verification Coverage Report](Reporting.md#verification-coverage-report)
 ---
+
+### Reverse Relation Traversal Behavior
+
+When reverse mode is enabled for model traversal:
+1. Follow backward relations (derivedFrom, satisfy, verify) instead of forward relations
+2. Start from leaf elements (elements with no outgoing forward relations) when no specific element is specified
+3. Build tree structure from leaves upward toward root requirements
+4. When a specific starting element is provided, start from that element and traverse upward
+5. Report "Reverse" direction indicator in output metadata
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Reverse Relation Traversal](Reporting.md#reverse-relation-traversal)
+---
+
+### Start Element Type Filter Behavior
+
+When start element type filtering is enabled:
+1. Accept a list of element types to filter starting points
+2. Use only elements matching specified types as traversal starting points
+3. When combined with reverse traversal, filter leaf elements by type
+4. When used with forward traversal, filter root elements by type
+5. Support all element types as filter values
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Start Element Type Filtering](Reporting.md#start-element-type-filtering)
+---
