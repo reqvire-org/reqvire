@@ -110,3 +110,28 @@ Error message structure for validation issues.
 #### Relations
   * satisfy: [Enhanced Validation Error Reporting](Validation.md#enhanced-validation-error-reporting)
 ---
+
+### Type Validation Error Behavior
+
+Error messages for invalid types shall include the list of valid types.
+
+#### Details
+**Element Type Errors:**
+When an invalid element type is encountered (in metadata or filters):
+- Error message shall include the invalid type value
+- Error message shall list all valid element types
+- Error message shall include the custom type pattern: "For custom types use: other-TYPENAME"
+
+**Relation Type Errors:**
+When an invalid relation type is encountered:
+- Error message shall include the invalid relation type
+- Error message shall list all valid relation types in sorted order
+
+This enables users to quickly identify and fix type errors without consulting documentation.
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Type Validation Error Requirement](Validation.md#type-validation-error-requirement)
+---

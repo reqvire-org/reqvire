@@ -29,6 +29,24 @@ The system shall validate relation types against a defined vocabulary and provid
   * verifiedBy: [Same-File Fragment Relations Test](Verifications/ValidationVerifications.md#same-file-fragment-relations-test)
 ---
 
+### Type Validation Error Requirement
+
+The system shall display all valid type options when type validation fails.
+
+#### Details
+- Invalid element types shall show list of valid element types including custom type pattern
+- Invalid relation types shall show list of valid relation types
+- Element type list format: "type1, type2, ... For custom types use: other-TYPENAME"
+- Relation type list format: "type1, type2, ..." (alphabetically sorted)
+
+#### Relations
+  * derivedFrom: [Enhanced Validation Error Reporting](#enhanced-validation-error-reporting)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * satisfiedBy: [Type Validation Error Behavior](Behaviors.md#type-validation-error-behavior)
+  * verifiedBy: [Type Validation Errors Test](Verifications/ValidationVerifications.md#type-validation-errors-test)
+---
+
 ### Excluded File Relation Validation
 
 The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and formatting operations.

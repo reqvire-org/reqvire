@@ -98,7 +98,13 @@ Element types are identified through a reserved `type` metadata property in the 
 
 | Type | Description |
 |------|-------------|
-| `other` | Custom element types defined by users |
+| `other` | Generic custom element type |
+| `other-TYPENAME` | Named custom element type (e.g., `other-interface`, `other-actor`) |
+
+**Custom Type Pattern:**
+- Use `other-TYPENAME` where TYPENAME is the custom type name
+- TYPENAME must be at least one character (e.g., `other-x` is valid, `other-` alone is not)
+- Custom types can only use `trace` relations
 
 **Usage Example:**
 To specify an element type, add a Metadata subsection with the type property:

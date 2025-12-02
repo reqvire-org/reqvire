@@ -1,0 +1,1 @@
+Invalid element type 'invalid-type'. Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME

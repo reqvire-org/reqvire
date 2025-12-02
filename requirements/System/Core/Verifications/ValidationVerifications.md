@@ -423,3 +423,33 @@ Test cases:
   * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
   * verify: [Cross-Section Duplicate Validation](../Validation.md#cross-section-duplicate-validation)
 ---
+
+### Type Validation Errors Test
+
+Test verifies that type validation errors include helpful type lists.
+
+#### Details
+1. Test invalid element type in --filter-type:
+   - Use invalid type like "invalid-type"
+   - Verify error includes list of valid element types
+   - Verify error includes "other-TYPENAME" pattern hint
+
+2. Test invalid relation type in metadata:
+   - Create element with invalid relation type like "invalidRelation"
+   - Verify error includes list of valid relation types
+
+3. Test custom type pattern acceptance:
+   - Verify "other-interface" is accepted as valid type
+   - Verify "other-" alone is rejected
+   - Verify "other" alone is accepted
+
+#### Metadata
+  * type: test-verification
+
+#### Attachments
+  * [Type Validation Error Behavior](../Behaviors.md#type-validation-error-behavior)
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-type-validation-errors/test.sh)
+  * verify: [Type Validation Error Requirement](../Validation.md#type-validation-error-requirement)
+---

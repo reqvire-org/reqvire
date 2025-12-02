@@ -288,12 +288,17 @@ System shall provide CLI command to generate model diagrams with optional filter
 - Shall support `--from=<name>` flag for filtering from specific element by name
 - Element names are globally unique, allowing lookup by name alone
 - Shall support `--json` flag for JSON output format
+- Shall support `--reverse` flag for leaf-to-root traversal
+- Shall support `--filter-type=<types>` flag with comma-separated element types to filter starting points (consistent with search command)
 - Default output shall be markdown with embedded Mermaid diagram
 - Shall integrate with existing model diagram generation functionality
 
 #### Attachments
   * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
   * [Mermaid Diagram Style Specification](../System/Output/Specifications.md#mermaid-diagram-style-specification)
+  * [Reverse Relation Traversal Behavior](../System/Output/Behaviors.md#reverse-relation-traversal-behavior)
+  * [Start Element Type Filter Behavior](../System/Output/Behaviors.md#start-element-type-filter-behavior)
+  * [Type Validation Error Behavior](../System/Core/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -572,6 +577,7 @@ Default output:
   * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
   * [Short Mode Behavior](../System/Output/Behaviors.md#short-mode-behavior)
   * [Text Output Formatting](../System/Output/Specifications.md#text-output-formatting)
+  * [Type Validation Error Behavior](../System/Core/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -637,6 +643,7 @@ reqvire traces --from-folder=docs/reports > docs/reports/traces.md
   * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
   * [Verification Trace Tree Construction](../System/Processing/Specifications.md#verification-trace-tree-construction)
   * [Mermaid Diagram Style Specification](../System/Output/Specifications.md#mermaid-diagram-style-specification)
+  * [Type Validation Error Behavior](../System/Core/Behaviors.md#type-validation-error-behavior)
 
 #### Relations
   * derive: [Verification Traces Element Navigation](#verification-traces-element-navigation)
