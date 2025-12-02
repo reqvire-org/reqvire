@@ -16,13 +16,15 @@ Use `--json` for programmatic processing.
 | `--filter-file` | Filter by file glob | `--filter-file="requirements/**/*.md"` |
 | `--filter-name` | Filter by element name (regex) | `--filter-name=".*Auth.*"` |
 | `--filter-id` | Filter by exact identifier | `--filter-id="requirements/File.md#element"` |
-| `--filter-type` | Filter by element type | `--filter-type="user-requirement"` |
+| `--filter-type` | Filter by element type (see types below) | `--filter-type="user-requirement"` |
 | `--filter-content` | Filter by content (regex) | `--filter-content="SHALL.*validate"` |
 | `--filter-page-content` | Filter by file frontmatter | `--filter-page-content="security"` |
 | `--have-relations` | Elements with ALL relations | `--have-relations="verifiedBy,satisfiedBy"` |
 | `--not-have-relations` | Elements without ALL relations | `--not-have-relations="verifiedBy"` |
 | `--has-attachments` | Elements with attachments | `--has-attachments` |
 | `--filter-attachment` | Filter by attachment pattern | `--filter-attachment="*.pdf"` |
+
+**Element types for --filter-type:** user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
 ## Element Manipulation
 
@@ -199,7 +201,18 @@ reqvire format --fix --with-full-relations  # Include auto-generated inverse rel
 ```bash
 reqvire model [--json]                 # All root requirements with nested relations
 reqvire model --from "Element Name"    # Start from specific element
+
+# Reverse traversal (leaf to root)
+reqvire model --reverse                # Start from leaf elements (verifications)
+reqvire model --reverse --json         # Reverse with JSON output
+
+# Filter by element type
+reqvire model --filter-type="user-requirement"
+reqvire model --filter-type="test-verification"
+reqvire model --reverse --filter-type="test-verification"  # Trace verifications upward
 ```
+
+**Element types:** user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
 ### Containment View
 ```bash
