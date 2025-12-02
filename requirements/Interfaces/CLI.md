@@ -119,6 +119,7 @@ The `add` command shall:
 - Insert element into file following Element Ordering Behavior
 - Apply changes immediately by default
 - Support `--dry-run` flag to preview changes without applying
+- Support `--override` flag to replace existing element with same name
 - Output git-style diff showing file changes by default
 - Support `--json` flag for structured output format
 - Report validation errors if element structure is invalid
@@ -129,6 +130,7 @@ The `add` command shall:
   * [File Persistence Behavior](../System/Operations/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../System/Operations/Constraints.md#target-location-constraint)
   * [Dry-Run Mode Behavior](../System/Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Create Element Override Behavior](../System/Operations/Behaviors.md#create-element-override-behavior)
   * [Diff Output Format Specification](../System/Output/Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../System/Output/Specifications.md#json-output-structure)
 

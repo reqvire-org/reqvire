@@ -132,3 +132,18 @@ How element manipulation operations persist changes to files:
 #### Metadata
   * type: behavior
 ---
+
+### Create Element Override Behavior
+
+When the create element operation is invoked with override mode:
+1. The system shall extract the element name from the markdown input (### Element Name pattern)
+2. If an element with that name exists in the model, the system shall remove it first
+3. The system shall then add the new element content to the target file
+4. The operation shall be reported as "Update" rather than "Add"
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Create Element Operation](ElementManipulation.md#create-element-operation)
+---

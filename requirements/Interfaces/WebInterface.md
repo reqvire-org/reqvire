@@ -218,7 +218,6 @@ The system shall ensure color consistency between:
 - D3.js containment tree visualization
 
 #### Attachments
-  * [Color Scheme Specification](../System/Output/Specifications.md#color-scheme-specification)
   * [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
 
 #### Relations

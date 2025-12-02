@@ -36,6 +36,13 @@ pub fn add_element(
         .to_string_lossy()
         .to_string();
 
+    // Track which files were modified before the operation
+    // IMPORTANT: Must track BEFORE any modifications (including override removal)
+    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
+        .iter()
+        .cloned()
+        .collect();
+
     // If override is requested, extract element name and remove existing element first
     if override_existing {
         // Extract element name from markdown (looks for ### Element Name pattern)
@@ -47,12 +54,6 @@ pub fn add_element(
             model_manager.graph_registry.remove_element_with_cleanup(&existing_id)?;
         }
     }
-
-    // Track which files were modified before the operation
-    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .cloned()
-        .collect();
 
     // Create element using core business logic
     let element = model_manager.graph_registry.create_element_from_string(

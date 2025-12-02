@@ -241,7 +241,6 @@ The report helps track verification completeness and identify gaps in requiremen
   * type: user-requirement
 
 #### Attachments
-  * [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
   * [Verification Type Categories Specification](../Core/Specifications.md#verification-type-categories-specification)
   * [JSON Output Structure](Specifications.md#json-output-structure)
   * [Text Output Formatting](Specifications.md#text-output-formatting)

@@ -36,9 +36,6 @@ The system shall integrate with Git workflows by reading exclusion patterns from
 - The system shall differentiate between .gitignore exclusions (complete) and .reqvireignore exclusions (parsing only)
 - The system shall implement ignore file processing following clearly defined specifications
 
-#### Attachments
-  * [Ignore Files Specification](Specifications.md#ignore-files-specification)
-
 #### Relations
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)

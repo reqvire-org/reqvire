@@ -16,9 +16,9 @@ When creating a new element, the system shall:
 - Insert the element into the target file following Element Ordering Behavior
 - Reject the operation and report validation errors if validation fails
 - Provide updates report following Diff Output Format Specification
+- The system shall support override mode to replace existing element with same name following rules defined in Create Element Override Behavior
 
 #### Attachments
-  * [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
@@ -35,6 +35,7 @@ When creating a new element, the system shall:
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
   * satisfiedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
+  * satisfiedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
   * verifiedBy: [Create Element Test](Verifications/ElementManipulationVerifications.md#create-element-test)
 ---
 

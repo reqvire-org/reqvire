@@ -935,3 +935,23 @@ The test shall verify that the `unlink` command removes relations from elements 
   * verify: [Relation Commands](../../../Interfaces/CLI.md#relation-commands)
   * verify: [Relation Management Operations](../../Core/ModelManagement.md#relation-management-operations)
 ---
+
+### Create Element Override Test
+
+Test verifies that create element with override mode correctly replaces existing elements:
+
+1. Create initial element "Test Element" in target file
+2. Run create element with override for "Test Element" with new content
+3. Verify old element content is replaced with new content
+4. Verify operation reports as "Update"
+5. Verify element relations are preserved from new content only
+
+#### Metadata
+  * type: test-verification
+
+#### Attachments
+  * [Create Element Override Behavior](../Behaviors.md#create-element-override-behavior)
+
+#### Relations
+  * verify: [Create Element Operation](../ElementManipulation.md#create-element-operation)
+---

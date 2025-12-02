@@ -43,9 +43,6 @@ The system shall implement diagram styling including:
 #### Metadata
   * type: user-requirement
 
-#### Attachments
-  * [Mermaid Diagram Style Specification](Specifications.md#mermaid-diagram-style-specification)
-
 #### Relations
   * derive: [Diagram Generation](#diagram-generation)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
@@ -160,9 +157,6 @@ The system shall render relationships using:
 - Correct arrow directions based on hierarchy semantics
 
 Each relation type has specific visual properties and directional semantics defined in the specification.
-
-#### Attachments
-  * [SysML Rendering Specification](Specifications.md#sysml-rendering-specification)
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)

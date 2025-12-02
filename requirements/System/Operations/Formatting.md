@@ -33,9 +33,6 @@ The system shall provide formatting capability to ensure consistent formatting i
 - The system shall detect and fix formatting inconsistencies following clearly defined specifications
 - The system shall maintain consistent formatting across all requirements documents
 
-#### Attachments
-  * [Format Consistency Specification](Specifications.md#format-consistency-specification)
-
 #### Relations
   * derive: [Document Structure Normalization](#document-structure-normalization)
   * derive: [Element Ordering Normalization](#element-ordering-normalization)
@@ -82,9 +79,6 @@ When generating formatted output, the system shall:
 1. If document has `# Elements` then `###` (no `##`): Add section header only
 2. If document has `# Elements` and `##`: No header additions needed
 
-#### Attachments
-  * [Document Structure Specification](Specifications.md#document-structure-specification)
-
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
@@ -118,9 +112,6 @@ This ensures:
 - Deterministic output regardless of parsing order or HashMap iteration order
 - Consistent diffs when comparing formatted files
 - Predictable relation ordering for review and verification
-
-#### Attachments
-  * [Relation Ordering Specification](Specifications.md#relation-ordering-specification)
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)

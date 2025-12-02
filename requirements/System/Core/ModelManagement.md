@@ -127,7 +127,6 @@ The system shall use the Git repository root as the project base for path resolu
   * type: user-requirement
 
 #### Attachments
-  * [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
   * [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
 
 #### Relations
@@ -202,9 +201,6 @@ The system shall define element type relation compatibility constraints.
 
 The system shall support predefined element types for classification and behavior determination following clearly defined specifications.
 
-#### Attachments
-  * [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
-
 #### Relations
   * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
   * derive: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
@@ -267,9 +263,6 @@ The system discovers all available templates in the repository and allows the us
 ### Verification Type Categories
 
 The system shall support defined verification categories following clearly defined specifications.
-
-#### Attachments
-  * [Verification Type Categories Specification](Specifications.md#verification-type-categories-specification)
 
 #### Relations
   * satisfiedBy: [Verification Type Categories Specification](Specifications.md#verification-type-categories-specification)
