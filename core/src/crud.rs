@@ -387,16 +387,22 @@ pub fn attach(
     let content = fs::read_to_string(&absolute_file_path)
         .map_err(|e| ReqvireError::IoError(e))?;
 
-    // Check if attachment already exists (idempotent)
+    // Check if attachment already exists - return error
     if element.attachments.iter().any(|a| a.target.as_str() == attachment_path) {
-        // Already attached, return success without changes
-        return Ok(CrudResult {
-            operation: CrudOperation::Update,
-            element_id: element_id.clone(),
-            element_name: format!("Attachment already exists: {}", attachment_path),
-            diffs: vec![],
-            dry_run,
-        });
+        return Err(ReqvireError::ElementError(
+            format!("Attachment '{}' already exists on '{}'", attachment_path, element_name)
+        ));
+    }
+
+    // Check for cross-section duplicate: target already exists in Relations
+    let in_relations = element.relations.iter().any(|r| {
+        r.target.link.as_str() == attachment_path
+    });
+
+    if in_relations {
+        return Err(ReqvireError::CrossSectionDuplicate(
+            format!("Target '{}' already exists in Relations of '{}'. Cannot add to Attachments.", attachment_path, element_name)
+        ));
     }
 
     // Calculate file-relative path for the attachment link in markdown
@@ -532,15 +538,22 @@ pub fn attach_element(
     let attachment_identifier = attachment_element.identifier.clone();
     let attachment_display_name = attachment_element.name.clone();
 
-    // Check if already attached
+    // Check if already attached - return error
     if target_element.attachments.iter().any(|a| a.target.as_str() == attachment_identifier) {
-        return Ok(CrudResult {
-            operation: CrudOperation::Update,
-            element_id: element_id.clone(),
-            element_name: format!("Attachment already exists: {}", attachment_element_name),
-            diffs: vec![],
-            dry_run,
-        });
+        return Err(ReqvireError::ElementError(
+            format!("Attachment '{}' already exists on '{}'", attachment_element_name, element_name)
+        ));
+    }
+
+    // Check for cross-section duplicate: target already exists in Relations
+    let in_relations = target_element.relations.iter().any(|r| {
+        r.target.link.as_str() == attachment_identifier
+    });
+
+    if in_relations {
+        return Err(ReqvireError::CrossSectionDuplicate(
+            format!("Target '{}' already exists in Relations of '{}'. Cannot add to Attachments.", attachment_element_name, element_name)
+        ));
     }
 
     // Read current file content
@@ -1417,13 +1430,20 @@ pub fn link(
     });
 
     if relation_exists {
-        return Ok(CrudResult {
-            operation: CrudOperation::Update,
-            element_id: source_id.clone(),
-            element_name: format!("Relation already exists: {} {} {}", source_name, relation_type, target),
-            diffs: vec![],
-            dry_run,
-        });
+        return Err(ReqvireError::RelationError(
+            format!("Relation '{}' from '{}' to '{}' already exists", relation_type, source_name, target)
+        ));
+    }
+
+    // Check for cross-section duplicate: target already exists in Attachments
+    let in_attachments = source_element.attachments.iter().any(|a| {
+        a.target.as_str() == target_id_for_check
+    });
+
+    if in_attachments {
+        return Err(ReqvireError::CrossSectionDuplicate(
+            format!("Target '{}' already exists in Attachments of '{}'. Cannot add to Relations.", target, source_name)
+        ));
     }
 
     // Read current file content

@@ -42,14 +42,28 @@ echo "Test 1 passed"
 echo ""
 
 # ==================================
-# Test 2: Link idempotency
+# Test 2: Link duplicate returns error
 # ==================================
-echo "Test 2: Link idempotency (duplicate link)..."
+echo "Test 2: Link duplicate returns error..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "derivedFrom" "Another Requirement" > /dev/null 2>&1
+set +e
+LINK_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "derivedFrom" "Another Requirement" 2>&1)
+LINK_DUP_EXIT=$?
+set -e
 
-# File should be unchanged (no duplicate)
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-link.md" "$TEST_DIR/specifications/Requirements.md" "Duplicate link should not modify file"
+if [ $LINK_DUP_EXIT -eq 0 ]; then
+  echo "FAILED: Duplicate link should fail with error"
+  exit 1
+fi
+
+if ! echo "$LINK_DUP_OUTPUT" | grep -qi "already exists"; then
+  echo "FAILED: Error message should mention 'already exists'"
+  echo "$LINK_DUP_OUTPUT"
+  exit 1
+fi
+
+# File should be unchanged (operation failed)
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-link.md" "$TEST_DIR/specifications/Requirements.md" "Failed link should not modify file"
 
 echo "Test 2 passed"
 echo ""
@@ -195,15 +209,54 @@ echo "Test 10 passed"
 echo ""
 
 # ==================================
-# Test 11: Link trace to external URL
+# Test 11: Link trace to external URL succeeds
 # ==================================
-echo "Test 11: Link trace to external URL..."
+echo "Test 11: Link trace to external URL succeeds..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "trace" "https://example.com/spec.html" > /dev/null 2>&1
+set +e
+LINK_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "trace" "https://example.com/spec.html" 2>&1)
+LINK_URL_EXIT=$?
+set -e
+
+if [ $LINK_URL_EXIT -ne 0 ]; then
+  echo "FAILED: Link to external URL should succeed"
+  echo "$LINK_URL_OUTPUT"
+  exit 1
+fi
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/11-link-external-url.md" "$TEST_DIR/specifications/Requirements.md" "Link to external URL does not match expected"
 
 echo "Test 11 passed"
+echo ""
+
+# ==================================
+# Test 12: Attaching external URL fails with helpful message
+# ==================================
+echo "Test 12: Attaching external URL fails with helpful message..."
+
+set +e
+ATTACH_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" attaching "https://example.com/doc.pdf" 2>&1)
+ATTACH_URL_EXIT=$?
+set -e
+
+if [ $ATTACH_URL_EXIT -eq 0 ]; then
+  echo "FAILED: Attaching external URL should fail"
+  exit 1
+fi
+
+if ! echo "$ATTACH_URL_OUTPUT" | grep -qi "external url"; then
+  echo "FAILED: Error message should mention 'external URL'"
+  echo "$ATTACH_URL_OUTPUT"
+  exit 1
+fi
+
+if ! echo "$ATTACH_URL_OUTPUT" | grep -qi "trace"; then
+  echo "FAILED: Error message should suggest using 'trace' relation"
+  echo "$ATTACH_URL_OUTPUT"
+  exit 1
+fi
+
+echo "Test 12 passed"
 echo ""
 
 echo "===================================="

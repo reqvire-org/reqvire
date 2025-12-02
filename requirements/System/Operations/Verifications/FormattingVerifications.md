@@ -294,3 +294,21 @@ This test verifies that the format command sorts relations alphabetically for de
   * satisfiedBy: [test.sh](../../../../tests/test-advanced-format/test.sh)
   * verify: [Relation Ordering Normalization](../Formatting.md#relation-ordering-normalization)
 ---
+
+### Format Duplicate Removal Test
+
+Test verifies that format removes within-section duplicates but not cross-section.
+
+#### Details
+Test cases:
+1. File with duplicate relations -> `format --fix` -> Duplicates removed
+2. File with duplicate attachments -> `format --fix` -> Duplicates removed
+3. File with cross-section duplicate -> `format --fix` -> No change (validation error, not format issue)
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
+  * verify: [Format Duplicate Removal](../Formatting.md#format-duplicate-removal)
+---

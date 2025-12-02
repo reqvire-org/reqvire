@@ -171,6 +171,24 @@ Rationale: Element names serve as stable IDs for element identity, independent o
   * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
 ---
 
+### Cross-Section Duplicate Validation
+
+The system shall detect when the same target appears in both the Relations and Attachments subsections of an element, treating this as a validation error.
+
+#### Details
+A constraint defines the detailed rules for cross-section duplicate detection.
+
+This applies to all target types: element identifiers and file paths.
+
+Within-section duplicates (same entry repeated within Relations OR within Attachments) are formatting issues handled by the format operation, not validation errors.
+
+#### Relations
+  * derivedFrom: [Internal Consistency Validator](#internal-consistency-validator)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [Cross-Section Duplicate Constraint](Constraints.md#cross-section-duplicate-constraint)
+  * verifiedBy: [Cross-Section Duplicate Validation Test](Verifications/ValidationVerifications.md#cross-section-duplicate-validation-test)
+---
+
 ### Two-Pass Validation Strategy
 
 The system shall execute model validation in two phases: element collection and graph validation.

@@ -404,3 +404,22 @@ This test verifies that the system correctly validates relations to excluded fil
   * satisfiedBy: [test.sh](../../../../tests/test-valid-relations/test.sh)
   * verify: [Excluded File Relation Validation](../Validation.md#excluded-file-relation-validation)
 ---
+
+### Cross-Section Duplicate Validation Test
+
+Test verifies that validation detects and reports cross-section duplicates.
+
+#### Details
+Test cases:
+1. Element with same target in both Relations (as satisfiedBy) and Attachments
+2. Run `reqvire validate`
+3. Verify validation fails with error mentioning "cross-section duplicate" or similar
+4. Verify error identifies the element and the duplicate target
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
+  * verify: [Cross-Section Duplicate Validation](../Validation.md#cross-section-duplicate-validation)
+---

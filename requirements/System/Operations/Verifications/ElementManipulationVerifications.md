@@ -771,10 +771,11 @@ The test shall verify that the `link` command adds relations to elements followi
 2. Verify Relations subsection is created
 3. Verify relation entry is added
 
-**Test Steps - Idempotent Behavior:**
+**Test Steps - Duplicate Detection:**
 1. Link same relation twice
-2. Verify relation is not duplicated
-3. Verify operation succeeds (no error)
+2. Verify second link fails with error
+3. Verify error message mentions 'already exists'
+4. Verify file is unchanged after failed operation
 
 **Test Steps - Dry Run:**
 1. Run `reqvire link --dry-run <source> <relation-type> <target>`
@@ -791,16 +792,25 @@ The test shall verify that the `link` command adds relations to elements followi
 7. Link from non-existent source
 8. Verify error is reported
 
+**Test Steps - External URL Handling:**
+1. Link with relation type (e.g., trace) to external URL
+2. Verify relation is added with URL as target
+3. Attempt to attach external URL using 'attaching' keyword
+4. Verify operation fails with clear error message
+5. Verify error message mentions "external URL" and suggests using 'trace' relation
+
 **Success Criteria:**
 - Adds relation to source element's Relations subsection
 - Creates Relations subsection if missing
 - Source resolves by file path first, then element name
 - Target must be existing element name
-- Idempotent (no duplicates)
+- Duplicate relations/attachments return error with 'already exists' message
 - Validates relation type against supported types
 - Validates element type compatibility
 - Supports --dry-run preview
 - Reports errors for invalid inputs
+- External URLs allowed for relations (trace, satisfiedBy, etc.)
+- External URLs rejected for 'attaching' with helpful error message
 
 #### Metadata
   * type: test-verification
@@ -808,6 +818,41 @@ The test shall verify that the `link` command adds relations to elements followi
 #### Relations
   * verify: [Relation Commands](../../../Interfaces/CLI.md#relation-commands)
   * verify: [Relation Management Operations](../../Core/ModelManagement.md#relation-management-operations)
+---
+
+### Add Command Duplicate Detection Test
+
+Test verifies that the add command rejects elements with duplicate entries.
+
+#### Details
+Test cases:
+1. **Duplicate relations**: Add element with same relation twice -> Error
+2. **Duplicate attachments**: Add element with same attachment twice -> Error
+3. **Cross-section duplicate**: Add element with same target in Relations and Attachments -> Error
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
+  * verify: [CLI Add Element Command](../../../Interfaces/CLI.md#cli-add-element-command)
+---
+
+### Link Command Cross-Section Detection Test
+
+Test verifies that link commands detect cross-section conflicts.
+
+#### Details
+Test cases:
+1. Element has attachment to B -> `link A relation B` -> Error (already in Attachments)
+2. Element has relation to B -> `link A attaching B` -> Error (already in Relations)
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-duplicate-detection/test.sh)
+  * verify: [Relation Commands](../../../Interfaces/CLI.md#relation-commands)
 ---
 
 ### Unlink Command Verification

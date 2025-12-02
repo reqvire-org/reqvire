@@ -42,14 +42,28 @@ echo "✅ Test 1 passed"
 echo ""
 
 # ==================================
-# Test 2: Attach idempotency
+# Test 2: Attach duplicate returns error
 # ==================================
-echo "Test 2: Attach idempotency (duplicate attach)..."
+echo "Test 2: Attach duplicate returns error..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "docs/SLA.txt" > /dev/null 2>&1
+set +e
+ATTACH_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "docs/SLA.txt" 2>&1)
+ATTACH_DUP_EXIT=$?
+set -e
 
-# File should be unchanged (no duplicate)
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-attach.md" "$TEST_DIR/specifications/Requirements.md" "Duplicate attach should not modify file"
+if [ $ATTACH_DUP_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Duplicate attach should fail with error"
+  exit 1
+fi
+
+if ! echo "$ATTACH_DUP_OUTPUT" | grep -qi "already exists"; then
+  echo "❌ FAILED: Error message should mention 'already exists'"
+  echo "$ATTACH_DUP_OUTPUT"
+  exit 1
+fi
+
+# File should be unchanged (operation failed)
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-attach.md" "$TEST_DIR/specifications/Requirements.md" "Failed attach should not modify file"
 
 echo "✅ Test 2 passed"
 echo ""
@@ -412,55 +426,8 @@ fi
 echo "✅ Test 18 passed"
 echo ""
 
-# ==================================
-# Test 19: mv-asset updates both Attachments and Relations
-# ==================================
-echo "Test 19: mv-asset updates both Attachments and Relations in same element..."
-
-# Create test file with both attachment and satisfiedBy pointing to same file
-cat > "$TEST_DIR/specifications/MixedTest.md" << 'EOF'
-# Elements
-
-### Mixed Test System
-
-Top level container.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derive: [Mixed Requirement](#mixed-requirement)
----
-
-### Mixed Requirement
-
-This requirement has both attachment and relation to same file.
-
-#### Attachments
-  * [shared_doc.pdf](../shared/shared_doc.pdf)
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Mixed Test System](#mixed-test-system)
-  * satisfiedBy: [shared_doc.pdf](../shared/shared_doc.pdf)
----
-
-EOF
-
-# Create the shared file
-mkdir -p "$TEST_DIR/shared"
-echo "PDF content" > "$TEST_DIR/shared/shared_doc.pdf"
-
-# Move the file
-mkdir -p "$TEST_DIR/documents"
-cd "$TEST_DIR" && "$REQVIRE_BIN" mv-asset "shared/shared_doc.pdf" "documents/shared_doc.pdf" > /dev/null 2>&1
-
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/19-after-mv-asset-mixed.md" "$TEST_DIR/specifications/MixedTest.md" "Both attachment and relation should be updated after mv-asset"
-
-echo "✅ Test 19 passed"
-echo ""
+# Note: Test 19 was removed - it tested having the same file in both Attachments AND Relations,
+# which is now prohibited by cross-section duplicate validation.
 
 echo "===================================="
 echo "All Attachments tests passed"

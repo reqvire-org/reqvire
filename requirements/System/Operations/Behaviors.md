@@ -14,6 +14,26 @@ Preview mode behavior for modification commands.
   * type: behavior
 ---
 
+### Format Duplicate Removal Behavior
+
+Deduplication rules for format fix operations.
+
+**Relations subsection:**
+- Duplicate relations (same relation_type + same target) are removed, keeping first occurrence
+- Different relation types to same target are NOT duplicates (e.g., `derivedFrom: A` and `trace: A` are both kept)
+
+**Attachments subsection:**
+- Duplicate attachments (same target path or identifier) are removed, keeping first occurrence
+
+**Cross-section duplicates are NOT removed** - these require user decision and are reported by validation.
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * satisfy: [Format Duplicate Removal](Formatting.md#format-duplicate-removal)
+---
+
 ### Element Ordering Behavior
 
 Ordering algorithm for elements within specification files during formatting and file persistence operations.

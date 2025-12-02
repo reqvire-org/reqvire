@@ -106,6 +106,39 @@ impl GraphRegistry {
         // Validate 'other' type elements only use trace relations
         errors.extend(self.validate_other_element_relations()?);
 
+        // Validate no cross-section duplicates (same target in Relations and Attachments)
+        errors.extend(self.validate_cross_section_duplicates()?);
+
+        Ok(errors)
+    }
+
+    /// Validates that no element has the same target in both Relations and Attachments subsections
+    fn validate_cross_section_duplicates(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        log::debug!("Running cross-section duplicate validation...");
+        let mut errors = Vec::new();
+
+        for (_identifier, node) in &self.nodes {
+            let element = &node.element;
+
+            // Collect all relation targets (normalized identifiers)
+            let relation_targets: std::collections::HashSet<String> = element.relations.iter()
+                .filter(|r| r.user_created)
+                .map(|r| r.target.link.as_str().to_string())
+                .collect();
+
+            // Check attachments against relations
+            for attachment in &element.attachments {
+                let attachment_target = attachment.target.as_str();
+                if relation_targets.contains(&attachment_target) {
+                    let msg = format!(
+                        "Cross-section duplicate in element '{}': target '{}' appears in both Relations and Attachments (file: {})",
+                        element.name, attachment_target, element.file_path
+                    );
+                    errors.push(ReqvireError::CrossSectionDuplicate(msg));
+                }
+            }
+        }
+
         Ok(errors)
     }
 
@@ -1062,9 +1095,15 @@ impl GraphRegistry {
         }
 
         // Add attachments subsection if there are attachments
-        if !element.attachments.is_empty() {
+        // Deduplicate attachments by target, keeping first occurrence
+        let mut seen_attachments: std::collections::HashSet<String> = std::collections::HashSet::new();
+        let unique_attachments: Vec<_> = element.attachments.iter()
+            .filter(|a| seen_attachments.insert(a.target.as_str()))
+            .collect();
+
+        if !unique_attachments.is_empty() {
             markdown.push_str("#### Attachments\n");
-            for attachment in &element.attachments {
+            for attachment in unique_attachments {
                 match &attachment.target {
                     crate::element::AttachmentTarget::FilePath(file_path) => {
                         // Attachment paths are stored as git-root-relative paths
@@ -1133,6 +1172,10 @@ impl GraphRegistry {
         relations_to_include.sort_by(|a, b| {
             (&a.relation_type.name, a.target.link.as_str())
                 .cmp(&(&b.relation_type.name, b.target.link.as_str()))
+        });
+        // Remove duplicate relations (same relation_type + same target), keeping first occurrence
+        relations_to_include.dedup_by(|a, b| {
+            a.relation_type.name == b.relation_type.name && a.target.link.as_str() == b.target.link.as_str()
         });
         if !relations_to_include.is_empty() {
             markdown.push_str("#### Relations\n");

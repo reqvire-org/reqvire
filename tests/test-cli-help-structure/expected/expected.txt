@@ -114,7 +114,7 @@ MV FILE OPTIONS:
 
 LINK OPTIONS:
        <SOURCE>                 Source element name
-       <RELATION_TYPE>          Relation type (derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace) OR 'attaching'
+       <RELATION_TYPE>          Relation type OR 'attaching'. Relations: derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace. Use 'attaching' to attach files or refinement elements (constraint, behavior, specification)
        <TARGET>                 Target: element name, internal path, or external URL (for relations); file path or element name (for attaching)
       --dry-run                 Preview changes without applying
 

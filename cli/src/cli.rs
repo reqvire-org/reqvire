@@ -317,7 +317,9 @@ pub enum Commands {
         /// Source element name
         source: String,
 
-        /// Relation type (derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace) OR 'attaching'
+        /// Relation type OR 'attaching'.
+        /// Relations: derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace.
+        /// Use 'attaching' to attach files or refinement elements (constraint, behavior, specification)
         relation_type: String,
 
         /// Target: element name, internal path, or external URL (for relations); file path or element name (for attaching)
@@ -1006,6 +1008,14 @@ pub fn handle_command(
 
             // Check if relation_type is 'attaching' - special keyword for attachments
             if relation_type == "attaching" {
+                // External URLs are not allowed for attachments
+                if reqvire::utils::is_external_url(&target) {
+                    return Err(ReqvireError::ProcessError(format!(
+                        "External URLs cannot be attached. Use a relation type (e.g., 'trace') instead:\n  reqvire link \"{}\" trace \"{}\"",
+                        source, target
+                    )));
+                }
+
                 // Auto-detect: check if target is a file or element name
                 let cwd = std::env::current_dir().unwrap_or_default();
                 let file_exists_cwd = cwd.join(&target).exists();

@@ -719,7 +719,9 @@ The `link` command shall:
 - Source: existing element name
 - Relation-type: one of derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace, OR 'attaching'
 - Target types for relations: element name, internal file path, or external URL (http/https)
-- Target types for attaching: internal file path or Refinement element name
+- Target types for attaching: internal file path or Refinement element name (external URLs NOT allowed)
+- When 'attaching' is used with an external URL, reject with error suggesting to use 'trace' relation instead
+- When relation or attachment already exists, return error with clear message
 - Support `--dry-run` flag for preview
 
 The `unlink` command shall:

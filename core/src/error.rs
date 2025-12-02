@@ -134,6 +134,10 @@ pub enum ReqvireError {
     DuplicateAttachment(String),
 
     #[allow(dead_code)]
+    #[error("Cross-section duplicate: {0}")]
+    CrossSectionDuplicate(String),
+
+    #[allow(dead_code)]
     #[error("Element not found: {0}")]
     ElementNotFound(String),
 

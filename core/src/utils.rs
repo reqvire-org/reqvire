@@ -360,6 +360,11 @@ pub const EXTERNAL_SCHEMES: &[&str] = &[
     "http://", "https://", "ftp://", "file://", "mailto:", "ssh://", "git://", "data:",
 ];
 
+/// Check if a string is an external URL (starts with known external scheme)
+pub fn is_external_url(s: &str) -> bool {
+    EXTERNAL_SCHEMES.iter().any(|scheme| s.starts_with(scheme))
+}
+
 /// Unified path resolution function that handles git-root-relative paths consistently
 ///
 /// Rules:
