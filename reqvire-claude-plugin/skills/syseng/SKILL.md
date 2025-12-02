@@ -123,6 +123,7 @@ Use for requirement statements:
 3. Never guess - read files before making changes
 4. Validate after each significant change
 5. When reading requirements, always check for **attachments** (documents, diagrams, images)
+6. Use `reqvire collect` to gather full context from requirement chains (ancestors + attachments)
 
 ## Model Optimization
 
@@ -133,6 +134,30 @@ When the model becomes cluttered with duplicate or over-fragmented requirements:
 - **Squash files**: Use `reqvire mv-file --squash` to combine specification files
 
 See [REFACTOR.md](REFACTOR.md) for complete refactoring and optimization guidance.
+
+## Collecting Requirement Context
+
+Use `reqvire collect` to gather complete context for a requirement:
+
+```bash
+# Get full requirement chain with all ancestor content and attachments
+reqvire collect "Feature Requirement"
+
+# JSON format for programmatic use
+reqvire collect "Feature Requirement" --json
+```
+
+**When to use collect:**
+- Before implementing a requirement - get full specification context
+- When analyzing impact of changes - understand complete requirement chain
+- When creating tasks from requirements - gather all related specifications
+- When reviewing requirements - see full derivation hierarchy with sources
+
+The collect command traverses `derivedFrom` relations upward and includes:
+- All ancestor requirement content
+- Attached markdown files (read as content)
+- Attached refinement elements (specifications, constraints, behaviors)
+- Source citations for traceability
 
 ## Task-Specific References
 

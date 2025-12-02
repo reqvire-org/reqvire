@@ -39,16 +39,25 @@ Generate implementation task plan from requirement changes on a feature branch.
 
 3. **For each changed requirement:**
 
-   Get details:
+   Get full context (requirement chain + attachments):
+   ```bash
+   reqvire collect "<requirement-name>" --json > /tmp/context.json
+   ```
+
+   This provides:
+   - Full content from requirement and all ancestors (via derivedFrom)
+   - Attached specifications, constraints, behaviors
+   - Attached documentation files
+   - Source citations for traceability
+
+   Get relations for implementation:
    ```bash
    reqvire search --filter-id="<requirement-id>" --json
    ```
 
    Extract:
-   - Requirement content
    - verifiedBy relations (tests to run)
    - satisfiedBy relations (code to update)
-   - derivedFrom relations (context)
 
 4. **For each verification:**
 
@@ -114,4 +123,5 @@ Generate implementation task plan from requirement changes on a feature branch.
 - Task plan uses TodoWrite format for tracking
 - Links to exact requirement versions via git blob URLs
 - Repository-agnostic: no technology assumptions
+- Use `reqvire collect` to get full requirement context with specifications and attachments
 - Always read full requirements, not just summaries

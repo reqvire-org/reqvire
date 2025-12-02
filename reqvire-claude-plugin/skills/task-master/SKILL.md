@@ -64,17 +64,39 @@ When analyzing requirements for task generation:
 | To Understand This | Use This Command |
 |--------------------|------------------|
 | What requirements changed | `reqvire change-impact --git-commit=<hash> --json` |
-| Requirement full content | `reqvire search --filter-id="<id>" --json` |
+| **Full requirement context with ancestors & attachments** | `reqvire collect "<requirement-name>" --json` |
+| Requirement content only | `reqvire search --filter-id="<id>" --json` |
 | What verifies a requirement | `reqvire traces --filter-id="<id>" --json` |
 | Which tests to run | Extract `satisfiedBy` from verification via `reqvire search` |
 | Implementation status | Check `satisfiedBy` relations in requirement |
 | Requirement hierarchy | `reqvire traces --filter-id="<id>"` shows derivedFrom chain |
+
+### Collecting Full Requirement Context
+
+**Use `reqvire collect` to gather complete context for implementation:**
+
+```bash
+# Get full requirement chain with all specifications and attachments
+reqvire collect "Feature Requirement" --json
+```
+
+This returns:
+- All ancestor requirements (via derivedFrom chain)
+- Attached specification content (constraints, behaviors, specifications)
+- Attached markdown documentation
+- Source citations for each piece of content
+
+**When to use collect:**
+- After change-impact identifies modified requirements
+- Before creating implementation tasks - need full specification context
+- When requirement has attachments or derives from parent requirements
 
 **Why use commands instead of reading files:**
 - Automatic relation following
 - Structured JSON output for parsing
 - Already validated and parsed
 - Includes computed fields (verification status, etc.)
+- `collect` gathers the complete requirement chain in one command
 - Much more efficient than manual file reading
 
 ## Task Plan Principles
