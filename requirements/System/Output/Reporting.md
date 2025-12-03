@@ -32,15 +32,31 @@ This requirement applies to all report operations, including:
   * type: user-requirement
 
 #### Relations
-  * derive: [Collect Content from Requirement Chain](#collect-content-from-requirement-chain)
   * derive: [Complete Model Structure Visualization](DiagramGeneration.md#complete-model-structure-visualization)
   * derive: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
   * derive: [Model Visualization and Exploration](DiagramGeneration.md#model-visualization-and-exploration)
+  * derive: [Collect Content from Requirement Chain](#collect-content-from-requirement-chain)
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
   * derive: [Provide Validation Reports](#provide-validation-reports)
   * derive: [Resources Report](#resources-report)
   * derive: [Verification Coverage Report](#verification-coverage-report)
   * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
+---
+
+### Collect Content from Requirement Chain
+
+The system shall collect and consolidate all content from a requirement element and its ancestors via derivedFrom relations, including attachment contents, and output with source citations in text or JSON format.
+
+#### Details
+The system shall define:
+- Content collection rules for elements and attachments
+- Output format specifications for text and JSON modes
+
+#### Relations
+  * derivedFrom: [Model Reports](#model-reports)
+  * satisfiedBy: [report_collect.rs](../../../core/src/report_collect.rs)
+  * satisfiedBy: [Collect Content Specification](Specifications.md#collect-content-specification)
+  * satisfiedBy: [Collect Output Format Specification](Specifications.md#collect-output-format-specification)
 ---
 
 ### Model Structure and Summaries
@@ -316,23 +332,4 @@ When tracing structural changes, the system shall analyze the System model and d
   * derive: [Change Impact Detection](../Processing/ChangeImpact.md#change-impact-detection)
   * derivedFrom: [Trace Changes in System Model](../../UserStories.md#trace-changes-in-system-model)
   * verifiedBy: [Structural Change Reports Verification](../Processing/Verifications/ChangeImpactVerifications.md#structural-change-reports-verification)
----
-
-### Collect Content from Requirement Chain
-
-The system shall collect and consolidate all content from a requirement element and its ancestors via derivedFrom relations, including attachment contents, and output with source citations in text or JSON format.
-
-#### Details
-The system shall define:
-- Content collection rules for elements and attachments
-- Output format specifications for text and JSON modes
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Model Reports](#model-reports)
-  * satisfiedBy: [Collect Content Specification](Specifications.md#collect-content-specification)
-  * satisfiedBy: [Collect Output Format Specification](Specifications.md#collect-output-format-specification)
-  * satisfiedBy: [report_collect.rs](../../../core/src/report_collect.rs)
 ---

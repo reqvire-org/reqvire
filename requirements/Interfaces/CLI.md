@@ -141,33 +141,6 @@ The `add` command shall:
   * verifiedBy: [CLI Add Element Test](../System/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test)
 ---
 
-### CLI Collect Command
-
-The system shall provide a `collect` command that performs content collection as specified in the attached specifications.
-
-#### Details
-Command syntax: `reqvire collect <element-name> [--json]`
-
-**Arguments:**
-- `<element-name>` - Required. Name of the requirement element to collect from.
-
-**Options:**
-- `--json` - Output in JSON format instead of text
-
-**Exit codes:**
-- 0 on success
-- Non-zero on error (element not found, invalid type, etc.)
-
-#### Attachments
-  * [Collect Content Specification](../System/Output/Specifications.md#collect-content-specification)
-  * [Collect Output Format Specification](../System/Output/Specifications.md#collect-output-format-specification)
-
-#### Relations
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
-  * verifiedBy: [CLI Collect Command Test](../System/Output/Verifications/ReportingVerifications.md#cli-collect-command-test)
----
-
 ### CLI Change Impact Report Command
 
 The system shall provide a command-line interface for initiating change impact analysis and controlling output formats.
@@ -208,6 +181,33 @@ Command invocation: `reqvire change-impact [OPTIONS]`
   * verifiedBy: [Change Impact Analysis Verification](../System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification)
   * verifiedBy: [Change Impact Detection Test](../System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test)
   * verifiedBy: [Change Impact Relations Test](../System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test)
+---
+
+### CLI Collect Command
+
+The system shall provide a `collect` command that performs content collection as specified in the attached specifications.
+
+#### Details
+Command syntax: `reqvire collect <element-name> [--json]`
+
+**Arguments:**
+- `<element-name>` - Required. Name of the requirement element to collect from.
+
+**Options:**
+- `--json` - Output in JSON format instead of text
+
+**Exit codes:**
+- 0 on success
+- Non-zero on error (element not found, invalid type, etc.)
+
+#### Attachments
+  * [Collect Content Specification](../System/Output/Specifications.md#collect-content-specification)
+  * [Collect Output Format Specification](../System/Output/Specifications.md#collect-output-format-specification)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
+  * verifiedBy: [CLI Collect Command Test](../System/Output/Verifications/ReportingVerifications.md#cli-collect-command-test)
 ---
 
 ### CLI Containment Command
