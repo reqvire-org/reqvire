@@ -1,22 +1,5 @@
 # Elements
 
-### EARS Pattern Specification
-
-EARS (Easy Approach to Requirements Syntax) patterns for requirement statements.
-
-#### Details
-| Pattern | Template |
-|---------|----------|
-| Ubiquitous | The system shall [capability] |
-| Event-driven | When [trigger], the system shall [response] |
-| State-driven | While [state], the system shall [capability] |
-| Unwanted | If [condition], then the system shall [response] |
-| Optional | Where [feature], the system shall [capability] |
-
-#### Metadata
-  * type: specification
----
-
 ### Industry Standards Specification
 
 Industry standards and methodologies followed by Reqvire.
@@ -39,3 +22,4 @@ Industry standards and methodologies followed by Reqvire.
 #### Relations
   * satisfy: [Align with Industry Standards](UserStories.md#align-with-industry-standards)
 ---
+

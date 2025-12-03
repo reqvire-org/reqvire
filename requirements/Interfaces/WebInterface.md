@@ -79,7 +79,6 @@ The system shall design and implement HTML pages with consistent layout, styling
 - All brand assets shall be exported to an assets folder during HTML export
 
 #### Attachments
-  * [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
   * [Web Interface Navigation Behavior](Behaviors.md#web-interface-navigation-behavior)
 
 #### Relations
@@ -96,6 +95,7 @@ The system shall design and implement HTML pages with consistent layout, styling
   * satisfiedBy: [index_generator.rs](../../core/src/index_generator.rs)
   * satisfiedBy: [base.html](../../core/templates/base.html)
   * satisfiedBy: [model.html](../../core/templates/model.html)
+  * satisfiedBy: [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
   * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [HTML Export Verification](Verifications/WebInterfaceVerifications.md#html-export-verification)
 ---

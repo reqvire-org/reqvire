@@ -27,9 +27,7 @@ Verification trace diagrams shall use the same visual styling as other mermaid d
 - Element type-based CSS classes (userRequirement, systemRequirement, verification) for consistent coloring
 - Directly verified requirements highlighted with appropriate styling
 
-#### Attachments
-  * [Verification Trace Tree Construction](Specifications.md#verification-trace-tree-construction)
-
 #### Relations
   * derivedFrom: [Verification Upward Traceability](../Output/Reporting.md#verification-upward-traceability)
+  * satisfiedBy: [Verification Trace Tree Construction](Specifications.md#verification-trace-tree-construction)
 ---

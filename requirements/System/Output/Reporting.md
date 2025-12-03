@@ -41,6 +41,11 @@ This requirement applies to all report operations, including:
   * derive: [Resources Report](#resources-report)
   * derive: [Verification Coverage Report](#verification-coverage-report)
   * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
+  * satisfiedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * satisfiedBy: [Error Message Format Specification](Specifications.md#error-message-format-specification)
+  * satisfiedBy: [JSON Output Structure](Specifications.md#json-output-structure)
+  * satisfiedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
+  * satisfiedBy: [Text Output Formatting](Specifications.md#text-output-formatting)
 ---
 
 ### Collect Content from Requirement Chain
@@ -61,7 +66,7 @@ The system shall define:
 
 ### Model Structure and Summaries
 
-When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections also supporting json and cypher output.
+When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections also supporting json output.
 
 #### Metadata
   * type: user-requirement
