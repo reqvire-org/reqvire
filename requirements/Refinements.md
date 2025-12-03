@@ -22,4 +22,3 @@ Industry standards and methodologies followed by Reqvire.
 #### Relations
   * satisfy: [Align with Industry Standards](UserStories.md#align-with-industry-standards)
 ---
-

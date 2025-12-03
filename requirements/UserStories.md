@@ -173,4 +173,3 @@ As an **System Engineer**, I want to validate the structure of System models, so
   * derive: [Model Formatting](System/Operations/Formatting.md#model-formatting)
   * derive: [Model Linting](System/Operations/Linting.md#model-linting)
 ---
-

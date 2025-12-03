@@ -62,6 +62,41 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
   * satisfy: [Ignore Files Integration](Configuration.md#ignore-files-integration)
 ---
 
+### Reserved Files Specification
+
+Reserved repository documentation filenames automatically excluded from structured markdown processing.
+
+#### Details
+The following filenames are reserved for general repository documentation and are automatically excluded from requirements parsing:
+
+**Reserved Filenames:**
+- `README.md` - Project overview and documentation
+- `CHANGELOG.md`, `CHANGES.md` - Version history and release notes
+- `CONTRIBUTING.md` - Contribution guidelines
+- `LICENSE.md` - License information
+- `CODE_OF_CONDUCT.md` - Community conduct standards
+- `SECURITY.md` - Security policies and vulnerability reporting
+- `AUTHORS.md` - Project contributors and credits
+- `ROADMAP.md` - Project roadmap and future plans
+
+**Exclusion Rules:**
+- Reserved filenames are excluded from structured markdown parsing across the entire repository
+- Reserved files can be referenced in file relations to elements (excluded from parsing but linkable)
+- Exclusion is combined with .gitignore and .reqvireignore patterns
+- Files matching reserved filenames are excluded regardless of ignore file configuration
+
+**Scope:**
+- Applies to exact filename matches (case-sensitive on case-sensitive filesystems)
+- Applies at all directory levels in the repository
+- Takes precedence before ignore pattern evaluation
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Reserved Repository Files Exclusion](Configuration.md#reserved-repository-files-exclusion)
+---
+
 ### Supported Element Types Specification
 
 Element types supported by the system for classification and behavior determination.

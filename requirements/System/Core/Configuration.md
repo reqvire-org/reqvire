@@ -86,30 +86,13 @@ Identification Process:
 The system shall automatically exclude certain common repository documentation files from structured markdown processing.
 
 #### Details
-The following reserved filenames are always excluded from structured markdown processing, as they are typically used for general repository documentation purposes rather than system requirements:
+The system shall define which repository documentation filenames are reserved and excluded from parsing.
 
-- `README.md`
-- `CHANGELOG.md`, `CHANGES.md`
-- `CONTRIBUTING.md`
-- `LICENSE.md`
-- `CODE_OF_CONDUCT.md`
-- `SECURITY.md`
-- `AUTHORS.md`
-- `ROADMAP.md`
-
-**Rules:**
-- Reserved filenames shall be automatically excluded from structured markdown parsing across the entire repository
-- Reserved files can still be referenced in file relations to elements (they are excluded from parsing but can be linked to)
-- The exclusion of reserved filenames shall be combined with .gitignore and .reqvireignore patterns
-- Files matching reserved filenames shall be excluded from parsing regardless of .gitignore or .reqvireignore configuration
-
-**Rationale:**
-- These files serve general repository documentation purposes and should not be processed as structured requirements
-- Standard repository files like README.md or LICENSE.md contain free-form documentation rather than structured requirements
-- Automatically excluding these files prevents confusion and reduces the need for explicit .reqvireignore patterns
+Reserved files serve general repository documentation purposes rather than structured requirements. This automatic exclusion prevents confusion and reduces the need for explicit .reqvireignore patterns.
 
 #### Relations
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
+  * satisfiedBy: [Reserved Files Specification](Specifications.md#reserved-files-specification)
   * verifiedBy: [File Exclusion Test](Verifications/ValidationVerifications.md#file-exclusion-test)
 ---
