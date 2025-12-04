@@ -223,6 +223,80 @@ fi
 echo "Test 9 passed"
 echo ""
 
+# ==================================
+# Test 10: Bug reproduction - Multiple source merge with many elements
+# ==================================
+echo "Test 10: Bug reproduction - Multiple source merge..."
+
+# Reset
+cp "${TEST_SCRIPT_DIR}/specifications/Requirements.md" "$TEST_DIR/specifications/Requirements.md"
+cp "${TEST_SCRIPT_DIR}/specifications/Verifications.md" "$TEST_DIR/specifications/Verifications.md"
+
+# This reproduces the bug where merging multiple sources causes unexpected deletion
+# Attempting to merge 3 sources into Target Requirement
+set +e
+MERGE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "Source Requirement One" "Source Requirement Two" "Unrelated Requirement" 2>&1)
+MERGE_EXIT=$?
+set -e
+
+# Save output for inspection
+echo "$MERGE_OUTPUT" > "${TEST_DIR}/test10_merge_output.txt"
+
+if [ $MERGE_EXIT -ne 0 ]; then
+  echo "FAILED: Multi-source merge failed with exit code $MERGE_EXIT"
+  echo "Output:"
+  cat "${TEST_DIR}/test10_merge_output.txt"
+  exit 1
+fi
+
+# Verify target still exists
+SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-name="Target Requirement" --short 2>&1)
+
+if ! echo "$SEARCH_OUTPUT" | grep -q "Target Requirement"; then
+  echo "FAILED: Target requirement should still exist after merge"
+  echo "Search output: $SEARCH_OUTPUT"
+  echo "Merge output:"
+  cat "${TEST_DIR}/test10_merge_output.txt"
+  echo ""
+  echo "File contents:"
+  cat "$TEST_DIR/specifications/Requirements.md"
+  exit 1
+fi
+
+# Verify sources are deleted
+for SOURCE in "Source Requirement One" "Source Requirement Two" "Unrelated Requirement"; do
+  SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-name="$SOURCE" --short 2>&1)
+  if echo "$SEARCH_OUTPUT" | grep -q "$SOURCE"; then
+    echo "FAILED: Source '$SOURCE' should have been deleted"
+    exit 1
+  fi
+done
+
+# Verify other elements are not affected
+for ELEMENT in "System Requirements" "Child Requirement" "Another Link" "Placeholder Requirement"; do
+  SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-name="$ELEMENT" --short 2>&1)
+  if ! echo "$SEARCH_OUTPUT" | grep -q "$ELEMENT"; then
+    echo "FAILED: Unrelated element '$ELEMENT' should not be deleted"
+    echo "File contents:"
+    cat "$TEST_DIR/specifications/Requirements.md"
+    exit 1
+  fi
+done
+
+# Verify model still validates
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "FAILED: Model should validate after merge"
+  echo "Validation output:"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+echo "Test 10 passed"
+echo ""
+
 echo "===================================="
 echo "All Merge Elements tests passed"
 echo "===================================="
