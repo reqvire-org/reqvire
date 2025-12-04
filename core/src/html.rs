@@ -374,11 +374,11 @@ pub fn process_mermaid_diagrams(
         static ref MERMAID_BLOCK: Regex = Regex::new(
             r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#
         ).unwrap();
-        
+
         /// 2) Find all .md links, we'll filter GitHub links in the replacement code
+        /// Note: pulldown-cmark 0.13+ does NOT HTML-encode quotes inside code blocks
         static ref MD_LINK: Regex = Regex::new(
-            // Matches "click X &quot;path/file.md#fragment&quot;"
-            r#"(click\s+\S+\s+&quot;)([^&"]*?)\.md(#[^&"]*)?(&quot;)"#
+            r#"(click\s+\S+\s+")([^"]*?)\.md(#[^"]*)?(")"#
         ).unwrap();
     }
     
@@ -395,10 +395,10 @@ pub fn process_mermaid_diagrams(
 
             // Handle .md links, but preserve GitHub blob links
             let fixed = MD_LINK.replace_all(&decoded, |c: &regex::Captures| {
-                let prefix = &c[1];          // click X &quot;
+                let prefix = &c[1];          // click X "
                 let path = &c[2];            // path/to/file
                 let anchor = c.get(3).map_or("", |m| m.as_str());
-                let suffix = &c[4];          // &quot;
+                let suffix = &c[4];          // "
 
                 // Check if this is a GitHub URL - if so, preserve the .md extension
                 if path.starts_with("https://github.com") {
@@ -1687,12 +1687,12 @@ mod tests {
         assert!(html.contains("DesignSpecifications/DirectMessages.html"));
     }
     
-    #[test]    
+    #[test]
     fn test_mermaid_click_links_preserve_rs_files() {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
     graph TD;
-        click A &quot;https://github.com/user/repo/blob/main/specs/Reqs.md#id1&quot;;
-        click B &quot;https://github.com/user/repo/blob/main/src/main.rs&quot;;
+        click A "https://github.com/user/repo/blob/main/specs/Reqs.md#id1";
+        click B "https://github.com/user/repo/blob/main/src/main.rs";
     </code></pre>"#;
 
         let file_path = PathBuf::from("specs/diagrams/example.md");
@@ -1708,8 +1708,8 @@ mod tests {
     fn test_direct_markdown_links_in_mermaid() {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
     graph TD;
-        click A &quot;specs/Reqs.md#id1&quot;;
-        click B &quot;../../src/main.rs&quot;;
+        click A "specs/Reqs.md#id1";
+        click B "../../src/main.rs";
     </code></pre>"#;
 
         let file_path = PathBuf::from("specs/diagrams/example.md");
@@ -1727,9 +1727,9 @@ mod tests {
     fn test_parent_directory_links_in_mermaid() {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
     graph TD;
-        click A &quot;../parent/Reqs.md#id1&quot;;
-        click B &quot;../../grandparent/Reqs.md#id1&quot;;
-        click B &quot;../../grandparent/Reqs.rs&quot;;        
+        click A "../parent/Reqs.md#id1";
+        click B "../../grandparent/Reqs.md#id1";
+        click B "../../grandparent/Reqs.rs";
     </code></pre>"#;
 
         let file_path = PathBuf::from("specs/diagrams/example.md");
@@ -1738,8 +1738,8 @@ mod tests {
         // Parent directories are preserved
         assert!(processed.contains("../parent/Reqs.html#id1"));
         assert!(processed.contains("../../grandparent/Reqs.html#id1"));
-        assert!(processed.contains("../../grandparent/Reqs.rs"));        
-                
+        assert!(processed.contains("../../grandparent/Reqs.rs"));
+
         // Original .md links are gone
         assert!(!processed.contains("../parent/Reqs.md#id1"));
         assert!(!processed.contains("../../grandparent/Reqs.md#id1"));
@@ -1750,9 +1750,9 @@ mod tests {
     fn test_mermaid_links_without_fragments() {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
     graph TD;
-        click A &quot;specs/Reqs.md&quot;;
-        click B &quot;../parent/Reqs.md&quot;;
-        click C &quot;https://github.com/user/repo/blob/main/specs/Reqs.md&quot;;
+        click A "specs/Reqs.md";
+        click B "../parent/Reqs.md";
+        click C "https://github.com/user/repo/blob/main/specs/Reqs.md";
     </code></pre>"#;
 
         let file_path = PathBuf::from("specs/diagrams/example.md");
@@ -1761,12 +1761,12 @@ mod tests {
         // Regular .md links are converted to .html
         assert!(processed.contains("specs/Reqs.html"));
         assert!(processed.contains("../parent/Reqs.html"));
-        
+
         // GitHub blob links are preserved with the .md extension
         assert!(processed.contains("https://github.com/user/repo/blob/main/specs/Reqs.md"));
-        
+
         // Original regular .md links are gone
-        assert!(!processed.contains("click A &quot;specs/Reqs.md"));
-        assert!(!processed.contains("click B &quot;../parent/Reqs.md"));
+        assert!(!processed.contains("click A \"specs/Reqs.md"));
+        assert!(!processed.contains("click B \"../parent/Reqs.md"));
     }
 }

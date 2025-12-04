@@ -12,34 +12,6 @@ The system SHALL support HTML export functionality with proper link handling.
 
 ---
 
-```mermaid
-graph LR;
-  %% Graph styling
-  classDef requirement fill:#dbeafe,stroke:#2563EB,stroke-width:1px;
-  classDef verification fill:#d4edda,stroke:#006400,stroke-width:1px;
-  classDef externalLink fill:#d0e0ff,stroke:#3080ff,stroke-width:1px;
-  classDef default fill:#f5f5f5,stroke:#333333,stroke-width:1px;
-
-  req1["Test Requirement 1"];
-  click req1 "TestRequirements.md#test-requirement-1";
-  class req1 requirement;
-  
-  req2["Test Requirement 2"];
-  click req2 "TestRequirements.md#test-requirement-2";
-  class req2 requirement;
-  
-  ver1["TestVerifications.md/Test Verification 1"];
-  click ver1 "TestVerifications.md#test-verification-1";
-  class ver1 verification;
-  
-  ver2["TestVerifications.md/Test Verification 2"];
-  click ver2 "TestVerifications.md#test-verification-2";
-  class ver2 verification;
-  
-  req1 -.->|verifiedBy| ver1;
-  req2 -.->|verifiedBy| ver2;
-```
-
 ### Test Requirement 1
 
 This is a test requirement with links to [SpecificationIndex.md](SpecificationIndex.md) and [TestVerifications.md](TestVerifications.md).
