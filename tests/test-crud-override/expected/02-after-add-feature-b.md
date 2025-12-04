@@ -15,6 +15,9 @@ New details section added.
 
 This is a brand new feature.
 
+#### Metadata
+  * type: requirement
+
 #### Relations
   * derivedFrom: [Feature A](#feature-a)
 ---

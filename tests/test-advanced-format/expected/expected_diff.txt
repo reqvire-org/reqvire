@@ -4,19 +4,19 @@ Found 6 file(s) with formatting changes:
   01     # Elements
   02
   03     ### Attachment Display Name Test
-
+  04
   05     This requirement tests that attachment display names are preserved by format.
-  06
-  07     #### Attachments
-  08 -     * [Human Readable Behavior Name](Behaviors.md#my-test-behavior)
-  08 +     * [My Test Behavior](Behaviors.md#my-test-behavior)
-  09
-  10 -   #### Metadata
-  10 -     * type: requirement
-  10 -   ␤
-  10     #### Relations
-  11       * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
-  12     ---
+  06 -   #### Attachments
+  06 -     * [Human Readable Behavior Name](Behaviors.md#my-test-behavior)
+  06 -   ␤
+  06     #### Metadata
+  07       * type: requirement
+  08 +   #### Attachments
+  09 +     * [My Test Behavior](Behaviors.md#my-test-behavior)
+  10 +   ␤
+  11     #### Relations
+  12       * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
+  13     ---
 
 
 
@@ -51,53 +51,54 @@ Found 6 file(s) with formatting changes:
   02 -   The system shall parse the files in all folders and subfolders from the root of git repository.
   02 +   ### Path Resolution Testing
   03
-  04 -   #### Metadata
-  04 -     * type: requirement
   04 +   This requirement tests various absolute path conversions from a subfolder.
-  05
-  06     #### Relations
-  07 -     * derivedFrom: ../UserStories.md#managing-mbse-models
-  07 -     * satisfiedBy: ../core/src/model.rs
-  07 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
-  08 +     * satisfiedBy: [parser.rs](../core/src/parser.rs)
-  09 +     * trace: [MOE_UA](../MOEs.md#moe_ua)
-  10 +     * verifiedBy: [Format Test](../Verifications/Tests.md#format-test)
-  11 +   ---
-  12
-  13 -   ### Validation Framework
-  13 +   ### Requirements Processing
-  14
-  15 -   The system shall implement a two-pass validation architecture for comprehensive error detection.
-  15 +   The system shall parse the files in all folders and subfolders from the root of git repository.
-  16
-  17 -   #### Metadata
-  17 -     * type: requirement
-  17 -   ␤
-  17     #### Relations
-  18 -     * derivedFrom: #requirements-processing
-  18 -     * satisfiedBy: ../core/src/graph_registry.rs
-  18 -   ␤
-  18 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
-  19 +     * satisfiedBy: [model.rs](../core/src/model.rs)
-  20     ---
-  21 -   ### Path Resolution Testing
-  21 +   ### Validation Framework
+  05 +   ␤
+  06     #### Metadata
+  07       * type: requirement
+  08
+  09     #### Relations
+  10 -     * derivedFrom: ../UserStories.md#managing-mbse-models
+  10 -     * satisfiedBy: ../core/src/model.rs
+  10 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
+  11 +     * satisfiedBy: [parser.rs](../core/src/parser.rs)
+  12 +     * trace: [MOE_UA](../MOEs.md#moe_ua)
+  13 +     * verifiedBy: [Format Test](../Verifications/Tests.md#format-test)
+  14 +   ---
+  15
+  16 -   ### Validation Framework
+  16 +   ### Requirements Processing
+  17
+  18 -   The system shall implement a two-pass validation architecture for comprehensive error detection.
+  18 +   The system shall parse the files in all folders and subfolders from the root of git repository.
+  19
+  20     #### Metadata
+  21       * type: requirement
   22
-  23 -   This requirement tests various absolute path conversions from a subfolder.
-  23 +   The system shall implement a two-pass validation architecture for comprehensive error detection.
-  24
-  25 -   #### Metadata
-  25 -     * type: requirement
-  25 -   ␤
-  25     #### Relations
-  26 -     * derivedFrom: [../UserStories.md#managing-mbse-models](/UserStories.md#managing-mbse-models)
-  26 -     * trace: [../MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  26 -     * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
-  26 -     * satisfiedBy: /core/src/parser.rs
-  26 +     * derivedFrom: [Requirements Processing](#requirements-processing)
-  27 +     * satisfiedBy: [graph_registry.rs](../core/src/graph_registry.rs)
-  28 +   ---
-  29
+  23     #### Relations
+  24 -     * derivedFrom: #requirements-processing
+  24 -     * satisfiedBy: ../core/src/graph_registry.rs
+  24 -   ␤
+  24 +     * derivedFrom: [Managing MBSE Models](../UserStories.md#managing-mbse-models)
+  25 +     * satisfiedBy: [model.rs](../core/src/model.rs)
+  26     ---
+  27 -   ### Path Resolution Testing
+  27 +   ### Validation Framework
+  28
+  29 -   This requirement tests various absolute path conversions from a subfolder.
+  29 +   The system shall implement a two-pass validation architecture for comprehensive error detection.
+  30
+  31     #### Metadata
+  32       * type: requirement
+  33
+  34     #### Relations
+  35 -     * derivedFrom: [../UserStories.md#managing-mbse-models](/UserStories.md#managing-mbse-models)
+  35 -     * trace: [../MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  35 -     * verifiedBy: [../Verifications/Tests.md#format-test](/Verifications/Tests.md#format-test)
+  35 -     * satisfiedBy: /core/src/parser.rs
+  35 +     * derivedFrom: [Requirements Processing](#requirements-processing)
+  36 +     * satisfiedBy: [graph_registry.rs](../core/src/graph_registry.rs)
+  37 +   ---
+  38
 
 
 

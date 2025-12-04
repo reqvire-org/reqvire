@@ -1145,28 +1145,23 @@ impl GraphRegistry {
             markdown.push_str("\n");
         }
 
-        // Add metadata subsection if there are custom metadata
+        // Add metadata subsection
+        // Always include metadata to preserve structure during CRUD operations
         let mut custom_metadata: Vec<_> = element.metadata.iter()
             .filter(|(key, _)| *key != "type") // type is handled separately
             .collect();
         custom_metadata.sort_by_key(|(key, _)| *key);
 
-        // Only add metadata section if there are custom metadata or non-default type
-        // Default type is only "requirement" - user-requirement should always be explicit
-        let has_non_default_type = element.element_type.as_str() != "requirement";
+        markdown.push_str("#### Metadata\n");
 
-        if !custom_metadata.is_empty() || has_non_default_type {
-            markdown.push_str("#### Metadata\n");
+        // Add type metadata
+        markdown.push_str(&format!("  * type: {}\n", element.element_type.as_str()));
 
-            // Add type metadata
-            markdown.push_str(&format!("  * type: {}\n", element.element_type.as_str()));
-
-            // Add other metadata
-            for (key, value) in custom_metadata {
-                markdown.push_str(&format!("  * {}: {}\n", key, value));
-            }
-            markdown.push_str("\n");
+        // Add other metadata
+        for (key, value) in custom_metadata {
+            markdown.push_str(&format!("  * {}: {}\n", key, value));
         }
+        markdown.push_str("\n");
 
         // Add attachments subsection if there are attachments
         // Deduplicate attachments by target, keeping first occurrence

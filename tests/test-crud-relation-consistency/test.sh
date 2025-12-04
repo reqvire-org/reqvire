@@ -126,7 +126,7 @@ else
   fi
 
   # Verify forward relation exists (derivedFrom)
-  if ! grep -A 5 "### Derived Requirement 3" "${TEST_DIR}/specifications/Requirements.md" | grep -q "derivedFrom:.*#root-requirement"; then
+  if ! grep -A 15 "### Derived Requirement 3" "${TEST_DIR}/specifications/Requirements.md" | grep -q "derivedFrom:.*#root-requirement"; then
     echo "❌ FAILED: Forward relation (derivedFrom) not found"
     OVERALL_RESULT=1
   fi
@@ -239,13 +239,13 @@ else
   fi
 
   # Verify outgoing relation preserved (derivedFrom to root-requirement)
-  if ! grep -A 5 "### Derived Requirement 2" "${TEST_DIR}/specifications/OtherRequirements.md" | grep -q "derivedFrom:.*Requirements.md#root-requirement"; then
+  if ! grep -A 15 "### Derived Requirement 2" "${TEST_DIR}/specifications/OtherRequirements.md" | grep -q "derivedFrom:.*Requirements.md#root-requirement"; then
     echo "❌ FAILED: Outgoing derivedFrom relation was not preserved"
     OVERALL_RESULT=1
   fi
 
   # Verify outgoing verifiedBy relation preserved and moved with element
-  if ! grep -A 10 "### Derived Requirement 2" "${TEST_DIR}/specifications/OtherRequirements.md" | grep -q "verifiedBy:.*Verifications/Tests.md#test-2"; then
+  if ! grep -A 15 "### Derived Requirement 2" "${TEST_DIR}/specifications/OtherRequirements.md" | grep -q "verifiedBy:.*Verifications/Tests.md#test-2"; then
     echo "❌ FAILED: Outgoing verifiedBy relation was not preserved during move"
     OVERALL_RESULT=1
   fi
@@ -341,10 +341,10 @@ else
 fi
 
 # ==================================
-# Test 5: Delete Root Element - Verify All Derived Relations Removed
+# Test 5: Orphaned Children Prevention - Verify Deletion Rejected
 # ==================================
 echo "" >> "${TEST_DIR}/test_results.log"
-echo "Test 5: Delete root element with multiple outgoing relations..." >> "${TEST_DIR}/test_results.log"
+echo "Test 5: Attempt to delete root element with children (should be rejected)..." >> "${TEST_DIR}/test_results.log"
 
 set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Root Requirement" 2>&1)
@@ -353,73 +353,70 @@ set -e
 
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 
-if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Delete root requirement command failed"
+if [ $EXIT_CODE -eq 0 ]; then
+  echo "❌ FAILED: Delete root requirement should be rejected (would orphan children)"
   echo "Output: $OUTPUT"
   OVERALL_RESULT=1
 else
-  # Verify root element was deleted
-  if grep -q "### Root Requirement" "${TEST_DIR}/specifications/Requirements.md"; then
-    echo "❌ FAILED: Root element was not deleted"
+  # Verify root element was NOT deleted
+  if ! grep -q "### Root Requirement" "${TEST_DIR}/specifications/Requirements.md"; then
+    echo "❌ FAILED: Root element should not be deleted when it has children"
     OVERALL_RESULT=1
   fi
 
-  # Verify all derivedFrom relations pointing to root are removed
-  if grep -q "derivedFrom:.*#root-requirement" "${TEST_DIR}/specifications/Requirements.md"; then
-    echo "❌ FAILED: derivedFrom relations to deleted root were not removed from Requirements.md"
+  # Verify error message mentions orphaned children
+  if ! echo "$OUTPUT" | grep -qi "orphan\|child"; then
+    echo "❌ FAILED: Error message should mention orphaned children"
+    echo "Got: $OUTPUT"
     OVERALL_RESULT=1
   fi
 
-  if grep -q "derivedFrom:.*Requirements.md#root-requirement" "${TEST_DIR}/specifications/OtherRequirements.md"; then
-    echo "❌ FAILED: derivedFrom relations to deleted root were not removed from OtherRequirements.md"
+  # Verify error message lists the children
+  if ! echo "$OUTPUT" | grep -q "Derived Requirement"; then
+    echo "❌ FAILED: Error message should list child elements"
+    echo "Got: $OUTPUT"
     OVERALL_RESULT=1
   fi
 
-  # After deleting root, child elements (Derived Req 2 & 3) are orphaned
-  # Verify that validation correctly identifies these orphaned elements
+  # Verify error provides resolution guidance
+  if ! echo "$OUTPUT" | grep -qi "delete.*child\|link.*parent"; then
+    echo "❌ FAILED: Error message should provide resolution guidance"
+    echo "Got: $OUTPUT"
+    OVERALL_RESULT=1
+  fi
+
+  # Verify model still validates (deletion was prevented)
   set +e
   VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
   VALIDATE_EXIT=$?
   set -e
 
-  if [ $VALIDATE_EXIT -eq 0 ]; then
-    echo "❌ FAILED: Model validation should fail after deleting root (orphaned children)"
+  if [ $VALIDATE_EXIT -ne 0 ]; then
+    echo "❌ FAILED: Model should still be valid after rejected deletion"
+    echo "Output: $VALIDATE_OUTPUT"
     OVERALL_RESULT=1
   else
-    # Verify specific expected errors for orphaned elements
-    if ! echo "$VALIDATE_OUTPUT" | grep -q "Missing parent relation.*Derived Requirement 2"; then
-      echo "❌ FAILED: Expected validation error for orphaned Derived Requirement 2"
-      OVERALL_RESULT=1
-    fi
-
-    if ! echo "$VALIDATE_OUTPUT" | grep -q "Missing parent relation.*Derived Requirement 3"; then
-      echo "❌ FAILED: Expected validation error for orphaned Derived Requirement 3"
-      OVERALL_RESULT=1
-    fi
-
-    echo "✓ Root element deleted and orphaned children correctly identified" >> "${TEST_DIR}/test_results.log"
+    echo "✓ Deletion rejected for parent with children - orphaned children prevented" >> "${TEST_DIR}/test_results.log"
   fi
 fi
 
 # ==================================
-# Test 6: Final Consistency Check - Verify Expected Validation Errors
+# Test 6: Final Consistency Check - Verify Model Remains Valid
 # ==================================
 echo "" >> "${TEST_DIR}/test_results.log"
-echo "Test 6: Final consistency check - verify expected validation errors..." >> "${TEST_DIR}/test_results.log"
+echo "Test 6: Final consistency check - verify model remains valid..." >> "${TEST_DIR}/test_results.log"
 
 set +e
-SUMMARY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
-SUMMARY_EXIT=$?
+VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATE_EXIT=$?
 set -e
 
-# Compare with expected output
-if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-summary.json" <(echo "$SUMMARY_OUTPUT"); then
-  echo "❌ FAILED: Summary output does not match expected"
-  echo ""
-  echo "Differences shown above (expected vs actual)"
+if [ $VALIDATE_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model should be valid (no orphaned elements due to prevention)"
+  echo "Output: $VALIDATE_OUTPUT"
   OVERALL_RESULT=1
 else
-  echo "✓ Summary correctly reports orphaned elements as validation errors" >> "${TEST_DIR}/test_results.log"
+  echo "✓ Model remains valid with orphaned children prevention" >> "${TEST_DIR}/test_results.log"
 fi
 
 # ==================================

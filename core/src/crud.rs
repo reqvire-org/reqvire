@@ -9,6 +9,45 @@ use crate::diff::{CrudResult, CrudOperation, generate_crud_diffs, generate_file_
 use globset::GlobSet;
 use std::path::Path;
 
+/// Check if deleting/overriding an element would orphan any children
+///
+/// Returns a sorted list of child element names that would be orphaned
+fn check_for_orphaned_children(
+    model_manager: &ModelManager,
+    element_id: &str,
+    _element_name: &str,
+) -> Result<Vec<String>, ReqvireError> {
+    let mut orphaned_children: Vec<String> = Vec::new();
+    let hierarchical_types = relation::get_hierarchical_relation_types();
+
+    for (_child_id, child_node) in &model_manager.graph_registry.nodes {
+        // Count how many hierarchical parent relations this child has to the element being deleted
+        let mut parents_to_target = 0;
+        let mut total_parents = 0;
+
+        for rel in &child_node.element.relations {
+            let target_id = match &rel.target.link {
+                crate::relation::LinkType::Identifier(id) => id.as_str(),
+                _ => continue, // Skip external links
+            };
+            if hierarchical_types.contains(&rel.relation_type.name) {
+                total_parents += 1;
+                if target_id == element_id {
+                    parents_to_target += 1;
+                }
+            }
+        }
+
+        // If child only has hierarchical parent relations to the target element, it will be orphaned
+        if parents_to_target > 0 && total_parents == parents_to_target {
+            orphaned_children.push(child_node.element.name.clone());
+        }
+    }
+
+    orphaned_children.sort();
+    Ok(orphaned_children)
+}
+
 /// Add a new element to the model
 ///
 /// # Arguments
@@ -52,6 +91,23 @@ pub fn add_element(
         // Check if element exists and remove it
         if let Some(existing_element) = model_manager.graph_registry.get_element_by_name(&element_name) {
             let existing_id = existing_element.identifier.clone();
+
+            // Check for orphaned children before removing
+            let orphaned_children = check_for_orphaned_children(model_manager, &existing_id, &element_name)?;
+            if !orphaned_children.is_empty() {
+                return Err(ReqvireError::InvalidOperation(
+                    format!(
+                        "Cannot override '{}' because it has {} child element(s) with parent hierarchical relations that would become orphaned: {}.\n\n\
+                        To proceed, either:\n\
+                        1. Delete the child elements first, or\n\
+                        2. Update the child elements to link to a different parent element",
+                        element_name,
+                        orphaned_children.len(),
+                        orphaned_children.join(", ")
+                    )
+                ));
+            }
+
             model_manager.graph_registry.remove_element_with_cleanup(&existing_id)?;
         }
     }
@@ -135,6 +191,22 @@ pub fn remove_element(
             format!("Element not found: {}", element_id)
         ))?;
     let element_name = element.element.name.clone();
+
+    // Check for orphaned children before deletion
+    let orphaned_children = check_for_orphaned_children(model_manager, element_id, &element_name)?;
+    if !orphaned_children.is_empty() {
+        return Err(ReqvireError::InvalidOperation(
+            format!(
+                "Cannot delete '{}' because it has {} child element(s) with parent hierarchical relations that would become orphaned: {}.\n\n\
+                To proceed, either:\n\
+                1. Delete the child elements first, or\n\
+                2. Update the child elements to link to a different parent element",
+                element_name,
+                orphaned_children.len(),
+                orphaned_children.join(", ")
+            )
+        ));
+    }
 
     // Track which files were modified before the operation
     let modified_before: Vec<String> = model_manager.graph_registry.modified_files
@@ -991,6 +1063,37 @@ pub fn merge_elements(
         .cloned()
         .collect();
 
+    // Capture BEFORE state: Get current in-memory content for files that will be modified
+    // We need to do this BEFORE the merge to show proper diffs
+    let target_file = target_element.file_path.clone();
+    let source_files: Vec<String> = source_ids.iter()
+        .filter_map(|id| model_manager.graph_registry.get_element(id))
+        .map(|el| el.file_path.clone())
+        .collect();
+
+    let mut before_content: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let grouped_before = model_manager.graph_registry.group_elements_by_location();
+
+    // Capture content for target file
+    if let Some(sections) = grouped_before.get(&target_file) {
+        before_content.insert(
+            target_file.clone(),
+            model_manager.graph_registry.generate_file_markdown(&target_file, sections, false)
+        );
+    }
+
+    // Capture content for source files
+    for source_file in &source_files {
+        if !before_content.contains_key(source_file.as_str()) {
+            if let Some(sections) = grouped_before.get(source_file.as_str()) {
+                before_content.insert(
+                    source_file.clone(),
+                    model_manager.graph_registry.generate_file_markdown(source_file, sections, false)
+                );
+            }
+        }
+    }
+
     // Perform the merge in graph_registry
     model_manager.graph_registry.merge_elements(&target_id, &source_ids)?;
 
@@ -1002,12 +1105,24 @@ pub fn merge_elements(
         .collect();
     modified_files.sort();
 
-    // Generate diffs for output
-    let diffs = generate_crud_diffs(
-        &model_manager.graph_registry,
-        &modified_files,
-        git_root,
-    )?;
+    // Generate diffs for output using BEFORE vs AFTER in-memory state
+    let mut diffs = Vec::new();
+    let grouped_after = model_manager.graph_registry.group_elements_by_location();
+
+    for file_path in &modified_files {
+        let before = before_content.get(file_path).map(|s| s.as_str()).unwrap_or("");
+
+        let after = if let Some(sections) = grouped_after.get(file_path) {
+            model_manager.graph_registry.generate_file_markdown(file_path, sections, false)
+        } else {
+            String::new()
+        };
+
+        let diff = crate::diff::generate_file_diff(file_path, before, &after);
+        if !diff.lines.is_empty() {
+            diffs.push(diff);
+        }
+    }
 
     // Flush changes if not dry-run
     if !dry_run {

@@ -62,6 +62,22 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
   * satisfy: [Format Consistency Enforcement](Formatting.md#format-consistency-enforcement)
 ---
 
+### Orphaned Children Error Message Specification
+
+The error message for orphaned children prevention shall include:
+- Statement that deletion cannot proceed due to orphaned children
+- Element name being deleted
+- Count of child elements that would be orphaned
+- List of child element names that would be orphaned
+- Resolution guidance: "Delete the child elements first, or update the child elements to link to a different parent element"
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Delete Element Operation](ElementManipulation.md#delete-element-operation)
+---
+
 ### Relation Operations Specification
 
 Technical specification for relation link and unlink operations.
@@ -144,3 +160,4 @@ Rules for validating and normalizing relation targets during element creation an
 #### Relations
   * satisfy: [Create Element Operation](ElementManipulation.md#create-element-operation)
 ---
+

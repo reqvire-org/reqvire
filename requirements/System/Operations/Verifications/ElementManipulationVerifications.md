@@ -401,6 +401,18 @@ The test shall verify that new model elements can be created from a full Markdow
 6. Verify error message indicates which relation target was not found
 7. Verify target file remains unchanged after rejection
 
+**Test Steps - Override with Orphaned Children Prevention:**
+1. Create a parent element with child elements having parent hierarchical relations
+2. Attempt to override the parent element with `--override` flag
+3. Verify the operation is rejected with clear error message
+4. Verify the error lists all children that would be orphaned
+5. Verify the error provides resolution guidance
+6. Create a parent element with children having multiple parent hierarchical relations
+7. Override the parent element with `--override` flag
+8. Verify the operation succeeds (children have other parents)
+9. Override an element with no children
+10. Verify the operation succeeds
+
 **Test Coverage:**
 - Valid element with all subsections (metadata, relations, details)
 - Valid element with minimal structure (only ### header and content)
@@ -430,6 +442,9 @@ The test shall verify that new model elements can be created from a full Markdow
 - **Non-existent relation targets cause rejection**
 - **Relation paths are normalized to git-root-relative format**
 - **External links (http://, https://) bypass validation**
+- Override of parent elements with orphaned children is rejected
+- Error message clearly lists orphaned children with resolution guidance
+- Override succeeds when children have other parent relations
 
 #### Metadata
   * type: test-verification
@@ -466,6 +481,18 @@ The test shall verify that existing model elements can be deleted, all relations
 5. Delete an element leaving other elements in the file
 6. Verify the file is NOT deleted (still contains elements)
 
+**Test Steps - Orphaned Children Prevention:**
+1. Create a parent element with child elements having parent hierarchical relations
+2. Attempt to delete the parent element
+3. Verify the operation is rejected with clear error message
+4. Verify the error lists all children that would be orphaned
+5. Verify the error provides resolution guidance
+6. Create a child element with multiple parent hierarchical relations
+7. Delete one parent element
+8. Verify the operation succeeds (child has other parents)
+9. Delete the last remaining parent
+10. Verify the operation is rejected (child would be orphaned)
+
 **Success Criteria:**
 - Element is completely removed from the source file
 - All incoming relations (relations from other elements to the deleted element) are removed
@@ -475,6 +502,9 @@ The test shall verify that existing model elements can be deleted, all relations
 - Files containing only the deleted element are removed
 - Files with remaining elements are preserved
 - File deletion is reported when it occurs
+- Deletion of parent elements with orphaned children is rejected
+- Error message clearly lists orphaned children with resolution guidance
+- Deletion succeeds when children have other parent relations
 
 **Test Coverage:**
 - Delete element with `derivedFrom` relations pointing to it
@@ -484,6 +514,9 @@ The test shall verify that existing model elements can be deleted, all relations
 - Delete element with multiple types of incoming relations
 - Delete last element in file (triggers file deletion)
 - Delete element leaving other elements (file preserved)
+- Delete parent element with children (single parent - rejected)
+- Delete parent element with children having multiple parents (allowed)
+- Error message validation for orphaned children prevention
 
 #### Metadata
   * type: test-verification

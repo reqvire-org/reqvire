@@ -3,13 +3,16 @@ set -uo pipefail
 
 # Test: Create Element Override Operation
 #
-# Satisfies: requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-override-test
+# Satisfies: requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-test
 #
 # Acceptance Criteria:
 # - Add command with --override replaces existing element with same name
 # - Operation reports as "Updated" rather than "Added"
 # - New content replaces old content completely
 # - Model validates after override
+# - Override is rejected when element has children that would be orphaned
+# - Error message lists orphaned children with resolution guidance
+# - Override succeeds when element has no children
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -147,15 +150,15 @@ if [ $VALIDATION_EXIT -ne 0 ]; then
 fi
 
 # ==================================
-# Test 4: Dry-run override should not modify files
+# Test 4: Override with orphaned children prevention (should fail)
 # ==================================
 
-# Store current file content
-cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/before-dryrun.md.bak"
+# Feature A now has Feature B as a child (from Test 3)
+# Attempting to override Feature A should be rejected
 
 DRYRUN_ELEMENT='### Feature A
 
-Dry run should not persist this.
+Attempted override that would orphan Feature B.
 
 #### Metadata
   * type: user-requirement
@@ -166,21 +169,78 @@ DRYRUN_OUTPUT=$(cd "$TEST_DIR" && echo "$DRYRUN_ELEMENT" | "$REQVIRE_BIN" add sp
 DRYRUN_EXIT=$?
 set -e
 
-if [ $DRYRUN_EXIT -ne 0 ]; then
-  echo "❌ FAILED: Dry-run override should succeed"
+# Override should FAIL due to orphaned children prevention
+if [ $DRYRUN_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Override should be rejected (would orphan Feature B)"
   echo "$DRYRUN_OUTPUT"
   exit 1
 fi
 
-# Verify file was not modified (should still match post-Feature B state)
-assert_file_matches "$TEST_DIR/before-dryrun.md.bak" \
-  "$TEST_DIR/specifications/Requirements.md" \
-  "Dry-run should not modify files"
-
-# Check that output shows "Updated" for dry-run override
-if ! echo "$DRYRUN_OUTPUT" | grep -q "Updated"; then
-  echo "❌ FAILED: Dry-run override should show 'Updated'"
+# Verify error message mentions orphaned children
+if ! echo "$DRYRUN_OUTPUT" | grep -qi "orphan"; then
+  echo "❌ FAILED: Error message should mention orphaned children"
   echo "Got: $DRYRUN_OUTPUT"
+  exit 1
+fi
+
+# Verify error message lists Feature B
+if ! echo "$DRYRUN_OUTPUT" | grep -q "Feature B"; then
+  echo "❌ FAILED: Error message should list Feature B as orphaned child"
+  echo "Got: $DRYRUN_OUTPUT"
+  exit 1
+fi
+
+# Verify error provides resolution guidance
+if ! echo "$DRYRUN_OUTPUT" | grep -qi "delete.*child\|link.*parent"; then
+  echo "❌ FAILED: Error message should provide resolution guidance"
+  echo "Got: $DRYRUN_OUTPUT"
+  exit 1
+fi
+
+# ==================================
+# Test 5: Override element without children (should succeed)
+# ==================================
+
+# Feature B has no children, so override should succeed
+
+OVERRIDE_B_ELEMENT='### Feature B
+
+This is UPDATED Feature B content.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature A](#feature-a)
+'
+
+set +e
+OVERRIDE_B_OUTPUT=$(cd "$TEST_DIR" && echo "$OVERRIDE_B_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md --override 2>&1)
+OVERRIDE_B_EXIT=$?
+set -e
+
+if [ $OVERRIDE_B_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Override of element without children should succeed"
+  echo "$OVERRIDE_B_OUTPUT"
+  exit 1
+fi
+
+# Check operation reports "Updated"
+if ! echo "$OVERRIDE_B_OUTPUT" | grep -q "Updated"; then
+  echo "❌ FAILED: Output should show 'Updated'"
+  echo "Got: $OVERRIDE_B_OUTPUT"
+  exit 1
+fi
+
+# Verify model still validates
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed after override of childless element"
+  echo "$VALIDATION_OUTPUT"
   exit 1
 fi
 

@@ -6,65 +6,63 @@ Added element: Feature D (specifications/Requirements.md#feature-d)
   [32m03 +   ␤[0m
   [32m04 +   This is a newly added feature.[0m
   [32m05 +   ␤[0m
-  [32m06 +   #### Relations[0m
-  [32m07 +     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m08 +   ---[0m
-  [32m09 +   ␤[0m
-  [37m10     ### Parent Feature[0m
-  [37m11[0m
-  [37m12     This is a parent requirement.[0m
-  [37m13[0m
-  [37m14     #### Metadata[0m
-  [37m15       * type: user-requirement[0m
-  [31m16 -   ␤[0m
-  [37m16     ---[0m
-  [37m17[0m
-  [37m18     ### Feature A[0m
-  [37m19[0m
-  [37m20     This is a test requirement for feature A.[0m
-  [31m21 -   #### Metadata[0m
-  [31m21 -     * type: requirement[0m
-  [32m21 +   #### Relations[0m
-  [32m22 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [32m23 +   ---[0m
-  [37m24[0m
-  [32m25 +   ### Complex chars, element/name example[0m
-  [32m26 +   ␤[0m
-  [32m27 +   This feature has special characters in its name including commas and slashes.[0m
-  [32m28 +   ␤[0m
-  [37m29     #### Relations[0m
-  [31m30 -     * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [32m30 +     * derivedFrom: [Feature A](#feature-a)[0m
-  [37m31     ---[0m
-  [37m32[0m
-  [37m33     ### Feature B[0m
-  [37m34[0m
-  [37m35     This is a test requirement for feature B.[0m
-  [31m36 -   #### Metadata[0m
-  [31m36 -     * type: requirement[0m
-  [31m36 -   ␤[0m
-  [37m36     #### Relations[0m
-  [37m37       * derivedFrom: [Feature A](#feature-a)[0m
-  [37m38     ---[0m
+  [32m06 +   #### Metadata[0m
+  [32m07 +     * type: requirement[0m
+  [32m08 +   ␤[0m
+  [32m09 +   #### Relations[0m
+  [32m10 +     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m11 +   ---[0m
+  [32m12 +   ␤[0m
+  [37m13     ### Parent Feature[0m
+  [37m14[0m
+  [37m15     This is a parent requirement.[0m
+  [37m16[0m
+  [37m17     #### Metadata[0m
+  [37m18       * type: user-requirement[0m
+  [31m19 -   ␤[0m
+  [37m19     ---[0m
+  [37m20[0m
+  [37m21     ### Feature A[0m
 
-  [37m40     ### Feature C[0m
-  [37m41[0m
-  [37m42     This is a test requirement for feature C with relations.[0m
-  [31m43 -   #### Metadata[0m
-  [31m43 -     * type: requirement[0m
-  [31m43 -   ␤[0m
-  [37m43     #### Relations[0m
-  [37m44       * derivedFrom: [Feature A](#feature-a)[0m
-  [37m45       * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
-  [37m46     ---[0m
-  [31m47 -   ### Complex chars, element/name example[0m
+  [37m28     #### Relations[0m
+  [37m29       * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m30     ---[0m
+  [31m31 -   ### Feature B[0m
+  [32m31 +   ### Complex chars, element/name example[0m
+  [37m32[0m
+  [31m33 -   This is a test requirement for feature B.[0m
+  [32m33 +   This feature has special characters in its name including commas and slashes.[0m
+  [37m34[0m
+  [37m35     #### Metadata[0m
+  [37m36       * type: requirement[0m
+
+  [37m38     #### Relations[0m
+  [37m39       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m40     ---[0m
+  [31m41 -   ### Feature C[0m
+  [32m41 +   ### Feature B[0m
+  [37m42[0m
+  [31m43 -   This is a test requirement for feature C with relations.[0m
+  [32m43 +   This is a test requirement for feature B.[0m
+  [37m44[0m
+  [37m45     #### Metadata[0m
+  [37m46       * type: requirement[0m
   [37m47[0m
-  [31m48 -   This feature has special characters in its name including commas and slashes.[0m
-  [31m48 -   ␤[0m
-  [31m48 -   #### Metadata[0m
-  [31m48 -     * type: requirement[0m
-  [31m48 -   ␤[0m
-  [31m48 -   #### Relations[0m
-  [31m48 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [31m48 -   ---[0m
-  [31m48 -   ␤[0m
+  [37m48     #### Relations[0m
+  [37m49       * derivedFrom: [Feature A](#feature-a)[0m
+  [31m50 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m50     ---[0m
+  [31m51 -   ### Complex chars, element/name example[0m
+  [32m51 +   ### Feature C[0m
+  [37m52[0m
+  [31m53 -   This feature has special characters in its name including commas and slashes.[0m
+  [32m53 +   This is a test requirement for feature C with relations.[0m
+  [37m54[0m
+  [37m55     #### Metadata[0m
+  [37m56       * type: requirement[0m
+  [37m57[0m
+  [37m58     #### Relations[0m
+  [37m59       * derivedFrom: [Feature A](#feature-a)[0m
+  [32m60 +     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m61     ---[0m
+  [32m62 +   ␤[0m

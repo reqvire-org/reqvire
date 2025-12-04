@@ -6,12 +6,15 @@ Moved element: Feature C (specifications/OtherRequirements.md#feature-c)
   [37m03[0m
   [32m04 +   This is a test requirement for feature C with relations.[0m
   [32m05 +   ␤[0m
-  [32m06 +   #### Relations[0m
-  [32m07 +     * derivedFrom: [Feature A](Requirements.md#feature-a)[0m
-  [32m08 +     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
-  [32m09 +   ---[0m
-  [32m10 +   ␤[0m
-  [32m11 +   ␤[0m
+  [32m06 +   #### Metadata[0m
+  [32m07 +     * type: requirement[0m
+  [32m08 +   ␤[0m
+  [32m09 +   #### Relations[0m
+  [32m10 +     * derivedFrom: [Feature A](Requirements.md#feature-a)[0m
+  [32m11 +     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [32m12 +   ---[0m
+  [32m13 +   ␤[0m
+  [32m14 +   ␤[0m
 
 
 
@@ -20,21 +23,24 @@ Moved element: Feature C (specifications/OtherRequirements.md#feature-c)
   [37m02[0m
   [37m03     ### Feature D Constraint[0m
 
-  [37m31     #### Relations[0m
-  [37m32       * derivedFrom: [Feature A](#feature-a)[0m
-  [37m33     ---[0m
-  [31m34 -   ### Feature C[0m
-  [31m34 -   ␤[0m
-  [31m34 -   This is a test requirement for feature C with relations.[0m
-  [31m34 -   ␤[0m
-  [31m34 -   #### Relations[0m
-  [31m34 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [31m34 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
-  [31m34 -   ---[0m
-  [31m34 -   ␤[0m
-  [37m34     ### Feature D[0m
-  [37m35[0m
-  [37m36     This is a newly added feature.[0m
+  [37m37     #### Relations[0m
+  [37m38       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m39     ---[0m
+  [31m40 -   ### Feature C[0m
+  [31m40 -   ␤[0m
+  [31m40 -   This is a test requirement for feature C with relations.[0m
+  [31m40 -   ␤[0m
+  [31m40 -   #### Metadata[0m
+  [31m40 -     * type: requirement[0m
+  [31m40 -   ␤[0m
+  [31m40 -   #### Relations[0m
+  [31m40 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [31m40 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [31m40 -   ---[0m
+  [31m40 -   ␤[0m
+  [37m40     ### Feature D[0m
+  [37m41[0m
+  [37m42     This is a newly added feature.[0m
 
 
 

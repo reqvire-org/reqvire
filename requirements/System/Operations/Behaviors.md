@@ -4,7 +4,11 @@
 
 When the create element operation is invoked with override mode:
 1. The system shall extract the element name from the markdown input (### Element Name pattern)
-2. If an element with that name exists in the model, the system shall remove it first
+2. If an element with that name exists in the model:
+   - The system shall check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
+   - If any children would be orphaned, the system shall reject the operation
+   - The system shall provide clear error message listing orphaned children with resolution guidance
+   - If no children would be orphaned, the system shall remove the existing element first
 3. The system shall then add the new element content to the target file
 4. The operation shall be reported as "Update" rather than "Add"
 

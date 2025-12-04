@@ -4,6 +4,9 @@
 
 This requirement tests that attachment display names are preserved by format.
 
+#### Metadata
+  * type: requirement
+
 #### Attachments
   * [My Test Behavior](Behaviors.md#my-test-behavior)
 

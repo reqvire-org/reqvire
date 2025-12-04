@@ -45,6 +45,10 @@ The system shall provide the capability to delete existing model elements while 
 
 #### Details
 When deleting an element, the system shall:
+- Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
+- Reject the operation if any child would become orphaned
+- Provide clear error message listing orphaned children with resolution guidance
+- Allow deletion if children have other parent hierarchical relations
 - Remove the element and all its content from the source file
 - Identify all relations pointing to the deleted element (incoming relations)
 - Remove all relations that reference the deleted element from other elements

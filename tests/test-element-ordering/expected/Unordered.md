@@ -12,6 +12,9 @@ Parent A is a root element with children.
 
 Child A derives from Parent A.
 
+#### Metadata
+  * type: requirement
+
 #### Relations
   * derivedFrom: [Parent A](#parent-a)
 ---
@@ -19,6 +22,9 @@ Child A derives from Parent A.
 ### Grandchild M
 
 Grandchild M derives from Child A.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Child A](#child-a)
@@ -28,6 +34,9 @@ Grandchild M derives from Child A.
 
 Grandchild Z derives from Child A.
 
+#### Metadata
+  * type: requirement
+
 #### Relations
   * derivedFrom: [Child A](#child-a)
 ---
@@ -35,6 +44,9 @@ Grandchild Z derives from Child A.
 ### Child B
 
 Child B element that derives from Parent A.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Parent A](#parent-a)

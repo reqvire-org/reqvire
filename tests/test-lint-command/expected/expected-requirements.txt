@@ -12,6 +12,9 @@ This is the root requirement.
 
 This is an alternative parent requirement also derived from root.
 
+#### Metadata
+  * type: requirement
+
 #### Relations
   * derivedFrom: [Root Requirement](#root-requirement)
 ---
@@ -19,6 +22,9 @@ This is an alternative parent requirement also derived from root.
 ### Multi-Path Redundant Requirement
 
 This requirement reaches root through MULTIPLE convergent paths (via parent-requirement and alternative-parent-requirement). Since root is reachable through other paths, the direct root relation is redundant and safe to auto-remove.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Alternative Parent Requirement](#alternative-parent-requirement)
@@ -29,6 +35,9 @@ This requirement reaches root through MULTIPLE convergent paths (via parent-requ
 
 This is a parent requirement derived from root.
 
+#### Metadata
+  * type: requirement
+
 #### Relations
   * derivedFrom: [Root Requirement](#root-requirement)
 ---
@@ -36,6 +45,9 @@ This is a parent requirement derived from root.
 ### Leaf Requirement
 
 This is a leaf requirement derived from parent.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Parent Requirement](#parent-requirement)
@@ -45,6 +57,9 @@ This is a leaf requirement derived from parent.
 ### Single-Chain Redundant Requirement
 
 This requirement has derivedFrom to both parent and root through a SINGLE chain (safe to auto-remove the root relation).
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Parent Requirement](#parent-requirement)

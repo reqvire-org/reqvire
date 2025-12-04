@@ -6,13 +6,16 @@ Moved element: Complex chars, element/name example (specifications/OtherRequirem
   [32m03 +   ␤[0m
   [32m04 +   This feature has special characters in its name including commas and slashes.[0m
   [32m05 +   ␤[0m
-  [32m06 +   #### Relations[0m
-  [32m07 +     * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
-  [32m08 +   ---[0m
-  [32m09 +   ␤[0m
-  [37m10     ### Feature C[0m
-  [37m11[0m
-  [37m12     This is a test requirement for feature C with relations.[0m
+  [32m06 +   #### Metadata[0m
+  [32m07 +     * type: requirement[0m
+  [32m08 +   ␤[0m
+  [32m09 +   #### Relations[0m
+  [32m10 +     * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
+  [32m11 +   ---[0m
+  [32m12 +   ␤[0m
+  [37m13     ### Feature C[0m
+  [37m14[0m
+  [37m15     This is a test requirement for feature C with relations.[0m
 
 
 
@@ -25,7 +28,7 @@ Moved element: Complex chars, element/name example (specifications/OtherRequirem
   [31m04 -   This feature has special characters in its name including commas and slashes.[0m
   [32m04 +   Rate limiting constraint for Feature D.[0m
   [37m05[0m
-  [32m06 +   #### Metadata[0m
+  [37m06     #### Metadata[0m
   [32m07 +     * type: constraint[0m
   [32m08 +   ---[0m
   [32m09 +   ␤[0m
@@ -41,45 +44,51 @@ Moved element: Complex chars, element/name example (specifications/OtherRequirem
   [32m19 +   ␤[0m
   [32m20 +   This is a test requirement for feature A.[0m
   [32m21 +   ␤[0m
-  [37m22     #### Relations[0m
-  [31m23 -     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
-  [32m23 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [37m24     ---[0m
-  [37m25[0m
-  [37m26     ### Feature D[0m
+  [32m22 +   #### Metadata[0m
+  [37m23       * type: requirement[0m
+  [37m24[0m
+  [37m25     #### Relations[0m
+  [31m26 -     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [32m26 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m27     ---[0m
+  [37m28[0m
+  [37m29     ### Feature D[0m
 
-  [37m30     #### Relations[0m
-  [37m31       * derivedFrom: [Feature Alpha](#feature-alpha)[0m
-  [37m32     ---[0m
-  [31m33 -   ### Feature D Constraint[0m
-  [31m33 -   ␤[0m
-  [31m33 -   Rate limiting constraint for Feature D.[0m
-  [31m33 -   ␤[0m
-  [31m33 -   #### Metadata[0m
-  [31m33 -     * type: constraint[0m
-  [31m33 -   ---[0m
-  [31m33 -   ␤[0m
-  [37m33     ### Feature E[0m
-  [37m34[0m
-  [37m35     This feature has an attachment to a refinement element.[0m
+  [37m36     #### Relations[0m
+  [37m37       * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m38     ---[0m
+  [31m39 -   ### Feature D Constraint[0m
+  [31m39 -   ␤[0m
+  [31m39 -   Rate limiting constraint for Feature D.[0m
+  [31m39 -   ␤[0m
+  [31m39 -   #### Metadata[0m
+  [31m39 -     * type: constraint[0m
+  [31m39 -   ---[0m
+  [31m39 -   ␤[0m
+  [37m39     ### Feature E[0m
+  [37m40[0m
+  [37m41     This feature has an attachment to a refinement element.[0m
 
-  [37m40     #### Relations[0m
-  [37m41       * derivedFrom: [Feature Alpha](#feature-alpha)[0m
-  [37m42     ---[0m
-  [31m43 -   ### Parent Feature[0m
-  [37m43[0m
-  [31m44 -   This is a parent requirement.[0m
-  [31m44 -   ␤[0m
-  [31m44 -   #### Metadata[0m
-  [31m44 -     * type: user-requirement[0m
-  [31m44 -   ---[0m
-  [31m44 -   ␤[0m
-  [31m44 -   ### Feature Alpha[0m
-  [31m44 -   ␤[0m
-  [31m44 -   This is a test requirement for feature A.[0m
-  [31m44 -   ␤[0m
-  [31m44 -   #### Relations[0m
-  [31m44 -     * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [31m44 -   ---[0m
-  [31m44 -   ␤[0m
-  [31m44 -   ␤[0m
+  [37m49     #### Relations[0m
+  [37m50       * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m51     ---[0m
+  [31m52 -   ### Parent Feature[0m
+  [37m52[0m
+  [31m53 -   This is a parent requirement.[0m
+  [31m53 -   ␤[0m
+  [31m53 -   #### Metadata[0m
+  [31m53 -     * type: user-requirement[0m
+  [31m53 -   ---[0m
+  [31m53 -   ␤[0m
+  [31m53 -   ### Feature Alpha[0m
+  [31m53 -   ␤[0m
+  [31m53 -   This is a test requirement for feature A.[0m
+  [31m53 -   ␤[0m
+  [31m53 -   #### Metadata[0m
+  [31m53 -     * type: requirement[0m
+  [31m53 -   ␤[0m
+  [31m53 -   #### Relations[0m
+  [31m53 -     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [31m53 -   ---[0m
+  [31m53 -   ␤[0m
+  [31m53 -   ␤[0m
