@@ -1,0 +1,50 @@
+## Auto-fixable Issues
+
+### Redundant Hierarchical Attachment
+
+**Element: Branch A**
+File: [specifications/Requirements.md#branch-a](specifications/Requirements.md#branch-a)
+
+Redundant attachment: `specifications/docs/spec-a.md`
+Already attached on ancestor: [Root Requirement](specifications/Requirements.md#root-requirement)
+
+Reason: Attachment 'specifications/docs/spec-a.md' is already present on ancestor 'Root Requirement'. Attachments propagate through hierarchical relations, so the child's duplicate can be safely removed.
+
+---
+
+### Redundant Hierarchical Attachment
+
+**Element: Branch B**
+File: [specifications/Requirements.md#branch-b](specifications/Requirements.md#branch-b)
+
+Redundant attachment: `specifications/docs/spec-b.md`
+Already attached on ancestor: [Root Requirement](specifications/Requirements.md#root-requirement)
+
+Reason: Attachment 'specifications/docs/spec-b.md' is already present on ancestor 'Root Requirement'. Attachments propagate through hierarchical relations, so the child's duplicate can be safely removed.
+
+---
+
+### Redundant Hierarchical Attachment
+
+**Element: Deep Leaf**
+File: [specifications/Requirements.md#deep-leaf](specifications/Requirements.md#deep-leaf)
+
+Redundant attachment: `specifications/docs/spec-a.md`
+Already attached on ancestor: [Branch A](specifications/Requirements.md#branch-a)
+
+Reason: Attachment 'specifications/docs/spec-a.md' is already present on ancestor 'Branch A'. Attachments propagate through hierarchical relations, so the child's duplicate can be safely removed.
+
+---
+
+### Redundant Hierarchical Attachment
+
+**Element: Leaf From A**
+File: [specifications/Requirements.md#leaf-from-a](specifications/Requirements.md#leaf-from-a)
+
+Redundant attachment: `specifications/docs/spec-a.md`
+Already attached on ancestor: [Branch A](specifications/Requirements.md#branch-a)
+
+Reason: Attachment 'specifications/docs/spec-a.md' is already present on ancestor 'Branch A'. Attachments propagate through hierarchical relations, so the child's duplicate can be safely removed.
+
+---
+

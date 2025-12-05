@@ -102,8 +102,8 @@ The test runner (`run_tests.sh`):
 ```
 test-feature-name/
 ├── test.sh                    # Test execution script
-├── .gitignore                 # MUST exclude expected/ from reqvire parsing
-├── expected/                  # Expected output files
+├── .reqvireignore             # Excludes expected/ from reqvire parsing
+├── expected/                  # Expected output files (committed to git)
 │   ├── 01-after-step1.md     # Expected state after step 1
 │   ├── 02-after-step2.md     # Expected state after step 2
 │   └── output.txt            # Expected command output
@@ -111,12 +111,30 @@ test-feature-name/
     └── Requirements.md
 ```
 
-#### .gitignore for Expected Files
-**CRITICAL**: Expected files contain `# Elements` headers, so they would be parsed as specifications causing duplicate element errors. Always add:
+#### CRITICAL: .reqvireignore vs .gitignore for Expected Files
+
+**IMPORTANT - When to use .reqvireignore vs .gitignore:**
+
+- **Use `.reqvireignore`** (PREFERRED for most tests):
+  - Excludes files from reqvire parsing ONLY
+  - Files remain tracked by git and committed to repository
+  - Expected output files can be version controlled
+  - Use this for tests with `expected/` directories that should be committed
+
+- **Use `.gitignore`** (ONLY for specific .gitignore functionality tests):
+  - Excludes files from BOTH git AND reqvire
+  - Files are untracked and not committed to repository
+  - Only use in tests that specifically test .gitignore behavior:
+    - `test-gitignore-integration` - Tests .gitignore integration
+    - `test-crud-target-location-validation` - Tests .gitignore exclusion validation
+
+**For regular tests with expected output files**, create `.reqvireignore`:
 ```
-# .gitignore in test directory
+# .reqvireignore in test directory
 expected/
 ```
+
+This prevents reqvire from parsing expected files (which contain `# Elements` headers that would cause duplicate element errors) while allowing them to be committed to git for version control.
 
 #### Helper Function Pattern
 ```bash

@@ -1,0 +1,47 @@
+{
+  "starting_element": "specifications/Requirements.md#leaf-requirement",
+  "items": [
+    {
+      "name": "Root Requirement",
+      "identifier": "specifications/Requirements.md#root-requirement",
+      "file_path": "specifications/Requirements.md",
+      "element_type": "user-requirement",
+      "content": "The root requirement for testing content collection.\n\n\n#### Details\nThis is the top-level requirement that has no derivedFrom relations.",
+      "depth": 0,
+      "source_type": "element"
+    },
+    {
+      "name": "Mid-Level Requirement",
+      "identifier": "specifications/Requirements.md#mid-level-requirement",
+      "file_path": "specifications/Requirements.md",
+      "element_type": "requirement",
+      "content": "The mid-level requirement derives from the root.\n\n\n#### Details\nThis requirement sits in the middle of the hierarchy.",
+      "depth": 1,
+      "source_type": "element"
+    },
+    {
+      "name": "Leaf Requirement",
+      "identifier": "specifications/Requirements.md#leaf-requirement",
+      "file_path": "specifications/Requirements.md",
+      "element_type": "requirement",
+      "content": "The leaf requirement at the bottom of the hierarchy.\n\n\n#### Details\nThis is the leaf requirement that derives from the mid-level.",
+      "depth": 2,
+      "source_type": "element"
+    },
+    {
+      "name": "DesignDoc.md",
+      "identifier": "specifications/DesignDoc.md",
+      "file_path": "specifications/DesignDoc.md",
+      "element_type": "attachment",
+      "content": "# Design Document\n\nThis is attached design documentation content.\n\n## Purpose\n\nThis document provides additional context for the leaf requirement.\n",
+      "depth": 2,
+      "source_type": "attachment_file",
+      "attached_to": "specifications/Requirements.md#leaf-requirement"
+    }
+  ],
+  "metadata": {
+    "element_count": 3,
+    "attachment_count": 1,
+    "total_items": 4
+  }
+}

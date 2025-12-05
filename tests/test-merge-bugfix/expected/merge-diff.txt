@@ -1,0 +1,34 @@
+Merged element: Merged 1 element(s) into 'CLI Interface Structure' (specifications/CLI.md#cli-interface-structure)
+
+📄 specifications/CLI.md
+  01     # Elements
+  02
+  03     ### Test Parent
+
+  09
+  10     #### Relations
+  11       * derive: [CLI Interface Structure](#cli-interface-structure)
+  12 -     * derive: [CLI Search Command](#cli-search-command)
+  12     ---
+  13
+  14     ### CLI Interface Structure
+
+  31       -h, --help               Print help
+  32       -V, --version            Print version
+  33     ```
+  34 -   ␤
+  34 -   #### Metadata
+  34 -     * type: requirement
+  34 -   ␤
+  34 -   #### Relations
+  34 -     * derivedFrom: [Test Parent](#test-parent)
+  34 -   ---
+  34 -   ␤
+  34 -   ### CLI Search Command
+  34 -   ␤
+  34     The system shall provide a `search` command to query and filter model elements with flexible output formats.
+  35 -   #### Details
+  35 +   #### Merged Details (CLI Search Command)
+  36     The `search` command shall:
+  37     - Support searching by element name, type, content, or relationships
+  38     - Support `--filter-name`, `--filter-type`, `--filter-content` options
