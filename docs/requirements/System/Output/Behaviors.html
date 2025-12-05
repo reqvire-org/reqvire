@@ -735,17 +735,23 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
-    subgraph 3931cad9905ceff7[&quot;📄 Behaviors.md&quot;]
-      5395e7834d9c0941[&quot;Mermaid Diagram Interaction Behavior&quot;];
-      class 5395e7834d9c0941 default;
-      click 5395e7834d9c0941 &quot;Behaviors.html#mermaid-diagram-interaction-behavior&quot;;
-      d060375c6412e553[&quot;Short Mode Behavior&quot;];
-      class d060375c6412e553 default;
-      click d060375c6412e553 &quot;Behaviors.html#short-mode-behavior&quot;;
-      c01d2af609d2780d[&quot;Verification Coverage Philosophy Behavior&quot;];
-      class c01d2af609d2780d default;
-      click c01d2af609d2780d &quot;Behaviors.html#verification-coverage-philosophy-behavior&quot;;
+  subgraph 7abe7cd3649051be["📁 requirements/System/Output"]
+    subgraph 545305c44740ed0c["📄 Behaviors.md"]
+      4ef6812f4d8f186e["Mermaid Diagram Interaction Behavior"];
+      class 4ef6812f4d8f186e default;
+      click 4ef6812f4d8f186e "Behaviors.html#mermaid-diagram-interaction-behavior";
+      9118ad34dc8898e1["Reverse Relation Traversal Behavior"];
+      class 9118ad34dc8898e1 default;
+      click 9118ad34dc8898e1 "Behaviors.html#reverse-relation-traversal-behavior";
+      fbea234fb154a985["Short Mode Behavior"];
+      class fbea234fb154a985 default;
+      click fbea234fb154a985 "Behaviors.html#short-mode-behavior";
+      b70e45ed7a866f34["Start Element Type Filter Behavior"];
+      class b70e45ed7a866f34 default;
+      click b70e45ed7a866f34 "Behaviors.html#start-element-type-filter-behavior";
+      2e90d80d5c54d556["Verification Coverage Philosophy Behavior"];
+      class 2e90d80d5c54d556 default;
+      click 2e90d80d5c54d556 "Behaviors.html#verification-coverage-philosophy-behavior";
     end
   end
 </div>
@@ -767,6 +773,24 @@ blockquote {
 <h4>Metadata</h4>
 <ul>
 <li>type: behavior</li>
+</ul>
+<hr />
+<h3 id="reverse-relation-traversal-behavior">Reverse Relation Traversal Behavior</h3>
+<p>When reverse mode is enabled for model traversal:</p>
+<ol>
+<li>Follow backward relations (derivedFrom, satisfy, verify) instead of forward relations</li>
+<li>Start from leaf elements (elements with no outgoing forward relations) when no specific element is specified</li>
+<li>Build tree structure from leaves upward toward root requirements</li>
+<li>When a specific starting element is provided, start from that element and traverse upward</li>
+<li>Report “Reverse” direction indicator in output metadata</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#reverse-relation-traversal">Reverse Relation Traversal</a></li>
 </ul>
 <hr />
 <h3 id="short-mode-behavior">Short Mode Behavior</h3>
@@ -795,6 +819,24 @@ blockquote {
 <h4>Metadata</h4>
 <ul>
 <li>type: behavior</li>
+</ul>
+<hr />
+<h3 id="start-element-type-filter-behavior">Start Element Type Filter Behavior</h3>
+<p>When start element type filtering is enabled:</p>
+<ol>
+<li>Accept a list of element types to filter starting points</li>
+<li>Use only elements matching specified types as traversal starting points</li>
+<li>When combined with reverse traversal, filter leaf elements by type</li>
+<li>When used with forward traversal, filter root elements by type</li>
+<li>Support all element types as filter values</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#start-element-type-filtering">Start Element Type Filtering</a></li>
 </ul>
 <hr />
 <h3 id="verification-coverage-philosophy-behavior">Verification Coverage Philosophy Behavior</h3>

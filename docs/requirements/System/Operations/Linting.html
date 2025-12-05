@@ -735,57 +735,70 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
-    subgraph ef60c20abd3a6265[&quot;📄 Linting.md&quot;]
-      4ea9fd0cb008a7d1[&quot;Lint Auto-fix Capability&quot;];
-      class 4ea9fd0cb008a7d1 systemRequirement;
-      click 4ea9fd0cb008a7d1 &quot;Linting.html#lint-auto-fix-capability&quot;;
-      6f992bcf1f37ec46[&quot;Lint Output Formatting&quot;];
-      class 6f992bcf1f37ec46 systemRequirement;
-      click 6f992bcf1f37ec46 &quot;Linting.html#lint-output-formatting&quot;;
-      b131ca76ea79134d[&quot;Model Linting&quot;];
-      class b131ca76ea79134d userRequirement;
-      click b131ca76ea79134d &quot;Linting.html#model-linting&quot;;
-      65dd8a2e87f01d79[&quot;Multi-Branch Convergence Detection<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction&quot;];
-      class 65dd8a2e87f01d79 systemRequirement;
-      click 65dd8a2e87f01d79 &quot;Linting.html#multi-branch-convergence-detection&quot;;
-      2bd0565cb57ff27c[&quot;Redundant Hierarchical Relations Detection<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction&quot;];
-      class 2bd0565cb57ff27c systemRequirement;
-      click 2bd0565cb57ff27c &quot;Linting.html#redundant-hierarchical-relations-detection&quot;;
-      28b58286a606077a[&quot;Redundant Verify Relations Detection<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction&quot;];
-      class 28b58286a606077a systemRequirement;
-      click 28b58286a606077a &quot;Linting.html#redundant-verify-relations-detection&quot;;
-      e55b28ea451e6a58[&quot;Safe Redundant Hierarchical Relations Auto-Removal&quot;];
-      class e55b28ea451e6a58 systemRequirement;
-      click e55b28ea451e6a58 &quot;Linting.html#safe-redundant-hierarchical-relations-auto-removal&quot;;
+  subgraph f97b31ef8bb9beb2["📁 requirements/System/Operations"]
+    subgraph 956c49ae392eca70["📄 Linting.md"]
+      dec167e9e354ced9["Lint Auto-fix Capability"];
+      class dec167e9e354ced9 systemRequirement;
+      click dec167e9e354ced9 "Linting.html#lint-auto-fix-capability";
+      8188faabab34ba29["Lint Output Formatting"];
+      class 8188faabab34ba29 systemRequirement;
+      click 8188faabab34ba29 "Linting.html#lint-output-formatting";
+      4e70a73c803758c7["Model Linting"];
+      class 4e70a73c803758c7 userRequirement;
+      click 4e70a73c803758c7 "Linting.html#model-linting";
+      aca44ff615e1b424["Multi-Branch Convergence Detection<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction"];
+      class aca44ff615e1b424 systemRequirement;
+      click aca44ff615e1b424 "Linting.html#multi-branch-convergence-detection";
+      78aac5e106578b7d["Redundant Hierarchical Attachment Detection"];
+      class 78aac5e106578b7d systemRequirement;
+      click 78aac5e106578b7d "Linting.html#redundant-hierarchical-attachment-detection";
+      9ba6da06e45fe3d9["Redundant Hierarchical Relations Detection<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction"];
+      class 9ba6da06e45fe3d9 systemRequirement;
+      click 9ba6da06e45fe3d9 "Linting.html#redundant-hierarchical-relations-detection";
+      9520c32395e404c9["Redundant Verify Relations Detection<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction"];
+      class 9520c32395e404c9 systemRequirement;
+      click 9520c32395e404c9 "Linting.html#redundant-verify-relations-detection";
+      6b12cb1182be9e75["Safe Redundant Hierarchical Relations Auto-Removal"];
+      class 6b12cb1182be9e75 systemRequirement;
+      click 6b12cb1182be9e75 "Linting.html#safe-redundant-hierarchical-relations-auto-removal";
     end
   end
-  subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
-    subgraph cc6e017f521dc69[&quot;📄 LintingVerifications.md&quot;]
-      ca79dd677191c9dd[&quot;Lint Command Verification&quot;];
-      class ca79dd677191c9dd verification;
-      click ca79dd677191c9dd &quot;Verifications/LintingVerifications.html#lint-command-verification&quot;;
+  subgraph d4f6f1eb956473cf["📁 requirements/System/Operations/Verifications"]
+    subgraph b5cf55876cc5dc67["📄 LintingVerifications.md"]
+      2382dd5fa22de0["Lint Command Verification"];
+      class 2382dd5fa22de0 verification;
+      click 2382dd5fa22de0 "Verifications/LintingVerifications.html#lint-command-verification";
+      3f79752a147268aa["Redundant Hierarchical Attachment Test"];
+      class 3f79752a147268aa verification;
+      click 3f79752a147268aa "Verifications/LintingVerifications.html#redundant-hierarchical-attachment-test";
     end
   end
-  4ea9fd0cb008a7d1 -.->|verifiedBy| ca79dd677191c9dd;
-  6f992bcf1f37ec46 -.->|verifiedBy| ca79dd677191c9dd;
-  b131ca76ea79134d -.->|deriveReqT| 6f992bcf1f37ec46;
-  b131ca76ea79134d -.->|deriveReqT| 65dd8a2e87f01d79;
-  b131ca76ea79134d -.->|deriveReqT| 2bd0565cb57ff27c;
-  b131ca76ea79134d -.->|deriveReqT| 28b58286a606077a;
-  a9b6f3acdf104ea5[&quot;lint.rs&quot;];
-  class a9b6f3acdf104ea5 default;
-  click a9b6f3acdf104ea5 &quot;../../../core/src/lint.rs&quot;;
-  65dd8a2e87f01d79 -->|satisfiedBy| a9b6f3acdf104ea5;
-  65dd8a2e87f01d79 -.->|verifiedBy| ca79dd677191c9dd;
-  2bd0565cb57ff27c -.->|deriveReqT| e55b28ea451e6a58;
-  28b58286a606077a -.->|verifiedBy| ca79dd677191c9dd;
-  e55b28ea451e6a58 -->|satisfiedBy| a9b6f3acdf104ea5;
-  e55b28ea451e6a58 -.->|verifiedBy| ca79dd677191c9dd;
-  68ac732fe5c5db53[&quot;test.sh&quot;];
-  class 68ac732fe5c5db53 default;
-  click 68ac732fe5c5db53 &quot;../../../tests/test-lint-command/test.sh&quot;;
-  ca79dd677191c9dd -->|satisfiedBy| 68ac732fe5c5db53;
+  dec167e9e354ced9 -.->|verifiedBy| 2382dd5fa22de0;
+  8188faabab34ba29 -.->|verifiedBy| 2382dd5fa22de0;
+  4e70a73c803758c7 -.->|deriveReqT| 8188faabab34ba29;
+  4e70a73c803758c7 -.->|deriveReqT| aca44ff615e1b424;
+  4e70a73c803758c7 -.->|deriveReqT| 78aac5e106578b7d;
+  4e70a73c803758c7 -.->|deriveReqT| 9ba6da06e45fe3d9;
+  4e70a73c803758c7 -.->|deriveReqT| 9520c32395e404c9;
+  bff128c40d23f061["lint.rs"];
+  class bff128c40d23f061 default;
+  click bff128c40d23f061 "../../../core/src/lint.rs";
+  aca44ff615e1b424 -->|satisfiedBy| bff128c40d23f061;
+  aca44ff615e1b424 -.->|verifiedBy| 2382dd5fa22de0;
+  78aac5e106578b7d -->|satisfiedBy| bff128c40d23f061;
+  78aac5e106578b7d -.->|verifiedBy| 3f79752a147268aa;
+  9ba6da06e45fe3d9 -.->|deriveReqT| 6b12cb1182be9e75;
+  9520c32395e404c9 -.->|verifiedBy| 2382dd5fa22de0;
+  6b12cb1182be9e75 -->|satisfiedBy| bff128c40d23f061;
+  6b12cb1182be9e75 -.->|verifiedBy| 2382dd5fa22de0;
+  627c92e05bc78e3b["test.sh"];
+  class 627c92e05bc78e3b default;
+  click 627c92e05bc78e3b "../../../tests/test-lint-command/test.sh";
+  2382dd5fa22de0 -->|satisfiedBy| 627c92e05bc78e3b;
+  f6021060dbf21d0c["test.sh"];
+  class f6021060dbf21d0c default;
+  click f6021060dbf21d0c "../../../tests/test-lint-redundant-attachments/test.sh";
+  3f79752a147268aa -->|satisfiedBy| f6021060dbf21d0c;
 </div>
 <h3 id="lint-auto-fix-capability">Lint Auto-fix Capability</h3>
 <p>The system shall provide automatic fixing capability for auto-fixable lint issues, applying changes directly to model files when the <code>--fix</code> flag is used.</p>
@@ -795,9 +808,14 @@ blockquote {
 <li>Only apply fixes for issues categorized as auto-fixable</li>
 <li>Modify the affected markdown files directly</li>
 <li>Remove redundant verify relations from verification elements</li>
+<li>Remove redundant hierarchical attachments from child elements</li>
 <li>Preserve all other content and formatting in the files</li>
 <li>Report all changes made (files modified, relations removed)</li>
 <li>Skip issues categorized as needing manual review</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -824,6 +842,7 @@ blockquote {
 <ul>
 <li>derive: <a href="#lint-output-formatting">Lint Output Formatting</a></li>
 <li>derive: <a href="#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></li>
+<li>derive: <a href="#redundant-hierarchical-attachment-detection">Redundant Hierarchical Attachment Detection</a></li>
 <li>derive: <a href="#redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</a></li>
 <li>derive: <a href="#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
@@ -855,6 +874,10 @@ blockquote {
 </li>
 </ul>
 <p>For auto-fixable issues, the output indicates these can be fixed with <code>--fix</code> flag. For manual review issues, the output explains why human judgment is required.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
@@ -898,6 +921,10 @@ blockquote {
 <li>Is one branch a modeling error? (remove that branch’s intermediate relations)</li>
 <li>Should there be a direct relation instead? (restructure the model)</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="../Processing/Specifications.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
@@ -907,6 +934,39 @@ blockquote {
 <li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
 <li>satisfiedBy: <a href="../../../core/src/lint.rs">lint.rs</a></li>
 <li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
+</ul>
+<hr />
+<h3 id="redundant-hierarchical-attachment-detection">Redundant Hierarchical Attachment Detection</h3>
+<p>The system shall detect attachments that are duplicated between child elements and their ancestors in the derivedFrom hierarchy, flagging the child’s attachment as redundant and auto-fixable.</p>
+<h4>Details</h4>
+<p>An attachment is redundant when:</p>
+<ul>
+<li>A child element has an attachment (file or refinement element)</li>
+<li>An ancestor element (via derivedFrom chain) has the same attachment</li>
+<li>The attachment is already accessible through the ancestor</li>
+</ul>
+<p>Detection shall:</p>
+<ul>
+<li>Traverse the derivedFrom hierarchy for each element with attachments</li>
+<li>Check if any ancestor has the same attachment</li>
+<li>Report the first (topmost) ancestor with the attachment</li>
+<li>Categorize as <strong>auto-fixable</strong> since the child’s duplicate adds no value</li>
+</ul>
+<p>Auto-fix behavior:</p>
+<ul>
+<li>Remove the redundant attachment from the child element</li>
+<li>Preserve the attachment on the ancestor (topmost stays)</li>
+<li>Report all removals for transparency</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
+<li>satisfiedBy: <a href="../../../core/src/lint.rs">lint.rs</a></li>
+<li>verifiedBy: <a href="Verifications/LintingVerifications.html#redundant-hierarchical-attachment-test">Redundant Hierarchical Attachment Test</a></li>
 </ul>
 <hr />
 <h3 id="redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</h3>
@@ -936,6 +996,10 @@ blockquote {
 </ul>
 <p>This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.</p>
 <p><strong>Note</strong>: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="../Processing/Specifications.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
@@ -982,6 +1046,10 @@ Reason: D is reachable via A → B → D and A → C → D
 <li>Report removed relations to the user for transparency</li>
 <li>Show which intermediate paths provide the alternate routes</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</a></li>
@@ -1004,6 +1072,10 @@ Reason: D is reachable via A → B → D and A → C → D
 <li>Identify ancestor requirements in each verification’s trace tree that are also directly verified</li>
 <li>Report these as redundant relations that add noise to the model</li>
 <li>Categorize as <strong>auto-fixable</strong> since removing them is safe and mechanical</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>

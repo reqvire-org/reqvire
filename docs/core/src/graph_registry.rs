@@ -106,6 +106,39 @@ impl GraphRegistry {
         // Validate 'other' type elements only use trace relations
         errors.extend(self.validate_other_element_relations()?);
 
+        // Validate no cross-section duplicates (same target in Relations and Attachments)
+        errors.extend(self.validate_cross_section_duplicates()?);
+
+        Ok(errors)
+    }
+
+    /// Validates that no element has the same target in both Relations and Attachments subsections
+    fn validate_cross_section_duplicates(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        log::debug!("Running cross-section duplicate validation...");
+        let mut errors = Vec::new();
+
+        for (_identifier, node) in &self.nodes {
+            let element = &node.element;
+
+            // Collect all relation targets (normalized identifiers)
+            let relation_targets: std::collections::HashSet<String> = element.relations.iter()
+                .filter(|r| r.user_created)
+                .map(|r| r.target.link.as_str().to_string())
+                .collect();
+
+            // Check attachments against relations
+            for attachment in &element.attachments {
+                let attachment_target = attachment.target.as_str();
+                if relation_targets.contains(&attachment_target) {
+                    let msg = format!(
+                        "Cross-section duplicate in element '{}': target '{}' appears in both Relations and Attachments (file: {})",
+                        element.name, attachment_target, element.file_path
+                    );
+                    errors.push(ReqvireError::CrossSectionDuplicate(msg));
+                }
+            }
+        }
+
         Ok(errors)
     }
 
@@ -464,7 +497,8 @@ impl GraphRegistry {
     }
 
     /// Validate Refinement element constraints
-    /// Refinement elements (constraint, behavior, specification) can only have satisfy relations.
+    /// Refinement elements (constraint, behavior, specification) can only have satisfy relations
+    /// and cannot have attachments.
     fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating Refinement element constraints...");
         let mut errors = Vec::new();
@@ -491,6 +525,18 @@ impl GraphRegistry {
                             element.name,
                             element.element_type.as_str(),
                             invalid_types
+                        ),
+                    ));
+                }
+
+                // Refinement elements cannot have attachments
+                if !element.attachments.is_empty() {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(
+                        format!(
+                            "File {}: Refinement element '{}' (type: {}) cannot have attachments. Refinement elements are atomic documentation units meant to be attached to requirements.",
+                            element.file_path,
+                            element.name,
+                            element.element_type.as_str(),
                         ),
                     ));
                 }
@@ -887,6 +933,67 @@ impl GraphRegistry {
         roots
     }
 
+    /// Find leaf elements for reverse traversal
+    /// Leaf elements are those that:
+    /// 1. Have backward relations (derivedFrom, satisfy, verify) - they trace upward to something
+    /// 2. Have no outgoing forward relations to other elements - nothing derives from them
+    /// Optionally filter by element types
+    pub fn find_leaf_elements(&self, type_filter: Option<&[&str]>) -> Vec<String> {
+        let mut leaves: Vec<String> = self.nodes.values()
+            .map(|node| &node.element)
+            .filter(|element| {
+                // Apply type filter if provided
+                if let Some(types) = type_filter {
+                    let element_type_str = element.element_type.as_str();
+                    if !types.iter().any(|t| *t == element_type_str) {
+                        return false;
+                    }
+                }
+
+                // Must have at least one backward relation (to trace upward)
+                let has_backward_relations = element.relations.iter()
+                    .any(|r| {
+                        relation::BACKWARD_RELATIONS.contains(&r.relation_type.name) &&
+                        matches!(r.target.link, relation::LinkType::Identifier(_))
+                    });
+
+                if !has_backward_relations {
+                    return false;
+                }
+
+                // Must NOT have outgoing forward relations to elements (nothing derives from it)
+                let has_forward_children = element.relations.iter()
+                    .any(|r| {
+                        relation::DIAGRAM_RELATIONS.contains(&r.relation_type.name) &&
+                        matches!(r.target.link, relation::LinkType::Identifier(_))
+                    });
+
+                !has_forward_children
+            })
+            .map(|e| e.identifier.clone())
+            .collect();
+
+        // Sort for deterministic output
+        leaves.sort();
+        leaves
+    }
+
+    /// Find starting elements filtered by type (for both forward and reverse traversal)
+    pub fn find_elements_by_type(&self, type_filter: &[&str]) -> Vec<String> {
+        let mut elements: Vec<String> = self.nodes.values()
+            .map(|node| &node.element)
+            .filter(|element| {
+                let element_type_str = element.element_type.as_str();
+                type_filter.iter().any(|t| *t == element_type_str)
+            })
+            .map(|e| e.identifier.clone())
+            .collect();
+
+        // Sort for deterministic output
+        elements.sort();
+        elements
+    }
+
     /// Collects all InternalPath targets from element relations
     pub fn get_internal_path_targets(&self) -> HashSet<PathBuf> {
         self.collect_internal_path_targets()
@@ -1038,33 +1145,34 @@ impl GraphRegistry {
             markdown.push_str("\n");
         }
 
-        // Add metadata subsection if there are custom metadata
+        // Add metadata subsection
+        // Always include metadata to preserve structure during CRUD operations
         let mut custom_metadata: Vec<_> = element.metadata.iter()
             .filter(|(key, _)| *key != "type") // type is handled separately
             .collect();
         custom_metadata.sort_by_key(|(key, _)| *key);
 
-        // Only add metadata section if there are custom metadata or non-default type
-        // Default type is only "requirement" - user-requirement should always be explicit
-        let has_non_default_type = element.element_type.as_str() != "requirement";
+        markdown.push_str("#### Metadata\n");
 
-        if !custom_metadata.is_empty() || has_non_default_type {
-            markdown.push_str("#### Metadata\n");
+        // Add type metadata
+        markdown.push_str(&format!("  * type: {}\n", element.element_type.as_str()));
 
-            // Add type metadata
-            markdown.push_str(&format!("  * type: {}\n", element.element_type.as_str()));
-
-            // Add other metadata
-            for (key, value) in custom_metadata {
-                markdown.push_str(&format!("  * {}: {}\n", key, value));
-            }
-            markdown.push_str("\n");
+        // Add other metadata
+        for (key, value) in custom_metadata {
+            markdown.push_str(&format!("  * {}: {}\n", key, value));
         }
+        markdown.push_str("\n");
 
         // Add attachments subsection if there are attachments
-        if !element.attachments.is_empty() {
+        // Deduplicate attachments by target, keeping first occurrence
+        let mut seen_attachments: std::collections::HashSet<String> = std::collections::HashSet::new();
+        let unique_attachments: Vec<_> = element.attachments.iter()
+            .filter(|a| seen_attachments.insert(a.target.as_str()))
+            .collect();
+
+        if !unique_attachments.is_empty() {
             markdown.push_str("#### Attachments\n");
-            for attachment in &element.attachments {
+            for attachment in unique_attachments {
                 match &attachment.target {
                     crate::element::AttachmentTarget::FilePath(file_path) => {
                         // Attachment paths are stored as git-root-relative paths
@@ -1133,6 +1241,10 @@ impl GraphRegistry {
         relations_to_include.sort_by(|a, b| {
             (&a.relation_type.name, a.target.link.as_str())
                 .cmp(&(&b.relation_type.name, b.target.link.as_str()))
+        });
+        // Remove duplicate relations (same relation_type + same target), keeping first occurrence
+        relations_to_include.dedup_by(|a, b| {
+            a.relation_type.name == b.relation_type.name && a.target.link.as_str() == b.target.link.as_str()
         });
         if !relations_to_include.is_empty() {
             markdown.push_str("#### Relations\n");
@@ -2081,6 +2193,29 @@ impl GraphRegistry {
         Ok(())
     }
 
+    /// Remove an attachment from an element
+    pub fn remove_element_attachment(&mut self, element_id: &str, attachment: &str) -> Result<(), ReqvireError> {
+        if let Some(node) = self.nodes.get_mut(element_id) {
+            let original_len = node.element.attachments.len();
+            node.element.attachments.retain(|a| {
+                a.target.as_str() != attachment
+            });
+
+            if node.element.attachments.len() < original_len {
+                self.modified_files.insert(node.element.file_path.clone());
+                Ok(())
+            } else {
+                Err(ReqvireError::ProcessError(format!(
+                    "Attachment '{}' not found on element '{}'", attachment, element_id
+                )))
+            }
+        } else {
+            Err(ReqvireError::ProcessError(format!(
+                "Element '{}' not found", element_id
+            )))
+        }
+    }
+
     /// Lists all relations for a given element
     pub fn list_relations(&self, element_id: &str) -> Result<Vec<(String, String)>, ReqvireError> {
         let node = self.nodes.get(element_id)
@@ -2091,6 +2226,239 @@ impl GraphRegistry {
             .collect();
 
         Ok(relations)
+    }
+
+    /// Adds a relation to an element with full validation and target resolution
+    /// This is the comprehensive method used by CRUD operations
+    ///
+    /// # Arguments
+    /// * `source_id` - Source element identifier
+    /// * `target` - Target (element name, URL, or file path)
+    /// * `relation_type` - Relation type name
+    /// * `git_root` - Git root path for file resolution
+    ///
+    /// # Returns
+    /// Modified file path
+    pub fn add_element_relation_full(
+        &mut self,
+        source_id: &str,
+        target: &str,
+        relation_type: &str,
+        git_root: &std::path::Path,
+    ) -> Result<String, ReqvireError> {
+        use crate::relation::{RELATION_TYPES, Relation, RelationTarget, LinkType};
+        use std::path::PathBuf;
+
+        // Validate source element exists
+        if !self.nodes.contains_key(source_id) {
+            return Err(ReqvireError::ElementNotFound(
+                format!("Source element '{}' not found", source_id)
+            ));
+        }
+
+        // Validate relation type
+        if !RELATION_TYPES.contains_key(relation_type) {
+            return Err(ReqvireError::UnsupportedRelationType(
+                format!("Invalid relation type '{}'. Valid types: {}",
+                    relation_type, crate::relation::supported_relation_types_list())
+            ));
+        }
+
+        // Get source element info
+        let source_node = self.nodes.get(source_id).unwrap();
+        let source_name = source_node.element.name.clone();
+        let source_file_path = source_node.element.file_path.clone();
+        let source_type = source_node.element.element_type.clone();
+
+        // Determine target type: element name, external URL, or internal path
+        let is_external_url = crate::utils::is_external_url(target);
+        let is_internal_path = !is_external_url && (
+            target.ends_with(".md") ||
+            target.contains('/') ||
+            git_root.join(target).exists()
+        );
+
+        // Resolve target and create relation components
+        let (target_display_name, relation_target_link, target_id_for_check, element_id_opt) =
+            if is_external_url {
+                // External URL - use as-is
+                (target.to_string(), LinkType::ExternalUrl(target.to_string()), target.to_string(), None)
+            } else if is_internal_path {
+                // Internal file path
+                let source_folder = crate::utils::get_parent_dir(&source_file_path);
+
+                // Calculate relative path from source file to target
+                let target_path = PathBuf::from(target);
+                let relative_path = pathdiff::diff_paths(&target_path, &source_folder)
+                    .unwrap_or_else(|| target_path.clone());
+
+                // Extract filename for display name
+                let display = target_path.file_name()
+                    .map(|n| n.to_string_lossy().to_string())
+                    .unwrap_or_else(|| target.to_string());
+
+                (display, LinkType::InternalPath(relative_path), target.to_string(), None)
+            } else {
+                // Element name - resolve to get identifier
+                let target_element = self.get_element_by_name(target)
+                    .ok_or_else(|| ReqvireError::ElementNotFound(
+                        format!("Target element '{}' not found", target)
+                    ))?;
+
+                let target_id = target_element.identifier.clone();
+                let target_display_name = target_element.name.clone();
+                let target_file_path = target_element.file_path.clone();
+                let target_type = target_element.element_type.clone();
+
+                // Validate type compatibility for element-to-element relations
+                // TODO: Add relation-type-specific validation here
+                // For now, just check that we're not linking incompatible types
+                if !source_type.is_merge_compatible(&target_type) {
+                    // Note: This is a simplified check - we may want more nuanced validation
+                    // based on the specific relation type
+                    log::warn!(
+                        "Adding relation '{}' between potentially incompatible types: {} ({}) -> {} ({})",
+                        relation_type, source_name, source_type.as_str(),
+                        target_display_name, target_type.as_str()
+                    );
+                }
+
+                // Calculate relative identifier from source element's file to target element
+                let source_folder = crate::utils::get_parent_dir(&source_file_path);
+
+                let relation_target = if source_file_path == target_file_path {
+                    // Same file - use just the fragment
+                    let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
+                    let fragment = fragment_opt.unwrap_or(&target_id);
+                    LinkType::Identifier(format!("#{}", fragment))
+                } else {
+                    // Different files - calculate relative path
+                    let relative_id = crate::utils::to_relative_identifier(
+                        &target_id,
+                        &source_folder,
+                        true
+                    ).unwrap_or_else(|_| target_id.clone());
+                    LinkType::Identifier(relative_id)
+                };
+
+                // Extract element ID (fragment) for change tracking
+                let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
+                let element_id = fragment_opt.map(|s| s.to_string());
+
+                (target_display_name, relation_target, target_id, element_id)
+            };
+
+        // Get source node again (mutable this time)
+        let source_node = self.nodes.get(source_id).unwrap();
+
+        // Validate: Check if relation already exists (idempotent)
+        let relation_exists = source_node.element.relations.iter().any(|r| {
+            r.user_created &&
+            r.relation_type.name == relation_type &&
+            r.target.link.as_str() == target_id_for_check
+        });
+
+        if relation_exists {
+            return Err(ReqvireError::RelationError(
+                format!("Relation '{}' from '{}' to '{}' already exists",
+                    relation_type, source_name, target)
+            ));
+        }
+
+        // Validate: Check for cross-section duplicate (target in Attachments)
+        let in_attachments = source_node.element.attachments.iter().any(|a| {
+            a.target.as_str() == target_id_for_check
+        });
+
+        if in_attachments {
+            return Err(ReqvireError::CrossSectionDuplicate(
+                format!("Target '{}' already exists in Attachments of '{}'. Cannot add to Relations.",
+                    target, source_name)
+            ));
+        }
+
+        // Create the relation
+        let relation_type_info = RELATION_TYPES.get(relation_type).unwrap();
+        let relation = Relation {
+            relation_type: relation_type_info,
+            target: RelationTarget {
+                text: target_display_name,
+                link: relation_target_link,
+                element_id: element_id_opt,
+            },
+            user_created: true,
+        };
+
+        // Add relation to source element
+        let source_node = self.nodes.get_mut(source_id).unwrap();
+        source_node.element.relations.push(relation);
+
+        // Mark file as modified
+        let file_path = source_node.element.file_path.clone();
+        self.modified_files.insert(file_path.clone());
+
+        Ok(file_path)
+    }
+
+    /// Removes a relation from an element with full target resolution
+    /// This is the comprehensive method used by CRUD operations
+    ///
+    /// # Arguments
+    /// * `source_id` - Source element identifier
+    /// * `target` - Target (element name, URL, or file path)
+    ///
+    /// # Returns
+    /// Tuple of (modified file path, relation type, target display name) or None if no relation found
+    pub fn remove_element_relation_full(
+        &mut self,
+        source_id: &str,
+        target: &str,
+    ) -> Result<Option<(String, String, String)>, ReqvireError> {
+        // Validate source element exists
+        if !self.nodes.contains_key(source_id) {
+            return Err(ReqvireError::ElementNotFound(
+                format!("Source element '{}' not found", source_id)
+            ));
+        }
+
+        let source_node = self.nodes.get(source_id).unwrap();
+        let source_file_path = source_node.element.file_path.clone();
+
+        // Try to resolve target as element name first
+        let target_id_to_find = if let Some(target_element) = self.get_element_by_name(target) {
+            target_element.identifier.clone()
+        } else {
+            // Not an element name - could be URL or path
+            target.to_string()
+        };
+
+        // Find matching relation
+        let relation_match = source_node.element.relations.iter()
+            .find(|r| {
+                r.user_created && r.target.link.as_str() == target_id_to_find
+            })
+            .cloned(); // Clone to avoid borrow issues
+
+        if let Some(relation) = relation_match {
+            let relation_type = relation.relation_type.name.to_string();
+            let target_display_name = relation.target.text.clone();
+
+            // Remove the relation
+            let source_node = self.nodes.get_mut(source_id).unwrap();
+            source_node.element.relations.retain(|r| {
+                !(r.user_created &&
+                  r.relation_type.name == relation_type &&
+                  r.target.link.as_str() == target_id_to_find)
+            });
+
+            // Mark file as modified
+            self.modified_files.insert(source_file_path.clone());
+
+            Ok(Some((source_file_path, relation_type, target_display_name)))
+        } else {
+            // No relation found - could be an attachment (handled by crud layer)
+            Ok(None)
+        }
     }
 
     /// Gets statistics about the graph
@@ -2186,6 +2554,41 @@ impl GraphRegistry {
         Ok(new_element)
     }
 
+    /// Check if removing an element would orphan any children
+    ///
+    /// Returns a sorted list of child element names that would be orphaned
+    fn check_for_orphaned_children(&self, element_id: &str) -> Result<Vec<String>, ReqvireError> {
+        let mut orphaned_children: Vec<String> = Vec::new();
+        let hierarchical_types = crate::relation::get_hierarchical_relation_types();
+
+        for (_child_id, child_node) in &self.nodes {
+            // Count how many hierarchical parent relations this child has to the element being deleted
+            let mut parents_to_target = 0;
+            let mut total_parents = 0;
+
+            for rel in &child_node.element.relations {
+                let target_id = match &rel.target.link {
+                    crate::relation::LinkType::Identifier(id) => id.as_str(),
+                    _ => continue, // Skip external links
+                };
+                if hierarchical_types.contains(&rel.relation_type.name) {
+                    total_parents += 1;
+                    if target_id == element_id {
+                        parents_to_target += 1;
+                    }
+                }
+            }
+
+            // If child only has hierarchical parent relations to the target element, it will be orphaned
+            if parents_to_target > 0 && total_parents == parents_to_target {
+                orphaned_children.push(child_node.element.name.clone());
+            }
+        }
+
+        orphaned_children.sort();
+        Ok(orphaned_children)
+    }
+
     /// Enhanced remove element that tracks modifications and performs cleanup
     pub fn remove_element_with_cleanup(&mut self, element_id: &str) -> Result<Vec<String>, ReqvireError> {
         if !self.nodes.contains_key(element_id) {
@@ -2196,7 +2599,24 @@ impl GraphRegistry {
 
         // Get element info before removal
         let element = &self.nodes.get(element_id).unwrap().element;
+        let element_name = element.name.clone();
         let file_path = element.file_path.clone();
+
+        // Validate: Check for orphaned children before removal
+        let orphaned_children = self.check_for_orphaned_children(element_id)?;
+        if !orphaned_children.is_empty() {
+            return Err(ReqvireError::InvalidOperation(
+                format!(
+                    "Cannot delete '{}' because it has {} child element(s) with parent hierarchical relations that would become orphaned: {}.\n\n\
+                    To proceed, either:\n\
+                    1. Delete the child elements first, or\n\
+                    2. Update the child elements to link to a different parent element",
+                    element_name,
+                    orphaned_children.len(),
+                    orphaned_children.join(", ")
+                )
+            ));
+        }
 
         // Track all files that will be modified
         let mut modified_files = vec![file_path.clone()];
@@ -2326,6 +2746,229 @@ impl GraphRegistry {
         Ok((new_identifier, modified_files))
     }
 
+    /// Merge multiple source elements into a target element
+    ///
+    /// # Arguments
+    /// * `target_id` - Identifier of the target element (must exist)
+    /// * `source_ids` - Identifiers of source elements to merge into target (must exist)
+    ///
+    /// # Behavior
+    /// - Source content is appended to target's Details section
+    /// - Source Details sections become "Merged Details (source name)" subsections
+    /// - Relations and attachments are merged with deduplication
+    /// - Source elements are deleted after successful merge
+    /// - Relations pointing to source elements are redirected to target
+    pub fn merge_elements(
+        &mut self,
+        target_id: &str,
+        source_ids: &[String],
+    ) -> Result<(), ReqvireError> {
+        // Validate target exists
+        if !self.nodes.contains_key(target_id) {
+            return Err(ReqvireError::ElementNotFound(
+                format!("Target element '{}' not found", target_id)
+            ));
+        }
+
+        // Get target element data first (needed for validation)
+        let target_node = self.nodes.get(target_id).unwrap();
+        let target_name = target_node.element.name.clone();
+        let target_type = target_node.element.element_type.clone();
+
+        // Validate all sources exist and collect their data
+        let mut source_data: Vec<(String, String, String, Vec<crate::relation::Relation>, Vec<crate::element::Attachment>)> = Vec::new();
+        for source_id in source_ids {
+            let source_node = self.nodes.get(source_id)
+                .ok_or_else(|| ReqvireError::ElementNotFound(
+                    format!("Source element '{}' not found", source_id)
+                ))?;
+
+            let source_element = &source_node.element;
+
+            // Validate: Check if source would merge into itself
+            if source_id == target_id {
+                return Err(ReqvireError::InvalidOperation(
+                    "Cannot merge element into itself".to_string()
+                ));
+            }
+
+            // Validate: Check type compatibility
+            if !target_type.is_merge_compatible(&source_element.element_type) {
+                return Err(ReqvireError::MergeTypeMismatch(format!(
+                    "Cannot merge '{}' ({}) into '{}' ({}): type mismatch. \
+                     Elements must be in the same category (requirement/verification/refinement/other).",
+                    source_element.name, source_element.element_type.as_str(),
+                    target_name, target_type.as_str()
+                )));
+            }
+
+            source_data.push((
+                source_id.clone(),
+                source_element.name.clone(),
+                source_element.content.clone(),
+                source_element.relations.iter()
+                    .filter(|r| r.user_created)
+                    .cloned()
+                    .collect(),
+                source_element.attachments.clone(),
+            ));
+        }
+
+        // Re-get target element data (needed after validation)
+        let target_node = self.nodes.get(target_id).unwrap();
+        let target_file_path = target_node.element.file_path.clone();
+        let mut merged_content = String::new();
+        let mut merged_relations: Vec<crate::relation::Relation> = target_node.element.relations.iter()
+            .filter(|r| r.user_created)
+            .cloned()
+            .collect();
+        let mut merged_attachments: Vec<crate::element::Attachment> = target_node.element.attachments.clone();
+
+        // Process each source element
+        for (source_id, source_name, source_content, source_relations, source_attachments) in &source_data {
+            // Extract main content and details from source
+            let (main_content, details_content) = extract_content_parts(source_content);
+
+            // Add main content to merged content (will go into target's Details)
+            if !main_content.trim().is_empty() {
+                merged_content.push_str(&format!("\n{}\n", main_content.trim()));
+            }
+
+            // Add details to "Merged Details (element name)" subsection
+            if !details_content.trim().is_empty() {
+                merged_content.push_str(&format!(
+                    "\n#### Merged Details ({})\n{}\n",
+                    source_name, details_content.trim()
+                ));
+            }
+
+            // Collect relations
+            for rel in source_relations {
+                merged_relations.push(rel.clone());
+            }
+
+            // Collect attachments
+            for att in source_attachments {
+                merged_attachments.push(att.clone());
+            }
+
+            // Track source file as modified
+            let source_file = self.nodes.get(source_id).unwrap().element.file_path.clone();
+            self.modified_files.insert(source_file);
+        }
+
+        // Deduplicate relations by (relation_type, target)
+        let mut seen_relations: HashSet<(String, String)> = HashSet::new();
+        merged_relations.retain(|r| {
+            let key = (r.relation_type.name.to_string(), r.target.link.as_str().to_string());
+            if seen_relations.contains(&key) {
+                false
+            } else {
+                seen_relations.insert(key);
+                true
+            }
+        });
+
+        // Deduplicate attachments by target
+        let mut seen_attachments: HashSet<String> = HashSet::new();
+        merged_attachments.retain(|a| {
+            let key = a.target.as_str().to_string();
+            if seen_attachments.contains(&key) {
+                false
+            } else {
+                seen_attachments.insert(key);
+                true
+            }
+        });
+
+        // Check for cross-section duplicates
+        let relation_targets: HashSet<String> = merged_relations.iter()
+            .map(|r| r.target.link.as_str().to_string())
+            .collect();
+
+        for attachment in &merged_attachments {
+            let target = attachment.target.as_str();
+            if relation_targets.contains(&target) {
+                return Err(ReqvireError::MergeCrossSectionDuplicate(format!(
+                    "Target '{}' would appear in both Relations and Attachments after merge. Remove one before merging.",
+                    target
+                )));
+            }
+        }
+
+        // Update target element with merged data
+        {
+            let target_node = self.nodes.get_mut(target_id).unwrap();
+            let target_element = &mut target_node.element;
+
+            // Merge content into target's Details section
+            if !merged_content.trim().is_empty() {
+                target_element.content = merge_content_into_details(&target_element.content, &merged_content);
+            }
+
+            target_element.relations = merged_relations;
+            target_element.attachments = merged_attachments;
+        }
+
+        self.modified_files.insert(target_file_path);
+
+        // Redirect relations from other elements pointing to sources to point to target
+        for (source_id, _, _, _, _) in &source_data {
+            self.redirect_relations_to_target(source_id, target_id)?;
+        }
+
+        // Remove source elements (this also removes them from the graph)
+        for (source_id, _, _, _, _) in &source_data {
+            self.remove_element(source_id)?;
+        }
+
+        Ok(())
+    }
+
+    /// Redirect all relations pointing to source_id to point to target_id
+    fn redirect_relations_to_target(
+        &mut self,
+        source_id: &str,
+        target_id: &str,
+    ) -> Result<(), ReqvireError> {
+        // Find all nodes with relations pointing to source_id
+        let nodes_to_update: Vec<String> = self.nodes.iter()
+            .filter(|(id, node)| {
+                *id != source_id && *id != target_id &&
+                node.element.relations.iter().any(|r| {
+                    match &r.target.link {
+                        LinkType::Identifier(ref id) => {
+                            id == source_id || id.ends_with(&format!("#{}", source_id))
+                        },
+                        _ => false,
+                    }
+                })
+            })
+            .map(|(id, _)| id.clone())
+            .collect();
+
+        for node_id in nodes_to_update {
+            if let Some(node) = self.nodes.get_mut(&node_id) {
+                let file_path = node.element.file_path.clone();
+                for relation in &mut node.element.relations {
+                    if let LinkType::Identifier(ref id) = relation.target.link {
+                        if id == source_id || id.ends_with(&format!("#{}", source_id)) {
+                            // Update to point to target
+                            relation.target = crate::relation::RelationTarget {
+                                text: target_id.to_string(),
+                                link: LinkType::Identifier(target_id.to_string()),
+                                element_id: Some(target_id.to_string()),
+                            };
+                        }
+                    }
+                }
+                self.modified_files.insert(file_path);
+            }
+        }
+
+        Ok(())
+    }
+
     /// Flushes only modified files to directory (optimization)
     pub fn flush_modified_files(&self, directory: &Path) -> Result<(), ReqvireError> {
         if self.modified_files.is_empty() {
@@ -2355,6 +2998,55 @@ impl GraphRegistry {
     /// Clears the modified files tracking
     pub fn clear_modified_files(&mut self) {
         self.modified_files.clear();
+    }
+}
+
+/// Extract main content and details section from element content
+///
+/// Returns (main_content, details_content) where:
+/// - main_content: Everything before the first "#### Details" header
+/// - details_content: Everything after "#### Details" header until the next #### section
+fn extract_content_parts(content: &str) -> (String, String) {
+    let details_marker = "#### Details";
+    if let Some(pos) = content.find(details_marker) {
+        let main = content[..pos].to_string();
+        let after_marker = pos + details_marker.len();
+        let rest = &content[after_marker..];
+
+        // Find end of details (next #### or end)
+        let details_end = rest.find("\n#### ")
+            .map(|p| p)
+            .unwrap_or(rest.len());
+
+        (main, rest[..details_end].to_string())
+    } else {
+        (content.to_string(), String::new())
+    }
+}
+
+/// Merge additional content into the Details section of target content
+fn merge_content_into_details(target_content: &str, additional: &str) -> String {
+    if additional.trim().is_empty() {
+        return target_content.to_string();
+    }
+
+    let details_marker = "#### Details";
+    if let Some(pos) = target_content.find(details_marker) {
+        // Find end of existing details
+        let after_marker = pos + details_marker.len();
+        let rest = &target_content[after_marker..];
+        let details_end = rest.find("\n#### ")
+            .map(|p| after_marker + p)
+            .unwrap_or(target_content.len());
+
+        // Insert additional content at end of Details
+        let mut result = target_content[..details_end].to_string();
+        result.push_str(additional);
+        result.push_str(&target_content[details_end..]);
+        result
+    } else {
+        // No Details section - create one
+        format!("{}\n#### Details\n{}", target_content.trim_end(), additional)
     }
 }
 

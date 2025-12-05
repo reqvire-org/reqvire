@@ -761,6 +761,7 @@ The `unlink` command shall:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
   * verifiedBy: [Link Command Verification](../System/Operations/Verifications/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../System/Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification)
 ---

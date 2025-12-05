@@ -735,31 +735,31 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph ebbb5ee2da6c145b[&quot;📁 requirements/Interfaces/Verifications&quot;]
-    subgraph a6e0b4f1b51d1969[&quot;📄 CLIVerifications.md&quot;]
-      a39de65a7d24ee22[&quot;CLI Git Commit Hash Flag Test&quot;];
-      class a39de65a7d24ee22 verification;
-      click a39de65a7d24ee22 &quot;CLIVerifications.html#cli-git-commit-hash-flag-test&quot;;
-      7ce243221ec8f143[&quot;CLI Help Structure Verification&quot;];
-      class 7ce243221ec8f143 verification;
-      click 7ce243221ec8f143 &quot;CLIVerifications.html#cli-help-structure-verification&quot;;
-      ecfef581e7e02111[&quot;Verification Traces Element Navigation Test&quot;];
-      class ecfef581e7e02111 verification;
-      click ecfef581e7e02111 &quot;CLIVerifications.html#verification-traces-element-navigation-test&quot;;
+  subgraph fa1ef16db3841757["📁 requirements/Interfaces/Verifications"]
+    subgraph 8f2f862ef196b492["📄 CLIVerifications.md"]
+      8a4a90f9572d8445["CLI Git Commit Hash Flag Test"];
+      class 8a4a90f9572d8445 verification;
+      click 8a4a90f9572d8445 "CLIVerifications.html#cli-git-commit-hash-flag-test";
+      59201973ca89cfb4["CLI Help Structure Verification"];
+      class 59201973ca89cfb4 verification;
+      click 59201973ca89cfb4 "CLIVerifications.html#cli-help-structure-verification";
+      d84d892c177e0260["Verification Traces Element Navigation Test"];
+      class d84d892c177e0260 verification;
+      click d84d892c177e0260 "CLIVerifications.html#verification-traces-element-navigation-test";
     end
   end
-  e95e3160edec8f1b[&quot;test.sh&quot;];
-  class e95e3160edec8f1b default;
-  click e95e3160edec8f1b &quot;../../../tests/test-change-impact-detection/test.sh&quot;;
-  a39de65a7d24ee22 -->|satisfiedBy| e95e3160edec8f1b;
-  6fb925575a1602f1[&quot;test.sh&quot;];
-  class 6fb925575a1602f1 default;
-  click 6fb925575a1602f1 &quot;../../../tests/test-cli-help-structure/test.sh&quot;;
-  7ce243221ec8f143 -->|satisfiedBy| 6fb925575a1602f1;
-  c4c5998e49538704[&quot;test.sh&quot;];
-  class c4c5998e49538704 default;
-  click c4c5998e49538704 &quot;../../../tests/test-verification-traces/test.sh&quot;;
-  ecfef581e7e02111 -->|satisfiedBy| c4c5998e49538704;
+  c2377a15dab54ba5["test.sh"];
+  class c2377a15dab54ba5 default;
+  click c2377a15dab54ba5 "../../../tests/test-change-impact-detection/test.sh";
+  8a4a90f9572d8445 -->|satisfiedBy| c2377a15dab54ba5;
+  7478201b4d47e866["test.sh"];
+  class 7478201b4d47e866 default;
+  click 7478201b4d47e866 "../../../tests/test-cli-help-structure/test.sh";
+  59201973ca89cfb4 -->|satisfiedBy| 7478201b4d47e866;
+  4c7c54f9c1995852["test.sh"];
+  class 4c7c54f9c1995852 default;
+  click 4c7c54f9c1995852 "../../../tests/test-verification-traces/test.sh";
+  d84d892c177e0260 -->|satisfiedBy| 4c7c54f9c1995852;
 </div>
 <h3 id="cli-git-commit-hash-flag-test">CLI Git Commit Hash Flag Test</h3>
 <p>This test verifies that the system properly handles the git commit hash flag for change impact analysis.</p>

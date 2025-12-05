@@ -328,6 +328,16 @@ pub fn extract_path_and_fragment(identifier: &str) -> (&str, Option<&str>) {
         ("", Some(identifier))
     }
 }
+
+/// Gets the parent directory of a file path.
+/// Returns the parent directory as a PathBuf, or an empty PathBuf if the path has no parent.
+/// This is commonly used when calculating file-relative paths in markdown.
+pub fn get_parent_dir(file_path: &str) -> PathBuf {
+    PathBuf::from(file_path).parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_default()
+}
+
 /// Normalizes a fragment identifier according to GitHub's rules:
 /// - Convert to lowercase
 /// - Replace spaces with hyphens

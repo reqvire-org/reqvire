@@ -2228,6 +2228,239 @@ impl GraphRegistry {
         Ok(relations)
     }
 
+    /// Adds a relation to an element with full validation and target resolution
+    /// This is the comprehensive method used by CRUD operations
+    ///
+    /// # Arguments
+    /// * `source_id` - Source element identifier
+    /// * `target` - Target (element name, URL, or file path)
+    /// * `relation_type` - Relation type name
+    /// * `git_root` - Git root path for file resolution
+    ///
+    /// # Returns
+    /// Modified file path
+    pub fn add_element_relation_full(
+        &mut self,
+        source_id: &str,
+        target: &str,
+        relation_type: &str,
+        git_root: &std::path::Path,
+    ) -> Result<String, ReqvireError> {
+        use crate::relation::{RELATION_TYPES, Relation, RelationTarget, LinkType};
+        use std::path::PathBuf;
+
+        // Validate source element exists
+        if !self.nodes.contains_key(source_id) {
+            return Err(ReqvireError::ElementNotFound(
+                format!("Source element '{}' not found", source_id)
+            ));
+        }
+
+        // Validate relation type
+        if !RELATION_TYPES.contains_key(relation_type) {
+            return Err(ReqvireError::UnsupportedRelationType(
+                format!("Invalid relation type '{}'. Valid types: {}",
+                    relation_type, crate::relation::supported_relation_types_list())
+            ));
+        }
+
+        // Get source element info
+        let source_node = self.nodes.get(source_id).unwrap();
+        let source_name = source_node.element.name.clone();
+        let source_file_path = source_node.element.file_path.clone();
+        let source_type = source_node.element.element_type.clone();
+
+        // Determine target type: element name, external URL, or internal path
+        let is_external_url = crate::utils::is_external_url(target);
+        let is_internal_path = !is_external_url && (
+            target.ends_with(".md") ||
+            target.contains('/') ||
+            git_root.join(target).exists()
+        );
+
+        // Resolve target and create relation components
+        let (target_display_name, relation_target_link, target_id_for_check, element_id_opt) =
+            if is_external_url {
+                // External URL - use as-is
+                (target.to_string(), LinkType::ExternalUrl(target.to_string()), target.to_string(), None)
+            } else if is_internal_path {
+                // Internal file path
+                let source_folder = crate::utils::get_parent_dir(&source_file_path);
+
+                // Calculate relative path from source file to target
+                let target_path = PathBuf::from(target);
+                let relative_path = pathdiff::diff_paths(&target_path, &source_folder)
+                    .unwrap_or_else(|| target_path.clone());
+
+                // Extract filename for display name
+                let display = target_path.file_name()
+                    .map(|n| n.to_string_lossy().to_string())
+                    .unwrap_or_else(|| target.to_string());
+
+                (display, LinkType::InternalPath(relative_path), target.to_string(), None)
+            } else {
+                // Element name - resolve to get identifier
+                let target_element = self.get_element_by_name(target)
+                    .ok_or_else(|| ReqvireError::ElementNotFound(
+                        format!("Target element '{}' not found", target)
+                    ))?;
+
+                let target_id = target_element.identifier.clone();
+                let target_display_name = target_element.name.clone();
+                let target_file_path = target_element.file_path.clone();
+                let target_type = target_element.element_type.clone();
+
+                // Validate type compatibility for element-to-element relations
+                // TODO: Add relation-type-specific validation here
+                // For now, just check that we're not linking incompatible types
+                if !source_type.is_merge_compatible(&target_type) {
+                    // Note: This is a simplified check - we may want more nuanced validation
+                    // based on the specific relation type
+                    log::warn!(
+                        "Adding relation '{}' between potentially incompatible types: {} ({}) -> {} ({})",
+                        relation_type, source_name, source_type.as_str(),
+                        target_display_name, target_type.as_str()
+                    );
+                }
+
+                // Calculate relative identifier from source element's file to target element
+                let source_folder = crate::utils::get_parent_dir(&source_file_path);
+
+                let relation_target = if source_file_path == target_file_path {
+                    // Same file - use just the fragment
+                    let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
+                    let fragment = fragment_opt.unwrap_or(&target_id);
+                    LinkType::Identifier(format!("#{}", fragment))
+                } else {
+                    // Different files - calculate relative path
+                    let relative_id = crate::utils::to_relative_identifier(
+                        &target_id,
+                        &source_folder,
+                        true
+                    ).unwrap_or_else(|_| target_id.clone());
+                    LinkType::Identifier(relative_id)
+                };
+
+                // Extract element ID (fragment) for change tracking
+                let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
+                let element_id = fragment_opt.map(|s| s.to_string());
+
+                (target_display_name, relation_target, target_id, element_id)
+            };
+
+        // Get source node again (mutable this time)
+        let source_node = self.nodes.get(source_id).unwrap();
+
+        // Validate: Check if relation already exists (idempotent)
+        let relation_exists = source_node.element.relations.iter().any(|r| {
+            r.user_created &&
+            r.relation_type.name == relation_type &&
+            r.target.link.as_str() == target_id_for_check
+        });
+
+        if relation_exists {
+            return Err(ReqvireError::RelationError(
+                format!("Relation '{}' from '{}' to '{}' already exists",
+                    relation_type, source_name, target)
+            ));
+        }
+
+        // Validate: Check for cross-section duplicate (target in Attachments)
+        let in_attachments = source_node.element.attachments.iter().any(|a| {
+            a.target.as_str() == target_id_for_check
+        });
+
+        if in_attachments {
+            return Err(ReqvireError::CrossSectionDuplicate(
+                format!("Target '{}' already exists in Attachments of '{}'. Cannot add to Relations.",
+                    target, source_name)
+            ));
+        }
+
+        // Create the relation
+        let relation_type_info = RELATION_TYPES.get(relation_type).unwrap();
+        let relation = Relation {
+            relation_type: relation_type_info,
+            target: RelationTarget {
+                text: target_display_name,
+                link: relation_target_link,
+                element_id: element_id_opt,
+            },
+            user_created: true,
+        };
+
+        // Add relation to source element
+        let source_node = self.nodes.get_mut(source_id).unwrap();
+        source_node.element.relations.push(relation);
+
+        // Mark file as modified
+        let file_path = source_node.element.file_path.clone();
+        self.modified_files.insert(file_path.clone());
+
+        Ok(file_path)
+    }
+
+    /// Removes a relation from an element with full target resolution
+    /// This is the comprehensive method used by CRUD operations
+    ///
+    /// # Arguments
+    /// * `source_id` - Source element identifier
+    /// * `target` - Target (element name, URL, or file path)
+    ///
+    /// # Returns
+    /// Tuple of (modified file path, relation type, target display name) or None if no relation found
+    pub fn remove_element_relation_full(
+        &mut self,
+        source_id: &str,
+        target: &str,
+    ) -> Result<Option<(String, String, String)>, ReqvireError> {
+        // Validate source element exists
+        if !self.nodes.contains_key(source_id) {
+            return Err(ReqvireError::ElementNotFound(
+                format!("Source element '{}' not found", source_id)
+            ));
+        }
+
+        let source_node = self.nodes.get(source_id).unwrap();
+        let source_file_path = source_node.element.file_path.clone();
+
+        // Try to resolve target as element name first
+        let target_id_to_find = if let Some(target_element) = self.get_element_by_name(target) {
+            target_element.identifier.clone()
+        } else {
+            // Not an element name - could be URL or path
+            target.to_string()
+        };
+
+        // Find matching relation
+        let relation_match = source_node.element.relations.iter()
+            .find(|r| {
+                r.user_created && r.target.link.as_str() == target_id_to_find
+            })
+            .cloned(); // Clone to avoid borrow issues
+
+        if let Some(relation) = relation_match {
+            let relation_type = relation.relation_type.name.to_string();
+            let target_display_name = relation.target.text.clone();
+
+            // Remove the relation
+            let source_node = self.nodes.get_mut(source_id).unwrap();
+            source_node.element.relations.retain(|r| {
+                !(r.user_created &&
+                  r.relation_type.name == relation_type &&
+                  r.target.link.as_str() == target_id_to_find)
+            });
+
+            // Mark file as modified
+            self.modified_files.insert(source_file_path.clone());
+
+            Ok(Some((source_file_path, relation_type, target_display_name)))
+        } else {
+            // No relation found - could be an attachment (handled by crud layer)
+            Ok(None)
+        }
+    }
+
     /// Gets statistics about the graph
     pub fn get_graph_stats(&self) -> (usize, usize) {
         let element_count = self.nodes.len();
@@ -2321,6 +2554,41 @@ impl GraphRegistry {
         Ok(new_element)
     }
 
+    /// Check if removing an element would orphan any children
+    ///
+    /// Returns a sorted list of child element names that would be orphaned
+    fn check_for_orphaned_children(&self, element_id: &str) -> Result<Vec<String>, ReqvireError> {
+        let mut orphaned_children: Vec<String> = Vec::new();
+        let hierarchical_types = crate::relation::get_hierarchical_relation_types();
+
+        for (_child_id, child_node) in &self.nodes {
+            // Count how many hierarchical parent relations this child has to the element being deleted
+            let mut parents_to_target = 0;
+            let mut total_parents = 0;
+
+            for rel in &child_node.element.relations {
+                let target_id = match &rel.target.link {
+                    crate::relation::LinkType::Identifier(id) => id.as_str(),
+                    _ => continue, // Skip external links
+                };
+                if hierarchical_types.contains(&rel.relation_type.name) {
+                    total_parents += 1;
+                    if target_id == element_id {
+                        parents_to_target += 1;
+                    }
+                }
+            }
+
+            // If child only has hierarchical parent relations to the target element, it will be orphaned
+            if parents_to_target > 0 && total_parents == parents_to_target {
+                orphaned_children.push(child_node.element.name.clone());
+            }
+        }
+
+        orphaned_children.sort();
+        Ok(orphaned_children)
+    }
+
     /// Enhanced remove element that tracks modifications and performs cleanup
     pub fn remove_element_with_cleanup(&mut self, element_id: &str) -> Result<Vec<String>, ReqvireError> {
         if !self.nodes.contains_key(element_id) {
@@ -2331,7 +2599,24 @@ impl GraphRegistry {
 
         // Get element info before removal
         let element = &self.nodes.get(element_id).unwrap().element;
+        let element_name = element.name.clone();
         let file_path = element.file_path.clone();
+
+        // Validate: Check for orphaned children before removal
+        let orphaned_children = self.check_for_orphaned_children(element_id)?;
+        if !orphaned_children.is_empty() {
+            return Err(ReqvireError::InvalidOperation(
+                format!(
+                    "Cannot delete '{}' because it has {} child element(s) with parent hierarchical relations that would become orphaned: {}.\n\n\
+                    To proceed, either:\n\
+                    1. Delete the child elements first, or\n\
+                    2. Update the child elements to link to a different parent element",
+                    element_name,
+                    orphaned_children.len(),
+                    orphaned_children.join(", ")
+                )
+            ));
+        }
 
         // Track all files that will be modified
         let mut modified_files = vec![file_path.clone()];
@@ -2485,6 +2770,11 @@ impl GraphRegistry {
             ));
         }
 
+        // Get target element data first (needed for validation)
+        let target_node = self.nodes.get(target_id).unwrap();
+        let target_name = target_node.element.name.clone();
+        let target_type = target_node.element.element_type.clone();
+
         // Validate all sources exist and collect their data
         let mut source_data: Vec<(String, String, String, Vec<crate::relation::Relation>, Vec<crate::element::Attachment>)> = Vec::new();
         for source_id in source_ids {
@@ -2494,6 +2784,24 @@ impl GraphRegistry {
                 ))?;
 
             let source_element = &source_node.element;
+
+            // Validate: Check if source would merge into itself
+            if source_id == target_id {
+                return Err(ReqvireError::InvalidOperation(
+                    "Cannot merge element into itself".to_string()
+                ));
+            }
+
+            // Validate: Check type compatibility
+            if !target_type.is_merge_compatible(&source_element.element_type) {
+                return Err(ReqvireError::MergeTypeMismatch(format!(
+                    "Cannot merge '{}' ({}) into '{}' ({}): type mismatch. \
+                     Elements must be in the same category (requirement/verification/refinement/other).",
+                    source_element.name, source_element.element_type.as_str(),
+                    target_name, target_type.as_str()
+                )));
+            }
+
             source_data.push((
                 source_id.clone(),
                 source_element.name.clone(),
@@ -2506,7 +2814,7 @@ impl GraphRegistry {
             ));
         }
 
-        // Get target element data
+        // Re-get target element data (needed after validation)
         let target_node = self.nodes.get(target_id).unwrap();
         let target_file_path = target_node.element.file_path.clone();
         let mut merged_content = String::new();

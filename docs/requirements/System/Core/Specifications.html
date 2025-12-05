@@ -735,20 +735,23 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
-    subgraph 98d50eb6f8a292bb[&quot;📄 Specifications.md&quot;]
-      f0239a043d4b79f1[&quot;Git Repository Scope Specification&quot;];
-      class f0239a043d4b79f1 default;
-      click f0239a043d4b79f1 &quot;Specifications.html#git-repository-scope-specification&quot;;
-      47d4dfd806994b53[&quot;Ignore Files Specification&quot;];
-      class 47d4dfd806994b53 default;
-      click 47d4dfd806994b53 &quot;Specifications.html#ignore-files-specification&quot;;
-      11d73b2bad3ddf0a[&quot;Supported Element Types Specification&quot;];
-      class 11d73b2bad3ddf0a default;
-      click 11d73b2bad3ddf0a &quot;Specifications.html#supported-element-types-specification&quot;;
-      aba468c74b8190dc[&quot;Verification Type Categories Specification&quot;];
-      class aba468c74b8190dc default;
-      click aba468c74b8190dc &quot;Specifications.html#verification-type-categories-specification&quot;;
+  subgraph 9e5f55ddfed5810b["📁 requirements/System/Core"]
+    subgraph 51a85b3f8dd9a397["📄 Specifications.md"]
+      cd48b92f881a8522["Git Repository Scope Specification"];
+      class cd48b92f881a8522 default;
+      click cd48b92f881a8522 "Specifications.html#git-repository-scope-specification";
+      85269b3f47786ec4["Ignore Files Specification"];
+      class 85269b3f47786ec4 default;
+      click 85269b3f47786ec4 "Specifications.html#ignore-files-specification";
+      4fdba9fe032dab42["Reserved Files Specification"];
+      class 4fdba9fe032dab42 default;
+      click 4fdba9fe032dab42 "Specifications.html#reserved-files-specification";
+      527a0da20f94637f["Supported Element Types Specification"];
+      class 527a0da20f94637f default;
+      click 527a0da20f94637f "Specifications.html#supported-element-types-specification";
+      aaec9c4da853562f["Verification Type Categories Specification"];
+      class aaec9c4da853562f default;
+      click aaec9c4da853562f "Specifications.html#verification-type-categories-specification";
     end
   end
 </div>
@@ -822,6 +825,43 @@ blockquote {
 <li>satisfy: <a href="Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
 </ul>
 <hr />
+<h3 id="reserved-files-specification">Reserved Files Specification</h3>
+<p>Reserved repository documentation filenames automatically excluded from structured markdown processing.</p>
+<h4>Details</h4>
+<p>The following filenames are reserved for general repository documentation and are automatically excluded from requirements parsing:</p>
+<p><strong>Reserved Filenames:</strong></p>
+<ul>
+<li><code>README.md</code> - Project overview and documentation</li>
+<li><code>CHANGELOG.md</code>, <code>CHANGES.md</code> - Version history and release notes</li>
+<li><code>CONTRIBUTING.md</code> - Contribution guidelines</li>
+<li><code>LICENSE.md</code> - License information</li>
+<li><code>CODE_OF_CONDUCT.md</code> - Community conduct standards</li>
+<li><code>SECURITY.md</code> - Security policies and vulnerability reporting</li>
+<li><code>AUTHORS.md</code> - Project contributors and credits</li>
+<li><code>ROADMAP.md</code> - Project roadmap and future plans</li>
+</ul>
+<p><strong>Exclusion Rules:</strong></p>
+<ul>
+<li>Reserved filenames are excluded from structured markdown parsing across the entire repository</li>
+<li>Reserved files can be referenced in file relations to elements (excluded from parsing but linkable)</li>
+<li>Exclusion is combined with .gitignore and .reqvireignore patterns</li>
+<li>Files matching reserved filenames are excluded regardless of ignore file configuration</li>
+</ul>
+<p><strong>Scope:</strong></p>
+<ul>
+<li>Applies to exact filename matches (case-sensitive on case-sensitive filesystems)</li>
+<li>Applies at all directory levels in the repository</li>
+<li>Takes precedence before ignore pattern evaluation</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Configuration.html#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a></li>
+</ul>
+<hr />
 <h3 id="supported-element-types-specification">Supported Element Types Specification</h3>
 <p>Element types supported by the system for classification and behavior determination.</p>
 <h4>Details</h4>
@@ -847,8 +887,15 @@ blockquote {
 </tbody></table>
 <p><strong>Other Types:</strong></p>
 <table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>other</code></td><td>Custom element types defined by users</td></tr>
+<tr><td><code>other</code></td><td>Generic custom element type</td></tr>
+<tr><td><code>other-TYPENAME</code></td><td>Named custom element type (e.g., <code>other-interface</code>, <code>other-actor</code>)</td></tr>
 </tbody></table>
+<p><strong>Custom Type Pattern:</strong></p>
+<ul>
+<li>Use <code>other-TYPENAME</code> where TYPENAME is the custom type name</li>
+<li>TYPENAME must be at least one character (e.g., <code>other-x</code> is valid, <code>other-</code> alone is not)</li>
+<li>Custom types can only use <code>trace</code> relations</li>
+</ul>
 <p><strong>Usage Example:</strong>
 To specify an element type, add a Metadata subsection with the type property:
 <code>* type: user-requirement</code></p>

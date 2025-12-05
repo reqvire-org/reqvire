@@ -49,7 +49,20 @@ impl SearchFilters {
 
         let file_glob = file.map(|p| compile_glob(p)).transpose()?;
         let name_re = name_regex.map(|r| compile_regex(r)).transpose()?;
-        let type_pat = typ.map(|s| s.to_lowercase());
+        // Validate element type if provided
+        let type_pat = if let Some(t) = typ {
+            let lowercase = t.to_lowercase();
+            if !element::is_valid_element_type(&lowercase) {
+                return Err(ReqvireError::ProcessError(format!(
+                    "Invalid element type '{}'. Valid types: {}",
+                    t,
+                    element::element_types_help()
+                )));
+            }
+            Some(lowercase)
+        } else {
+            None
+        };
         let content_re = content.map(|r| compile_regex(r)).transpose()?;
         let page_content_re = page_content.map(|r| compile_regex(r)).transpose()?;
         let attachment_glob = attachment.map(|p| compile_glob(p)).transpose()?;
@@ -122,9 +135,23 @@ impl SearchFilters {
 
         // Type filter
         if let Some(tp) = &self.type_pat {
-            let filter_type = element::ElementType::from_metadata(tp);
-            if &elem.element_type != &filter_type {
-                return false;
+            // Handle "other-TYPENAME" pattern for custom types
+            if tp.starts_with("other-") {
+                // Extract the custom type name after "other-"
+                let custom_type_name = &tp[6..];
+                match &elem.element_type {
+                    element::ElementType::Other(actual_name) => {
+                        if actual_name.to_lowercase() != custom_type_name {
+                            return false;
+                        }
+                    }
+                    _ => return false, // Not an Other type
+                }
+            } else {
+                let filter_type = element::ElementType::from_metadata(tp);
+                if &elem.element_type != &filter_type {
+                    return false;
+                }
             }
         }
 

@@ -735,85 +735,205 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
-    subgraph d9d3d619c8b2406e[&quot;📄 Specifications.md&quot;]
-      8a232f071d3fa417[&quot;Color Scheme Specification&quot;];
-      class 8a232f071d3fa417 default;
-      click 8a232f071d3fa417 &quot;Specifications.html#color-scheme-specification&quot;;
-      6c026c92dadc0fbb[&quot;Diff Output Format Specification&quot;];
-      class 6c026c92dadc0fbb default;
-      click 6c026c92dadc0fbb &quot;Specifications.html#diff-output-format-specification&quot;;
-      1ada57de60940ee9[&quot;Error Message Format Specification&quot;];
-      class 1ada57de60940ee9 default;
-      click 1ada57de60940ee9 &quot;Specifications.html#error-message-format-specification&quot;;
-      3bc36e64323d2171[&quot;JSON Output Structure&quot;];
-      class 3bc36e64323d2171 default;
-      click 3bc36e64323d2171 &quot;Specifications.html#json-output-structure&quot;;
-      b30c1e79aadc1554[&quot;Markdown Report Style Specification&quot;];
-      class b30c1e79aadc1554 default;
-      click b30c1e79aadc1554 &quot;Specifications.html#markdown-report-style-specification&quot;;
-      efd4d3e5c9cdc0ee[&quot;Mermaid Diagram Style Specification&quot;];
-      class efd4d3e5c9cdc0ee default;
-      click efd4d3e5c9cdc0ee &quot;Specifications.html#mermaid-diagram-style-specification&quot;;
-      fd4205ffbc1a9490[&quot;SysML Rendering Specification&quot;];
-      class fd4205ffbc1a9490 default;
-      click fd4205ffbc1a9490 &quot;Specifications.html#sysml-rendering-specification&quot;;
-      841395435f901267[&quot;Text Output Formatting&quot;];
-      class 841395435f901267 default;
-      click 841395435f901267 &quot;Specifications.html#text-output-formatting&quot;;
+  subgraph 7abe7cd3649051be["📁 requirements/System/Output"]
+    subgraph 27bc2bce1f269eda["📄 Specifications.md"]
+      fdbc1efd9f868583["Collect Content Specification"];
+      class fdbc1efd9f868583 default;
+      click fdbc1efd9f868583 "Specifications.html#collect-content-specification";
+      3cee3fc7d5320e45["Collect Output Format Specification"];
+      class 3cee3fc7d5320e45 default;
+      click 3cee3fc7d5320e45 "Specifications.html#collect-output-format-specification";
+      ed20c9b77fc44f9c["Color Scheme Specification"];
+      class ed20c9b77fc44f9c default;
+      click ed20c9b77fc44f9c "Specifications.html#color-scheme-specification";
+      56bb1bbec2929bbf["Diff Output Format Specification"];
+      class 56bb1bbec2929bbf default;
+      click 56bb1bbec2929bbf "Specifications.html#diff-output-format-specification";
+      7487a75cd05915f1["Error Message Format Specification"];
+      class 7487a75cd05915f1 default;
+      click 7487a75cd05915f1 "Specifications.html#error-message-format-specification";
+      6f05db68a045c3d5["JSON Output Structure"];
+      class 6f05db68a045c3d5 default;
+      click 6f05db68a045c3d5 "Specifications.html#json-output-structure";
+      8c00f5d9ecd6d1d["Markdown Report Style Specification"];
+      class 8c00f5d9ecd6d1d default;
+      click 8c00f5d9ecd6d1d "Specifications.html#markdown-report-style-specification";
+      a6174ccb6aaaa99["Mermaid Diagram Style Specification"];
+      class a6174ccb6aaaa99 default;
+      click a6174ccb6aaaa99 "Specifications.html#mermaid-diagram-style-specification";
+      e7f91b4f488c142f["SysML Rendering Specification"];
+      class e7f91b4f488c142f default;
+      click e7f91b4f488c142f "Specifications.html#sysml-rendering-specification";
+      533702f1ecbb5b59["Text Output Formatting"];
+      class 533702f1ecbb5b59 default;
+      click 533702f1ecbb5b59 "Specifications.html#text-output-formatting";
     end
   end
 </div>
+<h3 id="collect-content-specification">Collect Content Specification</h3>
+<p>Technical specification for content collection from requirement chains.</p>
+<h4>Details</h4>
+<p><strong>Input Validation:</strong></p>
+<ul>
+<li>Element name is required positional argument</li>
+<li>Element must exist in the model</li>
+<li>Element must be a requirement type (requirement or user-requirement)</li>
+<li>Error with non-zero exit if element not found or invalid type</li>
+</ul>
+<p><strong>Traversal Rules:</strong></p>
+<ul>
+<li>Start from specified requirement element</li>
+<li>Traverse derivedFrom relations in reverse direction (child to parents)</li>
+<li>Continue until root ancestors reached (elements with no derivedFrom)</li>
+<li>Include the starting element in output</li>
+</ul>
+<p><strong>Content Collection:</strong></p>
+<ul>
+<li>Collect element content field (main body text including Details section)</li>
+<li>For each attachment:
+<ul>
+<li>FilePath pointing to .md file: Read and include file content</li>
+<li>FilePath pointing to other file types: Include as markdown link</li>
+<li>ElementIdentifier: Include referenced element’s content</li>
+</ul>
+</li>
+<li>Skip external URL attachments</li>
+</ul>
+<p><strong>Output Ordering:</strong></p>
+<ul>
+<li>Flat list structure (no nesting)</li>
+<li>Ancestors first (depth 0 = root), then descendants</li>
+<li>Same-level elements sorted alphabetically by name or file path</li>
+</ul>
+<p><strong>Error Handling:</strong></p>
+<ul>
+<li>Element not found: Error with message</li>
+<li>Element not a requirement type: Error with message</li>
+<li>Attachment file not found: Warning, continue with other content</li>
+<li>Circular reference: Detect and break cycle</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#collect-content-from-requirement-chain">Collect Content from Requirement Chain</a></li>
+</ul>
+<hr />
+<h3 id="collect-output-format-specification">Collect Output Format Specification</h3>
+<p>Output format specification for collect command text and JSON modes.</p>
+<h4>Details</h4>
+<p><strong>Text Format:</strong>
+Each collected content block followed by source citation and separator:</p>
+<pre><code>[Content from element or attachment]
+
+— Source: [Element Name](file.html#element-id)
+
+
+</code></pre>
+<p><strong>Citation Formats:</strong></p>
+<table><thead><tr><th>Source Type</th><th>Citation Format</th></tr></thead><tbody>
+<tr><td>Element</td><td><code>— Source: [Element Name](file.html#element-id)</code></td></tr>
+<tr><td>Attachment File</td><td><code>— Source: [filename.html](path/to/file.html) attached to [Element Name](file.html#element-id)</code></td></tr>
+<tr><td>Refinement Element</td><td><code>— Source: [Refinement Name](file.html#refinement-id) satisfying [Element Name](file.html#element-id)</code></td></tr>
+</tbody></table>
+<p><strong>JSON Format:</strong></p>
+<pre><code class="language-json">{
+  "starting_element": "file.md#element-id",
+  "items": [
+    {
+      "name": "Element Name",
+      "identifier": "file.md#element-id",
+      "file_path": "path/to/file.md",
+      "element_type": "requirement",
+      "content": "The collected content...",
+      "depth": 0,
+      "source_type": "element"
+    },
+    {
+      "name": "Attached File",
+      "identifier": "path/to/attachment.md",
+      "file_path": "path/to/attachment.md",
+      "element_type": "attachment",
+      "content": "Content from attachment file...",
+      "depth": 0,
+      "source_type": "attachment_file",
+      "attached_to": "file.md#element-id"
+    }
+  ],
+  "metadata": {
+    "element_count": 5,
+    "attachment_count": 2,
+    "total_items": 7
+  }
+}
+</code></pre>
+<p><strong>Source Type Values:</strong></p>
+<ul>
+<li><code>element</code> - Content from model element</li>
+<li><code>attachment_file</code> - Content from attached file</li>
+<li><code>attachment_element</code> - Content from attached refinement element</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#collect-content-from-requirement-chain">Collect Content from Requirement Chain</a></li>
+</ul>
+<hr />
 <h3 id="color-scheme-specification">Color Scheme Specification</h3>
 <p>Comprehensive color coding for terminal output, HTML export, and diagram generation.</p>
 <h4>Details</h4>
-<p><strong>Terminal Colors (ANSI):</strong>
-| Color | Meaning | Usage |
-|—––|———|—––|
-| Red | Error | Validation errors, failed operations |
-| Yellow | Warning | Lint issues needing review, deprecations |
-| Green | Success | Added content, passed checks |
-| Cyan | Info | Element names, identifiers |
-| White/Default | Normal | Regular content |</p>
-<p><strong>Primary Colors (HTML):</strong>
-| Color Name | Hex Code | Usage |
-|————|–––––|—––|
-| Indigo | #3F51B5 | Navigation bar background, primary branding |
-| Indigo Hover | #7986CB | Navigation hover states |
-| Indigo Active | #303F9F | Navigation active/pressed states |
-| Off-White | #FAFAFA | Body background |
-| White | #FFFFFF | Content background, navigation text |</p>
-<p><strong>Element Type Colors:</strong>
-| Element Type | Color Name | Hex Code | Usage |
-|–––––––|————|–––––|—––|
-| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
-| User Requirement | Light Purple | #7E57C2 | User-level requirements |
-| Verification | Emerald Green | #4CAF50 | Validation criteria, testing |
-| Refinement | Orange | #FF9800 | Behaviors, constraints, specifications |
-| Other | Cool Gray | #9E9E9E | Other element types |</p>
-<p><strong>Status Indicator Colors:</strong>
-| Status | Color Name | Hex Code | Usage |
-|––––|————|–––––|—––|
-| Verified/Passing | Forest Green | #4CAF50 | Verified requirements, passing tests |
-| Pending/Warning | Amber | #FFB74D | Unverified items, warnings |
-| Failed/Error | Red | #F44336 | Error messages, validation errors |</p>
-<p><strong>Interactive State Colors:</strong>
-| State | Hex Code | Usage |
-|—––|–––––|—––|
-| Hover Highlight | #FFAB91 | Diagram node/edge hover effect |
-| Node Hover Shadow | rgba(255,171,145,0.7) | Drop-shadow on node hover |
-| Link Color | #3F51B5 | Hyperlinks |</p>
-<p><strong>D3.js Containment Tree Colors:</strong>
-| Node Type | Hex Code | Icon |
-|———–|–––––|——|
-| folder | #9E9E9E | 📁 |
-| file | #FFCA28 | 📄 |
-| user-requirement | #7E57C2 | 👤 |
-| requirement | #673AB7 | 📐 |
-| verification | #4CAF50 | ✅ |
-| refinement | #FF9800 | 🔧 |
-| design-document | #8D6E63 | 📝 |
-| attachment-file | #607D8B | 📎 |</p>
+<p><strong>Terminal Colors (ANSI):</strong></p>
+<table><thead><tr><th>Color</th><th>Meaning</th><th>Usage</th></tr></thead><tbody>
+<tr><td>Red</td><td>Error</td><td>Validation errors, failed operations</td></tr>
+<tr><td>Yellow</td><td>Warning</td><td>Lint issues needing review, deprecations</td></tr>
+<tr><td>Green</td><td>Success</td><td>Added content, passed checks</td></tr>
+<tr><td>Cyan</td><td>Info</td><td>Element names, identifiers</td></tr>
+<tr><td>White/Default</td><td>Normal</td><td>Regular content</td></tr>
+</tbody></table>
+<p><strong>Primary Colors (HTML):</strong></p>
+<table><thead><tr><th>Color Name</th><th>Hex Code</th><th>Usage</th></tr></thead><tbody>
+<tr><td>Indigo</td><td>#3F51B5</td><td>Navigation bar background, primary branding</td></tr>
+<tr><td>Indigo Hover</td><td>#7986CB</td><td>Navigation hover states</td></tr>
+<tr><td>Indigo Active</td><td>#303F9F</td><td>Navigation active/pressed states</td></tr>
+<tr><td>Off-White</td><td>#FAFAFA</td><td>Body background</td></tr>
+<tr><td>White</td><td>#FFFFFF</td><td>Content background, navigation text</td></tr>
+</tbody></table>
+<p><strong>Element Type Colors:</strong></p>
+<table><thead><tr><th>Element Type</th><th>Color Name</th><th>Hex Code</th><th>Usage</th></tr></thead><tbody>
+<tr><td>Requirement</td><td>Deep Purple</td><td>#673AB7</td><td>Core requirements, goals</td></tr>
+<tr><td>User Requirement</td><td>Light Purple</td><td>#7E57C2</td><td>User-level requirements</td></tr>
+<tr><td>Verification</td><td>Emerald Green</td><td>#4CAF50</td><td>Validation criteria, testing</td></tr>
+<tr><td>Refinement</td><td>Orange</td><td>#FF9800</td><td>Behaviors, constraints, specifications</td></tr>
+<tr><td>Other</td><td>Cool Gray</td><td>#9E9E9E</td><td>Other element types</td></tr>
+</tbody></table>
+<p><strong>Status Indicator Colors:</strong></p>
+<table><thead><tr><th>Status</th><th>Color Name</th><th>Hex Code</th><th>Usage</th></tr></thead><tbody>
+<tr><td>Verified/Passing</td><td>Forest Green</td><td>#4CAF50</td><td>Verified requirements, passing tests</td></tr>
+<tr><td>Pending/Warning</td><td>Amber</td><td>#FFB74D</td><td>Unverified items, warnings</td></tr>
+<tr><td>Failed/Error</td><td>Red</td><td>#F44336</td><td>Error messages, validation errors</td></tr>
+</tbody></table>
+<p><strong>Interactive State Colors:</strong></p>
+<table><thead><tr><th>State</th><th>Hex Code</th><th>Usage</th></tr></thead><tbody>
+<tr><td>Hover Highlight</td><td>#FFAB91</td><td>Diagram node/edge hover effect</td></tr>
+<tr><td>Node Hover Shadow</td><td>rgba(255,171,145,0.7)</td><td>Drop-shadow on node hover</td></tr>
+<tr><td>Link Color</td><td>#3F51B5</td><td>Hyperlinks</td></tr>
+</tbody></table>
+<p><strong>D3.js Containment Tree Colors:</strong></p>
+<table><thead><tr><th>Node Type</th><th>Hex Code</th><th>Icon</th></tr></thead><tbody>
+<tr><td>folder</td><td>#9E9E9E</td><td>📁</td></tr>
+<tr><td>file</td><td>#FFCA28</td><td>📄</td></tr>
+<tr><td>user-requirement</td><td>#7E57C2</td><td>👤</td></tr>
+<tr><td>requirement</td><td>#673AB7</td><td>📐</td></tr>
+<tr><td>verification</td><td>#4CAF50</td><td>✅</td></tr>
+<tr><td>refinement</td><td>#FF9800</td><td>🔧</td></tr>
+<tr><td>design-document</td><td>#8D6E63</td><td>📝</td></tr>
+<tr><td>attachment-file</td><td>#607D8B</td><td>📎</td></tr>
+</tbody></table>
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
@@ -851,6 +971,10 @@ blockquote {
 <ul>
 <li>type: specification</li>
 </ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
+</ul>
 <hr />
 <h3 id="error-message-format-specification">Error Message Format Specification</h3>
 <p>Structure for error and warning messages.</p>
@@ -877,6 +1001,10 @@ blockquote {
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
 </ul>
 <hr />
 <h3 id="json-output-structure">JSON Output Structure</h3>
@@ -908,6 +1036,10 @@ blockquote {
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
 </ul>
 <hr />
 <h3 id="markdown-report-style-specification">Markdown Report Style Specification</h3>
@@ -949,49 +1081,53 @@ blockquote {
 <ul>
 <li>type: specification</li>
 </ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
+</ul>
 <hr />
 <h3 id="mermaid-diagram-style-specification">Mermaid Diagram Style Specification</h3>
 <p>Styling conventions for Mermaid diagrams in CLI output and HTML export.</p>
 <h4>Details</h4>
 <p><strong>Containment Structure:</strong></p>
 <ul>
-<li>Folder subgraphs: <code>subgraph hashId[&quot;folder-icon Folder Name&quot;]</code></li>
-<li>File subgraphs: <code>subgraph hashId[&quot;file-icon File Name&quot;]</code></li>
+<li>Folder subgraphs: <code>subgraph hashId["folder-icon Folder Name"]</code></li>
+<li>File subgraphs: <code>subgraph hashId["file-icon File Name"]</code></li>
 <li>Elements rendered inside their containing file subgraph</li>
 <li>Collapsible in interactive mode</li>
 </ul>
-<p><strong>Node Shapes:</strong>
-| Element Type | Shape | Example |
-|–––––––|—––|———|
-| Requirement | Rectangle | <code>[Requirement Name]</code> |
-| Verification | Stadium | <code>([Verification Name])</code> |
-| File | Folder shape | <code>{{File.md}}</code> |
-| Folder | Hexagon | <code>{{folder/}}</code> |</p>
-<p><strong>Diagram Node Classes (CSS):</strong>
-| Class Name | Fill Color | Stroke Color | Usage |
-|————|————|–––––––|—––|
-| userRequirement | #D1C4E9 | #7E57C2 | Top-level user requirements |
-| systemRequirement | #E1D8EE | #673AB7 | System-level requirements |
-| requirement | #ECEFF1 | #673AB7 | Generic requirements |
-| verified | #D1C4E9 | #7E57C2 | Directly verified requirements |
-| verification | #DCEDC8 | #4CAF50 | Verification elements |
-| folder | #FAFAFA | #9E9E9E | Folder containers |
-| file | #FFFFFF | #9E9E9E | File containers |
-| attachment | #EFEBE9 | #8D6E63 | Design documents |
-| impacted | #FFAAAA | - | Change impact nodes |
-| changed | #FFDD57 | - | Changed nodes |</p>
-<p><strong>Relation Line Styles:</strong>
-| Relation Type | Color | Line Style |
-|—————|—––|————|
-| Derive/DerivedFrom | #673AB7 | Dashed |
-| Verify/VerifiedBy | #4CAF50 | Dashed |
-| Satisfy/SatisfiedBy | #673AB7 | Solid |
-| Trace | #9E9E9E | Dashed |</p>
-<p><strong>Interactive Highlighting:</strong>
-| Effect | Implementation |
-|––––|––––––––|
-| Hovered node | drop-shadow(0 0 8px rgba(255,171,145,0.7)) |
-| Connected edges | stroke: #FFAB91, increased width |</p>
+<p><strong>Node Shapes:</strong></p>
+<table><thead><tr><th>Element Type</th><th>Shape</th><th>Example</th></tr></thead><tbody>
+<tr><td>Requirement</td><td>Rectangle</td><td><code>[Requirement Name]</code></td></tr>
+<tr><td>Verification</td><td>Stadium</td><td><code>([Verification Name])</code></td></tr>
+<tr><td>File</td><td>Folder shape</td><td><code>{{File.md}}</code></td></tr>
+<tr><td>Folder</td><td>Hexagon</td><td><code>{{folder/}}</code></td></tr>
+</tbody></table>
+<p><strong>Diagram Node Classes (CSS):</strong></p>
+<table><thead><tr><th>Class Name</th><th>Fill Color</th><th>Stroke Color</th><th>Usage</th></tr></thead><tbody>
+<tr><td>userRequirement</td><td>#D1C4E9</td><td>#7E57C2</td><td>Top-level user requirements</td></tr>
+<tr><td>systemRequirement</td><td>#E1D8EE</td><td>#673AB7</td><td>System-level requirements</td></tr>
+<tr><td>requirement</td><td>#ECEFF1</td><td>#673AB7</td><td>Generic requirements</td></tr>
+<tr><td>verified</td><td>#D1C4E9</td><td>#7E57C2</td><td>Directly verified requirements</td></tr>
+<tr><td>verification</td><td>#DCEDC8</td><td>#4CAF50</td><td>Verification elements</td></tr>
+<tr><td>folder</td><td>#FAFAFA</td><td>#9E9E9E</td><td>Folder containers</td></tr>
+<tr><td>file</td><td>#FFFFFF</td><td>#9E9E9E</td><td>File containers</td></tr>
+<tr><td>attachment</td><td>#EFEBE9</td><td>#8D6E63</td><td>Design documents</td></tr>
+<tr><td>impacted</td><td>#FFAAAA</td><td>-</td><td>Change impact nodes</td></tr>
+<tr><td>changed</td><td>#FFDD57</td><td>-</td><td>Changed nodes</td></tr>
+</tbody></table>
+<p><strong>Relation Line Styles:</strong></p>
+<table><thead><tr><th>Relation Type</th><th>Color</th><th>Line Style</th></tr></thead><tbody>
+<tr><td>Derive/DerivedFrom</td><td>#673AB7</td><td>Dashed</td></tr>
+<tr><td>Verify/VerifiedBy</td><td>#4CAF50</td><td>Dashed</td></tr>
+<tr><td>Satisfy/SatisfiedBy</td><td>#673AB7</td><td>Solid</td></tr>
+<tr><td>Trace</td><td>#9E9E9E</td><td>Dashed</td></tr>
+</tbody></table>
+<p><strong>Interactive Highlighting:</strong></p>
+<table><thead><tr><th>Effect</th><th>Implementation</th></tr></thead><tbody>
+<tr><td>Hovered node</td><td>drop-shadow(0 0 8px rgba(255,171,145,0.7))</td></tr>
+<tr><td>Connected edges</td><td>stroke: #FFAB91, increased width</td></tr>
+</tbody></table>
 <p><strong>Diagram Background:</strong></p>
 <ul>
 <li>Canvas: #FAFAFA (off-white)</li>
@@ -1010,25 +1146,25 @@ blockquote {
 <p>SysML notation standards for relationship rendering in diagrams.</p>
 <h4>Details</h4>
 <p>Each relationship type is represented using SysML standard notation with specific arrow direction.</p>
-<p><strong>Derive Relations:</strong>
-| Relation | Stereotype | Line Style | Arrow Direction |
-|–––––|————|————|—————–|
-| derive | «deriveReqt» | dashed | Parent → Child (derived) |
-| derivedFrom | «deriveReqt» | dashed | Child → Parent (source) |</p>
-<p><strong>Verify Relations:</strong>
-| Relation | Stereotype | Line Style | Arrow Direction |
-|–––––|————|————|—————–|
-| verify | «verify» | dashed | Verification → Requirement |
-| verifiedBy | «verify» | dashed | Requirement → Verification |</p>
-<p><strong>Satisfy Relations:</strong>
-| Relation | Stereotype | Line Style | Arrow Direction |
-|–––––|————|————|—————–|
-| satisfy | «satisfy» | solid | Implementation → Requirement |
-| satisfiedBy | «satisfy» | solid | Requirement → Implementation |</p>
-<p><strong>Trace Relations:</strong>
-| Relation | Stereotype | Line Style | Arrow Direction |
-|–––––|————|————|—————–|
-| trace | «trace» | dashed | Tracing → Traced (neutral) |</p>
+<p><strong>Derive Relations:</strong></p>
+<table><thead><tr><th>Relation</th><th>Stereotype</th><th>Line Style</th><th>Arrow Direction</th></tr></thead><tbody>
+<tr><td>derive</td><td>«deriveReqt»</td><td>dashed</td><td>Parent → Child (derived)</td></tr>
+<tr><td>derivedFrom</td><td>«deriveReqt»</td><td>dashed</td><td>Child → Parent (source)</td></tr>
+</tbody></table>
+<p><strong>Verify Relations:</strong></p>
+<table><thead><tr><th>Relation</th><th>Stereotype</th><th>Line Style</th><th>Arrow Direction</th></tr></thead><tbody>
+<tr><td>verify</td><td>«verify»</td><td>dashed</td><td>Verification → Requirement</td></tr>
+<tr><td>verifiedBy</td><td>«verify»</td><td>dashed</td><td>Requirement → Verification</td></tr>
+</tbody></table>
+<p><strong>Satisfy Relations:</strong></p>
+<table><thead><tr><th>Relation</th><th>Stereotype</th><th>Line Style</th><th>Arrow Direction</th></tr></thead><tbody>
+<tr><td>satisfy</td><td>«satisfy»</td><td>solid</td><td>Implementation → Requirement</td></tr>
+<tr><td>satisfiedBy</td><td>«satisfy»</td><td>solid</td><td>Requirement → Implementation</td></tr>
+</tbody></table>
+<p><strong>Trace Relations:</strong></p>
+<table><thead><tr><th>Relation</th><th>Stereotype</th><th>Line Style</th><th>Arrow Direction</th></tr></thead><tbody>
+<tr><td>trace</td><td>«trace»</td><td>dashed</td><td>Tracing → Traced (neutral)</td></tr>
+</tbody></table>
 <p><strong>Arrowhead Style:</strong>
 All relation types use open (hollow) arrowheads per SysML specification.</p>
 <h4>Metadata</h4>
@@ -1072,6 +1208,10 @@ All relation types use open (hollow) arrowheads per SysML specification.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
 </ul>
 <hr />
 

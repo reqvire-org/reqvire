@@ -728,7 +728,7 @@ blockquote {
 <p>The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from stakeholder needs (user requirements) through system specifications (system requirements) to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.</p>
 <p><strong>Instructions:</strong> Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control.</p>
 <p>
-<div class="d3-sankey-container" id="d3sankey_560b68b38270">
+<div class="d3-sankey-container" id="d3sankey_557e1aa52680">
     <svg class="d3-sankey-svg"></svg>
 </div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -1048,6 +1048,36 @@ blockquote {
       "link": "requirements/System/Core/StructureAndParsing.md#specification-file-identification"
     },
     {
+      "name": "Cross-Section Duplicate Validation Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#cross-section-duplicate-validation-test"
+    },
+    {
+      "name": "Cross-Section Duplicate Validation",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#cross-section-duplicate-validation"
+    },
+    {
+      "name": "Internal Consistency Validator",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#internal-consistency-validator"
+    },
+    {
+      "name": "Validate Internal Consistency",
+      "type": "user-requirement",
+      "link": "requirements/System/Core/Validation.md#validate-internal-consistency"
+    },
+    {
+      "name": "Align with Industry Standards",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#align-with-industry-standards"
+    },
+    {
+      "name": "Validating Structures",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#validating-structures"
+    },
+    {
       "name": "Default Element Type Assignment Test",
       "type": "verification",
       "link": "requirements/System/Core/Verifications/ValidationVerifications.md#default-element-type-assignment-test"
@@ -1071,16 +1101,6 @@ blockquote {
       "name": "Validate Relation Types",
       "type": "user-requirement",
       "link": "requirements/System/Core/Validation.md#validate-relation-types"
-    },
-    {
-      "name": "Align with Industry Standards",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#align-with-industry-standards"
-    },
-    {
-      "name": "Validating Structures",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#validating-structures"
     },
     {
       "name": "File Exclusion Test",
@@ -1136,16 +1156,6 @@ blockquote {
       "name": "Validate Cross-Component Dependencies",
       "type": "user-requirement",
       "link": "requirements/System/Core/Validation.md#validate-cross-component-dependencies"
-    },
-    {
-      "name": "Internal Consistency Validator",
-      "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#internal-consistency-validator"
-    },
-    {
-      "name": "Validate Internal Consistency",
-      "type": "user-requirement",
-      "link": "requirements/System/Core/Validation.md#validate-internal-consistency"
     },
     {
       "name": "Relation Type Validation",
@@ -1238,6 +1248,16 @@ blockquote {
       "link": "requirements/System/Core/ModelManagement.md#git-repository-as-project-root"
     },
     {
+      "name": "Type Validation Errors Test",
+      "type": "verification",
+      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#type-validation-errors-test"
+    },
+    {
+      "name": "Type Validation Error Requirement",
+      "type": "requirement",
+      "link": "requirements/System/Core/Validation.md#type-validation-error-requirement"
+    },
+    {
       "name": "Unstructured Documents Test",
       "type": "verification",
       "link": "requirements/System/Core/Verifications/ValidationVerifications.md#unstructured-documents-test"
@@ -1253,14 +1273,19 @@ blockquote {
       "link": "requirements/System/Operations/Formatting.md#file-pattern-exclusion-for-format"
     },
     {
-      "name": "CLI Add Element Test",
+      "name": "Add Command Duplicate Detection Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test"
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#add-command-duplicate-detection-test"
     },
     {
       "name": "CLI Add Element Command",
       "type": "requirement",
       "link": "requirements/Interfaces/CLI.md#cli-add-element-command"
+    },
+    {
+      "name": "CLI Add Element Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test"
     },
     {
       "name": "CLI Move Element Test",
@@ -1293,14 +1318,19 @@ blockquote {
       "link": "requirements/Interfaces/CLI.md#cli-rename-element-command"
     },
     {
-      "name": "Create Element Test",
+      "name": "Create Element Override Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-test"
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-override-test"
     },
     {
       "name": "Create Element Operation",
       "type": "requirement",
       "link": "requirements/System/Operations/ElementManipulation.md#create-element-operation"
+    },
+    {
+      "name": "Create Element Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-test"
     },
     {
       "name": "Delete Element Test",
@@ -1323,9 +1353,9 @@ blockquote {
       "link": "requirements/System/Operations/ElementManipulation.md#element-manipulation-file-persistence"
     },
     {
-      "name": "Link Command Verification",
+      "name": "Link Command Cross-Section Detection Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#link-command-verification"
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#link-command-cross-section-detection-test"
     },
     {
       "name": "Relation Commands",
@@ -1333,9 +1363,24 @@ blockquote {
       "link": "requirements/Interfaces/CLI.md#relation-commands"
     },
     {
+      "name": "Link Command Verification",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#link-command-verification"
+    },
+    {
       "name": "Relation Management Operations",
       "type": "requirement",
       "link": "requirements/System/Core/ModelManagement.md#relation-management-operations"
+    },
+    {
+      "name": "Merge Elements Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#merge-elements-test"
+    },
+    {
+      "name": "Merge Element Operation",
+      "type": "requirement",
+      "link": "requirements/System/Operations/ElementManipulation.md#merge-element-operation"
     },
     {
       "name": "Move Element Test",
@@ -1428,6 +1473,16 @@ blockquote {
       "link": "requirements/System/Operations/Formatting.md#replace-absolute-links-with-relative-links"
     },
     {
+      "name": "Format Duplicate Removal Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#format-duplicate-removal-test"
+    },
+    {
+      "name": "Format Duplicate Removal",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Formatting.md#format-duplicate-removal"
+    },
+    {
       "name": "Full Relations Insertion Verification",
       "type": "verification",
       "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#full-relations-insertion-verification"
@@ -1491,6 +1546,16 @@ blockquote {
       "name": "Redundant Hierarchical Relations Detection",
       "type": "requirement",
       "link": "requirements/System/Operations/Linting.md#redundant-hierarchical-relations-detection"
+    },
+    {
+      "name": "Redundant Hierarchical Attachment Test",
+      "type": "verification",
+      "link": "requirements/System/Operations/Verifications/LintingVerifications.md#redundant-hierarchical-attachment-test"
+    },
+    {
+      "name": "Redundant Hierarchical Attachment Detection",
+      "type": "requirement",
+      "link": "requirements/System/Operations/Linting.md#redundant-hierarchical-attachment-detection"
     },
     {
       "name": "Automated Documentation Export on PR Merge Verification",
@@ -1578,6 +1643,16 @@ blockquote {
       "link": "requirements/System/Output/Verifications/DiagramVerifications.md#visualize-model-relationships-verification"
     },
     {
+      "name": "CLI Collect Command Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#cli-collect-command-test"
+    },
+    {
+      "name": "CLI Collect Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI.md#cli-collect-command"
+    },
+    {
       "name": "Containment View Design Documents Test",
       "type": "verification",
       "link": "requirements/System/Output/Verifications/ReportingVerifications.md#containment-view-design-documents-test"
@@ -1623,6 +1698,16 @@ blockquote {
       "link": "requirements/System/Output/Reporting.md#resources-report"
     },
     {
+      "name": "Reverse Model Traversal Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#reverse-model-traversal-test"
+    },
+    {
+      "name": "Reverse Relation Traversal",
+      "type": "requirement",
+      "link": "requirements/System/Output/Reporting.md#reverse-relation-traversal"
+    },
+    {
       "name": "Search Command Tests",
       "type": "verification",
       "link": "requirements/System/Output/Verifications/ReportingVerifications.md#search-command-tests"
@@ -1631,6 +1716,16 @@ blockquote {
       "name": "Search Report Generator",
       "type": "requirement",
       "link": "requirements/System/Output/Reporting.md#search-report-generator"
+    },
+    {
+      "name": "Start Type Filter Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#start-type-filter-test"
+    },
+    {
+      "name": "Start Element Type Filtering",
+      "type": "requirement",
+      "link": "requirements/System/Output/Reporting.md#start-element-type-filtering"
     },
     {
       "name": "TraceFlow View Test",
@@ -2200,6 +2295,31 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Cross-Section Duplicate Validation",
+      "target": "Cross-Section Duplicate Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Internal Consistency Validator",
+      "target": "Cross-Section Duplicate Validation",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Align with Industry Standards",
+      "target": "Validate Internal Consistency",
+      "value": 1
+    },
+    {
+      "source": "Validating Structures",
+      "target": "Validate Internal Consistency",
+      "value": 1
+    },
+    {
       "source": "Default Requirement Type Assignment",
       "target": "Default Element Type Assignment Test",
       "value": 1
@@ -2590,6 +2710,16 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Type Validation Error Requirement",
+      "target": "Type Validation Errors Test",
+      "value": 1
+    },
+    {
+      "source": "Enhanced Validation Error Reporting",
+      "target": "Type Validation Error Requirement",
+      "value": 1
+    },
+    {
       "source": "Excluded File Relation Validation",
       "target": "Unstructured Documents Test",
       "value": 1
@@ -2602,6 +2732,21 @@ blockquote {
     {
       "source": "Coexistence of Structured and Unstructured Documents",
       "target": "Ignoring Unstructured Documents",
+      "value": 1
+    },
+    {
+      "source": "CLI Add Element Command",
+      "target": "Add Command Duplicate Detection Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Add Element Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
       "value": 1
     },
     {
@@ -2681,6 +2826,26 @@ blockquote {
     },
     {
       "source": "Create Element Operation",
+      "target": "Create Element Override Test",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Create Element Operation",
+      "value": 1
+    },
+    {
+      "source": "Reserved Subsections Support",
+      "target": "Create Element Operation",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "Structure and Addressing in Markdown Documents",
+      "value": 1
+    },
+    {
+      "source": "Create Element Operation",
       "target": "Create Element Test",
       "value": 1
     },
@@ -2721,6 +2886,21 @@ blockquote {
     },
     {
       "source": "Relation Commands",
+      "target": "Link Command Cross-Section Detection Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Relation Commands",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Relation Commands",
       "target": "Link Command Verification",
       "value": 1
     },
@@ -2757,6 +2937,16 @@ blockquote {
     {
       "source": "AI-Assisted System Model Management",
       "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Merge Element Operation",
+      "target": "Merge Elements Test",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Merge Element Operation",
       "value": 1
     },
     {
@@ -2975,6 +3165,21 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Format Duplicate Removal",
+      "target": "Format Duplicate Removal Test",
+      "value": 1
+    },
+    {
+      "source": "Format Consistency Enforcement",
+      "target": "Format Duplicate Removal",
+      "value": 1
+    },
+    {
+      "source": "Validating Structures",
+      "target": "Model Formatting",
+      "value": 1
+    },
+    {
       "source": "Format Command",
       "target": "Full Relations Insertion Verification",
       "value": 1
@@ -3072,6 +3277,16 @@ blockquote {
     {
       "source": "Validating Structures",
       "target": "Model Linting",
+      "value": 1
+    },
+    {
+      "source": "Redundant Hierarchical Attachment Detection",
+      "target": "Redundant Hierarchical Attachment Test",
+      "value": 1
+    },
+    {
+      "source": "Model Linting",
+      "target": "Redundant Hierarchical Attachment Detection",
       "value": 1
     },
     {
@@ -3175,6 +3390,21 @@ blockquote {
       "value": 1
     },
     {
+      "source": "CLI Collect Command",
+      "target": "CLI Collect Command Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Collect Command",
+      "value": 1
+    },
+    {
+      "source": "Managing System Models",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
       "source": "Containment View Report",
       "target": "Containment View Design Documents Test",
       "value": 1
@@ -3255,6 +3485,21 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Reverse Relation Traversal",
+      "target": "Reverse Model Traversal Test",
+      "value": 1
+    },
+    {
+      "source": "Model Diagram Output Formats",
+      "target": "Reverse Relation Traversal",
+      "value": 1
+    },
+    {
+      "source": "Model Reports",
+      "target": "Model Structure and Summaries",
+      "value": 1
+    },
+    {
       "source": "CLI Search Command",
       "target": "Search Command Tests",
       "value": 1
@@ -3282,6 +3527,21 @@ blockquote {
     {
       "source": "Provide Reports",
       "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "Start Element Type Filtering",
+      "target": "Start Type Filter Test",
+      "value": 1
+    },
+    {
+      "source": "Model Diagram Output Formats",
+      "target": "Start Element Type Filtering",
+      "value": 1
+    },
+    {
+      "source": "Model Reports",
+      "target": "Model Structure and Summaries",
       "value": 1
     },
     {
@@ -3521,7 +3781,7 @@ blockquote {
     }
   ]
 };
-    const container = document.getElementById("d3sankey_560b68b38270");
+    const container = document.getElementById("d3sankey_557e1aa52680");
     const svg = d3.select(container).select("svg");
 
     // Configuration

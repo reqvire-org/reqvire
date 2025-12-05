@@ -735,23 +735,26 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
-    subgraph 13f813da82130a33[&quot;📄 Specifications.md&quot;]
-      319b7987b8267c37[&quot;Document Structure Specification&quot;];
-      class 319b7987b8267c37 default;
-      click 319b7987b8267c37 &quot;Specifications.html#document-structure-specification&quot;;
-      5922c01ef3d62086[&quot;Format Consistency Specification&quot;];
-      class 5922c01ef3d62086 default;
-      click 5922c01ef3d62086 &quot;Specifications.html#format-consistency-specification&quot;;
-      39fbf7f67a590dcf[&quot;Relation Operations Specification<br/>📎 RelationTypes.md<br/>📎 requirements/System/Core/Constraints.md#element-type-relation-compatibility-constraint<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification&quot;];
-      class 39fbf7f67a590dcf default;
-      click 39fbf7f67a590dcf &quot;Specifications.html#relation-operations-specification&quot;;
-      b0ff2a4698cc55f4[&quot;Relation Ordering Specification&quot;];
-      class b0ff2a4698cc55f4 default;
-      click b0ff2a4698cc55f4 &quot;Specifications.html#relation-ordering-specification&quot;;
-      9b4a4077c4e05529[&quot;Relation Validation Specification&quot;];
-      class 9b4a4077c4e05529 default;
-      click 9b4a4077c4e05529 &quot;Specifications.html#relation-validation-specification&quot;;
+  subgraph f97b31ef8bb9beb2["📁 requirements/System/Operations"]
+    subgraph 4ca803dc4703689d["📄 Specifications.md"]
+      c1719a07ca1ee33c["Document Structure Specification"];
+      class c1719a07ca1ee33c default;
+      click c1719a07ca1ee33c "Specifications.html#document-structure-specification";
+      b41fc564c1da22b["Format Consistency Specification"];
+      class b41fc564c1da22b default;
+      click b41fc564c1da22b "Specifications.html#format-consistency-specification";
+      71c52b0aeabfc312["Orphaned Children Error Message Specification"];
+      class 71c52b0aeabfc312 default;
+      click 71c52b0aeabfc312 "Specifications.html#orphaned-children-error-message-specification";
+      13fc9d08fcf3522d["Relation Operations Specification"];
+      class 13fc9d08fcf3522d default;
+      click 13fc9d08fcf3522d "Specifications.html#relation-operations-specification";
+      4dbe79da4a2a6c96["Relation Ordering Specification"];
+      class 4dbe79da4a2a6c96 default;
+      click 4dbe79da4a2a6c96 "Specifications.html#relation-ordering-specification";
+      3ae0d470974cfc92["Relation Validation Specification"];
+      class 3ae0d470974cfc92 default;
+      click 3ae0d470974cfc92 "Specifications.html#relation-validation-specification";
     end
   end
 </div>
@@ -826,6 +829,24 @@ blockquote {
 <li>satisfy: <a href="Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a></li>
 </ul>
 <hr />
+<h3 id="orphaned-children-error-message-specification">Orphaned Children Error Message Specification</h3>
+<p>The error message for orphaned children prevention shall include:</p>
+<ul>
+<li>Statement that deletion cannot proceed due to orphaned children</li>
+<li>Element name being deleted</li>
+<li>Count of child elements that would be orphaned</li>
+<li>List of child element names that would be orphaned</li>
+<li>Resolution guidance: “Delete the child elements first, or update the child elements to link to a different parent element”</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
+</ul>
+<hr />
 <h3 id="relation-operations-specification">Relation Operations Specification</h3>
 <p>Technical specification for relation link and unlink operations.</p>
 <h4>Details</h4>
@@ -857,13 +878,6 @@ blockquote {
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../Core/DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
-<li><a href="../Core/Constraints.html#element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</a></li>
-<li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
-<li><a href="Specifications.html#relation-validation-specification">Relation Validation Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>

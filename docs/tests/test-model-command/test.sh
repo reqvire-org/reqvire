@@ -188,4 +188,161 @@ if [ "$EXPECTED_FILTERED_JSON" != "$ACTUAL_FILTERED_JSON" ]; then
     exit 1
 fi
 
+# Test 5: Reverse Model Output - Compare against expected file
+echo "Running: reqvire model --reverse --json" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --reverse --json 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: model --reverse --json exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Validate JSON structure
+echo "$OUTPUT" | jq . >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "❌ FAILED: Reverse output is not valid JSON"
+    exit 1
+fi
+
+# Save actual output for comparison
+echo "$OUTPUT" | jq '.' > "${TEST_DIR}/actual_reverse_output.json"
+
+# Compare JSON outputs using jq (to handle formatting differences)
+EXPECTED_REVERSE_JSON=$(jq -S '.' "${TEST_SCRIPT_DIR}/expected/expected_reverse_output.json")
+ACTUAL_REVERSE_JSON=$(jq -S '.' "${TEST_DIR}/actual_reverse_output.json")
+
+if [ "$EXPECTED_REVERSE_JSON" != "$ACTUAL_REVERSE_JSON" ]; then
+    echo "❌ FAILED: Reverse JSON output does not match expected format"
+    echo "Expected: ${TEST_SCRIPT_DIR}/expected/expected_reverse_output.json"
+    echo "Actual: ${TEST_DIR}/actual_reverse_output.json"
+    diff -u <(echo "$EXPECTED_REVERSE_JSON") <(echo "$ACTUAL_REVERSE_JSON") || true
+    exit 1
+fi
+
+# Test 5b: Reverse Model Markdown Output - Compare against expected file
+echo "Running: reqvire model --reverse (markdown)" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --reverse 2>&1)
+EXIT_CODE=$?
+set -e
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: model --reverse exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Save actual output for comparison
+echo "$OUTPUT" > "${TEST_DIR}/actual_reverse_output.md"
+
+# Compare markdown outputs
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_reverse_output.md" "${TEST_DIR}/actual_reverse_output.md"; then
+    echo "❌ FAILED: Reverse markdown output does not match expected format"
+    exit 1
+fi
+
+# Test 6: Filter Type Output
+echo "Running: reqvire model --filter-type=test-verification --json" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --filter-type=test-verification --json 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: model --filter-type exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Validate JSON structure
+echo "$OUTPUT" | jq . >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "❌ FAILED: Filter-type output is not valid JSON"
+    exit 1
+fi
+
+# Verify type_filter is set
+TYPE_FILTER=$(echo "$OUTPUT" | jq -r '.metadata.type_filter[0]')
+if [ "$TYPE_FILTER" != "test-verification" ]; then
+    echo "❌ FAILED: Expected type_filter to contain 'test-verification', got '$TYPE_FILTER'"
+    exit 1
+fi
+
+# Verify all top-level elements are test-verification type
+WRONG_TYPE=$(echo "$OUTPUT" | jq '[.elements[].element_type] | map(select(. != "test-verification")) | length')
+if [ "$WRONG_TYPE" -ne 0 ]; then
+    echo "❌ FAILED: Filter-type should only return test-verification elements at top level"
+    exit 1
+fi
+
+# Test 7: Reverse + Filter Type (traces-like output) - Compare against expected file
+echo "Running: reqvire model --reverse --filter-type=test-verification --json" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --reverse --filter-type=test-verification --json 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: model --reverse --filter-type exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Validate JSON structure
+echo "$OUTPUT" | jq . >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "❌ FAILED: Reverse+filter-type output is not valid JSON"
+    exit 1
+fi
+
+# Save actual output for comparison
+echo "$OUTPUT" | jq '.' > "${TEST_DIR}/actual_reverse_filter_output.json"
+
+# Compare JSON outputs using jq (to handle formatting differences)
+EXPECTED_REVERSE_FILTER_JSON=$(jq -S '.' "${TEST_SCRIPT_DIR}/expected/expected_reverse_filter_output.json")
+ACTUAL_REVERSE_FILTER_JSON=$(jq -S '.' "${TEST_DIR}/actual_reverse_filter_output.json")
+
+if [ "$EXPECTED_REVERSE_FILTER_JSON" != "$ACTUAL_REVERSE_FILTER_JSON" ]; then
+    echo "❌ FAILED: Reverse+filter-type JSON output does not match expected format"
+    echo "Expected: ${TEST_SCRIPT_DIR}/expected/expected_reverse_filter_output.json"
+    echo "Actual: ${TEST_DIR}/actual_reverse_filter_output.json"
+    diff -u <(echo "$EXPECTED_REVERSE_FILTER_JSON") <(echo "$ACTUAL_REVERSE_FILTER_JSON") || true
+    exit 1
+fi
+
+# Test 7b: Reverse + Filter Type Markdown Output - Compare against expected file
+echo "Running: reqvire model --reverse --filter-type=test-verification (markdown)" >> "${TEST_DIR}/test_results.log"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --reverse --filter-type=test-verification 2>&1)
+EXIT_CODE=$?
+set -e
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: model --reverse --filter-type (markdown) exited with code $EXIT_CODE"
+    echo "$OUTPUT"
+    exit 1
+fi
+
+# Save actual output for comparison
+echo "$OUTPUT" > "${TEST_DIR}/actual_reverse_filter_output.md"
+
+# Compare markdown outputs
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_reverse_filter_output.md" "${TEST_DIR}/actual_reverse_filter_output.md"; then
+    echo "❌ FAILED: Reverse+filter-type markdown output does not match expected format"
+    exit 1
+fi
+
 exit 0

@@ -735,24 +735,51 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
-    subgraph 2b0b27142487cdbe[&quot;📄 Constraints.md&quot;]
-      1a01f3b1f5f4fd54[&quot;Element Type Relation Compatibility Constraint&quot;];
-      class 1a01f3b1f5f4fd54 default;
-      click 1a01f3b1f5f4fd54 &quot;Constraints.html#element-type-relation-compatibility-constraint&quot;;
+  subgraph 9e5f55ddfed5810b["📁 requirements/System/Core"]
+    subgraph a60329ab6b726793["📄 Constraints.md"]
+      eb8ed8c0d7287827["Cross-Section Duplicate Constraint"];
+      class eb8ed8c0d7287827 default;
+      click eb8ed8c0d7287827 "Constraints.html#cross-section-duplicate-constraint";
+      833188668b6b25cc["Element Type Relation Compatibility Constraint"];
+      class 833188668b6b25cc default;
+      click 833188668b6b25cc "Constraints.html#element-type-relation-compatibility-constraint";
     end
   end
 </div>
+<h3 id="cross-section-duplicate-constraint">Cross-Section Duplicate Constraint</h3>
+<p>Rules for detecting duplicate link targets across subsections.</p>
+<p><strong>Cross-section duplicates</strong> (same target in BOTH Relations AND Attachments):</p>
+<ul>
+<li>Applies to all target types: element identifiers AND file paths</li>
+<li>Treated as semantic errors requiring user resolution</li>
+<li>The validate command fails with error</li>
+<li>The format command does not auto-fix (user must decide which section to keep)</li>
+</ul>
+<p><strong>Within-section duplicates</strong> (same entry repeated in Relations OR in Attachments):</p>
+<ul>
+<li>Treated as formatting issues, not validation errors</li>
+<li>The format fix operation removes duplicate entries</li>
+<li>The validate command does not fail for within-section duplicates</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: constraint</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Validation.html#cross-section-duplicate-validation">Cross-Section Duplicate Validation</a></li>
+</ul>
+<hr />
 <h3 id="element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</h3>
 <p>Validation rules for element type and relation type combinations.</p>
 <h4>Details</h4>
-<p><strong>Relation Type Restrictions:</strong>
-| Relation Type | Allowed Source Types | Allowed Target Types |
-|—————|———————|———————|
-| derivedFrom/derive | requirement, user-requirement | requirement, user-requirement |
-| satisfiedBy/satisfy | requirement, user-requirement, test-verification, refinement types | InternalPath, refinement types |
-| verifiedBy/verify | requirement, user-requirement | All verification types |
-| trace | Any (except refinement types) | Any |</p>
+<p><strong>Relation Type Restrictions:</strong></p>
+<table><thead><tr><th>Relation Type</th><th>Allowed Source Types</th><th>Allowed Target Types</th></tr></thead><tbody>
+<tr><td>derivedFrom/derive</td><td>requirement, user-requirement</td><td>requirement, user-requirement</td></tr>
+<tr><td>satisfiedBy/satisfy</td><td>requirement, user-requirement, test-verification, refinement types</td><td>InternalPath, refinement types</td></tr>
+<tr><td>verifiedBy/verify</td><td>requirement, user-requirement</td><td>All verification types</td></tr>
+<tr><td>trace</td><td>Any (except refinement types)</td><td>Any</td></tr>
+</tbody></table>
 <p><strong>Key Constraints:</strong></p>
 <ul>
 <li>derivedFrom/derive restricted to requirement types only</li>

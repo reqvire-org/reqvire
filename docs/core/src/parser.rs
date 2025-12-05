@@ -1,5 +1,5 @@
 use crate::element::{Element, SubSection, ElementType, RequirementType, Attachment, AttachmentTarget};
-use crate::relation::Relation;
+use crate::relation::{self, Relation};
 use crate::error::ReqvireError;
 use crate::utils;
 use log::debug;
@@ -194,6 +194,16 @@ pub fn parse_single_element(
                     };
 
                     let relation = Relation::new(&relation_type, text, &normalized_target, None)?;
+
+                    // Check for duplicate relations (same type and target)
+                    let is_duplicate = element.relations.iter().any(|r| {
+                        r.relation_type == relation.relation_type && r.target == relation.target
+                    });
+                    if is_duplicate {
+                        return Err(ReqvireError::DuplicateRelation(
+                            format!("Duplicate relation '{}' to '{}'", relation_type, normalized_target)
+                        ));
+                    }
                     element.add_relation(relation);
 
                 } else if !trimmed.is_empty() {
@@ -252,6 +262,13 @@ pub fn parse_single_element(
                                 };
                                 AttachmentTarget::FilePath(attachment_path)
                             };
+
+                            // Check for duplicate attachments
+                            if element.attachments.iter().any(|a| a.target == target) {
+                                return Err(ReqvireError::DuplicateAttachment(
+                                    format!("Duplicate attachment '{}'", href)
+                                ));
+                            }
                             element.attachments.push(Attachment { target, content_hash: None });
                         }
                         Err(e) => {
@@ -572,12 +589,26 @@ pub fn parse_elements(
                                             // element_id will be populated later by GraphRegistry after all elements are registered
                                             match Relation::new(&relation_type, text, &normalized_target, None) {
                                                 Ok(relation) => {
-                                                    element.add_relation(relation);
+                                                    // Check for duplicate relations (same type and target)
+                                                    let is_duplicate = element.relations.iter().any(|r| {
+                                                        r.relation_type == relation.relation_type && r.target == relation.target
+                                                    });
+                                                    if is_duplicate {
+                                                        let msg = format!(
+                                                            "Duplicate relation '{}' to '{}' in element '{}' (file: {}, line {})",
+                                                            relation_type, normalized_target, element.name, file, line_num + 1
+                                                        );
+                                                        errors.push(ReqvireError::DuplicateRelation(msg.clone()));
+                                                        debug!("Warning: {}", msg);
+                                                    } else {
+                                                        element.add_relation(relation);
+                                                    }
                                                 }
                                                 Err(_) => {
                                                     let msg = format!(
-                                                        "'{}' in element '{}': (file: {}, line {})",
-                                                        relation_type, element.name, file, line_num + 1
+                                                        "'{}' in element '{}': (file: {}, line {}). Valid types: {}",
+                                                        relation_type, element.name, file, line_num + 1,
+                                                        relation::supported_relation_types_list()
                                                     );
                                                     errors.push(ReqvireError::UnsupportedRelationType(msg.clone()));
                                                     debug!("Error: {}", msg);

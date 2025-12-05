@@ -735,25 +735,25 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 63d7cba3f920744c[&quot;📁 requirements/System/Processing&quot;]
-    subgraph 6a8437a0c0d401f6[&quot;📄 Behaviors.md&quot;]
-      4eeae87393fce464[&quot;Change Propagation Behavior&quot;];
-      class 4eeae87393fce464 default;
-      click 4eeae87393fce464 &quot;Behaviors.html#change-propagation-behavior&quot;;
+  subgraph f1e62ab2dc6785["📁 requirements/System/Processing"]
+    subgraph be9aa110148ed949["📄 Behaviors.md"]
+      e82c8bdb5fb94146["Change Propagation Behavior"];
+      class e82c8bdb5fb94146 default;
+      click e82c8bdb5fb94146 "Behaviors.html#change-propagation-behavior";
     end
   end
 </div>
 <h3 id="change-propagation-behavior">Change Propagation Behavior</h3>
 <p>How changes propagate through model based on relation types.</p>
 <h4>Details</h4>
-<p><strong>Propagation by Relation:</strong>
-| Relation | Propagates |
-|–––––|————|
-| derive/derivedFrom | Yes - parent to child |
-| satisfiedBy/satisfy | Yes - requirement to implementation |
-| verifiedBy/verify | Yes - requirement to verification |
-| trace | No - documentation only |
-| Attachments | Yes - if content hash changes |</p>
+<p><strong>Propagation by Relation:</strong></p>
+<table><thead><tr><th>Relation</th><th>Propagates</th></tr></thead><tbody>
+<tr><td>derive/derivedFrom</td><td>Yes - parent to child</td></tr>
+<tr><td>satisfiedBy/satisfy</td><td>Yes - requirement to implementation</td></tr>
+<tr><td>verifiedBy/verify</td><td>Yes - requirement to verification</td></tr>
+<tr><td>trace</td><td>No - documentation only</td></tr>
+<tr><td>Attachments</td><td>Yes - if content hash changes</td></tr>
+</tbody></table>
 <p><strong>Attachment Impact:</strong></p>
 <ul>
 <li>Content changes → propagate impact</li>

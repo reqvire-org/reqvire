@@ -4,49 +4,9 @@
 
 use crate::error::ReqvireError;
 use crate::model::ModelManager;
-use crate::relation;
 use crate::diff::{CrudResult, CrudOperation, generate_crud_diffs, generate_file_diff};
 use globset::GlobSet;
 use std::path::Path;
-
-/// Check if deleting/overriding an element would orphan any children
-///
-/// Returns a sorted list of child element names that would be orphaned
-fn check_for_orphaned_children(
-    model_manager: &ModelManager,
-    element_id: &str,
-    _element_name: &str,
-) -> Result<Vec<String>, ReqvireError> {
-    let mut orphaned_children: Vec<String> = Vec::new();
-    let hierarchical_types = relation::get_hierarchical_relation_types();
-
-    for (_child_id, child_node) in &model_manager.graph_registry.nodes {
-        // Count how many hierarchical parent relations this child has to the element being deleted
-        let mut parents_to_target = 0;
-        let mut total_parents = 0;
-
-        for rel in &child_node.element.relations {
-            let target_id = match &rel.target.link {
-                crate::relation::LinkType::Identifier(id) => id.as_str(),
-                _ => continue, // Skip external links
-            };
-            if hierarchical_types.contains(&rel.relation_type.name) {
-                total_parents += 1;
-                if target_id == element_id {
-                    parents_to_target += 1;
-                }
-            }
-        }
-
-        // If child only has hierarchical parent relations to the target element, it will be orphaned
-        if parents_to_target > 0 && total_parents == parents_to_target {
-            orphaned_children.push(child_node.element.name.clone());
-        }
-    }
-
-    orphaned_children.sort();
-    Ok(orphaned_children)
-}
 
 /// Add a new element to the model
 ///
@@ -89,25 +49,9 @@ pub fn add_element(
         let element_name = extract_element_name_from_markdown(element_markdown)?;
 
         // Check if element exists and remove it
+        // Validation is handled by remove_element_with_cleanup
         if let Some(existing_element) = model_manager.graph_registry.get_element_by_name(&element_name) {
             let existing_id = existing_element.identifier.clone();
-
-            // Check for orphaned children before removing
-            let orphaned_children = check_for_orphaned_children(model_manager, &existing_id, &element_name)?;
-            if !orphaned_children.is_empty() {
-                return Err(ReqvireError::InvalidOperation(
-                    format!(
-                        "Cannot override '{}' because it has {} child element(s) with parent hierarchical relations that would become orphaned: {}.\n\n\
-                        To proceed, either:\n\
-                        1. Delete the child elements first, or\n\
-                        2. Update the child elements to link to a different parent element",
-                        element_name,
-                        orphaned_children.len(),
-                        orphaned_children.join(", ")
-                    )
-                ));
-            }
-
             model_manager.graph_registry.remove_element_with_cleanup(&existing_id)?;
         }
     }
@@ -185,28 +129,13 @@ pub fn remove_element(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    // Get element info before removal
-    let element = model_manager.graph_registry.nodes.get(element_id)
+    // Get element name before removal (needed for result structure)
+    let element_name = model_manager.graph_registry.nodes
+        .get(element_id)
         .ok_or_else(|| ReqvireError::MissingElement(
             format!("Element not found: {}", element_id)
-        ))?;
-    let element_name = element.element.name.clone();
-
-    // Check for orphaned children before deletion
-    let orphaned_children = check_for_orphaned_children(model_manager, element_id, &element_name)?;
-    if !orphaned_children.is_empty() {
-        return Err(ReqvireError::InvalidOperation(
-            format!(
-                "Cannot delete '{}' because it has {} child element(s) with parent hierarchical relations that would become orphaned: {}.\n\n\
-                To proceed, either:\n\
-                1. Delete the child elements first, or\n\
-                2. Update the child elements to link to a different parent element",
-                element_name,
-                orphaned_children.len(),
-                orphaned_children.join(", ")
-            )
-        ));
-    }
+        ))?
+        .element.name.clone();
 
     // Track which files were modified before the operation
     let modified_before: Vec<String> = model_manager.graph_registry.modified_files
@@ -214,7 +143,7 @@ pub fn remove_element(
         .cloned()
         .collect();
 
-    // Remove element using core business logic
+    // Remove element using core business logic (includes orphan validation)
     let _affected_files = model_manager.graph_registry.remove_element_with_cleanup(element_id)?;
 
     // Get list of newly modified files (sorted for deterministic output)
@@ -518,9 +447,7 @@ pub fn attach(
     }
 
     // Calculate file-relative path for the attachment link in markdown
-    let file_dir = PathBuf::from(&file_path).parent()
-        .map(|p| p.to_path_buf())
-        .unwrap_or_default();
+    let file_dir = crate::utils::get_parent_dir(&file_path);
     let attachment_path_buf = PathBuf::from(attachment_path);
     let relative_attachment_path = pathdiff::diff_paths(&attachment_path_buf, &file_dir)
         .unwrap_or_else(|| attachment_path_buf.clone());
@@ -576,9 +503,7 @@ pub fn detach(
         .map_err(|e| ReqvireError::IoError(e))?;
 
     // Calculate file-relative path for finding the attachment link in markdown
-    let file_dir = PathBuf::from(&file_path).parent()
-        .map(|p| p.to_path_buf())
-        .unwrap_or_default();
+    let file_dir = crate::utils::get_parent_dir(&file_path);
     let attachment_path_buf = PathBuf::from(attachment_path);
     let relative_attachment_path = pathdiff::diff_paths(&attachment_path_buf, &file_dir)
         .unwrap_or_else(|| attachment_path_buf.clone());
@@ -854,9 +779,7 @@ pub fn mv_asset(
 
         // Paths in markdown are file-relative, but stored in registry as reqvire-root-relative
         // Calculate the file-relative paths that appear in the markdown
-        let file_dir = PathBuf::from(file_path).parent()
-            .map(|p| p.to_path_buf())
-            .unwrap_or_default();
+        let file_dir = crate::utils::get_parent_dir(file_path);
 
         // Calculate old and new file-relative paths
         let old_relative = pathdiff::diff_paths(&old_path_buf, &file_dir)
@@ -962,9 +885,7 @@ pub fn rm_asset(
             .map_err(|e| ReqvireError::IoError(e))?;
 
         // Paths in markdown are file-relative, calculate the relative path from this file
-        let file_dir = PathBuf::from(spec_file_path).parent()
-            .map(|p| p.to_path_buf())
-            .unwrap_or_default();
+        let file_dir = crate::utils::get_parent_dir(spec_file_path);
         let relative_path = pathdiff::diff_paths(&file_path_buf, &file_dir)
             .unwrap_or_else(|| file_path_buf.clone());
         let relative_path_str = relative_path.to_string_lossy();
@@ -1027,32 +948,14 @@ pub fn merge_elements(
             format!("Target element '{}' not found", target_name)
         ))?;
     let target_id = target_element.identifier.clone();
-    let target_type = target_element.element_type.clone();
 
-    // Resolve all source elements and validate type compatibility
+    // Resolve all source elements (validation is done in graph_registry.merge_elements)
     let mut source_ids = Vec::new();
     for source_name in source_names {
         let source_element = model_manager.graph_registry.get_element_by_name(source_name)
             .ok_or_else(|| ReqvireError::ElementNotFound(
                 format!("Source element '{}' not found", source_name)
             ))?;
-
-        // Check if source would merge into itself
-        if source_element.identifier == target_id {
-            return Err(ReqvireError::InvalidOperation(
-                "Cannot merge element into itself".to_string()
-            ));
-        }
-
-        // Check type compatibility
-        if !target_type.is_merge_compatible(&source_element.element_type) {
-            return Err(ReqvireError::MergeTypeMismatch(format!(
-                "Cannot merge '{}' ({}) into '{}' ({}): type mismatch. \
-                 Elements must be in the same category (requirement/verification/refinement/other).",
-                source_name, source_element.element_type.as_str(),
-                target_name, target_type.as_str()
-            )));
-        }
 
         source_ids.push(source_element.identifier.clone());
     }
@@ -1585,16 +1488,6 @@ pub fn link(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
-    use crate::relation::RELATION_TYPES;
-
-    // Validate relation type
-    if !RELATION_TYPES.contains_key(relation_type) {
-        return Err(ReqvireError::UnsupportedRelationType(
-            format!("Invalid relation type '{}'. Valid types: {}", relation_type, relation::supported_relation_types_list())
-        ));
-    }
-
     // Resolve source element by name
     let source_element = model_manager.graph_registry.get_element_by_name(source)
         .ok_or_else(|| ReqvireError::ElementNotFound(
@@ -1603,119 +1496,43 @@ pub fn link(
 
     let source_id = source_element.identifier.clone();
     let source_name = source_element.name.clone();
-    let source_file_path = source_element.file_path.clone();
 
-    // Determine target type: element name, external URL, or internal path
-    let is_external_url = target.starts_with("http://") || target.starts_with("https://");
-    let is_internal_path = !is_external_url && (
-        target.ends_with(".md") ||
-        target.contains('/') ||
-        git_root.join(target).exists()
-    );
+    // Track which files were modified before the operation
+    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
+        .iter()
+        .cloned()
+        .collect();
 
-    let (target_display_name, relation_target, target_id_for_check) = if is_external_url {
-        // External URL - use as-is
-        (target.to_string(), target.to_string(), target.to_string())
-    } else if is_internal_path {
-        // Internal file path - use as satisfiedBy target
-        let source_file_path_buf = std::path::PathBuf::from(&source_file_path);
-        let source_folder = source_file_path_buf.parent()
-            .unwrap_or_else(|| std::path::Path::new("."))
-            .to_path_buf();
+    // Delegate to graph_registry (includes all validation and target resolution)
+    // NOTE: This will mutate the in-memory graph even in dry-run mode
+    let _modified_file = model_manager.graph_registry
+        .add_element_relation_full(&source_id, target, relation_type, git_root)?;
 
-        // Calculate relative path from source file to target
-        let target_path = std::path::PathBuf::from(target);
-        let relative_path = pathdiff::diff_paths(&target_path, &source_folder)
-            .unwrap_or_else(|| target_path.clone());
-        let relative_str = relative_path.to_string_lossy().to_string();
+    // Get list of newly modified files (sorted for deterministic output)
+    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
+        .iter()
+        .filter(|f| !modified_before.contains(f))
+        .cloned()
+        .collect();
+    modified_files.sort();
 
-        // Extract filename for display name
-        let display = target_path.file_name()
-            .map(|n| n.to_string_lossy().to_string())
-            .unwrap_or_else(|| target.to_string());
+    // Generate diffs for output
+    let diffs = generate_crud_diffs(
+        &model_manager.graph_registry,
+        &modified_files,
+        git_root,
+    )?;
 
-        (display, relative_str, target.to_string())
-    } else {
-        // Element name - resolve to get identifier
-        let target_element = model_manager.graph_registry.get_element_by_name(target)
-            .ok_or_else(|| ReqvireError::ElementNotFound(
-                format!("Target element '{}' not found", target)
-            ))?;
-
-        let target_id = target_element.identifier.clone();
-        let target_display_name = target_element.name.clone();
-        let target_file_path = target_element.file_path.clone();
-
-        // Calculate relative identifier from source element's file to target element
-        let source_file_path_buf = std::path::PathBuf::from(&source_file_path);
-        let source_folder = source_file_path_buf.parent()
-            .unwrap_or_else(|| std::path::Path::new("."))
-            .to_path_buf();
-
-        let relation_target = if source_file_path == target_file_path {
-            // Same file - use just the fragment
-            let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
-            let fragment = fragment_opt.unwrap_or(&target_id);
-            format!("#{}", fragment)
-        } else {
-            // Different files - calculate relative path
-            crate::utils::to_relative_identifier(
-                &target_id,
-                &source_folder,
-                true
-            ).unwrap_or_else(|_| target_id.clone())
-        };
-
-        (target_display_name, relation_target, target_id)
-    };
-
-    // Check if relation already exists (idempotent) - only check user_created relations
-    let relation_exists = source_element.relations.iter().any(|r| {
-        r.user_created && r.relation_type.name == relation_type && r.target.link.as_str() == target_id_for_check
-    });
-
-    if relation_exists {
-        return Err(ReqvireError::RelationError(
-            format!("Relation '{}' from '{}' to '{}' already exists", relation_type, source_name, target)
-        ));
-    }
-
-    // Check for cross-section duplicate: target already exists in Attachments
-    let in_attachments = source_element.attachments.iter().any(|a| {
-        a.target.as_str() == target_id_for_check
-    });
-
-    if in_attachments {
-        return Err(ReqvireError::CrossSectionDuplicate(
-            format!("Target '{}' already exists in Attachments of '{}'. Cannot add to Relations.", target, source_name)
-        ));
-    }
-
-    // Read current file content
-    let absolute_file_path = git_root.join(&source_file_path);
-    let content = fs::read_to_string(&absolute_file_path)
-        .map_err(|e| ReqvireError::IoError(e))?;
-
-    // Add relation to element
-    let new_content = add_relation_to_element(&content, &source_name, relation_type, &target_display_name, &relation_target)?;
-
-    // Generate diff
-    let diff = generate_file_diff(&source_file_path, &content, &new_content);
-
-    // Write to file if not dry run
+    // Flush changes if not dry-run
     if !dry_run {
-        fs::write(&absolute_file_path, &new_content)
-            .map_err(|e| ReqvireError::IoError(e))?;
-
-        // Mark file as modified for re-parsing
-        model_manager.graph_registry.modified_files.insert(source_file_path.clone());
+        model_manager.graph_registry.flush_modified_files(git_root)?;
     }
 
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id: source_id,
         element_name: format!("Linked {} {} {}", source_name, relation_type, target),
-        diffs: vec![diff],
+        diffs,
         dry_run,
     })
 }
@@ -1737,8 +1554,6 @@ pub fn unlink(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
-
     // Resolve source element by name
     let source_element = model_manager.graph_registry.get_element_by_name(source)
         .ok_or_else(|| ReqvireError::ElementNotFound(
@@ -1747,267 +1562,79 @@ pub fn unlink(
 
     let source_id = source_element.identifier.clone();
     let source_name = source_element.name.clone();
-    let source_file_path = source_element.file_path.clone();
 
-    // Step 1: Try to find a relation from source to target (by element name)
-    // First, try to resolve target as element name
-    if let Some(target_element) = model_manager.graph_registry.get_element_by_name(target) {
-        let target_id = target_element.identifier.clone();
-        let target_display_name = target_element.name.clone();
+    // Track modified files before
+    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
+        .iter().cloned().collect();
 
-        // Look for any user_created relation to this target
-        let relation_match = source_element.relations.iter().find(|r| {
-            r.user_created && r.target.link.as_str() == target_id
-        });
+    // Try to remove relation via graph_registry
+    // This handles element-to-element relations (NOT attachments)
+    match model_manager.graph_registry.remove_element_relation_full(&source_id, target)? {
+        Some((_modified_file, relation_type, target_display)) => {
+            // Relation was found and removed
+            // Get newly modified files
+            let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
+                .iter().filter(|f| !modified_before.contains(f)).cloned().collect();
+            modified_files.sort();
 
-        if let Some(relation) = relation_match {
-            let relation_type = relation.relation_type.name.to_string();
+            // Generate diffs
+            let diffs = generate_crud_diffs(&model_manager.graph_registry, &modified_files, git_root)?;
 
-            // Read current file content
-            let absolute_file_path = git_root.join(&source_file_path);
-            let content = fs::read_to_string(&absolute_file_path)
-                .map_err(|e| ReqvireError::IoError(e))?;
-
-            // Remove relation from element
-            let new_content = remove_relation_from_element(&content, &source_name, &relation_type, &target_display_name)?;
-
-            // Generate diff
-            let diff = generate_file_diff(&source_file_path, &content, &new_content);
-
-            // Write to file if not dry run
+            // Flush if not dry-run
             if !dry_run {
-                fs::write(&absolute_file_path, &new_content)
-                    .map_err(|e| ReqvireError::IoError(e))?;
-
-                // Mark file as modified for re-parsing
-                model_manager.graph_registry.modified_files.insert(source_file_path.clone());
+                model_manager.graph_registry.flush_modified_files(git_root)?;
             }
 
             return Ok(CrudResult {
                 operation: CrudOperation::Update,
                 element_id: source_id,
-                element_name: format!("Unlinked {} {} {}", source_name, relation_type, target),
-                diffs: vec![diff],
+                element_name: format!("Unlinked {} {} {}", source_name, relation_type, target_display),
+                diffs,
                 dry_run,
             });
         }
+        None => {
+            // No relation found - check if it's an attachment instead
+            // Get fresh source element (in case graph was modified)
+            let source_element = model_manager.graph_registry.get_element_by_name(source)
+                .ok_or_else(|| ReqvireError::ElementNotFound(
+                    format!("Source element '{}' not found", source)
+                ))?;
 
-        // No relation found, check if target element is an attachment
-        let attachment_match = source_element.attachments.iter().find(|a| {
-            a.target.as_str() == target_id
-        });
+            // Check if target is an element attachment
+            if let Some(target_element) = model_manager.graph_registry.get_element_by_name(target) {
+                let target_id = &target_element.identifier;
+                let attachment_match = source_element.attachments.iter().find(|a| {
+                    a.target.as_str() == target_id.as_str()
+                });
 
-        if attachment_match.is_some() {
-            // Detach the element attachment
-            return detach_element(model_manager, source, target, git_root, dry_run);
-        }
-    }
-
-    // Step 2: Try to find target as file attachment
-    // Check if target is a file path attachment
-    let cwd = std::env::current_dir().unwrap_or_default();
-    let file_exists_cwd = cwd.join(target).exists();
-    let file_exists_git_root = git_root.join(target).exists();
-
-    if file_exists_cwd || file_exists_git_root {
-        // It's a file - use file detachment logic
-        return detach(model_manager, source, target, git_root, dry_run);
-    }
-
-    // Step 3: Check attachments by path string (even if file doesn't exist anymore)
-    let attachment_by_path = source_element.attachments.iter().find(|a| {
-        a.target.as_str() == target || a.target.as_str().ends_with(target)
-    });
-
-    if attachment_by_path.is_some() {
-        return detach(model_manager, source, target, git_root, dry_run);
-    }
-
-    // Nothing found
-    Err(ReqvireError::RelationError(
-        format!("No relation or attachment found from '{}' to '{}'", source, target)
-    ))
-}
-
-/// Helper function to add a relation to an element in markdown content
-fn add_relation_to_element(content: &str, element_name: &str, relation_type: &str, target_name: &str, target_path: &str) -> Result<String, ReqvireError> {
-    let mut result = String::new();
-    let mut in_target_element = false;
-    let mut inserted = false;
-    let mut lines_iter = content.lines().peekable();
-
-    let relation_line = format!("  * {}: [{}]({})", relation_type, target_name, target_path);
-
-    while let Some(line) = lines_iter.next() {
-        let trimmed = line.trim();
-
-        // Check if we're entering the target element
-        if trimmed.starts_with("### ") {
-            let name = trimmed.trim_start_matches("### ").trim();
-            in_target_element = name == element_name;
-        }
-
-        // Check for Relations subsection
-        if in_target_element && trimmed == "#### Relations" {
-            result.push_str(line);
-            result.push('\n');
-
-            // Add the new relation after existing ones
-            while let Some(next_line) = lines_iter.peek() {
-                let next_trimmed = next_line.trim();
-                if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
-                    result.push_str(lines_iter.next().unwrap());
-                    result.push('\n');
-                } else if next_trimmed.is_empty() {
-                    result.push_str(lines_iter.next().unwrap());
-                    result.push('\n');
-                } else {
-                    break;
+                if attachment_match.is_some() {
+                    return detach_element(model_manager, source, target, git_root, dry_run);
                 }
             }
 
-            // Add our new relation
-            result.push_str(&relation_line);
-            result.push('\n');
-            inserted = true;
-            continue;
-        }
+            // Check if target is a file path attachment
+            let cwd = std::env::current_dir().unwrap_or_default();
+            let file_exists_cwd = cwd.join(target).exists();
+            let file_exists_git_root = git_root.join(target).exists();
 
-        // Check for separator (end of element) - insert Relations section if not found
-        if in_target_element && !inserted && trimmed == "---" {
-            // Need to add Relations section before the separator
-            result.push_str("\n#### Relations\n");
-            result.push_str(&relation_line);
-            result.push('\n');
-            inserted = true;
-        }
-
-        result.push_str(line);
-        result.push('\n');
-    }
-
-    if !inserted {
-        return Err(ReqvireError::ElementNotFound(
-            format!("Could not find element '{}' to add relation", element_name)
-        ));
-    }
-
-    Ok(result)
-}
-
-/// Helper function to remove a relation from an element in markdown content
-fn remove_relation_from_element(content: &str, element_name: &str, relation_type: &str, target_name: &str) -> Result<String, ReqvireError> {
-    let mut result = String::new();
-    let mut in_target_element = false;
-    let mut in_relations_section = false;
-    let mut removed = false;
-    let mut remaining_relations_count = 0;
-
-    // Match pattern like: * derivedFrom: [Target Name](path)
-    let relation_pattern = format!("{}: [{}]", relation_type, target_name);
-
-    for line in content.lines() {
-        let trimmed = line.trim();
-
-        // Check if we're entering a new element
-        if trimmed.starts_with("### ") {
-            let name = trimmed.trim_start_matches("### ").trim();
-            if name == element_name {
-                in_target_element = true;
-            } else if in_target_element {
-                in_target_element = false;
-            }
-            in_relations_section = false;
-        }
-
-        // Check for Relations subsection
-        if in_target_element && trimmed == "#### Relations" {
-            in_relations_section = true;
-        }
-
-        // Check for end of Relations section (another h4 header or element separator)
-        if in_relations_section && ((trimmed.starts_with("####") && trimmed != "#### Relations") || trimmed == "---") {
-            in_relations_section = false;
-        }
-
-        // Skip the relation line we want to remove
-        if in_target_element && in_relations_section {
-            if (trimmed.starts_with("* ") || trimmed.starts_with("- ")) && trimmed.contains(&relation_pattern) {
-                removed = true;
-                continue; // Skip this line
-            }
-            if trimmed.starts_with("* ") || trimmed.starts_with("- ") {
-                remaining_relations_count += 1;
-            }
-        }
-
-        result.push_str(line);
-        result.push('\n');
-    }
-
-    if !removed {
-        return Err(ReqvireError::RelationError(
-            format!("Could not find relation '{}' to '{}' in element '{}'", relation_type, target_name, element_name)
-        ));
-    }
-
-    // If we removed the last relation, clean up the empty Relations section
-    if remaining_relations_count == 0 {
-        result = remove_empty_relations_section(&result, element_name);
-    }
-
-    Ok(result)
-}
-
-/// Helper function to remove empty Relations section from markdown content
-fn remove_empty_relations_section(content: &str, element_name: &str) -> String {
-    let mut result = String::new();
-    let mut in_target_element = false;
-    let mut lines_iter = content.lines().peekable();
-
-    while let Some(line) = lines_iter.next() {
-        let trimmed = line.trim();
-
-        // Check if we're entering a new element
-        if trimmed.starts_with("### ") {
-            let name = trimmed.trim_start_matches("### ").trim();
-            in_target_element = name == element_name;
-        }
-
-        // Check for Relations subsection header
-        if in_target_element && trimmed == "#### Relations" {
-            // Check if there are any relations following
-            let mut has_relations = false;
-            let mut temp_lines: Vec<&str> = Vec::new();
-
-            while let Some(next_line) = lines_iter.peek() {
-                let next_trimmed = next_line.trim();
-                if next_trimmed.is_empty() {
-                    temp_lines.push(lines_iter.next().unwrap());
-                } else if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
-                    has_relations = true;
-                    break;
-                } else {
-                    break;
-                }
+            if file_exists_cwd || file_exists_git_root {
+                return detach(model_manager, source, target, git_root, dry_run);
             }
 
-            if has_relations {
-                // Keep the header and empty lines
-                result.push_str(line);
-                result.push('\n');
-                for temp in temp_lines {
-                    result.push_str(temp);
-                    result.push('\n');
-                }
+            // Check attachments by path string (even if file doesn't exist anymore)
+            let attachment_by_path = source_element.attachments.iter().find(|a| {
+                a.target.as_str() == target || a.target.as_str().ends_with(target)
+            });
+
+            if attachment_by_path.is_some() {
+                return detach(model_manager, source, target, git_root, dry_run);
             }
-            // If no relations, skip the header
-            continue;
+
+            // Nothing found
+            Err(ReqvireError::RelationError(
+                format!("No relation or attachment found from '{}' to '{}'", source, target)
+            ))
         }
-
-        result.push_str(line);
-        result.push('\n');
     }
-
-    result
 }

@@ -12,18 +12,6 @@ Top-level container for test requirements.
   * derive: [No Relations Requirement](#no-relations-requirement)
 ---
 
-### Feature Requirement
-
-A requirement to be linked/unlinked.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [System Requirements](#system-requirements)
-  * derivedFrom: [Another Requirement](#another-requirement)
----
-
 ### Another Requirement
 
 Another requirement for testing.
@@ -34,6 +22,18 @@ Another requirement for testing.
 #### Relations
   * derivedFrom: [System Requirements](#system-requirements)
   * verifiedBy: [Orphan Test](Verifications.md#orphan-test)
+---
+
+### Feature Requirement
+
+A requirement to be linked/unlinked.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Another Requirement](#another-requirement)
+  * derivedFrom: [System Requirements](#system-requirements)
 ---
 
 ### No Relations Requirement

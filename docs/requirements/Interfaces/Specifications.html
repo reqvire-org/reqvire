@@ -735,11 +735,11 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
-    subgraph 89b3e2dd5703d487[&quot;📄 Specifications.md&quot;]
-      651069951fc8a95b[&quot;Web Interface Style Specification&quot;];
-      class 651069951fc8a95b default;
-      click 651069951fc8a95b &quot;Specifications.html#web-interface-style-specification&quot;;
+  subgraph c97e5d4c96ea3f37["📁 requirements/Interfaces"]
+    subgraph f5a22f7f785fcf6a["📄 Specifications.md"]
+      19bf972ca85f2b44["Web Interface Style Specification"];
+      class 19bf972ca85f2b44 default;
+      click 19bf972ca85f2b44 "Specifications.html#web-interface-style-specification";
     end
   end
 </div>
@@ -758,23 +758,23 @@ blockquote {
 <li>Monospace for code and identifiers</li>
 <li>Heading hierarchy matches markdown levels</li>
 </ul>
-<p><strong>Color Palette:</strong>
-| Usage | Light Mode | Dark Mode |
-|—––|————|———–|
-| Background | #FFFFFF | #1a1a1a |
-| Text | #333333 | #e0e0e0 |
-| Links | #0066CC | #6699FF |
-| Borders | #DDDDDD | #444444 |
-| Code background | #F5F5F5 | #2d2d2d |</p>
-<p><strong>Element Cards:</strong>
-| Element Type | Border Color | Background |
-|–––––––|–––––––|————|
-| Requirement | #0066FF | #D0E0FF |
-| User-requirement | #0066FF | #D0E0FF |
-| Verification | #CC9900 | #FFF7B3 |
-| Behavior | #9900CC | #E0D0FF |
-| Specification | #009900 | #DFFFD0 |
-| Constraint | #CC0000 | #FFD0D0 |</p>
+<p><strong>Color Palette:</strong></p>
+<table><thead><tr><th>Usage</th><th>Light Mode</th><th>Dark Mode</th></tr></thead><tbody>
+<tr><td>Background</td><td>#FFFFFF</td><td>#1a1a1a</td></tr>
+<tr><td>Text</td><td>#333333</td><td>#e0e0e0</td></tr>
+<tr><td>Links</td><td>#0066CC</td><td>#6699FF</td></tr>
+<tr><td>Borders</td><td>#DDDDDD</td><td>#444444</td></tr>
+<tr><td>Code background</td><td>#F5F5F5</td><td>#2d2d2d</td></tr>
+</tbody></table>
+<p><strong>Element Cards:</strong></p>
+<table><thead><tr><th>Element Type</th><th>Border Color</th><th>Background</th></tr></thead><tbody>
+<tr><td>Requirement</td><td>#0066FF</td><td>#D0E0FF</td></tr>
+<tr><td>User-requirement</td><td>#0066FF</td><td>#D0E0FF</td></tr>
+<tr><td>Verification</td><td>#CC9900</td><td>#FFF7B3</td></tr>
+<tr><td>Behavior</td><td>#9900CC</td><td>#E0D0FF</td></tr>
+<tr><td>Specification</td><td>#009900</td><td>#DFFFD0</td></tr>
+<tr><td>Constraint</td><td>#CC0000</td><td>#FFD0D0</td></tr>
+</tbody></table>
 <p><strong>Navigation:</strong></p>
 <ul>
 <li>Breadcrumb trail for element hierarchy</li>
@@ -784,6 +784,10 @@ blockquote {
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="WebInterface.html#html-export">HTML Export</a></li>
 </ul>
 <hr />
 

@@ -744,13 +744,13 @@ blockquote {
 <p>The filtering system <strong>must support the following filters</strong>, which may be active simultaneously.</p>
 <h3 id="1.-file-path-filter-(glob)">1. File Path Filter (Glob)</h3>
 <p><strong>Purpose:</strong> Restrict search to elements defined in files whose paths match a given glob pattern.</p>
-<p><strong>Input:</strong> A single string pattern using glob syntax (e.g., <code>&quot;src/**/*Spec.md&quot;</code>)</p>
+<p><strong>Input:</strong> A single string pattern using glob syntax (e.g., <code>"src/**/*Spec.md"</code>)</p>
 <p><strong>Match Target:</strong> <code>Element.file_path</code></p>
 <p><strong>Behavior:</strong> Case-sensitive glob match. If the glob does not match any file, no elements are included.</p>
 <hr />
 <h3 id="2.-name-filter-(regex)">2. Name Filter (Regex)</h3>
 <p><strong>Purpose:</strong> Include only elements whose <code>name</code> matches a regular expression.</p>
-<p><strong>Input:</strong> A valid Rust-compatible regular expression (e.g., <code>&quot;autonomous.*&quot;</code>)</p>
+<p><strong>Input:</strong> A valid Rust-compatible regular expression (e.g., <code>"autonomous.*"</code>)</p>
 <p><strong>Match Target:</strong> <code>Element.name</code></p>
 <p><strong>Behavior:</strong> Case-sensitive match by default. The filter is considered invalid if the regex fails to compile.</p>
 <hr />
@@ -758,17 +758,17 @@ blockquote {
 <p><strong>Purpose:</strong> Include only elements of a specific type.</p>
 <p><strong>Input:</strong> One of the following valid string identifiers:</p>
 <ul>
-<li><code>&quot;requirement&quot;</code> - System requirement (default type)</li>
-<li><code>&quot;user-requirement&quot;</code> - User requirement</li>
-<li><code>&quot;verification&quot;</code> / <code>&quot;test-verification&quot;</code> - Test verification</li>
-<li><code>&quot;analysis-verification&quot;</code> - Analysis verification</li>
-<li><code>&quot;inspection-verification&quot;</code> - Inspection verification</li>
-<li><code>&quot;demonstration-verification&quot;</code> - Demonstration verification</li>
-<li><code>&quot;constraint&quot;</code> - Refinement documenting constraints</li>
-<li><code>&quot;behavior&quot;</code> - Refinement documenting behavior details</li>
-<li><code>&quot;specification&quot;</code> - Refinement documenting specifications</li>
-<li><code>&quot;file&quot;</code> - File element</li>
-<li>Any user-defined type (e.g., <code>&quot;interface&quot;</code>, <code>&quot;design&quot;</code>)</li>
+<li><code>"requirement"</code> - System requirement (default type)</li>
+<li><code>"user-requirement"</code> - User requirement</li>
+<li><code>"verification"</code> / <code>"test-verification"</code> - Test verification</li>
+<li><code>"analysis-verification"</code> - Analysis verification</li>
+<li><code>"inspection-verification"</code> - Inspection verification</li>
+<li><code>"demonstration-verification"</code> - Demonstration verification</li>
+<li><code>"constraint"</code> - Refinement documenting constraints</li>
+<li><code>"behavior"</code> - Refinement documenting behavior details</li>
+<li><code>"specification"</code> - Refinement documenting specifications</li>
+<li><code>"file"</code> - File element</li>
+<li>Any user-defined type (e.g., <code>"interface"</code>, <code>"design"</code>)</li>
 </ul>
 <p><strong>Match Target:</strong> <code>Element.element_type</code></p>
 <p><strong>Behavior:</strong> Matching must be exact. Internally, the filter string shall be mapped to an <code>ElementType</code> via a deterministic lookup function.</p>
@@ -787,13 +787,13 @@ blockquote {
 <hr />
 <h3 id="6.-have-relations-filter-(comma-separated-list)">6. Have Relations Filter (Comma-separated list)</h3>
 <p><strong>Purpose:</strong> Include only elements that have ALL specified relation types.</p>
-<p><strong>Input:</strong> Comma-separated list of relation type names (e.g., <code>&quot;verifiedBy,satisfiedBy&quot;</code>)</p>
+<p><strong>Input:</strong> Comma-separated list of relation type names (e.g., <code>"verifiedBy,satisfiedBy"</code>)</p>
 <p><strong>Match Target:</strong> <code>Element.relations</code></p>
 <p><strong>Behavior:</strong> When specified, element must have at least one relation of each specified type to be included. Invalid relation type names shall cause an error with a list of valid relation types.</p>
 <hr />
 <h3 id="7.-not-have-relations-filter-(comma-separated-list)">7. Not Have Relations Filter (Comma-separated list)</h3>
 <p><strong>Purpose:</strong> Include only elements that do NOT have ALL specified relation types.</p>
-<p><strong>Input:</strong> Comma-separated list of relation type names (e.g., <code>&quot;verifiedBy&quot;</code>)</p>
+<p><strong>Input:</strong> Comma-separated list of relation type names (e.g., <code>"verifiedBy"</code>)</p>
 <p><strong>Match Target:</strong> <code>Element.relations</code></p>
 <p><strong>Behavior:</strong> When specified, element must NOT have all the specified relation types to be included. If element has all specified relation types, it is excluded. Invalid relation type names shall cause an error with a list of valid relation types.</p>
 <hr />
@@ -820,10 +820,10 @@ blockquote {
 <tr><td><code>type = constraint</code></td><td>Only constraint refinement elements</td></tr>
 <tr><td><code>type = behavior</code></td><td>Only behavior refinement elements</td></tr>
 <tr><td><code>type = specification</code></td><td>Only specification refinement elements</td></tr>
-<tr><td><code>filter-file = &quot;System*&quot;</code> + <code>name = &quot;.*GPS.*&quot;</code></td><td>Elements in System files with GPS in name</td></tr>
+<tr><td><code>filter-file = "System*"</code> + <code>name = ".*GPS.*"</code></td><td>Elements in System files with GPS in name</td></tr>
 <tr><td><code>have-relations = verifiedBy,satisfiedBy</code></td><td>Elements that have both verifiedBy AND satisfiedBy relations</td></tr>
 <tr><td><code>not-have-relations = verifiedBy</code></td><td>Elements that do NOT have any verifiedBy relations</td></tr>
-<tr><td><code>filter-page-content = &quot;architecture&quot;</code></td><td>Elements in files whose frontmatter contains “architecture”</td></tr>
+<tr><td><code>filter-page-content = "architecture"</code></td><td>Elements in files whose frontmatter contains “architecture”</td></tr>
 </tbody></table>
 
         </div>

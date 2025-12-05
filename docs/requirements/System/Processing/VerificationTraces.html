@@ -735,16 +735,22 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 63d7cba3f920744c[&quot;📁 requirements/System/Processing&quot;]
-    subgraph c809e90dbf14fff7[&quot;📄 VerificationTraces.md&quot;]
-      3e62787c176807f6[&quot;Verification Roll-up Strategy&quot;];
-      class 3e62787c176807f6 systemRequirement;
-      click 3e62787c176807f6 &quot;VerificationTraces.html#verification-roll-up-strategy&quot;;
-      61e7a56e6d8e29d[&quot;Verification Trace Builder<br/>📎 requirements/System/Processing/Specifications.md#verification-trace-tree-construction&quot;];
-      class 61e7a56e6d8e29d systemRequirement;
-      click 61e7a56e6d8e29d &quot;VerificationTraces.html#verification-trace-builder&quot;;
+  subgraph f1e62ab2dc6785["📁 requirements/System/Processing"]
+    subgraph ae52f7490b4ae1["📄 Specifications.md"]
+      8a8c1920dbfb6be1["Verification Trace Tree Construction"];
+      class 8a8c1920dbfb6be1 default;
+      click 8a8c1920dbfb6be1 "Specifications.html#verification-trace-tree-construction";
+    end
+    subgraph a99c663a4b7ad375["📄 VerificationTraces.md"]
+      2ab44d6a5fa23e57["Verification Roll-up Strategy"];
+      class 2ab44d6a5fa23e57 systemRequirement;
+      click 2ab44d6a5fa23e57 "VerificationTraces.html#verification-roll-up-strategy";
+      a2df7f6845e524c2["Verification Trace Builder"];
+      class a2df7f6845e524c2 systemRequirement;
+      click a2df7f6845e524c2 "VerificationTraces.html#verification-trace-builder";
     end
   end
+  a2df7f6845e524c2 -->|satisfiedBy| 8a8c1920dbfb6be1;
 </div>
 <h3 id="verification-roll-up-strategy">Verification Roll-up Strategy</h3>
 <p>The system shall implement a verification roll-up strategy where parent requirements are considered verified based on the verification status of their child requirements.</p>
@@ -756,6 +762,10 @@ blockquote {
 <li>A parent with any unverified child shall be marked as unverified (❌), even if the parent itself has direct verification</li>
 <li>Verification status rolls up from leaf requirements through the entire parent chain to root requirements</li>
 <li>This strategy applies to all verification matrices, coverage reports, and trace outputs</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -772,13 +782,14 @@ Verification trace diagrams shall use the same visual styling as other mermaid d
 <li>Element type-based CSS classes (userRequirement, systemRequirement, verification) for consistent coloring</li>
 <li>Directly verified requirements highlighted with appropriate styling</li>
 </ul>
-<h4>Attachments</h4>
+<h4>Metadata</h4>
 <ul>
-<li><a href="Specifications.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Output/Reporting.html#verification-upward-traceability">Verification Upward Traceability</a></li>
+<li>satisfiedBy: <a href="Specifications.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
 </ul>
 <hr />
 

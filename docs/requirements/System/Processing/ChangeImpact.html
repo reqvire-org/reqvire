@@ -735,76 +735,76 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 2d73a43cf375cb0f[&quot;📁 requirements/System/Core/Verifications&quot;]
-    subgraph 41cd9fa811ae162b[&quot;📄 AttachmentsVerifications.md&quot;]
-      f1dfbc33d1f30608[&quot;Attachments Change Impact Verification&quot;];
-      class f1dfbc33d1f30608 verification;
-      click f1dfbc33d1f30608 &quot;../Core/Verifications/AttachmentsVerifications.html#attachments-change-impact-verification&quot;;
+  subgraph ef1b8526d9f32695["📁 requirements/System/Core/Verifications"]
+    subgraph 83a49946983be276["📄 AttachmentsVerifications.md"]
+      ba77e1914915375d["Attachments Change Impact Verification"];
+      class ba77e1914915375d verification;
+      click ba77e1914915375d "../Core/Verifications/AttachmentsVerifications.html#attachments-change-impact-verification";
     end
   end
-  subgraph 63d7cba3f920744c[&quot;📁 requirements/System/Processing&quot;]
-    subgraph 263fc0b0a2043fc1[&quot;📄 ChangeImpact.md&quot;]
-      87b7ea665c0ec9c2[&quot;Change Impact Detection<br/>📎 ElementIdentity.md&quot;];
-      class 87b7ea665c0ec9c2 systemRequirement;
-      click 87b7ea665c0ec9c2 &quot;ChangeImpact.html#change-impact-detection&quot;;
-      1db62a3344255ecc[&quot;Requirements Change Propagation<br/>📎 ChangePropagation.md&quot;];
-      class 1db62a3344255ecc systemRequirement;
-      click 1db62a3344255ecc &quot;ChangeImpact.html#requirements-change-propagation&quot;;
-      c93cc0e0f7685241[&quot;Structural Change Analyzer&quot;];
-      class c93cc0e0f7685241 systemRequirement;
-      click c93cc0e0f7685241 &quot;ChangeImpact.html#structural-change-analyzer&quot;;
+  subgraph f1e62ab2dc6785["📁 requirements/System/Processing"]
+    subgraph 8cdad3d875993104["📄 ChangeImpact.md"]
+      b06273848d1f5dc5["Change Impact Detection"];
+      class b06273848d1f5dc5 systemRequirement;
+      click b06273848d1f5dc5 "ChangeImpact.html#change-impact-detection";
+      9f29ea63df3dd0dd["Requirements Change Propagation<br/>📎 ChangePropagation.md"];
+      class 9f29ea63df3dd0dd systemRequirement;
+      click 9f29ea63df3dd0dd "ChangeImpact.html#requirements-change-propagation";
+      8cb80bd6cb8e72c3["Structural Change Analyzer"];
+      class 8cb80bd6cb8e72c3 systemRequirement;
+      click 8cb80bd6cb8e72c3 "ChangeImpact.html#structural-change-analyzer";
     end
   end
-  subgraph f876b12d880d294c[&quot;📁 requirements/System/Processing/Verifications&quot;]
-    subgraph 427027b536446d98[&quot;📄 ChangeImpactVerifications.md&quot;]
-      aa925b8b82776365[&quot;Change Impact Detection Test&quot;];
-      class aa925b8b82776365 verification;
-      click aa925b8b82776365 &quot;Verifications/ChangeImpactVerifications.html#change-impact-detection-test&quot;;
-      9c1a36e8cc156517[&quot;Change Impact Relations Test&quot;];
-      class 9c1a36e8cc156517 verification;
-      click 9c1a36e8cc156517 &quot;Verifications/ChangeImpactVerifications.html#change-impact-relations-test&quot;;
-      f3e6e51e1f4e513e[&quot;Change Impact Smart Filtering Test&quot;];
-      class f3e6e51e1f4e513e verification;
-      click f3e6e51e1f4e513e &quot;Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test&quot;;
-      3753d18d6b61231c[&quot;Element Content Extraction Test&quot;];
-      class 3753d18d6b61231c verification;
-      click 3753d18d6b61231c &quot;Verifications/ChangeImpactVerifications.html#element-content-extraction-test&quot;;
+  subgraph 392008bc7c0fc02c["📁 requirements/System/Processing/Verifications"]
+    subgraph 931561eace4454d0["📄 ChangeImpactVerifications.md"]
+      185861184535b972["Change Impact Detection Test"];
+      class 185861184535b972 verification;
+      click 185861184535b972 "Verifications/ChangeImpactVerifications.html#change-impact-detection-test";
+      f883820b438fade5["Change Impact Relations Test"];
+      class f883820b438fade5 verification;
+      click f883820b438fade5 "Verifications/ChangeImpactVerifications.html#change-impact-relations-test";
+      1d82e07bf187ac1e["Change Impact Smart Filtering Test"];
+      class 1d82e07bf187ac1e verification;
+      click 1d82e07bf187ac1e "Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test";
+      cd0e8d39fedeb815["Element Content Extraction Test"];
+      class cd0e8d39fedeb815 verification;
+      click cd0e8d39fedeb815 "Verifications/ChangeImpactVerifications.html#element-content-extraction-test";
     end
   end
-  87b7ea665c0ec9c2 -.->|deriveReqT| 1db62a3344255ecc;
-  87b7ea665c0ec9c2 -.->|deriveReqT| c93cc0e0f7685241;
-  4b89dbed94c08c3e[&quot;change_impact.rs&quot;];
-  class 4b89dbed94c08c3e default;
-  click 4b89dbed94c08c3e &quot;../../../core/src/change_impact.rs&quot;;
-  87b7ea665c0ec9c2 -->|satisfiedBy| 4b89dbed94c08c3e;
-  87b7ea665c0ec9c2 -.->|verifiedBy| f1dfbc33d1f30608;
-  1db62a3344255ecc -->|satisfiedBy| 4b89dbed94c08c3e;
-  1db62a3344255ecc -.->|verifiedBy| aa925b8b82776365;
-  1db62a3344255ecc -.->|verifiedBy| 9c1a36e8cc156517;
-  1db62a3344255ecc -.->|verifiedBy| f3e6e51e1f4e513e;
-  1db62a3344255ecc -.->|verifiedBy| 3753d18d6b61231c;
-  c93cc0e0f7685241 -->|satisfiedBy| 4b89dbed94c08c3e;
-  17b004dcfcf8f444[&quot;test.sh&quot;];
-  class 17b004dcfcf8f444 default;
-  click 17b004dcfcf8f444 &quot;../../../tests/test-change-impact-attachments/test.sh&quot;;
-  f1dfbc33d1f30608 -->|satisfiedBy| 17b004dcfcf8f444;
-  e95e3160edec8f1b[&quot;test.sh&quot;];
-  class e95e3160edec8f1b default;
-  click e95e3160edec8f1b &quot;../../../tests/test-change-impact-detection/test.sh&quot;;
-  aa925b8b82776365 -->|satisfiedBy| e95e3160edec8f1b;
-  fe115b41c9238caf[&quot;test.sh&quot;];
-  class fe115b41c9238caf default;
-  click fe115b41c9238caf &quot;../../../tests/test-change-impact-element-relocation/test.sh&quot;;
-  aa925b8b82776365 -->|satisfiedBy| fe115b41c9238caf;
-  9c1a36e8cc156517 -->|satisfiedBy| e95e3160edec8f1b;
-  6cc7cc8a3f2af10b[&quot;test.sh&quot;];
-  class 6cc7cc8a3f2af10b default;
-  click 6cc7cc8a3f2af10b &quot;../../../tests/test-change-impact-smart-filtering/test.sh&quot;;
-  f3e6e51e1f4e513e -->|satisfiedBy| 6cc7cc8a3f2af10b;
-  c287b52ceb52aa04[&quot;test.sh&quot;];
-  class c287b52ceb52aa04 default;
-  click c287b52ceb52aa04 &quot;../../../tests/test-element-content-extraction/test.sh&quot;;
-  3753d18d6b61231c -->|satisfiedBy| c287b52ceb52aa04;
+  b06273848d1f5dc5 -.->|deriveReqT| 9f29ea63df3dd0dd;
+  b06273848d1f5dc5 -.->|deriveReqT| 8cb80bd6cb8e72c3;
+  4391424e97bc407a["change_impact.rs"];
+  class 4391424e97bc407a default;
+  click 4391424e97bc407a "../../../core/src/change_impact.rs";
+  b06273848d1f5dc5 -->|satisfiedBy| 4391424e97bc407a;
+  b06273848d1f5dc5 -.->|verifiedBy| ba77e1914915375d;
+  9f29ea63df3dd0dd -->|satisfiedBy| 4391424e97bc407a;
+  9f29ea63df3dd0dd -.->|verifiedBy| 185861184535b972;
+  9f29ea63df3dd0dd -.->|verifiedBy| f883820b438fade5;
+  9f29ea63df3dd0dd -.->|verifiedBy| 1d82e07bf187ac1e;
+  9f29ea63df3dd0dd -.->|verifiedBy| cd0e8d39fedeb815;
+  8cb80bd6cb8e72c3 -->|satisfiedBy| 4391424e97bc407a;
+  4225cde0908b7474["test.sh"];
+  class 4225cde0908b7474 default;
+  click 4225cde0908b7474 "../../../tests/test-change-impact-attachments/test.sh";
+  ba77e1914915375d -->|satisfiedBy| 4225cde0908b7474;
+  c2377a15dab54ba5["test.sh"];
+  class c2377a15dab54ba5 default;
+  click c2377a15dab54ba5 "../../../tests/test-change-impact-detection/test.sh";
+  185861184535b972 -->|satisfiedBy| c2377a15dab54ba5;
+  4e0ed6253b039034["test.sh"];
+  class 4e0ed6253b039034 default;
+  click 4e0ed6253b039034 "../../../tests/test-change-impact-element-relocation/test.sh";
+  185861184535b972 -->|satisfiedBy| 4e0ed6253b039034;
+  f883820b438fade5 -->|satisfiedBy| c2377a15dab54ba5;
+  c22a6530fecc52ed["test.sh"];
+  class c22a6530fecc52ed default;
+  click c22a6530fecc52ed "../../../tests/test-change-impact-smart-filtering/test.sh";
+  1d82e07bf187ac1e -->|satisfiedBy| c22a6530fecc52ed;
+  dd7cc79a76771691["test.sh"];
+  class dd7cc79a76771691 default;
+  click dd7cc79a76771691 "../../../tests/test-element-content-extraction/test.sh";
+  cd0e8d39fedeb815 -->|satisfiedBy| dd7cc79a76771691;
 </div>
 <h3 id="change-impact-detection">Change Impact Detection</h3>
 <p>The system shall detect, analyze, and report changes to model elements between versions by comparing element content hashes, tracking relocations, and propagating impact through relationships.</p>
@@ -820,9 +820,9 @@ blockquote {
 <li>Refinement element content changes (hash changes) shall propagate change impact through the model via their attachment relationships</li>
 <li>Attachment identifier location changes (moved/renamed Refinement elements) shall be reported but do NOT propagate impact (same behavior as relation relocations)</li>
 </ul>
-<h4>Attachments</h4>
+<h4>Metadata</h4>
 <ul>
-<li><a href="../Core/DesignDocuments/ElementIdentity.html">ElementIdentity.html</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -836,6 +836,10 @@ blockquote {
 <hr />
 <h3 id="requirements-change-propagation">Requirements Change Propagation</h3>
 <p>When a requirement is changed, the system shall propagate the change through related requirements, verification artifacts, and design elements according to relation type definitions and propagation rules.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="DesignDocuments/ChangePropagation.html">ChangePropagation.html</a></li>
@@ -852,6 +856,10 @@ blockquote {
 <hr />
 <h3 id="structural-change-analyzer">Structural Change Analyzer</h3>
 <p>The system shall implement a model change analyzer that identifies structural modifications between model versions, determines affected elements through relationship traversal, and categorizes impacts according to change propagation rules.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#change-impact-detection">Change Impact Detection</a></li>

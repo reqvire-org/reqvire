@@ -735,55 +735,55 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 2d73a43cf375cb0f[&quot;📁 requirements/System/Core/Verifications&quot;]
-    subgraph 41cd9fa811ae162b[&quot;📄 AttachmentsVerifications.md&quot;]
-      71269c3d60db1560[&quot;Attach Command Verification&quot;];
-      class 71269c3d60db1560 verification;
-      click 71269c3d60db1560 &quot;AttachmentsVerifications.html#attach-command-verification&quot;;
-      b2b2b0b30708887[&quot;Attachment Identifier CRUD Verification&quot;];
-      class b2b2b0b30708887 verification;
-      click b2b2b0b30708887 &quot;AttachmentsVerifications.html#attachment-identifier-crud-verification&quot;;
-      a6cf9003ffcad7d2[&quot;Attachment Output Rendering Verification&quot;];
-      class a6cf9003ffcad7d2 verification;
-      click a6cf9003ffcad7d2 &quot;AttachmentsVerifications.html#attachment-output-rendering-verification&quot;;
-      405875bd7f079c80[&quot;Attachment Search Filters Verification&quot;];
-      class 405875bd7f079c80 verification;
-      click 405875bd7f079c80 &quot;AttachmentsVerifications.html#attachment-search-filters-verification&quot;;
-      f1dfbc33d1f30608[&quot;Attachments Change Impact Verification&quot;];
-      class f1dfbc33d1f30608 verification;
-      click f1dfbc33d1f30608 &quot;AttachmentsVerifications.html#attachments-change-impact-verification&quot;;
-      ab457fb3036a93b9[&quot;Attachments Subsection Parsing Verification&quot;];
-      class ab457fb3036a93b9 verification;
-      click ab457fb3036a93b9 &quot;AttachmentsVerifications.html#attachments-subsection-parsing-verification&quot;;
-      ebdc4f53fb16d23b[&quot;Attachments Validation Verification&quot;];
-      class ebdc4f53fb16d23b verification;
-      click ebdc4f53fb16d23b &quot;AttachmentsVerifications.html#attachments-validation-verification&quot;;
-      db3bde84906152d4[&quot;Detach Command Verification&quot;];
-      class db3bde84906152d4 verification;
-      click db3bde84906152d4 &quot;AttachmentsVerifications.html#detach-command-verification&quot;;
-      ec5f1378c6e3dc01[&quot;Move Asset Command Verification&quot;];
-      class ec5f1378c6e3dc01 verification;
-      click ec5f1378c6e3dc01 &quot;AttachmentsVerifications.html#move-asset-command-verification&quot;;
-      7c630e28257f4e98[&quot;Remove Asset Command Verification&quot;];
-      class 7c630e28257f4e98 verification;
-      click 7c630e28257f4e98 &quot;AttachmentsVerifications.html#remove-asset-command-verification&quot;;
+  subgraph ef1b8526d9f32695["📁 requirements/System/Core/Verifications"]
+    subgraph 83a49946983be276["📄 AttachmentsVerifications.md"]
+      b0257ad17686fff2["Attach Command Verification"];
+      class b0257ad17686fff2 verification;
+      click b0257ad17686fff2 "AttachmentsVerifications.html#attach-command-verification";
+      899ee454515b68f2["Attachment Identifier CRUD Verification"];
+      class 899ee454515b68f2 verification;
+      click 899ee454515b68f2 "AttachmentsVerifications.html#attachment-identifier-crud-verification";
+      ec1c9c1d3420a59a["Attachment Output Rendering Verification"];
+      class ec1c9c1d3420a59a verification;
+      click ec1c9c1d3420a59a "AttachmentsVerifications.html#attachment-output-rendering-verification";
+      e12f4ae83dbf831a["Attachment Search Filters Verification"];
+      class e12f4ae83dbf831a verification;
+      click e12f4ae83dbf831a "AttachmentsVerifications.html#attachment-search-filters-verification";
+      ba77e1914915375d["Attachments Change Impact Verification"];
+      class ba77e1914915375d verification;
+      click ba77e1914915375d "AttachmentsVerifications.html#attachments-change-impact-verification";
+      ca1c843687027d6c["Attachments Subsection Parsing Verification"];
+      class ca1c843687027d6c verification;
+      click ca1c843687027d6c "AttachmentsVerifications.html#attachments-subsection-parsing-verification";
+      555d3592805f5c2a["Attachments Validation Verification"];
+      class 555d3592805f5c2a verification;
+      click 555d3592805f5c2a "AttachmentsVerifications.html#attachments-validation-verification";
+      c415102f5df2b3da["Detach Command Verification"];
+      class c415102f5df2b3da verification;
+      click c415102f5df2b3da "AttachmentsVerifications.html#detach-command-verification";
+      10fdfbf90261d692["Move Asset Command Verification"];
+      class 10fdfbf90261d692 verification;
+      click 10fdfbf90261d692 "AttachmentsVerifications.html#move-asset-command-verification";
+      1a48aaaf69afbd60["Remove Asset Command Verification"];
+      class 1a48aaaf69afbd60 verification;
+      click 1a48aaaf69afbd60 "AttachmentsVerifications.html#remove-asset-command-verification";
     end
   end
-  d540c1ffaaac63ad[&quot;test.sh&quot;];
-  class d540c1ffaaac63ad default;
-  click d540c1ffaaac63ad &quot;../../../../tests/test-assets/test.sh&quot;;
-  71269c3d60db1560 -->|satisfiedBy| d540c1ffaaac63ad;
-  a6cf9003ffcad7d2 -->|satisfiedBy| d540c1ffaaac63ad;
-  405875bd7f079c80 -->|satisfiedBy| d540c1ffaaac63ad;
-  17b004dcfcf8f444[&quot;test.sh&quot;];
-  class 17b004dcfcf8f444 default;
-  click 17b004dcfcf8f444 &quot;../../../../tests/test-change-impact-attachments/test.sh&quot;;
-  f1dfbc33d1f30608 -->|satisfiedBy| 17b004dcfcf8f444;
-  ab457fb3036a93b9 -->|satisfiedBy| d540c1ffaaac63ad;
-  ebdc4f53fb16d23b -->|satisfiedBy| d540c1ffaaac63ad;
-  db3bde84906152d4 -->|satisfiedBy| d540c1ffaaac63ad;
-  ec5f1378c6e3dc01 -->|satisfiedBy| d540c1ffaaac63ad;
-  7c630e28257f4e98 -->|satisfiedBy| d540c1ffaaac63ad;
+  d882e7ff8e1ffe95["test.sh"];
+  class d882e7ff8e1ffe95 default;
+  click d882e7ff8e1ffe95 "../../../../tests/test-assets/test.sh";
+  b0257ad17686fff2 -->|satisfiedBy| d882e7ff8e1ffe95;
+  ec1c9c1d3420a59a -->|satisfiedBy| d882e7ff8e1ffe95;
+  e12f4ae83dbf831a -->|satisfiedBy| d882e7ff8e1ffe95;
+  4225cde0908b7474["test.sh"];
+  class 4225cde0908b7474 default;
+  click 4225cde0908b7474 "../../../../tests/test-change-impact-attachments/test.sh";
+  ba77e1914915375d -->|satisfiedBy| 4225cde0908b7474;
+  ca1c843687027d6c -->|satisfiedBy| d882e7ff8e1ffe95;
+  555d3592805f5c2a -->|satisfiedBy| d882e7ff8e1ffe95;
+  c415102f5df2b3da -->|satisfiedBy| d882e7ff8e1ffe95;
+  10fdfbf90261d692 -->|satisfiedBy| d882e7ff8e1ffe95;
+  1a48aaaf69afbd60 -->|satisfiedBy| d882e7ff8e1ffe95;
 </div>
 <h3 id="attach-command-verification">Attach Command Verification</h3>
 <p>Verify attach command creates Attachments subsection and adds links.</p>
@@ -860,7 +860,7 @@ blockquote {
 <p>Test cases for element identifiers:</p>
 <ul>
 <li>JSON includes element identifiers in attachments array as strings</li>
-<li>Element identifier format: <code>&quot;file.md#element-name&quot;</code></li>
+<li>Element identifier format: <code>"file.md#element-name"</code></li>
 <li>HTML export renders clickable links to Refinement elements</li>
 <li>Mixed file path and element identifier attachments display correctly</li>
 </ul>

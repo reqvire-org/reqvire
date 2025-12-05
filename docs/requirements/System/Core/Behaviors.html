@@ -735,23 +735,26 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
-    subgraph 585ddb96960b31b[&quot;📄 Behaviors.md&quot;]
-      d598ae092206a3ca[&quot;Attachment Identifier CRUD Update Behavior&quot;];
-      class d598ae092206a3ca default;
-      click d598ae092206a3ca &quot;Behaviors.html#attachment-identifier-crud-update-behavior&quot;;
-      52bb0dd16b7dd05c[&quot;Attachment Input Auto-Detection Behavior&quot;];
-      class 52bb0dd16b7dd05c default;
-      click 52bb0dd16b7dd05c &quot;Behaviors.html#attachment-input-auto-detection-behavior&quot;;
-      fcf8b5c885888584[&quot;Subdirectory Auto-Detection Behavior&quot;];
-      class fcf8b5c885888584 default;
-      click fcf8b5c885888584 &quot;Behaviors.html#subdirectory-auto-detection-behavior&quot;;
-      36c28052839ab0a1[&quot;Two-Pass Validation Behavior&quot;];
-      class 36c28052839ab0a1 default;
-      click 36c28052839ab0a1 &quot;Behaviors.html#two-pass-validation-behavior&quot;;
-      7b535a46a6894d14[&quot;Validation Error Reporting Behavior&quot;];
-      class 7b535a46a6894d14 default;
-      click 7b535a46a6894d14 &quot;Behaviors.html#validation-error-reporting-behavior&quot;;
+  subgraph 9e5f55ddfed5810b["📁 requirements/System/Core"]
+    subgraph 671cbac0c40e88f0["📄 Behaviors.md"]
+      cb224a2a30db9356["Attachment Identifier CRUD Update Behavior"];
+      class cb224a2a30db9356 default;
+      click cb224a2a30db9356 "Behaviors.html#attachment-identifier-crud-update-behavior";
+      fe05947fdcb55b0d["Attachment Input Auto-Detection Behavior"];
+      class fe05947fdcb55b0d default;
+      click fe05947fdcb55b0d "Behaviors.html#attachment-input-auto-detection-behavior";
+      51acec6b563693d5["Subdirectory Auto-Detection Behavior"];
+      class 51acec6b563693d5 default;
+      click 51acec6b563693d5 "Behaviors.html#subdirectory-auto-detection-behavior";
+      9cc3ec12d7910fa4["Two-Pass Validation Behavior"];
+      class 9cc3ec12d7910fa4 default;
+      click 9cc3ec12d7910fa4 "Behaviors.html#two-pass-validation-behavior";
+      77eb2b3737aa07bb["Type Validation Error Behavior"];
+      class 77eb2b3737aa07bb default;
+      click 77eb2b3737aa07bb "Behaviors.html#type-validation-error-behavior";
+      1e40c88115650f56["Validation Error Reporting Behavior"];
+      class 1e40c88115650f56 default;
+      click 1e40c88115650f56 "Behaviors.html#validation-error-reporting-behavior";
     end
   end
 </div>
@@ -856,6 +859,32 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>satisfy: <a href="Validation.html#two-pass-validation-strategy">Two-Pass Validation Strategy</a></li>
+</ul>
+<hr />
+<h3 id="type-validation-error-behavior">Type Validation Error Behavior</h3>
+<p>Error messages for invalid types shall include the list of valid types.</p>
+<h4>Details</h4>
+<p><strong>Element Type Errors:</strong>
+When an invalid element type is encountered (in metadata or filters):</p>
+<ul>
+<li>Error message shall include the invalid type value</li>
+<li>Error message shall list all valid element types</li>
+<li>Error message shall include the custom type pattern: “For custom types use: other-TYPENAME”</li>
+</ul>
+<p><strong>Relation Type Errors:</strong>
+When an invalid relation type is encountered:</p>
+<ul>
+<li>Error message shall include the invalid relation type</li>
+<li>Error message shall list all valid relation types in sorted order</li>
+</ul>
+<p>This enables users to quickly identify and fix type errors without consulting documentation.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Validation.html#type-validation-error-requirement">Type Validation Error Requirement</a></li>
 </ul>
 <hr />
 <h3 id="validation-error-reporting-behavior">Validation Error Reporting Behavior</h3>

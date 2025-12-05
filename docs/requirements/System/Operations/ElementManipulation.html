@@ -735,154 +735,195 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
-    subgraph 13cfa02dc956ea20[&quot;📄 Constraints.md&quot;]
-      df1f09bc9884c2de[&quot;Target Location Constraint&quot;];
-      class df1f09bc9884c2de default;
-      click df1f09bc9884c2de &quot;Constraints.html#target-location-constraint&quot;;
-    end
-    subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      ca74bbb037431e9b[&quot;Create Element Operation<br/>📎 requirements/System/Operations/Specifications.md#relation-validation-specification<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
-      class ca74bbb037431e9b systemRequirement;
-      click ca74bbb037431e9b &quot;ElementManipulation.html#create-element-operation&quot;;
-      b1ed46220f447242[&quot;Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
-      class b1ed46220f447242 systemRequirement;
-      click b1ed46220f447242 &quot;ElementManipulation.html#delete-element-operation&quot;;
-      5e9d1888d2914fd4[&quot;Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
-      class 5e9d1888d2914fd4 systemRequirement;
-      click 5e9d1888d2914fd4 &quot;ElementManipulation.html#element-manipulation-file-persistence&quot;;
-      84860e94fc819efd[&quot;Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
-      class 84860e94fc819efd systemRequirement;
-      click 84860e94fc819efd &quot;ElementManipulation.html#move-element-operation&quot;;
-      bbea6657a24b3f1c[&quot;Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
-      class bbea6657a24b3f1c systemRequirement;
-      click bbea6657a24b3f1c &quot;ElementManipulation.html#move-file-operation&quot;;
-      b7a7ab53d4242be8[&quot;Relation Consistency Maintenance&quot;];
-      class b7a7ab53d4242be8 systemRequirement;
-      click b7a7ab53d4242be8 &quot;ElementManipulation.html#relation-consistency-maintenance&quot;;
-      a6593dab7ef5d521[&quot;Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification&quot;];
-      class a6593dab7ef5d521 systemRequirement;
-      click a6593dab7ef5d521 &quot;ElementManipulation.html#rename-element-operation&quot;;
-      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification&quot;];
-      class 9987f9e9ae83fba3 systemRequirement;
-      click 9987f9e9ae83fba3 &quot;ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
-    end
-    subgraph 13f813da82130a33[&quot;📄 Specifications.md&quot;]
-      9b4a4077c4e05529[&quot;Relation Validation Specification&quot;];
-      class 9b4a4077c4e05529 default;
-      click 9b4a4077c4e05529 &quot;Specifications.html#relation-validation-specification&quot;;
+  subgraph c97e5d4c96ea3f37["📁 requirements/Interfaces"]
+    subgraph f57c66ff9e8042ff["📄 CLI.md"]
+      508ede87983d40e4["CLI Merge Element Command<br/>📎 requirements/System/Operations/Behaviors.md#merge-content-transformation-behavior<br/>📎 requirements/System/Operations/Constraints.md#merge-type-compatibility-constraint<br/>📎 requirements/System/Output/Specifications.md#json-output-structure"];
+      class 508ede87983d40e4 systemRequirement;
+      click 508ede87983d40e4 "../../Interfaces/CLI.html#cli-merge-element-command";
     end
   end
-  subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
-    subgraph d274cf61b3f74735[&quot;📄 ElementManipulationVerifications.md&quot;]
-      e9c9cae75f37f06[&quot;Create Element Test&quot;];
-      class e9c9cae75f37f06 verification;
-      click e9c9cae75f37f06 &quot;Verifications/ElementManipulationVerifications.html#create-element-test&quot;;
-      489fbf5e3ec08a53[&quot;Delete Element Test&quot;];
-      class 489fbf5e3ec08a53 verification;
-      click 489fbf5e3ec08a53 &quot;Verifications/ElementManipulationVerifications.html#delete-element-test&quot;;
-      9c8ea99467081d64[&quot;File Persistence Test<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
-      class 9c8ea99467081d64 verification;
-      click 9c8ea99467081d64 &quot;Verifications/ElementManipulationVerifications.html#file-persistence-test&quot;;
-      3df547c544ad75b1[&quot;Move Element Test&quot;];
-      class 3df547c544ad75b1 verification;
-      click 3df547c544ad75b1 &quot;Verifications/ElementManipulationVerifications.html#move-element-test&quot;;
-      98859ef52db96684[&quot;Move File Squash Test&quot;];
-      class 98859ef52db96684 verification;
-      click 98859ef52db96684 &quot;Verifications/ElementManipulationVerifications.html#move-file-squash-test&quot;;
-      7f694d7fb7057fc4[&quot;Relation Consistency Test&quot;];
-      class 7f694d7fb7057fc4 verification;
-      click 7f694d7fb7057fc4 &quot;Verifications/ElementManipulationVerifications.html#relation-consistency-test&quot;;
-      b6076972a6650ff1[&quot;Target Location Validation Test&quot;];
-      class b6076972a6650ff1 verification;
-      click b6076972a6650ff1 &quot;Verifications/ElementManipulationVerifications.html#target-location-validation-test&quot;;
+  subgraph f97b31ef8bb9beb2["📁 requirements/System/Operations"]
+    subgraph 2e0fed16c29dc496["📄 Behaviors.md"]
+      73c4967b996fee23["Create Element Override Behavior"];
+      class 73c4967b996fee23 default;
+      click 73c4967b996fee23 "Behaviors.html#create-element-override-behavior";
+      277a4d3ecee51842["Merge Content Transformation Behavior"];
+      class 277a4d3ecee51842 default;
+      click 277a4d3ecee51842 "Behaviors.html#merge-content-transformation-behavior";
     end
-    subgraph 5fdb7c9d75d9c8bf[&quot;📄 FormattingVerifications.md&quot;]
-      934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
-      class 934319026295f62c verification;
-      click 934319026295f62c &quot;Verifications/FormattingVerifications.html#element-ordering-verification&quot;;
+    subgraph b18c7c2b241cabf5["📄 Constraints.md"]
+      a252d80eba1d096d["Merge Type Compatibility Constraint"];
+      class a252d80eba1d096d default;
+      click a252d80eba1d096d "Constraints.html#merge-type-compatibility-constraint";
+      654443dbc158a1be["Target Location Constraint"];
+      class 654443dbc158a1be default;
+      click 654443dbc158a1be "Constraints.html#target-location-constraint";
+    end
+    subgraph 76b63ea3553591a5["📄 ElementManipulation.md"]
+      d63cd96ea16008f3["Create Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification"];
+      class d63cd96ea16008f3 systemRequirement;
+      click d63cd96ea16008f3 "ElementManipulation.html#create-element-operation";
+      c451b9804a173d2d["Delete Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification"];
+      class c451b9804a173d2d systemRequirement;
+      click c451b9804a173d2d "ElementManipulation.html#delete-element-operation";
+      7aec175b82ac4220["Element Manipulation File Persistence<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior"];
+      class 7aec175b82ac4220 systemRequirement;
+      click 7aec175b82ac4220 "ElementManipulation.html#element-manipulation-file-persistence";
+      8902786e44aa1577["Merge Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification"];
+      class 8902786e44aa1577 systemRequirement;
+      click 8902786e44aa1577 "ElementManipulation.html#merge-element-operation";
+      4e1ed202f7aebc08["Move Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification"];
+      class 4e1ed202f7aebc08 systemRequirement;
+      click 4e1ed202f7aebc08 "ElementManipulation.html#move-element-operation";
+      f62ea18144ad5177["Move File Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification"];
+      class f62ea18144ad5177 systemRequirement;
+      click f62ea18144ad5177 "ElementManipulation.html#move-file-operation";
+      e87eb406fa9dcd86["Relation Consistency Maintenance"];
+      class e87eb406fa9dcd86 systemRequirement;
+      click e87eb406fa9dcd86 "ElementManipulation.html#relation-consistency-maintenance";
+      d25201ef409823be["Rename Element Operation<br/>📎 requirements/System/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/System/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/System/Output/Specifications.md#diff-output-format-specification"];
+      class d25201ef409823be systemRequirement;
+      click d25201ef409823be "ElementManipulation.html#rename-element-operation";
+      a9f82fe8db689d9d["Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification"];
+      class a9f82fe8db689d9d systemRequirement;
+      click a9f82fe8db689d9d "ElementManipulation.html#target-location-validation-and-auto-creation";
+    end
+    subgraph 4ca803dc4703689d["📄 Specifications.md"]
+      71c52b0aeabfc312["Orphaned Children Error Message Specification"];
+      class 71c52b0aeabfc312 default;
+      click 71c52b0aeabfc312 "Specifications.html#orphaned-children-error-message-specification";
+      3ae0d470974cfc92["Relation Validation Specification"];
+      class 3ae0d470974cfc92 default;
+      click 3ae0d470974cfc92 "Specifications.html#relation-validation-specification";
     end
   end
-  80defdd4cbc7ee18[&quot;cli.rs&quot;];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../../cli/src/cli.rs&quot;;
-  ca74bbb037431e9b -->|satisfiedBy| 80defdd4cbc7ee18;
-  ea4ba0d9ffba93a5[&quot;crud.rs&quot;];
-  class ea4ba0d9ffba93a5 default;
-  click ea4ba0d9ffba93a5 &quot;../../../core/src/crud.rs&quot;;
-  ca74bbb037431e9b -->|satisfiedBy| ea4ba0d9ffba93a5;
-  e69395f926bba6a5[&quot;diff.rs&quot;];
-  class e69395f926bba6a5 default;
-  click e69395f926bba6a5 &quot;../../../core/src/diff.rs&quot;;
-  ca74bbb037431e9b -->|satisfiedBy| e69395f926bba6a5;
-  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
-  class b7c871ab64a7059a default;
-  click b7c871ab64a7059a &quot;../../../core/src/graph_registry.rs&quot;;
-  ca74bbb037431e9b -->|satisfiedBy| b7c871ab64a7059a;
-  f22d93285fcd7664[&quot;parser.rs&quot;];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
-  ca74bbb037431e9b -->|satisfiedBy| f22d93285fcd7664;
-  ce2625feec883e55[&quot;utils.rs&quot;];
-  class ce2625feec883e55 default;
-  click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
-  ca74bbb037431e9b -->|satisfiedBy| ce2625feec883e55;
-  ca74bbb037431e9b -->|satisfiedBy| 9b4a4077c4e05529;
-  ca74bbb037431e9b -.->|verifiedBy| e9c9cae75f37f06;
-  b1ed46220f447242 -->|satisfiedBy| 80defdd4cbc7ee18;
-  b1ed46220f447242 -->|satisfiedBy| ea4ba0d9ffba93a5;
-  b1ed46220f447242 -->|satisfiedBy| e69395f926bba6a5;
-  b1ed46220f447242 -->|satisfiedBy| b7c871ab64a7059a;
-  b1ed46220f447242 -.->|verifiedBy| 489fbf5e3ec08a53;
-  5e9d1888d2914fd4 -->|satisfiedBy| ea4ba0d9ffba93a5;
-  5e9d1888d2914fd4 -->|satisfiedBy| b7c871ab64a7059a;
-  5e9d1888d2914fd4 -.->|verifiedBy| 9c8ea99467081d64;
-  5e9d1888d2914fd4 -.->|verifiedBy| 934319026295f62c;
-  84860e94fc819efd -->|satisfiedBy| 80defdd4cbc7ee18;
-  84860e94fc819efd -->|satisfiedBy| ea4ba0d9ffba93a5;
-  84860e94fc819efd -->|satisfiedBy| e69395f926bba6a5;
-  84860e94fc819efd -->|satisfiedBy| b7c871ab64a7059a;
-  84860e94fc819efd -.->|verifiedBy| 3df547c544ad75b1;
-  bbea6657a24b3f1c -.->|verifiedBy| 98859ef52db96684;
-  b7a7ab53d4242be8 -->|satisfiedBy| b7c871ab64a7059a;
-  b7a7ab53d4242be8 -.->|verifiedBy| 7f694d7fb7057fc4;
-  a6593dab7ef5d521 -->|satisfiedBy| ea4ba0d9ffba93a5;
-  a6593dab7ef5d521 -->|satisfiedBy| e69395f926bba6a5;
-  a6593dab7ef5d521 -->|satisfiedBy| b7c871ab64a7059a;
-  9987f9e9ae83fba3 -->|satisfiedBy| b7c871ab64a7059a;
-  9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
-  9987f9e9ae83fba3 -->|satisfiedBy| df1f09bc9884c2de;
-  9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
-  e0536c36e7700661[&quot;test.sh&quot;];
-  class e0536c36e7700661 default;
-  click e0536c36e7700661 &quot;../../../tests/test-crud-manipulation/test.sh&quot;;
-  e9c9cae75f37f06 -->|satisfiedBy| e0536c36e7700661;
-  489fbf5e3ec08a53 -->|satisfiedBy| e0536c36e7700661;
-  ed4c8791300dc55[&quot;test.sh&quot;];
-  class ed4c8791300dc55 default;
-  click ed4c8791300dc55 &quot;../../../tests/test-crud-file-persistence/test.sh&quot;;
-  9c8ea99467081d64 -->|satisfiedBy| ed4c8791300dc55;
-  743d877eaae55d53[&quot;test.sh&quot;];
-  class 743d877eaae55d53 default;
-  click 743d877eaae55d53 &quot;../../../tests/test-element-ordering/test.sh&quot;;
-  934319026295f62c -->|satisfiedBy| 743d877eaae55d53;
-  47784e5a5c634123[&quot;test.sh&quot;];
-  class 47784e5a5c634123 default;
-  click 47784e5a5c634123 &quot;../../../tests/test-crud-empty-file-cleanup/test.sh&quot;;
-  3df547c544ad75b1 -->|satisfiedBy| 47784e5a5c634123;
-  3df547c544ad75b1 -->|satisfiedBy| e0536c36e7700661;
-  53d96c0e15013013[&quot;test.sh&quot;];
-  class 53d96c0e15013013 default;
-  click 53d96c0e15013013 &quot;../../../tests/test-crud-mv-file-squash/test.sh&quot;;
-  98859ef52db96684 -->|satisfiedBy| 53d96c0e15013013;
-  34577630f675428e[&quot;test.sh&quot;];
-  class 34577630f675428e default;
-  click 34577630f675428e &quot;../../../tests/test-crud-relation-consistency/test.sh&quot;;
-  7f694d7fb7057fc4 -->|satisfiedBy| 34577630f675428e;
-  fe344320c82b0bbf[&quot;test.sh&quot;];
-  class fe344320c82b0bbf default;
-  click fe344320c82b0bbf &quot;../../../tests/test-crud-target-location-validation/test.sh&quot;;
-  b6076972a6650ff1 -->|satisfiedBy| fe344320c82b0bbf;
+  subgraph d4f6f1eb956473cf["📁 requirements/System/Operations/Verifications"]
+    subgraph 7bbbe7aec7101929["📄 ElementManipulationVerifications.md"]
+      252f4f40cbad7405["Create Element Override Test<br/>📎 requirements/System/Operations/Behaviors.md#create-element-override-behavior"];
+      class 252f4f40cbad7405 verification;
+      click 252f4f40cbad7405 "Verifications/ElementManipulationVerifications.html#create-element-override-test";
+      444e4815897390cf["Create Element Test"];
+      class 444e4815897390cf verification;
+      click 444e4815897390cf "Verifications/ElementManipulationVerifications.html#create-element-test";
+      fc3aa79572543fb4["Delete Element Test"];
+      class fc3aa79572543fb4 verification;
+      click fc3aa79572543fb4 "Verifications/ElementManipulationVerifications.html#delete-element-test";
+      1c8e86886e5ad1fe["File Persistence Test<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior"];
+      class 1c8e86886e5ad1fe verification;
+      click 1c8e86886e5ad1fe "Verifications/ElementManipulationVerifications.html#file-persistence-test";
+      9b208d5159973951["Merge Elements Test"];
+      class 9b208d5159973951 verification;
+      click 9b208d5159973951 "Verifications/ElementManipulationVerifications.html#merge-elements-test";
+      82c90fd021de224b["Move Element Test"];
+      class 82c90fd021de224b verification;
+      click 82c90fd021de224b "Verifications/ElementManipulationVerifications.html#move-element-test";
+      a5bae150bb47aa93["Move File Squash Test"];
+      class a5bae150bb47aa93 verification;
+      click a5bae150bb47aa93 "Verifications/ElementManipulationVerifications.html#move-file-squash-test";
+      c81c0b2a7a12a67["Relation Consistency Test"];
+      class c81c0b2a7a12a67 verification;
+      click c81c0b2a7a12a67 "Verifications/ElementManipulationVerifications.html#relation-consistency-test";
+      c2c0bc44da2a0902["Target Location Validation Test"];
+      class c2c0bc44da2a0902 verification;
+      click c2c0bc44da2a0902 "Verifications/ElementManipulationVerifications.html#target-location-validation-test";
+    end
+    subgraph 9dfdb29c8515e24d["📄 FormattingVerifications.md"]
+      706b78390900580d["Element Ordering Verification<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior"];
+      class 706b78390900580d verification;
+      click 706b78390900580d "Verifications/FormattingVerifications.html#element-ordering-verification";
+    end
+  end
+  25bf5cc42f41e395["cli.rs"];
+  class 25bf5cc42f41e395 default;
+  click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
+  d63cd96ea16008f3 -->|satisfiedBy| 25bf5cc42f41e395;
+  993c12e82435a78e["crud.rs"];
+  class 993c12e82435a78e default;
+  click 993c12e82435a78e "../../../core/src/crud.rs";
+  d63cd96ea16008f3 -->|satisfiedBy| 993c12e82435a78e;
+  d07e49b06be4058e["diff.rs"];
+  class d07e49b06be4058e default;
+  click d07e49b06be4058e "../../../core/src/diff.rs";
+  d63cd96ea16008f3 -->|satisfiedBy| d07e49b06be4058e;
+  95cf526671ec752c["graph_registry.rs"];
+  class 95cf526671ec752c default;
+  click 95cf526671ec752c "../../../core/src/graph_registry.rs";
+  d63cd96ea16008f3 -->|satisfiedBy| 95cf526671ec752c;
+  35bd98d101f36b62["parser.rs"];
+  class 35bd98d101f36b62 default;
+  click 35bd98d101f36b62 "../../../core/src/parser.rs";
+  d63cd96ea16008f3 -->|satisfiedBy| 35bd98d101f36b62;
+  bdf9762d399478a5["utils.rs"];
+  class bdf9762d399478a5 default;
+  click bdf9762d399478a5 "../../../core/src/utils.rs";
+  d63cd96ea16008f3 -->|satisfiedBy| bdf9762d399478a5;
+  d63cd96ea16008f3 -->|satisfiedBy| 73c4967b996fee23;
+  d63cd96ea16008f3 -->|satisfiedBy| 3ae0d470974cfc92;
+  d63cd96ea16008f3 -.->|verifiedBy| 252f4f40cbad7405;
+  d63cd96ea16008f3 -.->|verifiedBy| 444e4815897390cf;
+  c451b9804a173d2d -->|satisfiedBy| 25bf5cc42f41e395;
+  c451b9804a173d2d -->|satisfiedBy| 993c12e82435a78e;
+  c451b9804a173d2d -->|satisfiedBy| d07e49b06be4058e;
+  c451b9804a173d2d -->|satisfiedBy| 95cf526671ec752c;
+  c451b9804a173d2d -->|satisfiedBy| 71c52b0aeabfc312;
+  c451b9804a173d2d -.->|verifiedBy| fc3aa79572543fb4;
+  7aec175b82ac4220 -->|satisfiedBy| 993c12e82435a78e;
+  7aec175b82ac4220 -->|satisfiedBy| 95cf526671ec752c;
+  7aec175b82ac4220 -.->|verifiedBy| 1c8e86886e5ad1fe;
+  7aec175b82ac4220 -.->|verifiedBy| 706b78390900580d;
+  8902786e44aa1577 -.->|deriveReqT| 508ede87983d40e4;
+  8902786e44aa1577 -->|satisfiedBy| 993c12e82435a78e;
+  8902786e44aa1577 -->|satisfiedBy| d07e49b06be4058e;
+  8902786e44aa1577 -->|satisfiedBy| 95cf526671ec752c;
+  8902786e44aa1577 -->|satisfiedBy| 277a4d3ecee51842;
+  8902786e44aa1577 -->|satisfiedBy| a252d80eba1d096d;
+  8902786e44aa1577 -.->|verifiedBy| 9b208d5159973951;
+  4e1ed202f7aebc08 -->|satisfiedBy| 25bf5cc42f41e395;
+  4e1ed202f7aebc08 -->|satisfiedBy| 993c12e82435a78e;
+  4e1ed202f7aebc08 -->|satisfiedBy| d07e49b06be4058e;
+  4e1ed202f7aebc08 -->|satisfiedBy| 95cf526671ec752c;
+  4e1ed202f7aebc08 -.->|verifiedBy| 82c90fd021de224b;
+  f62ea18144ad5177 -.->|verifiedBy| a5bae150bb47aa93;
+  e87eb406fa9dcd86 -->|satisfiedBy| 95cf526671ec752c;
+  e87eb406fa9dcd86 -.->|verifiedBy| c81c0b2a7a12a67;
+  d25201ef409823be -->|satisfiedBy| 993c12e82435a78e;
+  d25201ef409823be -->|satisfiedBy| d07e49b06be4058e;
+  d25201ef409823be -->|satisfiedBy| 95cf526671ec752c;
+  a9f82fe8db689d9d -->|satisfiedBy| 95cf526671ec752c;
+  a9f82fe8db689d9d -->|satisfiedBy| bdf9762d399478a5;
+  a9f82fe8db689d9d -->|satisfiedBy| 654443dbc158a1be;
+  a9f82fe8db689d9d -.->|verifiedBy| c2c0bc44da2a0902;
+  7f91546dcec3d680["test.sh"];
+  class 7f91546dcec3d680 default;
+  click 7f91546dcec3d680 "../../../tests/test-crud-manipulation/test.sh";
+  444e4815897390cf -->|satisfiedBy| 7f91546dcec3d680;
+  fc3aa79572543fb4 -->|satisfiedBy| 7f91546dcec3d680;
+  3ca44151e0210bb1["test.sh"];
+  class 3ca44151e0210bb1 default;
+  click 3ca44151e0210bb1 "../../../tests/test-crud-file-persistence/test.sh";
+  1c8e86886e5ad1fe -->|satisfiedBy| 3ca44151e0210bb1;
+  81623fde4ecde03d["test.sh"];
+  class 81623fde4ecde03d default;
+  click 81623fde4ecde03d "../../../tests/test-element-ordering/test.sh";
+  706b78390900580d -->|satisfiedBy| 81623fde4ecde03d;
+  508ede87983d40e4 -->|satisfiedBy| 25bf5cc42f41e395;
+  99e20055749fc61e["test.sh"];
+  class 99e20055749fc61e default;
+  click 99e20055749fc61e "../../../tests/test-crud-empty-file-cleanup/test.sh";
+  82c90fd021de224b -->|satisfiedBy| 99e20055749fc61e;
+  82c90fd021de224b -->|satisfiedBy| 7f91546dcec3d680;
+  6d7253e029455f50["test.sh"];
+  class 6d7253e029455f50 default;
+  click 6d7253e029455f50 "../../../tests/test-crud-mv-file-squash/test.sh";
+  a5bae150bb47aa93 -->|satisfiedBy| 6d7253e029455f50;
+  87a76fd329b99a81["test.sh"];
+  class 87a76fd329b99a81 default;
+  click 87a76fd329b99a81 "../../../tests/test-crud-relation-consistency/test.sh";
+  c81c0b2a7a12a67 -->|satisfiedBy| 87a76fd329b99a81;
+  cf7b1e3aeef95d4["test.sh"];
+  class cf7b1e3aeef95d4 default;
+  click cf7b1e3aeef95d4 "../../../tests/test-crud-target-location-validation/test.sh";
+  c2c0bc44da2a0902 -->|satisfiedBy| cf7b1e3aeef95d4;
 </div>
 <h3 id="create-element-operation">Create Element Operation</h3>
 <p>The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file.</p>
@@ -899,10 +940,14 @@ blockquote {
 <li>Insert the element into the target file following Element Ordering Behavior</li>
 <li>Reject the operation and report validation errors if validation fails</li>
 <li>Provide updates report following Diff Output Format Specification</li>
+<li>The system shall support override mode to replace existing element with same name following rules defined in Create Element Override Behavior</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="Specifications.html#relation-validation-specification">Relation Validation Specification</a></li>
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 <li><a href="Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
@@ -919,7 +964,9 @@ blockquote {
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
+<li>satisfiedBy: <a href="Behaviors.html#create-element-override-behavior">Create Element Override Behavior</a></li>
 <li>satisfiedBy: <a href="Specifications.html#relation-validation-specification">Relation Validation Specification</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#create-element-override-test">Create Element Override Test</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#create-element-test">Create Element Test</a></li>
 </ul>
 <hr />
@@ -928,6 +975,10 @@ blockquote {
 <h4>Details</h4>
 <p>When deleting an element, the system shall:</p>
 <ul>
+<li>Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)</li>
+<li>Reject the operation if any child would become orphaned</li>
+<li>Provide clear error message listing orphaned children with resolution guidance</li>
+<li>Allow deletion if children have other parent hierarchical relations</li>
 <li>Remove the element and all its content from the source file</li>
 <li>Identify all relations pointing to the deleted element (incoming relations)</li>
 <li>Remove all relations that reference the deleted element from other elements</li>
@@ -950,6 +1001,10 @@ blockquote {
 <li>All <code>satisfiedBy</code> relations pointing to the deleted element shall be removed</li>
 <li>Relations from the deleted element are automatically removed with the element</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
@@ -963,11 +1018,16 @@ blockquote {
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#orphaned-children-error-message-specification">Orphaned Children Error Message Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#delete-element-test">Delete Element Test</a></li>
 </ul>
 <hr />
 <h3 id="element-manipulation-file-persistence">Element Manipulation File Persistence</h3>
 <p>The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
@@ -980,6 +1040,50 @@ blockquote {
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#file-persistence-test">File Persistence Test</a></li>
 <li>verifiedBy: <a href="Verifications/FormattingVerifications.html#element-ordering-verification">Element Ordering Verification</a></li>
+</ul>
+<hr />
+<h3 id="merge-element-operation">Merge Element Operation</h3>
+<p>The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and attachments while enforcing type compatibility and removing source elements after successful merge.</p>
+<h4>Details</h4>
+<p>When merging elements, the system shall:</p>
+<ul>
+<li>Accept target element name (must exist in the model)</li>
+<li>Accept one or more source element names (must exist in the model)</li>
+<li>Validate type compatibility following clearly defined rules in Merge Type Compatibility Constraint</li>
+<li>Transform and merge content following clearly defined rules in Merge Content Transformation Behavior</li>
+<li>Preserve target element’s metadata (discard source metadata)</li>
+<li>Delete source elements after successful merge</li>
+<li>Update all relations pointing to source elements to point to target</li>
+<li>Remove empty source files when no elements remain</li>
+<li>Provide updates report following Diff Output Format Specification</li>
+</ul>
+<p>The system shall reject the operation with a clear error message if:</p>
+<ul>
+<li>The target element does not exist</li>
+<li>Any source element does not exist</li>
+<li>Source and target element types are incompatible per Merge Type Compatibility Constraint</li>
+<li>Merged result would have cross-section duplicates per Merge Content Transformation Behavior</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li><a href="Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
+<li><a href="../Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="../../Interfaces/CLI.html#cli-merge-element-command">CLI Merge Element Command</a></li>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="Behaviors.html#merge-content-transformation-behavior">Merge Content Transformation Behavior</a></li>
+<li>satisfiedBy: <a href="Constraints.html#merge-type-compatibility-constraint">Merge Type Compatibility Constraint</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#merge-elements-test">Merge Elements Test</a></li>
 </ul>
 <hr />
 <h3 id="move-element-operation">Move Element Operation</h3>
@@ -1014,6 +1118,10 @@ blockquote {
 <ul>
 <li>The element’s identifier changes from <code>&lt;old-file&gt;#&lt;element-name&gt;</code> to <code>&lt;new-file&gt;#&lt;element-name&gt;</code></li>
 <li>All references to the old identifier shall be updated to the new identifier</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
@@ -1061,6 +1169,10 @@ When the –squash flag is provided and the target file already exists, the syst
 <li>Remove the source file after all elements have been successfully moved</li>
 <li>Preserve element ordering from the source file when inserting into target section</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
@@ -1091,6 +1203,10 @@ When the –squash flag is provided and the target file already exists, the syst
 <li>The system shall report any inconsistencies detected during manipulation</li>
 <li>The system shall prevent operations that would leave the model in an inconsistent state</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
@@ -1116,6 +1232,10 @@ When the –squash flag is provided and the target file already exists, the syst
 <li>The element does not exist</li>
 <li>The new name conflicts with an existing element</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
@@ -1134,6 +1254,10 @@ When the –squash flag is provided and the target file already exists, the syst
 <p>The system shall validate target file paths for element manipulation operations and automatically create files when they do not exist, subject to path safety constraints.</p>
 <h4>Details</h4>
 <p>The system shall define target location validation constraints.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="../Core/Specifications.html#git-repository-scope-specification">Git Repository Scope Specification</a></li>

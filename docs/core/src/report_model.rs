@@ -1,5 +1,6 @@
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
+use crate::element;
 use crate::error::ReqvireError;
 use crate::diagrams::escape_label;
 use crate::utils::hash_identifier;
@@ -11,6 +12,13 @@ use std::collections::HashSet;
 pub struct ModelCentricReport {
     pub elements: Vec<ModelCentricElement>,
     pub metadata: ModelMetadata,
+}
+
+/// Direction of traversal for model report
+#[derive(Debug, Clone, Copy, PartialEq)]
+pub enum TraversalDirection {
+    Forward,  // Root to leaves (derive, satisfiedBy, verifiedBy, trace)
+    Reverse,  // Leaves to roots (derivedFrom, satisfy, verify)
 }
 
 /// Element in model-centric view with nested relations
@@ -58,16 +66,36 @@ pub struct ModelMetadata {
     pub total_elements: usize,
     pub total_relations: usize,
     pub filtered_from: Option<String>,
+    pub direction: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub type_filter: Option<Vec<String>>,
 }
 
 /// Generate model-centric report
 pub fn generate_model_report(
     registry: &GraphRegistry,
     root_element_name: Option<&str>,
+    reverse: bool,
+    type_filter: Option<Vec<&str>>,
     json_output: bool,
     diagram_direction: &str,  // "LR" or "TD"
 ) -> Result<String, ReqvireError> {
     use std::collections::HashSet;
+
+    // Validate type filter if provided
+    if let Some(ref types) = type_filter {
+        for t in types {
+            if !element::is_valid_element_type(t) {
+                return Err(ReqvireError::ProcessError(format!(
+                    "Invalid element type '{}'. Valid types: {}",
+                    t,
+                    element::element_types_help()
+                )));
+            }
+        }
+    }
+
+    let direction = if reverse { TraversalDirection::Reverse } else { TraversalDirection::Forward };
 
     // Determine starting elements
     let mut starting_elements = if let Some(name) = root_element_name {
@@ -82,6 +110,33 @@ pub fn generate_model_report(
                 return Err(ReqvireError::ElementError(format!("Element with name '{}' not found", name)));
             }
         }
+    } else if let Some(ref types) = type_filter {
+        // Filter by element types
+        if reverse {
+            // For reverse, filter leaf elements by type
+            registry.find_leaf_elements(Some(types.as_slice()))
+        } else {
+            // For forward, filter root elements by type
+            // First get all elements of the types, then filter to those that are roots
+            let type_elements = registry.find_elements_by_type(types.as_slice());
+            let hierarchical_relations = relation::get_hierarchical_relation_types();
+
+            type_elements.into_iter()
+                .filter(|id| {
+                    if let Some(element) = registry.get_element(id) {
+                        // Check if has any hierarchical parent relation
+                        let has_parent = element.relations.iter()
+                            .any(|r| hierarchical_relations.contains(&r.relation_type.name));
+                        !has_parent
+                    } else {
+                        false
+                    }
+                })
+                .collect()
+        }
+    } else if reverse {
+        // Reverse without type filter: use leaf elements
+        registry.find_leaf_elements(None)
     } else {
         // No filter, use root requirements
         registry.find_root_requirements()
@@ -91,18 +146,20 @@ pub fn generate_model_report(
     starting_elements.sort();
 
     // Build report
-    let mut visited = HashSet::new();
     let mut elements = Vec::new();
 
     for start_id in &starting_elements {
-        if let Some(element) = build_element_recursive(registry, start_id, &mut visited) {
+        // Each starting element gets its own visited set to allow independent traversals
+        // This is important for reverse mode where multiple leaves may trace to common ancestors
+        let mut visited = HashSet::new();
+        if let Some(element) = build_element_recursive(registry, start_id, &mut visited, direction) {
             elements.push(element);
         }
     }
 
     // Count metadata
     let total_elements = starting_elements.len();
-    let total_relations = count_relations(registry, &starting_elements);
+    let total_relations = count_relations(registry, &starting_elements, direction);
 
     let report = ModelCentricReport {
         elements,
@@ -110,6 +167,8 @@ pub fn generate_model_report(
             total_elements,
             total_relations,
             filtered_from: root_element_name.map(|s| s.to_string()),
+            direction: if reverse { "Reverse".to_string() } else { "Forward".to_string() },
+            type_filter: type_filter.map(|v| v.into_iter().map(|s| s.to_string()).collect()),
         },
     };
 
@@ -127,6 +186,7 @@ fn build_element_recursive(
     registry: &GraphRegistry,
     element_id: &str,
     visited: &mut HashSet<String>,
+    direction: TraversalDirection,
 ) -> Option<ModelCentricElement> {
 
     // Prevent infinite recursion
@@ -136,6 +196,12 @@ fn build_element_recursive(
     visited.insert(element_id.to_string());
 
     let element = registry.get_element(element_id)?;
+
+    // Choose which relations to follow based on direction
+    let allowed_relations = match direction {
+        TraversalDirection::Forward => relation::DIAGRAM_RELATIONS,
+        TraversalDirection::Reverse => relation::BACKWARD_RELATIONS,
+    };
 
     // Sort element relations for deterministic iteration
     let mut sorted_relations = element.relations.clone();
@@ -163,15 +229,15 @@ fn build_element_recursive(
     // Build relations with nested targets
     let mut relations = Vec::new();
     for relation in &sorted_relations {
-        // Only include forward relations (diagram relations)
-        if !relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
+        // Only include relations matching the direction
+        if !allowed_relations.contains(&relation.relation_type.name) {
             continue;
         }
 
         let target = match &relation.target.link {
             relation::LinkType::Identifier(target_id) => {
                 // Recursive element
-                if let Some(target_element) = build_element_recursive(registry, target_id, visited) {
+                if let Some(target_element) = build_element_recursive(registry, target_id, visited, direction) {
                     RelationTarget::Element {
                         element: Box::new(target_element),
                     }
@@ -219,33 +285,38 @@ fn build_element_recursive(
 }
 
 /// Count total relations from starting elements
-fn count_relations(registry: &GraphRegistry, starting_elements: &[String]) -> usize {
+fn count_relations(registry: &GraphRegistry, starting_elements: &[String], direction: TraversalDirection) -> usize {
     let mut count = 0;
     let mut visited = HashSet::new();
 
     for start_id in starting_elements {
-        count_relations_recursive(registry, start_id, &mut visited, &mut count);
+        count_relations_recursive(registry, start_id, &mut visited, &mut count, direction);
     }
 
     count
 }
 
 /// Count relations recursively
-fn count_relations_recursive(registry: &GraphRegistry, element_id: &str, visited: &mut HashSet<String>, count: &mut usize) {
+fn count_relations_recursive(registry: &GraphRegistry, element_id: &str, visited: &mut HashSet<String>, count: &mut usize, direction: TraversalDirection) {
 
     if visited.contains(element_id) {
         return;
     }
     visited.insert(element_id.to_string());
 
+    let allowed_relations = match direction {
+        TraversalDirection::Forward => relation::DIAGRAM_RELATIONS,
+        TraversalDirection::Reverse => relation::BACKWARD_RELATIONS,
+    };
+
     if let Some(element) = registry.get_element(element_id) {
         for relation in &element.relations {
-            if relation::DIAGRAM_RELATIONS.contains(&relation.relation_type.name) {
+            if allowed_relations.contains(&relation.relation_type.name) {
                 *count += 1;
 
                 // Recurse for identifier targets
                 if let relation::LinkType::Identifier(target_id) = &relation.target.link {
-                    count_relations_recursive(registry, &target_id, visited, count);
+                    count_relations_recursive(registry, &target_id, visited, count, direction);
                 }
             }
         }
@@ -259,8 +330,12 @@ fn generate_model_text(report: &ModelCentricReport, diagram_direction: &str) -> 
     // Metadata
     output.push_str(&format!("**Total Elements**: {}\n", report.metadata.total_elements));
     output.push_str(&format!("**Total Relations**: {}\n", report.metadata.total_relations));
+    output.push_str(&format!("**Direction**: {}\n", report.metadata.direction));
     if let Some(ref filtered) = report.metadata.filtered_from {
         output.push_str(&format!("**Filtered From**: {}\n", filtered));
+    }
+    if let Some(ref type_filter) = report.metadata.type_filter {
+        output.push_str(&format!("**Type Filter**: {}\n", type_filter.join(", ")));
     }
     output.push_str("\n");
 

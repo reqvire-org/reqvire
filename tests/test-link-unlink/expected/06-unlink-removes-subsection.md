@@ -1,5 +1,13 @@
 # Elements
 
+### No Relations Requirement
+
+A requirement without initial relations that link/unlink commands will modify.
+
+#### Metadata
+  * type: requirement
+---
+
 ### System Requirements
 
 Top-level container for test requirements.
@@ -9,17 +17,6 @@ Top-level container for test requirements.
 
 #### Relations
   * derive: [Feature Requirement](#feature-requirement)
----
-
-### Feature Requirement
-
-A requirement to be linked/unlinked.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [System Requirements](#system-requirements)
 ---
 
 ### Another Requirement
@@ -34,12 +31,14 @@ Another requirement for testing.
   * verifiedBy: [Orphan Test](Verifications.md#orphan-test)
 ---
 
-### No Relations Requirement
+### Feature Requirement
 
-A requirement without initial relations that link/unlink commands will modify.
+A requirement to be linked/unlinked.
 
 #### Metadata
   * type: requirement
 
+#### Relations
+  * derivedFrom: [System Requirements](#system-requirements)
 ---
 

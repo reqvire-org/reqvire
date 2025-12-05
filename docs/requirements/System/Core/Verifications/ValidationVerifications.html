@@ -735,71 +735,105 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 2d73a43cf375cb0f[&quot;📁 requirements/System/Core/Verifications&quot;]
-    subgraph 1e40212e2a6b5c6e[&quot;📄 ValidationVerifications.md&quot;]
-      8f31ddf6fff8aa75[&quot;Default Element Type Assignment Test&quot;];
-      class 8f31ddf6fff8aa75 verification;
-      click 8f31ddf6fff8aa75 &quot;ValidationVerifications.html#default-element-type-assignment-test&quot;;
-      d2ba1522cae21673[&quot;Element Type Relation Compatibility Test&quot;];
-      class d2ba1522cae21673 verification;
-      click d2ba1522cae21673 &quot;ValidationVerifications.html#element-type-relation-compatibility-test&quot;;
-      1413dd439a2ce574[&quot;File Exclusion Test&quot;];
-      class 1413dd439a2ce574 verification;
-      click 1413dd439a2ce574 &quot;ValidationVerifications.html#file-exclusion-test&quot;;
-      fec2cc6e4b40574c[&quot;Invalid Header Structure Test&quot;];
-      class fec2cc6e4b40574c verification;
-      click fec2cc6e4b40574c &quot;ValidationVerifications.html#invalid-header-structure-test&quot;;
-      23a09f2d69fc3b23[&quot;Invalid Relations Test&quot;];
-      class 23a09f2d69fc3b23 verification;
-      click 23a09f2d69fc3b23 &quot;ValidationVerifications.html#invalid-relations-test&quot;;
-      b32250e14e326cb[&quot;Requirements Files Search and Detection Test&quot;];
-      class b32250e14e326cb verification;
-      click b32250e14e326cb &quot;ValidationVerifications.html#requirements-files-search-and-detection-test&quot;;
-      fcb309f0f899a983[&quot;Same-File Fragment Relations Test&quot;];
-      class fcb309f0f899a983 verification;
-      click fcb309f0f899a983 &quot;ValidationVerifications.html#same-file-fragment-relations-test&quot;;
-      48724d283e4c3b16[&quot;Subdirectory Processing Verification&quot;];
-      class 48724d283e4c3b16 verification;
-      click 48724d283e4c3b16 &quot;ValidationVerifications.html#subdirectory-processing-verification&quot;;
-      90310f1e5378f4b2[&quot;Unstructured Documents Test&quot;];
-      class 90310f1e5378f4b2 verification;
-      click 90310f1e5378f4b2 &quot;ValidationVerifications.html#unstructured-documents-test&quot;;
+  subgraph ef1b8526d9f32695["📁 requirements/System/Core/Verifications"]
+    subgraph e39e433d7cd94342["📄 ValidationVerifications.md"]
+      2f54b493ca50cd36["Cross-Section Duplicate Validation Test"];
+      class 2f54b493ca50cd36 verification;
+      click 2f54b493ca50cd36 "ValidationVerifications.html#cross-section-duplicate-validation-test";
+      a8a205de0bd97675["Default Element Type Assignment Test"];
+      class a8a205de0bd97675 verification;
+      click a8a205de0bd97675 "ValidationVerifications.html#default-element-type-assignment-test";
+      350b96c1aa55ff27["Element Type Relation Compatibility Test"];
+      class 350b96c1aa55ff27 verification;
+      click 350b96c1aa55ff27 "ValidationVerifications.html#element-type-relation-compatibility-test";
+      8ec656906dc7cbf8["File Exclusion Test"];
+      class 8ec656906dc7cbf8 verification;
+      click 8ec656906dc7cbf8 "ValidationVerifications.html#file-exclusion-test";
+      5ba6b6cfb2def0dc["Invalid Header Structure Test"];
+      class 5ba6b6cfb2def0dc verification;
+      click 5ba6b6cfb2def0dc "ValidationVerifications.html#invalid-header-structure-test";
+      5f81a4c479783a7["Invalid Relations Test"];
+      class 5f81a4c479783a7 verification;
+      click 5f81a4c479783a7 "ValidationVerifications.html#invalid-relations-test";
+      e86c0661d8738a40["Requirements Files Search and Detection Test"];
+      class e86c0661d8738a40 verification;
+      click e86c0661d8738a40 "ValidationVerifications.html#requirements-files-search-and-detection-test";
+      89cf80589d3207d["Same-File Fragment Relations Test"];
+      class 89cf80589d3207d verification;
+      click 89cf80589d3207d "ValidationVerifications.html#same-file-fragment-relations-test";
+      c363deb2cf6a1d74["Subdirectory Processing Verification"];
+      class c363deb2cf6a1d74 verification;
+      click c363deb2cf6a1d74 "ValidationVerifications.html#subdirectory-processing-verification";
+      32916b70b7a04208["Type Validation Errors Test<br/>📎 requirements/System/Core/Behaviors.md#type-validation-error-behavior"];
+      class 32916b70b7a04208 verification;
+      click 32916b70b7a04208 "ValidationVerifications.html#type-validation-errors-test";
+      a4fc014ce222c175["Unstructured Documents Test"];
+      class a4fc014ce222c175 verification;
+      click a4fc014ce222c175 "ValidationVerifications.html#unstructured-documents-test";
     end
   end
-  2203c109e20d9c4b[&quot;test.sh&quot;];
-  class 2203c109e20d9c4b default;
-  click 2203c109e20d9c4b &quot;../../../../tests/test-default-type-assignment/test.sh&quot;;
-  8f31ddf6fff8aa75 -->|satisfiedBy| 2203c109e20d9c4b;
-  a62d9d7bace214e0[&quot;test.sh&quot;];
-  class a62d9d7bace214e0 default;
-  click a62d9d7bace214e0 &quot;../../../../tests/test-element-type-relation-compatibility/test.sh&quot;;
-  d2ba1522cae21673 -->|satisfiedBy| a62d9d7bace214e0;
-  7f5e53340a03365f[&quot;test.sh&quot;];
-  class 7f5e53340a03365f default;
-  click 7f5e53340a03365f &quot;../../../../tests/test-gitignore-integration/test.sh&quot;;
-  1413dd439a2ce574 -->|satisfiedBy| 7f5e53340a03365f;
-  8b8c9b79dcbe085e[&quot;test.sh&quot;];
-  class 8b8c9b79dcbe085e default;
-  click 8b8c9b79dcbe085e &quot;../../../../tests/test-invalid-relations/test.sh&quot;;
-  fec2cc6e4b40574c -->|satisfiedBy| 8b8c9b79dcbe085e;
-  23a09f2d69fc3b23 -->|satisfiedBy| 8b8c9b79dcbe085e;
-  a29e69e90fa71f39[&quot;test.sh&quot;];
-  class a29e69e90fa71f39 default;
-  click a29e69e90fa71f39 &quot;../../../../tests/test-excluded-patterns/test.sh&quot;;
-  b32250e14e326cb -->|satisfiedBy| a29e69e90fa71f39;
-  789c690d63402d63[&quot;test.sh&quot;];
-  class 789c690d63402d63 default;
-  click 789c690d63402d63 &quot;../../../../tests/test-fragment-relations/test.sh&quot;;
-  fcb309f0f899a983 -->|satisfiedBy| 789c690d63402d63;
-  a565a00c1df16a79[&quot;test.sh&quot;];
-  class a565a00c1df16a79 default;
-  click a565a00c1df16a79 &quot;../../../../tests/test-subdirectory-functionality/test.sh&quot;;
-  48724d283e4c3b16 -->|satisfiedBy| a565a00c1df16a79;
-  b91bd280b4e9971[&quot;test.sh&quot;];
-  class b91bd280b4e9971 default;
-  click b91bd280b4e9971 &quot;../../../../tests/test-valid-relations/test.sh&quot;;
-  90310f1e5378f4b2 -->|satisfiedBy| b91bd280b4e9971;
+  4179509ffe0be04b["test.sh"];
+  class 4179509ffe0be04b default;
+  click 4179509ffe0be04b "../../../../tests/test-duplicate-detection/test.sh";
+  2f54b493ca50cd36 -->|satisfiedBy| 4179509ffe0be04b;
+  f63a7acfc08bf665["test.sh"];
+  class f63a7acfc08bf665 default;
+  click f63a7acfc08bf665 "../../../../tests/test-default-type-assignment/test.sh";
+  a8a205de0bd97675 -->|satisfiedBy| f63a7acfc08bf665;
+  845fe9ccbc0f0550["test.sh"];
+  class 845fe9ccbc0f0550 default;
+  click 845fe9ccbc0f0550 "../../../../tests/test-element-type-relation-compatibility/test.sh";
+  350b96c1aa55ff27 -->|satisfiedBy| 845fe9ccbc0f0550;
+  94d34e73992ff9ac["test.sh"];
+  class 94d34e73992ff9ac default;
+  click 94d34e73992ff9ac "../../../../tests/test-gitignore-integration/test.sh";
+  8ec656906dc7cbf8 -->|satisfiedBy| 94d34e73992ff9ac;
+  5150ae05d0a88a84["test.sh"];
+  class 5150ae05d0a88a84 default;
+  click 5150ae05d0a88a84 "../../../../tests/test-invalid-relations/test.sh";
+  5ba6b6cfb2def0dc -->|satisfiedBy| 5150ae05d0a88a84;
+  5f81a4c479783a7 -->|satisfiedBy| 5150ae05d0a88a84;
+  b3573dfcbb8f5f40["test.sh"];
+  class b3573dfcbb8f5f40 default;
+  click b3573dfcbb8f5f40 "../../../../tests/test-excluded-patterns/test.sh";
+  e86c0661d8738a40 -->|satisfiedBy| b3573dfcbb8f5f40;
+  f0923d0189e77f4c["test.sh"];
+  class f0923d0189e77f4c default;
+  click f0923d0189e77f4c "../../../../tests/test-fragment-relations/test.sh";
+  89cf80589d3207d -->|satisfiedBy| f0923d0189e77f4c;
+  661275cf7a337c0e["test.sh"];
+  class 661275cf7a337c0e default;
+  click 661275cf7a337c0e "../../../../tests/test-subdirectory-functionality/test.sh";
+  c363deb2cf6a1d74 -->|satisfiedBy| 661275cf7a337c0e;
+  ddd4d40b5d6bdcc9["test.sh"];
+  class ddd4d40b5d6bdcc9 default;
+  click ddd4d40b5d6bdcc9 "../../../../tests/test-type-validation-errors/test.sh";
+  32916b70b7a04208 -->|satisfiedBy| ddd4d40b5d6bdcc9;
+  3ee9a5ae2313e6b0["test.sh"];
+  class 3ee9a5ae2313e6b0 default;
+  click 3ee9a5ae2313e6b0 "../../../../tests/test-valid-relations/test.sh";
+  a4fc014ce222c175 -->|satisfiedBy| 3ee9a5ae2313e6b0;
 </div>
+<h3 id="cross-section-duplicate-validation-test">Cross-Section Duplicate Validation Test</h3>
+<p>Test verifies that validation detects and reports cross-section duplicates.</p>
+<h4>Details</h4>
+<p>Test cases:</p>
+<ol>
+<li>Element with same target in both Relations (as satisfiedBy) and Attachments</li>
+<li>Run <code>reqvire validate</code></li>
+<li>Verify validation fails with error mentioning “cross-section duplicate” or similar</li>
+<li>Verify error identifies the element and the duplicate target</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-duplicate-detection/test.sh">test.sh</a></li>
+<li>verify: <a href="../Validation.html#cross-section-duplicate-validation">Cross-Section Duplicate Validation</a></li>
+</ul>
+<hr />
 <h3 id="default-element-type-assignment-test">Default Element Type Assignment Test</h3>
 <p>This test verifies that the system assigns the default type ‘requirement’ to all elements without explicit type metadata, regardless of their file location within the repository.</p>
 <h4>Details</h4>
@@ -927,6 +961,8 @@ blockquote {
 <li>Create behavior element with <code>derivedFrom</code> relation - FAIL with error</li>
 <li>Create specification element with <code>satisfiedBy</code> relation - FAIL with error</li>
 <li>Verify error messages indicate refinement types can only have satisfy relations</li>
+<li>Create constraint element with Attachments subsection - FAIL with error</li>
+<li>Verify error message indicates refinement types cannot have attachments</li>
 </ul>
 </li>
 <li>
@@ -1243,6 +1279,48 @@ blockquote {
 <li>verify: <a href="../../../Interfaces/CLI.html#cli-move-element-command">CLI Move Element Command</a></li>
 <li>verify: <a href="../../../Interfaces/CLI.html#cli-move-file-command">CLI Move File Command</a></li>
 <li>verify: <a href="../ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+</ul>
+<hr />
+<h3 id="type-validation-errors-test">Type Validation Errors Test</h3>
+<p>Test verifies that type validation errors include helpful type lists.</p>
+<h4>Details</h4>
+<ol>
+<li>
+<p>Test invalid element type in –filter-type:</p>
+<ul>
+<li>Use invalid type like “invalid-type”</li>
+<li>Verify error includes list of valid element types</li>
+<li>Verify error includes “other-TYPENAME” pattern hint</li>
+</ul>
+</li>
+<li>
+<p>Test invalid relation type in metadata:</p>
+<ul>
+<li>Create element with invalid relation type like “invalidRelation”</li>
+<li>Verify error includes list of valid relation types</li>
+</ul>
+</li>
+<li>
+<p>Test custom type pattern acceptance:</p>
+<ul>
+<li>Verify “other-interface” is accepted as valid type</li>
+<li>Verify “other-” alone is rejected</li>
+<li>Verify “other” alone is accepted</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Behaviors.html#type-validation-error-behavior">Type Validation Error Behavior</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-type-validation-errors/test.sh">test.sh</a></li>
+<li>verify: <a href="../Validation.html#type-validation-error-requirement">Type Validation Error Requirement</a></li>
 </ul>
 <hr />
 <h3 id="unstructured-documents-test">Unstructured Documents Test</h3>

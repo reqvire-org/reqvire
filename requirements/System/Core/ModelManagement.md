@@ -126,9 +126,6 @@ The system shall use the Git repository root as the project base for path resolu
 #### Metadata
   * type: user-requirement
 
-#### Attachments
-  * [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
-
 #### Relations
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Managing System Models](../../UserStories.md#managing-system-models)
@@ -184,11 +181,10 @@ When unlinking, the system shall:
 - Remove the relation entry from the element's Relations subsection
 - Remove the Relations subsection if no relations remain
 
-#### Attachments
-  * [Relation Operations Specification](../Operations/Specifications.md#relation-operations-specification)
-
 #### Relations
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Link Command Verification](../Operations/Verifications/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification)
 ---

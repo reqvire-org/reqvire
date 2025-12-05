@@ -8,20 +8,8 @@ Top-level container for test requirements.
   * type: user-requirement
 
 #### Relations
-  * derive: [Feature Requirement](#feature-requirement)
   * derive: [No Relations Requirement](#no-relations-requirement)
----
-
-### Feature Requirement
-
-A requirement to be linked/unlinked.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [System Requirements](#system-requirements)
-  * derivedFrom: [Another Requirement](#another-requirement)
+  * derive: [Feature Requirement](#feature-requirement)
 ---
 
 ### Another Requirement
@@ -32,6 +20,18 @@ Another requirement for testing.
   * type: requirement
 
 #### Relations
+  * derivedFrom: [System Requirements](#system-requirements)
+---
+
+### Feature Requirement
+
+A requirement to be linked/unlinked.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Another Requirement](#another-requirement)
   * derivedFrom: [System Requirements](#system-requirements)
 ---
 

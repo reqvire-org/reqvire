@@ -154,6 +154,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Operations/Behaviors.html#dry-run-mode-behavior"
                     },
                     {
+                      "name": "Create Element Override Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Operations/Behaviors.html#create-element-override-behavior"
+                    },
+                    {
                       "name": "Diff Output Format Specification",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#diff-output-format-specification"
@@ -189,6 +194,23 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Mermaid Diagram Style Specification",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    }
+                  ]
+                },
+                {
+                  "name": "CLI Collect Command",
+                  "type": "system-requirement",
+                  "link": "requirements/Interfaces/CLI.html#cli-collect-command",
+                  "children": [
+                    {
+                      "name": "Collect Content Specification",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Specifications.html#collect-content-specification"
+                    },
+                    {
+                      "name": "Collect Output Format Specification",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Specifications.html#collect-output-format-specification"
                     }
                   ]
                 },
@@ -269,6 +291,28 @@ The containment view shows the physical organization of the model—how requirem
                   ]
                 },
                 {
+                  "name": "CLI Merge Element Command",
+                  "type": "system-requirement",
+                  "link": "requirements/Interfaces/CLI.html#cli-merge-element-command",
+                  "children": [
+                    {
+                      "name": "Merge Content Transformation Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Operations/Behaviors.html#merge-content-transformation-behavior"
+                    },
+                    {
+                      "name": "Merge Type Compatibility Constraint",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Operations/Constraints.html#merge-type-compatibility-constraint"
+                    },
+                    {
+                      "name": "JSON Output Structure",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Specifications.html#json-output-structure"
+                    }
+                  ]
+                },
+                {
                   "name": "CLI Model Diagram Command",
                   "type": "system-requirement",
                   "link": "requirements/Interfaces/CLI.html#cli-model-diagram-command",
@@ -282,6 +326,21 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Mermaid Diagram Style Specification",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "Reverse Relation Traversal Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Behaviors.html#reverse-relation-traversal-behavior"
+                    },
+                    {
+                      "name": "Start Element Type Filter Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Behaviors.html#start-element-type-filter-behavior"
+                    },
+                    {
+                      "name": "Type Validation Error Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
                     }
                   ]
                 },
@@ -481,6 +540,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Text Output Formatting",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#text-output-formatting"
+                    },
+                    {
+                      "name": "Type Validation Error Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
                     }
                   ]
                 },
@@ -503,6 +567,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Mermaid Diagram Style Specification",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "Type Validation Error Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
                     }
                   ]
                 },
@@ -656,11 +725,6 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Interfaces/WebInterface.html#html-export",
                   "children": [
                     {
-                      "name": "Web Interface Style Specification",
-                      "type": "attachment-element",
-                      "link": "requirements/Interfaces/Specifications.html#web-interface-style-specification"
-                    },
-                    {
                       "name": "Web Interface Navigation Behavior",
                       "type": "attachment-element",
                       "link": "requirements/Interfaces/Behaviors.html#web-interface-navigation-behavior"
@@ -692,19 +756,7 @@ The containment view shows the physical organization of the model—how requirem
                 {
                   "name": "Web Interface Color Scheme",
                   "type": "system-requirement",
-                  "link": "requirements/Interfaces/WebInterface.html#web-interface-color-scheme",
-                  "children": [
-                    {
-                      "name": "Color Scheme Specification",
-                      "type": "attachment-element",
-                      "link": "requirements/System/Output/Specifications.html#color-scheme-specification"
-                    },
-                    {
-                      "name": "Web Interface Style Specification",
-                      "type": "attachment-element",
-                      "link": "requirements/Interfaces/Specifications.html#web-interface-style-specification"
-                    }
-                  ]
+                  "link": "requirements/Interfaces/WebInterface.html#web-interface-color-scheme"
                 }
               ]
             }
@@ -853,6 +905,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Core/Verifications/ValidationVerifications.html",
                       "children": [
                         {
+                          "name": "Cross-Section Duplicate Validation Test",
+                          "type": "verification",
+                          "link": "requirements/System/Core/Verifications/ValidationVerifications.html#cross-section-duplicate-validation-test"
+                        },
+                        {
                           "name": "Default Element Type Assignment Test",
                           "type": "verification",
                           "link": "requirements/System/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test"
@@ -893,6 +950,18 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification"
                         },
                         {
+                          "name": "Type Validation Errors Test",
+                          "type": "verification",
+                          "link": "requirements/System/Core/Verifications/ValidationVerifications.html#type-validation-errors-test",
+                          "children": [
+                            {
+                              "name": "Type Validation Error Behavior",
+                              "type": "attachment-element",
+                              "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
+                            }
+                          ]
+                        },
+                        {
                           "name": "Unstructured Documents Test",
                           "type": "verification",
                           "link": "requirements/System/Core/Verifications/ValidationVerifications.html#unstructured-documents-test"
@@ -927,6 +996,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Core/Behaviors.html#two-pass-validation-behavior"
                     },
                     {
+                      "name": "Type Validation Error Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
+                    },
+                    {
                       "name": "Validation Error Reporting Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Core/Behaviors.html#validation-error-reporting-behavior"
@@ -941,14 +1015,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Ignore Files Integration",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/Configuration.html#ignore-files-integration",
-                      "children": [
-                        {
-                          "name": "Ignore Files Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Specifications.html#ignore-files-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Core/Configuration.html#ignore-files-integration"
                     },
                     {
                       "name": "Ignoring Unstructured Documents",
@@ -977,6 +1044,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Core/Constraints.html",
                   "children": [
+                    {
+                      "name": "Cross-Section Duplicate Constraint",
+                      "type": "refinement",
+                      "link": "requirements/System/Core/Constraints.html#cross-section-duplicate-constraint"
+                    },
                     {
                       "name": "Element Type Relation Compatibility Constraint",
                       "type": "refinement",
@@ -1024,31 +1096,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Element Type Relation Compatibility",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#element-type-relation-compatibility",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#element-type-relation-compatibility"
                     },
                     {
                       "name": "Git Repository as Project Root",
                       "type": "user-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#git-repository-as-project-root",
-                      "children": [
-                        {
-                          "name": "Git Repository Scope Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Specifications.html#git-repository-scope-specification"
-                        },
-                        {
-                          "name": "Subdirectory Auto-Detection Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Behaviors.html#subdirectory-auto-detection-behavior"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#git-repository-as-project-root"
                     },
                     {
                       "name": "Refinement Element Structure Constraints",
@@ -1065,19 +1118,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Relation Management Operations",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#relation-management-operations",
-                      "children": [
-                        {
-                          "name": "Relation Operations Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#relation-operations-specification"
-                        },
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#relation-management-operations"
                     },
                     {
                       "name": "Relation Types and behaviors",
@@ -1094,14 +1135,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Supported Element Types",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#supported-element-types",
-                      "children": [
-                        {
-                          "name": "Supported Element Types Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Specifications.html#supported-element-types-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#supported-element-types"
                     },
                     {
                       "name": "Template-Based Model Bootstrapping",
@@ -1111,14 +1145,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Verification Type Categories",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#verification-type-categories",
-                      "children": [
-                        {
-                          "name": "Verification Type Categories Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Specifications.html#verification-type-categories-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#verification-type-categories"
                     }
                   ]
                 },
@@ -1136,6 +1163,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Ignore Files Specification",
                       "type": "refinement",
                       "link": "requirements/System/Core/Specifications.html#ignore-files-specification"
+                    },
+                    {
+                      "name": "Reserved Files Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Core/Specifications.html#reserved-files-specification"
                     },
                     {
                       "name": "Supported Element Types Specification",
@@ -1225,6 +1257,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Core/Validation.html#cross-component-dependency-validator"
                     },
                     {
+                      "name": "Cross-Section Duplicate Validation",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Core/Validation.html#cross-section-duplicate-validation"
+                    },
+                    {
                       "name": "Enhanced Validation Error Reporting",
                       "type": "user-requirement",
                       "link": "requirements/System/Core/Validation.html#enhanced-validation-error-reporting"
@@ -1247,14 +1284,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Internal Consistency Validator",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/Validation.html#internal-consistency-validator",
-                      "children": [
-                        {
-                          "name": "ElementIdentity.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/ElementIdentity.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/Validation.html#internal-consistency-validator"
                     },
                     {
                       "name": "Markdown Structure Validator",
@@ -1264,14 +1294,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Relation Element Type Validator",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/Validation.html#relation-element-type-validator",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/Validation.html#relation-element-type-validator"
                     },
                     {
                       "name": "Relation Type Validation",
@@ -1282,6 +1305,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Two-Pass Validation Strategy",
                       "type": "system-requirement",
                       "link": "requirements/System/Core/Validation.html#two-pass-validation-strategy"
+                    },
+                    {
+                      "name": "Type Validation Error Requirement",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Core/Validation.html#type-validation-error-requirement"
                     },
                     {
                       "name": "Validate Cross-Component Dependencies",
@@ -1306,14 +1334,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Validate Relation Types",
                       "type": "user-requirement",
-                      "link": "requirements/System/Core/Validation.html#validate-relation-types",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/Validation.html#validate-relation-types"
                     },
                     {
                       "name": "Validation Error Handling",
@@ -1445,6 +1466,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html",
                       "children": [
                         {
+                          "name": "Add Command Duplicate Detection Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#add-command-duplicate-detection-test"
+                        },
+                        {
                           "name": "CLI Add Element Test",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#cli-add-element-test",
@@ -1484,6 +1510,18 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#cli-rename-element-test"
                         },
                         {
+                          "name": "Create Element Override Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#create-element-override-test",
+                          "children": [
+                            {
+                              "name": "Create Element Override Behavior",
+                              "type": "attachment-element",
+                              "link": "requirements/System/Operations/Behaviors.html#create-element-override-behavior"
+                            }
+                          ]
+                        },
+                        {
                           "name": "Create Element Test",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#create-element-test"
@@ -1506,9 +1544,19 @@ The containment view shows the physical organization of the model—how requirem
                           ]
                         },
                         {
+                          "name": "Link Command Cross-Section Detection Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#link-command-cross-section-detection-test"
+                        },
+                        {
                           "name": "Link Command Verification",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#link-command-verification"
+                        },
+                        {
+                          "name": "Merge Elements Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#merge-elements-test"
                         },
                         {
                           "name": "Move Element Test",
@@ -1560,6 +1608,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification"
                         },
                         {
+                          "name": "Format Duplicate Removal Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/FormattingVerifications.html#format-duplicate-removal-test"
+                        },
+                        {
                           "name": "Full Relations Insertion Verification",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/FormattingVerifications.html#full-relations-insertion-verification"
@@ -1580,6 +1633,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Lint Command Verification",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/LintingVerifications.html#lint-command-verification"
+                        },
+                        {
+                          "name": "Redundant Hierarchical Attachment Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/LintingVerifications.html#redundant-hierarchical-attachment-test"
                         }
                       ]
                     }
@@ -1590,6 +1648,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Operations/Behaviors.html",
                   "children": [
+                    {
+                      "name": "Create Element Override Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Behaviors.html#create-element-override-behavior"
+                    },
                     {
                       "name": "Dry-Run Mode Behavior",
                       "type": "refinement",
@@ -1604,6 +1667,16 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "File Persistence Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Operations/Behaviors.html#file-persistence-behavior"
+                    },
+                    {
+                      "name": "Format Duplicate Removal Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Behaviors.html#format-duplicate-removal-behavior"
+                    },
+                    {
+                      "name": "Merge Content Transformation Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Behaviors.html#merge-content-transformation-behavior"
                     }
                   ]
                 },
@@ -1612,6 +1685,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Operations/Constraints.html",
                   "children": [
+                    {
+                      "name": "Merge Type Compatibility Constraint",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Constraints.html#merge-type-compatibility-constraint"
+                    },
                     {
                       "name": "Target Location Constraint",
                       "type": "refinement",
@@ -1629,11 +1707,6 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "system-requirement",
                       "link": "requirements/System/Operations/ElementManipulation.html#create-element-operation",
                       "children": [
-                        {
-                          "name": "Relation Validation Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#relation-validation-specification"
-                        },
                         {
                           "name": "File Persistence Behavior",
                           "type": "attachment-element",
@@ -1697,6 +1770,28 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Element Ordering Behavior",
                           "type": "attachment-element",
                           "link": "requirements/System/Operations/Behaviors.html#element-ordering-behavior"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Merge Element Operation",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Operations/ElementManipulation.html#merge-element-operation",
+                      "children": [
+                        {
+                          "name": "File Persistence Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Operations/Behaviors.html#file-persistence-behavior"
+                        },
+                        {
+                          "name": "Dry-Run Mode Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Operations/Behaviors.html#dry-run-mode-behavior"
+                        },
+                        {
+                          "name": "Diff Output Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#diff-output-format-specification"
                         }
                       ]
                     },
@@ -1808,14 +1903,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Document Structure Normalization",
                       "type": "system-requirement",
-                      "link": "requirements/System/Operations/Formatting.html#document-structure-normalization",
-                      "children": [
-                        {
-                          "name": "Document Structure Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#document-structure-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Operations/Formatting.html#document-structure-normalization"
                     },
                     {
                       "name": "Element Ordering Normalization",
@@ -1837,14 +1925,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Format Consistency Enforcement",
                       "type": "system-requirement",
-                      "link": "requirements/System/Operations/Formatting.html#format-consistency-enforcement",
-                      "children": [
-                        {
-                          "name": "Format Consistency Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#format-consistency-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Operations/Formatting.html#format-consistency-enforcement"
+                    },
+                    {
+                      "name": "Format Duplicate Removal",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Operations/Formatting.html#format-duplicate-removal"
                     },
                     {
                       "name": "Formatting Output",
@@ -1876,14 +1962,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Relation Ordering Normalization",
                       "type": "system-requirement",
-                      "link": "requirements/System/Operations/Formatting.html#relation-ordering-normalization",
-                      "children": [
-                        {
-                          "name": "Relation Ordering Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#relation-ordering-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Operations/Formatting.html#relation-ordering-normalization"
                     },
                     {
                       "name": "Replace Absolute Links with Relative Links",
@@ -1923,6 +2002,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Processing/Specifications.html#verification-trace-tree-construction"
                         }
                       ]
+                    },
+                    {
+                      "name": "Redundant Hierarchical Attachment Detection",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Operations/Linting.html#redundant-hierarchical-attachment-detection"
                     },
                     {
                       "name": "Redundant Hierarchical Relations Detection",
@@ -1971,31 +2055,14 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Operations/Specifications.html#format-consistency-specification"
                     },
                     {
+                      "name": "Orphaned Children Error Message Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Specifications.html#orphaned-children-error-message-specification"
+                    },
+                    {
                       "name": "Relation Operations Specification",
                       "type": "refinement",
-                      "link": "requirements/System/Operations/Specifications.html#relation-operations-specification",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        },
-                        {
-                          "name": "Element Type Relation Compatibility Constraint",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Constraints.html#element-type-relation-compatibility-constraint"
-                        },
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
-                          "name": "Relation Validation Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#relation-validation-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Operations/Specifications.html#relation-operations-specification"
                     },
                     {
                       "name": "Relation Ordering Specification",
@@ -2083,6 +2150,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Verifications/ReportingVerifications.html",
                       "children": [
                         {
+                          "name": "CLI Collect Command Test",
+                          "type": "verification",
+                          "link": "requirements/System/Output/Verifications/ReportingVerifications.html#cli-collect-command-test"
+                        },
+                        {
                           "name": "Containment Hierarchy Extraction Test",
                           "type": "verification",
                           "link": "requirements/System/Output/Verifications/ReportingVerifications.html#containment-hierarchy-extraction-test"
@@ -2128,9 +2200,33 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Output/Verifications/ReportingVerifications.html#resources-report-verification"
                         },
                         {
+                          "name": "Reverse Model Traversal Test",
+                          "type": "verification",
+                          "link": "requirements/System/Output/Verifications/ReportingVerifications.html#reverse-model-traversal-test",
+                          "children": [
+                            {
+                              "name": "Reverse Relation Traversal Behavior",
+                              "type": "attachment-element",
+                              "link": "requirements/System/Output/Behaviors.html#reverse-relation-traversal-behavior"
+                            }
+                          ]
+                        },
+                        {
                           "name": "Search Command Tests",
                           "type": "verification",
                           "link": "requirements/System/Output/Verifications/ReportingVerifications.html#search-command-tests"
+                        },
+                        {
+                          "name": "Start Type Filter Test",
+                          "type": "verification",
+                          "link": "requirements/System/Output/Verifications/ReportingVerifications.html#start-type-filter-test",
+                          "children": [
+                            {
+                              "name": "Start Element Type Filter Behavior",
+                              "type": "attachment-element",
+                              "link": "requirements/System/Output/Behaviors.html#start-element-type-filter-behavior"
+                            }
+                          ]
                         },
                         {
                           "name": "TraceFlow View Test",
@@ -2167,9 +2263,19 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Behaviors.html#mermaid-diagram-interaction-behavior"
                     },
                     {
+                      "name": "Reverse Relation Traversal Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Behaviors.html#reverse-relation-traversal-behavior"
+                    },
+                    {
                       "name": "Short Mode Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Output/Behaviors.html#short-mode-behavior"
+                    },
+                    {
+                      "name": "Start Element Type Filter Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Behaviors.html#start-element-type-filter-behavior"
                     },
                     {
                       "name": "Verification Coverage Philosophy Behavior",
@@ -2211,14 +2317,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams",
-                      "children": [
-                        {
-                          "name": "Mermaid Diagram Style Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
                     },
                     {
                       "name": "Model Visualization and Exploration",
@@ -2233,26 +2332,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "SysML-Compatible Relationship Rendering",
                       "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering",
-                      "children": [
-                        {
-                          "name": "SysML Rendering Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering"
                     },
                     {
                       "name": "Trace Relation Non-Directional Behavior",
                       "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#trace-relation-non-directional-behavior",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Output/DiagramGeneration.html#trace-relation-non-directional-behavior"
                     }
                   ]
                 },
@@ -2261,6 +2346,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Output/Reporting.html",
                   "children": [
+                    {
+                      "name": "Collect Content from Requirement Chain",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Output/Reporting.html#collect-content-from-requirement-chain"
+                    },
                     {
                       "name": "Containment View Report",
                       "type": "user-requirement",
@@ -2304,6 +2394,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Reporting.html#resources-report"
                     },
                     {
+                      "name": "Reverse Relation Traversal",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Output/Reporting.html#reverse-relation-traversal"
+                    },
+                    {
                       "name": "Search Report Generator",
                       "type": "system-requirement",
                       "link": "requirements/System/Output/Reporting.html#search-report-generator",
@@ -2329,6 +2424,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Output/Specifications.html#text-output-formatting"
                         }
                       ]
+                    },
+                    {
+                      "name": "Start Element Type Filtering",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Output/Reporting.html#start-element-type-filtering"
                     },
                     {
                       "name": "TraceFlow View Report Generation",
@@ -2358,11 +2458,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Reporting.html#verification-coverage-report",
                       "children": [
                         {
-                          "name": "Verification Coverage Philosophy Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
-                        },
-                        {
                           "name": "Verification Type Categories Specification",
                           "type": "attachment-element",
                           "link": "requirements/System/Core/Specifications.html#verification-type-categories-specification"
@@ -2391,6 +2486,16 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Output/Specifications.html",
                   "children": [
+                    {
+                      "name": "Collect Content Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Specifications.html#collect-content-specification"
+                    },
+                    {
+                      "name": "Collect Output Format Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Specifications.html#collect-output-format-specification"
+                    },
                     {
                       "name": "Color Scheme Specification",
                       "type": "refinement",
@@ -2525,14 +2630,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Change Impact Detection",
                       "type": "system-requirement",
-                      "link": "requirements/System/Processing/ChangeImpact.html#change-impact-detection",
-                      "children": [
-                        {
-                          "name": "ElementIdentity.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/ElementIdentity.md"
-                        }
-                      ]
+                      "link": "requirements/System/Processing/ChangeImpact.html#change-impact-detection"
                     },
                     {
                       "name": "Requirements Change Propagation",
@@ -2578,14 +2676,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Verification Trace Builder",
                       "type": "system-requirement",
-                      "link": "requirements/System/Processing/VerificationTraces.html#verification-trace-builder",
-                      "children": [
-                        {
-                          "name": "Verification Trace Tree Construction",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Processing/Specifications.html#verification-trace-tree-construction"
-                        }
-                      ]
+                      "link": "requirements/System/Processing/VerificationTraces.html#verification-trace-builder"
                     }
                   ]
                 }
@@ -2598,11 +2689,6 @@ The containment view shows the physical organization of the model—how requirem
           "type": "file",
           "link": "requirements/Refinements.html",
           "children": [
-            {
-              "name": "EARS Pattern Specification",
-              "type": "refinement",
-              "link": "requirements/Refinements.html#ears-pattern-specification"
-            },
             {
               "name": "Industry Standards Specification",
               "type": "refinement",
@@ -2833,6 +2919,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Operations/Behaviors.html#dry-run-mode-behavior"
                     },
                     {
+                      "name": "Create Element Override Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Operations/Behaviors.html#create-element-override-behavior"
+                    },
+                    {
                       "name": "Diff Output Format Specification",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#diff-output-format-specification"
@@ -2868,6 +2959,23 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Mermaid Diagram Style Specification",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    }
+                  ]
+                },
+                {
+                  "name": "CLI Collect Command",
+                  "type": "system-requirement",
+                  "link": "requirements/Interfaces/CLI.html#cli-collect-command",
+                  "children": [
+                    {
+                      "name": "Collect Content Specification",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Specifications.html#collect-content-specification"
+                    },
+                    {
+                      "name": "Collect Output Format Specification",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Specifications.html#collect-output-format-specification"
                     }
                   ]
                 },
@@ -2948,6 +3056,28 @@ The containment view shows the physical organization of the model—how requirem
                   ]
                 },
                 {
+                  "name": "CLI Merge Element Command",
+                  "type": "system-requirement",
+                  "link": "requirements/Interfaces/CLI.html#cli-merge-element-command",
+                  "children": [
+                    {
+                      "name": "Merge Content Transformation Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Operations/Behaviors.html#merge-content-transformation-behavior"
+                    },
+                    {
+                      "name": "Merge Type Compatibility Constraint",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Operations/Constraints.html#merge-type-compatibility-constraint"
+                    },
+                    {
+                      "name": "JSON Output Structure",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Specifications.html#json-output-structure"
+                    }
+                  ]
+                },
+                {
                   "name": "CLI Model Diagram Command",
                   "type": "system-requirement",
                   "link": "requirements/Interfaces/CLI.html#cli-model-diagram-command",
@@ -2961,6 +3091,21 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Mermaid Diagram Style Specification",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "Reverse Relation Traversal Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Behaviors.html#reverse-relation-traversal-behavior"
+                    },
+                    {
+                      "name": "Start Element Type Filter Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Output/Behaviors.html#start-element-type-filter-behavior"
+                    },
+                    {
+                      "name": "Type Validation Error Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
                     }
                   ]
                 },
@@ -3160,6 +3305,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Text Output Formatting",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#text-output-formatting"
+                    },
+                    {
+                      "name": "Type Validation Error Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
                     }
                   ]
                 },
@@ -3182,6 +3332,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Mermaid Diagram Style Specification",
                       "type": "attachment-element",
                       "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "Type Validation Error Behavior",
+                      "type": "attachment-element",
+                      "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
                     }
                   ]
                 },
@@ -3335,11 +3490,6 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Interfaces/WebInterface.html#html-export",
                   "children": [
                     {
-                      "name": "Web Interface Style Specification",
-                      "type": "attachment-element",
-                      "link": "requirements/Interfaces/Specifications.html#web-interface-style-specification"
-                    },
-                    {
                       "name": "Web Interface Navigation Behavior",
                       "type": "attachment-element",
                       "link": "requirements/Interfaces/Behaviors.html#web-interface-navigation-behavior"
@@ -3371,19 +3521,7 @@ The containment view shows the physical organization of the model—how requirem
                 {
                   "name": "Web Interface Color Scheme",
                   "type": "system-requirement",
-                  "link": "requirements/Interfaces/WebInterface.html#web-interface-color-scheme",
-                  "children": [
-                    {
-                      "name": "Color Scheme Specification",
-                      "type": "attachment-element",
-                      "link": "requirements/System/Output/Specifications.html#color-scheme-specification"
-                    },
-                    {
-                      "name": "Web Interface Style Specification",
-                      "type": "attachment-element",
-                      "link": "requirements/Interfaces/Specifications.html#web-interface-style-specification"
-                    }
-                  ]
+                  "link": "requirements/Interfaces/WebInterface.html#web-interface-color-scheme"
                 }
               ]
             }
@@ -3532,6 +3670,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Core/Verifications/ValidationVerifications.html",
                       "children": [
                         {
+                          "name": "Cross-Section Duplicate Validation Test",
+                          "type": "verification",
+                          "link": "requirements/System/Core/Verifications/ValidationVerifications.html#cross-section-duplicate-validation-test"
+                        },
+                        {
                           "name": "Default Element Type Assignment Test",
                           "type": "verification",
                           "link": "requirements/System/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test"
@@ -3572,6 +3715,18 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification"
                         },
                         {
+                          "name": "Type Validation Errors Test",
+                          "type": "verification",
+                          "link": "requirements/System/Core/Verifications/ValidationVerifications.html#type-validation-errors-test",
+                          "children": [
+                            {
+                              "name": "Type Validation Error Behavior",
+                              "type": "attachment-element",
+                              "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
+                            }
+                          ]
+                        },
+                        {
                           "name": "Unstructured Documents Test",
                           "type": "verification",
                           "link": "requirements/System/Core/Verifications/ValidationVerifications.html#unstructured-documents-test"
@@ -3606,6 +3761,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Core/Behaviors.html#two-pass-validation-behavior"
                     },
                     {
+                      "name": "Type Validation Error Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Core/Behaviors.html#type-validation-error-behavior"
+                    },
+                    {
                       "name": "Validation Error Reporting Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Core/Behaviors.html#validation-error-reporting-behavior"
@@ -3620,14 +3780,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Ignore Files Integration",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/Configuration.html#ignore-files-integration",
-                      "children": [
-                        {
-                          "name": "Ignore Files Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Specifications.html#ignore-files-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Core/Configuration.html#ignore-files-integration"
                     },
                     {
                       "name": "Ignoring Unstructured Documents",
@@ -3656,6 +3809,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Core/Constraints.html",
                   "children": [
+                    {
+                      "name": "Cross-Section Duplicate Constraint",
+                      "type": "refinement",
+                      "link": "requirements/System/Core/Constraints.html#cross-section-duplicate-constraint"
+                    },
                     {
                       "name": "Element Type Relation Compatibility Constraint",
                       "type": "refinement",
@@ -3703,31 +3861,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Element Type Relation Compatibility",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#element-type-relation-compatibility",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#element-type-relation-compatibility"
                     },
                     {
                       "name": "Git Repository as Project Root",
                       "type": "user-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#git-repository-as-project-root",
-                      "children": [
-                        {
-                          "name": "Git Repository Scope Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Specifications.html#git-repository-scope-specification"
-                        },
-                        {
-                          "name": "Subdirectory Auto-Detection Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Behaviors.html#subdirectory-auto-detection-behavior"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#git-repository-as-project-root"
                     },
                     {
                       "name": "Refinement Element Structure Constraints",
@@ -3744,19 +3883,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Relation Management Operations",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#relation-management-operations",
-                      "children": [
-                        {
-                          "name": "Relation Operations Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#relation-operations-specification"
-                        },
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#relation-management-operations"
                     },
                     {
                       "name": "Relation Types and behaviors",
@@ -3773,14 +3900,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Supported Element Types",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#supported-element-types",
-                      "children": [
-                        {
-                          "name": "Supported Element Types Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Specifications.html#supported-element-types-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#supported-element-types"
                     },
                     {
                       "name": "Template-Based Model Bootstrapping",
@@ -3790,14 +3910,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Verification Type Categories",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/ModelManagement.html#verification-type-categories",
-                      "children": [
-                        {
-                          "name": "Verification Type Categories Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Specifications.html#verification-type-categories-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Core/ModelManagement.html#verification-type-categories"
                     }
                   ]
                 },
@@ -3815,6 +3928,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Ignore Files Specification",
                       "type": "refinement",
                       "link": "requirements/System/Core/Specifications.html#ignore-files-specification"
+                    },
+                    {
+                      "name": "Reserved Files Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Core/Specifications.html#reserved-files-specification"
                     },
                     {
                       "name": "Supported Element Types Specification",
@@ -3904,6 +4022,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Core/Validation.html#cross-component-dependency-validator"
                     },
                     {
+                      "name": "Cross-Section Duplicate Validation",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Core/Validation.html#cross-section-duplicate-validation"
+                    },
+                    {
                       "name": "Enhanced Validation Error Reporting",
                       "type": "user-requirement",
                       "link": "requirements/System/Core/Validation.html#enhanced-validation-error-reporting"
@@ -3926,14 +4049,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Internal Consistency Validator",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/Validation.html#internal-consistency-validator",
-                      "children": [
-                        {
-                          "name": "ElementIdentity.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/ElementIdentity.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/Validation.html#internal-consistency-validator"
                     },
                     {
                       "name": "Markdown Structure Validator",
@@ -3943,14 +4059,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Relation Element Type Validator",
                       "type": "system-requirement",
-                      "link": "requirements/System/Core/Validation.html#relation-element-type-validator",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/Validation.html#relation-element-type-validator"
                     },
                     {
                       "name": "Relation Type Validation",
@@ -3961,6 +4070,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Two-Pass Validation Strategy",
                       "type": "system-requirement",
                       "link": "requirements/System/Core/Validation.html#two-pass-validation-strategy"
+                    },
+                    {
+                      "name": "Type Validation Error Requirement",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Core/Validation.html#type-validation-error-requirement"
                     },
                     {
                       "name": "Validate Cross-Component Dependencies",
@@ -3985,14 +4099,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Validate Relation Types",
                       "type": "user-requirement",
-                      "link": "requirements/System/Core/Validation.html#validate-relation-types",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Core/Validation.html#validate-relation-types"
                     },
                     {
                       "name": "Validation Error Handling",
@@ -4124,6 +4231,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html",
                       "children": [
                         {
+                          "name": "Add Command Duplicate Detection Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#add-command-duplicate-detection-test"
+                        },
+                        {
                           "name": "CLI Add Element Test",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#cli-add-element-test",
@@ -4163,6 +4275,18 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#cli-rename-element-test"
                         },
                         {
+                          "name": "Create Element Override Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#create-element-override-test",
+                          "children": [
+                            {
+                              "name": "Create Element Override Behavior",
+                              "type": "attachment-element",
+                              "link": "requirements/System/Operations/Behaviors.html#create-element-override-behavior"
+                            }
+                          ]
+                        },
+                        {
                           "name": "Create Element Test",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#create-element-test"
@@ -4185,9 +4309,19 @@ The containment view shows the physical organization of the model—how requirem
                           ]
                         },
                         {
+                          "name": "Link Command Cross-Section Detection Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#link-command-cross-section-detection-test"
+                        },
+                        {
                           "name": "Link Command Verification",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#link-command-verification"
+                        },
+                        {
+                          "name": "Merge Elements Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.html#merge-elements-test"
                         },
                         {
                           "name": "Move Element Test",
@@ -4239,6 +4373,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification"
                         },
                         {
+                          "name": "Format Duplicate Removal Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/FormattingVerifications.html#format-duplicate-removal-test"
+                        },
+                        {
                           "name": "Full Relations Insertion Verification",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/FormattingVerifications.html#full-relations-insertion-verification"
@@ -4259,6 +4398,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Lint Command Verification",
                           "type": "verification",
                           "link": "requirements/System/Operations/Verifications/LintingVerifications.html#lint-command-verification"
+                        },
+                        {
+                          "name": "Redundant Hierarchical Attachment Test",
+                          "type": "verification",
+                          "link": "requirements/System/Operations/Verifications/LintingVerifications.html#redundant-hierarchical-attachment-test"
                         }
                       ]
                     }
@@ -4269,6 +4413,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Operations/Behaviors.html",
                   "children": [
+                    {
+                      "name": "Create Element Override Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Behaviors.html#create-element-override-behavior"
+                    },
                     {
                       "name": "Dry-Run Mode Behavior",
                       "type": "refinement",
@@ -4283,6 +4432,16 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "File Persistence Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Operations/Behaviors.html#file-persistence-behavior"
+                    },
+                    {
+                      "name": "Format Duplicate Removal Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Behaviors.html#format-duplicate-removal-behavior"
+                    },
+                    {
+                      "name": "Merge Content Transformation Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Behaviors.html#merge-content-transformation-behavior"
                     }
                   ]
                 },
@@ -4291,6 +4450,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Operations/Constraints.html",
                   "children": [
+                    {
+                      "name": "Merge Type Compatibility Constraint",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Constraints.html#merge-type-compatibility-constraint"
+                    },
                     {
                       "name": "Target Location Constraint",
                       "type": "refinement",
@@ -4308,11 +4472,6 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "system-requirement",
                       "link": "requirements/System/Operations/ElementManipulation.html#create-element-operation",
                       "children": [
-                        {
-                          "name": "Relation Validation Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#relation-validation-specification"
-                        },
                         {
                           "name": "File Persistence Behavior",
                           "type": "attachment-element",
@@ -4376,6 +4535,28 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Element Ordering Behavior",
                           "type": "attachment-element",
                           "link": "requirements/System/Operations/Behaviors.html#element-ordering-behavior"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Merge Element Operation",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Operations/ElementManipulation.html#merge-element-operation",
+                      "children": [
+                        {
+                          "name": "File Persistence Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Operations/Behaviors.html#file-persistence-behavior"
+                        },
+                        {
+                          "name": "Dry-Run Mode Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Operations/Behaviors.html#dry-run-mode-behavior"
+                        },
+                        {
+                          "name": "Diff Output Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/System/Output/Specifications.html#diff-output-format-specification"
                         }
                       ]
                     },
@@ -4487,14 +4668,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Document Structure Normalization",
                       "type": "system-requirement",
-                      "link": "requirements/System/Operations/Formatting.html#document-structure-normalization",
-                      "children": [
-                        {
-                          "name": "Document Structure Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#document-structure-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Operations/Formatting.html#document-structure-normalization"
                     },
                     {
                       "name": "Element Ordering Normalization",
@@ -4516,14 +4690,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Format Consistency Enforcement",
                       "type": "system-requirement",
-                      "link": "requirements/System/Operations/Formatting.html#format-consistency-enforcement",
-                      "children": [
-                        {
-                          "name": "Format Consistency Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#format-consistency-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Operations/Formatting.html#format-consistency-enforcement"
+                    },
+                    {
+                      "name": "Format Duplicate Removal",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Operations/Formatting.html#format-duplicate-removal"
                     },
                     {
                       "name": "Formatting Output",
@@ -4555,14 +4727,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Relation Ordering Normalization",
                       "type": "system-requirement",
-                      "link": "requirements/System/Operations/Formatting.html#relation-ordering-normalization",
-                      "children": [
-                        {
-                          "name": "Relation Ordering Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#relation-ordering-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Operations/Formatting.html#relation-ordering-normalization"
                     },
                     {
                       "name": "Replace Absolute Links with Relative Links",
@@ -4602,6 +4767,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Processing/Specifications.html#verification-trace-tree-construction"
                         }
                       ]
+                    },
+                    {
+                      "name": "Redundant Hierarchical Attachment Detection",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Operations/Linting.html#redundant-hierarchical-attachment-detection"
                     },
                     {
                       "name": "Redundant Hierarchical Relations Detection",
@@ -4650,31 +4820,14 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Operations/Specifications.html#format-consistency-specification"
                     },
                     {
+                      "name": "Orphaned Children Error Message Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Operations/Specifications.html#orphaned-children-error-message-specification"
+                    },
+                    {
                       "name": "Relation Operations Specification",
                       "type": "refinement",
-                      "link": "requirements/System/Operations/Specifications.html#relation-operations-specification",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        },
-                        {
-                          "name": "Element Type Relation Compatibility Constraint",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Core/Constraints.html#element-type-relation-compatibility-constraint"
-                        },
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
-                          "name": "Relation Validation Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Operations/Specifications.html#relation-validation-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Operations/Specifications.html#relation-operations-specification"
                     },
                     {
                       "name": "Relation Ordering Specification",
@@ -4762,6 +4915,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Verifications/ReportingVerifications.html",
                       "children": [
                         {
+                          "name": "CLI Collect Command Test",
+                          "type": "verification",
+                          "link": "requirements/System/Output/Verifications/ReportingVerifications.html#cli-collect-command-test"
+                        },
+                        {
                           "name": "Containment Hierarchy Extraction Test",
                           "type": "verification",
                           "link": "requirements/System/Output/Verifications/ReportingVerifications.html#containment-hierarchy-extraction-test"
@@ -4807,9 +4965,33 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Output/Verifications/ReportingVerifications.html#resources-report-verification"
                         },
                         {
+                          "name": "Reverse Model Traversal Test",
+                          "type": "verification",
+                          "link": "requirements/System/Output/Verifications/ReportingVerifications.html#reverse-model-traversal-test",
+                          "children": [
+                            {
+                              "name": "Reverse Relation Traversal Behavior",
+                              "type": "attachment-element",
+                              "link": "requirements/System/Output/Behaviors.html#reverse-relation-traversal-behavior"
+                            }
+                          ]
+                        },
+                        {
                           "name": "Search Command Tests",
                           "type": "verification",
                           "link": "requirements/System/Output/Verifications/ReportingVerifications.html#search-command-tests"
+                        },
+                        {
+                          "name": "Start Type Filter Test",
+                          "type": "verification",
+                          "link": "requirements/System/Output/Verifications/ReportingVerifications.html#start-type-filter-test",
+                          "children": [
+                            {
+                              "name": "Start Element Type Filter Behavior",
+                              "type": "attachment-element",
+                              "link": "requirements/System/Output/Behaviors.html#start-element-type-filter-behavior"
+                            }
+                          ]
                         },
                         {
                           "name": "TraceFlow View Test",
@@ -4846,9 +5028,19 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Behaviors.html#mermaid-diagram-interaction-behavior"
                     },
                     {
+                      "name": "Reverse Relation Traversal Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Behaviors.html#reverse-relation-traversal-behavior"
+                    },
+                    {
                       "name": "Short Mode Behavior",
                       "type": "refinement",
                       "link": "requirements/System/Output/Behaviors.html#short-mode-behavior"
+                    },
+                    {
+                      "name": "Start Element Type Filter Behavior",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Behaviors.html#start-element-type-filter-behavior"
                     },
                     {
                       "name": "Verification Coverage Philosophy Behavior",
@@ -4890,14 +5082,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams",
-                      "children": [
-                        {
-                          "name": "Mermaid Diagram Style Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Output/Specifications.html#mermaid-diagram-style-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
                     },
                     {
                       "name": "Model Visualization and Exploration",
@@ -4912,26 +5097,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "SysML-Compatible Relationship Rendering",
                       "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering",
-                      "children": [
-                        {
-                          "name": "SysML Rendering Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Output/Specifications.html#sysml-rendering-specification"
-                        }
-                      ]
+                      "link": "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering"
                     },
                     {
                       "name": "Trace Relation Non-Directional Behavior",
                       "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#trace-relation-non-directional-behavior",
-                      "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/RelationTypes.md"
-                        }
-                      ]
+                      "link": "requirements/System/Output/DiagramGeneration.html#trace-relation-non-directional-behavior"
                     }
                   ]
                 },
@@ -4940,6 +5111,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Output/Reporting.html",
                   "children": [
+                    {
+                      "name": "Collect Content from Requirement Chain",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Output/Reporting.html#collect-content-from-requirement-chain"
+                    },
                     {
                       "name": "Containment View Report",
                       "type": "user-requirement",
@@ -4983,6 +5159,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Reporting.html#resources-report"
                     },
                     {
+                      "name": "Reverse Relation Traversal",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Output/Reporting.html#reverse-relation-traversal"
+                    },
+                    {
                       "name": "Search Report Generator",
                       "type": "system-requirement",
                       "link": "requirements/System/Output/Reporting.html#search-report-generator",
@@ -5008,6 +5189,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Output/Specifications.html#text-output-formatting"
                         }
                       ]
+                    },
+                    {
+                      "name": "Start Element Type Filtering",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Output/Reporting.html#start-element-type-filtering"
                     },
                     {
                       "name": "TraceFlow View Report Generation",
@@ -5037,11 +5223,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Reporting.html#verification-coverage-report",
                       "children": [
                         {
-                          "name": "Verification Coverage Philosophy Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior"
-                        },
-                        {
                           "name": "Verification Type Categories Specification",
                           "type": "attachment-element",
                           "link": "requirements/System/Core/Specifications.html#verification-type-categories-specification"
@@ -5070,6 +5251,16 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/System/Output/Specifications.html",
                   "children": [
+                    {
+                      "name": "Collect Content Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Specifications.html#collect-content-specification"
+                    },
+                    {
+                      "name": "Collect Output Format Specification",
+                      "type": "refinement",
+                      "link": "requirements/System/Output/Specifications.html#collect-output-format-specification"
+                    },
                     {
                       "name": "Color Scheme Specification",
                       "type": "refinement",
@@ -5204,14 +5395,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Change Impact Detection",
                       "type": "system-requirement",
-                      "link": "requirements/System/Processing/ChangeImpact.html#change-impact-detection",
-                      "children": [
-                        {
-                          "name": "ElementIdentity.md",
-                          "type": "attachment-file",
-                          "link": "requirements/System/Core/DesignDocuments/ElementIdentity.md"
-                        }
-                      ]
+                      "link": "requirements/System/Processing/ChangeImpact.html#change-impact-detection"
                     },
                     {
                       "name": "Requirements Change Propagation",
@@ -5257,14 +5441,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Verification Trace Builder",
                       "type": "system-requirement",
-                      "link": "requirements/System/Processing/VerificationTraces.html#verification-trace-builder",
-                      "children": [
-                        {
-                          "name": "Verification Trace Tree Construction",
-                          "type": "attachment-element",
-                          "link": "requirements/System/Processing/Specifications.html#verification-trace-tree-construction"
-                        }
-                      ]
+                      "link": "requirements/System/Processing/VerificationTraces.html#verification-trace-builder"
                     }
                   ]
                 }
@@ -5277,11 +5454,6 @@ The containment view shows the physical organization of the model—how requirem
           "type": "file",
           "link": "requirements/Refinements.html",
           "children": [
-            {
-              "name": "EARS Pattern Specification",
-              "type": "refinement",
-              "link": "requirements/Refinements.html#ears-pattern-specification"
-            },
             {
               "name": "Industry Standards Specification",
               "type": "refinement",

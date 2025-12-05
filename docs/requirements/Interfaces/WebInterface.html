@@ -735,164 +735,170 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1c3bc86f926627ab[&quot;📁 requirements/Interfaces&quot;]
-    subgraph 315f1b2b98bf7d1b[&quot;📄 CLI.md&quot;]
-      a867b4bb3e22cabf[&quot;Validate Command<br/>📎 requirements/System/Core/Behaviors.md#two-pass-validation-behavior<br/>📎 requirements/System/Core/Behaviors.md#validation-error-reporting-behavior<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#error-message-format-specification&quot;];
-      class a867b4bb3e22cabf systemRequirement;
-      click a867b4bb3e22cabf &quot;CLI.html#validate-command&quot;;
+  subgraph c97e5d4c96ea3f37["📁 requirements/Interfaces"]
+    subgraph f57c66ff9e8042ff["📄 CLI.md"]
+      ce8de49bd88dd05e["Validate Command<br/>📎 requirements/System/Core/Behaviors.md#two-pass-validation-behavior<br/>📎 requirements/System/Core/Behaviors.md#validation-error-reporting-behavior<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#error-message-format-specification"];
+      class ce8de49bd88dd05e systemRequirement;
+      click ce8de49bd88dd05e "CLI.html#validate-command";
     end
-    subgraph ca2dd19eaaf80aea[&quot;📄 WebInterface.md&quot;]
-      9548618d67bf80fd[&quot;Attachment Export&quot;];
-      class 9548618d67bf80fd systemRequirement;
-      click 9548618d67bf80fd &quot;WebInterface.html#attachment-export&quot;;
-      7b6511f887489bc1[&quot;Containment View Attachment Links&quot;];
-      class 7b6511f887489bc1 systemRequirement;
-      click 7b6511f887489bc1 &quot;WebInterface.html#containment-view-attachment-links&quot;;
-      a12088ce3af75577[&quot;Diagram Attachment Display<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification&quot;];
-      class a12088ce3af75577 systemRequirement;
-      click a12088ce3af75577 &quot;WebInterface.html#diagram-attachment-display&quot;;
-      7cee348e5d230f20[&quot;HTML Export<br/>📎 requirements/Interfaces/Specifications.md#web-interface-style-specification<br/>📎 requirements/Interfaces/Behaviors.md#web-interface-navigation-behavior&quot;];
-      class 7cee348e5d230f20 systemRequirement;
-      click 7cee348e5d230f20 &quot;WebInterface.html#html-export&quot;;
-      287f6140c4c9ba05[&quot;Model-Centric View Generation<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification&quot;];
-      class 287f6140c4c9ba05 systemRequirement;
-      click 287f6140c4c9ba05 &quot;WebInterface.html#model-centric-view-generation&quot;;
-      f2578977bd9395ad[&quot;Model View Element Navigation&quot;];
-      class f2578977bd9395ad systemRequirement;
-      click f2578977bd9395ad &quot;WebInterface.html#model-view-element-navigation&quot;;
-      7afe0ab429e8f97f[&quot;Serve Command&quot;];
-      class 7afe0ab429e8f97f systemRequirement;
-      click 7afe0ab429e8f97f &quot;WebInterface.html#serve-command&quot;;
-      17774b4ce265515[&quot;Web Interface Color Scheme<br/>📎 requirements/System/Output/Specifications.md#color-scheme-specification<br/>📎 requirements/Interfaces/Specifications.md#web-interface-style-specification&quot;];
-      class 17774b4ce265515 systemRequirement;
-      click 17774b4ce265515 &quot;WebInterface.html#web-interface-color-scheme&quot;;
+    subgraph f5a22f7f785fcf6a["📄 Specifications.md"]
+      19bf972ca85f2b44["Web Interface Style Specification"];
+      class 19bf972ca85f2b44 default;
+      click 19bf972ca85f2b44 "Specifications.html#web-interface-style-specification";
     end
-  end
-  subgraph ebbb5ee2da6c145b[&quot;📁 requirements/Interfaces/Verifications&quot;]
-    subgraph a6e0b4f1b51d1969[&quot;📄 CLIVerifications.md&quot;]
-      7ce243221ec8f143[&quot;CLI Help Structure Verification&quot;];
-      class 7ce243221ec8f143 verification;
-      click 7ce243221ec8f143 &quot;Verifications/CLIVerifications.html#cli-help-structure-verification&quot;;
-    end
-    subgraph 565c15260ba3d352[&quot;📄 WebInterfaceVerifications.md&quot;]
-      6b82beacdfe5cb16[&quot;Attachment Export Verification&quot;];
-      class 6b82beacdfe5cb16 verification;
-      click 6b82beacdfe5cb16 &quot;Verifications/WebInterfaceVerifications.html#attachment-export-verification&quot;;
-      3eba0fc81a8f5376[&quot;Containment Attachment Links Verification&quot;];
-      class 3eba0fc81a8f5376 verification;
-      click 3eba0fc81a8f5376 &quot;Verifications/WebInterfaceVerifications.html#containment-attachment-links-verification&quot;;
-      22440e2b04a21e0d[&quot;Diagram Attachment Display Verification&quot;];
-      class 22440e2b04a21e0d verification;
-      click 22440e2b04a21e0d &quot;Verifications/WebInterfaceVerifications.html#diagram-attachment-display-verification&quot;;
-      3b945d4fc7ba69e7[&quot;HTML Export Verification&quot;];
-      class 3b945d4fc7ba69e7 verification;
-      click 3b945d4fc7ba69e7 &quot;Verifications/WebInterfaceVerifications.html#html-export-verification&quot;;
-      991bc25b76f8f4a3[&quot;Model View Element Navigation Test&quot;];
-      class 991bc25b76f8f4a3 verification;
-      click 991bc25b76f8f4a3 &quot;Verifications/WebInterfaceVerifications.html#model-view-element-navigation-test&quot;;
-      6b3462d7df6e97c7[&quot;Serve Command Verification&quot;];
-      class 6b3462d7df6e97c7 verification;
-      click 6b3462d7df6e97c7 &quot;Verifications/WebInterfaceVerifications.html#serve-command-verification&quot;;
+    subgraph ac7dec238a8434fa["📄 WebInterface.md"]
+      83159aec9844792d["Attachment Export"];
+      class 83159aec9844792d systemRequirement;
+      click 83159aec9844792d "WebInterface.html#attachment-export";
+      c85f9aad190ad77a["Containment View Attachment Links"];
+      class c85f9aad190ad77a systemRequirement;
+      click c85f9aad190ad77a "WebInterface.html#containment-view-attachment-links";
+      4778760f733ed81b["Diagram Attachment Display<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification"];
+      class 4778760f733ed81b systemRequirement;
+      click 4778760f733ed81b "WebInterface.html#diagram-attachment-display";
+      14e955af5317bb0b["HTML Export<br/>📎 requirements/Interfaces/Behaviors.md#web-interface-navigation-behavior"];
+      class 14e955af5317bb0b systemRequirement;
+      click 14e955af5317bb0b "WebInterface.html#html-export";
+      41f55efb97fa8524["Model-Centric View Generation<br/>📎 requirements/System/Output/Specifications.md#mermaid-diagram-style-specification"];
+      class 41f55efb97fa8524 systemRequirement;
+      click 41f55efb97fa8524 "WebInterface.html#model-centric-view-generation";
+      36e21bcf5a3439df["Model View Element Navigation"];
+      class 36e21bcf5a3439df systemRequirement;
+      click 36e21bcf5a3439df "WebInterface.html#model-view-element-navigation";
+      1d4f213aefbd303a["Serve Command"];
+      class 1d4f213aefbd303a systemRequirement;
+      click 1d4f213aefbd303a "WebInterface.html#serve-command";
+      56cebc7215550cde["Web Interface Color Scheme"];
+      class 56cebc7215550cde systemRequirement;
+      click 56cebc7215550cde "WebInterface.html#web-interface-color-scheme";
     end
   end
-  subgraph 59af30609eb6d57c[&quot;📁 requirements/System/Output&quot;]
-    subgraph d9d3d619c8b2406e[&quot;📄 Specifications.md&quot;]
-      8a232f071d3fa417[&quot;Color Scheme Specification&quot;];
-      class 8a232f071d3fa417 default;
-      click 8a232f071d3fa417 &quot;../System/Output/Specifications.html#color-scheme-specification&quot;;
+  subgraph fa1ef16db3841757["📁 requirements/Interfaces/Verifications"]
+    subgraph 8f2f862ef196b492["📄 CLIVerifications.md"]
+      59201973ca89cfb4["CLI Help Structure Verification"];
+      class 59201973ca89cfb4 verification;
+      click 59201973ca89cfb4 "Verifications/CLIVerifications.html#cli-help-structure-verification";
+    end
+    subgraph ca464d6f78eddafc["📄 WebInterfaceVerifications.md"]
+      2659ed8cf83c501["Attachment Export Verification"];
+      class 2659ed8cf83c501 verification;
+      click 2659ed8cf83c501 "Verifications/WebInterfaceVerifications.html#attachment-export-verification";
+      12a55eab8544e612["Containment Attachment Links Verification"];
+      class 12a55eab8544e612 verification;
+      click 12a55eab8544e612 "Verifications/WebInterfaceVerifications.html#containment-attachment-links-verification";
+      a7aa7de717438d08["Diagram Attachment Display Verification"];
+      class a7aa7de717438d08 verification;
+      click a7aa7de717438d08 "Verifications/WebInterfaceVerifications.html#diagram-attachment-display-verification";
+      416aa735487a5d0b["HTML Export Verification"];
+      class 416aa735487a5d0b verification;
+      click 416aa735487a5d0b "Verifications/WebInterfaceVerifications.html#html-export-verification";
+      5c54c55943cf93d8["Model View Element Navigation Test"];
+      class 5c54c55943cf93d8 verification;
+      click 5c54c55943cf93d8 "Verifications/WebInterfaceVerifications.html#model-view-element-navigation-test";
+      8dae89044d5fb97d["Serve Command Verification"];
+      class 8dae89044d5fb97d verification;
+      click 8dae89044d5fb97d "Verifications/WebInterfaceVerifications.html#serve-command-verification";
     end
   end
-  345c82cd34408acb[&quot;export.rs&quot;];
-  class 345c82cd34408acb default;
-  click 345c82cd34408acb &quot;../../core/src/export.rs&quot;;
-  9548618d67bf80fd -->|satisfiedBy| 345c82cd34408acb;
-  9548618d67bf80fd -.->|verifiedBy| 6b82beacdfe5cb16;
-  2ab7d933a525a383[&quot;containment.rs&quot;];
-  class 2ab7d933a525a383 default;
-  click 2ab7d933a525a383 &quot;../../core/src/containment.rs&quot;;
-  7b6511f887489bc1 -->|satisfiedBy| 2ab7d933a525a383;
-  7b6511f887489bc1 -.->|verifiedBy| 3eba0fc81a8f5376;
-  dad7eeb932afdb92[&quot;diagrams.rs&quot;];
-  class dad7eeb932afdb92 default;
-  click dad7eeb932afdb92 &quot;../../core/src/diagrams.rs&quot;;
-  a12088ce3af75577 -->|satisfiedBy| dad7eeb932afdb92;
-  a12088ce3af75577 -.->|verifiedBy| 22440e2b04a21e0d;
-  7cee348e5d230f20 -.->|deriveReqT| 9548618d67bf80fd;
-  7cee348e5d230f20 -.->|deriveReqT| 7b6511f887489bc1;
-  7cee348e5d230f20 -.->|deriveReqT| a12088ce3af75577;
-  7cee348e5d230f20 -.->|deriveReqT| 287f6140c4c9ba05;
-  7cee348e5d230f20 -.->|deriveReqT| 17774b4ce265515;
-  80defdd4cbc7ee18[&quot;cli.rs&quot;];
-  class 80defdd4cbc7ee18 default;
-  click 80defdd4cbc7ee18 &quot;../../cli/src/cli.rs&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| 80defdd4cbc7ee18;
-  7cee348e5d230f20 -->|satisfiedBy| 345c82cd34408acb;
-  d0e6cc47b904faa5[&quot;html.rs&quot;];
-  class d0e6cc47b904faa5 default;
-  click d0e6cc47b904faa5 &quot;../../core/src/html.rs&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| d0e6cc47b904faa5;
-  c3d63c5d4133e346[&quot;html_export.rs&quot;];
-  class c3d63c5d4133e346 default;
-  click c3d63c5d4133e346 &quot;../../core/src/html_export.rs&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| c3d63c5d4133e346;
-  1a173441705701a0[&quot;index_generator.rs&quot;];
-  class 1a173441705701a0 default;
-  click 1a173441705701a0 &quot;../../core/src/index_generator.rs&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| 1a173441705701a0;
-  3a807a8535fb41fa[&quot;base.html&quot;];
-  class 3a807a8535fb41fa default;
-  click 3a807a8535fb41fa &quot;../../core/templates/base.html&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| 3a807a8535fb41fa;
-  c196fa9b3e2c2258[&quot;model.html&quot;];
-  class c196fa9b3e2c2258 default;
-  click c196fa9b3e2c2258 &quot;../../core/templates/model.html&quot;;
-  7cee348e5d230f20 -->|satisfiedBy| c196fa9b3e2c2258;
-  7cee348e5d230f20 -.->|verifiedBy| 7ce243221ec8f143;
-  7cee348e5d230f20 -.->|verifiedBy| 3b945d4fc7ba69e7;
-  287f6140c4c9ba05 -.->|deriveReqT| f2578977bd9395ad;
-  287f6140c4c9ba05 -->|satisfiedBy| 345c82cd34408acb;
-  ee222ed1a55fa477[&quot;report_model.rs&quot;];
-  class ee222ed1a55fa477 default;
-  click ee222ed1a55fa477 &quot;../../core/src/report_model.rs&quot;;
-  287f6140c4c9ba05 -->|satisfiedBy| ee222ed1a55fa477;
-  f2578977bd9395ad -->|satisfiedBy| ee222ed1a55fa477;
-  f2578977bd9395ad -.->|verifiedBy| 991bc25b76f8f4a3;
-  7afe0ab429e8f97f -->|satisfiedBy| 80defdd4cbc7ee18;
-  e313808f7a755f6[&quot;serve.rs&quot;];
-  class e313808f7a755f6 default;
-  click e313808f7a755f6 &quot;../../cli/src/serve.rs&quot;;
-  7afe0ab429e8f97f -->|satisfiedBy| e313808f7a755f6;
-  7afe0ab429e8f97f -.->|trace| a867b4bb3e22cabf;
-  7afe0ab429e8f97f -.->|verifiedBy| 6b3462d7df6e97c7;
-  17774b4ce265515 -->|satisfiedBy| 2ab7d933a525a383;
-  17774b4ce265515 -->|satisfiedBy| d0e6cc47b904faa5;
-  17774b4ce265515 -->|satisfiedBy| 3a807a8535fb41fa;
-  17774b4ce265515 -->|satisfiedBy| 8a232f071d3fa417;
-  443f72e06773b2fa[&quot;test.sh&quot;];
-  class 443f72e06773b2fa default;
-  click 443f72e06773b2fa &quot;../../tests/test-attachment-export/test.sh&quot;;
-  6b82beacdfe5cb16 -->|satisfiedBy| 443f72e06773b2fa;
-  3eba0fc81a8f5376 -->|satisfiedBy| 443f72e06773b2fa;
-  22440e2b04a21e0d -->|satisfiedBy| 443f72e06773b2fa;
-  6fb925575a1602f1[&quot;test.sh&quot;];
-  class 6fb925575a1602f1 default;
-  click 6fb925575a1602f1 &quot;../../tests/test-cli-help-structure/test.sh&quot;;
-  7ce243221ec8f143 -->|satisfiedBy| 6fb925575a1602f1;
-  8899a52ea9866d8b[&quot;test.sh&quot;];
-  class 8899a52ea9866d8b default;
-  click 8899a52ea9866d8b &quot;../../tests/test-html-export/test.sh&quot;;
-  3b945d4fc7ba69e7 -->|satisfiedBy| 8899a52ea9866d8b;
-  e3433ff5bc275516[&quot;test.sh&quot;];
-  class e3433ff5bc275516 default;
-  click e3433ff5bc275516 &quot;../../tests/test-model-command/test.sh&quot;;
-  991bc25b76f8f4a3 -->|satisfiedBy| e3433ff5bc275516;
-  a867b4bb3e22cabf -->|satisfiedBy| 80defdd4cbc7ee18;
-  a867b4bb3e22cabf -.->|verifiedBy| 7ce243221ec8f143;
-  a867b4bb3e22cabf -.->|verifiedBy| 23a09f2d69fc3b23;
-  dd6732f292fab4eb[&quot;test.sh&quot;];
-  class dd6732f292fab4eb default;
-  click dd6732f292fab4eb &quot;../../tests/test-serve-command/test.sh&quot;;
-  6b3462d7df6e97c7 -->|satisfiedBy| dd6732f292fab4eb;
+  subgraph 7abe7cd3649051be["📁 requirements/System/Output"]
+    subgraph 27bc2bce1f269eda["📄 Specifications.md"]
+      ed20c9b77fc44f9c["Color Scheme Specification"];
+      class ed20c9b77fc44f9c default;
+      click ed20c9b77fc44f9c "../System/Output/Specifications.html#color-scheme-specification";
+    end
+  end
+  bd747195bcfe94dd["export.rs"];
+  class bd747195bcfe94dd default;
+  click bd747195bcfe94dd "../../core/src/export.rs";
+  83159aec9844792d -->|satisfiedBy| bd747195bcfe94dd;
+  83159aec9844792d -.->|verifiedBy| 2659ed8cf83c501;
+  4a8772cb0c75593a["containment.rs"];
+  class 4a8772cb0c75593a default;
+  click 4a8772cb0c75593a "../../core/src/containment.rs";
+  c85f9aad190ad77a -->|satisfiedBy| 4a8772cb0c75593a;
+  c85f9aad190ad77a -.->|verifiedBy| 12a55eab8544e612;
+  d4166762363eb31d["diagrams.rs"];
+  class d4166762363eb31d default;
+  click d4166762363eb31d "../../core/src/diagrams.rs";
+  4778760f733ed81b -->|satisfiedBy| d4166762363eb31d;
+  4778760f733ed81b -.->|verifiedBy| a7aa7de717438d08;
+  14e955af5317bb0b -.->|deriveReqT| 83159aec9844792d;
+  14e955af5317bb0b -.->|deriveReqT| c85f9aad190ad77a;
+  14e955af5317bb0b -.->|deriveReqT| 4778760f733ed81b;
+  14e955af5317bb0b -.->|deriveReqT| 41f55efb97fa8524;
+  14e955af5317bb0b -.->|deriveReqT| 56cebc7215550cde;
+  25bf5cc42f41e395["cli.rs"];
+  class 25bf5cc42f41e395 default;
+  click 25bf5cc42f41e395 "../../cli/src/cli.rs";
+  14e955af5317bb0b -->|satisfiedBy| 25bf5cc42f41e395;
+  14e955af5317bb0b -->|satisfiedBy| bd747195bcfe94dd;
+  fb8158427d2fd55c["html.rs"];
+  class fb8158427d2fd55c default;
+  click fb8158427d2fd55c "../../core/src/html.rs";
+  14e955af5317bb0b -->|satisfiedBy| fb8158427d2fd55c;
+  68fef32bd3e3323d["html_export.rs"];
+  class 68fef32bd3e3323d default;
+  click 68fef32bd3e3323d "../../core/src/html_export.rs";
+  14e955af5317bb0b -->|satisfiedBy| 68fef32bd3e3323d;
+  b4e855d4c9269f88["index_generator.rs"];
+  class b4e855d4c9269f88 default;
+  click b4e855d4c9269f88 "../../core/src/index_generator.rs";
+  14e955af5317bb0b -->|satisfiedBy| b4e855d4c9269f88;
+  84be222e135b89cb["base.html"];
+  class 84be222e135b89cb default;
+  click 84be222e135b89cb "../../core/templates/base.html";
+  14e955af5317bb0b -->|satisfiedBy| 84be222e135b89cb;
+  82ff2e2c4a363e59["model.html"];
+  class 82ff2e2c4a363e59 default;
+  click 82ff2e2c4a363e59 "../../core/templates/model.html";
+  14e955af5317bb0b -->|satisfiedBy| 82ff2e2c4a363e59;
+  14e955af5317bb0b -->|satisfiedBy| 19bf972ca85f2b44;
+  14e955af5317bb0b -.->|verifiedBy| 59201973ca89cfb4;
+  14e955af5317bb0b -.->|verifiedBy| 416aa735487a5d0b;
+  41f55efb97fa8524 -.->|deriveReqT| 36e21bcf5a3439df;
+  41f55efb97fa8524 -->|satisfiedBy| bd747195bcfe94dd;
+  b2113c1b9405a723["report_model.rs"];
+  class b2113c1b9405a723 default;
+  click b2113c1b9405a723 "../../core/src/report_model.rs";
+  41f55efb97fa8524 -->|satisfiedBy| b2113c1b9405a723;
+  36e21bcf5a3439df -->|satisfiedBy| b2113c1b9405a723;
+  36e21bcf5a3439df -.->|verifiedBy| 5c54c55943cf93d8;
+  1d4f213aefbd303a -->|satisfiedBy| 25bf5cc42f41e395;
+  70c4d955a4bb93c["serve.rs"];
+  class 70c4d955a4bb93c default;
+  click 70c4d955a4bb93c "../../cli/src/serve.rs";
+  1d4f213aefbd303a -->|satisfiedBy| 70c4d955a4bb93c;
+  1d4f213aefbd303a -.->|trace| ce8de49bd88dd05e;
+  1d4f213aefbd303a -.->|verifiedBy| 8dae89044d5fb97d;
+  56cebc7215550cde -->|satisfiedBy| 4a8772cb0c75593a;
+  56cebc7215550cde -->|satisfiedBy| fb8158427d2fd55c;
+  56cebc7215550cde -->|satisfiedBy| 84be222e135b89cb;
+  56cebc7215550cde -->|satisfiedBy| ed20c9b77fc44f9c;
+  6da864fbba49def6["test.sh"];
+  class 6da864fbba49def6 default;
+  click 6da864fbba49def6 "../../tests/test-attachment-export/test.sh";
+  2659ed8cf83c501 -->|satisfiedBy| 6da864fbba49def6;
+  12a55eab8544e612 -->|satisfiedBy| 6da864fbba49def6;
+  a7aa7de717438d08 -->|satisfiedBy| 6da864fbba49def6;
+  7478201b4d47e866["test.sh"];
+  class 7478201b4d47e866 default;
+  click 7478201b4d47e866 "../../tests/test-cli-help-structure/test.sh";
+  59201973ca89cfb4 -->|satisfiedBy| 7478201b4d47e866;
+  7f5ed48bc960d276["test.sh"];
+  class 7f5ed48bc960d276 default;
+  click 7f5ed48bc960d276 "../../tests/test-html-export/test.sh";
+  416aa735487a5d0b -->|satisfiedBy| 7f5ed48bc960d276;
+  df92bf508f2f7295["test.sh"];
+  class df92bf508f2f7295 default;
+  click df92bf508f2f7295 "../../tests/test-model-command/test.sh";
+  5c54c55943cf93d8 -->|satisfiedBy| df92bf508f2f7295;
+  ce8de49bd88dd05e -->|satisfiedBy| 25bf5cc42f41e395;
+  ce8de49bd88dd05e -.->|verifiedBy| 59201973ca89cfb4;
+  ce8de49bd88dd05e -.->|verifiedBy| 5f81a4c479783a7;
+  b2e17101035a75d["test.sh"];
+  class b2e17101035a75d default;
+  click b2e17101035a75d "../../tests/test-serve-command/test.sh";
+  8dae89044d5fb97d -->|satisfiedBy| b2e17101035a75d;
 </div>
 <h3 id="html-export">HTML Export</h3>
 <p>The system SHALL generate comprehensive HTML documentation with all model artifacts by creating a temporary working copy, generating all reports in that copy, and exporting to the output directory.</p>
@@ -978,9 +984,12 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>Apple touch icons shall be included for mobile device support</li>
 <li>All brand assets shall be exported to an assets folder during HTML export</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="Specifications.html#web-interface-style-specification">Web Interface Style Specification</a></li>
 <li><a href="Behaviors.html#web-interface-navigation-behavior">Web Interface Navigation Behavior</a></li>
 </ul>
 <h4>Relations</h4>
@@ -998,6 +1007,7 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>satisfiedBy: <a href="../../core/src/index_generator.rs">index_generator.rs</a></li>
 <li>satisfiedBy: <a href="../../core/templates/base.html">base.html</a></li>
 <li>satisfiedBy: <a href="../../core/templates/model.html">model.html</a></li>
+<li>satisfiedBy: <a href="Specifications.html#web-interface-style-specification">Web Interface Style Specification</a></li>
 <li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
 <li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#html-export-verification">HTML Export Verification</a></li>
 </ul>
@@ -1013,6 +1023,10 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>Log attachment copying progress</li>
 </ul>
 <p>This ensures exported documentation includes all referenced external documents (PDFs, design documents, etc.) for complete offline browsing.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#html-export">HTML Export</a></li>
@@ -1030,6 +1044,10 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>File attachments use paperclip icon (📎) with type <code>attachment-file</code></li>
 <li>Element attachments are clickable and navigate to the referenced element</li>
 <li>File attachments show filename and path for reference</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1050,8 +1068,12 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>Format using Mermaid’s multiline label syntax (<code>&lt;br/&gt;</code>)</li>
 </ul>
 <p>Example Mermaid node:</p>
-<pre><code>elementId[&quot;Element Name&lt;br/&gt;📎 DesignDoc.md&quot;]
+<pre><code>elementId["Element Name&lt;br/&gt;📎 DesignDoc.md"]
 </code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="../System/Output/Specifications.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
@@ -1073,6 +1095,10 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>Generate mermaid diagrams showing all nested relations</li>
 <li>Output as markdown with embedded visualizations (model.html)</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="../System/Output/Specifications.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
@@ -1093,6 +1119,10 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>Links shall point to the element’s source file with fragment identifier</li>
 <li>Format: <code>[Element Name](file_path#element-fragment)</code></li>
 <li>Enables direct navigation from model view to element definition</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1118,10 +1148,9 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>Mermaid diagram rendering</li>
 <li>D3.js containment tree visualization</li>
 </ul>
-<h4>Attachments</h4>
+<h4>Metadata</h4>
 <ul>
-<li><a href="../System/Output/Specifications.html#color-scheme-specification">Color Scheme Specification</a></li>
-<li><a href="Specifications.html#web-interface-style-specification">Web Interface Style Specification</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1145,6 +1174,10 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>Display clickable server URL for user to open in browser</li>
 <li>Display instructions to press Ctrl-C to stop server</li>
 <li>Continue serving until terminated by the user (Ctrl-C)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>

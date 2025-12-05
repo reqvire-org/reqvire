@@ -735,133 +735,156 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
-    subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
-      bbe4bfafe31e5f09[&quot;Excluded File Relation Validation&quot;];
-      class bbe4bfafe31e5f09 systemRequirement;
-      click bbe4bfafe31e5f09 &quot;../Core/Validation.html#excluded-file-relation-validation&quot;;
+  subgraph 9e5f55ddfed5810b["📁 requirements/System/Core"]
+    subgraph 82c374faeb59ab1f["📄 Validation.md"]
+      b6c706397d797eee["Excluded File Relation Validation"];
+      class b6c706397d797eee systemRequirement;
+      click b6c706397d797eee "../Core/Validation.html#excluded-file-relation-validation";
     end
   end
-  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
-    subgraph 76dc8a8951f1adad[&quot;📄 Formatting.md&quot;]
-      61bb064413777e7d[&quot;Document Structure Normalization<br/>📎 requirements/System/Operations/Specifications.md#document-structure-specification&quot;];
-      class 61bb064413777e7d systemRequirement;
-      click 61bb064413777e7d &quot;Formatting.html#document-structure-normalization&quot;;
-      a446aaa2a629e38f[&quot;Element Ordering Normalization<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
-      class a446aaa2a629e38f systemRequirement;
-      click a446aaa2a629e38f &quot;Formatting.html#element-ordering-normalization&quot;;
-      3e259233db2e4d25[&quot;File Pattern Exclusion for Format&quot;];
-      class 3e259233db2e4d25 systemRequirement;
-      click 3e259233db2e4d25 &quot;Formatting.html#file-pattern-exclusion-for-format&quot;;
-      bf4135d4f544e1c[&quot;Format Consistency Enforcement<br/>📎 requirements/System/Operations/Specifications.md#format-consistency-specification&quot;];
-      class bf4135d4f544e1c systemRequirement;
-      click bf4135d4f544e1c &quot;Formatting.html#format-consistency-enforcement&quot;;
-      151b5c7a2cdfda2f[&quot;Formatting Output&quot;];
-      class 151b5c7a2cdfda2f systemRequirement;
-      click 151b5c7a2cdfda2f &quot;Formatting.html#formatting-output&quot;;
-      28d990cbf4db1b00[&quot;Full Relations Insertion<br/>📎 RelationTypes.md&quot;];
-      class 28d990cbf4db1b00 systemRequirement;
-      click 28d990cbf4db1b00 &quot;Formatting.html#full-relations-insertion&quot;;
-      40923d5efba35c34[&quot;Git-Style Diff Output for Format&quot;];
-      class 40923d5efba35c34 userRequirement;
-      click 40923d5efba35c34 &quot;Formatting.html#git-style-diff-output-for-format&quot;;
-      a2cb15bef87bc2ca[&quot;Model Formatting&quot;];
-      class a2cb15bef87bc2ca userRequirement;
-      click a2cb15bef87bc2ca &quot;Formatting.html#model-formatting&quot;;
-      8ef7660c853b898a[&quot;Relation Ordering Normalization<br/>📎 requirements/System/Operations/Specifications.md#relation-ordering-specification&quot;];
-      class 8ef7660c853b898a systemRequirement;
-      click 8ef7660c853b898a &quot;Formatting.html#relation-ordering-normalization&quot;;
-      9ead49b4bdac9bb2[&quot;Replace Absolute Links with Relative Links&quot;];
-      class 9ead49b4bdac9bb2 systemRequirement;
-      click 9ead49b4bdac9bb2 &quot;Formatting.html#replace-absolute-links-with-relative-links&quot;;
+  subgraph f97b31ef8bb9beb2["📁 requirements/System/Operations"]
+    subgraph 2e0fed16c29dc496["📄 Behaviors.md"]
+      d15621c5d512077b["Format Duplicate Removal Behavior"];
+      class d15621c5d512077b default;
+      click d15621c5d512077b "Behaviors.html#format-duplicate-removal-behavior";
     end
-    subgraph 13f813da82130a33[&quot;📄 Specifications.md&quot;]
-      319b7987b8267c37[&quot;Document Structure Specification&quot;];
-      class 319b7987b8267c37 default;
-      click 319b7987b8267c37 &quot;Specifications.html#document-structure-specification&quot;;
-      5922c01ef3d62086[&quot;Format Consistency Specification&quot;];
-      class 5922c01ef3d62086 default;
-      click 5922c01ef3d62086 &quot;Specifications.html#format-consistency-specification&quot;;
-      b0ff2a4698cc55f4[&quot;Relation Ordering Specification&quot;];
-      class b0ff2a4698cc55f4 default;
-      click b0ff2a4698cc55f4 &quot;Specifications.html#relation-ordering-specification&quot;;
+    subgraph f847acb9fd91c378["📄 Formatting.md"]
+      f39435021cb66e4b["Document Structure Normalization"];
+      class f39435021cb66e4b systemRequirement;
+      click f39435021cb66e4b "Formatting.html#document-structure-normalization";
+      9932fbe0ed2d74af["Element Ordering Normalization<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior"];
+      class 9932fbe0ed2d74af systemRequirement;
+      click 9932fbe0ed2d74af "Formatting.html#element-ordering-normalization";
+      c14e144ea79438bb["File Pattern Exclusion for Format"];
+      class c14e144ea79438bb systemRequirement;
+      click c14e144ea79438bb "Formatting.html#file-pattern-exclusion-for-format";
+      6cac299af6d6729b["Format Consistency Enforcement"];
+      class 6cac299af6d6729b systemRequirement;
+      click 6cac299af6d6729b "Formatting.html#format-consistency-enforcement";
+      df89f1cf4b62e103["Format Duplicate Removal"];
+      class df89f1cf4b62e103 systemRequirement;
+      click df89f1cf4b62e103 "Formatting.html#format-duplicate-removal";
+      1debd0c38479c1a7["Formatting Output"];
+      class 1debd0c38479c1a7 systemRequirement;
+      click 1debd0c38479c1a7 "Formatting.html#formatting-output";
+      a12662010b5497e6["Full Relations Insertion<br/>📎 RelationTypes.md"];
+      class a12662010b5497e6 systemRequirement;
+      click a12662010b5497e6 "Formatting.html#full-relations-insertion";
+      de29cec8f349c2c7["Git-Style Diff Output for Format"];
+      class de29cec8f349c2c7 userRequirement;
+      click de29cec8f349c2c7 "Formatting.html#git-style-diff-output-for-format";
+      6b2f557333e6e20e["Model Formatting"];
+      class 6b2f557333e6e20e userRequirement;
+      click 6b2f557333e6e20e "Formatting.html#model-formatting";
+      5abd6d5534486e97["Relation Ordering Normalization"];
+      class 5abd6d5534486e97 systemRequirement;
+      click 5abd6d5534486e97 "Formatting.html#relation-ordering-normalization";
+      9f38b218987142db["Replace Absolute Links with Relative Links"];
+      class 9f38b218987142db systemRequirement;
+      click 9f38b218987142db "Formatting.html#replace-absolute-links-with-relative-links";
     end
-  end
-  subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
-    subgraph 5fdb7c9d75d9c8bf[&quot;📄 FormattingVerifications.md&quot;]
-      934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
-      class 934319026295f62c verification;
-      click 934319026295f62c &quot;Verifications/FormattingVerifications.html#element-ordering-verification&quot;;
-      723757d62c730981[&quot;Format Command Requirements Verification&quot;];
-      class 723757d62c730981 verification;
-      click 723757d62c730981 &quot;Verifications/FormattingVerifications.html#format-command-requirements-verification&quot;;
-      6d1f64516c7eb3bb[&quot;Full Relations Insertion Verification&quot;];
-      class 6d1f64516c7eb3bb verification;
-      click 6d1f64516c7eb3bb &quot;Verifications/FormattingVerifications.html#full-relations-insertion-verification&quot;;
-      de9c99ddb7e13f89[&quot;Relation Ordering Verification&quot;];
-      class de9c99ddb7e13f89 verification;
-      click de9c99ddb7e13f89 &quot;Verifications/FormattingVerifications.html#relation-ordering-verification&quot;;
+    subgraph 4ca803dc4703689d["📄 Specifications.md"]
+      c1719a07ca1ee33c["Document Structure Specification"];
+      class c1719a07ca1ee33c default;
+      click c1719a07ca1ee33c "Specifications.html#document-structure-specification";
+      b41fc564c1da22b["Format Consistency Specification"];
+      class b41fc564c1da22b default;
+      click b41fc564c1da22b "Specifications.html#format-consistency-specification";
+      4dbe79da4a2a6c96["Relation Ordering Specification"];
+      class 4dbe79da4a2a6c96 default;
+      click 4dbe79da4a2a6c96 "Specifications.html#relation-ordering-specification";
     end
   end
-  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
-  class b7c871ab64a7059a default;
-  click b7c871ab64a7059a &quot;../../../core/src/graph_registry.rs&quot;;
-  61bb064413777e7d -->|satisfiedBy| b7c871ab64a7059a;
-  f22d93285fcd7664[&quot;parser.rs&quot;];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
-  61bb064413777e7d -->|satisfiedBy| f22d93285fcd7664;
-  61bb064413777e7d -->|satisfiedBy| 319b7987b8267c37;
-  61bb064413777e7d -.->|verifiedBy| 723757d62c730981;
-  a446aaa2a629e38f -.->|verifiedBy| 934319026295f62c;
-  3e259233db2e4d25 -.->|deriveReqT| bbe4bfafe31e5f09;
-  ce2625feec883e55[&quot;utils.rs&quot;];
-  class ce2625feec883e55 default;
-  click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
-  3e259233db2e4d25 -->|satisfiedBy| ce2625feec883e55;
-  bf4135d4f544e1c -.->|deriveReqT| 61bb064413777e7d;
-  bf4135d4f544e1c -.->|deriveReqT| a446aaa2a629e38f;
-  bf4135d4f544e1c -.->|deriveReqT| 8ef7660c853b898a;
-  8fbf4ca0471377ea[&quot;format.rs&quot;];
-  class 8fbf4ca0471377ea default;
-  click 8fbf4ca0471377ea &quot;../../../core/src/format.rs&quot;;
-  bf4135d4f544e1c -->|satisfiedBy| 8fbf4ca0471377ea;
-  bf4135d4f544e1c -->|satisfiedBy| 5922c01ef3d62086;
-  bf4135d4f544e1c -.->|verifiedBy| 723757d62c730981;
-  151b5c7a2cdfda2f -.->|deriveReqT| 40923d5efba35c34;
-  28d990cbf4db1b00 -.->|verifiedBy| 6d1f64516c7eb3bb;
-  e69395f926bba6a5[&quot;diff.rs&quot;];
-  class e69395f926bba6a5 default;
-  click e69395f926bba6a5 &quot;../../../core/src/diff.rs&quot;;
-  40923d5efba35c34 -->|satisfiedBy| e69395f926bba6a5;
-  40923d5efba35c34 -->|satisfiedBy| 8fbf4ca0471377ea;
-  40923d5efba35c34 -.->|verifiedBy| 723757d62c730981;
-  a2cb15bef87bc2ca -.->|deriveReqT| bf4135d4f544e1c;
-  a2cb15bef87bc2ca -.->|deriveReqT| 151b5c7a2cdfda2f;
-  a2cb15bef87bc2ca -.->|deriveReqT| 28d990cbf4db1b00;
-  a2cb15bef87bc2ca -.->|deriveReqT| 9ead49b4bdac9bb2;
-  8ef7660c853b898a -->|satisfiedBy| b7c871ab64a7059a;
-  8ef7660c853b898a -->|satisfiedBy| b0ff2a4698cc55f4;
-  8ef7660c853b898a -.->|verifiedBy| de9c99ddb7e13f89;
-  9ead49b4bdac9bb2 -.->|verifiedBy| 723757d62c730981;
-  eaf33ce1e6113c8a[&quot;test.sh&quot;];
-  class eaf33ce1e6113c8a default;
-  click eaf33ce1e6113c8a &quot;../../../tests/test-advanced-format/test.sh&quot;;
-  723757d62c730981 -->|satisfiedBy| eaf33ce1e6113c8a;
-  743d877eaae55d53[&quot;test.sh&quot;];
-  class 743d877eaae55d53 default;
-  click 743d877eaae55d53 &quot;../../../tests/test-element-ordering/test.sh&quot;;
-  934319026295f62c -->|satisfiedBy| 743d877eaae55d53;
-  bbe4bfafe31e5f09 -->|satisfiedBy| f22d93285fcd7664;
-  bbe4bfafe31e5f09 -.->|verifiedBy| 90310f1e5378f4b2;
-  8c631136f1cd90f[&quot;test.sh&quot;];
-  class 8c631136f1cd90f default;
-  click 8c631136f1cd90f &quot;../../../tests/test-format-full-relations/test.sh&quot;;
-  6d1f64516c7eb3bb -->|satisfiedBy| 8c631136f1cd90f;
-  de9c99ddb7e13f89 -->|satisfiedBy| eaf33ce1e6113c8a;
+  subgraph d4f6f1eb956473cf["📁 requirements/System/Operations/Verifications"]
+    subgraph 9dfdb29c8515e24d["📄 FormattingVerifications.md"]
+      706b78390900580d["Element Ordering Verification<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior"];
+      class 706b78390900580d verification;
+      click 706b78390900580d "Verifications/FormattingVerifications.html#element-ordering-verification";
+      afe734eb25af0948["Format Command Requirements Verification"];
+      class afe734eb25af0948 verification;
+      click afe734eb25af0948 "Verifications/FormattingVerifications.html#format-command-requirements-verification";
+      fd4eddc1dfcd11cc["Format Duplicate Removal Test"];
+      class fd4eddc1dfcd11cc verification;
+      click fd4eddc1dfcd11cc "Verifications/FormattingVerifications.html#format-duplicate-removal-test";
+      c9dbeddcef9622ec["Full Relations Insertion Verification"];
+      class c9dbeddcef9622ec verification;
+      click c9dbeddcef9622ec "Verifications/FormattingVerifications.html#full-relations-insertion-verification";
+      4260d1115e565ab9["Relation Ordering Verification"];
+      class 4260d1115e565ab9 verification;
+      click 4260d1115e565ab9 "Verifications/FormattingVerifications.html#relation-ordering-verification";
+    end
+  end
+  95cf526671ec752c["graph_registry.rs"];
+  class 95cf526671ec752c default;
+  click 95cf526671ec752c "../../../core/src/graph_registry.rs";
+  f39435021cb66e4b -->|satisfiedBy| 95cf526671ec752c;
+  35bd98d101f36b62["parser.rs"];
+  class 35bd98d101f36b62 default;
+  click 35bd98d101f36b62 "../../../core/src/parser.rs";
+  f39435021cb66e4b -->|satisfiedBy| 35bd98d101f36b62;
+  f39435021cb66e4b -->|satisfiedBy| c1719a07ca1ee33c;
+  f39435021cb66e4b -.->|verifiedBy| afe734eb25af0948;
+  9932fbe0ed2d74af -.->|verifiedBy| 706b78390900580d;
+  c14e144ea79438bb -.->|deriveReqT| b6c706397d797eee;
+  bdf9762d399478a5["utils.rs"];
+  class bdf9762d399478a5 default;
+  click bdf9762d399478a5 "../../../core/src/utils.rs";
+  c14e144ea79438bb -->|satisfiedBy| bdf9762d399478a5;
+  6cac299af6d6729b -.->|deriveReqT| f39435021cb66e4b;
+  6cac299af6d6729b -.->|deriveReqT| 9932fbe0ed2d74af;
+  6cac299af6d6729b -.->|deriveReqT| df89f1cf4b62e103;
+  6cac299af6d6729b -.->|deriveReqT| 5abd6d5534486e97;
+  79d54e418e36893["format.rs"];
+  class 79d54e418e36893 default;
+  click 79d54e418e36893 "../../../core/src/format.rs";
+  6cac299af6d6729b -->|satisfiedBy| 79d54e418e36893;
+  6cac299af6d6729b -->|satisfiedBy| b41fc564c1da22b;
+  6cac299af6d6729b -.->|verifiedBy| afe734eb25af0948;
+  df89f1cf4b62e103 -->|satisfiedBy| 79d54e418e36893;
+  df89f1cf4b62e103 -->|satisfiedBy| d15621c5d512077b;
+  df89f1cf4b62e103 -.->|verifiedBy| fd4eddc1dfcd11cc;
+  1debd0c38479c1a7 -.->|deriveReqT| de29cec8f349c2c7;
+  a12662010b5497e6 -.->|verifiedBy| c9dbeddcef9622ec;
+  d07e49b06be4058e["diff.rs"];
+  class d07e49b06be4058e default;
+  click d07e49b06be4058e "../../../core/src/diff.rs";
+  de29cec8f349c2c7 -->|satisfiedBy| d07e49b06be4058e;
+  de29cec8f349c2c7 -->|satisfiedBy| 79d54e418e36893;
+  de29cec8f349c2c7 -.->|verifiedBy| afe734eb25af0948;
+  6b2f557333e6e20e -.->|deriveReqT| 6cac299af6d6729b;
+  6b2f557333e6e20e -.->|deriveReqT| 1debd0c38479c1a7;
+  6b2f557333e6e20e -.->|deriveReqT| a12662010b5497e6;
+  6b2f557333e6e20e -.->|deriveReqT| 9f38b218987142db;
+  5abd6d5534486e97 -->|satisfiedBy| 95cf526671ec752c;
+  5abd6d5534486e97 -->|satisfiedBy| 4dbe79da4a2a6c96;
+  5abd6d5534486e97 -.->|verifiedBy| 4260d1115e565ab9;
+  9f38b218987142db -.->|verifiedBy| afe734eb25af0948;
+  aaf45a054cfa1d47["test.sh"];
+  class aaf45a054cfa1d47 default;
+  click aaf45a054cfa1d47 "../../../tests/test-advanced-format/test.sh";
+  afe734eb25af0948 -->|satisfiedBy| aaf45a054cfa1d47;
+  81623fde4ecde03d["test.sh"];
+  class 81623fde4ecde03d default;
+  click 81623fde4ecde03d "../../../tests/test-element-ordering/test.sh";
+  706b78390900580d -->|satisfiedBy| 81623fde4ecde03d;
+  b6c706397d797eee -->|satisfiedBy| 35bd98d101f36b62;
+  b6c706397d797eee -.->|verifiedBy| a4fc014ce222c175;
+  4179509ffe0be04b["test.sh"];
+  class 4179509ffe0be04b default;
+  click 4179509ffe0be04b "../../../tests/test-duplicate-detection/test.sh";
+  fd4eddc1dfcd11cc -->|satisfiedBy| 4179509ffe0be04b;
+  2a806c95f3f078e4["test.sh"];
+  class 2a806c95f3f078e4 default;
+  click 2a806c95f3f078e4 "../../../tests/test-format-full-relations/test.sh";
+  c9dbeddcef9622ec -->|satisfiedBy| 2a806c95f3f078e4;
+  4260d1115e565ab9 -->|satisfiedBy| aaf45a054cfa1d47;
 </div>
 <h3 id="file-pattern-exclusion-for-format">File Pattern Exclusion for Format</h3>
 <p>The system shall respect configured excluded filename patterns when performing formatting operations, ensuring that files intentionally excluded from processing do not receive inappropriate formatting suggestions.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="../Core/Validation.html#excluded-file-relation-validation">Excluded File Relation Validation</a></li>
@@ -891,14 +914,15 @@ blockquote {
 <li>The system shall detect and fix formatting inconsistencies following clearly defined specifications</li>
 <li>The system shall maintain consistent formatting across all requirements documents</li>
 </ul>
-<h4>Attachments</h4>
+<h4>Metadata</h4>
 <ul>
-<li><a href="Specifications.html#format-consistency-specification">Format Consistency Specification</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#document-structure-normalization">Document Structure Normalization</a></li>
 <li>derive: <a href="#element-ordering-normalization">Element Ordering Normalization</a></li>
+<li>derive: <a href="#format-duplicate-removal">Format Duplicate Removal</a></li>
 <li>derive: <a href="#relation-ordering-normalization">Relation Ordering Normalization</a></li>
 <li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
@@ -927,9 +951,9 @@ blockquote {
 <li>If document has <code># Elements</code> then <code>###</code> (no <code>##</code>): Add section header only</li>
 <li>If document has <code># Elements</code> and <code>##</code>: No header additions needed</li>
 </ol>
-<h4>Attachments</h4>
+<h4>Metadata</h4>
 <ul>
-<li><a href="Specifications.html#document-structure-specification">Document Structure Specification</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -942,6 +966,10 @@ blockquote {
 <hr />
 <h3 id="element-ordering-normalization">Element Ordering Normalization</h3>
 <p>When formatting or persisting specification files, the system shall reorder elements following the Element Ordering Behavior.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
@@ -950,6 +978,23 @@ blockquote {
 <ul>
 <li>derivedFrom: <a href="#format-consistency-enforcement">Format Consistency Enforcement</a></li>
 <li>verifiedBy: <a href="Verifications/FormattingVerifications.html#element-ordering-verification">Element Ordering Verification</a></li>
+</ul>
+<hr />
+<h3 id="format-duplicate-removal">Format Duplicate Removal</h3>
+<p>The system shall remove duplicate entries within the same subsection during format fix operations.</p>
+<h4>Details</h4>
+<p>A behavior defines the detailed deduplication rules.</p>
+<p>This operation only removes within-section duplicates (entries repeated in the same Relations or Attachments subsection). Cross-section duplicates are semantic errors that require user resolution.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#format-consistency-enforcement">Format Consistency Enforcement</a></li>
+<li>satisfiedBy: <a href="../../../core/src/format.rs">format.rs</a></li>
+<li>satisfiedBy: <a href="Behaviors.html#format-duplicate-removal-behavior">Format Duplicate Removal Behavior</a></li>
+<li>verifiedBy: <a href="Verifications/FormattingVerifications.html#format-duplicate-removal-test">Format Duplicate Removal Test</a></li>
 </ul>
 <hr />
 <h3 id="relation-ordering-normalization">Relation Ordering Normalization</h3>
@@ -966,9 +1011,9 @@ blockquote {
 <li>Consistent diffs when comparing formatted files</li>
 <li>Predictable relation ordering for review and verification</li>
 </ul>
-<h4>Attachments</h4>
+<h4>Metadata</h4>
 <ul>
-<li><a href="Specifications.html#relation-ordering-specification">Relation Ordering Specification</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -980,6 +1025,10 @@ blockquote {
 <hr />
 <h3 id="formatting-output">Formatting Output</h3>
 <p>The system shall display formatting changes suggestion in similar manner as git diffs.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#git-style-diff-output-for-format">Git-Style Diff Output for Format</a></li>
@@ -1009,6 +1058,10 @@ blockquote {
 <li>All relations from the model registry are written to the Relations subsection</li>
 <li>Relations are sorted according to the Relation Ordering Normalization requirement</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Attachments</h4>
 <ul>
 <li><a href="../Core/DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
@@ -1021,6 +1074,10 @@ blockquote {
 <hr />
 <h3 id="replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</h3>
 <p>The system shall replace absolute links with relative links, where applicable and contextually appropriate, to conform to repository standards and enhance portability.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-formatting">Model Formatting</a></li>

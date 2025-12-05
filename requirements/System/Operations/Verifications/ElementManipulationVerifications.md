@@ -668,6 +668,7 @@ The test shall verify that the `link` command adds relations to elements followi
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-link-unlink/test.sh)
   * verify: [Relation Commands](../../../Interfaces/CLI.md#relation-commands)
   * verify: [Relation Management Operations](../../Core/ModelManagement.md#relation-management-operations)
 ---
@@ -985,6 +986,7 @@ The test shall verify that the `unlink` command removes relations from elements 
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-link-unlink/test.sh)
   * verify: [Relation Commands](../../../Interfaces/CLI.md#relation-commands)
   * verify: [Relation Management Operations](../../Core/ModelManagement.md#relation-management-operations)
 ---

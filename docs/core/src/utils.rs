@@ -328,6 +328,16 @@ pub fn extract_path_and_fragment(identifier: &str) -> (&str, Option<&str>) {
         ("", Some(identifier))
     }
 }
+
+/// Gets the parent directory of a file path.
+/// Returns the parent directory as a PathBuf, or an empty PathBuf if the path has no parent.
+/// This is commonly used when calculating file-relative paths in markdown.
+pub fn get_parent_dir(file_path: &str) -> PathBuf {
+    PathBuf::from(file_path).parent()
+        .map(|p| p.to_path_buf())
+        .unwrap_or_default()
+}
+
 /// Normalizes a fragment identifier according to GitHub's rules:
 /// - Convert to lowercase
 /// - Replace spaces with hyphens
@@ -359,6 +369,11 @@ pub fn normalize_fragment(fragment: &str) -> String {
 pub const EXTERNAL_SCHEMES: &[&str] = &[
     "http://", "https://", "ftp://", "file://", "mailto:", "ssh://", "git://", "data:",
 ];
+
+/// Check if a string is an external URL (starts with known external scheme)
+pub fn is_external_url(s: &str) -> bool {
+    EXTERNAL_SCHEMES.iter().any(|scheme| s.starts_with(scheme))
+}
 
 /// Unified path resolution function that handles git-root-relative paths consistently
 ///

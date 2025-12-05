@@ -735,37 +735,37 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1d4bb727b3ab4a6c[&quot;📁 requirements/System/Integration&quot;]
-    subgraph 268068fe8571c82b[&quot;📄 GitHubIntegration.md&quot;]
-      d04391d8da99295c[&quot;Automate Documentation Export&quot;];
-      class d04391d8da99295c userRequirement;
-      click d04391d8da99295c &quot;GitHubIntegration.html#automate-documentation-export&quot;;
-      c1a9e533a6989fc9[&quot;Automate Pull Request Validations&quot;];
-      class c1a9e533a6989fc9 userRequirement;
-      click c1a9e533a6989fc9 &quot;GitHubIntegration.html#automate-pull-request-validations&quot;;
-      7146138ceda0c5b6[&quot;Automated Documentation Export on PR Merge&quot;];
-      class 7146138ceda0c5b6 systemRequirement;
-      click 7146138ceda0c5b6 &quot;GitHubIntegration.html#automated-documentation-export-on-pr-merge&quot;;
-      1b131bcd8f7c55b6[&quot;Generate Change Logs for Pull Requests&quot;];
-      class 1b131bcd8f7c55b6 userRequirement;
-      click 1b131bcd8f7c55b6 &quot;GitHubIntegration.html#generate-change-logs-for-pull-requests&quot;;
+  subgraph cb5b728beb4d2734["📁 requirements/System/Integration"]
+    subgraph c9bec6fcd3b4999f["📄 GitHubIntegration.md"]
+      2aa5aa462d89485f["Automate Documentation Export"];
+      class 2aa5aa462d89485f userRequirement;
+      click 2aa5aa462d89485f "GitHubIntegration.html#automate-documentation-export";
+      1682ee9ab90ee1bf["Automate Pull Request Validations"];
+      class 1682ee9ab90ee1bf userRequirement;
+      click 1682ee9ab90ee1bf "GitHubIntegration.html#automate-pull-request-validations";
+      cf71d151f44634a6["Automated Documentation Export on PR Merge"];
+      class cf71d151f44634a6 systemRequirement;
+      click cf71d151f44634a6 "GitHubIntegration.html#automated-documentation-export-on-pr-merge";
+      f1f1174d876fb6ff["Generate Change Logs for Pull Requests"];
+      class f1f1174d876fb6ff userRequirement;
+      click f1f1174d876fb6ff "GitHubIntegration.html#generate-change-logs-for-pull-requests";
     end
   end
-  subgraph fc8e08aa8f256556[&quot;📁 requirements/System/Output/Verifications&quot;]
-    subgraph b54ba9a3e7b471ff[&quot;📄 DiagramVerifications.md&quot;]
-      e30cc861c688638f[&quot;Automated Documentation Export on PR Merge Verification&quot;];
-      class e30cc861c688638f verification;
-      click e30cc861c688638f &quot;../Output/Verifications/DiagramVerifications.html#automated-documentation-export-on-pr-merge-verification&quot;;
+  subgraph 2b01e7137fa6f2ab["📁 requirements/System/Output/Verifications"]
+    subgraph f79df7298f8d11df["📄 DiagramVerifications.md"]
+      4d0f589d6d002dd3["Automated Documentation Export on PR Merge Verification"];
+      class 4d0f589d6d002dd3 verification;
+      click 4d0f589d6d002dd3 "../Output/Verifications/DiagramVerifications.html#automated-documentation-export-on-pr-merge-verification";
     end
   end
-  d04391d8da99295c -.->|deriveReqT| 7146138ceda0c5b6;
-  c1a9e533a6989fc9 -.->|deriveReqT| 7146138ceda0c5b6;
-  13fc1caf0ecb96e1[&quot;update_docs.yml&quot;];
-  class 13fc1caf0ecb96e1 default;
-  click 13fc1caf0ecb96e1 &quot;../../../.github/workflows/update_docs.yml&quot;;
-  7146138ceda0c5b6 -->|satisfiedBy| 13fc1caf0ecb96e1;
-  7146138ceda0c5b6 -.->|verifiedBy| e30cc861c688638f;
-  e30cc861c688638f -->|satisfiedBy| 13fc1caf0ecb96e1;
+  2aa5aa462d89485f -.->|deriveReqT| cf71d151f44634a6;
+  1682ee9ab90ee1bf -.->|deriveReqT| cf71d151f44634a6;
+  376c8d0428b96897["update_docs.yml"];
+  class 376c8d0428b96897 default;
+  click 376c8d0428b96897 "../../../.github/workflows/update_docs.yml";
+  cf71d151f44634a6 -->|satisfiedBy| 376c8d0428b96897;
+  cf71d151f44634a6 -.->|verifiedBy| 4d0f589d6d002dd3;
+  4d0f589d6d002dd3 -->|satisfiedBy| 376c8d0428b96897;
 </div>
 <h3 id="automate-documentation-export">Automate Documentation Export</h3>
 <p>The system shall automate export of HTML documentation in the GitHub workflow on PR merge event, so that the documentation is always accessible and up-to-date for GitHub Pages.</p>
@@ -793,6 +793,10 @@ blockquote {
 <li>Push the updates back to the main branch</li>
 </ul>
 <p>This ensures that the HTML documentation in the <code>docs/</code> folder is always up-to-date after changes are merged to the main branch, providing accurate documentation for GitHub Pages without requiring manual intervention.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#automate-documentation-export">Automate Documentation Export</a></li>

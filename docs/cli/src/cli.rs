@@ -15,6 +15,7 @@ use reqvire::git_commands;
 use reqvire::verification_trace;
 use crate::serve;
 use reqvire::lint;
+use reqvire::report_collect;
 use reqvire::report_resources;
 use reqvire::GraphRegistry;
 use reqvire::graph_registry::Page;
@@ -89,7 +90,7 @@ pub enum Commands {
     
 
     /// Search and filter model elements with comprehensive filtering options
-    #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
+    #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
     Search {
         /// Output results in JSON format
         #[clap(long, help_heading = "SEARCH OPTIONS")]
@@ -107,7 +108,7 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_name: Option<String>,
 
-        /// Only include elements of the given type e.g. `user-requirement`, `system-requirement`, `verification`
+        /// Only include elements of the given type. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE", help_heading = "SEARCH OPTIONS")]
         filter_type: Option<String>,
 
@@ -149,7 +150,7 @@ pub enum Commands {
     },
 
     /// Generate verification traces showing upward paths from verifications to root requirements
-    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type e.g. `test-verification`, `analysis-verification`")]
+    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type. Valid types: test-verification, analysis-verification, inspection-verification, demonstration-verification")]
     Traces {
         /// Output results in JSON format
         #[clap(long, help_heading = "TRACES OPTIONS")]
@@ -171,7 +172,7 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "TRACES OPTIONS")]
         filter_name: Option<String>,
 
-        /// Only include verifications of the given type e.g. `test-verification`, `analysis-verification`
+        /// Only include verifications of the given type. Valid: test-verification, analysis-verification, inspection-verification, demonstration-verification
         #[clap(long, value_name = "TYPE", help_heading = "TRACES OPTIONS")]
         filter_type: Option<String>,
     },
@@ -188,15 +189,24 @@ pub enum Commands {
     ///
     /// By default, shows root requirements (no hierarchical parent).
     /// Use --from <NAME> to start from specific element.
+    /// Use --reverse for leaf-to-root traversal.
     ///
     /// Output formats:
     /// - JSON: Nested structure with element details in relations
     /// - Markdown: Mermaid diagrams with all nested relationships
-    #[clap(override_help = "Generate model-centric structure with nested relations\n\nBy default, shows root requirements (no hierarchical parent).\nUse --from <NAME> to start from specific element.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --json                      Output results in JSON format (nested structure)")]
+    #[clap(override_help = "Generate model-centric structure with nested relations\n\nBy default, shows root requirements (no hierarchical parent).\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)")]
     Model {
         /// Start from specific element by name
         #[clap(long, value_name = "NAME", help_heading = "MODEL OPTIONS")]
         from: Option<String>,
+
+        /// Traverse from leaves to roots (follow backward relations)
+        #[clap(long, help_heading = "MODEL OPTIONS")]
+        reverse: bool,
+
+        /// Filter starting elements by type (comma-separated). Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
+        #[clap(long, value_name = "TYPE", help_heading = "MODEL OPTIONS")]
+        filter_type: Option<String>,
 
         /// Output results in JSON format (nested structure)
         #[clap(long, help_heading = "MODEL OPTIONS")]
@@ -224,10 +234,14 @@ pub enum Commands {
     },
 
     /// Add new element to model from Markdown definition
-    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>  # reads element from stdin")]
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --override                 Replace existing element with same name\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>  # reads element from stdin")]
     Add {
         /// Target file path (relative to git repository root)
         file: String,
+
+        /// Replace existing element with same name
+        #[clap(long = "override", help_heading = "ADD OPTIONS")]
+        override_existing: bool,
 
         /// Preview changes without applying
         #[clap(long, help_heading = "ADD OPTIONS")]
@@ -289,6 +303,25 @@ pub enum Commands {
         json: bool,
     },
 
+    /// Merge multiple elements into target element
+    #[clap(override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and attachments are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Verifications can merge into verifications (of any subtype)\n    - Refinements can merge into refinements (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Feature A\" \"Feature B\" --dry-run")]
+    Merge {
+        /// Target element name (receives merged content)
+        target: String,
+
+        /// One or more source element names to merge into target
+        #[clap(required = true, num_args = 1..)]
+        sources: Vec<String>,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "MERGE OPTIONS")]
+        dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MERGE OPTIONS")]
+        json: bool,
+    },
+
     /// Move entire specification file with all its elements
     #[clap(name = "mv-file", override_help = "Move entire specification file with all its elements\n\nMV-FILE OPTIONS:\n       <SOURCE_FILE>            Source file path (relative to current working directory)\n       <TARGET_FILE>            Target file path (relative to current working directory)\n      --squash                  Move all elements to target file's first section (if target exists)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv-file <source-file> <target-file>\n    reqvire mv-file <source-file> <target-file> --squash")]
     MvFile {
@@ -311,44 +344,18 @@ pub enum Commands {
         json: bool,
     },
 
-    /// Attach external document or Refinement element to element
-    #[clap(name = "attach", override_help = "Attach external document or Refinement element to element\n\nATTACH OPTIONS:\n       <ATTACHMENT>             File path OR Refinement element name (auto-detected)\n       <ELEMENT_NAME>           Name of element to attach to\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if attachment exists as file (file path priority)\n    2. If no file found, looks up element by name (must be Refinement type)\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire attach docs/SLO.pdf \"System Performance Requirements\"\n    reqvire attach \"My Constraint Element\" \"System Performance Requirements\"")]
-    Attach {
-        /// File path OR Refinement element name (auto-detected)
-        attachment_path: String,
-
-        /// Name of element to attach to
-        element_name: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "ATTACH OPTIONS")]
-        dry_run: bool,
-    },
-
-    /// Detach external document or Refinement element from element
-    #[clap(name = "detach", override_help = "Detach external document or Refinement element from element\n\nDETACH OPTIONS:\n       <ELEMENT_NAME>           Name of element to detach from\n       <ATTACHMENT>             File path OR Refinement element name (auto-detected)\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if attachment exists as file (file path priority)\n    2. If no file found, looks up element by name\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire detach \"System Performance Requirements\" docs/SLO.pdf\n    reqvire detach \"System Performance Requirements\" \"My Constraint Element\"")]
-    Detach {
-        /// Name of element to detach from
-        element_name: String,
-
-        /// File path OR Refinement element name (auto-detected)
-        attachment_path: String,
-
-        /// Preview changes without applying
-        #[clap(long, help_heading = "DETACH OPTIONS")]
-        dry_run: bool,
-    },
-
-    /// Add relation between elements
-    #[clap(name = "link", override_help = "Add relation between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Element name OR internal file path (auto-detected)\n       <RELATION_TYPE>          Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)\n       <TARGET>                 Target element name\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if source exists as internal file path\n    2. If no file found, looks up element by name in registry\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire link \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire link \"Test Verification\" verify \"Feature Requirement\"")]
+    /// Add relation or attachment between elements
+    #[clap(name = "link", override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n\nRELATION TYPES:\n    derivedFrom  - Source is derived from target (parent traceability)\n    derive       - Source derives target (child traceability)\n    satisfiedBy  - Source requirement is satisfied by target implementation\n    satisfy      - Source implementation satisfies target requirement\n    verifiedBy   - Source requirement is verified by target verification\n    verify       - Source verification verifies target requirement\n    trace        - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach file or Refinement element to source\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: internal file path or Refinement element name\n\nUSAGE:\n    reqvire link \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire link \"Test Verification\" verify \"Feature Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"System Requirement\" attaching docs/SLO.pdf\n    reqvire link \"System Requirement\" attaching \"My Constraint Element\"")]
     Link {
-        /// Element name OR internal file path (auto-detected)
+        /// Source element name
         source: String,
 
-        /// Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
+        /// Relation type OR 'attaching'.
+        /// Relations: derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace.
+        /// Use 'attaching' to attach files or refinement elements (constraint, behavior, specification)
         relation_type: String,
 
-        /// Target element name
+        /// Target: element name, internal path, or external URL (for relations); file path or element name (for attaching)
         target: String,
 
         /// Preview changes without applying
@@ -356,16 +363,13 @@ pub enum Commands {
         dry_run: bool,
     },
 
-    /// Remove relation between elements
-    #[clap(name = "unlink", override_help = "Remove relation between elements\n\nUNLINK OPTIONS:\n       <SOURCE>                 Element name OR internal file path (auto-detected)\n       <RELATION_TYPE>          Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)\n       <TARGET>                 Target element name\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    1. Checks if source exists as internal file path\n    2. If no file found, looks up element by name in registry\n    3. Error if neither file nor element found\n\nUSAGE:\n    reqvire unlink \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire unlink \"Test Verification\" verify \"Feature Requirement\"")]
+    /// Remove relation or attachment between elements (auto-detects type)
+    #[clap(name = "unlink", override_help = "Remove relation or attachment between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    Searches relations first, then attachments.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Feature Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\"")]
     Unlink {
-        /// Element name OR internal file path (auto-detected)
+        /// Source element name
         source: String,
 
-        /// Relation type (derivedFrom, derive, verifiedBy, verify, satisfiedBy, satisfy, trace)
-        relation_type: String,
-
-        /// Target element name
+        /// Target element name OR file path
         target: String,
 
         /// Preview changes without applying
@@ -415,6 +419,17 @@ pub enum Commands {
     Resources {
         /// Output results in JSON format
         #[clap(long, help_heading = "RESOURCES OPTIONS")]
+        json: bool,
+    },
+
+    /// Collect content from requirement chain via derivedFrom relations
+    #[clap(override_help = "Collect content from requirement chain via derivedFrom relations\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>    Name of the requirement element to collect from\n      --json            Output results in JSON format")]
+    Collect {
+        /// Name of the requirement element to collect from
+        element_name: String,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "COLLECT OPTIONS")]
         json: bool,
     },
 
@@ -800,11 +815,18 @@ pub fn handle_command(
             coverage_report.print(json);
             return Ok(0);
         },
-        Some(Commands::Model { from, json }) => {
+        Some(Commands::Model { from, reverse, filter_type, json }) => {
+            // Parse filter types if provided
+            let type_filter: Option<Vec<&str>> = filter_type.as_ref().map(|s| {
+                s.split(',').map(|t| t.trim()).collect()
+            });
+
             // Generate model-centric report with optional filtering
             let output = report_model::generate_model_report(
                 &model_manager.graph_registry,
                 from.as_deref(),
+                reverse,
+                type_filter,
                 json,
                 "LR"  // Left-to-right diagrams for markdown output
             )?;
@@ -907,7 +929,7 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Add { file, dry_run, json }) => {
+        Some(Commands::Add { file, override_existing, dry_run, json }) => {
             // Read element markdown from stdin
             use std::io::Read;
             let mut element_markdown = String::new();
@@ -929,6 +951,7 @@ pub fn handle_command(
                 &current_dir,
                 &git_root,
                 dry_run,
+                override_existing,
             )?;
 
             // Output result
@@ -1010,6 +1033,26 @@ pub fn handle_command(
 
             return Ok(0);
         },
+        Some(Commands::Merge { target, sources, dry_run, json }) => {
+            // Call CRUD operation
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = crud::merge_elements(
+                &mut model_manager,
+                &target,
+                &sources,
+                &git_root,
+                dry_run,
+            )?;
+
+            // Output result
+            if json {
+                println!("{}", render_crud_json(&result));
+            } else {
+                render_crud_result(&result);
+            }
+
+            return Ok(0);
+        },
         Some(Commands::MvFile { source_file, target_file, squash, dry_run, json }) => {
             // Call CRUD operation
             let git_root = git_commands::get_git_root_dir()?;
@@ -1032,89 +1075,64 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Attach { attachment_path, element_name, dry_run }) => {
-            let git_root = git_commands::get_git_root_dir()?;
-
-            // Auto-detect: check if attachment_path is a file or element name
-            // Priority: file path first, then element name lookup
-            let cwd = std::env::current_dir().unwrap_or_default();
-            let file_exists_cwd = cwd.join(&attachment_path).exists();
-            let file_exists_git_root = git_root.join(&attachment_path).exists();
-
-            if file_exists_cwd || file_exists_git_root {
-                // It's a file path - use existing file attachment logic
-                let result = reqvire::crud::attach(
-                    &mut model_manager,
-                    &element_name,
-                    &attachment_path,
-                    &git_root,
-                    dry_run,
-                )?;
-                render_crud_result(&result);
-            } else {
-                // Not a file - try to resolve as element name
-                let result = reqvire::crud::attach_element(
-                    &mut model_manager,
-                    &element_name,
-                    &attachment_path, // This is actually the element name to attach
-                    &git_root,
-                    dry_run,
-                )?;
-                render_crud_result(&result);
-            }
-            return Ok(0);
-        },
-        Some(Commands::Detach { element_name, attachment_path, dry_run }) => {
-            let git_root = git_commands::get_git_root_dir()?;
-
-            // Auto-detect: check if attachment_path is a file or element name
-            // Priority: file path first, then element name lookup
-            let cwd = std::env::current_dir().unwrap_or_default();
-            let file_exists_cwd = cwd.join(&attachment_path).exists();
-            let file_exists_git_root = git_root.join(&attachment_path).exists();
-
-            if file_exists_cwd || file_exists_git_root {
-                // It's a file path - use existing file detachment logic
-                let result = reqvire::crud::detach(
-                    &mut model_manager,
-                    &element_name,
-                    &attachment_path,
-                    &git_root,
-                    dry_run,
-                )?;
-                render_crud_result(&result);
-            } else {
-                // Not a file - try to resolve as element name
-                let result = reqvire::crud::detach_element(
-                    &mut model_manager,
-                    &element_name,
-                    &attachment_path, // This is actually the element name to detach
-                    &git_root,
-                    dry_run,
-                )?;
-                render_crud_result(&result);
-            }
-            return Ok(0);
-        },
         Some(Commands::Link { source, relation_type, target, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
-            let result = reqvire::crud::link(
-                &mut model_manager,
-                &source,
-                &relation_type,
-                &target,
-                &git_root,
-                dry_run,
-            )?;
-            render_crud_result(&result);
+
+            // Check if relation_type is 'attaching' - special keyword for attachments
+            if relation_type == "attaching" {
+                // External URLs are not allowed for attachments
+                if reqvire::utils::is_external_url(&target) {
+                    return Err(ReqvireError::ProcessError(format!(
+                        "External URLs cannot be attached. Use a relation type (e.g., 'trace') instead:\n  reqvire link \"{}\" trace \"{}\"",
+                        source, target
+                    )));
+                }
+
+                // Auto-detect: check if target is a file or element name
+                let cwd = std::env::current_dir().unwrap_or_default();
+                let file_exists_cwd = cwd.join(&target).exists();
+                let file_exists_git_root = git_root.join(&target).exists();
+
+                if file_exists_cwd || file_exists_git_root {
+                    // It's a file path - use file attachment logic
+                    let result = reqvire::crud::attach(
+                        &mut model_manager,
+                        &source,
+                        &target,
+                        &git_root,
+                        dry_run,
+                    )?;
+                    render_crud_result(&result);
+                } else {
+                    // Not a file - try to resolve as element name
+                    let result = reqvire::crud::attach_element(
+                        &mut model_manager,
+                        &source,
+                        &target,
+                        &git_root,
+                        dry_run,
+                    )?;
+                    render_crud_result(&result);
+                }
+            } else {
+                // Regular relation link
+                let result = reqvire::crud::link(
+                    &mut model_manager,
+                    &source,
+                    &relation_type,
+                    &target,
+                    &git_root,
+                    dry_run,
+                )?;
+                render_crud_result(&result);
+            }
             return Ok(0);
         },
-        Some(Commands::Unlink { source, relation_type, target, dry_run }) => {
+        Some(Commands::Unlink { source, target, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
             let result = reqvire::crud::unlink(
                 &mut model_manager,
                 &source,
-                &relation_type,
                 &target,
                 &git_root,
                 dry_run,
@@ -1164,6 +1182,17 @@ pub fn handle_command(
         Some(Commands::Resources { json }) => {
             let report = report_resources::generate_resources_report(&model_manager.graph_registry);
             report.print(json);
+            return Ok(0);
+        },
+        Some(Commands::Collect { element_name, json }) => {
+            let git_root = git_commands::get_git_root_dir()?;
+            let output = report_collect::generate_collect_report(
+                &model_manager.graph_registry,
+                &element_name,
+                &git_root,
+                json,
+            )?;
+            println!("{}", output);
             return Ok(0);
         },
         Some(Commands::Shell) => {

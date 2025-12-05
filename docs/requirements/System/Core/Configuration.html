@@ -735,132 +735,136 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph d262bfbbaa5049a3[&quot;📁 requirements/System/Core&quot;]
-    subgraph f23c409eff55fa7c[&quot;📄 Configuration.md&quot;]
-      b4fab4cd56cad6d8[&quot;Ignore Files Integration<br/>📎 requirements/System/Core/Specifications.md#ignore-files-specification&quot;];
-      class b4fab4cd56cad6d8 systemRequirement;
-      click b4fab4cd56cad6d8 &quot;Configuration.html#ignore-files-integration&quot;;
-      6921a84a17b97dda[&quot;Ignoring Unstructured Documents&quot;];
-      class 6921a84a17b97dda systemRequirement;
-      click 6921a84a17b97dda &quot;Configuration.html#ignoring-unstructured-documents&quot;;
-      526d3fd6fb8c0baf[&quot;Requirements Processing&quot;];
-      class 526d3fd6fb8c0baf systemRequirement;
-      click 526d3fd6fb8c0baf &quot;Configuration.html#requirements-processing&quot;;
-      7b1990b8b1329152[&quot;Reserved Repository Files Exclusion&quot;];
-      class 7b1990b8b1329152 systemRequirement;
-      click 7b1990b8b1329152 &quot;Configuration.html#reserved-repository-files-exclusion&quot;;
-      533fcaf27edc0797[&quot;Structured Markdown Files Search and Detection&quot;];
-      class 533fcaf27edc0797 systemRequirement;
-      click 533fcaf27edc0797 &quot;Configuration.html#structured-markdown-files-search-and-detection&quot;;
+  subgraph 9e5f55ddfed5810b["📁 requirements/System/Core"]
+    subgraph e41005469d1dda78["📄 Configuration.md"]
+      39fed9174e6d9044["Ignore Files Integration"];
+      class 39fed9174e6d9044 systemRequirement;
+      click 39fed9174e6d9044 "Configuration.html#ignore-files-integration";
+      7f4be14d980c42c9["Ignoring Unstructured Documents"];
+      class 7f4be14d980c42c9 systemRequirement;
+      click 7f4be14d980c42c9 "Configuration.html#ignoring-unstructured-documents";
+      9c40ee0e45c31bab["Requirements Processing"];
+      class 9c40ee0e45c31bab systemRequirement;
+      click 9c40ee0e45c31bab "Configuration.html#requirements-processing";
+      ffaf7999315b3a64["Reserved Repository Files Exclusion"];
+      class ffaf7999315b3a64 systemRequirement;
+      click ffaf7999315b3a64 "Configuration.html#reserved-repository-files-exclusion";
+      abbf1112ca9d10ef["Structured Markdown Files Search and Detection"];
+      class abbf1112ca9d10ef systemRequirement;
+      click abbf1112ca9d10ef "Configuration.html#structured-markdown-files-search-and-detection";
     end
-    subgraph 98d50eb6f8a292bb[&quot;📄 Specifications.md&quot;]
-      47d4dfd806994b53[&quot;Ignore Files Specification&quot;];
-      class 47d4dfd806994b53 default;
-      click 47d4dfd806994b53 &quot;Specifications.html#ignore-files-specification&quot;;
+    subgraph 51a85b3f8dd9a397["📄 Specifications.md"]
+      85269b3f47786ec4["Ignore Files Specification"];
+      class 85269b3f47786ec4 default;
+      click 85269b3f47786ec4 "Specifications.html#ignore-files-specification";
+      4fdba9fe032dab42["Reserved Files Specification"];
+      class 4fdba9fe032dab42 default;
+      click 4fdba9fe032dab42 "Specifications.html#reserved-files-specification";
     end
-    subgraph a0a42393a244d64c[&quot;📄 Validation.md&quot;]
-      bd13cd060c399ea6[&quot;GraphRegistry as Primary Registry&quot;];
-      class bd13cd060c399ea6 systemRequirement;
-      click bd13cd060c399ea6 &quot;Validation.html#graphregistry-as-primary-registry&quot;;
-      26e63d5a1bbe175[&quot;Two-Pass Validation Strategy&quot;];
-      class 26e63d5a1bbe175 systemRequirement;
-      click 26e63d5a1bbe175 &quot;Validation.html#two-pass-validation-strategy&quot;;
-    end
-  end
-  subgraph 2d73a43cf375cb0f[&quot;📁 requirements/System/Core/Verifications&quot;]
-    subgraph 1e40212e2a6b5c6e[&quot;📄 ValidationVerifications.md&quot;]
-      1413dd439a2ce574[&quot;File Exclusion Test&quot;];
-      class 1413dd439a2ce574 verification;
-      click 1413dd439a2ce574 &quot;Verifications/ValidationVerifications.html#file-exclusion-test&quot;;
-      b32250e14e326cb[&quot;Requirements Files Search and Detection Test&quot;];
-      class b32250e14e326cb verification;
-      click b32250e14e326cb &quot;Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test&quot;;
-      fcb309f0f899a983[&quot;Same-File Fragment Relations Test&quot;];
-      class fcb309f0f899a983 verification;
-      click fcb309f0f899a983 &quot;Verifications/ValidationVerifications.html#same-file-fragment-relations-test&quot;;
+    subgraph 82c374faeb59ab1f["📄 Validation.md"]
+      20579f2473db8bba["GraphRegistry as Primary Registry"];
+      class 20579f2473db8bba systemRequirement;
+      click 20579f2473db8bba "Validation.html#graphregistry-as-primary-registry";
+      472852d1c8db8a24["Two-Pass Validation Strategy"];
+      class 472852d1c8db8a24 systemRequirement;
+      click 472852d1c8db8a24 "Validation.html#two-pass-validation-strategy";
     end
   end
-  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
-    subgraph ce3b241a2629974e[&quot;📄 ElementManipulation.md&quot;]
-      9987f9e9ae83fba3[&quot;Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification&quot;];
-      class 9987f9e9ae83fba3 systemRequirement;
-      click 9987f9e9ae83fba3 &quot;../Operations/ElementManipulation.html#target-location-validation-and-auto-creation&quot;;
-    end
-    subgraph 76dc8a8951f1adad[&quot;📄 Formatting.md&quot;]
-      3e259233db2e4d25[&quot;File Pattern Exclusion for Format&quot;];
-      class 3e259233db2e4d25 systemRequirement;
-      click 3e259233db2e4d25 &quot;../Operations/Formatting.html#file-pattern-exclusion-for-format&quot;;
-    end
-  end
-  subgraph f876b12d880d294c[&quot;📁 requirements/System/Processing/Verifications&quot;]
-    subgraph 427027b536446d98[&quot;📄 ChangeImpactVerifications.md&quot;]
-      3753d18d6b61231c[&quot;Element Content Extraction Test&quot;];
-      class 3753d18d6b61231c verification;
-      click 3753d18d6b61231c &quot;../Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test&quot;;
+  subgraph ef1b8526d9f32695["📁 requirements/System/Core/Verifications"]
+    subgraph e39e433d7cd94342["📄 ValidationVerifications.md"]
+      8ec656906dc7cbf8["File Exclusion Test"];
+      class 8ec656906dc7cbf8 verification;
+      click 8ec656906dc7cbf8 "Verifications/ValidationVerifications.html#file-exclusion-test";
+      e86c0661d8738a40["Requirements Files Search and Detection Test"];
+      class e86c0661d8738a40 verification;
+      click e86c0661d8738a40 "Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test";
+      89cf80589d3207d["Same-File Fragment Relations Test"];
+      class 89cf80589d3207d verification;
+      click 89cf80589d3207d "Verifications/ValidationVerifications.html#same-file-fragment-relations-test";
     end
   end
-  b4fab4cd56cad6d8 -.->|deriveReqT| 9987f9e9ae83fba3;
-  8419dcc77d92b609[&quot;config.rs&quot;];
-  class 8419dcc77d92b609 default;
-  click 8419dcc77d92b609 &quot;../../../cli/src/config.rs&quot;;
-  b4fab4cd56cad6d8 -->|satisfiedBy| 8419dcc77d92b609;
-  b4fab4cd56cad6d8 -->|satisfiedBy| 47d4dfd806994b53;
-  b4fab4cd56cad6d8 -.->|verifiedBy| 1413dd439a2ce574;
-  6921a84a17b97dda -.->|deriveReqT| b4fab4cd56cad6d8;
-  6921a84a17b97dda -.->|deriveReqT| 526d3fd6fb8c0baf;
-  6921a84a17b97dda -.->|deriveReqT| 7b1990b8b1329152;
-  6921a84a17b97dda -.->|deriveReqT| 3e259233db2e4d25;
-  6921a84a17b97dda -->|satisfiedBy| 8419dcc77d92b609;
-  526d3fd6fb8c0baf -.->|deriveReqT| 533fcaf27edc0797;
-  526d3fd6fb8c0baf -.->|deriveReqT| bd13cd060c399ea6;
-  526d3fd6fb8c0baf -.->|deriveReqT| 26e63d5a1bbe175;
-  d50a859650933e55[&quot;model.rs&quot;];
-  class d50a859650933e55 default;
-  click d50a859650933e55 &quot;../../../core/src/model.rs&quot;;
-  526d3fd6fb8c0baf -->|satisfiedBy| d50a859650933e55;
-  f22d93285fcd7664[&quot;parser.rs&quot;];
-  class f22d93285fcd7664 default;
-  click f22d93285fcd7664 &quot;../../../core/src/parser.rs&quot;;
-  526d3fd6fb8c0baf -->|satisfiedBy| f22d93285fcd7664;
-  526d3fd6fb8c0baf -.->|verifiedBy| fcb309f0f899a983;
-  526d3fd6fb8c0baf -.->|verifiedBy| 3753d18d6b61231c;
-  7b1990b8b1329152 -->|satisfiedBy| 8419dcc77d92b609;
-  7b1990b8b1329152 -.->|verifiedBy| 1413dd439a2ce574;
-  533fcaf27edc0797 -->|satisfiedBy| d50a859650933e55;
-  533fcaf27edc0797 -.->|verifiedBy| b32250e14e326cb;
-  b7c871ab64a7059a[&quot;graph_registry.rs&quot;];
-  class b7c871ab64a7059a default;
-  click b7c871ab64a7059a &quot;../../../core/src/graph_registry.rs&quot;;
-  9987f9e9ae83fba3 -->|satisfiedBy| b7c871ab64a7059a;
-  ce2625feec883e55[&quot;utils.rs&quot;];
-  class ce2625feec883e55 default;
-  click ce2625feec883e55 &quot;../../../core/src/utils.rs&quot;;
-  9987f9e9ae83fba3 -->|satisfiedBy| ce2625feec883e55;
-  9987f9e9ae83fba3 -->|satisfiedBy| df1f09bc9884c2de;
-  9987f9e9ae83fba3 -.->|verifiedBy| b6076972a6650ff1;
-  7f5e53340a03365f[&quot;test.sh&quot;];
-  class 7f5e53340a03365f default;
-  click 7f5e53340a03365f &quot;../../../tests/test-gitignore-integration/test.sh&quot;;
-  1413dd439a2ce574 -->|satisfiedBy| 7f5e53340a03365f;
-  3e259233db2e4d25 -.->|deriveReqT| bbe4bfafe31e5f09;
-  3e259233db2e4d25 -->|satisfiedBy| ce2625feec883e55;
-  bd13cd060c399ea6 -->|satisfiedBy| b7c871ab64a7059a;
-  bd13cd060c399ea6 -->|satisfiedBy| d50a859650933e55;
-  bd13cd060c399ea6 -.->|verifiedBy| b32250e14e326cb;
-  26e63d5a1bbe175 -->|satisfiedBy| d50a859650933e55;
-  26e63d5a1bbe175 -->|satisfiedBy| 36c28052839ab0a1;
-  789c690d63402d63[&quot;test.sh&quot;];
-  class 789c690d63402d63 default;
-  click 789c690d63402d63 &quot;../../../tests/test-fragment-relations/test.sh&quot;;
-  fcb309f0f899a983 -->|satisfiedBy| 789c690d63402d63;
-  c287b52ceb52aa04[&quot;test.sh&quot;];
-  class c287b52ceb52aa04 default;
-  click c287b52ceb52aa04 &quot;../../../tests/test-element-content-extraction/test.sh&quot;;
-  3753d18d6b61231c -->|satisfiedBy| c287b52ceb52aa04;
-  a29e69e90fa71f39[&quot;test.sh&quot;];
-  class a29e69e90fa71f39 default;
-  click a29e69e90fa71f39 &quot;../../../tests/test-excluded-patterns/test.sh&quot;;
-  b32250e14e326cb -->|satisfiedBy| a29e69e90fa71f39;
+  subgraph f97b31ef8bb9beb2["📁 requirements/System/Operations"]
+    subgraph 76b63ea3553591a5["📄 ElementManipulation.md"]
+      a9f82fe8db689d9d["Target Location Validation and Auto-Creation<br/>📎 requirements/System/Core/Specifications.md#git-repository-scope-specification"];
+      class a9f82fe8db689d9d systemRequirement;
+      click a9f82fe8db689d9d "../Operations/ElementManipulation.html#target-location-validation-and-auto-creation";
+    end
+    subgraph f847acb9fd91c378["📄 Formatting.md"]
+      c14e144ea79438bb["File Pattern Exclusion for Format"];
+      class c14e144ea79438bb systemRequirement;
+      click c14e144ea79438bb "../Operations/Formatting.html#file-pattern-exclusion-for-format";
+    end
+  end
+  subgraph 392008bc7c0fc02c["📁 requirements/System/Processing/Verifications"]
+    subgraph 931561eace4454d0["📄 ChangeImpactVerifications.md"]
+      cd0e8d39fedeb815["Element Content Extraction Test"];
+      class cd0e8d39fedeb815 verification;
+      click cd0e8d39fedeb815 "../Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test";
+    end
+  end
+  39fed9174e6d9044 -.->|deriveReqT| a9f82fe8db689d9d;
+  ff93ce3d1f286d8a["config.rs"];
+  class ff93ce3d1f286d8a default;
+  click ff93ce3d1f286d8a "../../../cli/src/config.rs";
+  39fed9174e6d9044 -->|satisfiedBy| ff93ce3d1f286d8a;
+  39fed9174e6d9044 -->|satisfiedBy| 85269b3f47786ec4;
+  39fed9174e6d9044 -.->|verifiedBy| 8ec656906dc7cbf8;
+  7f4be14d980c42c9 -.->|deriveReqT| 39fed9174e6d9044;
+  7f4be14d980c42c9 -.->|deriveReqT| 9c40ee0e45c31bab;
+  7f4be14d980c42c9 -.->|deriveReqT| ffaf7999315b3a64;
+  7f4be14d980c42c9 -.->|deriveReqT| c14e144ea79438bb;
+  7f4be14d980c42c9 -->|satisfiedBy| ff93ce3d1f286d8a;
+  9c40ee0e45c31bab -.->|deriveReqT| abbf1112ca9d10ef;
+  9c40ee0e45c31bab -.->|deriveReqT| 20579f2473db8bba;
+  9c40ee0e45c31bab -.->|deriveReqT| 472852d1c8db8a24;
+  499d48218b73f571["model.rs"];
+  class 499d48218b73f571 default;
+  click 499d48218b73f571 "../../../core/src/model.rs";
+  9c40ee0e45c31bab -->|satisfiedBy| 499d48218b73f571;
+  35bd98d101f36b62["parser.rs"];
+  class 35bd98d101f36b62 default;
+  click 35bd98d101f36b62 "../../../core/src/parser.rs";
+  9c40ee0e45c31bab -->|satisfiedBy| 35bd98d101f36b62;
+  9c40ee0e45c31bab -.->|verifiedBy| 89cf80589d3207d;
+  9c40ee0e45c31bab -.->|verifiedBy| cd0e8d39fedeb815;
+  ffaf7999315b3a64 -->|satisfiedBy| ff93ce3d1f286d8a;
+  ffaf7999315b3a64 -->|satisfiedBy| 4fdba9fe032dab42;
+  ffaf7999315b3a64 -.->|verifiedBy| 8ec656906dc7cbf8;
+  abbf1112ca9d10ef -->|satisfiedBy| 499d48218b73f571;
+  abbf1112ca9d10ef -.->|verifiedBy| e86c0661d8738a40;
+  95cf526671ec752c["graph_registry.rs"];
+  class 95cf526671ec752c default;
+  click 95cf526671ec752c "../../../core/src/graph_registry.rs";
+  a9f82fe8db689d9d -->|satisfiedBy| 95cf526671ec752c;
+  bdf9762d399478a5["utils.rs"];
+  class bdf9762d399478a5 default;
+  click bdf9762d399478a5 "../../../core/src/utils.rs";
+  a9f82fe8db689d9d -->|satisfiedBy| bdf9762d399478a5;
+  a9f82fe8db689d9d -->|satisfiedBy| 654443dbc158a1be;
+  a9f82fe8db689d9d -.->|verifiedBy| c2c0bc44da2a0902;
+  94d34e73992ff9ac["test.sh"];
+  class 94d34e73992ff9ac default;
+  click 94d34e73992ff9ac "../../../tests/test-gitignore-integration/test.sh";
+  8ec656906dc7cbf8 -->|satisfiedBy| 94d34e73992ff9ac;
+  c14e144ea79438bb -.->|deriveReqT| b6c706397d797eee;
+  c14e144ea79438bb -->|satisfiedBy| bdf9762d399478a5;
+  20579f2473db8bba -->|satisfiedBy| 95cf526671ec752c;
+  20579f2473db8bba -->|satisfiedBy| 499d48218b73f571;
+  20579f2473db8bba -.->|verifiedBy| e86c0661d8738a40;
+  472852d1c8db8a24 -->|satisfiedBy| 499d48218b73f571;
+  472852d1c8db8a24 -->|satisfiedBy| 9cc3ec12d7910fa4;
+  f0923d0189e77f4c["test.sh"];
+  class f0923d0189e77f4c default;
+  click f0923d0189e77f4c "../../../tests/test-fragment-relations/test.sh";
+  89cf80589d3207d -->|satisfiedBy| f0923d0189e77f4c;
+  dd7cc79a76771691["test.sh"];
+  class dd7cc79a76771691 default;
+  click dd7cc79a76771691 "../../../tests/test-element-content-extraction/test.sh";
+  cd0e8d39fedeb815 -->|satisfiedBy| dd7cc79a76771691;
+  b3573dfcbb8f5f40["test.sh"];
+  class b3573dfcbb8f5f40 default;
+  click b3573dfcbb8f5f40 "../../../tests/test-excluded-patterns/test.sh";
+  e86c0661d8738a40 -->|satisfiedBy| b3573dfcbb8f5f40;
 </div>
 <h3 id="ignoring-unstructured-documents">Ignoring Unstructured Documents</h3>
 <p>The system shall support configurable glob patterns to exclude specific files from requirement processing.</p>
@@ -873,6 +877,10 @@ blockquote {
 examples/**
 </code></pre>
 <p>The <code>.reqvireignore</code> file provides Reqvire-specific exclusions for files that should remain in version control but not be processed as requirements.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#ignore-files-integration">Ignore Files Integration</a></li>
@@ -892,9 +900,9 @@ examples/**
 <li>The system shall differentiate between .gitignore exclusions (complete) and .reqvireignore exclusions (parsing only)</li>
 <li>The system shall implement ignore file processing following clearly defined specifications</li>
 </ul>
-<h4>Attachments</h4>
+<h4>Metadata</h4>
 <ul>
-<li><a href="Specifications.html#ignore-files-specification">Ignore Files Specification</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -913,6 +921,10 @@ examples/**
 <li>.gitignore patterns (files not in version control)</li>
 <li>.reqvireignore patterns (files in version control but excluded from requirements processing)</li>
 <li>Reserved repository files (README.md, LICENSE.md, etc.)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -935,6 +947,10 @@ examples/**
 <li><strong>Excluded Patterns Check</strong>: If a file matches any excluded patterns, it is marked as <strong>not a structured document file</strong>.</li>
 <li><strong>File Extension Check</strong>: If the file does not have a <code>.md</code> extension, it is marked as <strong>not a structured document file</strong>.</li>
 </ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#requirements-processing">Requirements Processing</a></li>
@@ -945,34 +961,17 @@ examples/**
 <h3 id="reserved-repository-files-exclusion">Reserved Repository Files Exclusion</h3>
 <p>The system shall automatically exclude certain common repository documentation files from structured markdown processing.</p>
 <h4>Details</h4>
-<p>The following reserved filenames are always excluded from structured markdown processing, as they are typically used for general repository documentation purposes rather than system requirements:</p>
+<p>The system shall define which repository documentation filenames are reserved and excluded from parsing.</p>
+<p>Reserved files serve general repository documentation purposes rather than structured requirements. This automatic exclusion prevents confusion and reduces the need for explicit .reqvireignore patterns.</p>
+<h4>Metadata</h4>
 <ul>
-<li><code>README.md</code></li>
-<li><code>CHANGELOG.md</code>, <code>CHANGES.md</code></li>
-<li><code>CONTRIBUTING.md</code></li>
-<li><code>LICENSE.md</code></li>
-<li><code>CODE_OF_CONDUCT.md</code></li>
-<li><code>SECURITY.md</code></li>
-<li><code>AUTHORS.md</code></li>
-<li><code>ROADMAP.md</code></li>
-</ul>
-<p><strong>Rules:</strong></p>
-<ul>
-<li>Reserved filenames shall be automatically excluded from structured markdown parsing across the entire repository</li>
-<li>Reserved files can still be referenced in file relations to elements (they are excluded from parsing but can be linked to)</li>
-<li>The exclusion of reserved filenames shall be combined with .gitignore and .reqvireignore patterns</li>
-<li>Files matching reserved filenames shall be excluded from parsing regardless of .gitignore or .reqvireignore configuration</li>
-</ul>
-<p><strong>Rationale:</strong></p>
-<ul>
-<li>These files serve general repository documentation purposes and should not be processed as structured requirements</li>
-<li>Standard repository files like README.md or LICENSE.md contain free-form documentation rather than structured requirements</li>
-<li>Automatically excluding these files prevents confusion and reduces the need for explicit .reqvireignore patterns</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#reserved-files-specification">Reserved Files Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a></li>
 </ul>
 <hr />

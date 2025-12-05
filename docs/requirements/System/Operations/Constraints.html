@@ -735,14 +735,46 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
-    subgraph 13cfa02dc956ea20[&quot;📄 Constraints.md&quot;]
-      df1f09bc9884c2de[&quot;Target Location Constraint&quot;];
-      class df1f09bc9884c2de default;
-      click df1f09bc9884c2de &quot;Constraints.html#target-location-constraint&quot;;
+  subgraph f97b31ef8bb9beb2["📁 requirements/System/Operations"]
+    subgraph b18c7c2b241cabf5["📄 Constraints.md"]
+      a252d80eba1d096d["Merge Type Compatibility Constraint"];
+      class a252d80eba1d096d default;
+      click a252d80eba1d096d "Constraints.html#merge-type-compatibility-constraint";
+      654443dbc158a1be["Target Location Constraint"];
+      class 654443dbc158a1be default;
+      click 654443dbc158a1be "Constraints.html#target-location-constraint";
     end
   end
 </div>
+<h3 id="merge-type-compatibility-constraint">Merge Type Compatibility Constraint</h3>
+<p>Type compatibility rules for merging elements.</p>
+<h4>Details</h4>
+<p><strong>Main Type Categories:</strong></p>
+<ul>
+<li><strong>Requirement types</strong>: <code>requirement</code>, <code>user-requirement</code></li>
+<li><strong>Verification types</strong>: <code>test-verification</code>, <code>analysis-verification</code>, <code>inspection-verification</code>, <code>demonstration-verification</code></li>
+<li><strong>Refinement types</strong>: <code>constraint</code>, <code>behavior</code>, <code>specification</code></li>
+<li><strong>Other</strong>: Any element type not in above categories</li>
+</ul>
+<p><strong>Compatibility Rules:</strong></p>
+<ul>
+<li>Source and target must be in the same main type category</li>
+<li>Subtype differences within a category are allowed (e.g., <code>user-requirement</code> can merge into <code>requirement</code>)</li>
+<li>Merging across categories is forbidden (e.g., requirement cannot merge into verification)</li>
+</ul>
+<p><strong>Error Messages:</strong></p>
+<ul>
+<li>When incompatible: “Cannot merge {source_type} into {target_type}: type mismatch”</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: constraint</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ElementManipulation.html#merge-element-operation">Merge Element Operation</a></li>
+</ul>
+<hr />
 <h3 id="target-location-constraint">Target Location Constraint</h3>
 <p>Validation rules for target paths in element operations.</p>
 <p><strong>Path Validation:</strong></p>

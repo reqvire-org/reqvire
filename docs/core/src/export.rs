@@ -386,6 +386,8 @@ pub fn generate_artifacts_in_temp(
     let model_report = crate::report_model::generate_model_report(
         &temp_model_manager.graph_registry,
         None,  // No filtering - use root requirements
+        false, // Not reverse - forward traversal
+        None,  // No type filter
         false, // Markdown output
         "TD"   // Top-down diagrams for HTML export
     )?;

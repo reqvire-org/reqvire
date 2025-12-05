@@ -735,20 +735,53 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 94359ac729226de6[&quot;📁 requirements/System/Operations&quot;]
-    subgraph 74d2c337dc5bdc2b[&quot;📄 Behaviors.md&quot;]
-      e02c812c8e81c986[&quot;Dry-Run Mode Behavior&quot;];
-      class e02c812c8e81c986 default;
-      click e02c812c8e81c986 &quot;Behaviors.html#dry-run-mode-behavior&quot;;
-      49f4fc3d7df8c797[&quot;Element Ordering Behavior&quot;];
-      class 49f4fc3d7df8c797 default;
-      click 49f4fc3d7df8c797 &quot;Behaviors.html#element-ordering-behavior&quot;;
-      319832f410de9f37[&quot;File Persistence Behavior&quot;];
-      class 319832f410de9f37 default;
-      click 319832f410de9f37 &quot;Behaviors.html#file-persistence-behavior&quot;;
+  subgraph f97b31ef8bb9beb2["📁 requirements/System/Operations"]
+    subgraph 2e0fed16c29dc496["📄 Behaviors.md"]
+      73c4967b996fee23["Create Element Override Behavior"];
+      class 73c4967b996fee23 default;
+      click 73c4967b996fee23 "Behaviors.html#create-element-override-behavior";
+      7482a2db66c66b6d["Dry-Run Mode Behavior"];
+      class 7482a2db66c66b6d default;
+      click 7482a2db66c66b6d "Behaviors.html#dry-run-mode-behavior";
+      5e0ebacc4f5dccd8["Element Ordering Behavior"];
+      class 5e0ebacc4f5dccd8 default;
+      click 5e0ebacc4f5dccd8 "Behaviors.html#element-ordering-behavior";
+      e84fbee842580159["File Persistence Behavior"];
+      class e84fbee842580159 default;
+      click e84fbee842580159 "Behaviors.html#file-persistence-behavior";
+      d15621c5d512077b["Format Duplicate Removal Behavior"];
+      class d15621c5d512077b default;
+      click d15621c5d512077b "Behaviors.html#format-duplicate-removal-behavior";
+      277a4d3ecee51842["Merge Content Transformation Behavior"];
+      class 277a4d3ecee51842 default;
+      click 277a4d3ecee51842 "Behaviors.html#merge-content-transformation-behavior";
     end
   end
 </div>
+<h3 id="create-element-override-behavior">Create Element Override Behavior</h3>
+<p>When the create element operation is invoked with override mode:</p>
+<ol>
+<li>The system shall extract the element name from the markdown input (### Element Name pattern)</li>
+<li>If an element with that name exists in the model:
+<ul>
+<li>The system shall check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)</li>
+<li>If any children would be orphaned, the system shall reject the operation</li>
+<li>The system shall provide clear error message listing orphaned children with resolution guidance</li>
+<li>If no children would be orphaned, the system shall remove the existing element first</li>
+</ul>
+</li>
+<li>The system shall then add the new element content to the target file</li>
+<li>The operation shall be reported as “Update” rather than “Add”</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+</ul>
+<hr />
 <h3 id="dry-run-mode-behavior">Dry-Run Mode Behavior</h3>
 <p>Preview mode behavior for modification commands.</p>
 <h4>Details</h4>
@@ -825,6 +858,73 @@ Elements shall be ordered so that parent elements appear before their children (
 <h4>Metadata</h4>
 <ul>
 <li>type: behavior</li>
+</ul>
+<hr />
+<h3 id="format-duplicate-removal-behavior">Format Duplicate Removal Behavior</h3>
+<p>Deduplication rules for format fix operations.</p>
+<p><strong>Relations subsection:</strong></p>
+<ul>
+<li>Duplicate relations (same relation_type + same target) are removed, keeping first occurrence</li>
+<li>Different relation types to same target are NOT duplicates (e.g., <code>derivedFrom: A</code> and <code>trace: A</code> are both kept)</li>
+</ul>
+<p><strong>Attachments subsection:</strong></p>
+<ul>
+<li>Duplicate attachments (same target path or identifier) are removed, keeping first occurrence</li>
+</ul>
+<p><strong>Cross-section duplicates are NOT removed</strong> - these require user decision and are reported by validation.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Formatting.html#format-duplicate-removal">Format Duplicate Removal</a></li>
+</ul>
+<hr />
+<h3 id="merge-content-transformation-behavior">Merge Content Transformation Behavior</h3>
+<p>Content transformation rules for the merge elements operation.</p>
+<h4>Details</h4>
+<p><strong>Content Merging:</strong></p>
+<ol>
+<li>For each source element in order:
+<ul>
+<li>If source has main content (before any #### subsection): append to target’s <code>#### Details</code></li>
+<li>If source has <code>#### Details</code>: create <code>#### Merged Details (Source Name)</code> with that content</li>
+</ul>
+</li>
+<li>Preserve target’s original content structure</li>
+<li>Merged content appears after target’s existing Details section (or creates one)</li>
+</ol>
+<p><strong>Relation Deduplication:</strong></p>
+<ul>
+<li>Relations are deduplicated by (relation_type, target) pair</li>
+<li>First occurrence is kept (target’s relations take precedence)</li>
+<li>Different relation types to same target are NOT duplicates</li>
+</ul>
+<p><strong>Attachment Deduplication:</strong></p>
+<ul>
+<li>Attachments are deduplicated by target identifier/path</li>
+<li>First occurrence is kept (target’s attachments take precedence)</li>
+</ul>
+<p><strong>Cross-Section Duplicate Check:</strong></p>
+<ul>
+<li>Before merge completes, validate no target appears in both Relations AND Attachments</li>
+<li>If cross-section duplicate detected, abort merge with error listing duplicates</li>
+<li>User must resolve by removing one of the duplicates before retrying</li>
+</ul>
+<p><strong>Relation Redirection:</strong></p>
+<ul>
+<li>Find all elements with relations pointing to source elements</li>
+<li>Update those relations to point to target element’s identifier</li>
+<li>This includes both forward and backward relations</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: behavior</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ElementManipulation.html#merge-element-operation">Merge Element Operation</a></li>
 </ul>
 <hr />
 

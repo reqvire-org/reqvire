@@ -271,8 +271,13 @@ The validator enforces the constraints defined in the [Element Type Relation Com
 - Refinement types (`constraint`, `behavior`, `specification`) can only have `satisfy` relations and cannot have Attachments subsections
 - Warnings should be issued when relation endpoints have incompatible element types
 
+This validation occurs:
+- During model parsing and validation (model.rs, parser.rs)
+- During link operations at CRUD time (graph_registry.rs)
+
 #### Relations
   * derivedFrom: [Validate Relation Types](#validate-relation-types)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)

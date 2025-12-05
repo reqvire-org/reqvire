@@ -738,10 +738,19 @@ blockquote {
 <p>Relations are categorized by their usage in different system functions:</p>
 <ol>
 <li>
-<p><strong>Diagram Rendering</strong> - Relations that are rendered in visual diagrams to avoid duplicate arrows</p>
+<p><strong>Diagram Rendering (Forward)</strong> - Relations that are rendered in visual diagrams to avoid duplicate arrows</p>
 <ul>
 <li>Only one relation from each opposite pair is shown (e.g., <code>derive</code> but not <code>derivedFrom</code>)</li>
+<li>Used for forward traversal (root to leaf) in model views</li>
 <li>Those are: <code>derive</code>, <code>satisfiedBy</code>, <code>verifiedBy</code>, <code>trace</code></li>
+</ul>
+</li>
+<li>
+<p><strong>Reverse Traversal (Backward)</strong> - Relations used for leaf-to-root traversal</p>
+<ul>
+<li>Opposite of diagram rendering relations</li>
+<li>Used for reverse model views and upward traceability</li>
+<li>Those are: <code>derivedFrom</code>, <code>satisfy</code>, <code>verify</code></li>
 </ul>
 </li>
 <li>
@@ -764,14 +773,14 @@ blockquote {
 </li>
 </ol>
 <h2 id="comprehensive-relation-type-table">Comprehensive Relation Type Table</h2>
-<table><thead><tr><th>Relation Type</th><th>Opposite Type</th><th>Diagram Rendering</th><th>Change Propagation</th><th>Description</th></tr></thead><tbody>
-<tr><td><strong>derivedFrom</strong></td><td>derive</td><td>No</td><td>No</td><td>Links a child element to the parent element it is derived from</td></tr>
-<tr><td><strong>derive</strong></td><td>derivedFrom</td><td>Yes</td><td>Yes</td><td>Links a parent element to child elements derived from it</td></tr>
-<tr><td><strong>satisfiedBy</strong></td><td>satisfy</td><td>Yes</td><td>Yes</td><td>Links a requirement to elements that satisfy it</td></tr>
-<tr><td><strong>satisfy</strong></td><td>satisfiedBy</td><td>No</td><td>No</td><td>Links an implementation to the requirement it satisfies</td></tr>
-<tr><td><strong>verifiedBy</strong></td><td>verify</td><td>Yes</td><td>Yes</td><td>Links a requirement to verification artifacts</td></tr>
-<tr><td><strong>verify</strong></td><td>verifiedBy</td><td>No</td><td>No</td><td>Links a verification artifact to the requirement it verifies</td></tr>
-<tr><td><strong>trace</strong></td><td>None</td><td>Yes</td><td>No</td><td>Establishes a trace relationship without change propagation</td></tr>
+<table><thead><tr><th>Relation Type</th><th>Opposite Type</th><th>Forward Traversal</th><th>Reverse Traversal</th><th>Change Propagation</th><th>Description</th></tr></thead><tbody>
+<tr><td><strong>derivedFrom</strong></td><td>derive</td><td>No</td><td>Yes</td><td>No</td><td>Links a child element to the parent element it is derived from</td></tr>
+<tr><td><strong>derive</strong></td><td>derivedFrom</td><td>Yes</td><td>No</td><td>Yes</td><td>Links a parent element to child elements derived from it</td></tr>
+<tr><td><strong>satisfiedBy</strong></td><td>satisfy</td><td>Yes</td><td>No</td><td>Yes</td><td>Links a requirement to elements that satisfy it</td></tr>
+<tr><td><strong>satisfy</strong></td><td>satisfiedBy</td><td>No</td><td>Yes</td><td>No</td><td>Links an implementation to the requirement it satisfies</td></tr>
+<tr><td><strong>verifiedBy</strong></td><td>verify</td><td>Yes</td><td>No</td><td>Yes</td><td>Links a requirement to verification artifacts</td></tr>
+<tr><td><strong>verify</strong></td><td>verifiedBy</td><td>No</td><td>Yes</td><td>No</td><td>Links a verification artifact to the requirement it verifies</td></tr>
+<tr><td><strong>trace</strong></td><td>None</td><td>Yes</td><td>No</td><td>No</td><td>Establishes a trace relationship without change propagation</td></tr>
 </tbody></table>
 <h2 id="relation-categories">Relation Categories</h2>
 <p>Relations are grouped into logical categories based on their semantic meaning:</p>

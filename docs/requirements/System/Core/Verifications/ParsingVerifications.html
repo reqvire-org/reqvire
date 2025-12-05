@@ -735,41 +735,41 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 2d73a43cf375cb0f[&quot;📁 requirements/System/Core/Verifications&quot;]
-    subgraph 4d8e9ad42eee63c5[&quot;📄 ParsingVerifications.md&quot;]
-      e21f26d3f283ac80[&quot;Element Subsection Parsing Test&quot;];
-      class e21f26d3f283ac80 verification;
-      click e21f26d3f283ac80 &quot;ParsingVerifications.html#element-subsection-parsing-test&quot;;
-      4b3aefbc8964bef0[&quot;Fragment Normalization Test&quot;];
-      class 4b3aefbc8964bef0 verification;
-      click 4b3aefbc8964bef0 &quot;ParsingVerifications.html#fragment-normalization-test&quot;;
-      eff6eeb4febadbd7[&quot;Non-Reserved Subsections Content Test&quot;];
-      class eff6eeb4febadbd7 verification;
-      click eff6eeb4febadbd7 &quot;ParsingVerifications.html#non-reserved-subsections-content-test&quot;;
-      a6a558a9f2daccdd[&quot;Refinement Element Type Parsing Test&quot;];
-      class a6a558a9f2daccdd verification;
-      click a6a558a9f2daccdd &quot;ParsingVerifications.html#refinement-element-type-parsing-test&quot;;
-      11bcef2a220fa0c8[&quot;Refinement Relations Rejection Test&quot;];
-      class 11bcef2a220fa0c8 verification;
-      click 11bcef2a220fa0c8 &quot;ParsingVerifications.html#refinement-relations-rejection-test&quot;;
-      d7b489a5edd073a2[&quot;Specification File Identification Test&quot;];
-      class d7b489a5edd073a2 verification;
-      click d7b489a5edd073a2 &quot;ParsingVerifications.html#specification-file-identification-test&quot;;
+  subgraph ef1b8526d9f32695["📁 requirements/System/Core/Verifications"]
+    subgraph 3ddcfdf1ce446139["📄 ParsingVerifications.md"]
+      93b8397a0426d420["Element Subsection Parsing Test"];
+      class 93b8397a0426d420 verification;
+      click 93b8397a0426d420 "ParsingVerifications.html#element-subsection-parsing-test";
+      684e3ecdccacca94["Fragment Normalization Test"];
+      class 684e3ecdccacca94 verification;
+      click 684e3ecdccacca94 "ParsingVerifications.html#fragment-normalization-test";
+      e1af75f98102697["Non-Reserved Subsections Content Test"];
+      class e1af75f98102697 verification;
+      click e1af75f98102697 "ParsingVerifications.html#non-reserved-subsections-content-test";
+      b268a6aff63332eb["Refinement Element Type Parsing Test"];
+      class b268a6aff63332eb verification;
+      click b268a6aff63332eb "ParsingVerifications.html#refinement-element-type-parsing-test";
+      66c5a27d1790cec8["Refinement Relations Rejection Test"];
+      class 66c5a27d1790cec8 verification;
+      click 66c5a27d1790cec8 "ParsingVerifications.html#refinement-relations-rejection-test";
+      bf4df38298e1e37e["Specification File Identification Test"];
+      class bf4df38298e1e37e verification;
+      click bf4df38298e1e37e "ParsingVerifications.html#specification-file-identification-test";
     end
   end
-  494239c0f3861cb5[&quot;test.sh&quot;];
-  class 494239c0f3861cb5 default;
-  click 494239c0f3861cb5 &quot;../../../../tests/test-parsing-functionality/test.sh&quot;;
-  e21f26d3f283ac80 -->|satisfiedBy| 494239c0f3861cb5;
-  4b3aefbc8964bef0 -->|satisfiedBy| 494239c0f3861cb5;
-  e8358fc93fee95fb[&quot;test.sh&quot;];
-  class e8358fc93fee95fb default;
-  click e8358fc93fee95fb &quot;../../../../tests/test-search-all-features/test.sh&quot;;
-  eff6eeb4febadbd7 -->|satisfiedBy| e8358fc93fee95fb;
-  7f5e53340a03365f[&quot;test.sh&quot;];
-  class 7f5e53340a03365f default;
-  click 7f5e53340a03365f &quot;../../../../tests/test-gitignore-integration/test.sh&quot;;
-  d7b489a5edd073a2 -->|satisfiedBy| 7f5e53340a03365f;
+  5f9cbc6f907e8045["test.sh"];
+  class 5f9cbc6f907e8045 default;
+  click 5f9cbc6f907e8045 "../../../../tests/test-parsing-functionality/test.sh";
+  93b8397a0426d420 -->|satisfiedBy| 5f9cbc6f907e8045;
+  684e3ecdccacca94 -->|satisfiedBy| 5f9cbc6f907e8045;
+  ea6a90c3d551dae4["test.sh"];
+  class ea6a90c3d551dae4 default;
+  click ea6a90c3d551dae4 "../../../../tests/test-search-all-features/test.sh";
+  e1af75f98102697 -->|satisfiedBy| ea6a90c3d551dae4;
+  94d34e73992ff9ac["test.sh"];
+  class 94d34e73992ff9ac default;
+  click 94d34e73992ff9ac "../../../../tests/test-gitignore-integration/test.sh";
+  bf4df38298e1e37e -->|satisfiedBy| 94d34e73992ff9ac;
 </div>
 <h3 id="element-subsection-parsing-test">Element Subsection Parsing Test</h3>
 <p>This test verifies that the system correctly extracts and parses element subsections (Metadata, Relations, Details) and element content from markdown documents.</p>
@@ -888,12 +888,12 @@ blockquote {
 </ul>
 <p><strong>Normalization Examples:</strong></p>
 <ul>
-<li><code>&quot;My Feature Name&quot;</code> → <code>&quot;my-feature-name&quot;</code></li>
-<li><code>&quot;Version 1.2.3&quot;</code> → <code>&quot;version-123&quot;</code> (dots removed)</li>
-<li><code>&quot;Installation (Windows)&quot;</code> → <code>&quot;installation-windows&quot;</code> (parentheses removed)</li>
-<li><code>&quot;C++ API Reference&quot;</code> → <code>&quot;c-api-reference&quot;</code> (plus signs removed)</li>
-<li><code>&quot;my_variable_name&quot;</code> → <code>&quot;my_variable_name&quot;</code> (underscores preserved)</li>
-<li><code>&quot;Multiple    Spaces&quot;</code> → <code>&quot;multiple----spaces&quot;</code> (each space becomes hyphen)</li>
+<li><code>"My Feature Name"</code> → <code>"my-feature-name"</code></li>
+<li><code>"Version 1.2.3"</code> → <code>"version-123"</code> (dots removed)</li>
+<li><code>"Installation (Windows)"</code> → <code>"installation-windows"</code> (parentheses removed)</li>
+<li><code>"C++ API Reference"</code> → <code>"c-api-reference"</code> (plus signs removed)</li>
+<li><code>"my_variable_name"</code> → <code>"my_variable_name"</code> (underscores preserved)</li>
+<li><code>"Multiple    Spaces"</code> → <code>"multiple----spaces"</code> (each space becomes hyphen)</li>
 </ul>
 <p><strong>Element ID Generation:</strong></p>
 <ul>
@@ -922,25 +922,25 @@ blockquote {
 <li>
 <p><strong>Special character handling:</strong></p>
 <ul>
-<li>Test elements with punctuation: <code>&quot;Feature (v2.0)&quot;</code></li>
-<li>Test elements with symbols: <code>&quot;C++ API&quot;</code></li>
-<li>Test elements with dots: <code>&quot;Version 1.2.3&quot;</code></li>
+<li>Test elements with punctuation: <code>"Feature (v2.0)"</code></li>
+<li>Test elements with symbols: <code>"C++ API"</code></li>
+<li>Test elements with dots: <code>"Version 1.2.3"</code></li>
 <li>Verify all punctuation is removed correctly</li>
 </ul>
 </li>
 <li>
 <p><strong>Underscore and hyphen preservation:</strong></p>
 <ul>
-<li>Test elements with underscores: <code>&quot;my_variable_name&quot;</code></li>
-<li>Test elements with hyphens: <code>&quot;pre-release-build&quot;</code></li>
+<li>Test elements with underscores: <code>"my_variable_name"</code></li>
+<li>Test elements with hyphens: <code>"pre-release-build"</code></li>
 <li>Verify both are preserved in normalized form</li>
 </ul>
 </li>
 <li>
 <p><strong>Whitespace handling:</strong></p>
 <ul>
-<li>Test multiple consecutive spaces: <code>&quot;Multiple    Spaces&quot;</code></li>
-<li>Test leading/trailing spaces: <code>&quot;  Trimmed  &quot;</code></li>
+<li>Test multiple consecutive spaces: <code>"Multiple    Spaces"</code></li>
+<li>Test leading/trailing spaces: <code>"  Trimmed  "</code></li>
 <li>Verify each space becomes a hyphen</li>
 <li>Verify trim operation works correctly</li>
 </ul>
@@ -948,8 +948,8 @@ blockquote {
 <li>
 <p><strong>Cross-reference resolution:</strong></p>
 <ul>
-<li>Create element <code>&quot;My Feature Name&quot;</code></li>
-<li>Reference it as <code>&quot;My Feature Name&quot;</code>, <code>&quot;my feature name&quot;</code>, <code>&quot;MY FEATURE NAME&quot;</code></li>
+<li>Create element <code>"My Feature Name"</code></li>
+<li>Reference it as <code>"My Feature Name"</code>, <code>"my feature name"</code>, <code>"MY FEATURE NAME"</code></li>
 <li>Verify all variants resolve to same element</li>
 <li>Verify relations are established correctly</li>
 </ul>
@@ -1043,13 +1043,13 @@ blockquote {
 <li>System shall parse <code>type: behavior</code> as Refinement type Behavior</li>
 <li>System shall parse <code>type: specification</code> as Refinement type Specification</li>
 <li>Refinement types shall be stored distinctly from other element types</li>
-<li>Refinement types shall display as <code>&quot;constraint&quot;</code>, <code>&quot;behavior&quot;</code>, <code>&quot;specification&quot;</code> in output</li>
+<li>Refinement types shall display as <code>"constraint"</code>, <code>"behavior"</code>, <code>"specification"</code> in output</li>
 </ul>
 <p><strong>Search and Filtering:</strong></p>
 <ul>
-<li>System shall support filtering by <code>--filter-type=&quot;constraint&quot;</code></li>
-<li>System shall support filtering by <code>--filter-type=&quot;behavior&quot;</code></li>
-<li>System shall support filtering by <code>--filter-type=&quot;specification&quot;</code></li>
+<li>System shall support filtering by <code>--filter-type="constraint"</code></li>
+<li>System shall support filtering by <code>--filter-type="behavior"</code></li>
+<li>System shall support filtering by <code>--filter-type="specification"</code></li>
 </ul>
 <h5>Test Criteria</h5>
 <ol>
@@ -1058,7 +1058,7 @@ blockquote {
 <ul>
 <li>Create element with <code>type: constraint</code> metadata</li>
 <li>Query model via JSON output</li>
-<li>Verify <code>element_type</code> field is <code>&quot;constraint&quot;</code></li>
+<li>Verify <code>element_type</code> field is <code>"constraint"</code></li>
 </ul>
 </li>
 <li>
@@ -1066,7 +1066,7 @@ blockquote {
 <ul>
 <li>Create element with <code>type: behavior</code> metadata</li>
 <li>Query model via JSON output</li>
-<li>Verify <code>element_type</code> field is <code>&quot;behavior&quot;</code></li>
+<li>Verify <code>element_type</code> field is <code>"behavior"</code></li>
 </ul>
 </li>
 <li>
@@ -1074,16 +1074,16 @@ blockquote {
 <ul>
 <li>Create element with <code>type: specification</code> metadata</li>
 <li>Query model via JSON output</li>
-<li>Verify <code>element_type</code> field is <code>&quot;specification&quot;</code></li>
+<li>Verify <code>element_type</code> field is <code>"specification"</code></li>
 </ul>
 </li>
 <li>
 <p><strong>Search filtering:</strong></p>
 <ul>
 <li>Create elements of all three Refinement types</li>
-<li>Test <code>--filter-type=&quot;constraint&quot;</code> returns only constraint elements</li>
-<li>Test <code>--filter-type=&quot;behavior&quot;</code> returns only behavior elements</li>
-<li>Test <code>--filter-type=&quot;specification&quot;</code> returns only specification elements</li>
+<li>Test <code>--filter-type="constraint"</code> returns only constraint elements</li>
+<li>Test <code>--filter-type="behavior"</code> returns only behavior elements</li>
+<li>Test <code>--filter-type="specification"</code> returns only specification elements</li>
 </ul>
 </li>
 </ol>

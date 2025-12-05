@@ -4,6 +4,62 @@ use crate::relation::Relation;
 use crate::utils;
 use serde::Serialize;
 
+/// All valid element types that can be used in --filter-type arguments.
+/// These values match what ElementType::as_str() returns for each variant.
+///
+/// MAINTENANCE NOTE: If you add a new ElementType variant, add its string here too.
+/// The values must match exactly what ElementType::as_str() returns.
+pub const ELEMENT_TYPES: &[&str] = &[
+    // RequirementType variants (from ElementType::Requirement)
+    "user-requirement",          // RequirementType::User
+    "requirement",               // RequirementType::System
+    // VerificationType variants (from ElementType::Verification)
+    "test-verification",         // VerificationType::Test/Default
+    "analysis-verification",     // VerificationType::Analysis
+    "inspection-verification",   // VerificationType::Inspection
+    "demonstration-verification",// VerificationType::Demonstration
+    // RefinementType variants (from ElementType::Refinement)
+    "constraint",                // RefinementType::Constraint
+    "behavior",                  // RefinementType::Behavior
+    "specification",             // RefinementType::Specification
+];
+
+/// Element type aliases that are also accepted (mapped to canonical types)
+/// These match the aliases in ElementType::from_metadata()
+pub const ELEMENT_TYPE_ALIASES: &[&str] = &[
+    "system-requirement",  // alias for "requirement"
+    "verification",        // alias for "test-verification"
+];
+
+/// Returns true if the given type string is a valid element type
+/// Valid types are:
+/// - Standard types (requirement, user-requirement, test-verification, etc.)
+/// - Aliases (system-requirement, verification)
+/// - Custom types following the pattern "other-TYPENAME" (e.g., other-use-case, other-actor)
+pub fn is_valid_element_type(type_str: &str) -> bool {
+    let lower = type_str.to_lowercase();
+    // Check standard types and aliases
+    if ELEMENT_TYPES.contains(&lower.as_str()) || ELEMENT_TYPE_ALIASES.contains(&lower.as_str()) {
+        return true;
+    }
+    // Check custom type pattern: other-TYPENAME
+    if lower.starts_with("other-") && lower.len() > 6 {
+        return true;
+    }
+    false
+}
+
+/// Helper function to get element types as a comma-separated string for CLI help
+pub fn element_types_list() -> String {
+    ELEMENT_TYPES.join(", ")
+}
+
+/// Helper function to get element types help with custom type explanation
+pub fn element_types_help() -> String {
+    format!("{}. For custom types use: other-TYPENAME", ELEMENT_TYPES.join(", "))
+}
+
+
 /// Represents the target of an attachment - either a file path or an element identifier
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum AttachmentTarget {
@@ -166,6 +222,23 @@ impl ElementType {
     /// Returns true if this element type is a Refinement type
     pub fn is_refinement(&self) -> bool {
         matches!(self, ElementType::Refinement(_))
+    }
+
+    /// Returns the main type category for merge compatibility
+    pub fn main_category(&self) -> &'static str {
+        match self {
+            ElementType::Requirement(_) => "requirement",
+            ElementType::Verification(_) => "verification",
+            ElementType::Refinement(_) => "refinement",
+            ElementType::File => "file",
+            ElementType::Other(_) => "other",
+        }
+    }
+
+    /// Check if two element types are merge-compatible
+    /// Elements are merge-compatible if they belong to the same main type category
+    pub fn is_merge_compatible(&self, other: &ElementType) -> bool {
+        self.main_category() == other.main_category()
     }
 }
 

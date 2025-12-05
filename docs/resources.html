@@ -738,10 +738,12 @@ blockquote {
 <ul>
 <li><a href="requirements/Interfaces/CLI.html#cli-add-element-command">CLI Add Element Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#cli-change-impact-report-command">CLI Change Impact Report Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI.html#cli-collect-command">CLI Collect Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#cli-containment-command">CLI Containment Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#cli-coverage-command">CLI Coverage Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#cli-interface-structure">CLI Interface Structure</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#cli-lint-command">CLI Lint Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI.html#cli-merge-element-command">CLI Merge Element Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#cli-model-diagram-command">CLI Model Diagram Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#cli-move-asset-command">CLI Move Asset Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#cli-move-element-command">CLI Move Element Command</a> (via satisfiedBy)</li>
@@ -753,6 +755,7 @@ blockquote {
 <li><a href="requirements/Interfaces/CLI.html#cli-search-command">CLI Search Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#cli-traces-command">CLI Traces Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#format-command">Format Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI.html#relation-commands">Relation Commands</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI.html#validate-command">Validate Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface.html#html-export">HTML Export</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface.html#serve-command">Serve Command</a> (via satisfiedBy)</li>
@@ -793,9 +796,11 @@ blockquote {
 <h3 id="core/src/crud.rs">core/src/crud.rs</h3>
 <ul>
 <li><a href="requirements/System/Core/ModelManagement.html#attachment-identifier-updates">Attachment Identifier Updates</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Operations/ElementManipulation.html#merge-element-operation">Merge Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a> (via satisfiedBy)</li>
 </ul>
@@ -818,6 +823,7 @@ blockquote {
 <ul>
 <li><a href="requirements/System/Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Operations/ElementManipulation.html#merge-element-operation">Merge Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a> (via satisfiedBy)</li>
@@ -829,6 +835,7 @@ blockquote {
 <li><a href="requirements/System/Core/StructureAndParsing.html#element-identity-model">Element Identity Model</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Core/Validation.html#type-validation-error-requirement">Type Validation Error Requirement</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/error.rs">core/src/error.rs</h3>
@@ -854,6 +861,7 @@ blockquote {
 <h3 id="core/src/format.rs">core/src/format.rs</h3>
 <ul>
 <li><a href="requirements/System/Operations/Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Operations/Formatting.html#format-duplicate-removal">Format Duplicate Removal</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a> (via satisfiedBy)</li>
 </ul>
 <hr />
@@ -864,10 +872,13 @@ blockquote {
 <hr />
 <h3 id="core/src/graph_registry.rs">core/src/graph_registry.rs</h3>
 <ul>
+<li><a href="requirements/System/Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Core/Validation.html#relation-element-type-validator">Relation Element Type Validator</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Operations/ElementManipulation.html#merge-element-operation">Merge Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a> (via satisfiedBy)</li>
@@ -895,6 +906,7 @@ blockquote {
 <h3 id="core/src/lint.rs">core/src/lint.rs</h3>
 <ul>
 <li><a href="requirements/System/Operations/Linting.html#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Operations/Linting.html#redundant-hierarchical-attachment-detection">Redundant Hierarchical Attachment Detection</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/Linting.html#safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</a> (via satisfiedBy)</li>
 </ul>
 <hr />
@@ -907,6 +919,7 @@ blockquote {
 <li><a href="requirements/System/Core/StructureAndParsing.html#specification-file-identification">Specification File Identification</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/Validation.html#cross-component-dependency-validator">Cross-Component Dependency Validator</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Core/Validation.html#cross-section-duplicate-validation">Cross-Section Duplicate Validation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/Validation.html#internal-consistency-validator">Internal Consistency Validator</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/Validation.html#markdown-structure-validator">Markdown Structure Validator</a> (via satisfiedBy)</li>
@@ -940,6 +953,12 @@ blockquote {
 <li><a href="requirements/System/Core/StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Core/Validation.html#relation-type-validation">Relation Type Validation</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Core/Validation.html#type-validation-error-requirement">Type Validation Error Requirement</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="core/src/report_collect.rs">core/src/report_collect.rs</h3>
+<ul>
+<li><a href="requirements/System/Output/Reporting.html#collect-content-from-requirement-chain">Collect Content from Requirement Chain</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/report_coverage.rs">core/src/report_coverage.rs</h3>
@@ -951,6 +970,8 @@ blockquote {
 <ul>
 <li><a href="requirements/Interfaces/WebInterface.html#model-centric-view-generation">Model-Centric View Generation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface.html#model-view-element-navigation">Model View Element Navigation</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Output/Reporting.html#reverse-relation-traversal">Reverse Relation Traversal</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Output/Reporting.html#start-element-type-filtering">Start Element Type Filtering</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/report_resources.rs">core/src/report_resources.rs</h3>
@@ -1047,6 +1068,11 @@ blockquote {
 <li><a href="requirements/Interfaces/Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-collect-command/test.sh">tests/test-collect-command/test.sh</h3>
+<ul>
+<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#cli-collect-command-test">CLI Collect Command Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-containment-view/test.sh">tests/test-containment-view/test.sh</h3>
 <ul>
 <li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#containment-hierarchy-extraction-test">Containment Hierarchy Extraction Test</a> (via satisfiedBy)</li>
@@ -1104,6 +1130,14 @@ blockquote {
 <li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test">Default Element Type Assignment Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-duplicate-detection/test.sh">tests/test-duplicate-detection/test.sh</h3>
+<ul>
+<li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#cross-section-duplicate-validation-test">Cross-Section Duplicate Validation Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#add-command-duplicate-detection-test">Add Command Duplicate Detection Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#link-command-cross-section-detection-test">Link Command Cross-Section Detection Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Operations/Verifications/FormattingVerifications.html#format-duplicate-removal-test">Format Duplicate Removal Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-element-content-extraction/test.sh">tests/test-element-content-extraction/test.sh</h3>
 <ul>
 <li><a href="requirements/System/Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test">Element Content Extraction Test</a> (via satisfiedBy)</li>
@@ -1151,9 +1185,20 @@ blockquote {
 <li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-link-unlink/test.sh">tests/test-link-unlink/test.sh</h3>
+<ul>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#link-command-verification">Link Command Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Operations/Verifications/ElementManipulationVerifications.html#unlink-command-verification">Unlink Command Verification</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-lint-command/test.sh">tests/test-lint-command/test.sh</h3>
 <ul>
 <li><a href="requirements/System/Operations/Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-lint-redundant-attachments/test.sh">tests/test-lint-redundant-attachments/test.sh</h3>
+<ul>
+<li><a href="requirements/System/Operations/Verifications/LintingVerifications.html#redundant-hierarchical-attachment-test">Redundant Hierarchical Attachment Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="tests/test-model-command/test.sh">tests/test-model-command/test.sh</h3>
@@ -1201,6 +1246,11 @@ blockquote {
 <li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#traceflow-view-test">TraceFlow View Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-type-validation-errors/test.sh">tests/test-type-validation-errors/test.sh</h3>
+<ul>
+<li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#type-validation-errors-test">Type Validation Errors Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-valid-relations/test.sh">tests/test-valid-relations/test.sh</h3>
 <ul>
 <li><a href="requirements/System/Core/Verifications/ValidationVerifications.html#unstructured-documents-test">Unstructured Documents Test</a> (via satisfiedBy)</li>
@@ -1218,8 +1268,6 @@ blockquote {
 <h3 id="requirements/system/core/designdocuments/elementidentity.md">requirements/System/Core/DesignDocuments/ElementIdentity.md</h3>
 <ul>
 <li><a href="requirements/System/Core/StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
-<li><a href="requirements/System/Core/Validation.html#internal-consistency-validator">Internal Consistency Validator</a></li>
-<li><a href="requirements/System/Processing/ChangeImpact.html#change-impact-detection">Change Impact Detection</a></li>
 </ul>
 <hr />
 <h3 id="requirements/system/core/designdocuments/identifiersandrelations.md">requirements/System/Core/DesignDocuments/IdentifiersAndRelations.md</h3>
@@ -1235,15 +1283,9 @@ blockquote {
 <h3 id="requirements/system/core/designdocuments/relationtypes.md">requirements/System/Core/DesignDocuments/RelationTypes.md</h3>
 <ul>
 <li><a href="requirements/Interfaces/CLI.html#relation-commands">Relation Commands</a></li>
-<li><a href="requirements/System/Core/ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
 <li><a href="requirements/System/Core/ModelManagement.html#refinement-element-structure-constraints">Refinement Element Structure Constraints</a></li>
-<li><a href="requirements/System/Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a></li>
 <li><a href="requirements/System/Core/ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
-<li><a href="requirements/System/Core/Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
-<li><a href="requirements/System/Core/Validation.html#validate-relation-types">Validate Relation Types</a></li>
 <li><a href="requirements/System/Operations/Formatting.html#full-relations-insertion">Full Relations Insertion</a></li>
-<li><a href="requirements/System/Operations/Specifications.html#relation-operations-specification">Relation Operations Specification</a></li>
-<li><a href="requirements/System/Output/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></li>
 </ul>
 <hr />
 <h3 id="requirements/system/core/designdocuments/reservedsubsections.md">requirements/System/Core/DesignDocuments/ReservedSubsections.md</h3>
@@ -1274,8 +1316,8 @@ blockquote {
 <hr />
 <h2 id="summary">Summary</h2>
 <ul>
-<li><strong>Relation Files:</strong> 69 (209 references)</li>
-<li><strong>Attachment Files:</strong> 9 (21 references)</li>
+<li><strong>Relation Files:</strong> 75 (235 references)</li>
+<li><strong>Attachment Files:</strong> 9 (13 references)</li>
 </ul>
 
         </div>

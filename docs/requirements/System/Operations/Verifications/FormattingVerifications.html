@@ -735,35 +735,42 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 66aa2b416ad6d023[&quot;📁 requirements/System/Operations/Verifications&quot;]
-    subgraph 5fdb7c9d75d9c8bf[&quot;📄 FormattingVerifications.md&quot;]
-      934319026295f62c[&quot;Element Ordering Verification<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior&quot;];
-      class 934319026295f62c verification;
-      click 934319026295f62c &quot;FormattingVerifications.html#element-ordering-verification&quot;;
-      723757d62c730981[&quot;Format Command Requirements Verification&quot;];
-      class 723757d62c730981 verification;
-      click 723757d62c730981 &quot;FormattingVerifications.html#format-command-requirements-verification&quot;;
-      6d1f64516c7eb3bb[&quot;Full Relations Insertion Verification&quot;];
-      class 6d1f64516c7eb3bb verification;
-      click 6d1f64516c7eb3bb &quot;FormattingVerifications.html#full-relations-insertion-verification&quot;;
-      de9c99ddb7e13f89[&quot;Relation Ordering Verification&quot;];
-      class de9c99ddb7e13f89 verification;
-      click de9c99ddb7e13f89 &quot;FormattingVerifications.html#relation-ordering-verification&quot;;
+  subgraph d4f6f1eb956473cf["📁 requirements/System/Operations/Verifications"]
+    subgraph 9dfdb29c8515e24d["📄 FormattingVerifications.md"]
+      706b78390900580d["Element Ordering Verification<br/>📎 requirements/System/Operations/Behaviors.md#element-ordering-behavior"];
+      class 706b78390900580d verification;
+      click 706b78390900580d "FormattingVerifications.html#element-ordering-verification";
+      afe734eb25af0948["Format Command Requirements Verification"];
+      class afe734eb25af0948 verification;
+      click afe734eb25af0948 "FormattingVerifications.html#format-command-requirements-verification";
+      fd4eddc1dfcd11cc["Format Duplicate Removal Test"];
+      class fd4eddc1dfcd11cc verification;
+      click fd4eddc1dfcd11cc "FormattingVerifications.html#format-duplicate-removal-test";
+      c9dbeddcef9622ec["Full Relations Insertion Verification"];
+      class c9dbeddcef9622ec verification;
+      click c9dbeddcef9622ec "FormattingVerifications.html#full-relations-insertion-verification";
+      4260d1115e565ab9["Relation Ordering Verification"];
+      class 4260d1115e565ab9 verification;
+      click 4260d1115e565ab9 "FormattingVerifications.html#relation-ordering-verification";
     end
   end
-  743d877eaae55d53[&quot;test.sh&quot;];
-  class 743d877eaae55d53 default;
-  click 743d877eaae55d53 &quot;../../../../tests/test-element-ordering/test.sh&quot;;
-  934319026295f62c -->|satisfiedBy| 743d877eaae55d53;
-  eaf33ce1e6113c8a[&quot;test.sh&quot;];
-  class eaf33ce1e6113c8a default;
-  click eaf33ce1e6113c8a &quot;../../../../tests/test-advanced-format/test.sh&quot;;
-  723757d62c730981 -->|satisfiedBy| eaf33ce1e6113c8a;
-  8c631136f1cd90f[&quot;test.sh&quot;];
-  class 8c631136f1cd90f default;
-  click 8c631136f1cd90f &quot;../../../../tests/test-format-full-relations/test.sh&quot;;
-  6d1f64516c7eb3bb -->|satisfiedBy| 8c631136f1cd90f;
-  de9c99ddb7e13f89 -->|satisfiedBy| eaf33ce1e6113c8a;
+  81623fde4ecde03d["test.sh"];
+  class 81623fde4ecde03d default;
+  click 81623fde4ecde03d "../../../../tests/test-element-ordering/test.sh";
+  706b78390900580d -->|satisfiedBy| 81623fde4ecde03d;
+  aaf45a054cfa1d47["test.sh"];
+  class aaf45a054cfa1d47 default;
+  click aaf45a054cfa1d47 "../../../../tests/test-advanced-format/test.sh";
+  afe734eb25af0948 -->|satisfiedBy| aaf45a054cfa1d47;
+  4179509ffe0be04b["test.sh"];
+  class 4179509ffe0be04b default;
+  click 4179509ffe0be04b "../../../../tests/test-duplicate-detection/test.sh";
+  fd4eddc1dfcd11cc -->|satisfiedBy| 4179509ffe0be04b;
+  2a806c95f3f078e4["test.sh"];
+  class 2a806c95f3f078e4 default;
+  click 2a806c95f3f078e4 "../../../../tests/test-format-full-relations/test.sh";
+  c9dbeddcef9622ec -->|satisfiedBy| 2a806c95f3f078e4;
+  4260d1115e565ab9 -->|satisfiedBy| aaf45a054cfa1d47;
 </div>
 <h3 id="element-ordering-verification">Element Ordering Verification</h3>
 <p>This test verifies that the format command reorders elements following the Element Ordering Behavior, ensuring parent elements appear before their children based on file-local derivedFrom hierarchy.</p>
@@ -1007,6 +1014,25 @@ blockquote {
 <li>verify: <a href="../Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a></li>
 <li>verify: <a href="../Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a></li>
 <li>verify: <a href="../Formatting.html#replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</a></li>
+</ul>
+<hr />
+<h3 id="format-duplicate-removal-test">Format Duplicate Removal Test</h3>
+<p>Test verifies that format removes within-section duplicates but not cross-section.</p>
+<h4>Details</h4>
+<p>Test cases:</p>
+<ol>
+<li>File with duplicate relations -&gt; <code>format --fix</code> -&gt; Duplicates removed</li>
+<li>File with duplicate attachments -&gt; <code>format --fix</code> -&gt; Duplicates removed</li>
+<li>File with cross-section duplicate -&gt; <code>format --fix</code> -&gt; No change (validation error, not format issue)</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-duplicate-detection/test.sh">test.sh</a></li>
+<li>verify: <a href="../Formatting.html#format-duplicate-removal">Format Duplicate Removal</a></li>
 </ul>
 <hr />
 <h3 id="full-relations-insertion-verification">Full Relations Insertion Verification</h3>

@@ -1,0 +1,368 @@
+use crate::element::{AttachmentTarget, ElementType};
+use crate::error::ReqvireError;
+use crate::graph_registry::GraphRegistry;
+use crate::relation;
+use serde::Serialize;
+use std::collections::HashSet;
+use std::fs;
+use std::path::Path;
+
+/// Source type for collected content items
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "snake_case")]
+pub enum SourceType {
+    /// Content from a model element
+    Element,
+    /// Content from an attached file
+    AttachmentFile,
+    /// Content from an attached refinement element
+    AttachmentElement,
+}
+
+/// A single collected content item
+#[derive(Debug, Serialize)]
+pub struct CollectedItem {
+    pub name: String,
+    pub identifier: String,
+    pub file_path: String,
+    pub element_type: String,
+    pub content: String,
+    pub depth: usize,
+    pub source_type: SourceType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub attached_to: Option<String>,
+}
+
+/// Metadata about the collection
+#[derive(Debug, Serialize)]
+pub struct CollectMetadata {
+    pub element_count: usize,
+    pub attachment_count: usize,
+    pub total_items: usize,
+}
+
+/// Complete collect report
+#[derive(Debug, Serialize)]
+pub struct CollectReport {
+    pub starting_element: String,
+    pub items: Vec<CollectedItem>,
+    pub metadata: CollectMetadata,
+}
+
+/// Generate a collect report for a requirement element
+pub fn generate_collect_report(
+    registry: &GraphRegistry,
+    element_name: &str,
+    git_root: &Path,
+    json_output: bool,
+) -> Result<String, ReqvireError> {
+    // Find element by name
+    let element_id = registry
+        .nodes
+        .iter()
+        .find(|(_, node)| node.element.name == element_name)
+        .map(|(id, _)| id.clone());
+
+    let element_id = match element_id {
+        Some(id) => id,
+        None => {
+            return Err(ReqvireError::ElementError(format!(
+                "Element with name '{}' not found",
+                element_name
+            )));
+        }
+    };
+
+    // Get the element
+    let element = registry.get_element(&element_id).ok_or_else(|| {
+        ReqvireError::ElementError(format!("Element '{}' not found in registry", element_id))
+    })?;
+
+    // Validate element type is a requirement
+    match &element.element_type {
+        ElementType::Requirement(_) => {}
+        _ => {
+            return Err(ReqvireError::ElementError(format!(
+                "Element '{}' is not a requirement type (found: {}). Only requirement and user-requirement types are supported.",
+                element_name,
+                element.element_type.as_str()
+            )));
+        }
+    }
+
+    // Collect ancestor chain via derivedFrom relations
+    let ancestor_chain = collect_ancestor_chain(registry, &element_id);
+
+    // Build collected items
+    let mut items: Vec<CollectedItem> = Vec::new();
+    let mut element_count = 0;
+    let mut attachment_count = 0;
+
+    // Process ancestors first (root first, depth 0)
+    // ancestor_chain is ordered from starting element to root, so we reverse
+    for (depth, elem_id) in ancestor_chain.iter().rev().enumerate() {
+        if let Some(elem) = registry.get_element(elem_id) {
+            // Add element content
+            items.push(CollectedItem {
+                name: elem.name.clone(),
+                identifier: elem.identifier.clone(),
+                file_path: elem.file_path.clone(),
+                element_type: elem.element_type.as_str().to_string(),
+                content: elem.content.clone(),
+                depth,
+                source_type: SourceType::Element,
+                attached_to: None,
+            });
+            element_count += 1;
+
+            // Collect attachment contents
+            for attachment in &elem.attachments {
+                if let Some(item) =
+                    collect_attachment_content(registry, attachment, &elem.identifier, depth, git_root)
+                {
+                    attachment_count += 1;
+                    items.push(item);
+                }
+            }
+        }
+    }
+
+    let report = CollectReport {
+        starting_element: element_id,
+        items,
+        metadata: CollectMetadata {
+            element_count,
+            attachment_count,
+            total_items: element_count + attachment_count,
+        },
+    };
+
+    if json_output {
+        serde_json::to_string_pretty(&report)
+            .map_err(|e| ReqvireError::SerializationError(e.to_string()))
+    } else {
+        Ok(generate_text_output(&report))
+    }
+}
+
+/// Collect the ancestor chain following derivedFrom relations
+fn collect_ancestor_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+    let mut chain = Vec::new();
+    let mut visited = HashSet::new();
+    let mut current_level = vec![start_id.to_string()];
+
+    while !current_level.is_empty() {
+        // Sort for deterministic ordering
+        let mut sorted_level = current_level.clone();
+        sorted_level.sort();
+
+        for elem_id in &sorted_level {
+            if visited.contains(elem_id) {
+                continue;
+            }
+            visited.insert(elem_id.clone());
+            chain.push(elem_id.clone());
+        }
+
+        // Find next level (parents via derivedFrom)
+        let mut next_level = Vec::new();
+        for elem_id in &sorted_level {
+            if let Some(elem) = registry.get_element(elem_id) {
+                for rel in &elem.relations {
+                    // Only follow derivedFrom relations (backward/reverse direction)
+                    if rel.relation_type.name == "derivedFrom" {
+                        if let relation::LinkType::Identifier(target_id) = &rel.target.link {
+                            if !visited.contains(target_id) {
+                                next_level.push(target_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        current_level = next_level;
+    }
+
+    chain
+}
+
+/// Collect content from an attachment
+fn collect_attachment_content(
+    registry: &GraphRegistry,
+    attachment: &crate::element::Attachment,
+    parent_identifier: &str,
+    depth: usize,
+    git_root: &Path,
+) -> Option<CollectedItem> {
+    match &attachment.target {
+        AttachmentTarget::FilePath(path) => {
+            let full_path = git_root.join(path);
+            let path_str = path.to_string_lossy().to_string();
+
+            // Check if it's a markdown file
+            if path_str.ends_with(".md") {
+                // Try to read file content
+                match fs::read_to_string(&full_path) {
+                    Ok(content) => Some(CollectedItem {
+                        name: path
+                            .file_name()
+                            .map(|n| n.to_string_lossy().to_string())
+                            .unwrap_or_else(|| path_str.clone()),
+                        identifier: path_str,
+                        file_path: path.to_string_lossy().to_string(),
+                        element_type: "attachment".to_string(),
+                        content,
+                        depth,
+                        source_type: SourceType::AttachmentFile,
+                        attached_to: Some(parent_identifier.to_string()),
+                    }),
+                    Err(_) => {
+                        // File not found - create link instead
+                        Some(CollectedItem {
+                            name: path
+                                .file_name()
+                                .map(|n| n.to_string_lossy().to_string())
+                                .unwrap_or_else(|| path_str.clone()),
+                            identifier: path_str.clone(),
+                            file_path: path.to_string_lossy().to_string(),
+                            element_type: "attachment".to_string(),
+                            content: format!("[{}]({})", path_str, path_str),
+                            depth,
+                            source_type: SourceType::AttachmentFile,
+                            attached_to: Some(parent_identifier.to_string()),
+                        })
+                    }
+                }
+            } else {
+                // Non-markdown file - create link
+                Some(CollectedItem {
+                    name: path
+                        .file_name()
+                        .map(|n| n.to_string_lossy().to_string())
+                        .unwrap_or_else(|| path_str.clone()),
+                    identifier: path_str.clone(),
+                    file_path: path.to_string_lossy().to_string(),
+                    element_type: "attachment".to_string(),
+                    content: format!("[{}]({})", path_str, path_str),
+                    depth,
+                    source_type: SourceType::AttachmentFile,
+                    attached_to: Some(parent_identifier.to_string()),
+                })
+            }
+        }
+        AttachmentTarget::ElementIdentifier(elem_id) => {
+            // Look up element content from registry
+            if let Some(elem) = registry.get_element(elem_id) {
+                Some(CollectedItem {
+                    name: elem.name.clone(),
+                    identifier: elem.identifier.clone(),
+                    file_path: elem.file_path.clone(),
+                    element_type: elem.element_type.as_str().to_string(),
+                    content: elem.content.clone(),
+                    depth,
+                    source_type: SourceType::AttachmentElement,
+                    attached_to: Some(parent_identifier.to_string()),
+                })
+            } else {
+                None
+            }
+        }
+    }
+}
+
+/// Generate text output with source citations
+fn generate_text_output(report: &CollectReport) -> String {
+    let mut output = String::new();
+
+    for item in &report.items {
+        // Add content
+        output.push_str(&item.content);
+        output.push_str("\n\n");
+
+        // Add source citation based on source type
+        match item.source_type {
+            SourceType::Element => {
+                output.push_str(&format!(
+                    "— Source: [{}]({})\n",
+                    item.name, item.identifier
+                ));
+            }
+            SourceType::AttachmentFile => {
+                if let Some(ref parent) = item.attached_to {
+                    output.push_str(&format!(
+                        "— Source: [{}]({}) attached to [{}]({})\n",
+                        item.name, item.identifier,
+                        extract_element_name(parent), parent
+                    ));
+                } else {
+                    output.push_str(&format!(
+                        "— Source: [{}]({})\n",
+                        item.name, item.identifier
+                    ));
+                }
+            }
+            SourceType::AttachmentElement => {
+                if let Some(ref parent) = item.attached_to {
+                    output.push_str(&format!(
+                        "— Source: [{}]({}) satisfying [{}]({})\n",
+                        item.name, item.identifier,
+                        extract_element_name(parent), parent
+                    ));
+                } else {
+                    output.push_str(&format!(
+                        "— Source: [{}]({})\n",
+                        item.name, item.identifier
+                    ));
+                }
+            }
+        }
+
+        // Add separator after citation
+        output.push_str("\n---\n\n");
+    }
+
+    output
+}
+
+/// Extract element name from identifier (text after #)
+fn extract_element_name(identifier: &str) -> String {
+    if let Some(pos) = identifier.rfind('#') {
+        // Convert fragment to title case
+        let fragment = &identifier[pos + 1..];
+        fragment
+            .split('-')
+            .map(|word| {
+                let mut chars = word.chars();
+                match chars.next() {
+                    Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+                    None => String::new(),
+                }
+            })
+            .collect::<Vec<_>>()
+            .join(" ")
+    } else {
+        identifier.to_string()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_extract_element_name() {
+        assert_eq!(
+            extract_element_name("file.md#some-element-name"),
+            "Some Element Name"
+        );
+        assert_eq!(
+            extract_element_name("path/to/file.md#simple"),
+            "Simple"
+        );
+        assert_eq!(
+            extract_element_name("no-fragment"),
+            "no-fragment"
+        );
+    }
+}

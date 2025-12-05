@@ -735,58 +735,58 @@ blockquote {
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 1d4bb727b3ab4a6c[&quot;📁 requirements/System/Integration&quot;]
-    subgraph 7cdfa652b08350b0[&quot;📄 CodeAlignment.md&quot;]
-      5d1f78408a91c908[&quot;BAT style comment&quot;];
-      class 5d1f78408a91c908 systemRequirement;
-      click 5d1f78408a91c908 &quot;CodeAlignment.html#bat-style-comment&quot;;
-      21c836664ae15aab[&quot;Code Traceability&quot;];
-      class 21c836664ae15aab userRequirement;
-      click 21c836664ae15aab &quot;CodeAlignment.html#code-traceability&quot;;
-      9b5f9a7fd1e0f242[&quot;Comment Style by File Extension&quot;];
-      class 9b5f9a7fd1e0f242 systemRequirement;
-      click 9b5f9a7fd1e0f242 &quot;CodeAlignment.html#comment-style-by-file-extension&quot;;
-      a31edd3024f12959[&quot;CSS style comment&quot;];
-      class a31edd3024f12959 systemRequirement;
-      click a31edd3024f12959 &quot;CodeAlignment.html#css-style-comment&quot;;
-      92701f2cabc0a09a[&quot;Dash style comment&quot;];
-      class 92701f2cabc0a09a userRequirement;
-      click 92701f2cabc0a09a &quot;CodeAlignment.html#dash-style-comment&quot;;
-      50bbe01fa1813913[&quot;Slash style comment&quot;];
-      class 50bbe01fa1813913 systemRequirement;
-      click 50bbe01fa1813913 &quot;CodeAlignment.html#slash-style-comment&quot;;
-      35cc91617e8c680e[&quot;SQL style comment&quot;];
-      class 35cc91617e8c680e systemRequirement;
-      click 35cc91617e8c680e &quot;CodeAlignment.html#sql-style-comment&quot;;
-      238aa11f608eaec2[&quot;Suggest Code Refactoring&quot;];
-      class 238aa11f608eaec2 userRequirement;
-      click 238aa11f608eaec2 &quot;CodeAlignment.html#suggest-code-refactoring&quot;;
-      640ca7b4880a0f75[&quot;Traceability Format&quot;];
-      class 640ca7b4880a0f75 systemRequirement;
-      click 640ca7b4880a0f75 &quot;CodeAlignment.html#traceability-format&quot;;
-      a9dc7bcdada8f895[&quot;Validating Traceability Format&quot;];
-      class a9dc7bcdada8f895 systemRequirement;
-      click a9dc7bcdada8f895 &quot;CodeAlignment.html#validating-traceability-format&quot;;
-      fa7115a6438e0a52[&quot;XML style comment&quot;];
-      class fa7115a6438e0a52 systemRequirement;
-      click fa7115a6438e0a52 &quot;CodeAlignment.html#xml-style-comment&quot;;
+  subgraph cb5b728beb4d2734["📁 requirements/System/Integration"]
+    subgraph 9ed02b5967de135f["📄 CodeAlignment.md"]
+      cf69cc5ac175685e["BAT style comment"];
+      class cf69cc5ac175685e systemRequirement;
+      click cf69cc5ac175685e "CodeAlignment.html#bat-style-comment";
+      d4bfae8624aa1c5f["Code Traceability"];
+      class d4bfae8624aa1c5f userRequirement;
+      click d4bfae8624aa1c5f "CodeAlignment.html#code-traceability";
+      9c83fc55d9318811["Comment Style by File Extension"];
+      class 9c83fc55d9318811 systemRequirement;
+      click 9c83fc55d9318811 "CodeAlignment.html#comment-style-by-file-extension";
+      69d45a1c6123c6e2["CSS style comment"];
+      class 69d45a1c6123c6e2 systemRequirement;
+      click 69d45a1c6123c6e2 "CodeAlignment.html#css-style-comment";
+      d8de72a1fc3c517["Dash style comment"];
+      class d8de72a1fc3c517 userRequirement;
+      click d8de72a1fc3c517 "CodeAlignment.html#dash-style-comment";
+      98d95c52acacf923["Slash style comment"];
+      class 98d95c52acacf923 systemRequirement;
+      click 98d95c52acacf923 "CodeAlignment.html#slash-style-comment";
+      7ba5900b21d7d193["SQL style comment"];
+      class 7ba5900b21d7d193 systemRequirement;
+      click 7ba5900b21d7d193 "CodeAlignment.html#sql-style-comment";
+      4d2b0bb788a7008a["Suggest Code Refactoring"];
+      class 4d2b0bb788a7008a userRequirement;
+      click 4d2b0bb788a7008a "CodeAlignment.html#suggest-code-refactoring";
+      5dcc6311f7ee50cb["Traceability Format"];
+      class 5dcc6311f7ee50cb systemRequirement;
+      click 5dcc6311f7ee50cb "CodeAlignment.html#traceability-format";
+      be225ede17f88d24["Validating Traceability Format"];
+      class be225ede17f88d24 systemRequirement;
+      click be225ede17f88d24 "CodeAlignment.html#validating-traceability-format";
+      405d786b95262a30["XML style comment"];
+      class 405d786b95262a30 systemRequirement;
+      click 405d786b95262a30 "CodeAlignment.html#xml-style-comment";
     end
-    subgraph cc11c1b576246b9[&quot;📄 Specifications.md&quot;]
-      cb771a7f677ef65b[&quot;Comment Style Specification&quot;];
-      class cb771a7f677ef65b default;
-      click cb771a7f677ef65b &quot;Specifications.html#comment-style-specification&quot;;
+    subgraph bc93274abf7267ad["📄 Specifications.md"]
+      fcc43d95feaae472["Comment Style Specification"];
+      class fcc43d95feaae472 default;
+      click fcc43d95feaae472 "Specifications.html#comment-style-specification";
     end
   end
-  21c836664ae15aab -.->|deriveReqT| 640ca7b4880a0f75;
-  9b5f9a7fd1e0f242 -.->|deriveReqT| 5d1f78408a91c908;
-  9b5f9a7fd1e0f242 -.->|deriveReqT| a31edd3024f12959;
-  9b5f9a7fd1e0f242 -.->|deriveReqT| 92701f2cabc0a09a;
-  9b5f9a7fd1e0f242 -.->|deriveReqT| 50bbe01fa1813913;
-  9b5f9a7fd1e0f242 -.->|deriveReqT| 35cc91617e8c680e;
-  9b5f9a7fd1e0f242 -.->|deriveReqT| fa7115a6438e0a52;
-  9b5f9a7fd1e0f242 -->|satisfiedBy| cb771a7f677ef65b;
-  640ca7b4880a0f75 -.->|deriveReqT| 9b5f9a7fd1e0f242;
-  640ca7b4880a0f75 -.->|deriveReqT| a9dc7bcdada8f895;
+  d4bfae8624aa1c5f -.->|deriveReqT| 5dcc6311f7ee50cb;
+  9c83fc55d9318811 -.->|deriveReqT| cf69cc5ac175685e;
+  9c83fc55d9318811 -.->|deriveReqT| 69d45a1c6123c6e2;
+  9c83fc55d9318811 -.->|deriveReqT| d8de72a1fc3c517;
+  9c83fc55d9318811 -.->|deriveReqT| 98d95c52acacf923;
+  9c83fc55d9318811 -.->|deriveReqT| 7ba5900b21d7d193;
+  9c83fc55d9318811 -.->|deriveReqT| 405d786b95262a30;
+  9c83fc55d9318811 -->|satisfiedBy| fcc43d95feaae472;
+  5dcc6311f7ee50cb -.->|deriveReqT| 9c83fc55d9318811;
+  5dcc6311f7ee50cb -.->|deriveReqT| be225ede17f88d24;
 </div>
 <h3 id="code-traceability">Code Traceability</h3>
 <p>The system shall support code traceability by using structured comments to link code implementations to corresponding requirements in the System model.</p>
@@ -817,6 +817,10 @@ blockquote {
 </li>
 <li><code>&lt;element identifier&gt;</code> is the identifier of the requirement being traced.</li>
 </ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
@@ -828,6 +832,10 @@ blockquote {
 <p>The system shall use different comment style based of file extension of the code source file.</p>
 <h4>Details</h4>
 <p>The system shall define comment style specification for each file extension.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#bat-style-comment">BAT style comment</a></li>
@@ -850,6 +858,10 @@ echo Hello, World!
 REM [reqvire::satisfies: Req1] END
 
 </code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
@@ -862,6 +874,10 @@ REM [reqvire::satisfies: Req1] END
 .button { background-color: blue; }
 /* [reqvire::satisfies: Req1] END */
 </code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
@@ -890,6 +906,10 @@ def process_sensor_data():
 SELECT * FROM users;
 -- [reqvire::satisfies: Req1] END
 </code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
@@ -904,6 +924,10 @@ void processSensorData() {
 }
 // [reqvire::satisfies: Req1] END
 </code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
@@ -917,6 +941,10 @@ void processSensorData() {
 &lt;!-- [reqvire::satisfies: Req1] END --&gt;
 
 </code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#comment-style-by-file-extension">Comment Style by File Extension</a></li>
@@ -924,6 +952,10 @@ void processSensorData() {
 <hr />
 <h3 id="validating-traceability-format">Validating Traceability Format</h3>
 <p>While processing traceability in code, the system shall ensure that each <code>[reqvire::...] START</code> tag has a corresponding <code>[reqvire::...] END</code> tag.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#traceability-format">Traceability Format</a></li>

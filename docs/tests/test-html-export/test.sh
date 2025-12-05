@@ -1,5 +1,8 @@
 #!/bin/bash
-set -euo pipefail
+set -uo pipefail  # NOTE: Do NOT use -e, it causes silent failures with diff
+
+# Get the directory where this test script is located
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 # Create log file immediately to ensure it exists for runner
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -75,124 +78,32 @@ if [ -f "${TEST_DIR}/SpecificationIndex.md" ] && [ ! -f "${TEST_DIR}/output/inde
   exit 1
 fi
 
-# Check basic HTML structure generation (use specifications subfolder to avoid generated files)
-FIRST_HTML=$(find "${TEST_DIR}/output/specifications" -name "*.html" -not -name "index.html" 2>/dev/null | head -n 1)
-if [ -n "$FIRST_HTML" ]; then
-  # Check for presence of HTML structure
-  if ! grep -q "<html" "$FIRST_HTML"; then
-    echo "❌ FAILED: Generated file doesn't contain basic HTML structure"
+# Helper function to compare files and show diff on failure
+assert_file_matches() {
+  local expected="$1"
+  local actual="$2"
+  local description="$3"
+
+  if ! diff -u "$expected" "$actual"; then
+    echo "❌ FAILED: $description"
+    echo ""
+    echo "If changes are intentional, update $expected"
     exit 1
   fi
-  
-  # Check for proper HTML conversion of Markdown headers
-  if ! grep -q "<h1\|<h2\|<h3" "$FIRST_HTML"; then
-    echo "❌ FAILED: HTML doesn't contain heading tags"
-    exit 1
-  fi
-  
-  # Check for presence of README.md to index.html conversion in links
-  if grep -q "SpecificationIndex.md" "$FIRST_HTML"; then
-    echo "❌ FAILED: HTML file contains unconverted SpecificationIndex.md references"
-    exit 1
-  fi
-  
-  # Check for presence of mermaid diagrams in HTML files
-  if grep -q "mermaid" "$FIRST_HTML"; then
-    
-    # Verify that no raw .md references exist in the HTML
-    if grep -q "\.md\"" "$FIRST_HTML"; then
-      echo "❌ FAILED: HTML file contains unconverted .md links"
-      exit 1
-    fi
-    
-    # Check if the file has click links in mermaid diagrams
-    if grep -q "click" "$FIRST_HTML"; then
-      # Verify that regular click links to md files are converted to html (excluding GitHub URLs)
-      if grep "click.*\.md" "$FIRST_HTML" | grep -vq "github.com"; then
-        echo "❌ FAILED: HTML file contains unconverted .md links in mermaid click commands (excluding GitHub URLs)"
-        exit 1
-      fi
-      
-      # Verify that click links include proper HTML extension
-      if ! grep -q "click.*\.html" "$FIRST_HTML"; then
-        echo "❌ FAILED: HTML file does not contain properly converted .html links in mermaid click commands"
-        exit 1
-      fi
-      
-    fi
-    
-  fi
-  
-  # Specifically check the MixedLinkTypes.html file for proper conversion of different link types
-  MIXED_LINKS_HTML=$(find "${TEST_DIR}/output" -name "MixedLinkTypes.html" | head -n 1)
-  if [ -n "$MIXED_LINKS_HTML" ]; then
-    
-    # Extract the exact content of the mermaid diagram for analysis
-    MERMAID_CONTENT=$(cat "$MIXED_LINKS_HTML" | grep -A 50 '<div class="mermaid">' | grep -B 50 '</div>' | grep -v '<div class="mermaid">' | grep -v '</div>')
-    
-    # Create a temp file with the extracted content
-    TEMP_MERMAID_FILE="${TEST_DIR}/mermaid_content.tmp"
-    echo "$MERMAID_CONTENT" > "$TEMP_MERMAID_FILE"
-    
-    # Check for direct path conversion - exact match with HTML-encoded quotes
-    if ! grep -q 'click req1 &quot;TestRequirements.html#test-requirement-1&quot;' "$TEMP_MERMAID_FILE"; then
-      echo "❌ FAILED: Direct path link not properly converted in mermaid diagram"
-      echo "Expected: click req1 &quot;TestRequirements.html#test-requirement-1&quot;"
-      grep "click req1" "$TEMP_MERMAID_FILE"
-      exit 1
-    fi
-    
-    # Check for GitHub URL preservation - the GitHub URL should remain as-is with .md extension
-    if ! grep -q 'click req2 &quot;https://github.com/user/repo/blob/main/specifications/TestRequirements.md#test-requirement-1&quot;' "$TEMP_MERMAID_FILE"; then
-      echo "❌ FAILED: GitHub URL link not preserved in mermaid diagram"
-      echo "Expected: click req2 &quot;https://github.com/user/repo/blob/main/specifications/TestRequirements.md#test-requirement-1&quot;"
-      grep "click req2" "$TEMP_MERMAID_FILE"
-      exit 1
-    fi
-    
-    # Check that non-markdown links are preserved - exact match with HTML-encoded quotes
-    if ! grep -q 'click req3 &quot;https://github.com/user/repo/blob/main/src/main.rs&quot;' "$TEMP_MERMAID_FILE"; then
-      echo "❌ FAILED: Non-markdown link not preserved in mermaid diagram"
-      echo "Expected: click req3 &quot;https://github.com/user/repo/blob/main/src/main.rs&quot;"
-      grep "click req3" "$TEMP_MERMAID_FILE"
-      exit 1
-    fi
-    
-    # Check for parent directory path conversion - exact match with HTML-encoded quotes
-    if ! grep -q 'click req4 &quot;../TestRequirements.html#test-requirement-2&quot;' "$TEMP_MERMAID_FILE"; then
-      echo "❌ FAILED: Parent directory path not properly converted in mermaid diagram"
-      echo "Expected: click req4 &quot;../TestRequirements.html#test-requirement-2&quot;"
-      grep "click req4" "$TEMP_MERMAID_FILE"
-      exit 1
-    fi
-    
-    # Check for MD file without fragment conversion - exact match with HTML-encoded quotes
-    if ! grep -q 'click req5 &quot;TestRequirements.html&quot;' "$TEMP_MERMAID_FILE"; then
-      echo "❌ FAILED: MD file without fragment not properly converted in mermaid diagram"
-      echo "Expected: click req5 &quot;TestRequirements.html&quot;"
-      grep "click req5" "$TEMP_MERMAID_FILE"
-      exit 1
-    fi
-    
-    # Check for GitHub URL without fragment - should remain as-is with .md extension
-    if ! grep -q 'click req6 &quot;https://github.com/user/repo/blob/main/specifications/TestRequirements.md&quot;' "$TEMP_MERMAID_FILE"; then
-      echo "❌ FAILED: GitHub URL without fragment not preserved in mermaid diagram"
-      echo "Expected: click req6 &quot;https://github.com/user/repo/blob/main/specifications/TestRequirements.md&quot;"
-      grep "click req6" "$TEMP_MERMAID_FILE"
-      exit 1
-    fi
-    
-    # Clean up temp file
-    rm -f "$TEMP_MERMAID_FILE"
-        
-    # Check for duplicated folder names in paths
-    if grep -q "specifications/specifications" "$MIXED_LINKS_HTML"; then
-      echo "❌ FAILED: Found duplicated folder names (specifications/specifications) in paths"
-      exit 1
-    fi
-  else
-    echo "⚠️ WARNING: MixedLinkTypes.html not found for detailed link conversion testing"
-  fi
+}
+
+# Check basic HTML structure generation - compare against expected files
+if [ -f "${TEST_DIR}/output/specifications/TestRequirements.html" ]; then
+  assert_file_matches "${TEST_SCRIPT_DIR}/expected/TestRequirements.html" \
+    "${TEST_DIR}/output/specifications/TestRequirements.html" \
+    "TestRequirements.html does not match expected output"
+fi
+
+# Check MixedLinkTypes.html if it exists
+if [ -f "${TEST_DIR}/output/specifications/Subfolder/MixedLinkTypes.html" ]; then
+  assert_file_matches "${TEST_SCRIPT_DIR}/expected/Subfolder/MixedLinkTypes.html" \
+    "${TEST_DIR}/output/specifications/Subfolder/MixedLinkTypes.html" \
+    "MixedLinkTypes.html does not match expected output"
 fi
 
 # ============================================================

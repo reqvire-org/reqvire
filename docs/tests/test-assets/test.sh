@@ -30,11 +30,11 @@ echo "===================================="
 echo ""
 
 # ==================================
-# Test 1: Attach file to element
+# Test 1: Attach file to element (using link ... attaching)
 # ==================================
 echo "Test 1: Attach file to element..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "docs/SLA.txt" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-attach.md" "$TEST_DIR/specifications/Requirements.md" "File content after attach does not match expected"
 
@@ -42,14 +42,28 @@ echo "✅ Test 1 passed"
 echo ""
 
 # ==================================
-# Test 2: Attach idempotency
+# Test 2: Attach duplicate returns error
 # ==================================
-echo "Test 2: Attach idempotency (duplicate attach)..."
+echo "Test 2: Attach duplicate returns error..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" > /dev/null 2>&1
+set +e
+ATTACH_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "docs/SLA.txt" 2>&1)
+ATTACH_DUP_EXIT=$?
+set -e
 
-# File should be unchanged (no duplicate)
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-attach.md" "$TEST_DIR/specifications/Requirements.md" "Duplicate attach should not modify file"
+if [ $ATTACH_DUP_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Duplicate attach should fail with error"
+  exit 1
+fi
+
+if ! echo "$ATTACH_DUP_OUTPUT" | grep -qi "already exists"; then
+  echo "❌ FAILED: Error message should mention 'already exists'"
+  echo "$ATTACH_DUP_OUTPUT"
+  exit 1
+fi
+
+# File should be unchanged (operation failed)
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-attach.md" "$TEST_DIR/specifications/Requirements.md" "Failed attach should not modify file"
 
 echo "✅ Test 2 passed"
 echo ""
@@ -59,7 +73,7 @@ echo ""
 # ==================================
 echo "Test 3: Multiple attachments on same element..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/benchmarks.txt" "Performance Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "docs/benchmarks.txt" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/03-multiple-attachments.md" "$TEST_DIR/specifications/Requirements.md" "Multiple attachments result does not match expected"
 
@@ -71,7 +85,7 @@ echo ""
 # ==================================
 echo "Test 4: Same file attached to multiple elements..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Implementation Detail" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Implementation Detail" attaching "docs/SLA.txt" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/04-many-to-many.md" "$TEST_DIR/specifications/Requirements.md" "Many-to-many attachment result does not match expected"
 
@@ -79,11 +93,11 @@ echo "✅ Test 4 passed"
 echo ""
 
 # ==================================
-# Test 5: Detach command
+# Test 5: Detach command (using unlink)
 # ==================================
-echo "Test 5: Detach command..."
+echo "Test 5: Detach command (using unlink)..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" detach "Performance Requirement" "docs/benchmarks.txt" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Performance Requirement" "docs/benchmarks.txt" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/05-after-detach.md" "$TEST_DIR/specifications/Requirements.md" "File content after detach does not match expected"
 
@@ -95,7 +109,7 @@ echo ""
 # ==================================
 echo "Test 6: Detach from one element doesn't affect others..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" detach "Performance Requirement" "docs/SLA.txt" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Performance Requirement" "docs/SLA.txt" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/06-detach-isolation.md" "$TEST_DIR/specifications/Requirements.md" "Detach isolation result does not match expected"
 
@@ -108,7 +122,7 @@ echo ""
 echo "Test 7: Search filters for attachments..."
 
 # Re-attach for search tests
-cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/SLA.txt" "Performance Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "docs/SLA.txt" > /dev/null 2>&1
 
 SEARCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --has-attachments --short 2>&1)
 
@@ -234,7 +248,7 @@ EOF
 
 cp "$TEST_DIR/specifications/DryRunTest.md" "$TEST_DIR/dryrun_backup.bak"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" attach "docs/benchmarks.txt" "Dry Run Element" --dry-run > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Dry Run Element" attaching "docs/benchmarks.txt" --dry-run > /dev/null 2>&1
 
 if ! cmp -s "$TEST_DIR/specifications/DryRunTest.md" "$TEST_DIR/dryrun_backup.bak"; then
   echo "❌ FAILED: Dry-run mode should not modify the file"
@@ -253,7 +267,7 @@ echo "Test 12: Attach Refinement element by display name..."
 # Reset Requirements.md to clean state for element attachment tests
 cp "${TEST_SCRIPT_DIR}/expected/09-after-rm-asset.md" "$TEST_DIR/specifications/Requirements.md"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Test Constraint Element" "Performance Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "Test Constraint Element" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/12-after-element-attach.md" "$TEST_DIR/specifications/Requirements.md" "Element attachment result does not match expected"
 
@@ -268,7 +282,7 @@ echo "Test 13: Auto-detect - file path takes priority over element name..."
 mkdir -p "$TEST_DIR/Test Constraint Element"
 echo "test content" > "$TEST_DIR/Test Constraint Element/data.txt"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" attach "Test Constraint Element/data.txt" "Implementation Detail" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Implementation Detail" attaching "Test Constraint Element/data.txt" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/13-file-priority.md" "$TEST_DIR/specifications/Requirements.md" "File path priority result does not match expected"
 
@@ -281,7 +295,7 @@ echo ""
 echo "Test 14: Attach non-Refinement element fails with error..."
 
 set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "No Attachments Requirement" "Performance Requirement" 2>&1)
+ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "No Attachments Requirement" 2>&1)
 ATTACH_EXIT=$?
 set -e
 
@@ -300,11 +314,11 @@ echo "✅ Test 14 passed"
 echo ""
 
 # ==================================
-# Test 15: Detach element by name
+# Test 15: Detach element by name (using unlink)
 # ==================================
 echo "Test 15: Detach Refinement element by display name..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" detach "Performance Requirement" "Test Constraint Element" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Performance Requirement" "Test Constraint Element" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/15-after-element-detach.md" "$TEST_DIR/specifications/Requirements.md" "Element detach result does not match expected"
 
@@ -317,7 +331,7 @@ echo ""
 echo "Test 16: Error when neither file nor element found..."
 
 set +e
-ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" attach "nonexistent_thing_xyz" "Performance Requirement" 2>&1)
+ATTACH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Performance Requirement" attaching "nonexistent_thing_xyz" 2>&1)
 ATTACH_EXIT=$?
 set -e
 
@@ -412,55 +426,8 @@ fi
 echo "✅ Test 18 passed"
 echo ""
 
-# ==================================
-# Test 19: mv-asset updates both Attachments and Relations
-# ==================================
-echo "Test 19: mv-asset updates both Attachments and Relations in same element..."
-
-# Create test file with both attachment and satisfiedBy pointing to same file
-cat > "$TEST_DIR/specifications/MixedTest.md" << 'EOF'
-# Elements
-
-### Mixed Test System
-
-Top level container.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derive: [Mixed Requirement](#mixed-requirement)
----
-
-### Mixed Requirement
-
-This requirement has both attachment and relation to same file.
-
-#### Attachments
-  * [shared_doc.pdf](../shared/shared_doc.pdf)
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Mixed Test System](#mixed-test-system)
-  * satisfiedBy: [shared_doc.pdf](../shared/shared_doc.pdf)
----
-
-EOF
-
-# Create the shared file
-mkdir -p "$TEST_DIR/shared"
-echo "PDF content" > "$TEST_DIR/shared/shared_doc.pdf"
-
-# Move the file
-mkdir -p "$TEST_DIR/documents"
-cd "$TEST_DIR" && "$REQVIRE_BIN" mv-asset "shared/shared_doc.pdf" "documents/shared_doc.pdf" > /dev/null 2>&1
-
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/19-after-mv-asset-mixed.md" "$TEST_DIR/specifications/MixedTest.md" "Both attachment and relation should be updated after mv-asset"
-
-echo "✅ Test 19 passed"
-echo ""
+# Note: Test 19 was removed - it tested having the same file in both Attachments AND Relations,
+# which is now prohibited by cross-section duplicate validation.
 
 echo "===================================="
 echo "All Attachments tests passed"
