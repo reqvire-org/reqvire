@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*)
 argument-hint: <source> <relation-type-or-attaching> <target>
 description: Link elements with a relation or attach files/elements
-model: claude-sonnet-4-5-20250929
+model: default
 ---
 
 # Link Elements

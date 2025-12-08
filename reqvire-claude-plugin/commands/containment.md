@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
 description: Analyze model's containment structure (folders, files, and elements) to understand organization and suggest improvements
-model: claude-sonnet-4-5-20250929
+model: default
 ---
 
 # Containment View

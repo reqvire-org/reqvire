@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*)
 argument-hint: [element-name]
 description: Remove an element from the model
-model: claude-sonnet-4-5-20250929
+model: default
 ---
 
 # Remove Element

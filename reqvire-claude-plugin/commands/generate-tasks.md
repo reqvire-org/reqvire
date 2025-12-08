@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*), Bash(git:*)
 argument-hint: [base-commit]
 description: Generate implementation task plan from requirement changes using change-impact analysis
-model: claude-sonnet-4-5-20250929
+model: sonnet
 ---
 
 # Generate Tasks

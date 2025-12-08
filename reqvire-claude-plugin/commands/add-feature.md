@@ -2,7 +2,7 @@
 allowed-tools: Read, Write, Edit, Bash(reqvire:*), SlashCommand
 argument-hint: [feature-name]
 description: Add a complete feature by orchestrating requirement and verification creation following MBSE workflow
-model: claude-sonnet-4-5-20250929
+model: sonnet
 ---
 
 # Add Feature

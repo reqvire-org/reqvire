@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*)
 argument-hint: <element-name> <file> [index]
 description: Move an element to a different file or position
-model: claude-sonnet-4-5-20250929
+model: default
 ---
 
 # Move Element

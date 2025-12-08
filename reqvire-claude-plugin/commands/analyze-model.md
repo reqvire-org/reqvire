@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
 description: Analyze the current Reqvire model structure, identify issues, coverage gaps, and provide improvement recommendations
-model: claude-sonnet-4-5-20250929
+model: sonnet
 ---
 
 # Analyze Reqvire Model

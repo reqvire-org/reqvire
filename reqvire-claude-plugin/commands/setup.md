@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash, Write, Edit, AskUserQuestion
 argument-hint: [install]
 description: Setup reqvire environment
-model: claude-sonnet-4-5-20250929
+model: default
 ---
 
 ## Setup Steps
