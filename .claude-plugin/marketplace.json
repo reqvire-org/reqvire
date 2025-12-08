@@ -9,7 +9,7 @@
     },
     "plugins": [
         {
-            "version": "1.3.0",
+            "version": "1.4.0",
             "name": "reqvire",
             "description": "The Requirements As Code framework for Modern Engineering Teams. Includes specialized skills for requirements and context engineering and task planning.",
             "author": {
@@ -44,6 +44,7 @@
                 "./commands/find-redundant-verifications.md",
                 "./commands/rename-element.md",
                 "./commands/analyze-impact.md",
+                "./commands/collect.md",
                 "./commands/generate-tasks.md",
                 "./commands/rm.md",
                 "./commands/link.md",

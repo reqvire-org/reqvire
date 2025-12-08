@@ -1,7 +1,6 @@
 ---
 name: task-master
 description: Expert at analyzing requirement changes, understanding what changed in specifications, and creating actionable implementation plans. Use when you need to understand what requirements changed, generate task lists from change-impact analysis, or plan implementation work with traceability.
-version: 1.0.0
 ---
 
 # Task Master Skill
