@@ -737,9 +737,24 @@ blockquote {
 
   subgraph 68908f1dbfe487c0["📁 requirements"]
     subgraph 922090a32bce0711["📄 Refinements.md"]
-      b8b0de5f21d42511["Industry Standards Specification"];
-      class b8b0de5f21d42511 default;
-      click b8b0de5f21d42511 "Refinements.html#industry-standards-specification";
+      e3505bdf96f2e996["Containment Specification"];
+      class e3505bdf96f2e996 default;
+      click e3505bdf96f2e996 "Refinements.html#containment-specification";
+      12b8c722b73f030f["Refinement Specification"];
+      class 12b8c722b73f030f default;
+      click 12b8c722b73f030f "Refinements.html#refinement-specification";
+      32bc0a15650ebf08["Relation Semantics Specification"];
+      class 32bc0a15650ebf08 default;
+      click 32bc0a15650ebf08 "Refinements.html#relation-semantics-specification";
+      a03cf6f1eda0c5c["Supported Element Types Specification"];
+      class a03cf6f1eda0c5c default;
+      click a03cf6f1eda0c5c "Refinements.html#supported-element-types-specification";
+      d3d2eb1636d763ca["Traceability Reporting Specification"];
+      class d3d2eb1636d763ca default;
+      click d3d2eb1636d763ca "Refinements.html#traceability-reporting-specification";
+      a7802cc8074affd0["Verification Coverage Specification"];
+      class a7802cc8074affd0 default;
+      click a7802cc8074affd0 "Refinements.html#verification-coverage-specification";
     end
     subgraph d5afb8f4e2d93d2e["📄 UserStories.md"]
       81533dcd7f44c7ef["AI-Assisted System Model Management"];
@@ -751,6 +766,12 @@ blockquote {
       b7bd2696af5e74d1["Aligning Design with Code"];
       class b7bd2696af5e74d1 userRequirement;
       click b7bd2696af5e74d1 "UserStories.html#aligning-design-with-code";
+      5962c1ae315af2be["Defining Model Structure"];
+      class 5962c1ae315af2be userRequirement;
+      click 5962c1ae315af2be "UserStories.html#defining-model-structure";
+      62c6fc22d922c798["Formatting Model Documents"];
+      class 62c6fc22d922c798 userRequirement;
+      click 62c6fc22d922c798 "UserStories.html#formatting-model-documents";
       92b0f1ddf8991ebe["Fostering Community Contributions"];
       class 92b0f1ddf8991ebe userRequirement;
       click 92b0f1ddf8991ebe "UserStories.html#fostering-community-contributions";
@@ -760,24 +781,138 @@ blockquote {
       4cedc67efb121d94["Integrate with GitHub Workflows"];
       class 4cedc67efb121d94 userRequirement;
       click 4cedc67efb121d94 "UserStories.html#integrate-with-github-workflows";
-      491265860cb15cc9["Managing System Models"];
-      class 491265860cb15cc9 userRequirement;
-      click 491265860cb15cc9 "UserStories.html#managing-system-models";
+      72aa2e113883d4a9["Linting Model Quality"];
+      class 72aa2e113883d4a9 userRequirement;
+      click 72aa2e113883d4a9 "UserStories.html#linting-model-quality";
       4fc38bb5182e281["Model Export"];
       class 4fc38bb5182e281 userRequirement;
       click 4fc38bb5182e281 "UserStories.html#model-export";
+      63cff97aeb9a82df["Operating on Model Elements"];
+      class 63cff97aeb9a82df userRequirement;
+      click 63cff97aeb9a82df "UserStories.html#operating-on-model-elements";
       3274d129a1f9939f["Promote Automation and Efficiency"];
       class 3274d129a1f9939f userRequirement;
       click 3274d129a1f9939f "UserStories.html#promote-automation-and-efficiency";
       b52103e4a7ac2f83["Provide Reports"];
       class b52103e4a7ac2f83 userRequirement;
       click b52103e4a7ac2f83 "UserStories.html#provide-reports";
+      c0d2b45b8534b0ce["System Model Interfaces"];
+      class c0d2b45b8534b0ce userRequirement;
+      click c0d2b45b8534b0ce "UserStories.html#system-model-interfaces";
       83e059965299c4d9["Trace Changes in System Model"];
       class 83e059965299c4d9 userRequirement;
       click 83e059965299c4d9 "UserStories.html#trace-changes-in-system-model";
       cbb3e11245e3e972["Validating Structures"];
       class cbb3e11245e3e972 userRequirement;
       click cbb3e11245e3e972 "UserStories.html#validating-structures";
+      94ec480b9c666ad["Verification Traceability"];
+      class 94ec480b9c666ad userRequirement;
+      click 94ec480b9c666ad "UserStories.html#verification-traceability";
+    end
+  end
+  subgraph 8735c0a811307e57["📁 requirements/Functional/Core"]
+    subgraph 193cce1f294b91c8["📄 ModelManagement.md"]
+      a293baca57a9e3b3["Coexistence of Structured and Unstructured Documents<br/>📎 requirements/Refinements.md#refinement-specification"];
+      class a293baca57a9e3b3 userRequirement;
+      click a293baca57a9e3b3 "Functional/Core/ModelManagement.html#coexistence-of-structured-and-unstructured-documents";
+      659a813dd417bc5e["Default Requirement Type Assignment<br/>📎 requirements/Functional/Core/Specifications.md#element-type-metadata-specification"];
+      class 659a813dd417bc5e userRequirement;
+      click 659a813dd417bc5e "Functional/Core/ModelManagement.html#default-requirement-type-assignment";
+      d27e40511b457522["Efficient Processing"];
+      class d27e40511b457522 userRequirement;
+      click d27e40511b457522 "Functional/Core/ModelManagement.html#efficient-processing";
+      d7718b70035d8d84["Element Manipulation Operations"];
+      class d7718b70035d8d84 userRequirement;
+      click d7718b70035d8d84 "Functional/Core/ModelManagement.html#element-manipulation-operations";
+      43eafdd22a501023["Git Repository as Project Root<br/>📎 requirements/Refinements.md#containment-specification"];
+      class 43eafdd22a501023 userRequirement;
+      click 43eafdd22a501023 "Functional/Core/ModelManagement.html#git-repository-as-project-root";
+      5dea9fe53eee419e["Template-Based Model Bootstrapping"];
+      class 5dea9fe53eee419e userRequirement;
+      click 5dea9fe53eee419e "Functional/Core/ModelManagement.html#template-based-model-bootstrapping";
+    end
+    subgraph b88b5e4ef23c0883["📄 StructureAndParsing.md"]
+      c1fde7d1c17c2acb["Specification File Identification"];
+      class c1fde7d1c17c2acb systemRequirement;
+      click c1fde7d1c17c2acb "Functional/Core/StructureAndParsing.html#specification-file-identification";
+      625bdde09d955477["Structure and Addressing in Markdown Documents<br/>📎 MarkdownStructure.md"];
+      class 625bdde09d955477 systemRequirement;
+      click 625bdde09d955477 "Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents";
+    end
+    subgraph 98067cc5207d6b91["📄 Validation.md"]
+      a869d98120d611e3["Enhanced Validation Error Reporting"];
+      class a869d98120d611e3 userRequirement;
+      click a869d98120d611e3 "Functional/Core/Validation.html#enhanced-validation-error-reporting";
+      6226bc768d0185df["Validate Cross-Component Dependencies"];
+      class 6226bc768d0185df userRequirement;
+      click 6226bc768d0185df "Functional/Core/Validation.html#validate-cross-component-dependencies";
+      15086e20fb6e1f44["Validate Filesystem Structure"];
+      class 15086e20fb6e1f44 userRequirement;
+      click 15086e20fb6e1f44 "Functional/Core/Validation.html#validate-filesystem-structure";
+      ff8ff08f0c0500f0["Validate Internal Consistency"];
+      class ff8ff08f0c0500f0 userRequirement;
+      click ff8ff08f0c0500f0 "Functional/Core/Validation.html#validate-internal-consistency";
+      76fbd08929220b2f["Validate Markdown Structure"];
+      class 76fbd08929220b2f userRequirement;
+      click 76fbd08929220b2f "Functional/Core/Validation.html#validate-markdown-structure";
+      4a77e514d9e5539b["Validate Relation Types<br/>📎 requirements/Refinements.md#relation-semantics-specification"];
+      class 4a77e514d9e5539b userRequirement;
+      click 4a77e514d9e5539b "Functional/Core/Validation.html#validate-relation-types";
+    end
+  end
+  subgraph 295862b78f71931e["📁 requirements/Functional/Integration"]
+    subgraph 46ddebdb4f22c8ba["📄 CodeAlignment.md"]
+      cb2d46c673c86826["Code Traceability"];
+      class cb2d46c673c86826 userRequirement;
+      click cb2d46c673c86826 "Functional/Integration/CodeAlignment.html#code-traceability";
+      46ce32751add1793["Suggest Code Refactoring"];
+      class 46ce32751add1793 userRequirement;
+      click 46ce32751add1793 "Functional/Integration/CodeAlignment.html#suggest-code-refactoring";
+    end
+    subgraph ab9daa77a1cb1221["📄 GitHubIntegration.md"]
+      b37b9282f6da886["Automate Documentation Export"];
+      class b37b9282f6da886 userRequirement;
+      click b37b9282f6da886 "Functional/Integration/GitHubIntegration.html#automate-documentation-export";
+      39bccf245057be71["Automate Pull Request Validations"];
+      class 39bccf245057be71 userRequirement;
+      click 39bccf245057be71 "Functional/Integration/GitHubIntegration.html#automate-pull-request-validations";
+      ac8e1ef6e6aaf2de["Generate Change Logs for Pull Requests"];
+      class ac8e1ef6e6aaf2de userRequirement;
+      click ac8e1ef6e6aaf2de "Functional/Integration/GitHubIntegration.html#generate-change-logs-for-pull-requests";
+    end
+  end
+  subgraph 91eede421faaa553["📁 requirements/Functional/Operations"]
+    subgraph e87e3ee72f8fcc8a["📄 Formatting.md"]
+      a39347281679d203["Model Formatting"];
+      class a39347281679d203 userRequirement;
+      click a39347281679d203 "Functional/Operations/Formatting.html#model-formatting";
+    end
+    subgraph 61ca07ef5d124066["📄 Linting.md"]
+      20f690d9cd389f10["Model Linting"];
+      class 20f690d9cd389f10 userRequirement;
+      click 20f690d9cd389f10 "Functional/Operations/Linting.html#model-linting";
+    end
+  end
+  subgraph e6e9a42ade18cb0e["📁 requirements/Functional/Output"]
+    subgraph a1762b6e181c2fd0["📄 DiagramGeneration.md"]
+      ee0d244ddc9aac8f["Interactive Mermaid Diagrams"];
+      class ee0d244ddc9aac8f userRequirement;
+      click ee0d244ddc9aac8f "Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams";
+    end
+    subgraph 2bc3d3f246abf2de["📄 Reporting.md"]
+      40dc720d7c510af0["Model Reports<br/>📎 requirements/Refinements.md#traceability-reporting-specification"];
+      class 40dc720d7c510af0 userRequirement;
+      click 40dc720d7c510af0 "Functional/Output/Reporting.html#model-reports";
+      9acde25d23600635["Tracing Structural Changes<br/>📎 requirements/Refinements.md#traceability-reporting-specification"];
+      class 9acde25d23600635 userRequirement;
+      click 9acde25d23600635 "Functional/Output/Reporting.html#tracing-structural-changes";
+    end
+  end
+  subgraph e57e8ed6cc4cc063["📁 requirements/Functional/Processing"]
+    subgraph 35073e93e967a10c["📄 VerificationTraces.md"]
+      69aa75e267b074df["Verification Upward Traceability<br/>📎 requirements/Refinements.md#traceability-reporting-specification"];
+      class 69aa75e267b074df userRequirement;
+      click 69aa75e267b074df "Functional/Processing/VerificationTraces.html#verification-upward-traceability";
     end
   end
   subgraph c97e5d4c96ea3f37["📁 requirements/Interfaces"]
@@ -790,273 +925,169 @@ blockquote {
       click ea7f8e1ac2ba1ba4 "Interfaces/Interfaces.html#web-interface";
     end
   end
-  subgraph 9e5f55ddfed5810b["📁 requirements/System/Core"]
-    subgraph e45c28272496028b["📄 ModelManagement.md"]
-      f6fa3bdeaa9235e["Coexistence of Structured and Unstructured Documents"];
-      class f6fa3bdeaa9235e userRequirement;
-      click f6fa3bdeaa9235e "System/Core/ModelManagement.html#coexistence-of-structured-and-unstructured-documents";
-      e9beb0f857c11700["Default Requirement Type Assignment"];
-      class e9beb0f857c11700 userRequirement;
-      click e9beb0f857c11700 "System/Core/ModelManagement.html#default-requirement-type-assignment";
-      55aa0d7601bc2257["Efficient Processing"];
-      class 55aa0d7601bc2257 userRequirement;
-      click 55aa0d7601bc2257 "System/Core/ModelManagement.html#efficient-processing";
-      5b1da118f76cb2d1["Element Manipulation Operations"];
-      class 5b1da118f76cb2d1 userRequirement;
-      click 5b1da118f76cb2d1 "System/Core/ModelManagement.html#element-manipulation-operations";
-      7fffd77808ea8235["Git Repository as Project Root"];
-      class 7fffd77808ea8235 userRequirement;
-      click 7fffd77808ea8235 "System/Core/ModelManagement.html#git-repository-as-project-root";
-      c12cde97f2ccb2d7["Template-Based Model Bootstrapping"];
-      class c12cde97f2ccb2d7 userRequirement;
-      click c12cde97f2ccb2d7 "System/Core/ModelManagement.html#template-based-model-bootstrapping";
-    end
-    subgraph 13d9382b79a0b4b9["📄 StructureAndParsing.md"]
-      edb968a167d3f94f["Identifiers and Relations<br/>📎 IdentifiersAndRelations.md"];
-      class edb968a167d3f94f systemRequirement;
-      click edb968a167d3f94f "System/Core/StructureAndParsing.html#identifiers-and-relations";
-      8f45f043a4ddf448["Specification File Identification"];
-      class 8f45f043a4ddf448 systemRequirement;
-      click 8f45f043a4ddf448 "System/Core/StructureAndParsing.html#specification-file-identification";
-      4218f0271ab7a1ff["Structure and Addressing in Markdown Documents<br/>📎 MarkdownStructure.md"];
-      class 4218f0271ab7a1ff systemRequirement;
-      click 4218f0271ab7a1ff "System/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents";
-    end
-    subgraph 82c374faeb59ab1f["📄 Validation.md"]
-      4cf628770fcfc9c1["Enhanced Validation Error Reporting"];
-      class 4cf628770fcfc9c1 userRequirement;
-      click 4cf628770fcfc9c1 "System/Core/Validation.html#enhanced-validation-error-reporting";
-      360041c797161272["Validate Cross-Component Dependencies"];
-      class 360041c797161272 userRequirement;
-      click 360041c797161272 "System/Core/Validation.html#validate-cross-component-dependencies";
-      2d385cc3a12a9791["Validate Filesystem Structure"];
-      class 2d385cc3a12a9791 userRequirement;
-      click 2d385cc3a12a9791 "System/Core/Validation.html#validate-filesystem-structure";
-      e6fda07170f84000["Validate Internal Consistency"];
-      class e6fda07170f84000 userRequirement;
-      click e6fda07170f84000 "System/Core/Validation.html#validate-internal-consistency";
-      dc3b0531ea04c35a["Validate Markdown Structure"];
-      class dc3b0531ea04c35a userRequirement;
-      click dc3b0531ea04c35a "System/Core/Validation.html#validate-markdown-structure";
-      4ff1bd8415012371["Validate Relation Types"];
-      class 4ff1bd8415012371 userRequirement;
-      click 4ff1bd8415012371 "System/Core/Validation.html#validate-relation-types";
-    end
-  end
-  subgraph cb5b728beb4d2734["📁 requirements/System/Integration"]
-    subgraph 9ed02b5967de135f["📄 CodeAlignment.md"]
-      d4bfae8624aa1c5f["Code Traceability"];
-      class d4bfae8624aa1c5f userRequirement;
-      click d4bfae8624aa1c5f "System/Integration/CodeAlignment.html#code-traceability";
-      4d2b0bb788a7008a["Suggest Code Refactoring"];
-      class 4d2b0bb788a7008a userRequirement;
-      click 4d2b0bb788a7008a "System/Integration/CodeAlignment.html#suggest-code-refactoring";
-    end
-    subgraph c9bec6fcd3b4999f["📄 GitHubIntegration.md"]
-      2aa5aa462d89485f["Automate Documentation Export"];
-      class 2aa5aa462d89485f userRequirement;
-      click 2aa5aa462d89485f "System/Integration/GitHubIntegration.html#automate-documentation-export";
-      1682ee9ab90ee1bf["Automate Pull Request Validations"];
-      class 1682ee9ab90ee1bf userRequirement;
-      click 1682ee9ab90ee1bf "System/Integration/GitHubIntegration.html#automate-pull-request-validations";
-      f1f1174d876fb6ff["Generate Change Logs for Pull Requests"];
-      class f1f1174d876fb6ff userRequirement;
-      click f1f1174d876fb6ff "System/Integration/GitHubIntegration.html#generate-change-logs-for-pull-requests";
-    end
-  end
-  subgraph f97b31ef8bb9beb2["📁 requirements/System/Operations"]
-    subgraph f847acb9fd91c378["📄 Formatting.md"]
-      6cac299af6d6729b["Format Consistency Enforcement"];
-      class 6cac299af6d6729b systemRequirement;
-      click 6cac299af6d6729b "System/Operations/Formatting.html#format-consistency-enforcement";
-      6b2f557333e6e20e["Model Formatting"];
-      class 6b2f557333e6e20e userRequirement;
-      click 6b2f557333e6e20e "System/Operations/Formatting.html#model-formatting";
-    end
-    subgraph 956c49ae392eca70["📄 Linting.md"]
-      4e70a73c803758c7["Model Linting"];
-      class 4e70a73c803758c7 userRequirement;
-      click 4e70a73c803758c7 "System/Operations/Linting.html#model-linting";
-    end
-  end
-  subgraph 7abe7cd3649051be["📁 requirements/System/Output"]
-    subgraph 6528ddfab3564226["📄 DiagramGeneration.md"]
-      f6eaca3198d3e7b1["Interactive Mermaid Diagrams"];
-      class f6eaca3198d3e7b1 userRequirement;
-      click f6eaca3198d3e7b1 "System/Output/DiagramGeneration.html#interactive-mermaid-diagrams";
-    end
-    subgraph b87937d74ce00328["📄 Reporting.md"]
-      61bf4405db9ec1d1["Model Reports"];
-      class 61bf4405db9ec1d1 userRequirement;
-      click 61bf4405db9ec1d1 "System/Output/Reporting.html#model-reports";
-      7c883e831e2c29b4["Provide Validation Reports"];
-      class 7c883e831e2c29b4 userRequirement;
-      click 7c883e831e2c29b4 "System/Output/Reporting.html#provide-validation-reports";
-      eba606a6e5946ae2["Tracing Structural Changes"];
-      class eba606a6e5946ae2 userRequirement;
-      click eba606a6e5946ae2 "System/Output/Reporting.html#tracing-structural-changes";
-    end
-  end
-  81533dcd7f44c7ef -.->|deriveReqT| edb968a167d3f94f;
-  1f2f1e74fb06dae9 -.->|deriveReqT| 360041c797161272;
-  1f2f1e74fb06dae9 -.->|deriveReqT| e6fda07170f84000;
-  1f2f1e74fb06dae9 -.->|deriveReqT| dc3b0531ea04c35a;
-  1f2f1e74fb06dae9 -.->|deriveReqT| 4ff1bd8415012371;
-  1f2f1e74fb06dae9 -.->|deriveReqT| 6cac299af6d6729b;
-  1f2f1e74fb06dae9 -.->|deriveReqT| 7c883e831e2c29b4;
-  1f2f1e74fb06dae9 -->|satisfiedBy| b8b0de5f21d42511;
-  b7bd2696af5e74d1 -.->|deriveReqT| d4bfae8624aa1c5f;
-  b7bd2696af5e74d1 -.->|deriveReqT| 4d2b0bb788a7008a;
-  afc24affb57aec68 -.->|deriveReqT| f6eaca3198d3e7b1;
-  4cedc67efb121d94 -.->|deriveReqT| 2aa5aa462d89485f;
-  4cedc67efb121d94 -.->|deriveReqT| 1682ee9ab90ee1bf;
-  4cedc67efb121d94 -.->|deriveReqT| f1f1174d876fb6ff;
-  491265860cb15cc9 -.->|deriveReqT| 90bec7578aacbe9d;
-  491265860cb15cc9 -.->|deriveReqT| ea7f8e1ac2ba1ba4;
-  491265860cb15cc9 -.->|deriveReqT| f6fa3bdeaa9235e;
-  491265860cb15cc9 -.->|deriveReqT| e9beb0f857c11700;
-  491265860cb15cc9 -.->|deriveReqT| 55aa0d7601bc2257;
-  491265860cb15cc9 -.->|deriveReqT| 5b1da118f76cb2d1;
-  491265860cb15cc9 -.->|deriveReqT| 7fffd77808ea8235;
-  491265860cb15cc9 -.->|deriveReqT| c12cde97f2ccb2d7;
-  491265860cb15cc9 -.->|deriveReqT| 8f45f043a4ddf448;
-  491265860cb15cc9 -.->|deriveReqT| 4218f0271ab7a1ff;
-  491265860cb15cc9 -.->|deriveReqT| 81533dcd7f44c7ef;
-  3274d129a1f9939f -.->|deriveReqT| 55aa0d7601bc2257;
+  1f2f1e74fb06dae9 -->|satisfiedBy| e3505bdf96f2e996;
+  1f2f1e74fb06dae9 -->|satisfiedBy| 12b8c722b73f030f;
+  1f2f1e74fb06dae9 -->|satisfiedBy| 32bc0a15650ebf08;
+  1f2f1e74fb06dae9 -->|satisfiedBy| a03cf6f1eda0c5c;
+  1f2f1e74fb06dae9 -->|satisfiedBy| d3d2eb1636d763ca;
+  1f2f1e74fb06dae9 -->|satisfiedBy| a7802cc8074affd0;
+  b7bd2696af5e74d1 -.->|deriveReqT| cb2d46c673c86826;
+  b7bd2696af5e74d1 -.->|deriveReqT| 46ce32751add1793;
+  5962c1ae315af2be -.->|deriveReqT| a293baca57a9e3b3;
+  5962c1ae315af2be -.->|deriveReqT| 43eafdd22a501023;
+  5962c1ae315af2be -.->|deriveReqT| c1fde7d1c17c2acb;
+  5962c1ae315af2be -.->|deriveReqT| 625bdde09d955477;
+  62c6fc22d922c798 -.->|deriveReqT| a39347281679d203;
+  afc24affb57aec68 -.->|deriveReqT| ee0d244ddc9aac8f;
+  4cedc67efb121d94 -.->|deriveReqT| b37b9282f6da886;
+  4cedc67efb121d94 -.->|deriveReqT| 39bccf245057be71;
+  4cedc67efb121d94 -.->|deriveReqT| ac8e1ef6e6aaf2de;
+  72aa2e113883d4a9 -.->|deriveReqT| 20f690d9cd389f10;
+  63cff97aeb9a82df -.->|deriveReqT| 659a813dd417bc5e;
+  63cff97aeb9a82df -.->|deriveReqT| d27e40511b457522;
+  63cff97aeb9a82df -.->|deriveReqT| d7718b70035d8d84;
+  63cff97aeb9a82df -.->|deriveReqT| 5dea9fe53eee419e;
+  3274d129a1f9939f -.->|deriveReqT| d27e40511b457522;
   3274d129a1f9939f -.->|deriveReqT| 4cedc67efb121d94;
-  b52103e4a7ac2f83 -.->|deriveReqT| 61bf4405db9ec1d1;
-  83e059965299c4d9 -.->|deriveReqT| eba606a6e5946ae2;
-  cbb3e11245e3e972 -.->|deriveReqT| 4cf628770fcfc9c1;
-  cbb3e11245e3e972 -.->|deriveReqT| 360041c797161272;
-  cbb3e11245e3e972 -.->|deriveReqT| 2d385cc3a12a9791;
-  cbb3e11245e3e972 -.->|deriveReqT| e6fda07170f84000;
-  cbb3e11245e3e972 -.->|deriveReqT| dc3b0531ea04c35a;
-  cbb3e11245e3e972 -.->|deriveReqT| 4ff1bd8415012371;
-  cbb3e11245e3e972 -.->|deriveReqT| 6b2f557333e6e20e;
-  cbb3e11245e3e972 -.->|deriveReqT| 4e70a73c803758c7;
-  edb968a167d3f94f -.->|deriveReqT| 2258aab04b64734c;
-  1cfe88f8d3cc7aac["relation.rs"];
-  class 1cfe88f8d3cc7aac default;
-  click 1cfe88f8d3cc7aac "../core/src/relation.rs";
-  edb968a167d3f94f -->|satisfiedBy| 1cfe88f8d3cc7aac;
-  360041c797161272 -.->|deriveReqT| c236bc6bfcef40c6;
-  e6fda07170f84000 -.->|deriveReqT| cf2dd596d2f63361;
-  e6fda07170f84000 -.->|deriveReqT| 472852d1c8db8a24;
-  dc3b0531ea04c35a -.->|deriveReqT| 29446630e887e0bd;
-  4ff1bd8415012371 -.->|deriveReqT| 7274c21a4e8608d0;
-  6cac299af6d6729b -.->|deriveReqT| f39435021cb66e4b;
-  6cac299af6d6729b -.->|deriveReqT| 9932fbe0ed2d74af;
-  6cac299af6d6729b -.->|deriveReqT| df89f1cf4b62e103;
-  6cac299af6d6729b -.->|deriveReqT| 5abd6d5534486e97;
-  79d54e418e36893["format.rs"];
-  class 79d54e418e36893 default;
-  click 79d54e418e36893 "../core/src/format.rs";
-  6cac299af6d6729b -->|satisfiedBy| 79d54e418e36893;
-  6cac299af6d6729b -->|satisfiedBy| b41fc564c1da22b;
-  6cac299af6d6729b -.->|verifiedBy| afe734eb25af0948;
-  7c883e831e2c29b4 -.->|deriveReqT| d2df74b41b33eab7;
-  7c883e831e2c29b4 -.->|deriveReqT| 57b153bc9d3d0079;
-  d4bfae8624aa1c5f -.->|deriveReqT| 5dcc6311f7ee50cb;
-  f6eaca3198d3e7b1 -.->|deriveReqT| 1b3214523418b124;
-  f6eaca3198d3e7b1 -->|satisfiedBy| a6174ccb6aaaa99;
-  2aa5aa462d89485f -.->|deriveReqT| cf71d151f44634a6;
-  1682ee9ab90ee1bf -.->|deriveReqT| cf71d151f44634a6;
-  90bec7578aacbe9d -.->|deriveReqT| 654d7988c22e19e4;
-  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 14e955af5317bb0b;
-  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 1d4f213aefbd303a;
-  f6fa3bdeaa9235e -.->|deriveReqT| 7f4be14d980c42c9;
-  e9beb0f857c11700 -.->|verifiedBy| 93b8397a0426d420;
-  e9beb0f857c11700 -.->|verifiedBy| a8a205de0bd97675;
-  5b1da118f76cb2d1 -.->|deriveReqT| 84ecbd7e47283d4c;
-  5b1da118f76cb2d1 -.->|deriveReqT| d63cd96ea16008f3;
-  5b1da118f76cb2d1 -.->|deriveReqT| c451b9804a173d2d;
-  5b1da118f76cb2d1 -.->|deriveReqT| 7aec175b82ac4220;
-  5b1da118f76cb2d1 -.->|deriveReqT| 8902786e44aa1577;
-  5b1da118f76cb2d1 -.->|deriveReqT| 4e1ed202f7aebc08;
-  5b1da118f76cb2d1 -.->|deriveReqT| f62ea18144ad5177;
-  5b1da118f76cb2d1 -.->|deriveReqT| e87eb406fa9dcd86;
-  5b1da118f76cb2d1 -.->|deriveReqT| d25201ef409823be;
-  5b1da118f76cb2d1 -.->|deriveReqT| a9f82fe8db689d9d;
-  7fffd77808ea8235 -.->|deriveReqT| a9f82fe8db689d9d;
+  b52103e4a7ac2f83 -.->|deriveReqT| 40dc720d7c510af0;
+  c0d2b45b8534b0ce -.->|deriveReqT| 90bec7578aacbe9d;
+  c0d2b45b8534b0ce -.->|deriveReqT| ea7f8e1ac2ba1ba4;
+  83e059965299c4d9 -.->|deriveReqT| 9acde25d23600635;
+  cbb3e11245e3e972 -.->|deriveReqT| a869d98120d611e3;
+  cbb3e11245e3e972 -.->|deriveReqT| 6226bc768d0185df;
+  cbb3e11245e3e972 -.->|deriveReqT| 15086e20fb6e1f44;
+  cbb3e11245e3e972 -.->|deriveReqT| ff8ff08f0c0500f0;
+  cbb3e11245e3e972 -.->|deriveReqT| 76fbd08929220b2f;
+  cbb3e11245e3e972 -.->|deriveReqT| 4a77e514d9e5539b;
+  94ec480b9c666ad -.->|deriveReqT| 69aa75e267b074df;
+  cb2d46c673c86826 -.->|deriveReqT| c71fb60381800071;
+  a293baca57a9e3b3 -.->|deriveReqT| a1795409a371f481;
+  43eafdd22a501023 -.->|deriveReqT| 9cdb6297e49a3802;
   9893721bc67f82c9["git_commands.rs"];
   class 9893721bc67f82c9 default;
   click 9893721bc67f82c9 "../core/src/git_commands.rs";
-  7fffd77808ea8235 -->|satisfiedBy| 9893721bc67f82c9;
-  7fffd77808ea8235 -->|satisfiedBy| 51acec6b563693d5;
-  7fffd77808ea8235 -->|satisfiedBy| cd48b92f881a8522;
-  7fffd77808ea8235 -.->|verifiedBy| c363deb2cf6a1d74;
+  43eafdd22a501023 -->|satisfiedBy| 9893721bc67f82c9;
+  43eafdd22a501023 -->|satisfiedBy| c7a7113c11f9175d;
+  43eafdd22a501023 -->|satisfiedBy| f95149e7369cd429;
+  43eafdd22a501023 -.->|verifiedBy| c40e17e0f8f2b5ec;
   499d48218b73f571["model.rs"];
   class 499d48218b73f571 default;
   click 499d48218b73f571 "../core/src/model.rs";
-  8f45f043a4ddf448 -->|satisfiedBy| 499d48218b73f571;
+  c1fde7d1c17c2acb -->|satisfiedBy| 499d48218b73f571;
   35bd98d101f36b62["parser.rs"];
   class 35bd98d101f36b62 default;
   click 35bd98d101f36b62 "../core/src/parser.rs";
-  8f45f043a4ddf448 -->|satisfiedBy| 35bd98d101f36b62;
-  8f45f043a4ddf448 -.->|verifiedBy| bf4df38298e1e37e;
-  4218f0271ab7a1ff -.->|deriveReqT| eadce6b56c2f99b8;
-  4218f0271ab7a1ff -.->|deriveReqT| b1e527e5b503667e;
+  c1fde7d1c17c2acb -->|satisfiedBy| 35bd98d101f36b62;
+  c1fde7d1c17c2acb -.->|verifiedBy| 6cf270efbdc5a78;
+  625bdde09d955477 -.->|deriveReqT| 136749f37a361991;
+  625bdde09d955477 -.->|deriveReqT| 9e793aabc302d0d5;
   e068cb8b03a77b4d["element.rs"];
   class e068cb8b03a77b4d default;
   click e068cb8b03a77b4d "../core/src/element.rs";
-  4218f0271ab7a1ff -->|satisfiedBy| e068cb8b03a77b4d;
-  4218f0271ab7a1ff -->|satisfiedBy| 499d48218b73f571;
-  4218f0271ab7a1ff -->|satisfiedBy| 35bd98d101f36b62;
-  4218f0271ab7a1ff -->|satisfiedBy| 1cfe88f8d3cc7aac;
+  625bdde09d955477 -->|satisfiedBy| e068cb8b03a77b4d;
+  625bdde09d955477 -->|satisfiedBy| 499d48218b73f571;
+  625bdde09d955477 -->|satisfiedBy| 35bd98d101f36b62;
+  1cfe88f8d3cc7aac["relation.rs"];
+  class 1cfe88f8d3cc7aac default;
+  click 1cfe88f8d3cc7aac "../core/src/relation.rs";
+  625bdde09d955477 -->|satisfiedBy| 1cfe88f8d3cc7aac;
   bfee2085e3bb9f2b["subsection.rs"];
   class bfee2085e3bb9f2b default;
   click bfee2085e3bb9f2b "../core/src/subsection.rs";
-  4218f0271ab7a1ff -->|satisfiedBy| bfee2085e3bb9f2b;
-  4218f0271ab7a1ff -.->|verifiedBy| 5ba6b6cfb2def0dc;
-  4218f0271ab7a1ff -.->|verifiedBy| afe734eb25af0948;
-  61bf4405db9ec1d1 -.->|deriveReqT| f6eaca3198d3e7b1;
-  61bf4405db9ec1d1 -.->|deriveReqT| 5998aab477c0f267;
-  61bf4405db9ec1d1 -.->|deriveReqT| c2dcd8bee857c1c9;
-  61bf4405db9ec1d1 -.->|deriveReqT| 7c883e831e2c29b4;
-  61bf4405db9ec1d1 -.->|deriveReqT| 1edca8b0e6593904;
-  61bf4405db9ec1d1 -.->|deriveReqT| 6a7acae8cf9e263a;
-  61bf4405db9ec1d1 -->|satisfiedBy| 56bb1bbec2929bbf;
-  61bf4405db9ec1d1 -->|satisfiedBy| 7487a75cd05915f1;
-  61bf4405db9ec1d1 -->|satisfiedBy| 6f05db68a045c3d5;
-  61bf4405db9ec1d1 -->|satisfiedBy| 8c00f5d9ecd6d1d;
-  61bf4405db9ec1d1 -->|satisfiedBy| 533702f1ecbb5b59;
-  eba606a6e5946ae2 -.->|deriveReqT| b06273848d1f5dc5;
-  eba606a6e5946ae2 -.->|verifiedBy| 126252a1943b389f;
-  4cf628770fcfc9c1 -.->|deriveReqT| a7edc6067e3c2e20;
-  4cf628770fcfc9c1 -.->|deriveReqT| 8f64ca1a58bc879e;
-  4cf628770fcfc9c1 -.->|deriveReqT| fa6d731edffe344d;
+  625bdde09d955477 -->|satisfiedBy| bfee2085e3bb9f2b;
+  625bdde09d955477 -.->|verifiedBy| 83d989f6ea529f74;
+  625bdde09d955477 -.->|verifiedBy| ccbfdf0d74ac48bf;
+  a39347281679d203 -.->|deriveReqT| 358f8e948bf99775;
+  a39347281679d203 -.->|deriveReqT| c1a2476e356893a8;
+  a39347281679d203 -.->|deriveReqT| 9bbe93242c4454b;
+  a39347281679d203 -.->|deriveReqT| 1e0f7595bc684d1;
+  ee0d244ddc9aac8f -.->|deriveReqT| b1a0db26e90f239f;
+  ee0d244ddc9aac8f -->|satisfiedBy| b214580f5133dc42;
+  b37b9282f6da886 -.->|deriveReqT| 80f699a01d9db166;
+  39bccf245057be71 -.->|deriveReqT| 80f699a01d9db166;
+  20f690d9cd389f10 -.->|deriveReqT| 176bc8c4eb6608de;
+  20f690d9cd389f10 -.->|deriveReqT| 8ab6eb6e6ddc46cc;
+  20f690d9cd389f10 -.->|deriveReqT| cc7864983ff441c7;
+  20f690d9cd389f10 -.->|deriveReqT| cdc082002507d4df;
+  20f690d9cd389f10 -.->|deriveReqT| 500be52cc121e6f2;
+  20f690d9cd389f10 -->|satisfiedBy| b8a5e3adb9b5d82d;
+  20f690d9cd389f10 -.->|verifiedBy| a967e55b50b57d2;
+  659a813dd417bc5e -.->|verifiedBy| 98ae4e1997fb1002;
+  659a813dd417bc5e -.->|verifiedBy| 40f8f3dcc6a4e8bd;
+  d7718b70035d8d84 -.->|deriveReqT| 42398f2c82684691;
+  d7718b70035d8d84 -.->|deriveReqT| bf9a2f73b67492b9;
+  d7718b70035d8d84 -.->|deriveReqT| 591265fa14ecd72d;
+  d7718b70035d8d84 -.->|deriveReqT| cab861a199d11c3c;
+  d7718b70035d8d84 -.->|deriveReqT| 451abcac00b45de4;
+  d7718b70035d8d84 -.->|deriveReqT| c68daf5bfafc5a05;
+  d7718b70035d8d84 -.->|deriveReqT| b9c9829782477a6c;
+  d7718b70035d8d84 -.->|deriveReqT| f006550e707e055f;
+  d7718b70035d8d84 -.->|deriveReqT| 8f31bcc56d19f6e9;
+  d7718b70035d8d84 -.->|deriveReqT| 9cdb6297e49a3802;
+  40dc720d7c510af0 -.->|deriveReqT| ee0d244ddc9aac8f;
+  40dc720d7c510af0 -.->|deriveReqT| 3136e3195e243669;
+  40dc720d7c510af0 -.->|deriveReqT| b7ae73612502c3fb;
+  40dc720d7c510af0 -.->|deriveReqT| c17deaee6f88323a;
+  40dc720d7c510af0 -.->|deriveReqT| a0f7724a2ceac1ec;
+  40dc720d7c510af0 -.->|deriveReqT| befd27abaf2aae8b;
+  40dc720d7c510af0 -->|satisfiedBy| e8918fd8f69a1f0a;
+  40dc720d7c510af0 -->|satisfiedBy| 38c3e6e7692e0875;
+  40dc720d7c510af0 -->|satisfiedBy| 64319236fb27fe2;
+  40dc720d7c510af0 -->|satisfiedBy| d55aca455bf08f76;
+  40dc720d7c510af0 -->|satisfiedBy| 934223a89d4e2022;
+  90bec7578aacbe9d -.->|deriveReqT| d6147550e948449e;
+  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 343e7b2d42df05e8;
+  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 9b566692fe070492;
+  9acde25d23600635 -.->|deriveReqT| a27cb4ff2637ed4a;
+  9acde25d23600635 -.->|verifiedBy| 129e024331e2ae9e;
+  a869d98120d611e3 -.->|deriveReqT| dcb530333efa6cc3;
+  a869d98120d611e3 -.->|deriveReqT| dcd747ef36b02f8c;
+  a869d98120d611e3 -.->|deriveReqT| e5ee40ed53dd3c3;
   637652e86464c11b["error.rs"];
   class 637652e86464c11b default;
   click 637652e86464c11b "../core/src/error.rs";
-  4cf628770fcfc9c1 -->|satisfiedBy| 637652e86464c11b;
-  4cf628770fcfc9c1 -->|satisfiedBy| 1e40c88115650f56;
-  6b2f557333e6e20e -.->|deriveReqT| 6cac299af6d6729b;
-  6b2f557333e6e20e -.->|deriveReqT| 1debd0c38479c1a7;
-  6b2f557333e6e20e -.->|deriveReqT| a12662010b5497e6;
-  6b2f557333e6e20e -.->|deriveReqT| 9f38b218987142db;
-  4e70a73c803758c7 -.->|deriveReqT| 8188faabab34ba29;
-  4e70a73c803758c7 -.->|deriveReqT| aca44ff615e1b424;
-  4e70a73c803758c7 -.->|deriveReqT| 78aac5e106578b7d;
-  4e70a73c803758c7 -.->|deriveReqT| 9ba6da06e45fe3d9;
-  4e70a73c803758c7 -.->|deriveReqT| 9520c32395e404c9;
+  a869d98120d611e3 -->|satisfiedBy| 637652e86464c11b;
+  a869d98120d611e3 -->|satisfiedBy| fc1df5aa988472a;
+  6226bc768d0185df -.->|deriveReqT| df9b3eb5275616dd;
+  ff8ff08f0c0500f0 -.->|deriveReqT| fcfc76ba4d193d75;
+  ff8ff08f0c0500f0 -.->|deriveReqT| f1ee9af5e71df06a;
+  ff8ff08f0c0500f0 -.->|deriveReqT| b207bb8eb7f88839;
+  ff8ff08f0c0500f0 -.->|deriveReqT| fed54223697ea04e;
+  ff8ff08f0c0500f0 -.->|deriveReqT| 32ca10d548006362;
+  76fbd08929220b2f -.->|deriveReqT| 4e665d02fddc5598;
+  4a77e514d9e5539b -.->|deriveReqT| 9f1021634cff7f57;
+  69aa75e267b074df -.->|deriveReqT| e93ddf96472a7933;
+  69aa75e267b074df -.->|deriveReqT| c1ff27df19e4e86;
 </div>
+<p><strong>Stakeholders:</strong></p>
+<table><thead><tr><th>Stakeholder</th><th>Description</th></tr></thead><tbody>
+<tr><td><strong>System Engineer</strong></td><td>Responsible for defining system architecture, requirements, and ensuring technical coherence across the system</td></tr>
+<tr><td><strong>V&amp;V Engineer</strong></td><td>Verification &amp; Validation Engineer responsible for ensuring requirements are properly verified and validated</td></tr>
+<tr><td><strong>Developer</strong></td><td>Implements system components and maintains alignment between code and specifications</td></tr>
+<tr><td><strong>Manager</strong></td><td>Oversees project progress, tracks metrics, and ensures alignment with organizational objectives</td></tr>
+<tr><td><strong>Contributor</strong></td><td>Open-source contributor who collaborates on the Reqvire project</td></tr>
+</tbody></table>
+<h3 id="ai-assisted-system-model-management">AI-Assisted System Model Management</h3>
+<p>As a <strong>Systems Engineer</strong>, I want to efficiently manage System models using AI-powered tools and LLM-based assistants.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<hr />
 <h3 id="align-with-industry-standards">Align with Industry Standards</h3>
-<p>As as <strong>System Engineer</strong>, I want to work with the system that adheres to widely recognized industry standards, such as ISO/IEC/IEEE 15288, to ensure compatibility and relevance in systems engineering practices.</p>
-<h4>Details</h4>
-<p>The system shall define industry standards and methodologies to follow.</p>
+<p>As a <strong>System Engineer</strong>, I want to work with a system that adheres to widely recognized industry standards, such as ISO/IEC/IEEE 15288 and SysML, to ensure compatibility and relevance in systems engineering practices.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="System/Core/Validation.html#validate-cross-component-dependencies">Validate Cross-Component Dependencies</a></li>
-<li>derive: <a href="System/Core/Validation.html#validate-internal-consistency">Validate Internal Consistency</a></li>
-<li>derive: <a href="System/Core/Validation.html#validate-markdown-structure">Validate Markdown Structure</a></li>
-<li>derive: <a href="System/Core/Validation.html#validate-relation-types">Validate Relation Types</a></li>
-<li>derive: <a href="System/Operations/Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a></li>
-<li>derive: <a href="System/Output/Reporting.html#provide-validation-reports">Provide Validation Reports</a></li>
-<li>satisfiedBy: <a href="Refinements.html#industry-standards-specification">Industry Standards Specification</a></li>
+<li>satisfiedBy: <a href="Refinements.html#containment-specification">Containment Specification</a></li>
+<li>satisfiedBy: <a href="Refinements.html#refinement-specification">Refinement Specification</a></li>
+<li>satisfiedBy: <a href="Refinements.html#relation-semantics-specification">Relation Semantics Specification</a></li>
+<li>satisfiedBy: <a href="Refinements.html#supported-element-types-specification">Supported Element Types Specification</a></li>
+<li>satisfiedBy: <a href="Refinements.html#traceability-reporting-specification">Traceability Reporting Specification</a></li>
+<li>satisfiedBy: <a href="Refinements.html#verification-coverage-specification">Verification Coverage Specification</a></li>
 </ul>
 <hr />
 <h3 id="aligning-design-with-code">Aligning Design with Code</h3>
@@ -1067,8 +1098,41 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="System/Integration/CodeAlignment.html#code-traceability">Code Traceability</a></li>
-<li>derive: <a href="System/Integration/CodeAlignment.html#suggest-code-refactoring">Suggest Code Refactoring</a></li>
+<li>derive: <a href="Functional/Integration/CodeAlignment.html#code-traceability">Code Traceability</a></li>
+<li>derive: <a href="Functional/Integration/CodeAlignment.html#suggest-code-refactoring">Suggest Code Refactoring</a></li>
+</ul>
+<hr />
+<h3 id="defining-model-structure">Defining Model Structure</h3>
+<p>As a <strong>System Engineer</strong>, I want a well-defined model structure and file identification mechanism, so that I can organize system specifications in a consistent and predictable manner.</p>
+<h4>Details</h4>
+<p>This user story covers the foundational aspects of how System models are structured:</p>
+<ul>
+<li>Identification of specification files within the repository</li>
+<li>Structure and addressing rules for markdown documents</li>
+<li>Coexistence of structured and unstructured documents</li>
+<li>Git repository as the project root for path resolution</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="Functional/Core/ModelManagement.html#coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</a></li>
+<li>derive: <a href="Functional/Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+<li>derive: <a href="Functional/Core/StructureAndParsing.html#specification-file-identification">Specification File Identification</a></li>
+<li>derive: <a href="Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+</ul>
+<hr />
+<h3 id="formatting-model-documents">Formatting Model Documents</h3>
+<p>As a <strong>System Engineer</strong>, I want to automatically format model documents to ensure consistent structure and style across all specification files.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="Functional/Operations/Formatting.html#model-formatting">Model Formatting</a></li>
 </ul>
 <hr />
 <h3 id="fostering-community-contributions">Fostering Community Contributions</h3>
@@ -1086,40 +1150,18 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="System/Output/DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+<li>derive: <a href="Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
 </ul>
 <hr />
-<h3 id="managing-system-models">Managing System Models</h3>
-<p>As an <strong>System Engineer</strong>, I want to manage System models effectively, so that I can ensure they align with project requirements and deliverable goals.</p>
+<h3 id="linting-model-quality">Linting Model Quality</h3>
+<p>As a <strong>System Engineer</strong>, I want to lint model documents to detect and fix quality issues such as missing relations, orphaned elements, and inconsistencies.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="Interfaces/Interfaces.html#cli-interface">CLI interface</a></li>
-<li>derive: <a href="Interfaces/Interfaces.html#web-interface">Web Interface</a></li>
-<li>derive: <a href="System/Core/ModelManagement.html#coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</a></li>
-<li>derive: <a href="System/Core/ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></li>
-<li>derive: <a href="System/Core/ModelManagement.html#efficient-processing">Efficient Processing</a></li>
-<li>derive: <a href="System/Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
-<li>derive: <a href="System/Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
-<li>derive: <a href="System/Core/ModelManagement.html#template-based-model-bootstrapping">Template-Based Model Bootstrapping</a></li>
-<li>derive: <a href="System/Core/StructureAndParsing.html#specification-file-identification">Specification File Identification</a></li>
-<li>derive: <a href="System/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
-<li>derive: <a href="#ai-assisted-system-model-management">AI-Assisted System Model Management</a></li>
-</ul>
-<hr />
-<h3 id="ai-assisted-system-model-management">AI-Assisted System Model Management</h3>
-<p>As a <strong>Systems Engineer</strong>, I want to efficiently manage System models using AI-powered tools and LLM-based assistants.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derive: <a href="System/Core/StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a></li>
-<li>derivedFrom: <a href="#managing-system-models">Managing System Models</a></li>
+<li>derive: <a href="Functional/Operations/Linting.html#model-linting">Model Linting</a></li>
 </ul>
 <hr />
 <h3 id="model-export">Model Export</h3>
@@ -1143,6 +1185,28 @@ blockquote {
 <li>type: user-requirement</li>
 </ul>
 <hr />
+<h3 id="operating-on-model-elements">Operating on Model Elements</h3>
+<p>As a <strong>System Engineer</strong>, I want to create, modify, move, and delete model elements programmatically, so that I can efficiently maintain and evolve the system model over time.</p>
+<h4>Details</h4>
+<p>This user story covers all operations that modify model elements:</p>
+<ul>
+<li>Element manipulation operations (add, remove, move, rename, merge)</li>
+<li>Default type assignment for new elements</li>
+<li>Efficient processing of model changes</li>
+<li>Template-based model bootstrapping</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="Functional/Core/ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></li>
+<li>derive: <a href="Functional/Core/ModelManagement.html#efficient-processing">Efficient Processing</a></li>
+<li>derive: <a href="Functional/Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>derive: <a href="Functional/Core/ModelManagement.html#template-based-model-bootstrapping">Template-Based Model Bootstrapping</a></li>
+</ul>
+<hr />
 <h3 id="promote-automation-and-efficiency">Promote Automation and Efficiency</h3>
 <p>As as <strong>System Engineer</strong>, I would like to reduce manual effort in managing requirements, models, and traceability by automating routine tasks.</p>
 <h4>Metadata</h4>
@@ -1151,7 +1215,7 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="System/Core/ModelManagement.html#efficient-processing">Efficient Processing</a></li>
+<li>derive: <a href="Functional/Core/ModelManagement.html#efficient-processing">Efficient Processing</a></li>
 <li>derive: <a href="#integrate-with-github-workflows">Integrate with GitHub Workflows</a></li>
 </ul>
 <hr />
@@ -1163,9 +1227,9 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="System/Integration/GitHubIntegration.html#automate-documentation-export">Automate Documentation Export</a></li>
-<li>derive: <a href="System/Integration/GitHubIntegration.html#automate-pull-request-validations">Automate Pull Request Validations</a></li>
-<li>derive: <a href="System/Integration/GitHubIntegration.html#generate-change-logs-for-pull-requests">Generate Change Logs for Pull Requests</a></li>
+<li>derive: <a href="Functional/Integration/GitHubIntegration.html#automate-documentation-export">Automate Documentation Export</a></li>
+<li>derive: <a href="Functional/Integration/GitHubIntegration.html#automate-pull-request-validations">Automate Pull Request Validations</a></li>
+<li>derive: <a href="Functional/Integration/GitHubIntegration.html#generate-change-logs-for-pull-requests">Generate Change Logs for Pull Requests</a></li>
 <li>derivedFrom: <a href="#promote-automation-and-efficiency">Promote Automation and Efficiency</a></li>
 </ul>
 <hr />
@@ -1177,7 +1241,25 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="System/Output/Reporting.html#model-reports">Model Reports</a></li>
+<li>derive: <a href="Functional/Output/Reporting.html#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="system-model-interfaces">System Model Interfaces</h3>
+<p>As a <strong>System Engineer</strong>, I want to interact with the system model through multiple interfaces, so that I can choose the most appropriate tool for my workflow.</p>
+<h4>Details</h4>
+<p>This user story covers the different ways to access and manage system models:</p>
+<ul>
+<li>Command-line interface for automation and scripting</li>
+<li>Web interface for browsing and visualization</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="Interfaces/Interfaces.html#cli-interface">CLI interface</a></li>
+<li>derive: <a href="Interfaces/Interfaces.html#web-interface">Web Interface</a></li>
 </ul>
 <hr />
 <h3 id="trace-changes-in-system-model">Trace Changes in System Model</h3>
@@ -1188,7 +1270,7 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="System/Output/Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
+<li>derive: <a href="Functional/Output/Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
 </ul>
 <hr />
 <h3 id="validating-structures">Validating Structures</h3>
@@ -1199,14 +1281,23 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="System/Core/Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
-<li>derive: <a href="System/Core/Validation.html#validate-cross-component-dependencies">Validate Cross-Component Dependencies</a></li>
-<li>derive: <a href="System/Core/Validation.html#validate-filesystem-structure">Validate Filesystem Structure</a></li>
-<li>derive: <a href="System/Core/Validation.html#validate-internal-consistency">Validate Internal Consistency</a></li>
-<li>derive: <a href="System/Core/Validation.html#validate-markdown-structure">Validate Markdown Structure</a></li>
-<li>derive: <a href="System/Core/Validation.html#validate-relation-types">Validate Relation Types</a></li>
-<li>derive: <a href="System/Operations/Formatting.html#model-formatting">Model Formatting</a></li>
-<li>derive: <a href="System/Operations/Linting.html#model-linting">Model Linting</a></li>
+<li>derive: <a href="Functional/Core/Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
+<li>derive: <a href="Functional/Core/Validation.html#validate-cross-component-dependencies">Validate Cross-Component Dependencies</a></li>
+<li>derive: <a href="Functional/Core/Validation.html#validate-filesystem-structure">Validate Filesystem Structure</a></li>
+<li>derive: <a href="Functional/Core/Validation.html#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>derive: <a href="Functional/Core/Validation.html#validate-markdown-structure">Validate Markdown Structure</a></li>
+<li>derive: <a href="Functional/Core/Validation.html#validate-relation-types">Validate Relation Types</a></li>
+</ul>
+<hr />
+<h3 id="verification-traceability">Verification Traceability</h3>
+<p>As a <strong>V&amp;V Engineer</strong>, I want to trace verification coverage through the requirement hierarchy, so that I can ensure all requirements are properly verified and identify gaps in verification.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="Functional/Processing/VerificationTraces.html#verification-upward-traceability">Verification Upward Traceability</a></li>
 </ul>
 <hr />
 

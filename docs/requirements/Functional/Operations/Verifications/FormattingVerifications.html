@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FormattingVerifications</title>
+    <link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico">
+    <link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png">
+    
+<style>
+:root {
+    /* Primary Colors */
+    --color-primary: #3F51B5;           /* Indigo - core branding */
+    --color-primary-hover: #7986CB;     /* Much lighter Indigo for hover - more visible */
+    --color-primary-active: #303F9F;    /* Darker Indigo for active */
+
+    /* Element Type Colors */
+    --color-requirement: #673AB7;       /* Deep Purple - core requirements */
+    --color-verification: #4CAF50;      /* Emerald Green - validated/completed */
+    --color-other: #9E9E9E;             /* Cool Gray - other element types */
+
+    /* Status Colors */
+    --color-verified: #4CAF50;          /* Forest Green - verified/passing */
+    --color-pending: #FFB74D;           /* Amber - pending/warning */
+    --color-error: #F44336;             /* Red - error/failed */
+
+    /* Interactive Colors */
+    --color-highlight: #FFAB91;         /* Peach - hover highlight */
+    --color-link: #212121;              /* Black - link color */
+    --color-link-hover: #3F51B5;        /* Indigo (same as nav bar) - link hover */
+
+    /* Text Colors */
+    --color-text-primary: #212121;      /* Primary text */
+    --color-text-secondary: #424242;    /* Body text */
+    --color-text-muted: #757575;        /* De-emphasized text */
+    --color-background: #FAFAFA;        /* Off-white background */
+    --color-border: #EEEEEE;            /* Very light gray borders */
+}
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #FAFAFA;
+    color: var(--color-text-secondary);
+}
+.reqvire-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50px;
+    background-color: var(--color-primary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+}
+.reqvire-nav a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+    transition: background-color 0.2s, text-decoration 0.2s;
+}
+.reqvire-nav a.nav-logo {
+    display: flex;
+    align-items: center;
+    padding: 5px 15px 5px 0;
+}
+.reqvire-nav a.nav-logo img {
+    vertical-align: middle;
+}
+.reqvire-nav a:hover {
+    background-color: var(--color-primary-hover);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav a:active,
+.reqvire-nav a.active {
+    background-color: var(--color-primary-active);
+    text-decoration: underline;
+    color: #ffffff;
+}
+.reqvire-nav-spacer {
+    height: 50px;
+}
+.container {
+    max-width: 95%;
+    margin: 0 auto;
+    padding: 20px;
+}
+.content {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    border: 1px solid #E0E0E0;
+}
+h1 {
+    color: var(--color-text-primary);
+    border-bottom: 2px solid #EEEEEE;
+    padding-bottom: 10px;
+    margin-top: 0;
+}
+h2 {
+    color: var(--color-text-primary);
+    border-bottom: 1px solid #EEEEEE;
+    padding-bottom: 5px;
+}
+h3 {
+    color: var(--color-text-primary);
+    margin-top: 25px;
+}
+h4 {
+    color: var(--color-text-secondary);
+    font-weight: 600;
+}
+a {
+    color: var(--color-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: text-decoration 0.15s ease;
+}
+a:hover {
+    text-decoration: underline;
+}
+a:focus {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 2px;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #EEEEEE;
+}
+th, td {
+    padding: 8px 12px;
+    text-align: left;
+}
+th {
+    background-color: #F5F5F5;
+    color: #212121;
+    font-weight: 600;
+}
+tr:hover td {
+    background-color: #FFF8E1;
+}
+code {
+    background: #f6f8fa;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-size: 90%;
+}
+pre {
+    background: #f6f8fa;
+    border-radius: 3px;
+    padding: 16px;
+    overflow: auto;
+}
+pre code {
+    background: transparent;
+    padding: 0;
+}
+blockquote {
+    margin: 0;
+    padding: 0 15px;
+    color: var(--color-text-muted);
+    border-left: 4px solid var(--color-primary);
+}
+.mermaid {
+    margin: 20px 0;
+    text-align: center;
+    height: calc(100vh - 150px);
+    width: 100%;
+    overflow: hidden;
+    position: relative; /* Required for absolutely-positioned navigation buttons */
+    border: 1px solid #EEEEEE;
+    border-radius: 3px;
+    background-color: #FAFAFA;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+.mermaid svg {
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 100%;
+    position: relative;
+    z-index: 1;
+}
+.diagram-nav-buttons {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    z-index: 999; /* higher than SVG (1) but lower than header nav (1000) */
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    background-color: rgba(255, 255, 255, 0.85);
+    padding: 3px;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+}
+.diagram-nav-row {
+    display: flex;
+    gap: 2px;
+    justify-content: center;
+}
+.diagram-nav-btn {
+    width: 22px;
+    height: 22px;
+    background-color: var(--color-primary);
+    color: white;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.diagram-nav-btn:hover {
+    background-color: var(--color-primary-hover);
+}
+.diagram-nav-btn:active {
+    background-color: var(--color-primary-active);
+}
+</style>
+
+    <!-- Enhanced mermaid configuration for Reqvire diagrams -->
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+        import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+        // Register ELK layout for large diagrams
+        mermaid.registerLayoutLoaders(elkLayouts);
+
+        // Capture Mermaid errors
+        mermaid.parseError = function(err, hash) {
+            console.error('Mermaid Parse Error:', err);
+            console.error('Error details:', {
+                str: err.str,
+                hash: err.hash,
+                message: err.message,
+                stack: err.stack
+            });
+        };
+
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'neutral',
+            maxTextSize: 5000000,
+            maxEdges: 50000,
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis',
+                defaultRenderer: 'elk'
+            },
+            layout: 'elk',
+            elk: {
+                mergeEdges: true,
+                nodePlacementStrategy: 'SIMPLE'
+            },
+            securityLevel: 'loose',
+            logLevel: 'error'
+        });
+
+        await mermaid.run();
+        window.mermaid = mermaid;
+
+        // Wait for SVGs to be fully rendered, then initialize
+        function waitForSvgs(callback) {
+            var containers = document.querySelectorAll('.mermaid');
+            var allReady = true;
+            containers.forEach(function(c) {
+                var svg = c.querySelector('svg');
+                // Check SVG exists, has getBBox, valid dimensions, and has actual content (nodes)
+                if (!svg || !svg.getBBox || svg.getBBox().width === 0 || !svg.querySelector('.node')) {
+                    allReady = false;
+                }
+            });
+            if (allReady && containers.length > 0) {
+                callback();
+            } else {
+                requestAnimationFrame(function() { waitForSvgs(callback); });
+            }
+        }
+
+        // Add pan/zoom to all Mermaid diagrams after rendering
+        waitForSvgs(function() {
+            var allMermaidContainers = document.querySelectorAll('.mermaid');
+
+            allMermaidContainers.forEach(function(mermaidContainer, index) {
+
+                var svg = mermaidContainer.querySelector('svg');
+                if (!svg) {
+                    return;
+                }
+
+                // Double-check SVG is ready
+                try {
+                    var bbox = svg.getBBox();
+                    if (bbox.width === 0 || bbox.height === 0) {
+                        return;
+                    }
+                } catch (e) {
+                    return;
+                }
+
+                // Get the natural size of the diagram
+                var bbox = svg.getBBox();
+                var containerWidth = mermaidContainer.clientWidth;
+                var containerHeight = mermaidContainer.clientHeight;
+
+                // Check if diagram fits within container (with some padding)
+                var padding = 40;
+                var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+                if (fitsInContainer) {
+                    // Diagram fits - use natural size, shrink container to fit content
+                    svg.style.width = 'auto';
+                    svg.style.height = 'auto';
+                    mermaidContainer.style.height = 'auto';
+                    mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                    mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                    // No pan/zoom needed for small diagrams
+                    return;
+                }
+
+                // Large diagram - enable pan/zoom
+                svg.style.maxWidth = 'none';
+                svg.style.maxHeight = 'none';
+
+                var eventsHandler = {
+                    haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                        init: function(options) {
+                            var instance = options.instance;
+                            var initialScale = 1;
+                            var pannedX = 0;
+                            var pannedY = 0;
+
+                            this.hammer = Hammer(options.svgElement, {
+                                inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                            });
+
+                            this.hammer.get('pinch').set({enable: true});
+
+                            this.hammer.on('doubletap', function(ev){
+                                instance.zoomIn();
+                            });
+
+                            this.hammer.on('panstart panmove', function(ev){
+                                if (ev.type === 'panstart') {
+                                    pannedX = 0;
+                                    pannedY = 0;
+                                }
+                                instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                                pannedX = ev.deltaX;
+                                pannedY = ev.deltaY;
+                            });
+
+                            this.hammer.on('pinchstart pinchmove', function(ev){
+                                if (ev.type === 'pinchstart') {
+                                    initialScale = instance.getZoom();
+                                }
+                                instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                            });
+
+                            options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                        },
+                        destroy: function(){
+                            this.hammer.destroy();
+                        }
+                    };
+
+                    // Diagrams with default zoom (no auto-fit)
+                    var panZoomInstance;
+                    try {
+                        panZoomInstance = svgPanZoom(svg, {
+                            zoomEnabled: true,
+                            controlIconsEnabled: true,
+                            fit: false,
+                            center: false,
+                            contain: false,
+                            minZoom: 0.5,
+                            maxZoom: 10,
+                            zoomScaleSensitivity: 0.3,
+                            customEventsHandler: eventsHandler
+                        });
+                    } catch (e) {
+                        return; // Skip this diagram and continue with others
+                    }
+
+                    if (!panZoomInstance) {
+                        return;
+                    }
+
+                    // Add navigation buttons
+                    var navButtons = document.createElement('div');
+                    navButtons.className = 'diagram-nav-buttons';
+                    navButtons.innerHTML = `
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="up">▲</button>
+                        </div>
+                        <div class="diagram-nav-row">
+                            <button class="diagram-nav-btn" data-action="left">◀</button>
+                            <button class="diagram-nav-btn" data-action="down">▼</button>
+                            <button class="diagram-nav-btn" data-action="right">▶</button>
+                        </div>
+                    `;
+                    mermaidContainer.appendChild(navButtons);
+
+                    // Wire up navigation buttons
+                    var panStep = 100;
+                    navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                        btn.addEventListener('click', function(e) {
+                            e.preventDefault();
+                            var action = this.getAttribute('data-action');
+                            switch(action) {
+                                case 'up':
+                                    panZoomInstance.panBy({x: 0, y: panStep});
+                                    break;
+                                case 'down':
+                                    panZoomInstance.panBy({x: 0, y: -panStep});
+                                    break;
+                                case 'left':
+                                    panZoomInstance.panBy({x: panStep, y: 0});
+                                    break;
+                                case 'right':
+                                    panZoomInstance.panBy({x: -panStep, y: 0});
+                                    break;
+                            }
+                        });
+                    });
+            });
+
+            // Add CSS for edge highlighting
+            var style = document.createElement('style');
+            style.textContent = `
+                path.edge-highlighted,
+                .edge-highlighted path,
+                svg path.edge-highlighted {
+                    stroke: #FFAB91 !important;
+                    stroke-width: 3px !important;
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Initialize edge highlighting for all diagrams
+            document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+                var nodes = svg.querySelectorAll('.node');
+
+                // Find flowchart-link paths (actual edges)
+                var edgePaths = svg.querySelectorAll('path.flowchart-link');
+                // Fallback: find paths in .edges group
+                if (edgePaths.length === 0) {
+                    var edgesGroup = svg.querySelector('.edges');
+                    if (edgesGroup) {
+                        edgePaths = edgesGroup.querySelectorAll('path');
+                    }
+                }
+
+                // Get SVG point for coordinate transforms
+                var svgPoint = svg.createSVGPoint();
+
+                // Helper: transform point through element's CTM
+                function getTransformedBBox(element) {
+                    var bbox = element.getBBox();
+                    var ctm = element.getCTM();
+                    if (!ctm) return bbox;
+
+                    // Transform all four corners
+                    var corners = [
+                        {x: bbox.x, y: bbox.y},
+                        {x: bbox.x + bbox.width, y: bbox.y},
+                        {x: bbox.x, y: bbox.y + bbox.height},
+                        {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+                    ];
+
+                    var transformed = corners.map(function(c) {
+                        svgPoint.x = c.x;
+                        svgPoint.y = c.y;
+                        var tp = svgPoint.matrixTransform(ctm);
+                        return {x: tp.x, y: tp.y};
+                    });
+
+                    var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+                    var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+                    var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+                    var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+                    return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+                }
+
+                // Helper: get all points from path
+                function getPathPoints(path) {
+                    var d = path.getAttribute('d') || '';
+                    var points = [];
+                    var ctm = path.getCTM();
+
+                    // Get M (start) point
+                    var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+                    if (startMatch) {
+                        var sx = parseFloat(startMatch[1]);
+                        var sy = parseFloat(startMatch[2]);
+                        if (ctm) {
+                            svgPoint.x = sx; svgPoint.y = sy;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: sx, y: sy});
+                        }
+                    }
+
+                    // Get last point - find last number pair before Z or end
+                    var allNums = d.match(/[\d.-]+/g);
+                    if (allNums && allNums.length >= 2) {
+                        var ex = parseFloat(allNums[allNums.length - 2]);
+                        var ey = parseFloat(allNums[allNums.length - 1]);
+                        if (ctm) {
+                            svgPoint.x = ex; svgPoint.y = ey;
+                            var tp = svgPoint.matrixTransform(ctm);
+                            points.push({x: tp.x, y: tp.y});
+                        } else {
+                            points.push({x: ex, y: ey});
+                        }
+                    }
+
+                    return points;
+                }
+
+                // Build node bounding boxes with transforms
+                var nodeData = {};
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    nodeData[hashId] = {
+                        node: node,
+                        bbox: getTransformedBBox(node)
+                    };
+                });
+
+                // Check if point is near bbox
+                function isNearBbox(pt, bbox, margin) {
+                    margin = margin || 40;
+                    return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                           pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+                }
+
+                // Calculate distance from point to bbox center
+                function distToBboxCenter(pt, bbox) {
+                    var centerX = bbox.x + bbox.width / 2;
+                    var centerY = bbox.y + bbox.height / 2;
+                    return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+                }
+
+                // Build edge connections with direction tracking
+                var edgeConnections = []; // [{path, source, target}]
+                var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+                var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+                Object.keys(nodeData).forEach(function(hashId) {
+                    upstreamOf[hashId] = [];
+                    downstreamOf[hashId] = [];
+                });
+
+                edgePaths.forEach(function(path) {
+                    var points = getPathPoints(path);
+                    if (points.length < 2) return;
+
+                    var startPt = points[0];
+                    var endPt = points[points.length - 1];
+
+                    var sourceNode = null;
+                    var targetNode = null;
+                    var sourceMinDist = Infinity;
+                    var targetMinDist = Infinity;
+
+                    // Find closest source and target nodes for this edge
+                    Object.keys(nodeData).forEach(function(hashId) {
+                        var bbox = nodeData[hashId].bbox;
+                        // Find closest node to start point (source)
+                        if (isNearBbox(startPt, bbox, 30)) {
+                            var dist = distToBboxCenter(startPt, bbox);
+                            if (dist < sourceMinDist) {
+                                sourceMinDist = dist;
+                                sourceNode = hashId;
+                            }
+                        }
+                        // Find closest node to end point (target)
+                        if (isNearBbox(endPt, bbox, 30)) {
+                            var dist = distToBboxCenter(endPt, bbox);
+                            if (dist < targetMinDist) {
+                                targetMinDist = dist;
+                                targetNode = hashId;
+                            }
+                        }
+                    });
+
+                    if (sourceNode && targetNode && sourceNode !== targetNode) {
+                        edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                        // source -> target means: target's upstream includes source
+                        if (!upstreamOf[targetNode].includes(sourceNode)) {
+                            upstreamOf[targetNode].push(sourceNode);
+                        }
+                        // source -> target means: source's downstream includes target
+                        if (!downstreamOf[sourceNode].includes(targetNode)) {
+                            downstreamOf[sourceNode].push(targetNode);
+                        }
+                    }
+                });
+
+                // Traverse only upstream (to parents/ancestors)
+                function findUpstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var parents = upstreamOf[current] || [];
+                        parents.forEach(function(parent) {
+                            if (!visited[parent]) {
+                                visited[parent] = true;
+                                queue.push(parent);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Traverse only downstream (to children/descendants)
+                function findDownstream(startNodeId) {
+                    var visited = {};
+                    var queue = [startNodeId];
+                    visited[startNodeId] = true;
+
+                    while (queue.length > 0) {
+                        var current = queue.shift();
+                        var children = downstreamOf[current] || [];
+                        children.forEach(function(child) {
+                            if (!visited[child]) {
+                                visited[child] = true;
+                                queue.push(child);
+                            }
+                        });
+                    }
+                    return visited;
+                }
+
+                // Get edges for connected nodes
+                function getChainEdges(nodeSet) {
+                    var edges = [];
+                    edgeConnections.forEach(function(conn) {
+                        if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                            edges.push(conn.path);
+                        }
+                    });
+                    return edges;
+                }
+
+                // Attach hover handlers
+                nodes.forEach(function(node) {
+                    var nodeId = node.id || '';
+                    var parts = nodeId.split('-');
+                    var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+                    node.style.cursor = 'pointer';
+
+                    node.addEventListener('mouseenter', function(e) {
+                        e.stopPropagation();
+                        nodes.forEach(function(n) { n.style.filter = ''; });
+                        node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                        // Find upstream (ancestors) and downstream (descendants) separately
+                        var upstream = findUpstream(hashId);
+                        var downstream = findDownstream(hashId);
+                        // Merge both sets
+                        var allConnected = {};
+                        Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                        Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                        var chainEdges = getChainEdges(allConnected);
+                        chainEdges.forEach(function(path) {
+                            path.classList.add('edge-highlighted');
+                        });
+                    });
+
+                    node.addEventListener('mouseleave', function() {
+                        node.style.filter = '';
+                        // Remove highlight from all edges
+                        edgePaths.forEach(function(path) {
+                            path.classList.remove('edge-highlighted');
+                        });
+                    });
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+    <nav class="reqvire-nav">
+        <a href="../../../../index.html" class="nav-logo"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a>
+        <a href="../../../../index.html">Containment</a>
+        <a href="../../../../model.html">Model</a>
+        <a href="../../../../traces.html">Traces</a>
+        <a href="../../../../traceflow.html">TraceFlow</a>
+        <a href="../../../../coverage.html">Coverage</a>
+        <a href="../../../../resources.html">Resources</a>
+    </nav>
+    <div class="reqvire-nav-spacer"></div>
+    <div class="container">
+        <div class="content">
+            <h1 id="elements">Elements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph 75874bcc96c01d2f["📁 requirements/Functional/Operations/Verifications"]
+    subgraph cae715fe712bf6a2["📄 FormattingVerifications.md"]
+      c89bd750e0ad5b9d["Element Ordering Verification<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      class c89bd750e0ad5b9d verification;
+      click c89bd750e0ad5b9d "FormattingVerifications.html#element-ordering-verification";
+      ccbfdf0d74ac48bf["Format Command Requirements Verification"];
+      class ccbfdf0d74ac48bf verification;
+      click ccbfdf0d74ac48bf "FormattingVerifications.html#format-command-requirements-verification";
+      29d28d35a64a722d["Format Duplicate Removal Test"];
+      class 29d28d35a64a722d verification;
+      click 29d28d35a64a722d "FormattingVerifications.html#format-duplicate-removal-test";
+      5df244b54d1b239c["Full Relations Insertion Verification"];
+      class 5df244b54d1b239c verification;
+      click 5df244b54d1b239c "FormattingVerifications.html#full-relations-insertion-verification";
+      753442551dab9958["Relation Ordering Verification"];
+      class 753442551dab9958 verification;
+      click 753442551dab9958 "FormattingVerifications.html#relation-ordering-verification";
+    end
+  end
+  81623fde4ecde03d["test.sh"];
+  class 81623fde4ecde03d default;
+  click 81623fde4ecde03d "../../../../tests/test-element-ordering/test.sh";
+  c89bd750e0ad5b9d -->|satisfiedBy| 81623fde4ecde03d;
+  aaf45a054cfa1d47["test.sh"];
+  class aaf45a054cfa1d47 default;
+  click aaf45a054cfa1d47 "../../../../tests/test-advanced-format/test.sh";
+  ccbfdf0d74ac48bf -->|satisfiedBy| aaf45a054cfa1d47;
+  4179509ffe0be04b["test.sh"];
+  class 4179509ffe0be04b default;
+  click 4179509ffe0be04b "../../../../tests/test-duplicate-detection/test.sh";
+  29d28d35a64a722d -->|satisfiedBy| 4179509ffe0be04b;
+  2a806c95f3f078e4["test.sh"];
+  class 2a806c95f3f078e4 default;
+  click 2a806c95f3f078e4 "../../../../tests/test-format-full-relations/test.sh";
+  5df244b54d1b239c -->|satisfiedBy| 2a806c95f3f078e4;
+  753442551dab9958 -->|satisfiedBy| aaf45a054cfa1d47;
+</div>
+<h3 id="element-ordering-verification">Element Ordering Verification</h3>
+<p>This test verifies that the format command reorders elements following the Element Ordering Behavior, ensuring parent elements appear before their children based on file-local derivedFrom hierarchy.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>Parent-Child Ordering:</strong></p>
+<ul>
+<li>Elements with file-local derivedFrom relations shall be ordered with parents before children</li>
+<li>Grandchildren shall appear after their parent elements</li>
+<li>The ordering shall be applied recursively through the entire hierarchy</li>
+</ul>
+<p><strong>Sibling Alphabetical Ordering:</strong></p>
+<ul>
+<li>Elements at the same hierarchy level (siblings) shall be sorted alphabetically</li>
+<li>Root elements (no file-local parent) shall be sorted alphabetically among themselves</li>
+<li>Children of the same parent shall be sorted alphabetically</li>
+</ul>
+<p><strong>Hierarchy Grouping:</strong></p>
+<ul>
+<li>Elements shall be grouped by their file-local parent chains</li>
+<li>Each parent’s subtree shall be kept together (parent, then all descendants)</li>
+<li>Cross-file derivedFrom relations shall not affect ordering</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic parent-child ordering</strong></p>
+<ul>
+<li>Create file with child element before parent element</li>
+<li>Run format command</li>
+<li>Verify parent appears before child in output</li>
+</ul>
+</li>
+<li>
+<p><strong>Multi-level hierarchy</strong></p>
+<ul>
+<li>Create file with grandchild, child, parent in wrong order</li>
+<li>Run format command</li>
+<li>Verify order: parent → child → grandchild</li>
+</ul>
+</li>
+<li>
+<p><strong>Sibling alphabetical sorting</strong></p>
+<ul>
+<li>Create file with siblings “Child Z” and “Child A” under same parent</li>
+<li>Run format command</li>
+<li>Verify order: parent → Child A → Child Z</li>
+</ul>
+</li>
+<li>
+<p><strong>Multiple root elements</strong></p>
+<ul>
+<li>Create file with multiple root elements (no file-local parents) in wrong alphabetical order</li>
+<li>Run format command</li>
+<li>Verify roots are sorted alphabetically</li>
+</ul>
+</li>
+<li>
+<p><strong>Mixed hierarchy and standalone</strong></p>
+<ul>
+<li>Create file with hierarchy group and standalone elements</li>
+<li>Run format command</li>
+<li>Verify hierarchy groups are kept together and all roots sorted alphabetically</li>
+</ul>
+</li>
+<li>
+<p><strong>Cross-file relations ignored</strong></p>
+<ul>
+<li>Create file where element derives from element in different file</li>
+<li>Run format command</li>
+<li>Verify cross-file derivedFrom does not affect local ordering</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-element-ordering/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
+<li>verify: <a href="../Formatting.html#element-ordering-normalization">Element Ordering Normalization</a></li>
+<li>verify: <a href="../../../Interfaces/CLI/Commands.html#format-command">Format Command</a></li>
+</ul>
+<hr />
+<h3 id="format-command-requirements-verification">Format Command Requirements Verification</h3>
+<p>This test verifies the format command requirements from SystemRequirements and UserRequirements, focusing on normalizing and standardizing System models for consistency and readability.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>Format Command Functionality:</strong></p>
+<ul>
+<li>System shall provide format command that normalizes and standardizes markdown documents</li>
+<li>System shall default to dry-run mode (preview changes without applying them)</li>
+<li>System shall require –fix flag to actually apply formatting changes to files</li>
+<li>System shall display changes in git diff style with line numbers and colors</li>
+<li>System shall show diff output in both preview mode and when applying changes with –fix</li>
+<li>System shall support –json flag for structured output of formatting results</li>
+<li>System shall preserve all document content while improving formatting consistency</li>
+</ul>
+<p><strong>Content Preservation:</strong></p>
+<ul>
+<li>System shall preserve personas sections and other non-element content</li>
+<li>System shall maintain element ordering within files</li>
+<li>System shall preserve page content (frontmatter before first element)</li>
+</ul>
+<p><strong>Formatting Consistency:</strong></p>
+<ul>
+<li>System shall trim excess whitespace from lines</li>
+<li>System shall normalize line endings consistently</li>
+<li>System shall insert proper separators between elements</li>
+<li>System shall normalize consecutive separators to single separators</li>
+<li>System shall normalize relation indentation to proper 2-space format</li>
+<li>System shall format relation links with human-readable names</li>
+<li>System shall clean up file references to show filename only for implementation files</li>
+</ul>
+<p><strong>Document Structure Normalization:</strong></p>
+<ul>
+<li>System shall always output <code># Elements</code> as the page header</li>
+<li>System shall add <code>## Elements</code> section header when elements exist without section header</li>
+<li>System shall preserve existing section headers (starting with <code>## </code>)</li>
+<li>System shall correctly distinguish level 1 headers from level 2+ headers</li>
+</ul>
+<p><strong>Change Preview Quality:</strong></p>
+<ul>
+<li>System shall show file identification clearly in change output</li>
+<li>System shall display line references with consistent width based on maximum line number</li>
+</ul>
+<p><strong>Known Limitations:</strong></p>
+<ul>
+<li>Diff output may not correctly display blank line additions in all cases (blank lines shown with ␤ character may have incorrect line numbering or positioning)</li>
+<li>System shall visualize trailing whitespace removal with special characters</li>
+<li>System shall use colors to distinguish additions (green) and removals (red)</li>
+<li>System shall group changes by file with clear separators</li>
+<li>System shall only show lines that have changes, omitting unchanged content</li>
+<li>System shall provide context lines before and after changes for better readability</li>
+<li>System shall maintain sequential line numbering that reflects final file positions</li>
+<li>System shall ensure line number continuity throughout diff output</li>
+</ul>
+<p><strong>Relation Link Enhancement:</strong></p>
+<ul>
+<li>System shall convert simple identifiers (non-markdown format) to proper markdown link format</li>
+<li>System shall convert absolute links to relative links where appropriate</li>
+<li>System shall preserve already correct relative links without modification</li>
+<li>System shall replace fragment-only same-file references with full element names</li>
+<li>System shall convert implementation file paths to clean filename references</li>
+<li>System shall preserve external URLs without modification</li>
+</ul>
+<p><strong>Attachment Formatting:</strong></p>
+<ul>
+<li>System shall format element identifier attachments with human-readable element names</li>
+<li>System shall look up actual element name from registry for attachment display names</li>
+<li>System shall NOT use identifier fragment as display name (e.g., NOT <code>[my-behavior]</code> but <code>[My Behavior]</code>)</li>
+<li>System shall preserve file attachment display names (filename)</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic format functionality</strong></p>
+<ul>
+<li>Format command runs successfully on test markdown files</li>
+<li>Default mode (no –fix flag) shows preview without making changes</li>
+<li>–fix flag applies changes correctly</li>
+<li>Format command shows diff output in both preview and –fix modes</li>
+<li>JSON flag produces structured output with formatting results</li>
+</ul>
+</li>
+<li>
+<p><strong>Content preservation verification</strong></p>
+<ul>
+<li>Personas sections remain intact after formatting</li>
+<li>Element content and structure preserved</li>
+<li>Element ordering maintained correctly within files</li>
+<li>Page content preserved</li>
+</ul>
+</li>
+<li>
+<p><strong>Change detection and preview</strong></p>
+<ul>
+<li>Changes are clearly identified by file</li>
+<li>Line references include consistent number width</li>
+<li>Trailing whitespace removal is visualized</li>
+<li>Color coding distinguishes addition/removal changes</li>
+<li>Context lines provide readable context around changes</li>
+<li>Line numbering maintains sequential continuity reflecting final file positions</li>
+</ul>
+</li>
+<li>
+<p><strong>Relation link quality</strong></p>
+<ul>
+<li>Simple identifiers are converted to proper markdown link format</li>
+<li>Absolute links are converted to relative links where appropriate</li>
+<li>Already correct relative links remain unchanged</li>
+<li>Same-file references use human-readable element names</li>
+<li>Implementation file references show clean filenames</li>
+<li>Fragment references use proper notation</li>
+</ul>
+</li>
+<li>
+<p><strong>Formatting consistency</strong></p>
+<ul>
+<li>Excess whitespace is trimmed appropriately</li>
+<li>Separators are inserted correctly between elements</li>
+<li>Consecutive separators are normalized to single separators</li>
+<li>Relation indentation is normalized to proper 2-space format</li>
+<li>Line endings are normalized</li>
+</ul>
+</li>
+<li>
+<p><strong>Line numbering accuracy</strong></p>
+<ul>
+<li>Line numbers in diff output are sequential and consistent</li>
+<li>Context lines maintain proper numbering continuity</li>
+<li>Added lines show correct position in final file</li>
+<li>Line numbering reflects final file structure accurately</li>
+</ul>
+</li>
+<li>
+<p><strong>Attachment display name preservation</strong></p>
+<ul>
+<li>Element identifier attachments use actual element name as display text</li>
+<li>Format does NOT replace human-readable names with identifier fragments</li>
+<li>File attachments preserve filename as display text</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-advanced-format/test.sh">test.sh</a></li>
+<li>verify: <a href="../../Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+<li>verify: <a href="../Formatting.html#document-structure-normalization">Document Structure Normalization</a></li>
+<li>verify: <a href="../Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a></li>
+<li>verify: <a href="../Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a></li>
+<li>verify: <a href="../Formatting.html#replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</a></li>
+<li>verify: <a href="../../../Interfaces/CLI/Commands.html#format-command">Format Command</a></li>
+</ul>
+<hr />
+<h3 id="format-duplicate-removal-test">Format Duplicate Removal Test</h3>
+<p>Test verifies that format removes within-section duplicates but not cross-section.</p>
+<h4>Details</h4>
+<p>Test cases:</p>
+<ol>
+<li>File with duplicate relations -&gt; <code>format --fix</code> -&gt; Duplicates removed</li>
+<li>File with duplicate attachments -&gt; <code>format --fix</code> -&gt; Duplicates removed</li>
+<li>File with cross-section duplicate -&gt; <code>format --fix</code> -&gt; No change (validation error, not format issue)</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-duplicate-detection/test.sh">test.sh</a></li>
+<li>verify: <a href="../Formatting.html#format-duplicate-removal">Format Duplicate Removal</a></li>
+</ul>
+<hr />
+<h3 id="full-relations-insertion-verification">Full Relations Insertion Verification</h3>
+<p>This test verifies that the –with-full-relations flag correctly inserts all registered relations (user-created and auto-generated) into elements during formatting.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>Auto-Generated Relations Insertion:</strong></p>
+<ul>
+<li>System shall insert inverse relations when –with-full-relations is provided</li>
+<li>satisfiedBy relations generated from satisfy shall be inserted</li>
+<li>derive relations generated from derivedFrom shall be inserted</li>
+<li>verify relations generated from verifiedBy shall be inserted</li>
+<li>tracedFrom relations generated from trace shall be inserted</li>
+</ul>
+<p><strong>Relation Ordering:</strong></p>
+<ul>
+<li>All relations (user-created and auto-generated) shall be sorted according to the Relation Ordering Normalization requirement</li>
+<li>Relations shall be sorted alphabetically by type, then by target identifier</li>
+</ul>
+<p><strong>Idempotency:</strong></p>
+<ul>
+<li>Running format –with-full-relations twice shall produce same output</li>
+<li>Already present relations shall not be duplicated</li>
+</ul>
+<p><strong>Selective Behavior:</strong></p>
+<ul>
+<li>Without –with-full-relations flag, only user-created relations are persisted</li>
+<li>With –with-full-relations flag, all relations from registry are persisted</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Basic inverse relation insertion</strong></p>
+<ul>
+<li>Create element A with satisfy relation to element B</li>
+<li>Run format –with-full-relations –fix</li>
+<li>Verify element B now has satisfiedBy relation to element A</li>
+</ul>
+</li>
+<li>
+<p><strong>Multiple inverse relation types</strong></p>
+<ul>
+<li>Create elements with derivedFrom, satisfiedBy, verifiedBy, trace relations</li>
+<li>Run format –with-full-relations –fix</li>
+<li>Verify all inverse relations (derive, satisfy, verify, tracedFrom) are inserted</li>
+</ul>
+</li>
+<li>
+<p><strong>No duplication</strong></p>
+<ul>
+<li>Run format –with-full-relations –fix twice</li>
+<li>Verify relations are not duplicated</li>
+</ul>
+</li>
+<li>
+<p><strong>Default behavior unchanged</strong></p>
+<ul>
+<li>Create element with satisfy relation</li>
+<li>Run format –fix (without –with-full-relations)</li>
+<li>Verify inverse relations are NOT inserted</li>
+</ul>
+</li>
+<li>
+<p><strong>Preview mode</strong></p>
+<ul>
+<li>Run format –with-full-relations (without –fix)</li>
+<li>Verify diff shows proposed relation insertions</li>
+<li>Verify files are not modified</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-format-full-relations/test.sh">test.sh</a></li>
+<li>verify: <a href="../Formatting.html#full-relations-insertion">Full Relations Insertion</a></li>
+<li>verify: <a href="../../../Interfaces/CLI/Commands.html#format-command">Format Command</a></li>
+</ul>
+<hr />
+<h3 id="relation-ordering-verification">Relation Ordering Verification</h3>
+<p>This test verifies that the format command sorts relations alphabetically for deterministic output.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<p><strong>Primary Sort by Relation Type:</strong></p>
+<ul>
+<li>Relations shall be sorted alphabetically by relation type name</li>
+<li>derivedFrom shall appear before satisfiedBy</li>
+<li>satisfy shall appear before trace</li>
+<li>trace shall appear before verifiedBy</li>
+</ul>
+<p><strong>Secondary Sort by Target Identifier:</strong></p>
+<ul>
+<li>Within the same relation type, relations shall be sorted alphabetically by target identifier</li>
+<li>For example: <code>derivedFrom: A</code> shall appear before <code>derivedFrom: B</code></li>
+</ul>
+<p><strong>Deterministic Output:</strong></p>
+<ul>
+<li>Same input shall always produce same output</li>
+<li>Output shall not depend on HashMap iteration order or parsing order</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Relation type alphabetical ordering</strong></p>
+<ul>
+<li>Create element with relations in non-alphabetical type order</li>
+<li>Run format –fix</li>
+<li>Verify relations are sorted by type name alphabetically</li>
+</ul>
+</li>
+<li>
+<p><strong>Same-type relation ordering</strong></p>
+<ul>
+<li>Create element with multiple relations of same type to different targets</li>
+<li>Run format –fix</li>
+<li>Verify relations of same type are sorted by target identifier</li>
+</ul>
+</li>
+<li>
+<p><strong>Deterministic output across runs</strong></p>
+<ul>
+<li>Run format –fix multiple times</li>
+<li>Verify output is identical each time</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-advanced-format/test.sh">test.sh</a></li>
+<li>verify: <a href="../Formatting.html#relation-ordering-normalization">Relation Ordering Normalization</a></li>
+</ul>
+<hr />
+
+        </div>
+    </div>
+</body>
+</html>

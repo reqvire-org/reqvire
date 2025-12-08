@@ -728,7 +728,7 @@ blockquote {
 <p>The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from stakeholder needs (user requirements) through system specifications (system requirements) to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.</p>
 <p><strong>Instructions:</strong> Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control.</p>
 <p>
-<div class="d3-sankey-container" id="d3sankey_55f84f19a450">
+<div class="d3-sankey-container" id="d3sankey_55b937dce910">
     <svg class="d3-sankey-svg"></svg>
 </div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -738,19 +738,69 @@ blockquote {
     const data = {
   "nodes": [
     {
-      "name": "CLI Git Commit Hash Flag Test",
+      "name": "Attach Command Verification",
       "type": "verification",
-      "link": "requirements/Interfaces/Verifications/CLIVerifications.md#cli-git-commit-hash-flag-test"
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attach-command-verification"
     },
     {
-      "name": "CLI Change Impact Report Command",
+      "name": "Attachment Commands",
       "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-change-impact-report-command"
+      "link": "requirements/Interfaces/CLI/Commands.md#attachment-commands"
+    },
+    {
+      "name": "Reserved Subsections Support",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/StructureAndParsing.md#reserved-subsections-support"
+    },
+    {
+      "name": "Structure and Addressing in Markdown Documents",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents"
+    },
+    {
+      "name": "Defining Model Structure",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#defining-model-structure"
+    },
+    {
+      "name": "Attachment Identifier CRUD Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachment-identifier-crud-verification"
+    },
+    {
+      "name": "Attachment Identifier Updates",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#attachment-identifier-updates"
+    },
+    {
+      "name": "Element Manipulation Operations",
+      "type": "user-requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#element-manipulation-operations"
+    },
+    {
+      "name": "Operating on Model Elements",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#operating-on-model-elements"
+    },
+    {
+      "name": "Attachment Output Rendering Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachment-output-rendering-verification"
+    },
+    {
+      "name": "Attachment Search Filters Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification"
+    },
+    {
+      "name": "CLI Search Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-search-command"
     },
     {
       "name": "CLI Interface Structure",
       "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-interface-structure"
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-interface-structure"
     },
     {
       "name": "CLI interface",
@@ -758,184 +808,29 @@ blockquote {
       "link": "requirements/Interfaces/Interfaces.md#cli-interface"
     },
     {
-      "name": "Managing System Models",
+      "name": "System Model Interfaces",
       "type": "user-requirement",
-      "link": "requirements/UserStories.md#managing-system-models"
-    },
-    {
-      "name": "CLI Help Structure Verification",
-      "type": "verification",
-      "link": "requirements/Interfaces/Verifications/CLIVerifications.md#cli-help-structure-verification"
-    },
-    {
-      "name": "CLI Coverage Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-coverage-command"
-    },
-    {
-      "name": "CLI Search Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-search-command"
-    },
-    {
-      "name": "CLI Traces Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-traces-command"
-    },
-    {
-      "name": "Format Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#format-command"
-    },
-    {
-      "name": "Validate Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#validate-command"
-    },
-    {
-      "name": "HTML Export",
-      "type": "requirement",
-      "link": "requirements/Interfaces/WebInterface.md#html-export"
-    },
-    {
-      "name": "Web Interface",
-      "type": "user-requirement",
-      "link": "requirements/Interfaces/Interfaces.md#web-interface"
-    },
-    {
-      "name": "Verification Traces Element Navigation Test",
-      "type": "verification",
-      "link": "requirements/Interfaces/Verifications/CLIVerifications.md#verification-traces-element-navigation-test"
-    },
-    {
-      "name": "Verification Traces Element Navigation",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#verification-traces-element-navigation"
-    },
-    {
-      "name": "Attachment Export Verification",
-      "type": "verification",
-      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#attachment-export-verification"
-    },
-    {
-      "name": "Attachment Export",
-      "type": "requirement",
-      "link": "requirements/Interfaces/WebInterface.md#attachment-export"
-    },
-    {
-      "name": "Containment Attachment Links Verification",
-      "type": "verification",
-      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#containment-attachment-links-verification"
-    },
-    {
-      "name": "Containment View Attachment Links",
-      "type": "requirement",
-      "link": "requirements/Interfaces/WebInterface.md#containment-view-attachment-links"
-    },
-    {
-      "name": "Diagram Attachment Display Verification",
-      "type": "verification",
-      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#diagram-attachment-display-verification"
-    },
-    {
-      "name": "Diagram Attachment Display",
-      "type": "requirement",
-      "link": "requirements/Interfaces/WebInterface.md#diagram-attachment-display"
-    },
-    {
-      "name": "HTML Export Verification",
-      "type": "verification",
-      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#html-export-verification"
-    },
-    {
-      "name": "Model View Element Navigation Test",
-      "type": "verification",
-      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#model-view-element-navigation-test"
-    },
-    {
-      "name": "Model View Element Navigation",
-      "type": "requirement",
-      "link": "requirements/Interfaces/WebInterface.md#model-view-element-navigation"
-    },
-    {
-      "name": "Model-Centric View Generation",
-      "type": "requirement",
-      "link": "requirements/Interfaces/WebInterface.md#model-centric-view-generation"
-    },
-    {
-      "name": "Serve Command Verification",
-      "type": "verification",
-      "link": "requirements/Interfaces/Verifications/WebInterfaceVerifications.md#serve-command-verification"
-    },
-    {
-      "name": "Serve Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/WebInterface.md#serve-command"
-    },
-    {
-      "name": "Attach Command Verification",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attach-command-verification"
-    },
-    {
-      "name": "Attachment Commands",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#attachment-commands"
-    },
-    {
-      "name": "Reserved Subsections Support",
-      "type": "requirement",
-      "link": "requirements/System/Core/StructureAndParsing.md#reserved-subsections-support"
-    },
-    {
-      "name": "Structure and Addressing in Markdown Documents",
-      "type": "requirement",
-      "link": "requirements/System/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents"
-    },
-    {
-      "name": "Attachment Identifier CRUD Verification",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachment-identifier-crud-verification"
-    },
-    {
-      "name": "Attachment Identifier Updates",
-      "type": "requirement",
-      "link": "requirements/System/Core/ModelManagement.md#attachment-identifier-updates"
-    },
-    {
-      "name": "Element Manipulation Operations",
-      "type": "user-requirement",
-      "link": "requirements/System/Core/ModelManagement.md#element-manipulation-operations"
-    },
-    {
-      "name": "Attachment Output Rendering Verification",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachment-output-rendering-verification"
-    },
-    {
-      "name": "Attachment Search Filters Verification",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification"
+      "link": "requirements/UserStories.md#system-model-interfaces"
     },
     {
       "name": "Attachments Change Impact Verification",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachments-change-impact-verification"
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachments-change-impact-verification"
     },
     {
       "name": "Change Impact Detection",
       "type": "requirement",
-      "link": "requirements/System/Processing/ChangeImpact.md#change-impact-detection"
+      "link": "requirements/Functional/Processing/ChangeImpact.md#change-impact-detection"
     },
     {
       "name": "Element Identity Model",
       "type": "requirement",
-      "link": "requirements/System/Core/StructureAndParsing.md#element-identity-model"
+      "link": "requirements/Functional/Core/StructureAndParsing.md#element-identity-model"
     },
     {
       "name": "Tracing Structural Changes",
       "type": "user-requirement",
-      "link": "requirements/System/Output/Reporting.md#tracing-structural-changes"
+      "link": "requirements/Functional/Output/Reporting.md#tracing-structural-changes"
     },
     {
       "name": "Trace Changes in System Model",
@@ -945,132 +840,17 @@ blockquote {
     {
       "name": "Attachments Subsection Parsing Verification",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachments-subsection-parsing-verification"
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachments-subsection-parsing-verification"
     },
     {
       "name": "Attachment Target Validation",
       "type": "requirement",
-      "link": "requirements/System/Core/StructureAndParsing.md#attachment-target-validation"
-    },
-    {
-      "name": "Attachments Validation Verification",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#attachments-validation-verification"
-    },
-    {
-      "name": "Detach Command Verification",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#detach-command-verification"
-    },
-    {
-      "name": "Move Asset Command Verification",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#move-asset-command-verification"
-    },
-    {
-      "name": "CLI Move Asset Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-move-asset-command"
-    },
-    {
-      "name": "Remove Asset Command Verification",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/AttachmentsVerifications.md#remove-asset-command-verification"
-    },
-    {
-      "name": "CLI Remove Asset Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-remove-asset-command"
-    },
-    {
-      "name": "Element Subsection Parsing Test",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#element-subsection-parsing-test"
-    },
-    {
-      "name": "Default Requirement Type Assignment",
-      "type": "user-requirement",
-      "link": "requirements/System/Core/ModelManagement.md#default-requirement-type-assignment"
-    },
-    {
-      "name": "Relation Types and behaviors",
-      "type": "requirement",
-      "link": "requirements/System/Core/ModelManagement.md#relation-types-and-behaviors"
-    },
-    {
-      "name": "Identifiers and Relations",
-      "type": "requirement",
-      "link": "requirements/System/Core/StructureAndParsing.md#identifiers-and-relations"
-    },
-    {
-      "name": "AI-Assisted System Model Management",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#ai-assisted-system-model-management"
-    },
-    {
-      "name": "Supported Element Types",
-      "type": "requirement",
-      "link": "requirements/System/Core/ModelManagement.md#supported-element-types"
-    },
-    {
-      "name": "Fragment Normalization Test",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#fragment-normalization-test"
-    },
-    {
-      "name": "Non-Reserved Subsections Content Test",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#non-reserved-subsections-content-test"
-    },
-    {
-      "name": "Refinement Element Type Parsing Test",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#refinement-element-type-parsing-test"
-    },
-    {
-      "name": "Refinement Relations Rejection Test",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#refinement-relations-rejection-test"
-    },
-    {
-      "name": "Refinement Element Structure Constraints",
-      "type": "requirement",
-      "link": "requirements/System/Core/ModelManagement.md#refinement-element-structure-constraints"
-    },
-    {
-      "name": "Specification File Identification Test",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/ParsingVerifications.md#specification-file-identification-test"
-    },
-    {
-      "name": "Specification File Identification",
-      "type": "requirement",
-      "link": "requirements/System/Core/StructureAndParsing.md#specification-file-identification"
-    },
-    {
-      "name": "Cross-Section Duplicate Validation Test",
-      "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#cross-section-duplicate-validation-test"
-    },
-    {
-      "name": "Cross-Section Duplicate Validation",
-      "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#cross-section-duplicate-validation"
-    },
-    {
-      "name": "Internal Consistency Validator",
-      "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#internal-consistency-validator"
+      "link": "requirements/Functional/Core/Validation.md#attachment-target-validation"
     },
     {
       "name": "Validate Internal Consistency",
       "type": "user-requirement",
-      "link": "requirements/System/Core/Validation.md#validate-internal-consistency"
-    },
-    {
-      "name": "Align with Industry Standards",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#align-with-industry-standards"
+      "link": "requirements/Functional/Core/Validation.md#validate-internal-consistency"
     },
     {
       "name": "Validating Structures",
@@ -1078,499 +858,584 @@ blockquote {
       "link": "requirements/UserStories.md#validating-structures"
     },
     {
+      "name": "Attachments Validation Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachments-validation-verification"
+    },
+    {
+      "name": "Detach Command Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#detach-command-verification"
+    },
+    {
+      "name": "Move Asset Command Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#move-asset-command-verification"
+    },
+    {
+      "name": "CLI Move Asset Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-move-asset-command"
+    },
+    {
+      "name": "Remove Asset Command Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#remove-asset-command-verification"
+    },
+    {
+      "name": "CLI Remove Asset Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-remove-asset-command"
+    },
+    {
+      "name": "Element Subsection Parsing Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#element-subsection-parsing-test"
+    },
+    {
+      "name": "Default Requirement Type Assignment",
+      "type": "user-requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#default-requirement-type-assignment"
+    },
+    {
+      "name": "Relation Types and behaviors",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#relation-types-and-behaviors"
+    },
+    {
+      "name": "Identifiers and Relations",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/StructureAndParsing.md#identifiers-and-relations"
+    },
+    {
+      "name": "Fragment Normalization Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#fragment-normalization-test"
+    },
+    {
+      "name": "Non-Reserved Subsections Content Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#non-reserved-subsections-content-test"
+    },
+    {
+      "name": "Refinement Element Type Parsing Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#refinement-element-type-parsing-test"
+    },
+    {
+      "name": "Refinement Element Structure Constraints",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#refinement-element-structure-constraints"
+    },
+    {
+      "name": "Refinement Relations Rejection Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#refinement-relations-rejection-test"
+    },
+    {
+      "name": "Specification File Identification Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#specification-file-identification-test"
+    },
+    {
+      "name": "Specification File Identification",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/StructureAndParsing.md#specification-file-identification"
+    },
+    {
+      "name": "Cross-Section Duplicate Validation Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#cross-section-duplicate-validation-test"
+    },
+    {
+      "name": "Cross-Section Duplicate Validation",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/Validation.md#cross-section-duplicate-validation"
+    },
+    {
+      "name": "Internal Consistency Validator",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/Validation.md#internal-consistency-validator"
+    },
+    {
       "name": "Default Element Type Assignment Test",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#default-element-type-assignment-test"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#default-element-type-assignment-test"
     },
     {
       "name": "Element Type Relation Compatibility Test",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#element-type-relation-compatibility-test"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#element-type-relation-compatibility-test"
     },
     {
       "name": "Element Type Relation Compatibility",
       "type": "requirement",
-      "link": "requirements/System/Core/ModelManagement.md#element-type-relation-compatibility"
+      "link": "requirements/Functional/Core/ModelManagement.md#element-type-relation-compatibility"
     },
     {
       "name": "Relation Element Type Validator",
       "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#relation-element-type-validator"
+      "link": "requirements/Functional/Core/Validation.md#relation-element-type-validator"
     },
     {
       "name": "Validate Relation Types",
       "type": "user-requirement",
-      "link": "requirements/System/Core/Validation.md#validate-relation-types"
+      "link": "requirements/Functional/Core/Validation.md#validate-relation-types"
     },
     {
       "name": "File Exclusion Test",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#file-exclusion-test"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#file-exclusion-test"
     },
     {
       "name": "Ignore Files Integration",
       "type": "requirement",
-      "link": "requirements/System/Core/Configuration.md#ignore-files-integration"
+      "link": "requirements/Functional/Core/Configuration.md#ignore-files-integration"
     },
     {
       "name": "Ignoring Unstructured Documents",
       "type": "requirement",
-      "link": "requirements/System/Core/Configuration.md#ignoring-unstructured-documents"
+      "link": "requirements/Functional/Core/Configuration.md#ignoring-unstructured-documents"
     },
     {
       "name": "Coexistence of Structured and Unstructured Documents",
       "type": "user-requirement",
-      "link": "requirements/System/Core/ModelManagement.md#coexistence-of-structured-and-unstructured-documents"
+      "link": "requirements/Functional/Core/ModelManagement.md#coexistence-of-structured-and-unstructured-documents"
     },
     {
       "name": "Reserved Repository Files Exclusion",
       "type": "requirement",
-      "link": "requirements/System/Core/Configuration.md#reserved-repository-files-exclusion"
+      "link": "requirements/Functional/Core/Configuration.md#reserved-repository-files-exclusion"
     },
     {
       "name": "Invalid Header Structure Test",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#invalid-header-structure-test"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#invalid-header-structure-test"
     },
     {
       "name": "Markdown Structure Validator",
       "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#markdown-structure-validator"
+      "link": "requirements/Functional/Core/Validation.md#markdown-structure-validator"
     },
     {
       "name": "Validate Markdown Structure",
       "type": "user-requirement",
-      "link": "requirements/System/Core/Validation.md#validate-markdown-structure"
+      "link": "requirements/Functional/Core/Validation.md#validate-markdown-structure"
     },
     {
       "name": "Invalid Relations Test",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#invalid-relations-test"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#invalid-relations-test"
     },
     {
       "name": "Cross-Component Dependency Validator",
       "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#cross-component-dependency-validator"
+      "link": "requirements/Functional/Core/Validation.md#cross-component-dependency-validator"
     },
     {
       "name": "Validate Cross-Component Dependencies",
       "type": "user-requirement",
-      "link": "requirements/System/Core/Validation.md#validate-cross-component-dependencies"
+      "link": "requirements/Functional/Core/Validation.md#validate-cross-component-dependencies"
     },
     {
       "name": "Relation Type Validation",
       "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#relation-type-validation"
+      "link": "requirements/Functional/Core/Validation.md#relation-type-validation"
     },
     {
       "name": "Enhanced Validation Error Reporting",
       "type": "user-requirement",
-      "link": "requirements/System/Core/Validation.md#enhanced-validation-error-reporting"
+      "link": "requirements/Functional/Core/Validation.md#enhanced-validation-error-reporting"
     },
     {
       "name": "Validation Error Handling",
       "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#validation-error-handling"
-    },
-    {
-      "name": "Detailed Error Handling and Logging",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#detailed-error-handling-and-logging"
-    },
-    {
-      "name": "Validation Report Generator",
-      "type": "requirement",
-      "link": "requirements/System/Output/Reporting.md#validation-report-generator"
-    },
-    {
-      "name": "Provide Validation Reports",
-      "type": "user-requirement",
-      "link": "requirements/System/Output/Reporting.md#provide-validation-reports"
-    },
-    {
-      "name": "Model Reports",
-      "type": "user-requirement",
-      "link": "requirements/System/Output/Reporting.md#model-reports"
-    },
-    {
-      "name": "Provide Reports",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#provide-reports"
+      "link": "requirements/Functional/Core/Validation.md#validation-error-handling"
     },
     {
       "name": "Trace Relation Non-Directional Behavior",
       "type": "requirement",
-      "link": "requirements/System/Output/DiagramGeneration.md#trace-relation-non-directional-behavior"
+      "link": "requirements/Functional/Output/DiagramGeneration.md#trace-relation-non-directional-behavior"
+    },
+    {
+      "name": "Validate Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#validate-command"
     },
     {
       "name": "Requirements Files Search and Detection Test",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test"
     },
     {
       "name": "Structured Markdown Files Search and Detection",
       "type": "requirement",
-      "link": "requirements/System/Core/Configuration.md#structured-markdown-files-search-and-detection"
+      "link": "requirements/Functional/Core/Configuration.md#structured-markdown-files-search-and-detection"
     },
     {
       "name": "Requirements Processing",
       "type": "requirement",
-      "link": "requirements/System/Core/Configuration.md#requirements-processing"
+      "link": "requirements/Functional/Core/Configuration.md#requirements-processing"
     },
     {
       "name": "GraphRegistry as Primary Registry",
       "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#graphregistry-as-primary-registry"
+      "link": "requirements/Functional/Core/Validation.md#graphregistry-as-primary-registry"
     },
     {
       "name": "Same-File Fragment Relations Test",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#same-file-fragment-relations-test"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#same-file-fragment-relations-test"
     },
     {
       "name": "Subdirectory Processing Verification",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification"
-    },
-    {
-      "name": "CLI Move Element Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-move-element-command"
-    },
-    {
-      "name": "CLI Move File Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-move-file-command"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification"
     },
     {
       "name": "Git Repository as Project Root",
       "type": "user-requirement",
-      "link": "requirements/System/Core/ModelManagement.md#git-repository-as-project-root"
+      "link": "requirements/Functional/Core/ModelManagement.md#git-repository-as-project-root"
+    },
+    {
+      "name": "CLI Move Element Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-move-element-command"
+    },
+    {
+      "name": "CLI Move File Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-move-file-command"
     },
     {
       "name": "Type Validation Errors Test",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#type-validation-errors-test"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#type-validation-errors-test"
     },
     {
       "name": "Type Validation Error Requirement",
       "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#type-validation-error-requirement"
+      "link": "requirements/Functional/Core/Validation.md#type-validation-error-requirement"
     },
     {
       "name": "Unstructured Documents Test",
       "type": "verification",
-      "link": "requirements/System/Core/Verifications/ValidationVerifications.md#unstructured-documents-test"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#unstructured-documents-test"
     },
     {
       "name": "Excluded File Relation Validation",
       "type": "requirement",
-      "link": "requirements/System/Core/Validation.md#excluded-file-relation-validation"
+      "link": "requirements/Functional/Core/Validation.md#excluded-file-relation-validation"
     },
     {
       "name": "File Pattern Exclusion for Format",
       "type": "requirement",
-      "link": "requirements/System/Operations/Formatting.md#file-pattern-exclusion-for-format"
+      "link": "requirements/Functional/Operations/Formatting.md#file-pattern-exclusion-for-format"
     },
     {
       "name": "Add Command Duplicate Detection Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#add-command-duplicate-detection-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#add-command-duplicate-detection-test"
     },
     {
       "name": "CLI Add Element Command",
       "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-add-element-command"
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-add-element-command"
     },
     {
       "name": "CLI Add Element Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test"
     },
     {
       "name": "CLI Move Element Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-element-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-move-element-test"
     },
     {
       "name": "CLI Move File Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test"
     },
     {
       "name": "CLI Remove Element Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-remove-element-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-remove-element-test"
     },
     {
       "name": "CLI Remove Element Command",
       "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-remove-element-command"
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-remove-element-command"
     },
     {
       "name": "CLI Rename Element Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#cli-rename-element-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-rename-element-test"
     },
     {
       "name": "CLI Rename Element Command",
       "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-rename-element-command"
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-rename-element-command"
     },
     {
       "name": "Create Element Override Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-override-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#create-element-override-test"
     },
     {
       "name": "Create Element Operation",
       "type": "requirement",
-      "link": "requirements/System/Operations/ElementManipulation.md#create-element-operation"
+      "link": "requirements/Functional/Operations/ElementManipulation.md#create-element-operation"
     },
     {
       "name": "Create Element Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#create-element-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#create-element-test"
     },
     {
       "name": "Delete Element Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#delete-element-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#delete-element-test"
     },
     {
       "name": "Delete Element Operation",
       "type": "requirement",
-      "link": "requirements/System/Operations/ElementManipulation.md#delete-element-operation"
+      "link": "requirements/Functional/Operations/ElementManipulation.md#delete-element-operation"
     },
     {
       "name": "File Persistence Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#file-persistence-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#file-persistence-test"
     },
     {
       "name": "Element Manipulation File Persistence",
       "type": "requirement",
-      "link": "requirements/System/Operations/ElementManipulation.md#element-manipulation-file-persistence"
+      "link": "requirements/Functional/Operations/ElementManipulation.md#element-manipulation-file-persistence"
     },
     {
       "name": "Link Command Cross-Section Detection Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#link-command-cross-section-detection-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#link-command-cross-section-detection-test"
     },
     {
       "name": "Relation Commands",
       "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#relation-commands"
+      "link": "requirements/Interfaces/CLI/Commands.md#relation-commands"
     },
     {
       "name": "Link Command Verification",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#link-command-verification"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#link-command-verification"
     },
     {
       "name": "Relation Management Operations",
       "type": "requirement",
-      "link": "requirements/System/Core/ModelManagement.md#relation-management-operations"
+      "link": "requirements/Functional/Core/ModelManagement.md#relation-management-operations"
     },
     {
       "name": "Merge Elements Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#merge-elements-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#merge-elements-test"
     },
     {
       "name": "Merge Element Operation",
       "type": "requirement",
-      "link": "requirements/System/Operations/ElementManipulation.md#merge-element-operation"
+      "link": "requirements/Functional/Operations/ElementManipulation.md#merge-element-operation"
     },
     {
       "name": "Move Element Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#move-element-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#move-element-test"
     },
     {
       "name": "Move Element Operation",
       "type": "requirement",
-      "link": "requirements/System/Operations/ElementManipulation.md#move-element-operation"
+      "link": "requirements/Functional/Operations/ElementManipulation.md#move-element-operation"
     },
     {
       "name": "Move File Squash Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#move-file-squash-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#move-file-squash-test"
     },
     {
       "name": "Move File Operation",
       "type": "requirement",
-      "link": "requirements/System/Operations/ElementManipulation.md#move-file-operation"
+      "link": "requirements/Functional/Operations/ElementManipulation.md#move-file-operation"
     },
     {
       "name": "Relation Consistency Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#relation-consistency-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#relation-consistency-test"
     },
     {
       "name": "Relation Consistency Maintenance",
       "type": "requirement",
-      "link": "requirements/System/Operations/ElementManipulation.md#relation-consistency-maintenance"
+      "link": "requirements/Functional/Operations/ElementManipulation.md#relation-consistency-maintenance"
     },
     {
       "name": "Target Location Validation Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#target-location-validation-test"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#target-location-validation-test"
     },
     {
       "name": "Target Location Validation and Auto-Creation",
       "type": "requirement",
-      "link": "requirements/System/Operations/ElementManipulation.md#target-location-validation-and-auto-creation"
+      "link": "requirements/Functional/Operations/ElementManipulation.md#target-location-validation-and-auto-creation"
     },
     {
       "name": "Unlink Command Verification",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification"
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification"
     },
     {
       "name": "Element Ordering Verification",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#element-ordering-verification"
+      "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.md#element-ordering-verification"
     },
     {
       "name": "Element Ordering Normalization",
       "type": "requirement",
-      "link": "requirements/System/Operations/Formatting.md#element-ordering-normalization"
+      "link": "requirements/Functional/Operations/Formatting.md#element-ordering-normalization"
     },
     {
       "name": "Format Consistency Enforcement",
       "type": "requirement",
-      "link": "requirements/System/Operations/Formatting.md#format-consistency-enforcement"
+      "link": "requirements/Functional/Operations/Formatting.md#format-consistency-enforcement"
     },
     {
       "name": "Model Formatting",
       "type": "user-requirement",
-      "link": "requirements/System/Operations/Formatting.md#model-formatting"
+      "link": "requirements/Functional/Operations/Formatting.md#model-formatting"
+    },
+    {
+      "name": "Formatting Model Documents",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#formatting-model-documents"
+    },
+    {
+      "name": "Format Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#format-command"
     },
     {
       "name": "Format Command Requirements Verification",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification"
+      "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.md#format-command-requirements-verification"
     },
     {
       "name": "Document Structure Normalization",
       "type": "requirement",
-      "link": "requirements/System/Operations/Formatting.md#document-structure-normalization"
+      "link": "requirements/Functional/Operations/Formatting.md#document-structure-normalization"
     },
     {
       "name": "Git-Style Diff Output for Format",
       "type": "user-requirement",
-      "link": "requirements/System/Operations/Formatting.md#git-style-diff-output-for-format"
+      "link": "requirements/Functional/Operations/Formatting.md#git-style-diff-output-for-format"
     },
     {
       "name": "Formatting Output",
       "type": "requirement",
-      "link": "requirements/System/Operations/Formatting.md#formatting-output"
+      "link": "requirements/Functional/Operations/Formatting.md#formatting-output"
     },
     {
       "name": "Replace Absolute Links with Relative Links",
       "type": "requirement",
-      "link": "requirements/System/Operations/Formatting.md#replace-absolute-links-with-relative-links"
+      "link": "requirements/Functional/Operations/Formatting.md#replace-absolute-links-with-relative-links"
     },
     {
       "name": "Format Duplicate Removal Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#format-duplicate-removal-test"
+      "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.md#format-duplicate-removal-test"
     },
     {
       "name": "Format Duplicate Removal",
       "type": "requirement",
-      "link": "requirements/System/Operations/Formatting.md#format-duplicate-removal"
+      "link": "requirements/Functional/Operations/Formatting.md#format-duplicate-removal"
     },
     {
       "name": "Full Relations Insertion Verification",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#full-relations-insertion-verification"
+      "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.md#full-relations-insertion-verification"
     },
     {
       "name": "Full Relations Insertion",
       "type": "requirement",
-      "link": "requirements/System/Operations/Formatting.md#full-relations-insertion"
+      "link": "requirements/Functional/Operations/Formatting.md#full-relations-insertion"
     },
     {
       "name": "Relation Ordering Verification",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/FormattingVerifications.md#relation-ordering-verification"
+      "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.md#relation-ordering-verification"
     },
     {
       "name": "Relation Ordering Normalization",
       "type": "requirement",
-      "link": "requirements/System/Operations/Formatting.md#relation-ordering-normalization"
+      "link": "requirements/Functional/Operations/Formatting.md#relation-ordering-normalization"
     },
     {
       "name": "Lint Command Verification",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/LintingVerifications.md#lint-command-verification"
+      "link": "requirements/Functional/Operations/Verifications/LintingVerifications.md#lint-command-verification"
     },
     {
       "name": "Lint Auto-fix Capability",
       "type": "requirement",
-      "link": "requirements/System/Operations/Linting.md#lint-auto-fix-capability"
-    },
-    {
-      "name": "CLI Lint Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-lint-command"
-    },
-    {
-      "name": "Lint Output Formatting",
-      "type": "requirement",
-      "link": "requirements/System/Operations/Linting.md#lint-output-formatting"
+      "link": "requirements/Functional/Operations/Linting.md#lint-auto-fix-capability"
     },
     {
       "name": "Model Linting",
       "type": "user-requirement",
-      "link": "requirements/System/Operations/Linting.md#model-linting"
+      "link": "requirements/Functional/Operations/Linting.md#model-linting"
+    },
+    {
+      "name": "Linting Model Quality",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#linting-model-quality"
     },
     {
       "name": "Multi-Branch Convergence Detection",
       "type": "requirement",
-      "link": "requirements/System/Operations/Linting.md#multi-branch-convergence-detection"
+      "link": "requirements/Functional/Operations/Linting.md#multi-branch-convergence-detection"
     },
     {
       "name": "Redundant Verify Relations Detection",
       "type": "requirement",
-      "link": "requirements/System/Operations/Linting.md#redundant-verify-relations-detection"
+      "link": "requirements/Functional/Operations/Linting.md#redundant-verify-relations-detection"
     },
     {
       "name": "Safe Redundant Hierarchical Relations Auto-Removal",
       "type": "requirement",
-      "link": "requirements/System/Operations/Linting.md#safe-redundant-hierarchical-relations-auto-removal"
+      "link": "requirements/Functional/Operations/Linting.md#safe-redundant-hierarchical-relations-auto-removal"
     },
     {
       "name": "Redundant Hierarchical Relations Detection",
       "type": "requirement",
-      "link": "requirements/System/Operations/Linting.md#redundant-hierarchical-relations-detection"
+      "link": "requirements/Functional/Operations/Linting.md#redundant-hierarchical-relations-detection"
     },
     {
       "name": "Redundant Hierarchical Attachment Test",
       "type": "verification",
-      "link": "requirements/System/Operations/Verifications/LintingVerifications.md#redundant-hierarchical-attachment-test"
+      "link": "requirements/Functional/Operations/Verifications/LintingVerifications.md#redundant-hierarchical-attachment-test"
     },
     {
       "name": "Redundant Hierarchical Attachment Detection",
       "type": "requirement",
-      "link": "requirements/System/Operations/Linting.md#redundant-hierarchical-attachment-detection"
+      "link": "requirements/Functional/Operations/Linting.md#redundant-hierarchical-attachment-detection"
     },
     {
       "name": "Automated Documentation Export on PR Merge Verification",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#automated-documentation-export-on-pr-merge-verification"
+      "link": "requirements/Functional/Output/Verifications/DiagramVerifications.md#automated-documentation-export-on-pr-merge-verification"
     },
     {
       "name": "Automated Documentation Export on PR Merge",
       "type": "requirement",
-      "link": "requirements/System/Integration/GitHubIntegration.md#automated-documentation-export-on-pr-merge"
+      "link": "requirements/Functional/Integration/GitHubIntegration.md#automated-documentation-export-on-pr-merge"
     },
     {
       "name": "Automate Documentation Export",
       "type": "user-requirement",
-      "link": "requirements/System/Integration/GitHubIntegration.md#automate-documentation-export"
+      "link": "requirements/Functional/Integration/GitHubIntegration.md#automate-documentation-export"
     },
     {
       "name": "Integrate with GitHub Workflows",
@@ -1585,22 +1450,32 @@ blockquote {
     {
       "name": "Automate Pull Request Validations",
       "type": "user-requirement",
-      "link": "requirements/System/Integration/GitHubIntegration.md#automate-pull-request-validations"
+      "link": "requirements/Functional/Integration/GitHubIntegration.md#automate-pull-request-validations"
     },
     {
       "name": "Diagram Generation Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#diagram-generation-test"
+      "link": "requirements/Functional/Output/Verifications/DiagramVerifications.md#diagram-generation-test"
     },
     {
       "name": "Diagram Generation",
       "type": "requirement",
-      "link": "requirements/System/Output/DiagramGeneration.md#diagram-generation"
+      "link": "requirements/Functional/Output/DiagramGeneration.md#diagram-generation"
     },
     {
       "name": "Interactive Mermaid Diagrams",
       "type": "user-requirement",
-      "link": "requirements/System/Output/DiagramGeneration.md#interactive-mermaid-diagrams"
+      "link": "requirements/Functional/Output/DiagramGeneration.md#interactive-mermaid-diagrams"
+    },
+    {
+      "name": "Model Reports",
+      "type": "user-requirement",
+      "link": "requirements/Functional/Output/Reporting.md#model-reports"
+    },
+    {
+      "name": "Provide Reports",
+      "type": "user-requirement",
+      "link": "requirements/UserStories.md#provide-reports"
     },
     {
       "name": "Generate Diagrams",
@@ -1610,410 +1485,300 @@ blockquote {
     {
       "name": "Diagram Relation Filtering Verification",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#diagram-relation-filtering-verification"
+      "link": "requirements/Functional/Output/Verifications/DiagramVerifications.md#diagram-relation-filtering-verification"
     },
     {
       "name": "File Diagram Attachment Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#file-diagram-attachment-test"
+      "link": "requirements/Functional/Output/Verifications/DiagramVerifications.md#file-diagram-attachment-test"
     },
     {
       "name": "File Diagram Attachment Display",
       "type": "requirement",
-      "link": "requirements/System/Output/DiagramGeneration.md#file-diagram-attachment-display"
+      "link": "requirements/Functional/Output/DiagramGeneration.md#file-diagram-attachment-display"
     },
     {
       "name": "Visualize Model Relationships Verification",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#visualize-model-relationships-verification"
+      "link": "requirements/Functional/Output/Verifications/DiagramVerifications.md#visualize-model-relationships-verification"
     },
     {
       "name": "CLI Collect Command Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#cli-collect-command-test"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#cli-collect-command-test"
     },
     {
       "name": "CLI Collect Command",
       "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-collect-command"
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-collect-command"
     },
     {
       "name": "Containment View Design Documents Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#containment-view-design-documents-test"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#containment-view-design-documents-test"
     },
     {
       "name": "Containment View Report",
       "type": "user-requirement",
-      "link": "requirements/System/Output/Reporting.md#containment-view-report"
+      "link": "requirements/Functional/Output/Reporting.md#containment-view-report"
     },
     {
       "name": "Model Structure and Summaries",
       "type": "user-requirement",
-      "link": "requirements/System/Output/Reporting.md#model-structure-and-summaries"
+      "link": "requirements/Functional/Output/Reporting.md#model-structure-and-summaries"
     },
     {
       "name": "Model Command Verification",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#model-command-verification"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#model-command-verification"
     },
     {
       "name": "Forward-Only Relation Traversal",
       "type": "requirement",
-      "link": "requirements/System/Output/Reporting.md#forward-only-relation-traversal"
+      "link": "requirements/Functional/Output/Reporting.md#forward-only-relation-traversal"
     },
     {
       "name": "Model Diagram Output Formats",
       "type": "requirement",
-      "link": "requirements/System/Output/Reporting.md#model-diagram-output-formats"
+      "link": "requirements/Functional/Output/Reporting.md#model-diagram-output-formats"
     },
     {
       "name": "Multi-Type Search Filter Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#multi-type-search-filter-test"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#multi-type-search-filter-test"
     },
     {
       "name": "Comma-Separated Type Filter Parsing",
       "type": "requirement",
-      "link": "requirements/System/Output/Reporting.md#comma-separated-type-filter-parsing"
+      "link": "requirements/Functional/Output/Reporting.md#comma-separated-type-filter-parsing"
     },
     {
       "name": "Flexible Search Type Filtering",
       "type": "user-requirement",
-      "link": "requirements/System/Output/Reporting.md#flexible-search-type-filtering"
+      "link": "requirements/Functional/Output/Reporting.md#flexible-search-type-filtering"
     },
     {
       "name": "Search Report Generator",
       "type": "requirement",
-      "link": "requirements/System/Output/Reporting.md#search-report-generator"
+      "link": "requirements/Functional/Output/Reporting.md#search-report-generator"
     },
     {
       "name": "Resources Report Verification",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#resources-report-verification"
-    },
-    {
-      "name": "CLI Resources Command",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI.md#cli-resources-command"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#resources-report-verification"
     },
     {
       "name": "Resources Report",
       "type": "user-requirement",
-      "link": "requirements/System/Output/Reporting.md#resources-report"
+      "link": "requirements/Functional/Output/Reporting.md#resources-report"
+    },
+    {
+      "name": "CLI Resources Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-resources-command"
     },
     {
       "name": "Reverse Model Traversal Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#reverse-model-traversal-test"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#reverse-model-traversal-test"
     },
     {
       "name": "Reverse Relation Traversal",
       "type": "requirement",
-      "link": "requirements/System/Output/Reporting.md#reverse-relation-traversal"
+      "link": "requirements/Functional/Output/Reporting.md#reverse-relation-traversal"
     },
     {
       "name": "Search Command Tests",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#search-command-tests"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#search-command-tests"
     },
     {
       "name": "Start Type Filter Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#start-type-filter-test"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#start-type-filter-test"
     },
     {
       "name": "Start Element Type Filtering",
       "type": "requirement",
-      "link": "requirements/System/Output/Reporting.md#start-element-type-filtering"
+      "link": "requirements/Functional/Output/Reporting.md#start-element-type-filtering"
     },
     {
       "name": "TraceFlow View Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#traceflow-view-test"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#traceflow-view-test"
     },
     {
       "name": "TraceFlow View Report Generation",
       "type": "requirement",
-      "link": "requirements/System/Output/Reporting.md#traceflow-view-report-generation"
-    },
-    {
-      "name": "Verification Upward Traceability",
-      "type": "user-requirement",
-      "link": "requirements/System/Output/Reporting.md#verification-upward-traceability"
+      "link": "requirements/Functional/Output/Reporting.md#traceflow-view-report-generation"
     },
     {
       "name": "Verification Coverage Report",
       "type": "user-requirement",
-      "link": "requirements/System/Output/Reporting.md#verification-coverage-report"
+      "link": "requirements/Functional/Output/Reporting.md#verification-coverage-report"
     },
     {
       "name": "Verification Coverage Report Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test"
+    },
+    {
+      "name": "CLI Coverage Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-coverage-command"
     },
     {
       "name": "Verification Traces Filter Options Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#verification-traces-filter-options-test"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#verification-traces-filter-options-test"
+    },
+    {
+      "name": "CLI Traces Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-traces-command"
     },
     {
       "name": "Verification Traces From-Folder Test",
       "type": "verification",
-      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#verification-traces-from-folder-test"
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#verification-traces-from-folder-test"
     },
     {
       "name": "Change Impact Analysis Verification",
       "type": "verification",
-      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification"
+      "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification"
+    },
+    {
+      "name": "CLI Change Impact Report Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-change-impact-report-command"
     },
     {
       "name": "Change Impact Detection Test",
       "type": "verification",
-      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test"
+      "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test"
     },
     {
       "name": "Requirements Change Propagation",
       "type": "requirement",
-      "link": "requirements/System/Processing/ChangeImpact.md#requirements-change-propagation"
+      "link": "requirements/Functional/Processing/ChangeImpact.md#requirements-change-propagation"
     },
     {
       "name": "Change Impact Relations Test",
       "type": "verification",
-      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test"
+      "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test"
     },
     {
       "name": "Change Impact Smart Filtering Test",
       "type": "verification",
-      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#change-impact-smart-filtering-test"
+      "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-smart-filtering-test"
     },
     {
       "name": "Element Content Extraction Test",
       "type": "verification",
-      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#element-content-extraction-test"
+      "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#element-content-extraction-test"
     },
     {
       "name": "Structural Change Reports Verification",
       "type": "verification",
-      "link": "requirements/System/Processing/Verifications/ChangeImpactVerifications.md#structural-change-reports-verification"
+      "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#structural-change-reports-verification"
     },
     {
       "name": "Trace Relations No Cycles Verification",
       "type": "verification",
-      "link": "requirements/System/Processing/Verifications/TraceVerifications.md#trace-relations-no-cycles-verification"
+      "link": "requirements/Functional/Processing/Verifications/TraceVerifications.md#trace-relations-no-cycles-verification"
+    },
+    {
+      "name": "CLI Git Commit Hash Flag Test",
+      "type": "verification",
+      "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.md#cli-git-commit-hash-flag-test"
+    },
+    {
+      "name": "CLI Help Structure Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.md#cli-help-structure-verification"
+    },
+    {
+      "name": "HTML Export",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Features.md#html-export"
+    },
+    {
+      "name": "Web Interface",
+      "type": "user-requirement",
+      "link": "requirements/Interfaces/Interfaces.md#web-interface"
+    },
+    {
+      "name": "Verification Traces Element Navigation Test",
+      "type": "verification",
+      "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.md#verification-traces-element-navigation-test"
+    },
+    {
+      "name": "Verification Traces Element Navigation",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#verification-traces-element-navigation"
+    },
+    {
+      "name": "Attachment Export Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#attachment-export-verification"
+    },
+    {
+      "name": "Attachment Export",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Features.md#attachment-export"
+    },
+    {
+      "name": "Containment Attachment Links Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#containment-attachment-links-verification"
+    },
+    {
+      "name": "Containment View Attachment Links",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Features.md#containment-view-attachment-links"
+    },
+    {
+      "name": "Diagram Attachment Display Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#diagram-attachment-display-verification"
+    },
+    {
+      "name": "Diagram Attachment Display",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Features.md#diagram-attachment-display"
+    },
+    {
+      "name": "HTML Export Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#html-export-verification"
+    },
+    {
+      "name": "Model View Element Navigation Test",
+      "type": "verification",
+      "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#model-view-element-navigation-test"
+    },
+    {
+      "name": "Model View Element Navigation",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Features.md#model-view-element-navigation"
+    },
+    {
+      "name": "Model-Centric View Generation",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Features.md#model-centric-view-generation"
+    },
+    {
+      "name": "Serve Command Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#serve-command-verification"
+    },
+    {
+      "name": "Serve Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Features.md#serve-command"
     }
   ],
   "links": [
-    {
-      "source": "CLI Change Impact Report Command",
-      "target": "CLI Git Commit Hash Flag Test",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "CLI Change Impact Report Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "CLI Change Impact Report Command",
-      "target": "CLI Help Structure Verification",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "CLI Change Impact Report Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "CLI Coverage Command",
-      "target": "CLI Help Structure Verification",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "CLI Coverage Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "CLI Search Command",
-      "target": "CLI Help Structure Verification",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "CLI Search Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "CLI Traces Command",
-      "target": "CLI Help Structure Verification",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "CLI Traces Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "Format Command",
-      "target": "CLI Help Structure Verification",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "Format Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "Validate Command",
-      "target": "CLI Help Structure Verification",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "Validate Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "HTML Export",
-      "target": "CLI Help Structure Verification",
-      "value": 1
-    },
-    {
-      "source": "Web Interface",
-      "target": "HTML Export",
-      "value": 1
-    },
-    {
-      "source": "Verification Traces Element Navigation",
-      "target": "Verification Traces Element Navigation Test",
-      "value": 1
-    },
-    {
-      "source": "CLI Traces Command",
-      "target": "Verification Traces Element Navigation",
-      "value": 1
-    },
-    {
-      "source": "CLI interface",
-      "target": "CLI Interface Structure",
-      "value": 1
-    },
-    {
-      "source": "Attachment Export",
-      "target": "Attachment Export Verification",
-      "value": 1
-    },
-    {
-      "source": "HTML Export",
-      "target": "Attachment Export",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "Web Interface",
-      "value": 1
-    },
-    {
-      "source": "Containment View Attachment Links",
-      "target": "Containment Attachment Links Verification",
-      "value": 1
-    },
-    {
-      "source": "HTML Export",
-      "target": "Containment View Attachment Links",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "Web Interface",
-      "value": 1
-    },
-    {
-      "source": "Diagram Attachment Display",
-      "target": "Diagram Attachment Display Verification",
-      "value": 1
-    },
-    {
-      "source": "HTML Export",
-      "target": "Diagram Attachment Display",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "Web Interface",
-      "value": 1
-    },
-    {
-      "source": "HTML Export",
-      "target": "HTML Export Verification",
-      "value": 1
-    },
-    {
-      "source": "Web Interface",
-      "target": "HTML Export",
-      "value": 1
-    },
-    {
-      "source": "Model View Element Navigation",
-      "target": "Model View Element Navigation Test",
-      "value": 1
-    },
-    {
-      "source": "Model-Centric View Generation",
-      "target": "Model View Element Navigation",
-      "value": 1
-    },
-    {
-      "source": "Web Interface",
-      "target": "HTML Export",
-      "value": 1
-    },
-    {
-      "source": "Serve Command",
-      "target": "Serve Command Verification",
-      "value": 1
-    },
-    {
-      "source": "Web Interface",
-      "target": "Serve Command",
-      "value": 1
-    },
     {
       "source": "Attachment Commands",
       "target": "Attach Command Verification",
@@ -2025,7 +1790,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
@@ -2060,7 +1825,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2075,7 +1840,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
@@ -2085,23 +1850,28 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Reserved Subsections Support",
+      "target": "Attachments Subsection Parsing Verification",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Reserved Subsections Support",
+      "value": 1
+    },
+    {
       "source": "Attachment Target Validation",
       "target": "Attachments Subsection Parsing Verification",
       "value": 1
     },
     {
-      "source": "Reserved Subsections Support",
+      "source": "Validate Internal Consistency",
       "target": "Attachment Target Validation",
       "value": 1
     },
     {
-      "source": "Managing System Models",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
       "source": "Reserved Subsections Support",
-      "target": "Attachments Subsection Parsing Verification",
+      "target": "Attachments Validation Verification",
       "value": 1
     },
     {
@@ -2115,23 +1885,8 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Reserved Subsections Support",
+      "source": "Validate Internal Consistency",
       "target": "Attachment Target Validation",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
-      "source": "Reserved Subsections Support",
-      "target": "Attachments Validation Verification",
-      "value": 1
-    },
-    {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Reserved Subsections Support",
       "value": 1
     },
     {
@@ -2145,7 +1900,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
@@ -2160,7 +1915,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2175,7 +1930,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2185,7 +1940,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Operating on Model Elements",
       "target": "Default Requirement Type Assignment",
       "value": 1
     },
@@ -2202,26 +1957,6 @@ blockquote {
     {
       "source": "Structure and Addressing in Markdown Documents",
       "target": "Element Identity Model",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "AI-Assisted System Model Management",
-      "value": 1
-    },
-    {
-      "source": "Supported Element Types",
-      "target": "Element Subsection Parsing Test",
-      "value": 1
-    },
-    {
-      "source": "Reserved Subsections Support",
-      "target": "Supported Element Types",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
@@ -2255,17 +1990,22 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Supported Element Types",
+      "source": "Refinement Element Structure Constraints",
       "target": "Refinement Element Type Parsing Test",
       "value": 1
     },
     {
-      "source": "Reserved Subsections Support",
-      "target": "Supported Element Types",
+      "source": "Relation Types and behaviors",
+      "target": "Refinement Element Structure Constraints",
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Element Identity Model",
+      "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
@@ -2275,13 +2015,18 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Supported Element Types",
+      "source": "Relation Types and behaviors",
       "target": "Refinement Element Structure Constraints",
       "value": 1
     },
     {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Reserved Subsections Support",
+      "source": "Element Identity Model",
+      "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Defining Model Structure",
+      "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
@@ -2290,7 +2035,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Specification File Identification",
       "value": 1
     },
@@ -2310,11 +2055,6 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Align with Industry Standards",
-      "target": "Validate Internal Consistency",
-      "value": 1
-    },
-    {
       "source": "Validating Structures",
       "target": "Validate Internal Consistency",
       "value": 1
@@ -2325,7 +2065,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Operating on Model Elements",
       "target": "Default Requirement Type Assignment",
       "value": 1
     },
@@ -2345,23 +2085,8 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
-      "source": "AI-Assisted System Model Management",
-      "target": "Identifiers and Relations",
-      "value": 1
-    },
-    {
-      "source": "Supported Element Types",
-      "target": "Element Type Relation Compatibility",
-      "value": 1
-    },
-    {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Reserved Subsections Support",
       "value": 1
     },
     {
@@ -2385,11 +2110,6 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
-      "target": "AI-Assisted System Model Management",
-      "value": 1
-    },
-    {
       "source": "Ignore Files Integration",
       "target": "File Exclusion Test",
       "value": 1
@@ -2400,7 +2120,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Coexistence of Structured and Unstructured Documents",
       "value": 1
     },
@@ -2415,7 +2135,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Coexistence of Structured and Unstructured Documents",
       "value": 1
     },
@@ -2425,7 +2145,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
@@ -2437,21 +2157,6 @@ blockquote {
     {
       "source": "Validate Markdown Structure",
       "target": "Markdown Structure Validator",
-      "value": 1
-    },
-    {
-      "source": "Validate Command",
-      "target": "Invalid Relations Test",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "Validate Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -2475,7 +2180,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
@@ -2515,21 +2220,6 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
-      "target": "AI-Assisted System Model Management",
-      "value": 1
-    },
-    {
-      "source": "Reserved Subsections Support",
-      "target": "Supported Element Types",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
       "source": "Validate Relation Types",
       "target": "Relation Element Type Validator",
       "value": 1
@@ -2542,11 +2232,6 @@ blockquote {
     {
       "source": "Structure and Addressing in Markdown Documents",
       "target": "Element Identity Model",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "AI-Assisted System Model Management",
       "value": 1
     },
     {
@@ -2565,28 +2250,8 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Detailed Error Handling and Logging",
+      "source": "Enhanced Validation Error Reporting",
       "target": "Validation Error Handling",
-      "value": 1
-    },
-    {
-      "source": "Validating Structures",
-      "target": "Enhanced Validation Error Reporting",
-      "value": 1
-    },
-    {
-      "source": "Validation Report Generator",
-      "target": "Validation Error Handling",
-      "value": 1
-    },
-    {
-      "source": "Model Reports",
-      "target": "Provide Validation Reports",
-      "value": 1
-    },
-    {
-      "source": "Align with Industry Standards",
-      "target": "Provide Validation Reports",
       "value": 1
     },
     {
@@ -2605,13 +2270,23 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
-      "source": "AI-Assisted System Model Management",
-      "target": "Identifiers and Relations",
+      "source": "Validate Command",
+      "target": "Invalid Relations Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Validate Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
       "value": 1
     },
     {
@@ -2635,13 +2310,8 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Requirements Processing",
+      "source": "Validate Internal Consistency",
       "target": "GraphRegistry as Primary Registry",
-      "value": 1
-    },
-    {
-      "source": "Coexistence of Structured and Unstructured Documents",
-      "target": "Ignoring Unstructured Documents",
       "value": 1
     },
     {
@@ -2655,7 +2325,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Coexistence of Structured and Unstructured Documents",
       "value": 1
     },
@@ -2670,6 +2340,16 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Git Repository as Project Root",
+      "target": "Subdirectory Processing Verification",
+      "value": 1
+    },
+    {
+      "source": "Defining Model Structure",
+      "target": "Git Repository as Project Root",
+      "value": 1
+    },
+    {
       "source": "CLI Move Element Command",
       "target": "Subdirectory Processing Verification",
       "value": 1
@@ -2680,7 +2360,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2695,18 +2375,8 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "Git Repository as Project Root",
-      "target": "Subdirectory Processing Verification",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "Git Repository as Project Root",
       "value": 1
     },
     {
@@ -2745,7 +2415,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2760,7 +2430,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2775,7 +2445,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2790,7 +2460,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2805,7 +2475,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2820,7 +2490,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2840,7 +2510,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
@@ -2860,7 +2530,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
@@ -2895,22 +2565,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "Relation Commands",
-      "target": "Link Command Verification",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "Relation Commands",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -2930,13 +2585,23 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
-      "source": "AI-Assisted System Model Management",
-      "target": "Identifiers and Relations",
+      "source": "Relation Commands",
+      "target": "Link Command Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Relation Commands",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
       "value": 1
     },
     {
@@ -3005,21 +2670,6 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Relation Commands",
-      "target": "Unlink Command Verification",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "Relation Commands",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Relation Management Operations",
       "target": "Unlink Command Verification",
       "value": 1
@@ -3035,27 +2685,22 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
-      "source": "AI-Assisted System Model Management",
-      "target": "Identifiers and Relations",
-      "value": 1
-    },
-    {
-      "source": "Format Command",
-      "target": "Element Ordering Verification",
+      "source": "Relation Commands",
+      "target": "Unlink Command Verification",
       "value": 1
     },
     {
       "source": "CLI Interface Structure",
-      "target": "Format Command",
+      "target": "Relation Commands",
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -3080,13 +2725,13 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Validating Structures",
+      "source": "Formatting Model Documents",
       "target": "Model Formatting",
       "value": 1
     },
     {
       "source": "Format Command",
-      "target": "Format Command Requirements Verification",
+      "target": "Element Ordering Verification",
       "value": 1
     },
     {
@@ -3095,7 +2740,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -3105,7 +2750,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
@@ -3120,7 +2765,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Validating Structures",
+      "source": "Formatting Model Documents",
       "target": "Model Formatting",
       "value": 1
     },
@@ -3131,11 +2776,6 @@ blockquote {
     },
     {
       "source": "Model Formatting",
-      "target": "Format Consistency Enforcement",
-      "value": 1
-    },
-    {
-      "source": "Align with Industry Standards",
       "target": "Format Consistency Enforcement",
       "value": 1
     },
@@ -3150,7 +2790,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Validating Structures",
+      "source": "Formatting Model Documents",
       "target": "Model Formatting",
       "value": 1
     },
@@ -3165,6 +2805,21 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Format Command",
+      "target": "Format Command Requirements Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Format Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
       "source": "Format Duplicate Removal",
       "target": "Format Duplicate Removal Test",
       "value": 1
@@ -3175,23 +2830,8 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Validating Structures",
+      "source": "Formatting Model Documents",
       "target": "Model Formatting",
-      "value": 1
-    },
-    {
-      "source": "Format Command",
-      "target": "Full Relations Insertion Verification",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "Format Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -3205,6 +2845,21 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Format Command",
+      "target": "Full Relations Insertion Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Format Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
       "source": "Relation Ordering Normalization",
       "target": "Relation Ordering Verification",
       "value": 1
@@ -3215,7 +2870,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Validating Structures",
+      "source": "Formatting Model Documents",
       "target": "Model Formatting",
       "value": 1
     },
@@ -3225,23 +2880,18 @@ blockquote {
       "value": 1
     },
     {
-      "source": "CLI Lint Command",
+      "source": "Model Linting",
       "target": "Lint Auto-fix Capability",
       "value": 1
     },
     {
-      "source": "CLI interface",
-      "target": "CLI Interface Structure",
-      "value": 1
-    },
-    {
-      "source": "Lint Output Formatting",
+      "source": "Model Linting",
       "target": "Lint Command Verification",
       "value": 1
     },
     {
-      "source": "Model Linting",
-      "target": "Lint Output Formatting",
+      "source": "Linting Model Quality",
+      "target": "Model Linting",
       "value": 1
     },
     {
@@ -3250,18 +2900,8 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Model Linting",
-      "target": "Multi-Branch Convergence Detection",
-      "value": 1
-    },
-    {
       "source": "Redundant Verify Relations Detection",
       "target": "Lint Command Verification",
-      "value": 1
-    },
-    {
-      "source": "Model Linting",
-      "target": "Redundant Verify Relations Detection",
       "value": 1
     },
     {
@@ -3272,11 +2912,6 @@ blockquote {
     {
       "source": "Redundant Hierarchical Relations Detection",
       "target": "Safe Redundant Hierarchical Relations Auto-Removal",
-      "value": 1
-    },
-    {
-      "source": "Validating Structures",
-      "target": "Model Linting",
       "value": 1
     },
     {
@@ -3390,7 +3025,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -3460,6 +3095,16 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Resources Report",
+      "target": "Resources Report Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Reports",
+      "target": "Resources Report",
+      "value": 1
+    },
+    {
       "source": "CLI Resources Command",
       "target": "Resources Report Verification",
       "value": 1
@@ -3470,28 +3115,8 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "Resources Report",
-      "target": "CLI Resources Command",
-      "value": 1
-    },
-    {
-      "source": "Provide Reports",
-      "target": "Model Reports",
-      "value": 1
-    },
-    {
-      "source": "Resources Report",
-      "target": "Resources Report Verification",
-      "value": 1
-    },
-    {
-      "source": "Model Reports",
-      "target": "Resources Report",
       "value": 1
     },
     {
@@ -3510,21 +3135,6 @@ blockquote {
       "value": 1
     },
     {
-      "source": "CLI Search Command",
-      "target": "Search Command Tests",
-      "value": 1
-    },
-    {
-      "source": "CLI Interface Structure",
-      "target": "CLI Search Command",
-      "value": 1
-    },
-    {
-      "source": "Managing System Models",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Search Report Generator",
       "target": "Search Command Tests",
       "value": 1
@@ -3537,6 +3147,21 @@ blockquote {
     {
       "source": "Provide Reports",
       "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "CLI Search Command",
+      "target": "Search Command Tests",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Search Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
       "value": 1
     },
     {
@@ -3560,13 +3185,13 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Verification Upward Traceability",
+      "source": "Verification Coverage Report",
       "target": "TraceFlow View Report Generation",
       "value": 1
     },
     {
-      "source": "Model Reports",
-      "target": "Verification Coverage Report",
+      "source": "Provide Reports",
+      "target": "Model Reports",
       "value": 1
     },
     {
@@ -3580,7 +3205,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -3595,7 +3220,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -3610,7 +3235,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
@@ -3625,8 +3250,28 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Requirements Change Propagation",
+      "target": "Change Impact Detection Test",
+      "value": 1
+    },
+    {
+      "source": "Change Impact Detection",
+      "target": "Requirements Change Propagation",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Trace Changes in System Model",
+      "target": "Tracing Structural Changes",
       "value": 1
     },
     {
@@ -3640,13 +3285,13 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
       "value": 1
     },
     {
       "source": "Requirements Change Propagation",
-      "target": "Change Impact Detection Test",
+      "target": "Change Impact Relations Test",
       "value": 1
     },
     {
@@ -3675,28 +3320,8 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "System Model Interfaces",
       "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "Requirements Change Propagation",
-      "target": "Change Impact Relations Test",
-      "value": 1
-    },
-    {
-      "source": "Change Impact Detection",
-      "target": "Requirements Change Propagation",
-      "value": 1
-    },
-    {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Element Identity Model",
-      "value": 1
-    },
-    {
-      "source": "Trace Changes in System Model",
-      "target": "Tracing Structural Changes",
       "value": 1
     },
     {
@@ -3730,7 +3355,7 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Coexistence of Structured and Unstructured Documents",
       "value": 1
     },
@@ -3780,18 +3405,223 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Managing System Models",
+      "source": "Defining Model Structure",
       "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
-      "source": "AI-Assisted System Model Management",
-      "target": "Identifiers and Relations",
+      "source": "CLI Change Impact Report Command",
+      "target": "CLI Git Commit Hash Flag Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Change Impact Report Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Change Impact Report Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Change Impact Report Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Coverage Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Coverage Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Search Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Search Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "CLI Traces Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Traces Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Format Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Format Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Validate Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Validate Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "Web Interface",
+      "target": "HTML Export",
+      "value": 1
+    },
+    {
+      "source": "Verification Traces Element Navigation",
+      "target": "Verification Traces Element Navigation Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Traces Command",
+      "target": "Verification Traces Element Navigation",
+      "value": 1
+    },
+    {
+      "source": "CLI interface",
+      "target": "CLI Interface Structure",
+      "value": 1
+    },
+    {
+      "source": "Attachment Export",
+      "target": "Attachment Export Verification",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "Attachment Export",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "Web Interface",
+      "value": 1
+    },
+    {
+      "source": "Containment View Attachment Links",
+      "target": "Containment Attachment Links Verification",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "Containment View Attachment Links",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "Web Interface",
+      "value": 1
+    },
+    {
+      "source": "Diagram Attachment Display",
+      "target": "Diagram Attachment Display Verification",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "Diagram Attachment Display",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "Web Interface",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "HTML Export Verification",
+      "value": 1
+    },
+    {
+      "source": "Web Interface",
+      "target": "HTML Export",
+      "value": 1
+    },
+    {
+      "source": "Model View Element Navigation",
+      "target": "Model View Element Navigation Test",
+      "value": 1
+    },
+    {
+      "source": "Model-Centric View Generation",
+      "target": "Model View Element Navigation",
+      "value": 1
+    },
+    {
+      "source": "Web Interface",
+      "target": "HTML Export",
+      "value": 1
+    },
+    {
+      "source": "Serve Command",
+      "target": "Serve Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Web Interface",
+      "target": "Serve Command",
       "value": 1
     }
   ]
 };
-    const container = document.getElementById("d3sankey_55f84f19a450");
+    const container = document.getElementById("d3sankey_55b937dce910");
     const svg = d3.select(container).select("svg");
 
     // Configuration

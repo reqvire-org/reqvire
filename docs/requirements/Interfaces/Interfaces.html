@@ -736,11 +736,6 @@ blockquote {
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   subgraph c97e5d4c96ea3f37["📁 requirements/Interfaces"]
-    subgraph f57c66ff9e8042ff["📄 CLI.md"]
-      654d7988c22e19e4["CLI Interface Structure"];
-      class 654d7988c22e19e4 systemRequirement;
-      click 654d7988c22e19e4 "CLI.html#cli-interface-structure";
-    end
     subgraph 7ecaecf58817be05["📄 Interfaces.md"]
       90bec7578aacbe9d["CLI interface"];
       class 90bec7578aacbe9d userRequirement;
@@ -749,83 +744,92 @@ blockquote {
       class ea7f8e1ac2ba1ba4 userRequirement;
       click ea7f8e1ac2ba1ba4 "Interfaces.html#web-interface";
     end
-    subgraph ac7dec238a8434fa["📄 WebInterface.md"]
-      14e955af5317bb0b["HTML Export<br/>📎 requirements/Interfaces/Behaviors.md#web-interface-navigation-behavior"];
-      class 14e955af5317bb0b systemRequirement;
-      click 14e955af5317bb0b "WebInterface.html#html-export";
-      1d4f213aefbd303a["Serve Command"];
-      class 1d4f213aefbd303a systemRequirement;
-      click 1d4f213aefbd303a "WebInterface.html#serve-command";
+  end
+  subgraph cfe1eea0278796bc["📁 requirements/Interfaces/CLI"]
+    subgraph 43307c569ff89429["📄 Commands.md"]
+      d6147550e948449e["CLI Interface Structure"];
+      class d6147550e948449e systemRequirement;
+      click d6147550e948449e "CLI/Commands.html#cli-interface-structure";
     end
   end
-  90bec7578aacbe9d -.->|deriveReqT| 654d7988c22e19e4;
-  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 14e955af5317bb0b;
-  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 1d4f213aefbd303a;
-  654d7988c22e19e4 -.->|deriveReqT| 5bdbff35782339bf;
-  654d7988c22e19e4 -.->|deriveReqT| a37e697c9894b050;
-  654d7988c22e19e4 -.->|deriveReqT| 3674f24282438b68;
-  654d7988c22e19e4 -.->|deriveReqT| a505c5be33bd743f;
-  654d7988c22e19e4 -.->|deriveReqT| c8277f9cadb0039b;
-  654d7988c22e19e4 -.->|deriveReqT| 1107c99a02c7046e;
-  654d7988c22e19e4 -.->|deriveReqT| 508ede87983d40e4;
-  654d7988c22e19e4 -.->|deriveReqT| 30e3fd21c48a0eac;
-  654d7988c22e19e4 -.->|deriveReqT| 656be7dca3efb2d0;
-  654d7988c22e19e4 -.->|deriveReqT| 6d4956293375aa06;
-  654d7988c22e19e4 -.->|deriveReqT| a4db5deafcdf8ad0;
-  654d7988c22e19e4 -.->|deriveReqT| 9ba1e38b82424de3;
-  654d7988c22e19e4 -.->|deriveReqT| db028ef2cc57c85d;
-  654d7988c22e19e4 -.->|deriveReqT| 3b6e84a22e965fc6;
-  654d7988c22e19e4 -.->|deriveReqT| dd5f821c42d5decf;
-  654d7988c22e19e4 -.->|deriveReqT| e95698f0fe0890bd;
-  654d7988c22e19e4 -.->|deriveReqT| 99d9d89906ac74fc;
-  654d7988c22e19e4 -.->|deriveReqT| 4c4656a5ecadf586;
-  654d7988c22e19e4 -.->|deriveReqT| e4f44da91fce01b1;
-  654d7988c22e19e4 -.->|deriveReqT| ce8de49bd88dd05e;
-  654d7988c22e19e4 -.->|deriveReqT| d2df74b41b33eab7;
+  subgraph 46bd8996ef832bd8["📁 requirements/Interfaces/WebInterface"]
+    subgraph 318b1cdfa03981b0["📄 Features.md"]
+      343e7b2d42df05e8["HTML Export<br/>📎 requirements/Interfaces/WebInterface/Behaviors.md#web-interface-navigation-behavior"];
+      class 343e7b2d42df05e8 systemRequirement;
+      click 343e7b2d42df05e8 "WebInterface/Features.html#html-export";
+      9b566692fe070492["Serve Command"];
+      class 9b566692fe070492 systemRequirement;
+      click 9b566692fe070492 "WebInterface/Features.html#serve-command";
+    end
+  end
+  90bec7578aacbe9d -.->|deriveReqT| d6147550e948449e;
+  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 343e7b2d42df05e8;
+  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 9b566692fe070492;
+  d6147550e948449e -.->|deriveReqT| 104c59d25b737d22;
+  d6147550e948449e -.->|deriveReqT| 68e30181f97f6f71;
+  d6147550e948449e -.->|deriveReqT| 9a2adde3721af9df;
+  d6147550e948449e -.->|deriveReqT| 218fa75a3081be32;
+  d6147550e948449e -.->|deriveReqT| 43efd1fafe961f2e;
+  d6147550e948449e -.->|deriveReqT| ec02481a0771dca;
+  d6147550e948449e -.->|deriveReqT| 51a6083e0a55197c;
+  d6147550e948449e -.->|deriveReqT| 151987ac330b33f0;
+  d6147550e948449e -.->|deriveReqT| a68fbec67469256b;
+  d6147550e948449e -.->|deriveReqT| 7ef6cb0e4258e1bc;
+  d6147550e948449e -.->|deriveReqT| d9c57dd799158af9;
+  d6147550e948449e -.->|deriveReqT| 91025cd88b1df4f0;
+  d6147550e948449e -.->|deriveReqT| 1f8022dac203e679;
+  d6147550e948449e -.->|deriveReqT| 2f51b946a8587225;
+  d6147550e948449e -.->|deriveReqT| ee7ad64abb668237;
+  d6147550e948449e -.->|deriveReqT| d2fc543d82f61bbb;
+  d6147550e948449e -.->|deriveReqT| 9578836eb8e0fc6;
+  d6147550e948449e -.->|deriveReqT| 62f24ccbcd1f428a;
+  d6147550e948449e -.->|deriveReqT| 8d334537008d94ba;
+  d6147550e948449e -.->|deriveReqT| c04221154b7fc90d;
+  d6147550e948449e -.->|deriveReqT| a8750da2c3580220;
   25bf5cc42f41e395["cli.rs"];
   class 25bf5cc42f41e395 default;
   click 25bf5cc42f41e395 "../../cli/src/cli.rs";
-  654d7988c22e19e4 -->|satisfiedBy| 25bf5cc42f41e395;
-  14e955af5317bb0b -.->|deriveReqT| 83159aec9844792d;
-  14e955af5317bb0b -.->|deriveReqT| c85f9aad190ad77a;
-  14e955af5317bb0b -.->|deriveReqT| 4778760f733ed81b;
-  14e955af5317bb0b -.->|deriveReqT| 41f55efb97fa8524;
-  14e955af5317bb0b -.->|deriveReqT| 56cebc7215550cde;
-  14e955af5317bb0b -->|satisfiedBy| 25bf5cc42f41e395;
+  d6147550e948449e -->|satisfiedBy| 25bf5cc42f41e395;
+  343e7b2d42df05e8 -.->|deriveReqT| e03d9fc7fee23cbf;
+  343e7b2d42df05e8 -.->|deriveReqT| 1a4bd1d4cf59c6c3;
+  343e7b2d42df05e8 -.->|deriveReqT| 399558ec4fcaeca;
+  343e7b2d42df05e8 -.->|deriveReqT| 27d051a7dc8ddd3d;
+  343e7b2d42df05e8 -.->|deriveReqT| 965615d978d68cf5;
+  343e7b2d42df05e8 -->|satisfiedBy| 25bf5cc42f41e395;
   bd747195bcfe94dd["export.rs"];
   class bd747195bcfe94dd default;
   click bd747195bcfe94dd "../../core/src/export.rs";
-  14e955af5317bb0b -->|satisfiedBy| bd747195bcfe94dd;
+  343e7b2d42df05e8 -->|satisfiedBy| bd747195bcfe94dd;
   fb8158427d2fd55c["html.rs"];
   class fb8158427d2fd55c default;
   click fb8158427d2fd55c "../../core/src/html.rs";
-  14e955af5317bb0b -->|satisfiedBy| fb8158427d2fd55c;
+  343e7b2d42df05e8 -->|satisfiedBy| fb8158427d2fd55c;
   68fef32bd3e3323d["html_export.rs"];
   class 68fef32bd3e3323d default;
   click 68fef32bd3e3323d "../../core/src/html_export.rs";
-  14e955af5317bb0b -->|satisfiedBy| 68fef32bd3e3323d;
+  343e7b2d42df05e8 -->|satisfiedBy| 68fef32bd3e3323d;
   b4e855d4c9269f88["index_generator.rs"];
   class b4e855d4c9269f88 default;
   click b4e855d4c9269f88 "../../core/src/index_generator.rs";
-  14e955af5317bb0b -->|satisfiedBy| b4e855d4c9269f88;
+  343e7b2d42df05e8 -->|satisfiedBy| b4e855d4c9269f88;
   84be222e135b89cb["base.html"];
   class 84be222e135b89cb default;
   click 84be222e135b89cb "../../core/templates/base.html";
-  14e955af5317bb0b -->|satisfiedBy| 84be222e135b89cb;
+  343e7b2d42df05e8 -->|satisfiedBy| 84be222e135b89cb;
   82ff2e2c4a363e59["model.html"];
   class 82ff2e2c4a363e59 default;
   click 82ff2e2c4a363e59 "../../core/templates/model.html";
-  14e955af5317bb0b -->|satisfiedBy| 82ff2e2c4a363e59;
-  14e955af5317bb0b -->|satisfiedBy| 19bf972ca85f2b44;
-  14e955af5317bb0b -.->|verifiedBy| 59201973ca89cfb4;
-  14e955af5317bb0b -.->|verifiedBy| 416aa735487a5d0b;
-  1d4f213aefbd303a -->|satisfiedBy| 25bf5cc42f41e395;
+  343e7b2d42df05e8 -->|satisfiedBy| 82ff2e2c4a363e59;
+  343e7b2d42df05e8 -->|satisfiedBy| 945adb3f0ea1012e;
+  343e7b2d42df05e8 -.->|verifiedBy| bd0b4833b30da28;
+  343e7b2d42df05e8 -.->|verifiedBy| a7eeaf4fd1d17030;
+  9b566692fe070492 -->|satisfiedBy| 25bf5cc42f41e395;
   70c4d955a4bb93c["serve.rs"];
   class 70c4d955a4bb93c default;
   click 70c4d955a4bb93c "../../cli/src/serve.rs";
-  1d4f213aefbd303a -->|satisfiedBy| 70c4d955a4bb93c;
-  1d4f213aefbd303a -.->|trace| ce8de49bd88dd05e;
-  1d4f213aefbd303a -.->|verifiedBy| 8dae89044d5fb97d;
+  9b566692fe070492 -->|satisfiedBy| 70c4d955a4bb93c;
+  9b566692fe070492 -.->|trace| a8750da2c3580220;
+  9b566692fe070492 -.->|verifiedBy| d48ee06d20b13bcc;
 </div>
 <h3 id="cli-interface">CLI interface</h3>
 <p>The system shall provide command line interface (CLI) to faciliate model management.</p>
@@ -835,8 +839,8 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="CLI.html#cli-interface-structure">CLI Interface Structure</a></li>
-<li>derivedFrom: <a href="../UserStories.html#managing-system-models">Managing System Models</a></li>
+<li>derive: <a href="CLI/Commands.html#cli-interface-structure">CLI Interface Structure</a></li>
+<li>derivedFrom: <a href="../UserStories.html#system-model-interfaces">System Model Interfaces</a></li>
 </ul>
 <hr />
 <h3 id="web-interface">Web Interface</h3>
@@ -870,9 +874,9 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="WebInterface.html#html-export">HTML Export</a></li>
-<li>derive: <a href="WebInterface.html#serve-command">Serve Command</a></li>
-<li>derivedFrom: <a href="../UserStories.html#managing-system-models">Managing System Models</a></li>
+<li>derive: <a href="WebInterface/Features.html#html-export">HTML Export</a></li>
+<li>derive: <a href="WebInterface/Features.html#serve-command">Serve Command</a></li>
+<li>derivedFrom: <a href="../UserStories.html#system-model-interfaces">System Model Interfaces</a></li>
 </ul>
 <hr />
 
