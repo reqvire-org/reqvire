@@ -16,7 +16,7 @@ Use `--json` for programmatic processing.
 | `--filter-file` | Filter by file glob | `--filter-file="requirements/**/*.md"` |
 | `--filter-name` | Filter by element name (regex) | `--filter-name=".*Auth.*"` |
 | `--filter-id` | Filter by exact identifier | `--filter-id="requirements/File.md#element"` |
-| `--filter-type` | Filter by element type (see types below) | `--filter-type="user-requirement"` |
+| `--filter-type` | Filter by element type (comma-separated, OR logic) | `--filter-type="user-requirement"` or `--filter-type="requirement,behavior"` |
 | `--filter-content` | Filter by content (regex) | `--filter-content="SHALL.*validate"` |
 | `--filter-page-content` | Filter by file frontmatter | `--filter-page-content="security"` |
 | `--have-relations` | Elements with ALL relations | `--have-relations="verifiedBy,satisfiedBy"` |
@@ -24,7 +24,7 @@ Use `--json` for programmatic processing.
 | `--has-attachments` | Elements with attachments | `--has-attachments` |
 | `--filter-attachment` | Filter by attachment pattern | `--filter-attachment="*.pdf"` |
 
-**Element types for --filter-type:** user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types: `other-TYPENAME`
+**Element types for --filter-type (supports comma-separated list):** user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
 ## Element Manipulation
 
