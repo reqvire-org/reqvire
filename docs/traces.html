@@ -4027,45 +4027,6 @@ blockquote {
   61bf4405db9ec1d1 -.->|derivedFrom| b52103e4a7ac2f83;
   f6eaca3198d3e7b1 -.->|derivedFrom| afc24affb57aec68;
 </div>
-<h3><a href="requirements/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification">Remove Generated Diagrams Verification</a></h3>
-<ul>
-<li><strong>Type</strong>: analysis-verification</li>
-<li><strong>Directly Verified</strong>: 1 requirements</li>
-<li><strong>Total in Tree</strong>: 3 requirements</li>
-</ul>
-<div class="mermaid">graph TD
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
-  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
-  classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
-  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
-  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
-  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
-  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
-
-  subgraph 68908f1dbfe487c0["📁 requirements"]
-    subgraph d5afb8f4e2d93d2e["📄 UserStories.md"]
-      afc24affb57aec68["Generate Diagrams"]:::userRequirement
-      click afc24affb57aec68 "requirements/UserStories.html#generate-diagrams";
-    end
-  end
-  subgraph 7abe7cd3649051be["📁 requirements/System/Output"]
-    subgraph 6528ddfab3564226["📄 DiagramGeneration.md"]
-      8dec214273bac76c["Diagram Removal"]:::systemRequirement
-      click 8dec214273bac76c "requirements/System/Output/DiagramGeneration.html#diagram-removal";
-      df6f500f1d9527ef["Remove Generated Diagrams"]:::userRequirement
-      click df6f500f1d9527ef "requirements/System/Output/DiagramGeneration.html#remove-generated-diagrams";
-    end
-  end
-  subgraph 2b01e7137fa6f2ab["📁 requirements/System/Output/Verifications"]
-    subgraph f79df7298f8d11df["📄 DiagramVerifications.md"]
-      8140719061af8939["Remove Generated Diagrams Verification"]:::verification
-      click 8140719061af8939 "requirements/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification";
-    end
-  end
-  8140719061af8939 -.->|verifies| 8dec214273bac76c;
-  8dec214273bac76c -.->|derivedFrom| df6f500f1d9527ef;
-  df6f500f1d9527ef -.->|derivedFrom| afc24affb57aec68;
-</div>
 <h3><a href="requirements/System/Output/Verifications/DiagramVerifications.html#visualize-model-relationships-verification">Visualize Model Relationships Verification</a></h3>
 <ul>
 <li><strong>Type</strong>: test-verification</li>
@@ -4243,6 +4204,54 @@ blockquote {
   8a1991dbeeaca9f2 -.->|verifies| c3d401a0917ac0be;
   ee8cab95309925d6 -.->|derivedFrom| c3d401a0917ac0be;
   c3d401a0917ac0be -.->|derivedFrom| c2dcd8bee857c1c9;
+  c2dcd8bee857c1c9 -.->|derivedFrom| 61bf4405db9ec1d1;
+  61bf4405db9ec1d1 -.->|derivedFrom| b52103e4a7ac2f83;
+</div>
+<h3><a href="requirements/System/Output/Verifications/ReportingVerifications.html#multi-type-search-filter-test">Multi-Type Search Filter Test</a></h3>
+<ul>
+<li><strong>Type</strong>: test-verification</li>
+<li><strong>Directly Verified</strong>: 1 requirements</li>
+<li><strong>Total in Tree</strong>: 6 requirements</li>
+</ul>
+<div class="mermaid">graph TD
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph 68908f1dbfe487c0["📁 requirements"]
+    subgraph d5afb8f4e2d93d2e["📄 UserStories.md"]
+      b52103e4a7ac2f83["Provide Reports"]:::userRequirement
+      click b52103e4a7ac2f83 "requirements/UserStories.html#provide-reports";
+    end
+  end
+  subgraph 7abe7cd3649051be["📁 requirements/System/Output"]
+    subgraph b87937d74ce00328["📄 Reporting.md"]
+      cb00259ccd5c87ca["Comma-Separated Type Filter Parsing"]:::systemRequirement
+      click cb00259ccd5c87ca "requirements/System/Output/Reporting.html#comma-separated-type-filter-parsing";
+      815eb67448eaa51e["Flexible Search Type Filtering"]:::userRequirement
+      click 815eb67448eaa51e "requirements/System/Output/Reporting.html#flexible-search-type-filtering";
+      61bf4405db9ec1d1["Model Reports"]:::userRequirement
+      click 61bf4405db9ec1d1 "requirements/System/Output/Reporting.html#model-reports";
+      c2dcd8bee857c1c9["Model Structure and Summaries"]:::userRequirement
+      click c2dcd8bee857c1c9 "requirements/System/Output/Reporting.html#model-structure-and-summaries";
+      e2185df67eff8500["Search Report Generator<br/>📎 SearchFiltering.md<br/>📎 requirements/System/Core/Specifications.md#supported-element-types-specification<br/>📎 requirements/System/Output/Specifications.md#json-output-structure<br/>📎 requirements/System/Output/Specifications.md#text-output-formatting"]:::systemRequirement
+      click e2185df67eff8500 "requirements/System/Output/Reporting.html#search-report-generator";
+    end
+  end
+  subgraph 2b01e7137fa6f2ab["📁 requirements/System/Output/Verifications"]
+    subgraph 9ff9f77cb34a3f7d["📄 ReportingVerifications.md"]
+      acf0d1712055db19["Multi-Type Search Filter Test"]:::verification
+      click acf0d1712055db19 "requirements/System/Output/Verifications/ReportingVerifications.html#multi-type-search-filter-test";
+    end
+  end
+  acf0d1712055db19 -.->|verifies| cb00259ccd5c87ca;
+  cb00259ccd5c87ca -.->|derivedFrom| 815eb67448eaa51e;
+  815eb67448eaa51e -.->|derivedFrom| e2185df67eff8500;
+  e2185df67eff8500 -.->|derivedFrom| c2dcd8bee857c1c9;
   c2dcd8bee857c1c9 -.->|derivedFrom| 61bf4405db9ec1d1;
   61bf4405db9ec1d1 -.->|derivedFrom| b52103e4a7ac2f83;
 </div>

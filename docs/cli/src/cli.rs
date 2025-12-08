@@ -108,8 +108,8 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_name: Option<String>,
 
-        /// Only include elements of the given type. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
-        #[clap(long, value_name = "TYPE", help_heading = "SEARCH OPTIONS")]
+        /// Only include elements of the given type(s). Supports comma-separated list. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
+        #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
         filter_type: Option<String>,
 
         /// Only include elements whose content matches this regular expression

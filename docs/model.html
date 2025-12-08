@@ -707,7 +707,7 @@ blockquote {
             <h1 id="model">Model</h1>
 <p>The model view displays the logical structure starting from root requirements—requirements without parent derivations. Each element shows its complete relation tree: derived child requirements, verifications, and implementations. This follows MBSE principles where stakeholder needs flow down through requirement hierarchies to verifiable, implementable specifications.</p>
 <p><strong>Total Elements</strong>: 10
-<strong>Total Relations</strong>: 576
+<strong>Total Relations</strong>: 574
 <strong>Direction</strong>: Forward</p>
 <h2><a href="requirements/UserStories.html#align-with-industry-standards">Align with Industry Standards</a></h2>
 <p><strong>Type</strong>: user-requirement
@@ -1105,15 +1105,9 @@ blockquote {
   end
   subgraph 7abe7cd3649051be["📁 requirements/System/Output"]
     subgraph 6528ddfab3564226["📄 DiagramGeneration.md"]
-      970dcd3b04788a43["Complete Model Structure Visualization"];
-      class 970dcd3b04788a43 userRequirement;
-      click 970dcd3b04788a43 "requirements/System/Output/DiagramGeneration.html#complete-model-structure-visualization";
       1b3214523418b124["Diagram Generation"];
       class 1b3214523418b124 systemRequirement;
       click 1b3214523418b124 "requirements/System/Output/DiagramGeneration.html#diagram-generation";
-      8dec214273bac76c["Diagram Removal"];
-      class 8dec214273bac76c systemRequirement;
-      click 8dec214273bac76c "requirements/System/Output/DiagramGeneration.html#diagram-removal";
       86f3db4870a89b17["File Diagram Attachment Display"];
       class 86f3db4870a89b17 systemRequirement;
       click 86f3db4870a89b17 "requirements/System/Output/DiagramGeneration.html#file-diagram-attachment-display";
@@ -1123,12 +1117,6 @@ blockquote {
       f6eaca3198d3e7b1["Interactive Mermaid Diagrams"];
       class f6eaca3198d3e7b1 userRequirement;
       click f6eaca3198d3e7b1 "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams";
-      5dcc81aca3456920["Model Visualization and Exploration"];
-      class 5dcc81aca3456920 userRequirement;
-      click 5dcc81aca3456920 "requirements/System/Output/DiagramGeneration.html#model-visualization-and-exploration";
-      df6f500f1d9527ef["Remove Generated Diagrams"];
-      class df6f500f1d9527ef userRequirement;
-      click df6f500f1d9527ef "requirements/System/Output/DiagramGeneration.html#remove-generated-diagrams";
       93754c5773c5b736["SysML-Compatible Relationship Rendering"];
       class 93754c5773c5b736 systemRequirement;
       click 93754c5773c5b736 "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering";
@@ -1153,15 +1141,11 @@ blockquote {
       c609877033de6df3["File Diagram Attachment Test"];
       class c609877033de6df3 verification;
       click c609877033de6df3 "requirements/System/Output/Verifications/DiagramVerifications.html#file-diagram-attachment-test";
-      8140719061af8939["Remove Generated Diagrams Verification"];
-      class 8140719061af8939 verification;
-      click 8140719061af8939 "requirements/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification";
       f31b44e8e814dc14["Visualize Model Relationships Verification"];
       class f31b44e8e814dc14 verification;
       click f31b44e8e814dc14 "requirements/System/Output/Verifications/DiagramVerifications.html#visualize-model-relationships-verification";
     end
   end
-  afc24affb57aec68 -->|derive| 970dcd3b04788a43;
   afc24affb57aec68 -->|derive| f6eaca3198d3e7b1;
   f6eaca3198d3e7b1 -->|derive| 1b3214523418b124;
   1b3214523418b124 -->|derive| 86f3db4870a89b17;
@@ -1201,14 +1185,6 @@ blockquote {
   1b3214523418b124 -->|verifiedBy| 598958f484d969e5;
   1b3214523418b124 -->|verifiedBy| f31b44e8e814dc14;
   f6eaca3198d3e7b1 -->|satisfiedBy| a6174ccb6aaaa99;
-  afc24affb57aec68 -->|derive| 5dcc81aca3456920;
-  afc24affb57aec68 -->|derive| df6f500f1d9527ef;
-  df6f500f1d9527ef -->|derive| 8dec214273bac76c;
-  7bc5b50e6df6bf7c["core/src/diagrams.rs"];
-  class 7bc5b50e6df6bf7c default;
-  click 7bc5b50e6df6bf7c "core/src/diagrams.rs";
-  8dec214273bac76c -->|satisfiedBy| 7bc5b50e6df6bf7c;
-  8dec214273bac76c -->|verifiedBy| 8140719061af8939;
 </div>
 <h2><a href="requirements/UserStories.html#managing-system-models">Managing System Models</a></h2>
 <p><strong>Type</strong>: user-requirement
@@ -2823,9 +2799,6 @@ blockquote {
       click 2e90d80d5c54d556 "requirements/System/Output/Behaviors.html#verification-coverage-philosophy-behavior";
     end
     subgraph 6528ddfab3564226["📄 DiagramGeneration.md"]
-      970dcd3b04788a43["Complete Model Structure Visualization"];
-      class 970dcd3b04788a43 userRequirement;
-      click 970dcd3b04788a43 "requirements/System/Output/DiagramGeneration.html#complete-model-structure-visualization";
       1b3214523418b124["Diagram Generation"];
       class 1b3214523418b124 systemRequirement;
       click 1b3214523418b124 "requirements/System/Output/DiagramGeneration.html#diagram-generation";
@@ -2838,9 +2811,6 @@ blockquote {
       f6eaca3198d3e7b1["Interactive Mermaid Diagrams"];
       class f6eaca3198d3e7b1 userRequirement;
       click f6eaca3198d3e7b1 "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams";
-      5dcc81aca3456920["Model Visualization and Exploration"];
-      class 5dcc81aca3456920 userRequirement;
-      click 5dcc81aca3456920 "requirements/System/Output/DiagramGeneration.html#model-visualization-and-exploration";
       93754c5773c5b736["SysML-Compatible Relationship Rendering"];
       class 93754c5773c5b736 systemRequirement;
       click 93754c5773c5b736 "requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering";
@@ -2849,9 +2819,15 @@ blockquote {
       5998aab477c0f267["Collect Content from Requirement Chain"];
       class 5998aab477c0f267 systemRequirement;
       click 5998aab477c0f267 "requirements/System/Output/Reporting.html#collect-content-from-requirement-chain";
+      cb00259ccd5c87ca["Comma-Separated Type Filter Parsing"];
+      class cb00259ccd5c87ca systemRequirement;
+      click cb00259ccd5c87ca "requirements/System/Output/Reporting.html#comma-separated-type-filter-parsing";
       e22e8f9f71fadde8["Containment View Report<br/>📎 requirements/System/Output/DesignDocuments/ContainmentView.md"];
       class e22e8f9f71fadde8 userRequirement;
       click e22e8f9f71fadde8 "requirements/System/Output/Reporting.html#containment-view-report";
+      815eb67448eaa51e["Flexible Search Type Filtering"];
+      class 815eb67448eaa51e userRequirement;
+      click 815eb67448eaa51e "requirements/System/Output/Reporting.html#flexible-search-type-filtering";
       ee8cab95309925d6["Forward-Only Relation Traversal"];
       class ee8cab95309925d6 systemRequirement;
       click ee8cab95309925d6 "requirements/System/Output/Reporting.html#forward-only-relation-traversal";
@@ -2944,6 +2920,9 @@ blockquote {
       8a1991dbeeaca9f2["Model Command Verification"];
       class 8a1991dbeeaca9f2 verification;
       click 8a1991dbeeaca9f2 "requirements/System/Output/Verifications/ReportingVerifications.html#model-command-verification";
+      acf0d1712055db19["Multi-Type Search Filter Test"];
+      class acf0d1712055db19 verification;
+      click acf0d1712055db19 "requirements/System/Output/Verifications/ReportingVerifications.html#multi-type-search-filter-test";
       f290c17c914f75f7["Resources Report Verification"];
       class f290c17c914f75f7 verification;
       click f290c17c914f75f7 "requirements/System/Output/Verifications/ReportingVerifications.html#resources-report-verification";
@@ -2977,7 +2956,6 @@ blockquote {
     end
   end
   b52103e4a7ac2f83 -->|derive| 61bf4405db9ec1d1;
-  61bf4405db9ec1d1 -->|derive| 970dcd3b04788a43;
   61bf4405db9ec1d1 -->|derive| f6eaca3198d3e7b1;
   f6eaca3198d3e7b1 -->|derive| 1b3214523418b124;
   1b3214523418b124 -->|derive| 86f3db4870a89b17;
@@ -3017,7 +2995,6 @@ blockquote {
   1b3214523418b124 -->|verifiedBy| 598958f484d969e5;
   1b3214523418b124 -->|verifiedBy| f31b44e8e814dc14;
   f6eaca3198d3e7b1 -->|satisfiedBy| a6174ccb6aaaa99;
-  61bf4405db9ec1d1 -->|derive| 5dcc81aca3456920;
   61bf4405db9ec1d1 -->|derive| 5998aab477c0f267;
   39f5bfa47bc3cfcf["core/src/report_collect.rs"];
   class 39f5bfa47bc3cfcf default;
@@ -3066,14 +3043,29 @@ blockquote {
   click d5ee203713b905a8 "core/src/diagrams.rs";
   c3d401a0917ac0be -->|satisfiedBy| d5ee203713b905a8;
   c2dcd8bee857c1c9 -->|derive| e2185df67eff8500;
-  727d9b8e3294565c["core/src/filters.rs"];
-  class 727d9b8e3294565c default;
-  click 727d9b8e3294565c "core/src/filters.rs";
-  e2185df67eff8500 -->|satisfiedBy| 727d9b8e3294565c;
-  18446f89d79dd575["core/src/search.rs"];
+  e2185df67eff8500 -->|derive| 815eb67448eaa51e;
+  815eb67448eaa51e -->|derive| cb00259ccd5c87ca;
+  b36d490f5e3b7cc5["cli/src/cli.rs"];
+  class b36d490f5e3b7cc5 default;
+  click b36d490f5e3b7cc5 "cli/src/cli.rs";
+  cb00259ccd5c87ca -->|satisfiedBy| b36d490f5e3b7cc5;
+  af3ab35641d10401["core/src/search.rs"];
+  class af3ab35641d10401 default;
+  click af3ab35641d10401 "core/src/search.rs";
+  cb00259ccd5c87ca -->|satisfiedBy| af3ab35641d10401;
+  cb00259ccd5c87ca -->|verifiedBy| acf0d1712055db19;
+  509831ea1dae4aaf["tests/test-multi-type-search/test.sh"];
+  class 509831ea1dae4aaf default;
+  click 509831ea1dae4aaf "tests/test-multi-type-search/test.sh";
+  acf0d1712055db19 -->|satisfiedBy| 509831ea1dae4aaf;
+  18446f89d79dd575["core/src/filters.rs"];
   class 18446f89d79dd575 default;
-  click 18446f89d79dd575 "core/src/search.rs";
+  click 18446f89d79dd575 "core/src/filters.rs";
   e2185df67eff8500 -->|satisfiedBy| 18446f89d79dd575;
+  f3fac8d2d4954f0e["core/src/search.rs"];
+  class f3fac8d2d4954f0e default;
+  click f3fac8d2d4954f0e "core/src/search.rs";
+  e2185df67eff8500 -->|satisfiedBy| f3fac8d2d4954f0e;
   e2185df67eff8500 -->|verifiedBy| d9207a146d02d394;
   98bca8236f074de["tests/test-search-all-features/test.sh"];
   class 98bca8236f074de default;

@@ -764,6 +764,9 @@ blockquote {
       8a1991dbeeaca9f2["Model Command Verification"];
       class 8a1991dbeeaca9f2 verification;
       click 8a1991dbeeaca9f2 "ReportingVerifications.html#model-command-verification";
+      acf0d1712055db19["Multi-Type Search Filter Test"];
+      class acf0d1712055db19 verification;
+      click acf0d1712055db19 "ReportingVerifications.html#multi-type-search-filter-test";
       f290c17c914f75f7["Resources Report Verification"];
       class f290c17c914f75f7 verification;
       click f290c17c914f75f7 "ReportingVerifications.html#resources-report-verification";
@@ -811,6 +814,10 @@ blockquote {
   class df92bf508f2f7295 default;
   click df92bf508f2f7295 "../../../../tests/test-model-command/test.sh";
   8a1991dbeeaca9f2 -->|satisfiedBy| df92bf508f2f7295;
+  80aab4c106444560["test.sh"];
+  class 80aab4c106444560 default;
+  click 80aab4c106444560 "../../../../tests/test-multi-type-search/test.sh";
+  acf0d1712055db19 -->|satisfiedBy| 80aab4c106444560;
   c326a5f02f65c781["test.sh"];
   class c326a5f02f65c781 default;
   click c326a5f02f65c781 "../../../../tests/test-resources-report/test.sh";
@@ -1542,6 +1549,38 @@ Command: <code>reqvire model --json</code></p>
 <li>satisfiedBy: <a href="../../../../tests/test-model-command/test.sh">test.sh</a></li>
 <li>verify: <a href="../Reporting.html#forward-only-relation-traversal">Forward-Only Relation Traversal</a></li>
 <li>verify: <a href="../Reporting.html#model-diagram-output-formats">Model Diagram Output Formats</a></li>
+</ul>
+<hr />
+<h3 id="multi-type-search-filter-test">Multi-Type Search Filter Test</h3>
+<p>This test verifies that the search command correctly filters by multiple element types using comma-separated values.</p>
+<h4>Details</h4>
+<h5>Test Steps</h5>
+<ol>
+<li>Search with single type (baseline - existing behavior)</li>
+<li>Search with two comma-separated types</li>
+<li>Search with three or more types</li>
+<li>Search with custom type in list</li>
+<li>Search with invalid type in list (expect error)</li>
+<li>Search with multiple types combined with other filters (name, file, etc.)</li>
+<li>Verify JSON output with multiple types</li>
+</ol>
+<h5>Expected Results</h5>
+<ul>
+<li>Single type queries work as before (backward compatibility)</li>
+<li>Multi-type queries return elements matching ANY specified type</li>
+<li>Invalid types produce clear error messages</li>
+<li>Comma-separated parsing handles whitespace correctly</li>
+<li>Combined filters work correctly</li>
+<li>JSON output is valid</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-multi-type-search/test.sh">test.sh</a></li>
+<li>verify: <a href="../Reporting.html#comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</a></li>
 </ul>
 <hr />
 <h3 id="resources-report-verification">Resources Report Verification</h3>

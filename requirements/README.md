@@ -10,7 +10,7 @@ flowchart LR
     subgraph "ReqvireTool"
         subgraph "Cli"
             manageModel((Manage System Model))
-            generateDiagrams((Generate/Remove Diagrams))
+            generateDiagrams((Generate Diagrams))
             analiseRelations((Analyze Relations))
             reports[Provide Reports]
             validateStructure((Validate Structure))

@@ -14,7 +14,7 @@ use std::collections::BTreeMap;
 pub struct SearchFilters {
     file_glob: Option<GlobMatcher>,
     name_re: Option<Regex>,
-    type_pat: Option<String>,
+    type_patterns: Option<Vec<String>>,
     content_re: Option<Regex>,
     page_content_re: Option<Regex>,
     have_relations: Vec<String>,
@@ -49,20 +49,29 @@ impl SearchFilters {
 
         let file_glob = file.map(|p| compile_glob(p)).transpose()?;
         let name_re = name_regex.map(|r| compile_regex(r)).transpose()?;
-        // Validate element type if provided
-        let type_pat = if let Some(t) = typ {
-            let lowercase = t.to_lowercase();
-            if !element::is_valid_element_type(&lowercase) {
-                return Err(ReqvireError::ProcessError(format!(
-                    "Invalid element type '{}'. Valid types: {}",
-                    t,
-                    element::element_types_help()
-                )));
+
+        // Parse and validate comma-separated element types
+        let type_patterns = if let Some(t) = typ {
+            let types: Vec<String> = t.split(',')
+                .map(|s| s.trim().to_lowercase())
+                .collect();
+
+            // Validate each type
+            for typ in &types {
+                if !element::is_valid_element_type(typ) {
+                    return Err(ReqvireError::ProcessError(format!(
+                        "Invalid element type '{}'. Valid types: {}",
+                        typ,
+                        element::element_types_help()
+                    )));
+                }
             }
-            Some(lowercase)
+
+            Some(types)
         } else {
             None
         };
+
         let content_re = content.map(|r| compile_regex(r)).transpose()?;
         let page_content_re = page_content.map(|r| compile_regex(r)).transpose()?;
         let attachment_glob = attachment.map(|p| compile_glob(p)).transpose()?;
@@ -107,7 +116,7 @@ impl SearchFilters {
         Ok(SearchFilters {
             file_glob,
             name_re,
-            type_pat,
+            type_patterns,
             content_re,
             page_content_re,
             have_relations,
@@ -133,25 +142,34 @@ impl SearchFilters {
             }
         }
 
-        // Type filter
-        if let Some(tp) = &self.type_pat {
-            // Handle "other-TYPENAME" pattern for custom types
-            if tp.starts_with("other-") {
-                // Extract the custom type name after "other-"
-                let custom_type_name = &tp[6..];
-                match &elem.element_type {
-                    element::ElementType::Other(actual_name) => {
-                        if actual_name.to_lowercase() != custom_type_name {
-                            return false;
+        // Type filter - element must match ANY of the specified types (OR logic)
+        if let Some(types) = &self.type_patterns {
+            let mut matches_any = false;
+
+            for tp in types {
+                let matches = if tp.starts_with("other-") {
+                    // Handle "other-TYPENAME" pattern for custom types
+                    // Strip "other-" prefix and compare with stored custom type name
+                    let custom_type_name = &tp[6..];
+                    match &elem.element_type {
+                        element::ElementType::Other(actual_name) => {
+                            actual_name.to_lowercase() == custom_type_name
                         }
+                        _ => false, // Not an Other type
                     }
-                    _ => return false, // Not an Other type
+                } else {
+                    let filter_type = element::ElementType::from_metadata(tp);
+                    &elem.element_type == &filter_type
+                };
+
+                if matches {
+                    matches_any = true;
+                    break;
                 }
-            } else {
-                let filter_type = element::ElementType::from_metadata(tp);
-                if &elem.element_type != &filter_type {
-                    return false;
-                }
+            }
+
+            if !matches_any {
+                return false;
             }
         }
 

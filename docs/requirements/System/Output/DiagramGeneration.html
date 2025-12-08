@@ -744,15 +744,9 @@ blockquote {
   end
   subgraph 7abe7cd3649051be["📁 requirements/System/Output"]
     subgraph 6528ddfab3564226["📄 DiagramGeneration.md"]
-      970dcd3b04788a43["Complete Model Structure Visualization"];
-      class 970dcd3b04788a43 userRequirement;
-      click 970dcd3b04788a43 "DiagramGeneration.html#complete-model-structure-visualization";
       1b3214523418b124["Diagram Generation"];
       class 1b3214523418b124 systemRequirement;
       click 1b3214523418b124 "DiagramGeneration.html#diagram-generation";
-      8dec214273bac76c["Diagram Removal"];
-      class 8dec214273bac76c systemRequirement;
-      click 8dec214273bac76c "DiagramGeneration.html#diagram-removal";
       86f3db4870a89b17["File Diagram Attachment Display"];
       class 86f3db4870a89b17 systemRequirement;
       click 86f3db4870a89b17 "DiagramGeneration.html#file-diagram-attachment-display";
@@ -762,12 +756,6 @@ blockquote {
       f6eaca3198d3e7b1["Interactive Mermaid Diagrams"];
       class f6eaca3198d3e7b1 userRequirement;
       click f6eaca3198d3e7b1 "DiagramGeneration.html#interactive-mermaid-diagrams";
-      5dcc81aca3456920["Model Visualization and Exploration"];
-      class 5dcc81aca3456920 userRequirement;
-      click 5dcc81aca3456920 "DiagramGeneration.html#model-visualization-and-exploration";
-      df6f500f1d9527ef["Remove Generated Diagrams"];
-      class df6f500f1d9527ef userRequirement;
-      click df6f500f1d9527ef "DiagramGeneration.html#remove-generated-diagrams";
       93754c5773c5b736["SysML-Compatible Relationship Rendering"];
       class 93754c5773c5b736 systemRequirement;
       click 93754c5773c5b736 "DiagramGeneration.html#sysml-compatible-relationship-rendering";
@@ -795,9 +783,6 @@ blockquote {
       c609877033de6df3["File Diagram Attachment Test"];
       class c609877033de6df3 verification;
       click c609877033de6df3 "Verifications/DiagramVerifications.html#file-diagram-attachment-test";
-      8140719061af8939["Remove Generated Diagrams Verification"];
-      class 8140719061af8939 verification;
-      click 8140719061af8939 "Verifications/DiagramVerifications.html#remove-generated-diagrams-verification";
       f31b44e8e814dc14["Visualize Model Relationships Verification"];
       class f31b44e8e814dc14 verification;
       click f31b44e8e814dc14 "Verifications/DiagramVerifications.html#visualize-model-relationships-verification";
@@ -824,8 +809,6 @@ blockquote {
   1b3214523418b124 -.->|verifiedBy| 1c648d54b43d758;
   1b3214523418b124 -.->|verifiedBy| 598958f484d969e5;
   1b3214523418b124 -.->|verifiedBy| f31b44e8e814dc14;
-  8dec214273bac76c -->|satisfiedBy| d4166762363eb31d;
-  8dec214273bac76c -.->|verifiedBy| 8140719061af8939;
   86f3db4870a89b17 -->|satisfiedBy| d4166762363eb31d;
   86f3db4870a89b17 -.->|verifiedBy| c609877033de6df3;
   25bf5cc42f41e395["cli.rs"];
@@ -835,7 +818,6 @@ blockquote {
   abc00b61496fe297 -->|satisfiedBy| d4166762363eb31d;
   f6eaca3198d3e7b1 -.->|deriveReqT| 1b3214523418b124;
   f6eaca3198d3e7b1 -->|satisfiedBy| a6174ccb6aaaa99;
-  df6f500f1d9527ef -.->|deriveReqT| 8dec214273bac76c;
   93754c5773c5b736 -->|satisfiedBy| d4166762363eb31d;
   93754c5773c5b736 -->|satisfiedBy| e7f91b4f488c142f;
   a22063662f365a7b -.->|verifiedBy| 5f81a4c479783a7;
@@ -853,10 +835,27 @@ blockquote {
   click f9055f9f44c18e4a "../../../tests/test-trace-no-cycles/test.sh";
   12126bef619186a2 -->|satisfiedBy| f9055f9f44c18e4a;
 </div>
-<h3 id="complete-model-structure-visualization">Complete Model Structure Visualization</h3>
-<p>The system shall provide visualization of the complete model structure showing an element-centric view with nested relations.</p>
+<h3 id="interactive-mermaid-diagrams">Interactive Mermaid Diagrams</h3>
+<p>The system shall produce visual representations of relationships within the System model in the form of Mermaid diagrams following clearly defined specifications, enabling users to explore relations and understand dependencies and their impact.</p>
 <h4>Details</h4>
-<p>The visualization shall:</p>
+<p><strong>Diagram Generation Approach:</strong>
+Diagram generation follows a file-based approach:</p>
+<ul>
+<li>One diagram is generated per specification file</li>
+<li>The diagram shows all elements in the file and their relationships</li>
+<li>External related resources are displayed as linked boxes to the actual resource</li>
+</ul>
+<p><strong>Diagram Styling:</strong>
+The system shall implement diagram styling including:</p>
+<ul>
+<li>Containment structure with nested subgraphs for physical organization</li>
+<li>Element type-specific CSS classes for visual differentiation</li>
+<li>Relation-specific line styles and colors</li>
+<li>Interactive highlighting on hover</li>
+<li>Consistent background and border styling</li>
+</ul>
+<p><strong>Model Structure Visualization:</strong>
+The system shall provide visualization of the complete model structure showing an element-centric view with nested relations:</p>
 <ul>
 <li>Display elements with their properties (identifier, name, type, file location)</li>
 <li>Show relations nested inside elements with full target details</li>
@@ -865,34 +864,17 @@ blockquote {
 <li>Provide metadata about total elements and relations</li>
 <li>Use consistent visual styling with mermaid diagrams showing hash-based node identifiers</li>
 </ul>
+<p><strong>Model Navigation and Filtering:</strong>
+Users shall be able to generate and view model structure diagrams from any starting point:</p>
+<ul>
+<li>Default view shows root requirements (no hierarchical parent)</li>
+<li>Filter from specific element using –from flag</li>
+<li>Generate complete model structure with nested relations showing element details recursively</li>
+<li>Mermaid diagrams display all nested relations recursively</li>
+</ul>
+<p><strong>Diagram Output:</strong>
+The system shall generate Mermaid diagrams embedded in markdown format for visual representation of the model structure.</p>
 <p>The visualization helps users understand the model’s logical structure, navigate relationships between elements, and explore the model from any starting point.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="Reporting.html#model-reports">Model Reports</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#generate-diagrams">Generate Diagrams</a></li>
-</ul>
-<hr />
-<h3 id="interactive-mermaid-diagrams">Interactive Mermaid Diagrams</h3>
-<p>The system shall produce visual representations of relationships within the System model in the form of Mermaid diagrams following clearly defined specifications, enabling users to explore relations and understand dependencies and their impact.</p>
-<h4>Details</h4>
-<p>Diagram generation follows a file-based approach:</p>
-<ul>
-<li>One diagram is generated per specification file</li>
-<li>The diagram shows all elements in the file and their relationships</li>
-<li>External related resources are displayed as linked boxes to the actual resource</li>
-</ul>
-<p>The system shall implement diagram styling including:</p>
-<ul>
-<li>Containment structure with nested subgraphs for physical organization</li>
-<li>Element type-specific CSS classes for visual differentiation</li>
-<li>Relation-specific line styles and colors</li>
-<li>Interactive highlighting on hover</li>
-<li>Consistent background and border styling</li>
-</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
@@ -909,18 +891,16 @@ blockquote {
 <p>When requested, the system shall automatically generate diagrams and save them to the required locations of the model.</p>
 <h4>Details</h4>
 <p><strong>Auto-Generated Diagram Identification:</strong>
-The system shall embed a unique identification marker “REQVIRE-AUTOGENERATED-DIAGRAM” as a comment within all auto-generated mermaid diagrams to distinguish them from user-created diagrams for reliable filtering and removal operations.</p>
+The system shall embed a unique identification marker “REQVIRE-AUTOGENERATED-DIAGRAM” as a comment within all auto-generated mermaid diagrams to distinguish them from user-created diagrams.</p>
 <p>The marker must be:</p>
 <ul>
 <li>Embedded as a mermaid comment line using the <code>%% REQVIRE-AUTOGENERATED-DIAGRAM</code> format</li>
 <li>Present in every auto-generated diagram</li>
-<li>Used by diagram removal functionality to identify which diagrams to remove</li>
 <li>Not present in user-created custom diagrams</li>
 </ul>
 <p>This enables the system to:</p>
 <ul>
 <li>Reliably identify auto-generated diagrams regardless of their location in documents</li>
-<li>Preserve user-created diagrams during removal operations</li>
 <li>Support mixed documents containing both auto-generated and custom diagrams</li>
 </ul>
 <p><strong>Diagram Relation Filtering:</strong>
@@ -1029,52 +1009,6 @@ The system shall implement relation filtering in diagram generation to render on
 <li>derivedFrom: <a href="#diagram-generation">Diagram Generation</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
 <li>satisfiedBy: <a href="Specifications.html#sysml-rendering-specification">SysML Rendering Specification</a></li>
-</ul>
-<hr />
-<h3 id="model-visualization-and-exploration">Model Visualization and Exploration</h3>
-<p>Users shall be able to generate and view model structure diagrams from any starting point of the model.</p>
-<h4>Details</h4>
-<ul>
-<li>Generate complete model structure with nested relations showing element details recursively</li>
-<li>Default view shows root requirements (no hierarchical parent)</li>
-<li>Filter from specific element using –from flag</li>
-<li>View both JSON and markdown output formats</li>
-<li>Nested structure shows relations with full target details</li>
-<li>Mermaid diagrams display all nested relations recursively</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="Reporting.html#model-reports">Model Reports</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#generate-diagrams">Generate Diagrams</a></li>
-</ul>
-<hr />
-<h3 id="remove-generated-diagrams">Remove Generated Diagrams</h3>
-<p>The system shall provide functionality to remove all generated Mermaid diagrams from the model, allowing users to clean up generated artifacts when needed.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derive: <a href="#diagram-removal">Diagram Removal</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#generate-diagrams">Generate Diagrams</a></li>
-</ul>
-<hr />
-<h3 id="diagram-removal">Diagram Removal</h3>
-<p>When requested, the system shall remove all generated diagrams from the model by locating and deleting all mermaid code blocks that were automatically generated.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#remove-generated-diagrams">Remove Generated Diagrams</a></li>
-<li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
-<li>verifiedBy: <a href="Verifications/DiagramVerifications.html#remove-generated-diagrams-verification">Remove Generated Diagrams Verification</a></li>
 </ul>
 <hr />
 <h3 id="trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</h3>

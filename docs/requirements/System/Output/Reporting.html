@@ -765,23 +765,23 @@ blockquote {
       click 2e90d80d5c54d556 "Behaviors.html#verification-coverage-philosophy-behavior";
     end
     subgraph 6528ddfab3564226["📄 DiagramGeneration.md"]
-      970dcd3b04788a43["Complete Model Structure Visualization"];
-      class 970dcd3b04788a43 userRequirement;
-      click 970dcd3b04788a43 "DiagramGeneration.html#complete-model-structure-visualization";
       f6eaca3198d3e7b1["Interactive Mermaid Diagrams"];
       class f6eaca3198d3e7b1 userRequirement;
       click f6eaca3198d3e7b1 "DiagramGeneration.html#interactive-mermaid-diagrams";
-      5dcc81aca3456920["Model Visualization and Exploration"];
-      class 5dcc81aca3456920 userRequirement;
-      click 5dcc81aca3456920 "DiagramGeneration.html#model-visualization-and-exploration";
     end
     subgraph b87937d74ce00328["📄 Reporting.md"]
       5998aab477c0f267["Collect Content from Requirement Chain"];
       class 5998aab477c0f267 systemRequirement;
       click 5998aab477c0f267 "Reporting.html#collect-content-from-requirement-chain";
+      cb00259ccd5c87ca["Comma-Separated Type Filter Parsing"];
+      class cb00259ccd5c87ca systemRequirement;
+      click cb00259ccd5c87ca "Reporting.html#comma-separated-type-filter-parsing";
       e22e8f9f71fadde8["Containment View Report<br/>📎 ContainmentView.md"];
       class e22e8f9f71fadde8 userRequirement;
       click e22e8f9f71fadde8 "Reporting.html#containment-view-report";
+      815eb67448eaa51e["Flexible Search Type Filtering"];
+      class 815eb67448eaa51e userRequirement;
+      click 815eb67448eaa51e "Reporting.html#flexible-search-type-filtering";
       ee8cab95309925d6["Forward-Only Relation Traversal"];
       class ee8cab95309925d6 systemRequirement;
       click ee8cab95309925d6 "Reporting.html#forward-only-relation-traversal";
@@ -857,6 +857,9 @@ blockquote {
       8a1991dbeeaca9f2["Model Command Verification"];
       class 8a1991dbeeaca9f2 verification;
       click 8a1991dbeeaca9f2 "Verifications/ReportingVerifications.html#model-command-verification";
+      acf0d1712055db19["Multi-Type Search Filter Test"];
+      class acf0d1712055db19 verification;
+      click acf0d1712055db19 "Verifications/ReportingVerifications.html#multi-type-search-filter-test";
       f290c17c914f75f7["Resources Report Verification"];
       class f290c17c914f75f7 verification;
       click f290c17c914f75f7 "Verifications/ReportingVerifications.html#resources-report-verification";
@@ -902,11 +905,21 @@ blockquote {
   5998aab477c0f267 -->|satisfiedBy| 4ada1b79f43485ee;
   5998aab477c0f267 -->|satisfiedBy| fdbc1efd9f868583;
   5998aab477c0f267 -->|satisfiedBy| 3cee3fc7d5320e45;
+  25bf5cc42f41e395["cli.rs"];
+  class 25bf5cc42f41e395 default;
+  click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
+  cb00259ccd5c87ca -->|satisfiedBy| 25bf5cc42f41e395;
+  399c3564599787ff["search.rs"];
+  class 399c3564599787ff default;
+  click 399c3564599787ff "../../../core/src/search.rs";
+  cb00259ccd5c87ca -->|satisfiedBy| 399c3564599787ff;
+  cb00259ccd5c87ca -.->|verifiedBy| acf0d1712055db19;
   4a8772cb0c75593a["containment.rs"];
   class 4a8772cb0c75593a default;
   click 4a8772cb0c75593a "../../../core/src/containment.rs";
   e22e8f9f71fadde8 -->|satisfiedBy| 4a8772cb0c75593a;
   e22e8f9f71fadde8 -.->|verifiedBy| 2f87bbc2d075a2e1;
+  815eb67448eaa51e -.->|deriveReqT| cb00259ccd5c87ca;
   d4166762363eb31d["diagrams.rs"];
   class d4166762363eb31d default;
   click d4166762363eb31d "../../../core/src/diagrams.rs";
@@ -917,9 +930,7 @@ blockquote {
   c3d401a0917ac0be -.->|deriveReqT| 3711a5d9a2149861;
   c3d401a0917ac0be -->|satisfiedBy| d4166762363eb31d;
   c3d401a0917ac0be -.->|verifiedBy| 8a1991dbeeaca9f2;
-  61bf4405db9ec1d1 -.->|deriveReqT| 970dcd3b04788a43;
   61bf4405db9ec1d1 -.->|deriveReqT| f6eaca3198d3e7b1;
-  61bf4405db9ec1d1 -.->|deriveReqT| 5dcc81aca3456920;
   61bf4405db9ec1d1 -.->|deriveReqT| 5998aab477c0f267;
   61bf4405db9ec1d1 -.->|deriveReqT| c2dcd8bee857c1c9;
   61bf4405db9ec1d1 -.->|deriveReqT| 7c883e831e2c29b4;
@@ -947,13 +958,11 @@ blockquote {
   19b49743a7f7aab8 -->|satisfiedBy| b2113c1b9405a723;
   19b49743a7f7aab8 -->|satisfiedBy| 9118ad34dc8898e1;
   19b49743a7f7aab8 -.->|verifiedBy| 60c8d3bf75db2afa;
+  e2185df67eff8500 -.->|deriveReqT| 815eb67448eaa51e;
   20029702488622b["filters.rs"];
   class 20029702488622b default;
   click 20029702488622b "../../../core/src/filters.rs";
   e2185df67eff8500 -->|satisfiedBy| 20029702488622b;
-  399c3564599787ff["search.rs"];
-  class 399c3564599787ff default;
-  click 399c3564599787ff "../../../core/src/search.rs";
   e2185df67eff8500 -->|satisfiedBy| 399c3564599787ff;
   e2185df67eff8500 -.->|verifiedBy| d9207a146d02d394;
   3711a5d9a2149861 -->|satisfiedBy| b2113c1b9405a723;
@@ -980,6 +989,10 @@ blockquote {
   163433f7f6ed0c4 -.->|deriveReqT| b0ec6effe7112413;
   163433f7f6ed0c4 -.->|deriveReqT| 2ab44d6a5fa23e57;
   163433f7f6ed0c4 -.->|deriveReqT| a2df7f6845e524c2;
+  80aab4c106444560["test.sh"];
+  class 80aab4c106444560 default;
+  click 80aab4c106444560 "../../../tests/test-multi-type-search/test.sh";
+  acf0d1712055db19 -->|satisfiedBy| 80aab4c106444560;
   ea79f4f1551d1df1["test.sh"];
   class ea79f4f1551d1df1 default;
   click ea79f4f1551d1df1 "../../../tests/test-containment-view/test.sh";
@@ -990,9 +1003,6 @@ blockquote {
   8a1991dbeeaca9f2 -->|satisfiedBy| df92bf508f2f7295;
   f6eaca3198d3e7b1 -.->|deriveReqT| 1b3214523418b124;
   f6eaca3198d3e7b1 -->|satisfiedBy| a6174ccb6aaaa99;
-  25bf5cc42f41e395["cli.rs"];
-  class 25bf5cc42f41e395 default;
-  click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
   d2df74b41b33eab7 -->|satisfiedBy| 25bf5cc42f41e395;
   dd5f821c42d5decf -->|satisfiedBy| 25bf5cc42f41e395;
   dd5f821c42d5decf -.->|verifiedBy| f290c17c914f75f7;
@@ -1060,9 +1070,7 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="DiagramGeneration.html#complete-model-structure-visualization">Complete Model Structure Visualization</a></li>
 <li>derive: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
-<li>derive: <a href="DiagramGeneration.html#model-visualization-and-exploration">Model Visualization and Exploration</a></li>
 <li>derive: <a href="#collect-content-from-requirement-chain">Collect Content from Requirement Chain</a></li>
 <li>derive: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
 <li>derive: <a href="#provide-validation-reports">Provide Validation Reports</a></li>
@@ -1250,10 +1258,60 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#flexible-search-type-filtering">Flexible Search Type Filtering</a></li>
 <li>derivedFrom: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
 <li>satisfiedBy: <a href="../../../core/src/filters.rs">filters.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/search.rs">search.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#search-command-tests">Search Command Tests</a></li>
+</ul>
+<hr />
+<h3 id="flexible-search-type-filtering">Flexible Search Type Filtering</h3>
+<p>The system shall support filtering search results by multiple element types simultaneously to enable flexible querying across type categories.</p>
+<h4>Details</h4>
+<p>Users shall be able to specify multiple element types in a single search operation using comma-separated values (e.g., <code>requirement,test-verification,behavior</code>).</p>
+<p>This capability enables:</p>
+<ul>
+<li>Searching across related type categories (all requirement types, all verification types)</li>
+<li>Building complex queries without multiple search invocations</li>
+<li>Improved workflow efficiency for model analysis and reporting</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</a></li>
+<li>derivedFrom: <a href="#search-report-generator">Search Report Generator</a></li>
+</ul>
+<hr />
+<h3 id="comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</h3>
+<p>The system shall parse comma-separated element type values in the <code>--filter-type</code> flag, validating each type and applying OR logic to match elements.</p>
+<h4>Details</h4>
+<p>When parsing the <code>--filter-type</code> argument:</p>
+<ul>
+<li>Split input by comma delimiter</li>
+<li>Trim whitespace from each type value</li>
+<li>Convert to lowercase for case-insensitive matching</li>
+<li>Validate each type against the valid element types list</li>
+<li>Return clear error messages for invalid types</li>
+</ul>
+<p>When filtering elements:</p>
+<ul>
+<li>Element matches if it matches ANY of the specified types (OR logic)</li>
+<li>Support for custom types using <code>other-TYPENAME</code> syntax</li>
+<li>Maintain backward compatibility with single-type queries</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#flexible-search-type-filtering">Flexible Search Type Filtering</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/search.rs">search.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#multi-type-search-filter-test">Multi-Type Search Filter Test</a></li>
 </ul>
 <hr />
 <h3 id="provide-validation-reports">Provide Validation Reports</h3>

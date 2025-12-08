@@ -546,6 +546,37 @@ Comprehensive test verifying model command generates model-centric nested output
   * verify: [Model Diagram Output Formats](../Reporting.md#model-diagram-output-formats)
 ---
 
+### Multi-Type Search Filter Test
+
+This test verifies that the search command correctly filters by multiple element types using comma-separated values.
+
+#### Details
+
+##### Test Steps
+1. Search with single type (baseline - existing behavior)
+2. Search with two comma-separated types
+3. Search with three or more types
+4. Search with custom type in list
+5. Search with invalid type in list (expect error)
+6. Search with multiple types combined with other filters (name, file, etc.)
+7. Verify JSON output with multiple types
+
+##### Expected Results
+- Single type queries work as before (backward compatibility)
+- Multi-type queries return elements matching ANY specified type
+- Invalid types produce clear error messages
+- Comma-separated parsing handles whitespace correctly
+- Combined filters work correctly
+- JSON output is valid
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Comma-Separated Type Filter Parsing](../Reporting.md#comma-separated-type-filter-parsing)
+  * satisfiedBy: [test.sh](../../../../tests/test-multi-type-search/test.sh)
+---
+
 ### Resources Report Verification
 
 This test verifies that the resources command correctly generates reports showing all files referenced by the model through relations and attachments.
@@ -1074,3 +1105,4 @@ This test verifies that the --from-folder option correctly generates relative li
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
   * verify: [CLI Traces Command](../../../Interfaces/CLI.md#cli-traces-command)
 ---
+

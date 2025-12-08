@@ -17,40 +17,35 @@ Perform comprehensive analysis of the current Reqvire model.
 
 ## Steps
 
-1. **Remove diagrams to save tokens:**
-   ```bash
-   reqvire remove-diagrams
-   ```
-
-2. **Run validation:**
+1. **Run validation:**
    ```bash
    reqvire validate --json > /tmp/validation.json
    ```
 
-3. **Generate model search:**
+2. **Generate model search:**
    ```bash
    reqvire search --short --json > /tmp/search.json
    ```
 
    Use `--short` to get model structure without full content.
 
-4. **Check coverage:**
+3. **Check coverage:**
    ```bash
    reqvire coverage --json > /tmp/coverage.json
    ```
 
-5. **Run lint checks:**
+4. **Run lint checks:**
    ```bash
    reqvire lint --json > /tmp/lint.json
    ```
 
-6. **Analyze the results:**
+5. **Analyze the results:**
    - Review validation errors and warnings
    - Identify unverified requirements from coverage report
    - Check for model quality issues from lint report
    - Calculate coverage percentages and statistics
 
-7. **Provide recommendations:**
+6. **Provide recommendations:**
    - List specific issues found with file locations
    - Suggest improvements prioritized by impact
    - Recommend commands to fix issues (e.g., `reqvire lint --fix`)
@@ -66,6 +61,5 @@ Present findings in clear sections:
 
 ## Notes
 
-- Always run `remove-diagrams` first to save context tokens
 - Use `/tmp` for JSON outputs
 - Focus on actionable recommendations

@@ -1,5 +1,31 @@
 # Elements
 
+### Comma-Separated Type Filter Parsing
+
+The system shall parse comma-separated element type values in the `--filter-type` flag, validating each type and applying OR logic to match elements.
+
+#### Details
+When parsing the `--filter-type` argument:
+- Split input by comma delimiter
+- Trim whitespace from each type value
+- Convert to lowercase for case-insensitive matching
+- Validate each type against the valid element types list
+- Return clear error messages for invalid types
+
+When filtering elements:
+- Element matches if it matches ANY of the specified types (OR logic)
+- Support for custom types using `other-TYPENAME` syntax
+- Maintain backward compatibility with single-type queries
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Flexible Search Type Filtering](#flexible-search-type-filtering)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+---
+
 ### Model Reports
 
 When requested the system shall provide human readable and machine readable System model reports.
@@ -32,9 +58,7 @@ This requirement applies to all report operations, including:
   * type: user-requirement
 
 #### Relations
-  * derive: [Complete Model Structure Visualization](DiagramGeneration.md#complete-model-structure-visualization)
   * derive: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
-  * derive: [Model Visualization and Exploration](DiagramGeneration.md#model-visualization-and-exploration)
   * derive: [Collect Content from Requirement Chain](#collect-content-from-requirement-chain)
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
   * derive: [Provide Validation Reports](#provide-validation-reports)
@@ -56,6 +80,9 @@ The system shall collect and consolidate all content from a requirement element 
 The system shall define:
 - Content collection rules for elements and attachments
 - Output format specifications for text and JSON modes
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
@@ -121,6 +148,9 @@ System shall support markdown and JSON output formats.
 - Both formats shall represent the same filtered or complete model data
 - Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)
 
+#### Metadata
+  * type: requirement
+
 #### Relations
   * derive: [Forward-Only Relation Traversal](#forward-only-relation-traversal)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
@@ -139,6 +169,9 @@ When filtering by root element, system shall traverse only forward relations dow
 - Shall NOT traverse backward (no bidirectional traversal)
 - Unfiltered diagrams (no --from) shall show complete model with all elements
 
+#### Metadata
+  * type: requirement
+
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
@@ -148,6 +181,9 @@ When filtering by root element, system shall traverse only forward relations dow
 ### Reverse Relation Traversal
 
 The system shall support reverse relation traversal for model views, following defined rules in Reverse Relation Traversal Behavior.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
@@ -159,6 +195,9 @@ The system shall support reverse relation traversal for model views, following d
 ### Start Element Type Filtering
 
 The system shall support filtering starting elements by type for model traversal, following defined rules in Start Element Type Filter Behavior.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
@@ -186,6 +225,9 @@ The system shall define custom element type tracking:
 - Identify types not in standard categories
 - Report custom types with counts
 
+#### Metadata
+  * type: requirement
+
 #### Attachments
   * [SearchFiltering.md](DesignDocuments/SearchFiltering.md)
   * [Supported Element Types Specification](../Core/Specifications.md#supported-element-types-specification)
@@ -197,6 +239,25 @@ The system shall define custom element type tracking:
   * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
   * verifiedBy: [Search Command Tests](Verifications/ReportingVerifications.md#search-command-tests)
+---
+
+### Flexible Search Type Filtering
+
+The system shall support filtering search results by multiple element types simultaneously to enable flexible querying across type categories.
+
+#### Details
+Users shall be able to specify multiple element types in a single search operation using comma-separated values (e.g., `requirement,test-verification,behavior`).
+
+This capability enables:
+- Searching across related type categories (all requirement types, all verification types)
+- Building complex queries without multiple search invocations
+- Improved workflow efficiency for model analysis and reporting
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Search Report Generator](#search-report-generator)
 ---
 
 ### Provide Validation Reports
@@ -219,6 +280,9 @@ Validation shall be performed automatically when any command requires the parsed
 ### Validation Report Generator
 
 The system shall implement a validation report generator that compiles and formats validation results from all validators, providing a unified view of model quality with categorized issues, remediation suggestions, and compliance metrics.
+
+#### Metadata
+  * type: requirement
 
 #### Relations
   * derive: [Validation Error Handling](../Core/Validation.md#validation-error-handling)
@@ -317,6 +381,9 @@ The system shall provide upward traceability visualization from verifications to
 
 The system shall generate a TraceFlow view page showing the verification traceability flow using an interactive D3.js Sankey diagram visualization. The view displays how requirements flow from user requirements through system requirements to verifications.
 
+#### Metadata
+  * type: requirement
+
 #### Attachments
   * [TraceFlowView.md](DesignDocuments/TraceFlowView.md)
 
@@ -338,3 +405,4 @@ When tracing structural changes, the system shall analyze the System model and d
   * derivedFrom: [Trace Changes in System Model](../../UserStories.md#trace-changes-in-system-model)
   * verifiedBy: [Structural Change Reports Verification](../Processing/Verifications/ChangeImpactVerifications.md#structural-change-reports-verification)
 ---
+

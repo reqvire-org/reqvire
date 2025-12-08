@@ -729,14 +729,14 @@ blockquote {
 <h2 id="summary">Summary</h2>
 <h3 id="leaf-requirements">Leaf Requirements</h3>
 <ul>
-<li><strong>Total Leaf Requirements:</strong> 100</li>
-<li><strong>Verified Leaf Requirements:</strong> 70 (70.0%)</li>
-<li><strong>Unverified Leaf Requirements:</strong> 30</li>
+<li><strong>Total Leaf Requirements:</strong> 97</li>
+<li><strong>Verified Leaf Requirements:</strong> 69 (71.1%)</li>
+<li><strong>Unverified Leaf Requirements:</strong> 28</li>
 </ul>
 <h3 id="test-verifications">Test Verifications</h3>
 <ul>
-<li><strong>Total Test Verifications:</strong> 90</li>
-<li><strong>Satisfied Test Verifications:</strong> 80 (88.9%)</li>
+<li><strong>Total Test Verifications:</strong> 91</li>
+<li><strong>Satisfied Test Verifications:</strong> 81 (89.0%)</li>
 <li><strong>Unsatisfied Test Verifications:</strong> 10</li>
 </ul>
 <h3 id="orphaned-verifications">Orphaned Verifications</h3>
@@ -746,8 +746,8 @@ blockquote {
 </ul>
 <h3 id="verification-types">Verification Types</h3>
 <ul>
-<li>Test: 90</li>
-<li>Analysis: 1</li>
+<li>Test: 91</li>
+<li>Analysis: 0</li>
 <li>Inspection: 0</li>
 <li>Demonstration: 0</li>
 </ul>
@@ -1349,15 +1349,6 @@ blockquote {
 </ul>
 <h3><a href="requirements/System/Output/DiagramGeneration.html">requirements/System/Output/DiagramGeneration.html</a></h3>
 <ul>
-<li>✅ <strong><a href="requirements/System/Output/DiagramGeneration.html#diagram-removal">Diagram Removal</a></strong>
-<ul>
-<li>Verified by:
-<ul>
-<li><a href="requirements/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification">requirements/System/Output/Verifications/DiagramVerifications.md#remove-generated-diagrams-verification</a></li>
-</ul>
-</li>
-</ul>
-</li>
 <li>✅ <strong><a href="requirements/System/Output/DiagramGeneration.html#file-diagram-attachment-display">File Diagram Attachment Display</a></strong>
 <ul>
 <li>Verified by:
@@ -1380,6 +1371,15 @@ blockquote {
 </ul>
 <h3><a href="requirements/System/Output/Reporting.html">requirements/System/Output/Reporting.html</a></h3>
 <ul>
+<li>✅ <strong><a href="requirements/System/Output/Reporting.html#comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#multi-type-search-filter-test">requirements/System/Output/Verifications/ReportingVerifications.md#multi-type-search-filter-test</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li>✅ <strong><a href="requirements/System/Output/Reporting.html#containment-view-report">Containment View Report</a></strong>
 <ul>
 <li>Verified by:
@@ -1403,15 +1403,6 @@ blockquote {
 <li>Verified by:
 <ul>
 <li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#reverse-model-traversal-test">requirements/System/Output/Verifications/ReportingVerifications.md#reverse-model-traversal-test</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li>✅ <strong><a href="requirements/System/Output/Reporting.html#search-report-generator">Search Report Generator</a></strong>
-<ul>
-<li>Verified by:
-<ul>
-<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#search-command-tests">requirements/System/Output/Verifications/ReportingVerifications.md#search-command-tests</a></li>
 </ul>
 </li>
 </ul>
@@ -1494,9 +1485,7 @@ blockquote {
 </ul>
 <h3><a href="requirements/System/Output/DiagramGeneration.html">requirements/System/Output/DiagramGeneration.html</a></h3>
 <ul>
-<li>❌ <strong><a href="requirements/System/Output/DiagramGeneration.html#complete-model-structure-visualization">Complete Model Structure Visualization</a></strong></li>
 <li>❌ <strong><a href="requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</a></strong></li>
-<li>❌ <strong><a href="requirements/System/Output/DiagramGeneration.html#model-visualization-and-exploration">Model Visualization and Exploration</a></strong></li>
 <li>❌ <strong><a href="requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</a></strong></li>
 </ul>
 <h3><a href="requirements/System/Output/Reporting.html">requirements/System/Output/Reporting.html</a></h3>
@@ -2148,6 +2137,15 @@ blockquote {
 <li>Satisfied by:
 <ul>
 <li><a href="tests/test-model-command/test.sh">tests/test-model-command/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/System/Output/Verifications/ReportingVerifications.html#multi-type-search-filter-test">Multi-Type Search Filter Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-multi-type-search/test.sh">tests/test-multi-type-search/test.sh</a></li>
 </ul>
 </li>
 </ul>

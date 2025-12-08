@@ -2133,11 +2133,6 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Output/Verifications/DiagramVerifications.html#file-diagram-attachment-test"
                         },
                         {
-                          "name": "Remove Generated Diagrams Verification",
-                          "type": "verification",
-                          "link": "requirements/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification"
-                        },
-                        {
                           "name": "Visualize Model Relationships Verification",
                           "type": "verification",
                           "link": "requirements/System/Output/Verifications/DiagramVerifications.html#visualize-model-relationships-verification"
@@ -2193,6 +2188,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Model Command Verification",
                           "type": "verification",
                           "link": "requirements/System/Output/Verifications/ReportingVerifications.html#model-command-verification"
+                        },
+                        {
+                          "name": "Multi-Type Search Filter Test",
+                          "type": "verification",
+                          "link": "requirements/System/Output/Verifications/ReportingVerifications.html#multi-type-search-filter-test"
                         },
                         {
                           "name": "Resources Report Verification",
@@ -2290,19 +2290,9 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/System/Output/DiagramGeneration.html",
                   "children": [
                     {
-                      "name": "Complete Model Structure Visualization",
-                      "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#complete-model-structure-visualization"
-                    },
-                    {
                       "name": "Diagram Generation",
                       "type": "system-requirement",
                       "link": "requirements/System/Output/DiagramGeneration.html#diagram-generation"
-                    },
-                    {
-                      "name": "Diagram Removal",
-                      "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#diagram-removal"
                     },
                     {
                       "name": "File Diagram Attachment Display",
@@ -2318,16 +2308,6 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
                       "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
-                    },
-                    {
-                      "name": "Model Visualization and Exploration",
-                      "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#model-visualization-and-exploration"
-                    },
-                    {
-                      "name": "Remove Generated Diagrams",
-                      "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#remove-generated-diagrams"
                     },
                     {
                       "name": "SysML-Compatible Relationship Rendering",
@@ -2352,6 +2332,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Reporting.html#collect-content-from-requirement-chain"
                     },
                     {
+                      "name": "Comma-Separated Type Filter Parsing",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Output/Reporting.html#comma-separated-type-filter-parsing"
+                    },
+                    {
                       "name": "Containment View Report",
                       "type": "user-requirement",
                       "link": "requirements/System/Output/Reporting.html#containment-view-report",
@@ -2362,6 +2347,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Output/DesignDocuments/ContainmentView.md"
                         }
                       ]
+                    },
+                    {
+                      "name": "Flexible Search Type Filtering",
+                      "type": "user-requirement",
+                      "link": "requirements/System/Output/Reporting.html#flexible-search-type-filtering"
                     },
                     {
                       "name": "Forward-Only Relation Traversal",
@@ -4898,11 +4888,6 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Output/Verifications/DiagramVerifications.html#file-diagram-attachment-test"
                         },
                         {
-                          "name": "Remove Generated Diagrams Verification",
-                          "type": "verification",
-                          "link": "requirements/System/Output/Verifications/DiagramVerifications.html#remove-generated-diagrams-verification"
-                        },
-                        {
                           "name": "Visualize Model Relationships Verification",
                           "type": "verification",
                           "link": "requirements/System/Output/Verifications/DiagramVerifications.html#visualize-model-relationships-verification"
@@ -4958,6 +4943,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Model Command Verification",
                           "type": "verification",
                           "link": "requirements/System/Output/Verifications/ReportingVerifications.html#model-command-verification"
+                        },
+                        {
+                          "name": "Multi-Type Search Filter Test",
+                          "type": "verification",
+                          "link": "requirements/System/Output/Verifications/ReportingVerifications.html#multi-type-search-filter-test"
                         },
                         {
                           "name": "Resources Report Verification",
@@ -5055,19 +5045,9 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/System/Output/DiagramGeneration.html",
                   "children": [
                     {
-                      "name": "Complete Model Structure Visualization",
-                      "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#complete-model-structure-visualization"
-                    },
-                    {
                       "name": "Diagram Generation",
                       "type": "system-requirement",
                       "link": "requirements/System/Output/DiagramGeneration.html#diagram-generation"
-                    },
-                    {
-                      "name": "Diagram Removal",
-                      "type": "system-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#diagram-removal"
                     },
                     {
                       "name": "File Diagram Attachment Display",
@@ -5083,16 +5063,6 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
                       "link": "requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
-                    },
-                    {
-                      "name": "Model Visualization and Exploration",
-                      "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#model-visualization-and-exploration"
-                    },
-                    {
-                      "name": "Remove Generated Diagrams",
-                      "type": "user-requirement",
-                      "link": "requirements/System/Output/DiagramGeneration.html#remove-generated-diagrams"
                     },
                     {
                       "name": "SysML-Compatible Relationship Rendering",
@@ -5117,6 +5087,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/System/Output/Reporting.html#collect-content-from-requirement-chain"
                     },
                     {
+                      "name": "Comma-Separated Type Filter Parsing",
+                      "type": "system-requirement",
+                      "link": "requirements/System/Output/Reporting.html#comma-separated-type-filter-parsing"
+                    },
+                    {
                       "name": "Containment View Report",
                       "type": "user-requirement",
                       "link": "requirements/System/Output/Reporting.html#containment-view-report",
@@ -5127,6 +5102,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/System/Output/DesignDocuments/ContainmentView.md"
                         }
                       ]
+                    },
+                    {
+                      "name": "Flexible Search Type Filtering",
+                      "type": "user-requirement",
+                      "link": "requirements/System/Output/Reporting.html#flexible-search-type-filtering"
                     },
                     {
                       "name": "Forward-Only Relation Traversal",

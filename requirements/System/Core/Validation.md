@@ -97,8 +97,6 @@ Commands shall be categorized into two groups:
 - change-impact: Requires valid relations for impact analysis
 - traces: Needs validated relationships for traceability
 - generate-index: Requires complete element registry
-- generate-diagrams: Needs valid relations for visualization
-- remove-diagrams: Operates on validated markdown structure
 - coverage-report: Requires complete verification data
 
 **Commands operating on raw files:**

@@ -52,7 +52,7 @@ SEARCH OPTIONS:
       --short                   Output abbreviated format (one-line per element in text, omit fields in JSON)
       --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
       --filter-name <REGEX>     Only include elements whose name matches this regular expression
-      --filter-type <TYPE>      Only include elements of the given type. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
+      --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
       --filter-content <REGEX>  Only include elements whose content matches this regular expression
       --filter-page-content <REGEX> Only include elements whose parent file page content matches this regular expression
       --have-relations <LIST>   Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")

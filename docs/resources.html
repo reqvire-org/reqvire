@@ -764,6 +764,7 @@ blockquote {
 <li><a href="requirements/System/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</a> (via satisfiedBy)</li>
+<li><a href="requirements/System/Output/Reporting.html#comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="cli/src/config.rs">cli/src/config.rs</h3>
@@ -811,7 +812,6 @@ blockquote {
 <li><a href="requirements/Interfaces/CLI.html#cli-model-diagram-command">CLI Model Diagram Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface.html#diagram-attachment-display">Diagram Attachment Display</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Output/DiagramGeneration.html#diagram-generation">Diagram Generation</a> (via satisfiedBy)</li>
-<li><a href="requirements/System/Output/DiagramGeneration.html#diagram-removal">Diagram Removal</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Output/DiagramGeneration.html#file-diagram-attachment-display">File Diagram Attachment Display</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</a> (via satisfiedBy)</li>
@@ -981,6 +981,7 @@ blockquote {
 <hr />
 <h3 id="core/src/search.rs">core/src/search.rs</h3>
 <ul>
+<li><a href="requirements/System/Output/Reporting.html#comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</a> (via satisfiedBy)</li>
 <li><a href="requirements/System/Output/Reporting.html#search-report-generator">Search Report Generator</a> (via satisfiedBy)</li>
 </ul>
 <hr />
@@ -1207,6 +1208,11 @@ blockquote {
 <li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#model-command-verification">Model Command Verification</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-multi-type-search/test.sh">tests/test-multi-type-search/test.sh</h3>
+<ul>
+<li><a href="requirements/System/Output/Verifications/ReportingVerifications.html#multi-type-search-filter-test">Multi-Type Search Filter Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-parsing-functionality/test.sh">tests/test-parsing-functionality/test.sh</h3>
 <ul>
 <li><a href="requirements/System/Core/Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a> (via satisfiedBy)</li>
@@ -1316,7 +1322,7 @@ blockquote {
 <hr />
 <h2 id="summary">Summary</h2>
 <ul>
-<li><strong>Relation Files:</strong> 75 (235 references)</li>
+<li><strong>Relation Files:</strong> 76 (237 references)</li>
 <li><strong>Attachment Files:</strong> 9 (13 references)</li>
 </ul>
 

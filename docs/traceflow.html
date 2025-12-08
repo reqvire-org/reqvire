@@ -728,7 +728,7 @@ blockquote {
 <p>The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from stakeholder needs (user requirements) through system specifications (system requirements) to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.</p>
 <p><strong>Instructions:</strong> Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control.</p>
 <p>
-<div class="d3-sankey-container" id="d3sankey_557e1aa52680">
+<div class="d3-sankey-container" id="d3sankey_55f84f19a450">
     <svg class="d3-sankey-svg"></svg>
 </div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -1623,21 +1623,6 @@ blockquote {
       "link": "requirements/System/Output/DiagramGeneration.md#file-diagram-attachment-display"
     },
     {
-      "name": "Remove Generated Diagrams Verification",
-      "type": "verification",
-      "link": "requirements/System/Output/Verifications/DiagramVerifications.md#remove-generated-diagrams-verification"
-    },
-    {
-      "name": "Diagram Removal",
-      "type": "requirement",
-      "link": "requirements/System/Output/DiagramGeneration.md#diagram-removal"
-    },
-    {
-      "name": "Remove Generated Diagrams",
-      "type": "user-requirement",
-      "link": "requirements/System/Output/DiagramGeneration.md#remove-generated-diagrams"
-    },
-    {
       "name": "Visualize Model Relationships Verification",
       "type": "verification",
       "link": "requirements/System/Output/Verifications/DiagramVerifications.md#visualize-model-relationships-verification"
@@ -1683,6 +1668,26 @@ blockquote {
       "link": "requirements/System/Output/Reporting.md#model-diagram-output-formats"
     },
     {
+      "name": "Multi-Type Search Filter Test",
+      "type": "verification",
+      "link": "requirements/System/Output/Verifications/ReportingVerifications.md#multi-type-search-filter-test"
+    },
+    {
+      "name": "Comma-Separated Type Filter Parsing",
+      "type": "requirement",
+      "link": "requirements/System/Output/Reporting.md#comma-separated-type-filter-parsing"
+    },
+    {
+      "name": "Flexible Search Type Filtering",
+      "type": "user-requirement",
+      "link": "requirements/System/Output/Reporting.md#flexible-search-type-filtering"
+    },
+    {
+      "name": "Search Report Generator",
+      "type": "requirement",
+      "link": "requirements/System/Output/Reporting.md#search-report-generator"
+    },
+    {
       "name": "Resources Report Verification",
       "type": "verification",
       "link": "requirements/System/Output/Verifications/ReportingVerifications.md#resources-report-verification"
@@ -1711,11 +1716,6 @@ blockquote {
       "name": "Search Command Tests",
       "type": "verification",
       "link": "requirements/System/Output/Verifications/ReportingVerifications.md#search-command-tests"
-    },
-    {
-      "name": "Search Report Generator",
-      "type": "requirement",
-      "link": "requirements/System/Output/Reporting.md#search-report-generator"
     },
     {
       "name": "Start Type Filter Test",
@@ -3365,16 +3365,6 @@ blockquote {
       "value": 1
     },
     {
-      "source": "Diagram Removal",
-      "target": "Remove Generated Diagrams Verification",
-      "value": 1
-    },
-    {
-      "source": "Remove Generated Diagrams",
-      "target": "Diagram Removal",
-      "value": 1
-    },
-    {
       "source": "Diagram Generation",
       "target": "Visualize Model Relationships Verification",
       "value": 1
@@ -3442,6 +3432,26 @@ blockquote {
     {
       "source": "Model Structure and Summaries",
       "target": "Model Diagram Output Formats",
+      "value": 1
+    },
+    {
+      "source": "Provide Reports",
+      "target": "Model Reports",
+      "value": 1
+    },
+    {
+      "source": "Comma-Separated Type Filter Parsing",
+      "target": "Multi-Type Search Filter Test",
+      "value": 1
+    },
+    {
+      "source": "Flexible Search Type Filtering",
+      "target": "Comma-Separated Type Filter Parsing",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Search Report Generator",
       "value": 1
     },
     {
@@ -3781,7 +3791,7 @@ blockquote {
     }
   ]
 };
-    const container = document.getElementById("d3sankey_557e1aa52680");
+    const container = document.getElementById("d3sankey_55f84f19a450");
     const svg = d3.select(container).select("svg");
 
     // Configuration
