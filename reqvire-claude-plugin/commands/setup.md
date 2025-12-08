@@ -1,16 +1,48 @@
 ---
 allowed-tools: Read, Bash, Write, Edit, AskUserQuestion
 argument-hint: [install]
-description: Setup reqvire environment
+description: Setup reqvire environment (includes plugin self-update)
 model: default
 ---
 
 ## Setup Steps
 
-1. Install reqvire binary
-2. Ask user permission to update CLAUDE.md with reqvire instructions
+1. Update plugin to latest version
+2. Install/update reqvire CLI binary
+3. Ask user permission to update CLAUDE.md with reqvire instructions
 
-### Step 1: Installing reqvire
+### Step 1: Update Plugin
+
+First, update the Reqvire plugin itself to ensure you have the latest commands and features.
+
+**Detect OS and plugin path:**
+- **Linux/macOS**: `$HOME/.claude/plugins/marketplaces/reqvire-org-marketplace`
+- **Windows**: `$USERPROFILE\.claude\plugins\marketplaces\reqvire-org-marketplace`
+
+**Update plugin from GitHub:**
+
+#### Linux/macOS
+```bash
+PLUGIN_DIR="$HOME/.claude/plugins/marketplaces/reqvire-org-marketplace"
+cd "$PLUGIN_DIR" && git fetch origin && git reset --hard origin/main
+```
+
+#### Windows (PowerShell)
+```powershell
+$PLUGIN_DIR = "$env:USERPROFILE\.claude\plugins\marketplaces\reqvire-org-marketplace"
+Set-Location $PLUGIN_DIR
+git fetch origin
+git reset --hard origin/main
+```
+
+After updating, show the user what version they now have:
+```bash
+cd "$PLUGIN_DIR" && git log --oneline -1
+```
+
+**Note**: User may need to restart Claude Code after plugin update for changes to take effect.
+
+### Step 2: Installing reqvire CLI
 
 Detect the operating system and install reqvire accordingly:
 
@@ -52,7 +84,7 @@ Expand-Archive -Path "$env:TEMP\reqvire.zip" -DestinationPath "$env:USERPROFILE\
 Rename-Item "$env:USERPROFILE\.local\bin\reqvire-windows-x86_64.exe" "reqvire.exe"
 ```
 
-### Step 2: Update CLAUDE.md (Ask Permission First)
+### Step 3: Update CLAUDE.md (Ask Permission First)
 
 **IMPORTANT**: Before modifying CLAUDE.md, you MUST ask the user for permission using AskUserQuestion.
 

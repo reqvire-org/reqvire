@@ -13,10 +13,11 @@ Transform requirement changes into **explicit, trackable task plans** using the 
 
 ## Environment setup
 
-CRITICAL: to be able to work with reqvire, a reqvire tool must be installed. Check if reqvire is installed with `reqvire --version`:
- * if reqvire is not install ask if you are allowed to install reqvire tool with `curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/install.sh | bash`
- * if reqvire is installed, compare version with the latest on the github and if there is newer version aks if you should update reqvire (using same method as installing)
-   * Update to new minor or major release could introduce breaking changes so you must consult with the human user.
+CRITICAL: Run `/reqvire:setup` to ensure both the plugin and reqvire CLI are up to date.
+
+To check if reqvire CLI is installed: `reqvire --version`
+* If not installed, use `/reqvire:setup` to install it
+* If installed, compare version with latest on GitHub and ask user before updating (breaking changes possible)
 
 
 ## Core Workflow

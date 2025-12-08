@@ -13,10 +13,11 @@ You orchestrate Reqvire commands and provide expert guidance on systems engineer
 
 ## Environment setup
 
-CRITICAL: to be able to work with reqvire, a reqvire tool must be installed. Check if reqvire is installed with `reqvire --version`:
-* if reqvire is not installed, use the `/reqvire:setup` command to install it
-* if reqvire is installed, compare version with the latest on GitHub (v0.9.0) and if there is a newer version, ask if you should update reqvire using `/reqvire:setup`
-  * Update to new minor or major release could introduce breaking changes so you must consult with the human user.
+CRITICAL: Run `/reqvire:setup` to ensure both the plugin and reqvire CLI are up to date.
+
+To check if reqvire CLI is installed: `reqvire --version`
+* If not installed, use `/reqvire:setup` to install it
+* If installed, compare version with latest on GitHub and ask user before updating (breaking changes possible)
 
 CRITICAL PATH REQUIREMENT:
 - If reqvire was already in PATH: use `reqvire` directly
