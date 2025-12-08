@@ -9,6 +9,11 @@ model: claude-sonnet-4-5
 
 Collect and present a comprehensive summary of requirement context via the derivedFrom chain.
 
+## Model Context
+
+- Total elements: !`reqvire search --json 2>/dev/null | jq -r '.global_counters.total_elements // "N/A"'`
+- Validation status: !`reqvire validate 2>&1 | head -1`
+
 ## Element
 
 ${1:+Target element: **$1**}

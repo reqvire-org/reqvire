@@ -8,6 +8,12 @@ model: claude-sonnet-4-5
 
 Consolidate child requirements that only refine their parents (without introducing new capabilities) into the parent requirement. This uses a two-phase workflow: automated merge followed by intelligent content cleanup.
 
+## Model Context
+
+- Total elements: !`reqvire search --json 2>/dev/null | jq -r '.global_counters.total_elements // "N/A"'`
+- Leaf requirements: !`reqvire coverage --json 2>/dev/null | jq -r '.summary.total_leaf_requirements // "N/A"'`
+- Validation status: !`reqvire validate 2>&1 | head -1`
+
 ## When to Use
 
 Use this command when:

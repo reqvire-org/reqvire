@@ -9,6 +9,12 @@ model: claude-sonnet-4-5
 
 Analyze how changes to requirements propagate through the model.
 
+## Git Context
+
+- Current branch: !`git branch --show-current`
+- Recent commits: !`git log --oneline -5`
+- Base branch merge-base: !`git merge-base main HEAD 2>/dev/null || echo "N/A"`
+
 ## Comparison Target
 
 ${1:+Comparing against: $1}
