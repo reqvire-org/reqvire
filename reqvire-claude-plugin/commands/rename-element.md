@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*)
 argument-hint: [current-name] [new-name]
 description: Rename an existing element while updating all relations that reference it
-model: default
+model: sonnet
 ---
 
 # Rename Element

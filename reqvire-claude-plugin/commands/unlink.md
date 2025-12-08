@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*)
 argument-hint: <source> <target>
 description: Remove a relation or attachment (auto-detects type)
-model: default
+model: sonnet
 ---
 
 # Unlink Elements

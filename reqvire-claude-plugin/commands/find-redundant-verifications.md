@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
 description: Find and analyze redundant verify relations in the Reqvire model
-model: default
+model: sonnet
 ---
 
 # Find Redundant Verify Relations

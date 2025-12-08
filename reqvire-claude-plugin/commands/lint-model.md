@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
 description: Lint and clean up the Reqvire model by fixing issues and identifying items needing review
-model: default
+model: sonnet
 ---
 
 # Lint Model

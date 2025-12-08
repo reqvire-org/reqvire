@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*)
 argument-hint: [source-file] [target-file]
 description: Move entire specification file with all its elements to a new location
-model: default
+model: sonnet
 ---
 
 # Move File
