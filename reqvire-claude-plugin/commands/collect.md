@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*)
 argument-hint: <element-name>
 description: Collect and summarize requirement context via derivedFrom chain
-model: sonnet
+model: claude-sonnet-4-5
 ---
 
 # Collect Requirement Context

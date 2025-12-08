@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash, Write, Edit, AskUserQuestion
 argument-hint: [install]
 description: Setup reqvire environment (includes plugin self-update)
-model: sonnet
+model: claude-sonnet-4-5
 ---
 
 ## Setup Steps

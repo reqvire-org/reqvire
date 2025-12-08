@@ -2,7 +2,7 @@
 allowed-tools: Read, Edit, Bash(reqvire:*)
 argument-hint: [requirement-id]
 description: Add a verification for an existing requirement, checking if verification is needed based on requirement hierarchy
-model: sonnet
+model: claude-sonnet-4-5
 ---
 
 # Add Verification

@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*), Bash(git:*)
 argument-hint: [commit-hash]
 description: Analyze change impact for modified requirements using git commit history
-model: sonnet
+model: claude-sonnet-4-5
 ---
 
 # Analyze Change Impact

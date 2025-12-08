@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
 description: Analyze verification coverage and identify unverified requirements
-model: sonnet
+model: claude-sonnet-4-5
 ---
 
 # Analyze Verification Coverage

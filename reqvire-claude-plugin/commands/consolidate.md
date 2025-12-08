@@ -1,7 +1,7 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
 description: Consolidate elements using automated merge + intelligent cleanup workflow
-model: sonnet
+model: claude-sonnet-4-5
 ---
 
 # Consolidate Requirements Model

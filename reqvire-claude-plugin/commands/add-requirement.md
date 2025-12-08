@@ -2,7 +2,7 @@
 allowed-tools: Read, Bash(reqvire:*)
 argument-hint: [requirement-name]
 description: Add a new requirement to the Reqvire model with proper structure and traceability
-model: sonnet
+model: claude-sonnet-4-5
 ---
 
 # Add New Requirement
