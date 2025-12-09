@@ -95,27 +95,6 @@ As a **System Engineer**, I want to lint model documents to detect and fix quali
   * type: user-requirement
 ---
 
-### Model Export
-
-As a **Manager**, I want to export specifications into diferent formats including HTML, so that I can communicate system architecture effectively.
-
-#### Details
-All exports shall produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.
-
-The system shall ensure deterministic export output by:
-- Sorting elements by identifier before processing
-- Sorting relations by type and target identifier
-- Maintaining consistent file ordering alphabetically
-
-This determinism ensures that:
-- Running exports multiple times produces byte-identical output
-- Version control diffs reflect actual content changes
-- Continuous integration pipelines produce reproducible results
-
-#### Metadata
-  * type: user-requirement
----
-
 ### Operating on Model Elements
 
 As a **System Engineer**, I want to create, modify, move, and delete model elements programmatically, so that I can efficiently maintain and evolve the system model over time.
@@ -218,4 +197,3 @@ As a **V&V Engineer**, I want to trace verification coverage through the require
 #### Relations
   * derive: [Verification Upward Traceability](Functional/Processing/VerificationTraces.md#verification-upward-traceability)
 ---
-
