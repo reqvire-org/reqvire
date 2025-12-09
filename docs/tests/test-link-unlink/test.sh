@@ -93,11 +93,19 @@ echo "Test 4 passed"
 echo ""
 
 # ==================================
-# Test 5: Unlink command (auto-detects relation type)
+# Test 5: Unlink command (auto-detects relation type) + Setup for Test 6
 # ==================================
 echo "Test 5: Unlink command..."
 
 cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Feature Requirement" "Another Requirement" > /dev/null 2>&1
+
+# Add another parent to "No Relations Requirement" so it won't be orphaned in Test 6
+# Link creates derive on Feature Requirement (in file) and derivedFrom on No Relations (in-memory only)
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "derive" "No Relations Requirement" > /dev/null 2>&1
+
+# Format with --with-full-relations to write the opposite derivedFrom to file
+# This ensures No Relations has a parent in file after Test 6 unlinks System Requirements
+cd "$TEST_DIR" && "$REQVIRE_BIN" format --with-full-relations --fix > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md" "File content after unlink does not match expected"
 
@@ -105,14 +113,13 @@ echo "Test 5 passed"
 echo ""
 
 # ==================================
-# Test 6: Unlink removes relation from parent
+# Test 6: Unlink removes relation AND its opposite
 # ==================================
-echo "Test 6: Unlink removes derive relation..."
+echo "Test 6: Unlink removes derive relation and its derivedFrom opposite..."
 
 cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "System Requirements" "No Relations Requirement" > /dev/null 2>&1
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "No Relations Requirement" "System Requirements" > /dev/null 2>&1
 
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/06-unlink-removes-subsection.md" "$TEST_DIR/specifications/Requirements.md" "Unlink should remove relation"
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/06-unlink-removes-subsection.md" "$TEST_DIR/specifications/Requirements.md" "Unlink should remove both the relation and its opposite"
 
 echo "Test 6 passed"
 echo ""
@@ -257,6 +264,90 @@ if ! echo "$ATTACH_URL_OUTPUT" | grep -qi "trace"; then
 fi
 
 echo "Test 12 passed"
+echo ""
+
+# ==================================
+# Test 13: Unlink Scenario 2 - Both relations in file (after format --with-full-relations)
+# ==================================
+echo "Test 13: Unlink when both relations exist in file..."
+
+# Setup: Start from state after Test 3 (link created)
+cp "${TEST_SCRIPT_DIR}/expected/03-link-creates-subsection.md" "$TEST_DIR/specifications/Requirements.md"
+
+# Format with full relations to write opposites to disk
+cd "$TEST_DIR" && "$REQVIRE_BIN" format --with-full-relations --fix > /dev/null 2>&1
+
+# Now unlink - both relations should be removed from files
+cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "System Requirements" "No Relations Requirement" > /dev/null 2>&1
+
+# Expected: Both System Requirements' derive AND No Relations Requirement's derivedFrom removed
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/13-unlink-both-in-file.md" "$TEST_DIR/specifications/Requirements.md" "Unlink should remove both relations when both are in file"
+
+echo "Test 13 passed"
+echo ""
+
+# ==================================
+# Test 14: Unlink Scenario 3 - Unlink from opposite side
+# ==================================
+echo "Test 14: Unlink from opposite side (with only in-memory opposite)..."
+
+# Setup: Create state where Child has derivedFrom (user_created) but Parent has NO derive in file
+# Remove Verifications.md to avoid validation errors (it references elements that won't exist)
+rm -f "$TEST_DIR/specifications/Verifications.md"
+
+cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
+# Elements
+
+### Parent Req
+
+Parent.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Child Req
+
+Child.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Parent Req](#parent-req)
+---
+EOF
+
+# Unlink from Parent side (which has only in-memory opposite derive)
+# This should remove Child's derivedFrom from file
+cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Parent Req" "Child Req" > /dev/null 2>&1
+
+# Expected: Child's derivedFrom removed, Parent unchanged (never had derive in file)
+# Note: Elements sorted alphabetically after unlink (no parent-child hierarchy)
+cat > "$TEST_DIR/expected-test14.md" << 'EOF'
+# Elements
+
+### Child Req
+
+Child.
+
+#### Metadata
+  * type: requirement
+---
+
+### Parent Req
+
+Parent.
+
+#### Metadata
+  * type: user-requirement
+---
+
+EOF
+
+assert_file_matches "$TEST_DIR/expected-test14.md" "$TEST_DIR/specifications/Requirements.md" "Unlink from opposite side should remove user-created relation"
+
+echo "Test 14 passed"
 echo ""
 
 echo "===================================="

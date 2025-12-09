@@ -2397,6 +2397,38 @@ impl GraphRegistry {
         let file_path = source_node.element.file_path.clone();
         self.modified_files.insert(file_path.clone());
 
+        // CRITICAL: Maintain bidirectional consistency for in-memory model
+        // If this relation has an opposite, and the target is an element (not external URL/path),
+        // create the opposite relation on the target element (marked as user_created=false)
+        if let Some(opposite_type_name) = relation_type_info.opposite {
+            // Only create opposite if target_id corresponds to an element
+            if self.nodes.contains_key(&target_id_for_check) {
+                let opposite_relation_info = RELATION_TYPES.get(opposite_type_name).unwrap();
+
+                // Get source info for opposite relation
+                let source_node = self.nodes.get(source_id).unwrap();
+                let source_name = source_node.element.name.clone();
+                let source_element_id = source_node.element.id.clone();
+
+                // Create opposite relation using full identifier (in-memory model uses full IDs)
+                let opposite_relation = Relation {
+                    relation_type: opposite_relation_info,
+                    target: RelationTarget {
+                        text: source_name,
+                        link: LinkType::Identifier(source_id.to_string()),
+                        element_id: Some(source_element_id), // Fragment of source element
+                    },
+                    user_created: false, // Auto-generated opposite
+                };
+
+                // Add opposite relation to target element
+                let target_node = self.nodes.get_mut(&target_id_for_check).unwrap();
+                target_node.element.relations.push(opposite_relation);
+
+                // Do NOT mark target file as modified - opposite is not written by default
+            }
+        }
+
         Ok(file_path)
     }
 
@@ -2432,27 +2464,61 @@ impl GraphRegistry {
             target.to_string()
         };
 
-        // Find matching relation
+        // Find matching relation (check both user_created and auto-generated)
+        // This allows unlinking from either side of a bidirectional relation
         let relation_match = source_node.element.relations.iter()
             .find(|r| {
-                r.user_created && r.target.link.as_str() == target_id_to_find
+                r.target.link.as_str() == target_id_to_find
             })
             .cloned(); // Clone to avoid borrow issues
 
         if let Some(relation) = relation_match {
             let relation_type = relation.relation_type.name.to_string();
             let target_display_name = relation.target.text.clone();
+            let relation_type_info = crate::relation::RELATION_TYPES.get(relation_type.as_str()).unwrap();
+            let source_relation_was_user_created = relation.user_created;
 
-            // Remove the relation
+            // Remove the relation (both user_created and auto-generated)
             let source_node = self.nodes.get_mut(source_id).unwrap();
             source_node.element.relations.retain(|r| {
-                !(r.user_created &&
-                  r.relation_type.name == relation_type &&
+                !(r.relation_type.name == relation_type &&
                   r.target.link.as_str() == target_id_to_find)
             });
 
-            // Mark file as modified
-            self.modified_files.insert(source_file_path.clone());
+            // Mark source file as modified only if relation was user_created (written to file)
+            if source_relation_was_user_created {
+                self.modified_files.insert(source_file_path.clone());
+            }
+
+            // CRITICAL: Maintain bidirectional consistency for in-memory model
+            // If this relation has an opposite, and the target is an element,
+            // remove the opposite relation from the target element
+            if let Some(opposite_type_name) = relation_type_info.opposite {
+                // Only remove opposite if target_id corresponds to an element
+                if self.nodes.contains_key(&target_id_to_find) {
+                    // Check if target has user_created opposite (would be in file)
+                    let target_node_check = self.nodes.get(&target_id_to_find).unwrap();
+                    let had_user_created_opposite = target_node_check.element.relations.iter().any(|r| {
+                        r.user_created &&
+                        r.relation_type.name == opposite_type_name &&
+                        r.target.link.as_str() == source_id
+                    });
+
+                    // Remove opposite relation from target (both user_created true and false)
+                    let target_node = self.nodes.get_mut(&target_id_to_find).unwrap();
+                    let target_file_path = target_node.element.file_path.clone();
+
+                    target_node.element.relations.retain(|r| {
+                        !(r.relation_type.name == opposite_type_name &&
+                          r.target.link.as_str() == source_id)
+                    });
+
+                    // Mark target file as modified only if opposite was user_created (written to file)
+                    if had_user_created_opposite {
+                        self.modified_files.insert(target_file_path);
+                    }
+                }
+            }
 
             Ok(Some((source_file_path, relation_type, target_display_name)))
         } else {
@@ -2547,6 +2613,10 @@ impl GraphRegistry {
 
         // Add to graph
         self.add_element(new_element.clone())?;
+
+        // Populate element_id for all relations (including the newly added element)
+        // This is necessary for hierarchical ordering to recognize parent-child relationships
+        self.populate_relation_element_ids();
 
         // Track modified file
         self.modified_files.insert(target_file.to_string());

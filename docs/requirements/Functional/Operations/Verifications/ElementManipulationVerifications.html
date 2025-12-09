@@ -1504,9 +1504,10 @@ blockquote {
 <p><strong>Test Steps - Basic Link:</strong></p>
 <ol>
 <li>Run <code>reqvire link &lt;source-element-name&gt; &lt;relation-type&gt; &lt;target-element-name&gt;</code></li>
-<li>Verify relation entry is added to source element’s Relations subsection</li>
+<li>Verify relation entry is added to source element’s Relations subsection (written to file)</li>
 <li>Verify relation format: <code>* &lt;relation-type&gt;: [target-name](target-path)</code></li>
-<li>Verify model validates after link</li>
+<li>Verify target element’s file does NOT contain opposite relation (opposite exists in-memory only)</li>
+<li>Verify model validates after link (confirms in-memory model is complete)</li>
 </ol>
 <p><strong>Test Steps - Source Resolution:</strong></p>
 <ol>
@@ -1557,7 +1558,9 @@ blockquote {
 </ol>
 <p><strong>Success Criteria:</strong></p>
 <ul>
-<li>Adds relation to source element’s Relations subsection</li>
+<li>Adds relation to source element’s Relations subsection (written to file)</li>
+<li>Does NOT add opposite relation to target element’s file (opposite exists in-memory only)</li>
+<li>In-memory model is complete with bidirectional relations (verified by successful validation)</li>
 <li>Creates Relations subsection if missing</li>
 <li>Source resolves by file path first, then element name</li>
 <li>Target must be existing element name</li>
@@ -1870,10 +1873,29 @@ blockquote {
 <li>Prepare source elements with relations to remove</li>
 <li>Document expected state after unlink</li>
 </ul>
-<p><strong>Test Steps - Basic Unlink:</strong></p>
+<p><strong>Test Steps - Unlink Scenario 1 (Default - Only Source in File):</strong></p>
 <ol>
-<li>Run <code>reqvire unlink &lt;source-element-name&gt; &lt;relation-type&gt; &lt;target-element-name&gt;</code></li>
-<li>Verify relation entry is removed from source element’s Relations subsection</li>
+<li>Link creates relation on source (written to file), opposite on target (in-memory only)</li>
+<li>Run <code>reqvire unlink &lt;source-element-name&gt; &lt;target-element-name&gt;</code></li>
+<li>Verify relation removed from source element’s Relations subsection (from file)</li>
+<li>Verify target element’s file unchanged (opposite was never written to file)</li>
+<li>Verify model validates after unlink</li>
+</ol>
+<p><strong>Test Steps - Unlink Scenario 2 (Both Relations in File):</strong></p>
+<ol>
+<li>Run <code>reqvire format --with-full-relations --fix</code> to write opposites to files</li>
+<li>Verify both source and target have relations in their files</li>
+<li>Run <code>reqvire unlink &lt;source-element-name&gt; &lt;target-element-name&gt;</code></li>
+<li>Verify relation removed from source element’s file</li>
+<li>Verify opposite relation also removed from target element’s file</li>
+<li>Verify model validates after unlink</li>
+</ol>
+<p><strong>Test Steps - Unlink Scenario 3 (Unlinking from Opposite Side):</strong></p>
+<ol>
+<li>Setup: Only target has user-created relation in file, source has auto-generated opposite in-memory</li>
+<li>Run <code>reqvire unlink &lt;source-element-name&gt; &lt;target-element-name&gt;</code> (unlink from side with only in-memory opposite)</li>
+<li>Verify target element’s user-created relation is removed from file</li>
+<li>Verify source element’s in-memory opposite is removed</li>
 <li>Verify model validates after unlink</li>
 </ol>
 <p><strong>Test Steps - Source Resolution:</strong></p>
@@ -1907,7 +1929,10 @@ blockquote {
 </ol>
 <p><strong>Success Criteria:</strong></p>
 <ul>
-<li>Removes relation from source element’s Relations subsection</li>
+<li>Scenario 1: When only source has relation in file, removes from source file, target file unchanged</li>
+<li>Scenario 2: When both have relations in file (after format –with-full-relations), removes from both files</li>
+<li>Scenario 3: When unlinking from opposite side (only in-memory), removes user-created relation from target file</li>
+<li>All scenarios: In-memory model updated correctly with both relations removed</li>
 <li>Removes Relations subsection when empty</li>
 <li>Source resolves by file path first, then element name</li>
 <li>Target must be existing element name</li>

@@ -19,6 +19,20 @@ set -uo pipefail
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
+# Helper function to compare files and show diff on failure
+assert_file_matches() {
+  local expected="$1"
+  local actual="$2"
+  local description="$3"
+
+  if ! diff -u "$expected" "$actual"; then
+    echo "FAILED: $description"
+    echo ""
+    echo "If changes are intentional, update $expected"
+    exit 1
+  fi
+}
+
 echo "====================================" >> "${TEST_DIR}/test_results.log"
 echo "Relation Consistency Tests" >> "${TEST_DIR}/test_results.log"
 echo "====================================" >> "${TEST_DIR}/test_results.log"
@@ -91,10 +105,10 @@ This test verifies derived requirement 2.
 EOF
 
 # ==================================
-# Test 1: Create Element with Relations - Verify Bidirectional Consistency
+# Test 1: Create Element with Relations - Verify In-Memory Bidirectional Consistency
 # ==================================
 echo "" >> "${TEST_DIR}/test_results.log"
-echo "Test 1: Create element with relations..." >> "${TEST_DIR}/test_results.log"
+echo "Test 1: Create element with derivedFrom - verify file has only user-created relations..." >> "${TEST_DIR}/test_results.log"
 
 NEW_ELEMENT='### Derived Requirement 3
 
@@ -107,44 +121,28 @@ This is a new derived requirement.
   * derivedFrom: #root-requirement
 '
 
+cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md > /dev/null 2>&1
+
+# Verify:
+# - File has only user-created relations (Root should NOT have derive in file)
+# - In-memory model is complete (verified by successful validation)
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-add-with-opposite.md" \
+  "$TEST_DIR/specifications/Requirements.md" \
+  "After add, file should have only user-created relations (opposite exists in-memory only)"
+
+# Verify model validates (confirms in-memory model has opposite relations)
 set +e
-OUTPUT=$(cd "$TEST_DIR" && echo "$NEW_ELEMENT" | "$REQVIRE_BIN" add specifications/Requirements.md 2>&1)
-EXIT_CODE=$?
+VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATE_EXIT=$?
 set -e
 
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-
-if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: Add command failed"
-  echo "Output: $OUTPUT"
-  OVERALL_RESULT=1
-else
-  # Verify element was created
-  if ! grep -q "### Derived Requirement 3" "${TEST_DIR}/specifications/Requirements.md"; then
-    echo "❌ FAILED: Element was not created"
-    OVERALL_RESULT=1
-  fi
-
-  # Verify forward relation exists (derivedFrom)
-  if ! grep -A 15 "### Derived Requirement 3" "${TEST_DIR}/specifications/Requirements.md" | grep -q "derivedFrom:.*#root-requirement"; then
-    echo "❌ FAILED: Forward relation (derivedFrom) not found"
-    OVERALL_RESULT=1
-  fi
-
-  # Verify model validates (bidirectional consistency check)
-  set +e
-  VALIDATE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
-  VALIDATE_EXIT=$?
-  set -e
-
-  if [ $VALIDATE_EXIT -ne 0 ]; then
-    echo "❌ FAILED: Model validation failed after create"
-    echo "Output: $VALIDATE_OUTPUT"
-    OVERALL_RESULT=1
-  else
-    echo "✓ Element created with bidirectional relations" >> "${TEST_DIR}/test_results.log"
-  fi
+if [ $VALIDATE_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed - in-memory model not complete"
+  echo "Output: $VALIDATE_OUTPUT"
+  exit 1
 fi
+
+echo "✓ Element created - file has user-created relations only, in-memory model complete" >> "${TEST_DIR}/test_results.log"
 
 # ==================================
 # Test 2: Delete Element - Verify Bidirectional Relation Removal

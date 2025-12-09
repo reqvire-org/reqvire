@@ -8,6 +8,7 @@ Top-level container for test requirements.
   * type: user-requirement
 
 #### Relations
+  * derive: [Another Requirement](#another-requirement)
   * derive: [Feature Requirement](#feature-requirement)
   * derive: [No Relations Requirement](#no-relations-requirement)
 ---
@@ -32,7 +33,9 @@ A requirement to be linked/unlinked.
   * type: requirement
 
 #### Relations
+  * derive: [No Relations Requirement](#no-relations-requirement)
   * derivedFrom: [System Requirements](#system-requirements)
+  * verifiedBy: [Feature Test](Verifications.md#feature-test)
 ---
 
 ### No Relations Requirement
@@ -43,6 +46,6 @@ A requirement without initial relations that link/unlink commands will modify.
   * type: requirement
 
 #### Relations
+  * derivedFrom: [Feature Requirement](#feature-requirement)
   * derivedFrom: [System Requirements](#system-requirements)
 ---
-

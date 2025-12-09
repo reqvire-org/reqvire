@@ -2,67 +2,48 @@ Added element: Feature D (specifications/Requirements.md#feature-d)
 
 📄 specifications/Requirements.md
   [37m01     # Elements[0m
-  [32m02 +   ### Feature D[0m
-  [32m03 +   ␤[0m
-  [32m04 +   This is a newly added feature.[0m
-  [32m05 +   ␤[0m
-  [32m06 +   #### Metadata[0m
-  [32m07 +     * type: requirement[0m
-  [32m08 +   ␤[0m
-  [32m09 +   #### Relations[0m
-  [32m10 +     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m11 +   ---[0m
-  [32m12 +   ␤[0m
-  [37m13     ### Parent Feature[0m
-  [37m14[0m
-  [37m15     This is a parent requirement.[0m
-  [37m16[0m
-  [37m17     #### Metadata[0m
-  [37m18       * type: user-requirement[0m
-  [31m19 -   ␤[0m
-  [37m19     ---[0m
-  [37m20[0m
-  [37m21     ### Feature A[0m
+  [37m02[0m
+  [37m03     ### Parent Feature[0m
 
-  [37m28     #### Relations[0m
-  [37m29       * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [37m30     ---[0m
-  [31m31 -   ### Feature B[0m
-  [32m31 +   ### Complex chars, element/name example[0m
-  [37m32[0m
-  [31m33 -   This is a test requirement for feature B.[0m
-  [32m33 +   This feature has special characters in its name including commas and slashes.[0m
-  [37m34[0m
-  [37m35     #### Metadata[0m
-  [37m36       * type: requirement[0m
+  [37m06[0m
+  [37m07     #### Metadata[0m
+  [37m08       * type: user-requirement[0m
+  [31m09 -   ␤[0m
+  [37m09     ---[0m
+  [37m10[0m
+  [37m11     ### Feature A[0m
 
-  [37m38     #### Relations[0m
-  [37m39       * derivedFrom: [Feature A](#feature-a)[0m
-  [37m40     ---[0m
-  [31m41 -   ### Feature C[0m
-  [32m41 +   ### Feature B[0m
-  [37m42[0m
-  [31m43 -   This is a test requirement for feature C with relations.[0m
-  [32m43 +   This is a test requirement for feature B.[0m
-  [37m44[0m
-  [37m45     #### Metadata[0m
-  [37m46       * type: requirement[0m
-  [37m47[0m
-  [37m48     #### Relations[0m
-  [37m49       * derivedFrom: [Feature A](#feature-a)[0m
-  [31m50 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
-  [37m50     ---[0m
-  [31m51 -   ### Complex chars, element/name example[0m
-  [32m51 +   ### Feature C[0m
-  [37m52[0m
-  [31m53 -   This feature has special characters in its name including commas and slashes.[0m
-  [32m53 +   This is a test requirement for feature C with relations.[0m
-  [37m54[0m
-  [37m55     #### Metadata[0m
-  [37m56       * type: requirement[0m
+  [37m18     #### Relations[0m
+  [37m19       * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m20     ---[0m
+  [32m21 +   ### Complex chars, element/name example[0m
+  [32m22 +   ␤[0m
+  [32m23 +   This feature has special characters in its name including commas and slashes.[0m
+  [32m24 +   ␤[0m
+  [32m25 +   #### Metadata[0m
+  [32m26 +     * type: requirement[0m
+  [32m27 +   ␤[0m
+  [32m28 +   #### Relations[0m
+  [32m29 +     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m30 +   ---[0m
+  [32m31 +   ␤[0m
+  [37m32     ### Feature B[0m
+  [37m33[0m
+  [37m34     This is a test requirement for feature B.[0m
+
+  [37m51       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m52       * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m53     ---[0m
+  [31m54 -   ### Complex chars, element/name example[0m
+  [32m54 +   ### Feature D[0m
+  [37m55[0m
+  [31m56 -   This feature has special characters in its name including commas and slashes.[0m
+  [32m56 +   This is a newly added feature.[0m
   [37m57[0m
-  [37m58     #### Relations[0m
-  [37m59       * derivedFrom: [Feature A](#feature-a)[0m
-  [32m60 +     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
-  [37m61     ---[0m
-  [32m62 +   ␤[0m
+  [37m58     #### Metadata[0m
+  [37m59       * type: requirement[0m
+
+  [37m61     #### Relations[0m
+  [37m62       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m63     ---[0m
+  [32m64 +   ␤[0m

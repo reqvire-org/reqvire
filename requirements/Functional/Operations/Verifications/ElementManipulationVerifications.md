@@ -606,9 +606,10 @@ The test shall verify that the `link` command adds relations to elements followi
 
 **Test Steps - Basic Link:**
 1. Run `reqvire link <source-element-name> <relation-type> <target-element-name>`
-2. Verify relation entry is added to source element's Relations subsection
+2. Verify relation entry is added to source element's Relations subsection (written to file)
 3. Verify relation format: `* <relation-type>: [target-name](target-path)`
-4. Verify model validates after link
+4. Verify target element's file does NOT contain opposite relation (opposite exists in-memory only)
+5. Verify model validates after link (confirms in-memory model is complete)
 
 **Test Steps - Source Resolution:**
 1. Link using element name as source
@@ -652,7 +653,9 @@ The test shall verify that the `link` command adds relations to elements followi
 5. Verify error message mentions "external URL" and suggests using 'trace' relation
 
 **Success Criteria:**
-- Adds relation to source element's Relations subsection
+- Adds relation to source element's Relations subsection (written to file)
+- Does NOT add opposite relation to target element's file (opposite exists in-memory only)
+- In-memory model is complete with bidirectional relations (verified by successful validation)
 - Creates Relations subsection if missing
 - Source resolves by file path first, then element name
 - Target must be existing element name
@@ -943,10 +946,27 @@ The test shall verify that the `unlink` command removes relations from elements 
 - Prepare source elements with relations to remove
 - Document expected state after unlink
 
-**Test Steps - Basic Unlink:**
-1. Run `reqvire unlink <source-element-name> <relation-type> <target-element-name>`
-2. Verify relation entry is removed from source element's Relations subsection
-3. Verify model validates after unlink
+**Test Steps - Unlink Scenario 1 (Default - Only Source in File):**
+1. Link creates relation on source (written to file), opposite on target (in-memory only)
+2. Run `reqvire unlink <source-element-name> <target-element-name>`
+3. Verify relation removed from source element's Relations subsection (from file)
+4. Verify target element's file unchanged (opposite was never written to file)
+5. Verify model validates after unlink
+
+**Test Steps - Unlink Scenario 2 (Both Relations in File):**
+1. Run `reqvire format --with-full-relations --fix` to write opposites to files
+2. Verify both source and target have relations in their files
+3. Run `reqvire unlink <source-element-name> <target-element-name>`
+4. Verify relation removed from source element's file
+5. Verify opposite relation also removed from target element's file
+6. Verify model validates after unlink
+
+**Test Steps - Unlink Scenario 3 (Unlinking from Opposite Side):**
+1. Setup: Only target has user-created relation in file, source has auto-generated opposite in-memory
+2. Run `reqvire unlink <source-element-name> <target-element-name>` (unlink from side with only in-memory opposite)
+3. Verify target element's user-created relation is removed from file
+4. Verify source element's in-memory opposite is removed
+5. Verify model validates after unlink
 
 **Test Steps - Source Resolution:**
 1. Unlink using element name as source
@@ -974,7 +994,10 @@ The test shall verify that the `unlink` command removes relations from elements 
 6. Verify error is reported
 
 **Success Criteria:**
-- Removes relation from source element's Relations subsection
+- Scenario 1: When only source has relation in file, removes from source file, target file unchanged
+- Scenario 2: When both have relations in file (after format --with-full-relations), removes from both files
+- Scenario 3: When unlinking from opposite side (only in-memory), removes user-created relation from target file
+- All scenarios: In-memory model updated correctly with both relations removed
 - Removes Relations subsection when empty
 - Source resolves by file path first, then element name
 - Target must be existing element name
