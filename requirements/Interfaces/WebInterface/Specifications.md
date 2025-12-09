@@ -1,5 +1,124 @@
 # Elements
 
+### D3.js Containment Tree Specification
+
+Specification for the D3.js interactive containment tree visualization.
+
+#### Details
+The containment page (containment.html) shall display an interactive D3.js collapsible tree showing the containment hierarchy:
+1. Root node representing the model root
+2. Folder nodes that can be expanded/collapsed
+3. File nodes containing element children
+4. Element nodes with type-specific icons and colors
+5. Attachment nodes as children of elements (element and file attachments)
+6. Clickable elements that navigate to their definitions
+7. Expand All / Collapse All buttons for tree control
+
+The containment view serves as the primary entry point for HTML documentation, providing an interactive visual overview of the model structure.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [HTML Export](Features.md#html-export)
+---
+
+### HTML Branding Specification
+
+Specification for Reqvire branding elements in HTML export.
+
+#### Details
+**Logo and Branding:**
+- The navigation bar shall display the Reqvire logo on the left side before the navigation links
+- A favicon shall be included for browser tab identification
+- Apple touch icons shall be included for mobile device support
+- All brand assets shall be exported to an assets folder during HTML export
+
+**HTML Design:**
+The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [HTML Export](Features.md#html-export)
+---
+
+### HTML Export Pipeline Specification
+
+Technical specification for HTML export generation pipeline.
+
+#### Details
+**Working Directory Setup:**
+- Create temporary working directory (e.g., in /tmp)
+- Generate markdown files from registry with full relations (user-created and auto-generated inverse relations)
+- Copy all related system elements (following satisfiedBy and other relations)
+- Copy all attachment files to temporary directory preserving structure
+
+**Generation Pipeline (in temporary directory):**
+Execute all generation commands treating temporary directory as repository root:
+1. Generate all Mermaid diagrams in markdown files
+2. Generate index.md (interactive D3.js tree showing containment hierarchy - main entry point)
+3. Generate model.md (model-centric visualization with nested relations from root requirements)
+4. Generate traces.md (verification upward traceability)
+5. Generate coverage.md (verification coverage report)
+
+**HTML Conversion:**
+- Convert all markdown files to HTML with embedded styles
+- Process Mermaid diagrams for web rendering
+- Convert internal .md links to .html links
+- Preserve directory structure
+
+**Output:**
+- Accept optional `--output` option to specify output directory
+- When `--output` is not specified, export to a temporary directory and print the path
+- When `--output` is specified, create output folder if not existing
+- Copy generated HTML and all artifacts from temp directory to output directory
+- Clean up temporary working directory (except when output is temp directory)
+
+**Source Protection:**
+- Never modify original repository files
+- All generation happens in isolated temporary directory
+
+**Git Directory Exclusion:**
+- The .git directory shall never be exported to the output folder
+- This prevents internal git metadata from polluting the exported documentation
+
+**Export Related System Elements:**
+- Ensure that any related system elements are also copied into output folder to ensure consistency of exported model
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [HTML Export](Features.md#html-export)
+---
+
+### HTML Navigation Bar Specification
+
+Specification for the fixed navigation bar in HTML pages.
+
+#### Details
+The system shall provide a fixed navigation bar in all HTML pages with links to key model artifacts for easy access.
+
+The navigation bar must include (left to right):
+- Containment: Link to containment.html (interactive D3.js tree - main entry point)
+- Model: Link to model.html (model-centric view with nested relations)
+- Traces: Link to traces.html (verification upward traceability report)
+- Coverage: Link to coverage.html (verification coverage report)
+
+The navigation bar must be:
+- Always visible (fixed position) while scrolling
+- Consistent across all HTML pages
+- Clearly visible and accessible
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [HTML Export](Features.md#html-export)
+---
+
 ### Web Interface Style Specification
 
 Styling conventions for HTML export web interface.

@@ -4,20 +4,6 @@
 
 The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file.
 
-#### Details
-When creating a new element, the system shall:
-- Accept a string containing the full element definition in Markdown format
-- Accept target location: file path
-- Validate the target location using path validation rules
-- Create target file if it does not exist (subject to validation constraints)
-- Parse and validate the element definition string
-- Verify the element name is globally unique in the model
-- Validate and normalize all relations following clearly defined specifications
-- Insert the element into the target file following Element Ordering Behavior
-- Reject the operation and report validation errors if validation fails
-- Provide updates report following Diff Output Format Specification
-- The system shall support override mode to replace existing element with same name following rules defined in Create Element Override Behavior
-
 #### Metadata
   * type: requirement
 
@@ -38,6 +24,7 @@ When creating a new element, the system shall:
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
   * satisfiedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
+  * satisfiedBy: [Create Element Workflow Specification](Specifications.md#create-element-workflow-specification)
   * satisfiedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * verifiedBy: [Create Element Test](Verifications/ElementManipulationVerifications.md#create-element-test)
 ---
@@ -45,32 +32,6 @@ When creating a new element, the system shall:
 ### Delete Element Operation
 
 The system shall provide the capability to delete existing model elements while automatically removing or updating all relations that reference the deleted element, and removing empty files when no elements remain.
-
-#### Details
-When deleting an element, the system shall:
-- Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
-- Reject the operation if any child would become orphaned
-- Provide clear error message listing orphaned children with resolution guidance
-- Allow deletion if children have other parent hierarchical relations
-- Remove the element and all its content from the source file
-- Identify all relations pointing to the deleted element (incoming relations)
-- Remove all relations that reference the deleted element from other elements
-- Identify all relations from the deleted element (outgoing relations)
-- Remove the complete element section including separators
-- Maintain file structure and formatting after deletion
-- Provide updates report following Diff Output Format Specification
-
-**Empty File Cleanup:**
-- After deleting the element, check if the source file contains any remaining elements
-- If no elements remain and all sections are empty (only page content, headers, or whitespace), remove the file from the filesystem
-- If the file is removed, report the file deletion in the operation output
-
-**Relation Handling:**
-- All `derivedFrom` relations pointing to the deleted element shall be removed
-- All `verifiedBy` relations pointing to the deleted element shall be removed
-- All `verify` relations pointing to the deleted element shall be removed
-- All `satisfiedBy` relations pointing to the deleted element shall be removed
-- Relations from the deleted element are automatically removed with the element
 
 #### Metadata
   * type: requirement
@@ -86,6 +47,7 @@ When deleting an element, the system shall:
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [Delete Element Workflow Specification](Specifications.md#delete-element-workflow-specification)
   * verifiedBy: [Delete Element Test](Verifications/ElementManipulationVerifications.md#delete-element-test)
 ---
 
@@ -112,24 +74,6 @@ The system shall persist all element manipulation operations to the source files
 
 The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and attachments while enforcing type compatibility and removing source elements after successful merge.
 
-#### Details
-When merging elements, the system shall:
-- Accept target element name (must exist in the model)
-- Accept one or more source element names (must exist in the model)
-- Validate type compatibility following clearly defined rules in Merge Type Compatibility Constraint
-- Transform and merge content following clearly defined rules in Merge Content Transformation Behavior
-- Preserve target element's metadata (discard source metadata)
-- Delete source elements after successful merge
-- Update all relations pointing to source elements to point to target
-- Remove empty source files when no elements remain
-- Provide updates report following Diff Output Format Specification
-
-The system shall reject the operation with a clear error message if:
-- The target element does not exist
-- Any source element does not exist
-- Source and target element types are incompatible per Merge Type Compatibility Constraint
-- Merged result would have cross-section duplicates per Merge Content Transformation Behavior
-
 #### Metadata
   * type: requirement
 
@@ -145,39 +89,13 @@ The system shall reject the operation with a clear error message if:
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [Merge Content Transformation Behavior](Behaviors.md#merge-content-transformation-behavior)
   * satisfiedBy: [Merge Type Compatibility Constraint](Constraints.md#merge-type-compatibility-constraint)
+  * satisfiedBy: [Merge Element Workflow Specification](Specifications.md#merge-element-workflow-specification)
   * verifiedBy: [Merge Elements Test](Verifications/ElementManipulationVerifications.md#merge-elements-test)
 ---
 
 ### Move Element Operation
 
 The system shall provide the capability to move existing model elements to different file locations while automatically updating all relations that reference the moved element, creating target files if needed, and removing empty source files when no elements remain.
-
-#### Details
-When moving an element, the system shall:
-- Validate the target location using path validation rules
-- Create target file if it does not exist (subject to validation constraints)
-- Remove the element from the source file
-- Insert the element into the target file following Element Ordering Behavior
-- Preserve all element content, metadata, and relations
-- Update the element's identifier to reflect the new location
-- Identify all relations pointing to the moved element (incoming relations)
-- Update all relations that reference the moved element with the new identifier
-- Maintain file structure and formatting in both source and target files
-- Ensure the element name is globally unique in the model
-- Provide updates report following Diff Output Format Specification
-
-**Empty Source File Cleanup:**
-- After moving the element, check if the source file contains any remaining elements
-- If no elements remain (only page content, headers, or whitespace), remove the source file from the filesystem
-- If the file is removed, report the file deletion in the operation output
-
-**Relation Update Requirements:**
-- All relations (both forward and backward) pointing to the moved element shall be updated to the new identifier
-- Relations within the moved element (outgoing relations) shall be preserved unchanged
-
-**Identifier Update:**
-- The element's identifier changes from `<old-file>#<element-name>` to `<new-file>#<element-name>`
-- All references to the old identifier shall be updated to the new identifier
 
 #### Metadata
   * type: requirement
@@ -195,6 +113,7 @@ When moving an element, the system shall:
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [Move Element Workflow Specification](Specifications.md#move-element-workflow-specification)
   * verifiedBy: [Move Element Test](Verifications/ElementManipulationVerifications.md#move-element-test)
 ---
 

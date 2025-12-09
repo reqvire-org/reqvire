@@ -4,80 +4,6 @@
 
 The system SHALL generate comprehensive HTML documentation with all model artifacts by creating a temporary working copy, generating all reports in that copy, and exporting to the output directory.
 
-#### Details
-**Working Directory Setup:**
-- Create temporary working directory (e.g., in /tmp)
-- Generate markdown files from registry with full relations (user-created and auto-generated inverse relations)
-- Copy all related system elements (following satisfiedBy and other relations)
-- Copy all attachment files to temporary directory preserving structure
-
-**Generation Pipeline (in temporary directory):**
-Execute all generation commands treating temporary directory as repository root:
-1. Generate all Mermaid diagrams in markdown files
-2. Generate index.md (interactive D3.js tree showing containment hierarchy - main entry point)
-3. Generate model.md (model-centric visualization with nested relations from root requirements)
-4. Generate traces.md (verification upward traceability)
-5. Generate coverage.md (verification coverage report)
-
-**HTML Conversion:**
-- Convert all markdown files to HTML with embedded styles
-- Process Mermaid diagrams for web rendering
-- Convert internal .md links to .html links
-- Preserve directory structure
-
-**Output:**
-- Accept optional `--output` option to specify output directory
-- When `--output` is not specified, export to a temporary directory and print the path
-- When `--output` is specified, create output folder if not existing
-- Copy generated HTML and all artifacts from temp directory to output directory
-- Clean up temporary working directory (except when output is temp directory)
-
-**Source Protection:**
-- Never modify original repository files
-- All generation happens in isolated temporary directory
-
-**Git Directory Exclusion:**
-- The .git directory shall never be exported to the output folder
-- This prevents internal git metadata from polluting the exported documentation
-
-**Export Related System Elements:**
-- Ensure that any related system elements are also copied into output folder to ensure consistency of exported model
-
-**Containment Generation (D3.js Tree):**
-The containment page (containment.html) shall display an interactive D3.js collapsible tree showing the containment hierarchy:
-1. Root node representing the model root
-2. Folder nodes that can be expanded/collapsed
-3. File nodes containing element children
-4. Element nodes with type-specific icons and colors
-5. Attachment nodes as children of elements (element and file attachments)
-6. Clickable elements that navigate to their definitions
-7. Expand All / Collapse All buttons for tree control
-
-The containment view serves as the primary entry point for HTML documentation, providing an interactive visual overview of the model structure.
-
-**HTML Navigation Bar:**
-The system shall provide a fixed navigation bar in all HTML pages with links to key model artifacts for easy access.
-
-The navigation bar must include (left to right):
-- Containment: Link to containment.html (interactive D3.js tree - main entry point)
-- Model: Link to model.html (model-centric view with nested relations)
-- Traces: Link to traces.html (verification upward traceability report)
-- Coverage: Link to coverage.html (verification coverage report)
-
-The navigation bar must be:
-- Always visible (fixed position) while scrolling
-- Consistent across all HTML pages
-- Clearly visible and accessible
-
-**HTML Design:**
-The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.
-
-**Logo and Branding:**
-- The navigation bar shall display the Reqvire logo on the left side before the navigation links
-- A favicon shall be included for browser tab identification
-- Apple touch icons shall be included for mobile device support
-- All brand assets shall be exported to an assets folder during HTML export
-
 #### Metadata
   * type: requirement
 
@@ -98,6 +24,10 @@ The system shall design and implement HTML pages with consistent layout, styling
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
   * satisfiedBy: [base.html](../../../core/templates/base.html)
   * satisfiedBy: [model.html](../../../core/templates/model.html)
+  * satisfiedBy: [D3.js Containment Tree Specification](Specifications.md#d3js-containment-tree-specification)
+  * satisfiedBy: [HTML Branding Specification](Specifications.md#html-branding-specification)
+  * satisfiedBy: [HTML Export Pipeline Specification](Specifications.md#html-export-pipeline-specification)
+  * satisfiedBy: [HTML Navigation Bar Specification](Specifications.md#html-navigation-bar-specification)
   * satisfiedBy: [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
   * verifiedBy: [CLI Help Structure Verification](../CLI/Verifications/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [HTML Export Verification](Verifications/WebInterfaceVerifications.md#html-export-verification)
@@ -139,6 +69,9 @@ For each element with attachments:
 
 #### Metadata
   * type: requirement
+
+#### Attachments
+  * [D3.js Containment Tree Specification](Specifications.md#d3js-containment-tree-specification)
 
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
@@ -191,6 +124,8 @@ The system shall generate a model-centric visualization during HTML export showi
 
 #### Attachments
   * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
+  * [HTML Export Pipeline Specification](Specifications.md#html-export-pipeline-specification)
+  * [HTML Navigation Bar Specification](Specifications.md#html-navigation-bar-specification)
 
 #### Relations
   * derive: [Model View Element Navigation](#model-view-element-navigation)
@@ -238,6 +173,10 @@ The system shall ensure color consistency between:
 #### Metadata
   * type: requirement
 
+#### Attachments
+  * [HTML Navigation Bar Specification](Specifications.md#html-navigation-bar-specification)
+  * [HTML Branding Specification](Specifications.md#html-branding-specification)
+
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
@@ -263,6 +202,9 @@ The system SHALL provide a serve command that exports comprehensive HTML documen
 
 #### Metadata
   * type: requirement
+
+#### Attachments
+  * [HTML Export Pipeline Specification](Specifications.md#html-export-pipeline-specification)
 
 #### Relations
   * derivedFrom: [Web Interface](../Interfaces.md#web-interface)

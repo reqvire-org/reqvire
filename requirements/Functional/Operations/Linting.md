@@ -57,39 +57,6 @@ Auto-fix shall:
 
 The system shall detect when an element reaches a common ancestor through multiple distinct branch paths without a direct relation, reporting these cases as needing manual review to determine if both branches are semantically necessary or if one represents a modeling error.
 
-#### Details
-A multi-branch convergence occurs when:
-- An element reaches a common ancestor through two or more distinct derivedFrom branch paths
-- There is NO direct derivedFrom relation from the element to the ancestor
-- Each branch represents a potentially different semantic relationship
-- The convergence may be intentional (element truly derives from ancestor through multiple contexts) OR may represent redundant modeling
-
-**Key Distinction from Redundant Hierarchical Relations:**
-- **Redundant Hierarchical Relations**: Element has a DIRECT relation to ancestor PLUS alternate paths → auto-fixable (remove direct relation)
-- **Multi-Branch Convergence**: Element reaches ancestor through MULTIPLE branches with NO direct relation → needs manual review (determine if branches are semantically distinct)
-
-**Example:**
-```
-Authorization (root)
-  → Management API
-    → API Specification
-  → Public API
-    → API Specification
-```
-API Specification reaches Authorization through two branches (Management API and Public API). Both branches might be semantically valid (spec derives from auth in context of both APIs), OR one might be a modeling error that should be removed.
-
-Detection shall:
-- Use the trace tree building logic to identify elements that reach common ancestors through multiple distinct branch paths
-- Exclude cases where a direct relation exists (those are handled by Redundant Hierarchical Relations Detection)
-- Report the element, the common ancestor, and all distinct branch paths
-- Categorize as **needs manual review** since determining semantic necessity requires human judgment
-- Explain that the user must decide whether all branches represent valid semantic relationships or if one is redundant
-
-This enables the model author to review and decide:
-- Are both branches semantically necessary? (keep both)
-- Is one branch a modeling error? (remove that branch's intermediate relations)
-- Should there be a direct relation instead? (restructure the model)
-
 #### Metadata
   * type: requirement
 
@@ -99,6 +66,7 @@ This enables the model author to review and decide:
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
+  * satisfiedBy: [Multi-Branch Convergence Detection Specification](Specifications.md#multi-branch-convergence-detection-specification)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 

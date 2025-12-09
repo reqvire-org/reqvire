@@ -1,5 +1,67 @@
 # Elements
 
+### Create Element Workflow Specification
+
+Detailed workflow for creating new model elements.
+
+#### Details
+When creating a new element, the system shall:
+- Accept a string containing the full element definition in Markdown format
+- Accept target location: file path
+- Validate the target location using path validation rules
+- Create target file if it does not exist (subject to validation constraints)
+- Parse and validate the element definition string
+- Verify the element name is globally unique in the model
+- Validate and normalize all relations following clearly defined specifications
+- Insert the element into the target file following Element Ordering Behavior
+- Reject the operation and report validation errors if validation fails
+- Provide updates report following Diff Output Format Specification
+- The system shall support override mode to replace existing element with same name following rules defined in Create Element Override Behavior
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Create Element Operation](ElementManipulation.md#create-element-operation)
+---
+
+### Delete Element Workflow Specification
+
+Detailed workflow for deleting existing model elements.
+
+#### Details
+When deleting an element, the system shall:
+- Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
+- Reject the operation if any child would become orphaned
+- Provide clear error message listing orphaned children with resolution guidance
+- Allow deletion if children have other parent hierarchical relations
+- Remove the element and all its content from the source file
+- Identify all relations pointing to the deleted element (incoming relations)
+- Remove all relations that reference the deleted element from other elements
+- Identify all relations from the deleted element (outgoing relations)
+- Remove the complete element section including separators
+- Maintain file structure and formatting after deletion
+- Provide updates report following Diff Output Format Specification
+
+**Empty File Cleanup:**
+- After deleting the element, check if the source file contains any remaining elements
+- If no elements remain and all sections are empty (only page content, headers, or whitespace), remove the file from the filesystem
+- If the file is removed, report the file deletion in the operation output
+
+**Relation Handling:**
+- All `derivedFrom` relations pointing to the deleted element shall be removed
+- All `verifiedBy` relations pointing to the deleted element shall be removed
+- All `verify` relations pointing to the deleted element shall be removed
+- All `satisfiedBy` relations pointing to the deleted element shall be removed
+- Relations from the deleted element are automatically removed with the element
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Delete Element Operation](ElementManipulation.md#delete-element-operation)
+---
+
 ### Document Structure Specification
 
 Rules for normalizing document hierarchical structure during formatting.
@@ -90,6 +152,117 @@ Specification for lint command output format and content structure.
 
 #### Relations
   * satisfy: [Model Linting](Linting.md#model-linting)
+---
+
+### Merge Element Workflow Specification
+
+Detailed workflow for merging multiple source elements into a target element.
+
+#### Details
+When merging elements, the system shall:
+- Accept target element name (must exist in the model)
+- Accept one or more source element names (must exist in the model)
+- Validate type compatibility following clearly defined rules in Merge Type Compatibility Constraint
+- Transform and merge content following clearly defined rules in Merge Content Transformation Behavior
+- Preserve target element's metadata (discard source metadata)
+- Delete source elements after successful merge
+- Update all relations pointing to source elements to point to target
+- Remove empty source files when no elements remain
+- Provide updates report following Diff Output Format Specification
+
+The system shall reject the operation with a clear error message if:
+- The target element does not exist
+- Any source element does not exist
+- Source and target element types are incompatible per Merge Type Compatibility Constraint
+- Merged result would have cross-section duplicates per Merge Content Transformation Behavior
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Merge Element Operation](ElementManipulation.md#merge-element-operation)
+---
+
+### Move Element Workflow Specification
+
+Detailed workflow for moving existing model elements to different file locations.
+
+#### Details
+When moving an element, the system shall:
+- Validate the target location using path validation rules
+- Create target file if it does not exist (subject to validation constraints)
+- Remove the element from the source file
+- Insert the element into the target file following Element Ordering Behavior
+- Preserve all element content, metadata, and relations
+- Update the element's identifier to reflect the new location
+- Identify all relations pointing to the moved element (incoming relations)
+- Update all relations that reference the moved element with the new identifier
+- Maintain file structure and formatting in both source and target files
+- Ensure the element name is globally unique in the model
+- Provide updates report following Diff Output Format Specification
+
+**Empty Source File Cleanup:**
+- After moving the element, check if the source file contains any remaining elements
+- If no elements remain (only page content, headers, or whitespace), remove the source file from the filesystem
+- If the file is removed, report the file deletion in the operation output
+
+**Relation Update Requirements:**
+- All relations (both forward and backward) pointing to the moved element shall be updated to the new identifier
+- Relations within the moved element (outgoing relations) shall be preserved unchanged
+
+**Identifier Update:**
+- The element's identifier changes from `<old-file>#<element-name>` to `<new-file>#<element-name>`
+- All references to the old identifier shall be updated to the new identifier
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Move Element Operation](ElementManipulation.md#move-element-operation)
+---
+
+### Multi-Branch Convergence Detection Specification
+
+Technical specification for detecting when an element reaches a common ancestor through multiple distinct branch paths.
+
+#### Details
+A multi-branch convergence occurs when:
+- An element reaches a common ancestor through two or more distinct derivedFrom branch paths
+- There is NO direct derivedFrom relation from the element to the ancestor
+- Each branch represents a potentially different semantic relationship
+- The convergence may be intentional (element truly derives from ancestor through multiple contexts) OR may represent redundant modeling
+
+**Key Distinction from Redundant Hierarchical Relations:**
+- **Redundant Hierarchical Relations**: Element has a DIRECT relation to ancestor PLUS alternate paths → auto-fixable (remove direct relation)
+- **Multi-Branch Convergence**: Element reaches ancestor through MULTIPLE branches with NO direct relation → needs manual review (determine if branches are semantically distinct)
+
+**Example:**
+```
+Authorization (root)
+  → Management API
+    → API Specification
+  → Public API
+    → API Specification
+```
+API Specification reaches Authorization through two branches (Management API and Public API). Both branches might be semantically valid (spec derives from auth in context of both APIs), OR one might be a modeling error that should be removed.
+
+Detection shall:
+- Use the trace tree building logic to identify elements that reach common ancestors through multiple distinct branch paths
+- Exclude cases where a direct relation exists (those are handled by Redundant Hierarchical Relations Detection)
+- Report the element, the common ancestor, and all distinct branch paths
+- Categorize as **needs manual review** since determining semantic necessity requires human judgment
+- Explain that the user must decide whether all branches represent valid semantic relationships or if one is redundant
+
+This enables the model author to review and decide:
+- Are both branches semantically necessary? (keep both)
+- Is one branch a modeling error? (remove that branch's intermediate relations)
+- Should there be a direct relation instead? (restructure the model)
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Multi-Branch Convergence Detection](Linting.md#multi-branch-convergence-detection)
 ---
 
 ### Orphaned Children Error Message Specification

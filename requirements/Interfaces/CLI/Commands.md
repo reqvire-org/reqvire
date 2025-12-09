@@ -142,6 +142,7 @@ The `add` command shall:
   * [Create Element Override Behavior](../../Functional/Operations/Behaviors.md#create-element-override-behavior)
   * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
+  * [Create Element Workflow Specification](../../Functional/Operations/Specifications.md#create-element-workflow-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -250,6 +251,7 @@ The markdown output shall include:
   * [Short Mode Behavior](../../Functional/Output/Behaviors.md#short-mode-behavior)
   * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
   * [ContainmentView.md](../../Functional/Output/DesignDocuments/ContainmentView.md)
+  * [D3.js Containment Tree Specification](../WebInterface/Specifications.md#d3js-containment-tree-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -324,6 +326,7 @@ Command output shall be written to stdout for easy redirection to files.
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Lint Output Specification](../../Functional/Operations/Specifications.md#lint-output-specification)
   * [Text Output Formatting](../../Functional/Output/Specifications.md#text-output-formatting)
+  * [Multi-Branch Convergence Detection Specification](../../Functional/Operations/Specifications.md#multi-branch-convergence-detection-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -352,6 +355,7 @@ The `merge` command shall:
   * [Merge Content Transformation Behavior](../../Functional/Operations/Behaviors.md#merge-content-transformation-behavior)
   * [Merge Type Compatibility Constraint](../../Functional/Operations/Constraints.md#merge-type-compatibility-constraint)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
+  * [Merge Element Workflow Specification](../../Functional/Operations/Specifications.md#merge-element-workflow-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -451,6 +455,7 @@ The `mv` command shall:
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
+  * [Move Element Workflow Specification](../../Functional/Operations/Specifications.md#move-element-workflow-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -546,6 +551,7 @@ The `rm` command shall:
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
+  * [Delete Element Workflow Specification](../../Functional/Operations/Specifications.md#delete-element-workflow-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
