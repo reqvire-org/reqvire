@@ -43,7 +43,6 @@ As a **Developer**, I want to align code with System models, so that implementat
 
 #### Relations
   * derive: [Code Traceability](Functional/Integration/CodeAlignment.md#code-traceability)
-  * derive: [Suggest Code Refactoring](Functional/Integration/CodeAlignment.md#suggest-code-refactoring)
 ---
 
 ### Defining Model Structure
@@ -219,3 +218,4 @@ As a **V&V Engineer**, I want to trace verification coverage through the require
 #### Relations
   * derive: [Verification Upward Traceability](Functional/Processing/VerificationTraces.md#verification-upward-traceability)
 ---
+

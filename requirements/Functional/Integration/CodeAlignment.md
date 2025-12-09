@@ -185,13 +185,3 @@ While processing traceability in code, the system shall ensure that each `[reqvi
   * derivedFrom: [Traceability Format](#traceability-format)
 ---
 
-### Suggest Code Refactoring
-
-The system shall suggest code refactoring opportunities to better align with the structure and relationships in the System model.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Aligning Design with Code](../../UserStories.md#aligning-design-with-code)
----
