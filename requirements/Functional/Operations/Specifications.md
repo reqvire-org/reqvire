@@ -108,6 +108,83 @@ The error message for orphaned children prevention shall include:
   * satisfy: [Delete Element Operation](ElementManipulation.md#delete-element-operation)
 ---
 
+### Redundant Hierarchical Relations Specification
+
+Technical specification for detecting and auto-removing redundant derivedFrom relations in the requirement hierarchy.
+
+#### Details
+**What is Redundant:**
+
+A derivedFrom relation is redundant when:
+- An element has a direct derivedFrom relation to an ancestor requirement
+- The same element also reaches that ancestor through other derivedFrom relations via intermediate elements
+- The hierarchy chain is already established through other paths (single or multiple convergent paths)
+
+**Core Principle**: If an element has a direct relation to an ancestor AND that ancestor is reachable through any other path(s), the direct relation adds no traceability value and can be safely auto-removed.
+
+This applies to:
+- **Single-chain redundancy**: Element reaches ancestor through exactly one intermediate path
+- **Multi-path/branching redundancy**: Element reaches ancestor through multiple convergent paths
+
+**Detection Logic:**
+
+The system shall use verification trace tree logic for detection:
+- Create a virtual/dummy verification element
+- Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations
+- Apply the same trace tree building logic used for verification upward traceability
+- The trace tree will naturally identify when leaf requirements have derivedFrom relations to both a parent and its ancestor
+- Identify which intermediate paths provide the alternate routes to the ancestor
+
+This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.
+
+**Safe Auto-Removal Criteria:**
+
+A redundant hierarchical derivation relation shall be considered safe to auto-remove when ALL of the following conditions are met:
+1. **Direct relation exists**: Element A has a direct derivedFrom relation to element C
+2. **Alternate path exists**: There exists at least one path from A to C through intermediate elements (single or multiple convergent paths)
+3. **Transitive redundancy**: The direct A → C relation is redundant because C is reachable through other derivedFrom relations
+
+**Examples:**
+
+*Single-chain redundancy (auto-removable):*
+```
+User Requirement A
+  → System Requirement B
+    → Implementation C
+
+Redundant: A → C (can be safely auto-removed)
+Reason: C is reachable via A → B → C
+```
+
+*Multi-path/branching redundancy (auto-removable):*
+```
+Authorization A
+  → Public API B → API Specification D
+  → Management API C → API Specification D
+
+Redundant: A → D (can be safely auto-removed)
+Reason: D is reachable via A → B → D and A → C → D
+```
+
+**Auto-Removal Behavior:**
+
+When auto-fix mode is activated, the system shall:
+- Remove ALL redundant derivedFrom relations where alternate paths exist
+- Preserve traceability through intermediate elements
+- Maintain model coherence by ensuring all elements remain reachable through non-redundant paths
+- Report removed relations to the user for transparency
+- Show which intermediate paths provide the alternate routes
+- Categorize ALL redundant hierarchical relations as **auto-fixable** since the direct relation adds no value when alternate paths exist
+
+**Implementation Note**: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * satisfy: [Redundant Hierarchical Relations Detection and Auto-Removal](Linting.md#redundant-hierarchical-relations-detection-and-auto-removal)
+---
+
 ### Relation Operations Specification
 
 Technical specification for relation link and unlink operations.
