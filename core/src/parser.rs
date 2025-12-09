@@ -47,6 +47,33 @@ fn remove_generated_diagrams(content: &str) -> String {
     result
 }
 
+/// Returns an example of correctly formatted element markdown for error messages
+fn get_element_example() -> &'static str {
+    r#"
+Example of correctly formatted element:
+
+### Element Name
+
+Brief description of the element.
+
+#### Details
+Additional details can go here.
+
+You can use **markdown formatting**.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Parent Element](../ParentFile.md#parent-element)
+  * satisfiedBy: [Implementation](../code/impl.rs)
+
+#### Attachments
+  * [Attached Specification](Specifications.md#specification-name)
+---
+"#
+}
+
 /// Parses a single element from markdown string.
 /// Used for CRUD operations (add command) to parse element from stdin or inline argument.
 /// Returns the parsed Element or an error.
@@ -83,7 +110,7 @@ pub fn parse_single_element(
         if trimmed.starts_with("### ") {
             if found_header {
                 return Err(ReqvireError::InvalidMarkdownStructure(
-                    "Multiple ### headers found. Single element should have only one ### header.".to_string()
+                    format!("Multiple ### headers found. Single element should have only one ### header.\n{}", get_element_example())
                 ));
             }
 
@@ -159,7 +186,7 @@ pub fn parse_single_element(
                     }
                 } else {
                     return Err(ReqvireError::InvalidMetadataFormat(
-                        format!("Invalid metadata format: '{}'", trimmed)
+                        format!("Invalid metadata format: '{}'. Expected format: '  * key: value'\n{}", trimmed, get_element_example())
                     ));
                 }
             }
@@ -170,7 +197,7 @@ pub fn parse_single_element(
                 if trimmed.starts_with("* ") {
                     let (relation_type, (text, link)) = utils::parse_relation_line(trimmed)
                         .map_err(|_| ReqvireError::InvalidRelationFormat(
-                            format!("Invalid relation format: '{}'", trimmed)
+                            format!("Invalid relation format: '{}'. Expected format: '  * relationType: [Text](link)'\n{}", trimmed, get_element_example())
                         ))?;
 
                     // Normalize relation target
@@ -208,7 +235,7 @@ pub fn parse_single_element(
 
                 } else if !trimmed.is_empty() {
                     return Err(ReqvireError::InvalidRelationFormat(
-                        format!("Invalid relations format: '{}'", trimmed)
+                        format!("Invalid relations format: '{}'. Expected format: '  * relationType: [Text](link)'\n{}", trimmed, get_element_example())
                     ));
                 }
             }
@@ -273,13 +300,13 @@ pub fn parse_single_element(
                         }
                         Err(e) => {
                             return Err(ReqvireError::InvalidAttachmentFormat(
-                                format!("Invalid attachment format '{}': {}", trimmed, e)
+                                format!("Invalid attachment format '{}': {}.\n{}", trimmed, e, get_element_example())
                             ));
                         }
                     }
                 } else if !trimmed.is_empty() {
                     return Err(ReqvireError::InvalidAttachmentFormat(
-                        format!("Invalid attachment format: '{}'", trimmed)
+                        format!("Invalid attachment format: '{}'. Expected format: '  * [Text](link)'\n{}", trimmed, get_element_example())
                     ));
                 }
             }
@@ -290,14 +317,14 @@ pub fn parse_single_element(
     if let Some(mut element) = current_element {
         if !found_header {
             return Err(ReqvireError::InvalidMarkdownStructure(
-                "Element must start with ### header".to_string()
+                format!("Element must start with ### header.\n{}", get_element_example())
             ));
         }
         element.freeze_content();
         Ok(element)
     } else {
         Err(ReqvireError::InvalidMarkdownStructure(
-            "No element found in markdown string".to_string()
+            format!("No element found in markdown string.\n{}", get_element_example())
         ))
     }
 }
