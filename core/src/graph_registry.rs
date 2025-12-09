@@ -2618,6 +2618,44 @@ impl GraphRegistry {
         // This is necessary for hierarchical ordering to recognize parent-child relationships
         self.populate_relation_element_ids();
 
+        // CRITICAL: Maintain bidirectional consistency for in-memory model
+        // Create opposite relations for all relations in the newly added element
+        let new_element_id = new_element.identifier.clone();
+        let relations_to_process: Vec<_> = self.nodes.get(&new_element_id)
+            .unwrap()
+            .element
+            .relations
+            .clone();
+
+        for relation in relations_to_process {
+            // Check if this relation type has an opposite
+            if let Some(opposite_type_name) = relation.relation_type.opposite {
+                // Only create opposite if target is an element (has full identifier)
+                if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
+                    // Check if target element exists in nodes
+                    if self.nodes.contains_key(target_id) {
+                        let opposite_relation_info = crate::relation::RELATION_TYPES.get(opposite_type_name).unwrap();
+
+                        // Create opposite relation
+                        let opposite_relation = crate::relation::Relation {
+                            relation_type: opposite_relation_info,
+                            target: crate::relation::RelationTarget {
+                                text: new_element.name.clone(),
+                                link: crate::relation::LinkType::Identifier(new_element_id.clone()),
+                                element_id: Some(new_element.id.clone()),
+                            },
+                            user_created: false, // Auto-generated opposite
+                        };
+
+                        // Add opposite relation to target element
+                        if let Some(target_node) = self.nodes.get_mut(target_id) {
+                            target_node.element.relations.push(opposite_relation);
+                        }
+                    }
+                }
+            }
+        }
+
         // Track modified file
         self.modified_files.insert(target_file.to_string());
 
