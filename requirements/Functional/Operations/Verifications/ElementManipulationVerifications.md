@@ -18,6 +18,57 @@ Test cases:
   * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
 ---
 
+### Add Command Error Messages Test
+
+Test verifies that the add command provides contextual error messages with examples when format parsing fails.
+
+#### Details
+**Test Cases:**
+
+1. **Missing ### header**: Provide markdown without element header
+   - Verify error message includes "Example of correctly formatted element"
+   - Verify example shows "### Element Name"
+
+2. **Multiple ### headers**: Provide markdown with multiple element headers
+   - Verify error message includes example
+   - Verify example includes Metadata subsection
+
+3. **Invalid metadata format**: Provide metadata without bullet point
+   - Verify error message includes "Expected format: '  * key: value'"
+   - Verify example shows correct metadata format
+
+4. **Invalid relation format**: Provide relation without proper markdown link
+   - Verify error message includes "Expected format: '  * relationType: [Text](link)'"
+   - Verify example includes Relations subsection
+
+5. **Invalid attachment format**: Provide attachment without proper markdown link
+   - Verify error message includes "Expected format: '  * [Text](link)'"
+   - Verify example includes Attachments subsection
+
+6. **Example completeness**: Verify example includes all subsections
+   - Details subsection with markdown formatting
+   - Metadata subsection with type
+   - Relations subsection with derivedFrom and satisfiedBy examples
+   - Attachments subsection
+   - Separator (---)
+
+**Success Criteria:**
+- Command exits with non-zero code for all invalid inputs
+- Error messages include "Example of correctly formatted element"
+- Examples show proper structure for all subsections
+- Format guidance is specific to the error type
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-add-command-error-messages/test.sh)
+  * verify: [Enhanced Validation Error Reporting](../../Core/Validation.md#enhanced-validation-error-reporting)
+  * verify: [Markdown Structure Validator](../../Core/Validation.md#markdown-structure-validator)
+  * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
+  * verify: [Detailed Error Handling and Logging](../../../Interfaces/CLI/Commands.md#detailed-error-handling-and-logging)
+---
+
 ### CLI Add Element Test
 
 The test shall verify that the `add` command creates new elements from stdin or inline string input, validates structure, inserts following Element Ordering Behavior, and outputs git-style diffs.
