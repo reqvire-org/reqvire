@@ -2,31 +2,7 @@
 
 ### Model Reports
 
-When requested the system shall provide human readable and machine readable System model reports.
-
-#### Details
-All generated reports shall produce deterministic output with consistent ordering to enable reliable testing, version control, and reproducible builds.
-
-The system shall ensure deterministic output by:
-
-1. **Element Ordering**: Elements shall be sorted by identifier before iteration to ensure consistent processing order across all operations
-2. **Relation Ordering**: Relations within each element shall be sorted by relation type name and then by target identifier before rendering
-3. **Section Ordering**: Sections within files shall be sorted alphabetically when order is not semantically significant
-4. **File Ordering**: Files within folders shall be sorted alphabetically
-
-This determinism ensures that:
-- Running the same operation multiple times produces byte-identical output
-- Automated tests can reliably compare expected and actual outputs using simple diff tools without special normalization
-- Version control diffs are meaningful and reflect actual changes rather than random ordering variations
-- Continuous integration pipelines produce consistent, reproducible results
-
-This requirement applies to all report operations, including:
-- Model summary reporting - Summary reports in text and JSON formats
-- Verification tracing - Upward traceability trees from verifications to requirements
-- Coverage reporting - Verification coverage analysis
-- Change impact analysis - Reports showing propagation of changes
-- Validation reporting - Model validation error reports
-- Linting - Model quality issue reports
+When requested the system shall provide human readable and machine readable System model reports with deterministic output and consistent ordering.
 
 #### Metadata
   * type: user-requirement
@@ -42,6 +18,7 @@ This requirement applies to all report operations, including:
   * derive: [Resources Report](#resources-report)
   * derive: [Verification Coverage Report](#verification-coverage-report)
   * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
+  * satisfiedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
   * satisfiedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * satisfiedBy: [Error Message Format Specification](Specifications.md#error-message-format-specification)
   * satisfiedBy: [JSON Output Structure](Specifications.md#json-output-structure)
@@ -60,6 +37,9 @@ The system shall define:
 
 #### Metadata
   * type: requirement
+
+#### Attachments
+  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
@@ -107,6 +87,9 @@ The system shall include design documents:
 #### Attachments
   * [ContainmentView.md](DesignDocuments/ContainmentView.md)
   * [Containment Specification](../../Refinements.md#containment-specification)
+  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
+  * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
+  * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
@@ -129,6 +112,11 @@ System shall support markdown and JSON output formats.
 #### Metadata
   * type: requirement
 
+#### Attachments
+  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
+  * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
+  * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
+
 #### Relations
   * derive: [Forward-Only Relation Traversal](#forward-only-relation-traversal)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
@@ -150,6 +138,9 @@ When filtering by root element, system shall traverse only forward relations dow
 #### Metadata
   * type: requirement
 
+#### Attachments
+  * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
+
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
@@ -162,6 +153,9 @@ The system shall support reverse relation traversal for model views, following d
 
 #### Metadata
   * type: requirement
+
+#### Attachments
+  * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
 
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
@@ -211,6 +205,8 @@ The system shall define custom element type tracking:
   * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
   * [JSON Output Structure](Specifications.md#json-output-structure)
   * [Text Output Formatting](Specifications.md#text-output-formatting)
+  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
+  * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
@@ -286,6 +282,9 @@ The system shall implement a validation report generator that compiles and forma
 #### Metadata
   * type: requirement
 
+#### Attachments
+  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
+
 #### Relations
   * derivedFrom: [Provide Validation Reports](#provide-validation-reports)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
@@ -293,31 +292,7 @@ The system shall implement a validation report generator that compiles and forma
 
 ### Resources Report
 
-The system shall provide a resources report showing all files referenced by the model through relations and attachments.
-
-#### Details
-**Report Structure:**
-- Two sections: Relations and Attachments
-- Each section lists files alphabetically by path
-- Each file shows referencing elements with links
-
-**Relations Section:**
-- Files from InternalPath relation targets (satisfiedBy, trace, etc.)
-- Shows relation type and source element for each reference
-- Sorted by relation type, then by element identifier
-
-**Attachments Section:**
-- Files from FilePath attachment targets
-- Shows source element for each reference
-- Sorted by element identifier
-
-**Output Formats:**
-- Text/Markdown: Human-readable with markdown links
-- JSON: Structured data for programmatic use
-
-**HTML Export:**
-- Resources view available in HTML export with navigation link
-- Shows complete list of referenced files with element traceability
+The system shall provide a resources report showing all files referenced by the model through relations and attachments in text, JSON, and HTML formats.
 
 #### Metadata
   * type: user-requirement
@@ -326,6 +301,7 @@ The system shall provide a resources report showing all files referenced by the 
   * derive: [CLI Resources Command](../../Interfaces/CLI/Commands.md#cli-resources-command)
   * derivedFrom: [Model Reports](#model-reports)
   * satisfiedBy: [report_resources.rs](../../../core/src/report_resources.rs)
+  * satisfiedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
   * verifiedBy: [Resources Report Verification](Verifications/ReportingVerifications.md#resources-report-verification)
 ---
 
@@ -355,6 +331,7 @@ The report helps track verification completeness and identify gaps in requiremen
   * [Verification Coverage Specification](../../Refinements.md#verification-coverage-specification)
   * [Verification Roll-up Specification](../Processing/Specifications.md#verification-roll-up-specification)
   * [Verification Type Selection Guidelines](../Core/Specifications.md#verification-type-selection-guidelines)
+  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
@@ -374,6 +351,7 @@ The system shall generate a TraceFlow view page showing the verification traceab
   * [Traceability Reporting Specification](../../Refinements.md#traceability-reporting-specification)
   * [Verification Roll-up Specification](../Processing/Specifications.md#verification-roll-up-specification)
   * [Verification Trace Tree Construction](../Processing/Specifications.md#verification-trace-tree-construction)
+  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
 
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)

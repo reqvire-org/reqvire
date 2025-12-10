@@ -729,24 +729,24 @@ blockquote {
 <h2 id="summary">Summary</h2>
 <h3 id="leaf-requirements">Leaf Requirements</h3>
 <ul>
-<li><strong>Total Leaf Requirements:</strong> 102</li>
-<li><strong>Verified Leaf Requirements:</strong> 69 (67.6%)</li>
-<li><strong>Unverified Leaf Requirements:</strong> 33</li>
+<li><strong>Total Leaf Requirements:</strong> 100</li>
+<li><strong>Verified Leaf Requirements:</strong> 70 (70.0%)</li>
+<li><strong>Unverified Leaf Requirements:</strong> 30</li>
 </ul>
 <h3 id="test-verifications">Test Verifications</h3>
 <ul>
-<li><strong>Total Test Verifications:</strong> 91</li>
-<li><strong>Satisfied Test Verifications:</strong> 81 (89.0%)</li>
+<li><strong>Total Test Verifications:</strong> 92</li>
+<li><strong>Satisfied Test Verifications:</strong> 82 (89.1%)</li>
 <li><strong>Unsatisfied Test Verifications:</strong> 10</li>
 </ul>
 <h3 id="orphaned-verifications">Orphaned Verifications</h3>
 <ul>
-<li><strong>Total Verifications:</strong> 91</li>
-<li><strong>Orphaned Verifications:</strong> 6 (6.6%)</li>
+<li><strong>Total Verifications:</strong> 92</li>
+<li><strong>Orphaned Verifications:</strong> 6 (6.5%)</li>
 </ul>
 <h3 id="verification-types">Verification Types</h3>
 <ul>
-<li>Test: 91</li>
+<li>Test: 92</li>
 <li>Analysis: 0</li>
 <li>Inspection: 0</li>
 <li>Demonstration: 0</li>
@@ -881,6 +881,7 @@ blockquote {
 <ul>
 <li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#invalid-header-structure-test">requirements/Functional/Core/Verifications/ValidationVerifications.md#invalid-header-structure-test</a></li>
 <li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#invalid-relations-test">requirements/Functional/Core/Verifications/ValidationVerifications.md#invalid-relations-test</a></li>
+<li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#add-command-error-messages-test</a></li>
 </ul>
 </li>
 </ul>
@@ -1108,7 +1109,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="requirements/Functional/Operations/Linting.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></strong>
+<li>✅ <strong><a href="requirements/Functional/Operations/Linting.html#redundant-hierarchical-relations-detection-and-auto-removal">Redundant Hierarchical Relations Detection and Auto-Removal</a></strong>
 <ul>
 <li>Verified by:
 <ul>
@@ -1117,7 +1118,7 @@ blockquote {
 </li>
 </ul>
 </li>
-<li>✅ <strong><a href="requirements/Functional/Operations/Linting.html#safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</a></strong>
+<li>✅ <strong><a href="requirements/Functional/Operations/Linting.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></strong>
 <ul>
 <li>Verified by:
 <ul>
@@ -1238,6 +1239,7 @@ blockquote {
 <li>Verified by:
 <ul>
 <li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-duplicate-detection-test">requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#add-command-duplicate-detection-test</a></li>
+<li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#add-command-error-messages-test</a></li>
 <li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#cli-add-element-test">requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test</a></li>
 </ul>
 </li>
@@ -1347,6 +1349,15 @@ blockquote {
 <li><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html#attachment-search-filters-verification">requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification</a></li>
 <li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#search-command-tests">requirements/Functional/Output/Verifications/ReportingVerifications.md#search-command-tests</a></li>
 <li><a href="requirements/Interfaces/CLI/Verifications/CLIVerifications.html#cli-help-structure-verification">requirements/Interfaces/CLI/Verifications/CLIVerifications.md#cli-help-structure-verification</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/Interfaces/CLI/Commands.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></strong>
+<ul>
+<li>Verified by:
+<ul>
+<li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#add-command-error-messages-test</a></li>
 </ul>
 </li>
 </ul>
@@ -1462,7 +1473,6 @@ blockquote {
 <li>❌ <strong><a href="requirements/Functional/Integration/CodeAlignment.html#dash-style-comment">Dash style comment</a></strong></li>
 <li>❌ <strong><a href="requirements/Functional/Integration/CodeAlignment.html#sql-style-comment">SQL style comment</a></strong></li>
 <li>❌ <strong><a href="requirements/Functional/Integration/CodeAlignment.html#slash-style-comment">Slash style comment</a></strong></li>
-<li>❌ <strong><a href="requirements/Functional/Integration/CodeAlignment.html#suggest-code-refactoring">Suggest Code Refactoring</a></strong></li>
 <li>❌ <strong><a href="requirements/Functional/Integration/CodeAlignment.html#validating-traceability-format">Validating Traceability Format</a></strong></li>
 <li>❌ <strong><a href="requirements/Functional/Integration/CodeAlignment.html#xml-style-comment">XML style comment</a></strong></li>
 </ul>
@@ -1499,7 +1509,6 @@ blockquote {
 <li>❌ <strong><a href="requirements/Interfaces/CLI/Commands.html#cli-lint-command">CLI Lint Command</a></strong></li>
 <li>❌ <strong><a href="requirements/Interfaces/CLI/Commands.html#cli-merge-element-command">CLI Merge Element Command</a></strong></li>
 <li>❌ <strong><a href="requirements/Interfaces/CLI/Commands.html#cli-model-diagram-command">CLI Model Diagram Command</a></strong></li>
-<li>❌ <strong><a href="requirements/Interfaces/CLI/Commands.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></strong></li>
 </ul>
 <h3><a href="requirements/Interfaces/WebInterface/Features.html">requirements/Interfaces/WebInterface/Features.html</a></h3>
 <ul>
@@ -1510,7 +1519,6 @@ blockquote {
 <li>❌ <strong><a href="requirements/UserStories.html#ai-assisted-system-model-management">AI-Assisted System Model Management</a></strong></li>
 <li>❌ <strong><a href="requirements/UserStories.html#align-with-industry-standards">Align with Industry Standards</a></strong></li>
 <li>❌ <strong><a href="requirements/UserStories.html#fostering-community-contributions">Fostering Community Contributions</a></strong></li>
-<li>❌ <strong><a href="requirements/UserStories.html#model-export">Model Export</a></strong></li>
 </ul>
 <h2 id="satisfied-test-verifications">Satisfied Test Verifications</h2>
 <h3><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html">requirements/Functional/Core/Verifications/AttachmentsVerifications.html</a></h3>
@@ -1745,6 +1753,15 @@ blockquote {
 <li>Satisfied by:
 <ul>
 <li><a href="tests/test-duplicate-detection/test.sh">tests/test-duplicate-detection/test.sh</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>✅ <strong><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">Add Command Error Messages Test</a></strong> (test-verification)
+<ul>
+<li>Satisfied by:
+<ul>
+<li><a href="tests/test-add-command-error-messages/test.sh">tests/test-add-command-error-messages/test.sh</a></li>
 </ul>
 </li>
 </ul>

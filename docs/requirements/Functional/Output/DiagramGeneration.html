@@ -744,19 +744,19 @@ blockquote {
   end
   subgraph e6e9a42ade18cb0e["📁 requirements/Functional/Output"]
     subgraph a1762b6e181c2fd0["📄 DiagramGeneration.md"]
-      b1a0db26e90f239f["Diagram Generation"];
+      b1a0db26e90f239f["Diagram Generation<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-interactive-features-specification"];
       class b1a0db26e90f239f systemRequirement;
       click b1a0db26e90f239f "DiagramGeneration.html#diagram-generation";
-      fba18d76f9130464["File Diagram Attachment Display"];
+      fba18d76f9130464["File Diagram Attachment Display<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-interactive-features-specification"];
       class fba18d76f9130464 systemRequirement;
       click fba18d76f9130464 "DiagramGeneration.html#file-diagram-attachment-display";
-      4dcf8077bf98e9e7["Interactive Mermaid Diagram Node Behavior"];
+      4dcf8077bf98e9e7["Interactive Mermaid Diagram Node Behavior<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-interactive-features-specification"];
       class 4dcf8077bf98e9e7 systemRequirement;
       click 4dcf8077bf98e9e7 "DiagramGeneration.html#interactive-mermaid-diagram-node-behavior";
-      ee0d244ddc9aac8f["Interactive Mermaid Diagrams"];
+      ee0d244ddc9aac8f["Interactive Mermaid Diagrams<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class ee0d244ddc9aac8f userRequirement;
       click ee0d244ddc9aac8f "DiagramGeneration.html#interactive-mermaid-diagrams";
-      4ac07a91ef7bd376["SysML-Compatible Relationship Rendering"];
+      4ac07a91ef7bd376["SysML-Compatible Relationship Rendering<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class 4ac07a91ef7bd376 systemRequirement;
       click 4ac07a91ef7bd376 "DiagramGeneration.html#sysml-compatible-relationship-rendering";
       6a54472e974b0c63["Trace Relation Non-Directional Behavior"];
@@ -764,9 +764,18 @@ blockquote {
       click 6a54472e974b0c63 "DiagramGeneration.html#trace-relation-non-directional-behavior";
     end
     subgraph 7799005208c6c9c1["📄 Specifications.md"]
+      4804d27a20a41dfb["Diagram Relation Filtering Specification"];
+      class 4804d27a20a41dfb default;
+      click 4804d27a20a41dfb "Specifications.html#diagram-relation-filtering-specification";
+      ac522a615450fded["Mermaid Diagram Generation Specification"];
+      class ac522a615450fded default;
+      click ac522a615450fded "Specifications.html#mermaid-diagram-generation-specification";
       b214580f5133dc42["Mermaid Diagram Style Specification"];
       class b214580f5133dc42 default;
       click b214580f5133dc42 "Specifications.html#mermaid-diagram-style-specification";
+      ec385316ac867c67["Mermaid Interactive Features Specification"];
+      class ec385316ac867c67 default;
+      click ec385316ac867c67 "Specifications.html#mermaid-interactive-features-specification";
       9e3bad6862a77529["SysML Rendering Specification"];
       class 9e3bad6862a77529 default;
       click 9e3bad6862a77529 "Specifications.html#sysml-rendering-specification";
@@ -806,6 +815,7 @@ blockquote {
   class bdf9762d399478a5 default;
   click bdf9762d399478a5 "../../../core/src/utils.rs";
   b1a0db26e90f239f -->|satisfiedBy| bdf9762d399478a5;
+  b1a0db26e90f239f -->|satisfiedBy| 4804d27a20a41dfb;
   b1a0db26e90f239f -.->|verifiedBy| dc6eabd419d3f364;
   b1a0db26e90f239f -.->|verifiedBy| 6e29457ef7c1661a;
   b1a0db26e90f239f -.->|verifiedBy| 4149573a28941f35;
@@ -817,7 +827,9 @@ blockquote {
   4dcf8077bf98e9e7 -->|satisfiedBy| 25bf5cc42f41e395;
   4dcf8077bf98e9e7 -->|satisfiedBy| d4166762363eb31d;
   ee0d244ddc9aac8f -.->|deriveReqT| b1a0db26e90f239f;
+  ee0d244ddc9aac8f -->|satisfiedBy| ac522a615450fded;
   ee0d244ddc9aac8f -->|satisfiedBy| b214580f5133dc42;
+  ee0d244ddc9aac8f -->|satisfiedBy| ec385316ac867c67;
   4ac07a91ef7bd376 -->|satisfiedBy| d4166762363eb31d;
   4ac07a91ef7bd376 -->|satisfiedBy| 9e3bad6862a77529;
   6a54472e974b0c63 -.->|verifiedBy| ad323c8d4c0751e;
@@ -836,90 +848,35 @@ blockquote {
   881f005c754cdc5b -->|satisfiedBy| f9055f9f44c18e4a;
 </div>
 <h3 id="interactive-mermaid-diagrams">Interactive Mermaid Diagrams</h3>
-<p>The system shall produce visual representations of relationships within the System model in the form of Mermaid diagrams following clearly defined specifications, enabling users to explore relations and understand dependencies and their impact.</p>
-<h4>Details</h4>
-<p><strong>Diagram Generation Approach:</strong>
-Diagram generation follows a file-based approach:</p>
-<ul>
-<li>One diagram is generated per specification file</li>
-<li>The diagram shows all elements in the file and their relationships</li>
-<li>External related resources are displayed as linked boxes to the actual resource</li>
-</ul>
-<p><strong>Diagram Styling:</strong>
-The system shall implement diagram styling including:</p>
-<ul>
-<li>Containment structure with nested subgraphs for physical organization</li>
-<li>Element type-specific CSS classes for visual differentiation</li>
-<li>Relation-specific line styles and colors</li>
-<li>Interactive highlighting on hover</li>
-<li>Consistent background and border styling</li>
-</ul>
-<p><strong>Model Structure Visualization:</strong>
-The system shall provide visualization of the complete model structure showing an element-centric view with nested relations:</p>
-<ul>
-<li>Display elements with their properties (identifier, name, type, file location)</li>
-<li>Show relations nested inside elements with full target details</li>
-<li>Support recursive nesting for element-to-element relations</li>
-<li>Handle file path and external URL relations</li>
-<li>Provide metadata about total elements and relations</li>
-<li>Use consistent visual styling with mermaid diagrams showing hash-based node identifiers</li>
-</ul>
-<p><strong>Model Navigation and Filtering:</strong>
-Users shall be able to generate and view model structure diagrams from any starting point:</p>
-<ul>
-<li>Default view shows root requirements (no hierarchical parent)</li>
-<li>Filter from specific element using –from flag</li>
-<li>Generate complete model structure with nested relations showing element details recursively</li>
-<li>Mermaid diagrams display all nested relations recursively</li>
-</ul>
-<p><strong>Diagram Output:</strong>
-The system shall generate Mermaid diagrams embedded in markdown format for visual representation of the model structure.</p>
-<p>The visualization helps users understand the model’s logical structure, navigate relationships between elements, and explore the model from any starting point.</p>
+<p>The system shall produce interactive visual representations of relationships within the System model in the form of Mermaid diagrams, enabling users to explore relations, navigate the model structure, and understand dependencies.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#diagram-relation-filtering-specification">Diagram Relation Filtering Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#diagram-generation">Diagram Generation</a></li>
 <li>derivedFrom: <a href="Reporting.html#model-reports">Model Reports</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#generate-diagrams">Generate Diagrams</a></li>
+<li>satisfiedBy: <a href="Specifications.html#mermaid-diagram-generation-specification">Mermaid Diagram Generation Specification</a></li>
 <li>satisfiedBy: <a href="Specifications.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
+<li>satisfiedBy: <a href="Specifications.html#mermaid-interactive-features-specification">Mermaid Interactive Features Specification</a></li>
 </ul>
 <hr />
 <h3 id="diagram-generation">Diagram Generation</h3>
-<p>When requested, the system shall automatically generate diagrams and save them to the required locations of the model.</p>
-<h4>Details</h4>
-<p><strong>Auto-Generated Diagram Identification:</strong>
-The system shall embed a unique identification marker “REQVIRE-AUTOGENERATED-DIAGRAM” as a comment within all auto-generated mermaid diagrams to distinguish them from user-created diagrams.</p>
-<p>The marker must be:</p>
-<ul>
-<li>Embedded as a mermaid comment line using the <code>%% REQVIRE-AUTOGENERATED-DIAGRAM</code> format</li>
-<li>Present in every auto-generated diagram</li>
-<li>Not present in user-created custom diagrams</li>
-</ul>
-<p>This enables the system to:</p>
-<ul>
-<li>Reliably identify auto-generated diagrams regardless of their location in documents</li>
-<li>Support mixed documents containing both auto-generated and custom diagrams</li>
-</ul>
-<p><strong>Diagram Relation Filtering:</strong>
-The system shall implement relation filtering in diagram generation to render only forward relations while ensuring complete element hierarchy representation starting from file-local parent elements and including all children.</p>
-<p>When generating diagrams, the system shall apply the following relation filtering rules:</p>
-<ol>
-<li><strong>Diagram Relation Filtering</strong>: Only relations specified in the DIAGRAM_RELATIONS list shall be rendered to prevent duplicate arrows representing the same logical relationship</li>
-<li><strong>Complete Hierarchy Inclusion</strong>: Start with file-local parent requirements but include all children even if they are defined outside of the file</li>
-<li><strong>List-Based Rendering</strong>: Relations shall be rendered according to the DIAGRAM_RELATIONS list which defines which relation from each opposite pair should be shown</li>
-</ol>
-<p>The filtering ensures that:</p>
-<ul>
-<li>Bidirectional relationships (e.g., <code>derivedFrom</code>/<code>derive</code>) appear as single arrows using the relation specified in DIAGRAM_RELATIONS</li>
-<li>Hierarchical context is preserved by starting from local parents and showing all derived children regardless of file location</li>
-<li>Diagram readability is maintained while accurately representing the complete model structure</li>
-</ul>
+<p>When requested, the system shall automatically generate diagrams with relation filtering and save them to the required locations of the model.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#mermaid-diagram-generation-specification">Mermaid Diagram Generation Specification</a></li>
+<li><a href="Specifications.html#mermaid-interactive-features-specification">Mermaid Interactive Features Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -929,6 +886,7 @@ The system shall implement relation filtering in diagram generation to render on
 <li>derivedFrom: <a href="#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#diagram-relation-filtering-specification">Diagram Relation Filtering Specification</a></li>
 <li>verifiedBy: <a href="Verifications/DiagramVerifications.html#diagram-generation-test">Diagram Generation Test</a></li>
 <li>verifiedBy: <a href="Verifications/DiagramVerifications.html#diagram-relation-filtering-verification">Diagram Relation Filtering Verification</a></li>
 <li>verifiedBy: <a href="Verifications/DiagramVerifications.html#visualize-model-relationships-verification">Visualize Model Relationships Verification</a></li>
@@ -949,6 +907,11 @@ The system shall implement relation filtering in diagram generation to render on
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#mermaid-diagram-generation-specification">Mermaid Diagram Generation Specification</a></li>
+<li><a href="Specifications.html#mermaid-interactive-features-specification">Mermaid Interactive Features Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -982,6 +945,10 @@ The system shall implement relation filtering in diagram generation to render on
 <ul>
 <li>type: requirement</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#mermaid-interactive-features-specification">Mermaid Interactive Features Specification</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#diagram-generation">Diagram Generation</a></li>
@@ -1003,6 +970,11 @@ The system shall implement relation filtering in diagram generation to render on
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#mermaid-diagram-generation-specification">Mermaid Diagram Generation Specification</a></li>
+<li><a href="Specifications.html#diagram-relation-filtering-specification">Diagram Relation Filtering Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>

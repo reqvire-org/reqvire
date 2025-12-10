@@ -706,8 +706,8 @@ blockquote {
         <div class="content">
             <h1 id="model">Model</h1>
 <p>The model view displays the logical structure starting from root requirements—requirements without parent derivations. Each element shows its complete relation tree: derived child requirements, verifications, and implementations. This follows MBSE principles where stakeholder needs flow down through requirement hierarchies to verifiable, implementable specifications.</p>
-<p><strong>Total Elements</strong>: 16
-<strong>Total Relations</strong>: 565
+<p><strong>Total Elements</strong>: 15
+<strong>Total Relations</strong>: 583
 <strong>Direction</strong>: Forward</p>
 <h2><a href="requirements/UserStories.html#ai-assisted-system-model-management">AI-Assisted System Model Management</a></h2>
 <p><strong>Type</strong>: user-requirement
@@ -800,9 +800,6 @@ blockquote {
       c6b7e74445a27ce1["SQL style comment"];
       class c6b7e74445a27ce1 systemRequirement;
       click c6b7e74445a27ce1 "requirements/Functional/Integration/CodeAlignment.html#sql-style-comment";
-      46ce32751add1793["Suggest Code Refactoring"];
-      class 46ce32751add1793 userRequirement;
-      click 46ce32751add1793 "requirements/Functional/Integration/CodeAlignment.html#suggest-code-refactoring";
       c71fb60381800071["Traceability Format"];
       class c71fb60381800071 systemRequirement;
       click c71fb60381800071 "requirements/Functional/Integration/CodeAlignment.html#traceability-format";
@@ -830,7 +827,6 @@ blockquote {
   1fa67e6ca679696f -->|derive| 274e7f2bddc1ffb;
   1fa67e6ca679696f -->|satisfiedBy| e65459f80f414a8d;
   c71fb60381800071 -->|derive| 43da2919bb21bb21;
-  b7bd2696af5e74d1 -->|derive| 46ce32751add1793;
 </div>
 <h2><a href="requirements/UserStories.html#defining-model-structure">Defining Model Structure</a></h2>
 <p><strong>Type</strong>: user-requirement
@@ -1056,6 +1052,9 @@ blockquote {
       click 3126a7da8d2fc941 "requirements/Functional/Operations/Formatting.html#file-pattern-exclusion-for-format";
     end
     subgraph 7c2e7eef0051f760["📄 Specifications.md"]
+      3c85593db589fd04["Create Element Workflow Specification"];
+      class 3c85593db589fd04 default;
+      click 3c85593db589fd04 "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification";
       2a23f1dee6913aeb["Relation Operations Specification"];
       class 2a23f1dee6913aeb default;
       click 2a23f1dee6913aeb "requirements/Functional/Operations/Specifications.html#relation-operations-specification";
@@ -1440,6 +1439,7 @@ blockquote {
   click df94db6e76e72cc2 "core/src/utils.rs";
   bf9a2f73b67492b9 -->|satisfiedBy| df94db6e76e72cc2;
   bf9a2f73b67492b9 -->|satisfiedBy| 40714cbda978a508;
+  bf9a2f73b67492b9 -->|satisfiedBy| 3c85593db589fd04;
   bf9a2f73b67492b9 -->|satisfiedBy| 86e301b42cc16d0d;
   bf9a2f73b67492b9 -->|verifiedBy| 221f6c008823a4d0;
   bf9a2f73b67492b9 -->|verifiedBy| d5bf7d0addaf6d19;
@@ -1688,26 +1688,35 @@ blockquote {
   end
   subgraph e6e9a42ade18cb0e["📁 requirements/Functional/Output"]
     subgraph a1762b6e181c2fd0["📄 DiagramGeneration.md"]
-      b1a0db26e90f239f["Diagram Generation"];
+      b1a0db26e90f239f["Diagram Generation<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-interactive-features-specification"];
       class b1a0db26e90f239f systemRequirement;
       click b1a0db26e90f239f "requirements/Functional/Output/DiagramGeneration.html#diagram-generation";
-      fba18d76f9130464["File Diagram Attachment Display"];
+      fba18d76f9130464["File Diagram Attachment Display<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-interactive-features-specification"];
       class fba18d76f9130464 systemRequirement;
       click fba18d76f9130464 "requirements/Functional/Output/DiagramGeneration.html#file-diagram-attachment-display";
-      4dcf8077bf98e9e7["Interactive Mermaid Diagram Node Behavior"];
+      4dcf8077bf98e9e7["Interactive Mermaid Diagram Node Behavior<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-interactive-features-specification"];
       class 4dcf8077bf98e9e7 systemRequirement;
       click 4dcf8077bf98e9e7 "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior";
-      ee0d244ddc9aac8f["Interactive Mermaid Diagrams"];
+      ee0d244ddc9aac8f["Interactive Mermaid Diagrams<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class ee0d244ddc9aac8f userRequirement;
       click ee0d244ddc9aac8f "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams";
-      4ac07a91ef7bd376["SysML-Compatible Relationship Rendering"];
+      4ac07a91ef7bd376["SysML-Compatible Relationship Rendering<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class 4ac07a91ef7bd376 systemRequirement;
       click 4ac07a91ef7bd376 "requirements/Functional/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering";
     end
     subgraph 7799005208c6c9c1["📄 Specifications.md"]
+      4804d27a20a41dfb["Diagram Relation Filtering Specification"];
+      class 4804d27a20a41dfb default;
+      click 4804d27a20a41dfb "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification";
+      ac522a615450fded["Mermaid Diagram Generation Specification"];
+      class ac522a615450fded default;
+      click ac522a615450fded "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification";
       b214580f5133dc42["Mermaid Diagram Style Specification"];
       class b214580f5133dc42 default;
       click b214580f5133dc42 "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification";
+      ec385316ac867c67["Mermaid Interactive Features Specification"];
+      class ec385316ac867c67 default;
+      click ec385316ac867c67 "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification";
       9e3bad6862a77529["SysML Rendering Specification"];
       class 9e3bad6862a77529 default;
       click 9e3bad6862a77529 "requirements/Functional/Output/Specifications.html#sysml-rendering-specification";
@@ -1764,10 +1773,13 @@ blockquote {
   class 264070906b593a8 default;
   click 264070906b593a8 "core/src/utils.rs";
   b1a0db26e90f239f -->|satisfiedBy| 264070906b593a8;
+  b1a0db26e90f239f -->|satisfiedBy| 4804d27a20a41dfb;
   b1a0db26e90f239f -->|verifiedBy| dc6eabd419d3f364;
   b1a0db26e90f239f -->|verifiedBy| 6e29457ef7c1661a;
   b1a0db26e90f239f -->|verifiedBy| 4149573a28941f35;
+  ee0d244ddc9aac8f -->|satisfiedBy| ac522a615450fded;
   ee0d244ddc9aac8f -->|satisfiedBy| b214580f5133dc42;
+  ee0d244ddc9aac8f -->|satisfiedBy| ec385316ac867c67;
 </div>
 <h2><a href="requirements/UserStories.html#linting-model-quality">Linting Model Quality</a></h2>
 <p><strong>Type</strong>: user-requirement
@@ -1802,20 +1814,23 @@ blockquote {
       cc7864983ff441c7["Redundant Hierarchical Attachment Detection"];
       class cc7864983ff441c7 systemRequirement;
       click cc7864983ff441c7 "requirements/Functional/Operations/Linting.html#redundant-hierarchical-attachment-detection";
-      cdc082002507d4df["Redundant Hierarchical Relations Detection<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
-      class cdc082002507d4df systemRequirement;
-      click cdc082002507d4df "requirements/Functional/Operations/Linting.html#redundant-hierarchical-relations-detection";
+      5f8fafa1901435c["Redundant Hierarchical Relations Detection and Auto-Removal<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
+      class 5f8fafa1901435c systemRequirement;
+      click 5f8fafa1901435c "requirements/Functional/Operations/Linting.html#redundant-hierarchical-relations-detection-and-auto-removal";
       500be52cc121e6f2["Redundant Verify Relations Detection<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
       class 500be52cc121e6f2 systemRequirement;
       click 500be52cc121e6f2 "requirements/Functional/Operations/Linting.html#redundant-verify-relations-detection";
-      979e46c91787cd55["Safe Redundant Hierarchical Relations Auto-Removal"];
-      class 979e46c91787cd55 systemRequirement;
-      click 979e46c91787cd55 "requirements/Functional/Operations/Linting.html#safe-redundant-hierarchical-relations-auto-removal";
     end
     subgraph 7c2e7eef0051f760["📄 Specifications.md"]
       b8a5e3adb9b5d82d["Lint Output Specification"];
       class b8a5e3adb9b5d82d default;
       click b8a5e3adb9b5d82d "requirements/Functional/Operations/Specifications.html#lint-output-specification";
+      c5d346cc41243982["Multi-Branch Convergence Detection Specification"];
+      class c5d346cc41243982 default;
+      click c5d346cc41243982 "requirements/Functional/Operations/Specifications.html#multi-branch-convergence-detection-specification";
+      6a995b12e8da977a["Redundant Hierarchical Relations Specification"];
+      class 6a995b12e8da977a default;
+      click 6a995b12e8da977a "requirements/Functional/Operations/Specifications.html#redundant-hierarchical-relations-specification";
     end
   end
   subgraph 75874bcc96c01d2f["📁 requirements/Functional/Operations/Verifications"]
@@ -1840,6 +1855,7 @@ blockquote {
   class bd9918df0c2783d5 default;
   click bd9918df0c2783d5 "core/src/lint.rs";
   8ab6eb6e6ddc46cc -->|satisfiedBy| bd9918df0c2783d5;
+  8ab6eb6e6ddc46cc -->|satisfiedBy| c5d346cc41243982;
   20f690d9cd389f10 -->|derive| cc7864983ff441c7;
   c1c24aaf3793de71["core/src/lint.rs"];
   class c1c24aaf3793de71 default;
@@ -1850,18 +1866,15 @@ blockquote {
   class ffd803ba768c3cd default;
   click ffd803ba768c3cd "tests/test-lint-redundant-attachments/test.sh";
   d57f3715f551dd1f -->|satisfiedBy| ffd803ba768c3cd;
-  20f690d9cd389f10 -->|derive| cdc082002507d4df;
-  cdc082002507d4df -->|derive| 979e46c91787cd55;
-  a5075d0ce1ea60fa["core/src/lint.rs"];
-  class a5075d0ce1ea60fa default;
-  click a5075d0ce1ea60fa "core/src/lint.rs";
-  979e46c91787cd55 -->|satisfiedBy| a5075d0ce1ea60fa;
+  20f690d9cd389f10 -->|derive| 5f8fafa1901435c;
+  cb970a75ab797614["core/src/lint.rs"];
+  class cb970a75ab797614 default;
+  click cb970a75ab797614 "core/src/lint.rs";
+  5f8fafa1901435c -->|satisfiedBy| cb970a75ab797614;
+  5f8fafa1901435c -->|satisfiedBy| 6a995b12e8da977a;
   20f690d9cd389f10 -->|derive| 500be52cc121e6f2;
   20f690d9cd389f10 -->|satisfiedBy| b8a5e3adb9b5d82d;
 </div>
-<h2><a href="requirements/UserStories.html#model-export">Model Export</a></h2>
-<p><strong>Type</strong>: user-requirement
-<strong>File</strong>: <a href="requirements/UserStories.html">requirements/UserStories.html</a></p>
 <h2><a href="requirements/UserStories.html#operating-on-model-elements">Operating on Model Elements</a></h2>
 <p><strong>Type</strong>: user-requirement
 <strong>File</strong>: <a href="requirements/UserStories.html">requirements/UserStories.html</a></p>
@@ -1964,6 +1977,18 @@ blockquote {
       click 9cdb6297e49a3802 "requirements/Functional/Operations/ElementManipulation.html#target-location-validation-and-auto-creation";
     end
     subgraph 7c2e7eef0051f760["📄 Specifications.md"]
+      3c85593db589fd04["Create Element Workflow Specification"];
+      class 3c85593db589fd04 default;
+      click 3c85593db589fd04 "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification";
+      bc1f889f5f12a980["Delete Element Workflow Specification"];
+      class bc1f889f5f12a980 default;
+      click bc1f889f5f12a980 "requirements/Functional/Operations/Specifications.html#delete-element-workflow-specification";
+      9a6c593ffee9a214["Merge Element Workflow Specification"];
+      class 9a6c593ffee9a214 default;
+      click 9a6c593ffee9a214 "requirements/Functional/Operations/Specifications.html#merge-element-workflow-specification";
+      c75283445bce637a["Move Element Workflow Specification"];
+      class c75283445bce637a default;
+      click c75283445bce637a "requirements/Functional/Operations/Specifications.html#move-element-workflow-specification";
       4366fe5150f6d7c2["Orphaned Children Error Message Specification"];
       class 4366fe5150f6d7c2 default;
       click 4366fe5150f6d7c2 "requirements/Functional/Operations/Specifications.html#orphaned-children-error-message-specification";
@@ -2053,6 +2078,7 @@ blockquote {
   click df94db6e76e72cc2 "core/src/utils.rs";
   bf9a2f73b67492b9 -->|satisfiedBy| df94db6e76e72cc2;
   bf9a2f73b67492b9 -->|satisfiedBy| 40714cbda978a508;
+  bf9a2f73b67492b9 -->|satisfiedBy| 3c85593db589fd04;
   bf9a2f73b67492b9 -->|satisfiedBy| 86e301b42cc16d0d;
   bf9a2f73b67492b9 -->|verifiedBy| 221f6c008823a4d0;
   bf9a2f73b67492b9 -->|verifiedBy| d5bf7d0addaf6d19;
@@ -2077,6 +2103,7 @@ blockquote {
   class d990eb630122d6f6 default;
   click d990eb630122d6f6 "core/src/graph_registry.rs";
   591265fa14ecd72d -->|satisfiedBy| d990eb630122d6f6;
+  591265fa14ecd72d -->|satisfiedBy| bc1f889f5f12a980;
   591265fa14ecd72d -->|satisfiedBy| 4366fe5150f6d7c2;
   591265fa14ecd72d -->|verifiedBy| bfd28e1e74918526;
   7310fcd1925980cb["tests/test-crud-manipulation/test.sh"];
@@ -2117,6 +2144,7 @@ blockquote {
   451abcac00b45de4 -->|satisfiedBy| ad895905dd4f6f93;
   451abcac00b45de4 -->|satisfiedBy| 2a2729a903e6692f;
   451abcac00b45de4 -->|satisfiedBy| 3e506d76554b3740;
+  451abcac00b45de4 -->|satisfiedBy| 9a6c593ffee9a214;
   451abcac00b45de4 -->|verifiedBy| c7b35d6963f1017;
   d7718b70035d8d84 -->|derive| c68daf5bfafc5a05;
   633cd47968df77db["cli/src/cli.rs"];
@@ -2135,6 +2163,7 @@ blockquote {
   class 95dc3e6d3df86877 default;
   click 95dc3e6d3df86877 "core/src/graph_registry.rs";
   c68daf5bfafc5a05 -->|satisfiedBy| 95dc3e6d3df86877;
+  c68daf5bfafc5a05 -->|satisfiedBy| c75283445bce637a;
   c68daf5bfafc5a05 -->|verifiedBy| 9ae2cd53e62b6a33;
   b443f6ff591ae630["tests/test-crud-empty-file-cleanup/test.sh"];
   class b443f6ff591ae630 default;
@@ -2290,39 +2319,39 @@ blockquote {
       click 8244c27e5a9f5023 "requirements/Functional/Output/Behaviors.html#verification-coverage-philosophy-behavior";
     end
     subgraph a1762b6e181c2fd0["📄 DiagramGeneration.md"]
-      b1a0db26e90f239f["Diagram Generation"];
+      b1a0db26e90f239f["Diagram Generation<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-interactive-features-specification"];
       class b1a0db26e90f239f systemRequirement;
       click b1a0db26e90f239f "requirements/Functional/Output/DiagramGeneration.html#diagram-generation";
-      fba18d76f9130464["File Diagram Attachment Display"];
+      fba18d76f9130464["File Diagram Attachment Display<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-interactive-features-specification"];
       class fba18d76f9130464 systemRequirement;
       click fba18d76f9130464 "requirements/Functional/Output/DiagramGeneration.html#file-diagram-attachment-display";
-      4dcf8077bf98e9e7["Interactive Mermaid Diagram Node Behavior"];
+      4dcf8077bf98e9e7["Interactive Mermaid Diagram Node Behavior<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-interactive-features-specification"];
       class 4dcf8077bf98e9e7 systemRequirement;
       click 4dcf8077bf98e9e7 "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior";
-      ee0d244ddc9aac8f["Interactive Mermaid Diagrams"];
+      ee0d244ddc9aac8f["Interactive Mermaid Diagrams<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class ee0d244ddc9aac8f userRequirement;
       click ee0d244ddc9aac8f "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams";
-      4ac07a91ef7bd376["SysML-Compatible Relationship Rendering"];
+      4ac07a91ef7bd376["SysML-Compatible Relationship Rendering<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class 4ac07a91ef7bd376 systemRequirement;
       click 4ac07a91ef7bd376 "requirements/Functional/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering";
     end
     subgraph 2bc3d3f246abf2de["📄 Reporting.md"]
-      3136e3195e243669["Collect Content from Requirement Chain"];
+      3136e3195e243669["Collect Content from Requirement Chain<br/>📎 requirements/Functional/Output/Specifications.md#deterministic-output-specification"];
       class 3136e3195e243669 systemRequirement;
       click 3136e3195e243669 "requirements/Functional/Output/Reporting.html#collect-content-from-requirement-chain";
       eeeef3e5049982b8["Comma-Separated Type Filter Parsing"];
       class eeeef3e5049982b8 systemRequirement;
       click eeeef3e5049982b8 "requirements/Functional/Output/Reporting.html#comma-separated-type-filter-parsing";
-      2a8c9ba9fd932aba["Containment View Report<br/>📎 requirements/Functional/Output/DesignDocuments/ContainmentView.md<br/>📎 requirements/Refinements.md#containment-specification"];
+      2a8c9ba9fd932aba["Containment View Report<br/>📎 requirements/Functional/Output/DesignDocuments/ContainmentView.md<br/>📎 requirements/Refinements.md#containment-specification<br/>📎 requirements/Functional/Output/Specifications.md#deterministic-output-specification<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#resources-report-format-specification"];
       class 2a8c9ba9fd932aba userRequirement;
       click 2a8c9ba9fd932aba "requirements/Functional/Output/Reporting.html#containment-view-report";
       5aa1c66a1962bbcf["Flexible Search Type Filtering"];
       class 5aa1c66a1962bbcf userRequirement;
       click 5aa1c66a1962bbcf "requirements/Functional/Output/Reporting.html#flexible-search-type-filtering";
-      98610608d81a8fde["Forward-Only Relation Traversal"];
+      98610608d81a8fde["Forward-Only Relation Traversal<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class 98610608d81a8fde systemRequirement;
       click 98610608d81a8fde "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal";
-      f8301585b3d30631["Model Diagram Output Formats"];
+      f8301585b3d30631["Model Diagram Output Formats<br/>📎 requirements/Functional/Output/Specifications.md#deterministic-output-specification<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class f8301585b3d30631 systemRequirement;
       click f8301585b3d30631 "requirements/Functional/Output/Reporting.html#model-diagram-output-formats";
       40dc720d7c510af0["Model Reports<br/>📎 requirements/Refinements.md#traceability-reporting-specification"];
@@ -2337,22 +2366,22 @@ blockquote {
       a0f7724a2ceac1ec["Resources Report"];
       class a0f7724a2ceac1ec userRequirement;
       click a0f7724a2ceac1ec "requirements/Functional/Output/Reporting.html#resources-report";
-      6a3c5a7153a49a89["Reverse Relation Traversal"];
+      6a3c5a7153a49a89["Reverse Relation Traversal<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class 6a3c5a7153a49a89 systemRequirement;
       click 6a3c5a7153a49a89 "requirements/Functional/Output/Reporting.html#reverse-relation-traversal";
-      f484430652f48bac["Search Report Generator<br/>📎 requirements/Functional/Output/DesignDocuments/SearchFiltering.md<br/>📎 requirements/Refinements.md#supported-element-types-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting"];
+      f484430652f48bac["Search Report Generator<br/>📎 requirements/Functional/Output/DesignDocuments/SearchFiltering.md<br/>📎 requirements/Refinements.md#supported-element-types-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting<br/>📎 requirements/Functional/Output/Specifications.md#deterministic-output-specification<br/>📎 requirements/Functional/Output/Specifications.md#resources-report-format-specification"];
       class f484430652f48bac systemRequirement;
       click f484430652f48bac "requirements/Functional/Output/Reporting.html#search-report-generator";
       f941bbbbf5db2d8c["Start Element Type Filtering"];
       class f941bbbbf5db2d8c systemRequirement;
       click f941bbbbf5db2d8c "requirements/Functional/Output/Reporting.html#start-element-type-filtering";
-      c52fdde1821f5cf2["TraceFlow View Report Generation<br/>📎 requirements/Functional/Output/DesignDocuments/TraceFlowView.md<br/>📎 requirements/Refinements.md#traceability-reporting-specification<br/>📎 requirements/Functional/Processing/Specifications.md#verification-roll-up-specification<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
+      c52fdde1821f5cf2["TraceFlow View Report Generation<br/>📎 requirements/Functional/Output/DesignDocuments/TraceFlowView.md<br/>📎 requirements/Refinements.md#traceability-reporting-specification<br/>📎 requirements/Functional/Processing/Specifications.md#verification-roll-up-specification<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction<br/>📎 requirements/Functional/Output/Specifications.md#deterministic-output-specification"];
       class c52fdde1821f5cf2 systemRequirement;
       click c52fdde1821f5cf2 "requirements/Functional/Output/Reporting.html#traceflow-view-report-generation";
-      c988fb8451de7d2d["Validation Report Generator"];
+      c988fb8451de7d2d["Validation Report Generator<br/>📎 requirements/Functional/Output/Specifications.md#deterministic-output-specification"];
       class c988fb8451de7d2d systemRequirement;
       click c988fb8451de7d2d "requirements/Functional/Output/Reporting.html#validation-report-generator";
-      befd27abaf2aae8b["Verification Coverage Report<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting<br/>📎 requirements/Refinements.md#verification-coverage-specification<br/>📎 requirements/Functional/Processing/Specifications.md#verification-roll-up-specification<br/>📎 requirements/Functional/Core/Specifications.md#verification-type-selection-guidelines"];
+      befd27abaf2aae8b["Verification Coverage Report<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting<br/>📎 requirements/Refinements.md#verification-coverage-specification<br/>📎 requirements/Functional/Processing/Specifications.md#verification-roll-up-specification<br/>📎 requirements/Functional/Core/Specifications.md#verification-type-selection-guidelines<br/>📎 requirements/Functional/Output/Specifications.md#deterministic-output-specification"];
       class befd27abaf2aae8b userRequirement;
       click befd27abaf2aae8b "requirements/Functional/Output/Reporting.html#verification-coverage-report";
     end
@@ -2363,6 +2392,12 @@ blockquote {
       9bce1082c475cb0d["Collect Output Format Specification"];
       class 9bce1082c475cb0d default;
       click 9bce1082c475cb0d "requirements/Functional/Output/Specifications.html#collect-output-format-specification";
+      d415e0f99fc5ad0c["Deterministic Output Specification"];
+      class d415e0f99fc5ad0c default;
+      click d415e0f99fc5ad0c "requirements/Functional/Output/Specifications.html#deterministic-output-specification";
+      4804d27a20a41dfb["Diagram Relation Filtering Specification"];
+      class 4804d27a20a41dfb default;
+      click 4804d27a20a41dfb "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification";
       e8918fd8f69a1f0a["Diff Output Format Specification"];
       class e8918fd8f69a1f0a default;
       click e8918fd8f69a1f0a "requirements/Functional/Output/Specifications.html#diff-output-format-specification";
@@ -2375,9 +2410,18 @@ blockquote {
       d55aca455bf08f76["Markdown Report Style Specification"];
       class d55aca455bf08f76 default;
       click d55aca455bf08f76 "requirements/Functional/Output/Specifications.html#markdown-report-style-specification";
+      ac522a615450fded["Mermaid Diagram Generation Specification"];
+      class ac522a615450fded default;
+      click ac522a615450fded "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification";
       b214580f5133dc42["Mermaid Diagram Style Specification"];
       class b214580f5133dc42 default;
       click b214580f5133dc42 "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification";
+      ec385316ac867c67["Mermaid Interactive Features Specification"];
+      class ec385316ac867c67 default;
+      click ec385316ac867c67 "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification";
+      1006dcaf287c0eec["Resources Report Format Specification"];
+      class 1006dcaf287c0eec default;
+      click 1006dcaf287c0eec "requirements/Functional/Output/Specifications.html#resources-report-format-specification";
       9e3bad6862a77529["SysML Rendering Specification"];
       class 9e3bad6862a77529 default;
       click 9e3bad6862a77529 "requirements/Functional/Output/Specifications.html#sysml-rendering-specification";
@@ -2474,10 +2518,13 @@ blockquote {
   class 264070906b593a8 default;
   click 264070906b593a8 "core/src/utils.rs";
   b1a0db26e90f239f -->|satisfiedBy| 264070906b593a8;
+  b1a0db26e90f239f -->|satisfiedBy| 4804d27a20a41dfb;
   b1a0db26e90f239f -->|verifiedBy| dc6eabd419d3f364;
   b1a0db26e90f239f -->|verifiedBy| 6e29457ef7c1661a;
   b1a0db26e90f239f -->|verifiedBy| 4149573a28941f35;
+  ee0d244ddc9aac8f -->|satisfiedBy| ac522a615450fded;
   ee0d244ddc9aac8f -->|satisfiedBy| b214580f5133dc42;
+  ee0d244ddc9aac8f -->|satisfiedBy| ec385316ac867c67;
   40dc720d7c510af0 -->|derive| 3136e3195e243669;
   44a06d689bf8d903["core/src/report_collect.rs"];
   class 44a06d689bf8d903 default;
@@ -2575,6 +2622,7 @@ blockquote {
   class 2fe356aa808b4abd default;
   click 2fe356aa808b4abd "core/src/report_resources.rs";
   a0f7724a2ceac1ec -->|satisfiedBy| 2fe356aa808b4abd;
+  a0f7724a2ceac1ec -->|satisfiedBy| 1006dcaf287c0eec;
   40dc720d7c510af0 -->|derive| befd27abaf2aae8b;
   befd27abaf2aae8b -->|derive| c52fdde1821f5cf2;
   ace45495a1081c14["core/src/export.rs"];
@@ -2592,6 +2640,7 @@ blockquote {
   click 3ac3d1dd664690cf "core/src/report_coverage.rs";
   befd27abaf2aae8b -->|satisfiedBy| 3ac3d1dd664690cf;
   befd27abaf2aae8b -->|satisfiedBy| 8244c27e5a9f5023;
+  40dc720d7c510af0 -->|satisfiedBy| d415e0f99fc5ad0c;
   40dc720d7c510af0 -->|satisfiedBy| e8918fd8f69a1f0a;
   40dc720d7c510af0 -->|satisfiedBy| 38c3e6e7692e0875;
   40dc720d7c510af0 -->|satisfiedBy| 64319236fb27fe2;
@@ -2643,6 +2692,9 @@ blockquote {
       9ce04315a8dd0d88["Add Command Duplicate Detection Test"];
       class 9ce04315a8dd0d88 verification;
       click 9ce04315a8dd0d88 "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-duplicate-detection-test";
+      f7d422af274a64cf["Add Command Error Messages Test"];
+      class f7d422af274a64cf verification;
+      click f7d422af274a64cf "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test";
       868e15205b620ba2["CLI Add Element Test<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
       class 868e15205b620ba2 verification;
       click 868e15205b620ba2 "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#cli-add-element-test";
@@ -2734,7 +2786,7 @@ blockquote {
   end
   subgraph cfe1eea0278796bc["📁 requirements/Interfaces/CLI"]
     subgraph 43307c569ff89429["📄 Commands.md"]
-      104c59d25b737d22["CLI Add Element Command<br/>📎 requirements/Functional/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#create-element-override-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure"];
+      104c59d25b737d22["CLI Add Element Command<br/>📎 requirements/Functional/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#create-element-override-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#create-element-workflow-specification"];
       class 104c59d25b737d22 systemRequirement;
       click 104c59d25b737d22 "requirements/Interfaces/CLI/Commands.html#cli-add-element-command";
       68e30181f97f6f71["CLI Change Impact Report Command<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting<br/>📎 requirements/Functional/Processing/Behaviors.md#change-propagation-behavior<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification"];
@@ -2743,7 +2795,7 @@ blockquote {
       9a2adde3721af9df["CLI Collect Command<br/>📎 requirements/Functional/Output/Specifications.md#collect-content-specification<br/>📎 requirements/Functional/Output/Specifications.md#collect-output-format-specification"];
       class 9a2adde3721af9df systemRequirement;
       click 9a2adde3721af9df "requirements/Interfaces/CLI/Commands.html#cli-collect-command";
-      218fa75a3081be32["CLI Containment Command<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Behaviors.md#short-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 requirements/Functional/Output/DesignDocuments/ContainmentView.md"];
+      218fa75a3081be32["CLI Containment Command<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Behaviors.md#short-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 requirements/Functional/Output/DesignDocuments/ContainmentView.md<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#d3js-containment-tree-specification"];
       class 218fa75a3081be32 systemRequirement;
       click 218fa75a3081be32 "requirements/Interfaces/CLI/Commands.html#cli-containment-command";
       43efd1fafe961f2e["CLI Coverage Command<br/>📎 requirements/Functional/Core/Specifications.md#verification-type-selection-guidelines<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting"];
@@ -2752,10 +2804,10 @@ blockquote {
       d6147550e948449e["CLI Interface Structure"];
       class d6147550e948449e systemRequirement;
       click d6147550e948449e "requirements/Interfaces/CLI/Commands.html#cli-interface-structure";
-      ec02481a0771dca["CLI Lint Command<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#lint-output-specification<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting"];
+      ec02481a0771dca["CLI Lint Command<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#lint-output-specification<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting<br/>📎 requirements/Functional/Operations/Specifications.md#multi-branch-convergence-detection-specification"];
       class ec02481a0771dca systemRequirement;
       click ec02481a0771dca "requirements/Interfaces/CLI/Commands.html#cli-lint-command";
-      51a6083e0a55197c["CLI Merge Element Command<br/>📎 requirements/Functional/Operations/Behaviors.md#merge-content-transformation-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#merge-type-compatibility-constraint<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure"];
+      51a6083e0a55197c["CLI Merge Element Command<br/>📎 requirements/Functional/Operations/Behaviors.md#merge-content-transformation-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#merge-type-compatibility-constraint<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#merge-element-workflow-specification"];
       class 51a6083e0a55197c systemRequirement;
       click 51a6083e0a55197c "requirements/Interfaces/CLI/Commands.html#cli-merge-element-command";
       151987ac330b33f0["CLI Model Diagram Command<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 requirements/Functional/Output/Behaviors.md#reverse-relation-traversal-behavior<br/>📎 requirements/Functional/Output/Behaviors.md#start-element-type-filter-behavior<br/>📎 requirements/Functional/Core/Behaviors.md#type-validation-error-behavior"];
@@ -2764,7 +2816,7 @@ blockquote {
       a68fbec67469256b["CLI Move Asset Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification"];
       class a68fbec67469256b systemRequirement;
       click a68fbec67469256b "requirements/Interfaces/CLI/Commands.html#cli-move-asset-command";
-      7ef6cb0e4258e1bc["CLI Move Element Command<br/>📎 requirements/Functional/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure"];
+      7ef6cb0e4258e1bc["CLI Move Element Command<br/>📎 requirements/Functional/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#move-element-workflow-specification"];
       class 7ef6cb0e4258e1bc systemRequirement;
       click 7ef6cb0e4258e1bc "requirements/Interfaces/CLI/Commands.html#cli-move-element-command";
       d9c57dd799158af9["CLI Move File Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure"];
@@ -2773,7 +2825,7 @@ blockquote {
       91025cd88b1df4f0["CLI Remove Asset Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification"];
       class 91025cd88b1df4f0 systemRequirement;
       click 91025cd88b1df4f0 "requirements/Interfaces/CLI/Commands.html#cli-remove-asset-command";
-      1f8022dac203e679["CLI Remove Element Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure"];
+      1f8022dac203e679["CLI Remove Element Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#delete-element-workflow-specification"];
       class 1f8022dac203e679 systemRequirement;
       click 1f8022dac203e679 "requirements/Interfaces/CLI/Commands.html#cli-remove-element-command";
       2f51b946a8587225["CLI Rename Element Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure"];
@@ -2823,7 +2875,7 @@ blockquote {
       e03d9fc7fee23cbf["Attachment Export"];
       class e03d9fc7fee23cbf systemRequirement;
       click e03d9fc7fee23cbf "requirements/Interfaces/WebInterface/Features.html#attachment-export";
-      1a4bd1d4cf59c6c3["Containment View Attachment Links"];
+      1a4bd1d4cf59c6c3["Containment View Attachment Links<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#d3js-containment-tree-specification"];
       class 1a4bd1d4cf59c6c3 systemRequirement;
       click 1a4bd1d4cf59c6c3 "requirements/Interfaces/WebInterface/Features.html#containment-view-attachment-links";
       399558ec4fcaeca["Diagram Attachment Display<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification"];
@@ -2832,20 +2884,32 @@ blockquote {
       343e7b2d42df05e8["HTML Export<br/>📎 requirements/Interfaces/WebInterface/Behaviors.md#web-interface-navigation-behavior"];
       class 343e7b2d42df05e8 systemRequirement;
       click 343e7b2d42df05e8 "requirements/Interfaces/WebInterface/Features.html#html-export";
-      27d051a7dc8ddd3d["Model-Centric View Generation<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification"];
+      27d051a7dc8ddd3d["Model-Centric View Generation<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-export-pipeline-specification<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-navigation-bar-specification"];
       class 27d051a7dc8ddd3d systemRequirement;
       click 27d051a7dc8ddd3d "requirements/Interfaces/WebInterface/Features.html#model-centric-view-generation";
       d9d538e0add3a7ee["Model View Element Navigation"];
       class d9d538e0add3a7ee systemRequirement;
       click d9d538e0add3a7ee "requirements/Interfaces/WebInterface/Features.html#model-view-element-navigation";
-      9b566692fe070492["Serve Command"];
+      9b566692fe070492["Serve Command<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-export-pipeline-specification"];
       class 9b566692fe070492 systemRequirement;
       click 9b566692fe070492 "requirements/Interfaces/WebInterface/Features.html#serve-command";
-      965615d978d68cf5["Web Interface Color Scheme"];
+      965615d978d68cf5["Web Interface Color Scheme<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-navigation-bar-specification<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-branding-specification"];
       class 965615d978d68cf5 systemRequirement;
       click 965615d978d68cf5 "requirements/Interfaces/WebInterface/Features.html#web-interface-color-scheme";
     end
     subgraph 5d341d66c5d20d4a["📄 Specifications.md"]
+      2c269288950887aa["D3.js Containment Tree Specification"];
+      class 2c269288950887aa default;
+      click 2c269288950887aa "requirements/Interfaces/WebInterface/Specifications.html#d3js-containment-tree-specification";
+      ac8ced009233741a["HTML Branding Specification"];
+      class ac8ced009233741a default;
+      click ac8ced009233741a "requirements/Interfaces/WebInterface/Specifications.html#html-branding-specification";
+      32592aed4644ac95["HTML Export Pipeline Specification"];
+      class 32592aed4644ac95 default;
+      click 32592aed4644ac95 "requirements/Interfaces/WebInterface/Specifications.html#html-export-pipeline-specification";
+      1c6c804d67bc741e["HTML Navigation Bar Specification"];
+      class 1c6c804d67bc741e default;
+      click 1c6c804d67bc741e "requirements/Interfaces/WebInterface/Specifications.html#html-navigation-bar-specification";
       945adb3f0ea1012e["Web Interface Style Specification"];
       class 945adb3f0ea1012e default;
       click 945adb3f0ea1012e "requirements/Interfaces/WebInterface/Specifications.html#web-interface-style-specification";
@@ -2885,6 +2949,11 @@ blockquote {
   class ba76934401978296 default;
   click ba76934401978296 "tests/test-duplicate-detection/test.sh";
   9ce04315a8dd0d88 -->|satisfiedBy| ba76934401978296;
+  104c59d25b737d22 -->|verifiedBy| f7d422af274a64cf;
+  5f4bcd49fa479e1b["tests/test-add-command-error-messages/test.sh"];
+  class 5f4bcd49fa479e1b default;
+  click 5f4bcd49fa479e1b "tests/test-add-command-error-messages/test.sh";
+  f7d422af274a64cf -->|satisfiedBy| 5f4bcd49fa479e1b;
   104c59d25b737d22 -->|verifiedBy| 868e15205b620ba2;
   4273cf1741fc0b67["tests/test-crud-manipulation/test.sh"];
   class 4273cf1741fc0b67 default;
@@ -3247,6 +3316,10 @@ blockquote {
   class ef201fdc295333b2 default;
   click ef201fdc295333b2 "core/templates/model.html";
   343e7b2d42df05e8 -->|satisfiedBy| ef201fdc295333b2;
+  343e7b2d42df05e8 -->|satisfiedBy| 2c269288950887aa;
+  343e7b2d42df05e8 -->|satisfiedBy| ac8ced009233741a;
+  343e7b2d42df05e8 -->|satisfiedBy| 32592aed4644ac95;
+  343e7b2d42df05e8 -->|satisfiedBy| 1c6c804d67bc741e;
   343e7b2d42df05e8 -->|satisfiedBy| 945adb3f0ea1012e;
   343e7b2d42df05e8 -->|verifiedBy| a7eeaf4fd1d17030;
   5cf91c9c2f7c9b34["tests/test-html-export/test.sh"];
@@ -3510,6 +3583,13 @@ blockquote {
       click 776101677ee97029 "requirements/Functional/Core/Verifications/ValidationVerifications.html#type-validation-errors-test";
     end
   end
+  subgraph 75874bcc96c01d2f["📁 requirements/Functional/Operations/Verifications"]
+    subgraph 264302f069db5bdb["📄 ElementManipulationVerifications.md"]
+      f7d422af274a64cf["Add Command Error Messages Test"];
+      class f7d422af274a64cf verification;
+      click f7d422af274a64cf "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test";
+    end
+  end
   cbb3e11245e3e972 -->|derive| a869d98120d611e3;
   a869d98120d611e3 -->|derive| dcb530333efa6cc3;
   3638f0a3ab70da46["core/src/relation.rs"];
@@ -3555,6 +3635,11 @@ blockquote {
   click 27ae6ed47f3232b0 "core/src/error.rs";
   a869d98120d611e3 -->|satisfiedBy| 27ae6ed47f3232b0;
   a869d98120d611e3 -->|satisfiedBy| fc1df5aa988472a;
+  a869d98120d611e3 -->|verifiedBy| f7d422af274a64cf;
+  5f4bcd49fa479e1b["tests/test-add-command-error-messages/test.sh"];
+  class 5f4bcd49fa479e1b default;
+  click 5f4bcd49fa479e1b "tests/test-add-command-error-messages/test.sh";
+  f7d422af274a64cf -->|satisfiedBy| 5f4bcd49fa479e1b;
   cbb3e11245e3e972 -->|derive| 6226bc768d0185df;
   6226bc768d0185df -->|derive| df9b3eb5275616dd;
   a27bba83ffbda077["core/src/model.rs"];

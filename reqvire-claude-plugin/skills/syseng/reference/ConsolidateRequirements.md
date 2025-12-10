@@ -6,27 +6,39 @@ Use this reference when reorganizing the model structure without changing requir
 
 ## Refactoring Activities
 
-- Extracting inline constraints/specifications into dedicated elements
-- Converting attachments to `satisfiedBy` relations where appropriate
-- Merging duplicate/overlapping requirements
 - Splitting mixed-type requirements (user vs system)
 - Moving elements between files for better organization
 - Adding missing relations (satisfiedBy, derivedFrom)
 - Removing redundant verify relations
 - Consolidating scattered specifications
-- **Reordering elements**: Parents at top, children at bottom (follow derivedFrom hierarchy)
 
 ## Workflow
 
-### Step 1: Audit Specifications Without Relations
+### Step 1: Audit Current State
 
-Find specifications not linked to any requirement:
+Find elements that need attention during refactoring:
 
 ```bash
+# Find specifications not linked to any requirement
 reqvire search --filter-type='specification' --not-have-relations='satisfy' --short --json
+
+# Find constraints without satisfy relations
+reqvire search --filter-type='constraint' --not-have-relations='satisfy' --short
+
+# Find requirements with attachments (candidates for conversion to relations)
+reqvire search --has-attachments --short
+
+# Find duplicate or similar requirement names
+reqvire search --filter-name=".*Feature.*" --short
+
+# Find elements in specific files that might need reorganization
+reqvire search --filter-file="requirements/System/**" --short
 ```
 
-These need to be linked via `satisfiedBy` from appropriate requirements.
+These findings guide the refactoring work:
+- Orphaned specifications need `satisfiedBy` relations from appropriate requirements
+- Attachments may need conversion to `satisfiedBy` relations
+- Duplicate names suggest potential merge candidates
 
 ### Step 2: Find Requirements Asking for Specifications
 
@@ -45,49 +57,82 @@ For each specification attachment, ask:
 - Does this requirement *define* this specification? → Use `satisfiedBy`
 - Does this requirement *reference* or *depend on* this specification? → Keep as `Attachment`
 
-### Step 4: Consolidate Constraints
-
-Find a root requirement that asks for constraints to be defined. Add `satisfiedBy` relations to all constraint elements.
-
-### Step 5: Validate After Each Change
+Convert attachments to relations using link and unlink commands:
 
 ```bash
+# Remove attachment from requirement
+reqvire unlink "API Authorization Specification" "Authorization System Specification"
+
+# Add satisfiedBy relation instead
+reqvire link "API Authorization Specification" "satisfiedBy" "Authorization System Specification"
+
+# Or add satisfy relation from opposite direction
+reqvire link "Authorization System Specification" "satisfy" "API Authorization Specification"
+```
+
+**When to keep attachments:**
+- Requirement references but doesn't define the specification
+- Specification is defined by a different requirement
+- The attachment is a design document or external file (not an element)
+
+### Step 4: Consolidate Constraints
+
+Find a root requirement that asks for constraints to be defined. Add `satisfiedBy` relations to all constraint elements using the link command:
+
+```bash
+# Link constraint to requirement that defines it
+reqvire link "System Constraints Requirement" "satisfiedBy" "Performance Constraint"
+reqvire link "System Constraints Requirement" "satisfiedBy" "Security Constraint"
+
+# Or link from constraint to requirement
+reqvire link "Performance Constraint" "satisfy" "System Constraints Requirement"
+```
+
+When you find duplicate constraints, merge them:
+
+```bash
+# Preview merge to see what will happen
+reqvire merge "Primary Constraint" "Duplicate Constraint" --dry-run
+
+# Execute merge if preview looks correct
+reqvire merge "Primary Constraint" "Duplicate Constraint"
+```
+
+### Step 5: Remove Obsolete Elements
+
+After consolidation, remove elements that are no longer needed:
+
+```bash
+# Remove deprecated or duplicate element
+reqvire rm "Old Requirement Name"
+
+# Move element to better location before removing
+reqvire mv "Element Name" "requirements/Archive.md"
+```
+
+**Important**: Delete cleanly - don't leave "DEPRECATED" markers. Use git history to track what was removed and why.
+
+### Step 6: Validate After Each Change
+
+Run validation and linting after each refactoring step:
+
+```bash
+# Check model consistency
 reqvire validate
+
+# Show all linting issues
+reqvire lint
+
+# Show only auto-fixable issues
+reqvire lint --fixable
+
+# Show issues needing manual review
+reqvire lint --auditable
+
+# Apply automatic fixes
 reqvire lint --fix
 ```
 
-## Consolidating Specifications
-
-### Extract inline constraints into Constraints.md
-
-Find requirements with hardcoded limits and extract them as constraint elements:
-
-1. Create constraint elements in `requirements/Specifications/Constraints.md`
-2. Attach the constraint to requirements that reference the limit
-3. Link constraint to parent requirement via `satisfiedBy`
-
-**Examples of hardcoded limits to extract:**
-
-*Web App:*
-- "Session expires after 30 minutes of inactivity"
-- "Maximum file upload size: 10 MB"
-- "Password must be 8-128 characters"
-
-*API:*
-- "Rate limit: 100 requests per minute"
-- "Maximum payload size: 1 MB"
-- "Token expiration: 24 hours"
-
-*Database:*
-- "Connection pool maximum: 20 connections"
-- "Query timeout: 30 seconds"
-
-### Extract inline specifications
-
-Find requirements with detailed specifications in Details section:
-
-1. Create specification elements in `requirements/Specifications/*Specifications.md`
-2. Use `satisfiedBy` relation from the requirement
 
 ## Identifying Missing Relations
 
@@ -175,22 +220,6 @@ The system shall implement API Access Authorization following clearly defined sp
   * satisfiedBy: [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
 ```
 
-### Constraint Consolidation:
-
-Root requirement with satisfiedBy:
-```markdown
-### Operational Constraints
-
-The system shall implement operational constraints and rate limits.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * satisfiedBy: [Rate Limits](../Specifications/Constraints.md#rate-limits)
-  * satisfiedBy: [Session Limits](../Specifications/Constraints.md#session-limits)
-```
-
 Referencing requirement (keeps attachment):
 ```markdown
 ### Add IP to Whitelist
@@ -200,6 +229,27 @@ The system shall allow adding IPs to whitelist.
 #### Attachments
   * [Environment Limits](../Specifications/Constraints.md#environment-limits)
 ```
+
+## Final Formatting
+
+After completing all refactoring changes, apply formatting to ensure consistency:
+
+```bash
+# Preview formatting changes (dry-run by default)
+reqvire format
+
+# Apply formatting fixes
+reqvire format --fix
+
+# Apply formatting with full relation expansion (includes auto-generated inverse relations)
+reqvire format --fix --with-full-relations
+```
+
+The format command ensures:
+- Consistent markdown structure
+- Proper element separator lines (`---`)
+- Correct subsection ordering (Metadata, Relations, Details, Attachments)
+- Clean whitespace and indentation
 
 ## Git Philosophy
 

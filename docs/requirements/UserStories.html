@@ -784,9 +784,6 @@ blockquote {
       72aa2e113883d4a9["Linting Model Quality"];
       class 72aa2e113883d4a9 userRequirement;
       click 72aa2e113883d4a9 "UserStories.html#linting-model-quality";
-      4fc38bb5182e281["Model Export"];
-      class 4fc38bb5182e281 userRequirement;
-      click 4fc38bb5182e281 "UserStories.html#model-export";
       63cff97aeb9a82df["Operating on Model Elements"];
       class 63cff97aeb9a82df userRequirement;
       click 63cff97aeb9a82df "UserStories.html#operating-on-model-elements";
@@ -865,9 +862,6 @@ blockquote {
       cb2d46c673c86826["Code Traceability"];
       class cb2d46c673c86826 userRequirement;
       click cb2d46c673c86826 "Functional/Integration/CodeAlignment.html#code-traceability";
-      46ce32751add1793["Suggest Code Refactoring"];
-      class 46ce32751add1793 userRequirement;
-      click 46ce32751add1793 "Functional/Integration/CodeAlignment.html#suggest-code-refactoring";
     end
     subgraph ab9daa77a1cb1221["📄 GitHubIntegration.md"]
       b37b9282f6da886["Automate Documentation Export"];
@@ -895,7 +889,7 @@ blockquote {
   end
   subgraph e6e9a42ade18cb0e["📁 requirements/Functional/Output"]
     subgraph a1762b6e181c2fd0["📄 DiagramGeneration.md"]
-      ee0d244ddc9aac8f["Interactive Mermaid Diagrams"];
+      ee0d244ddc9aac8f["Interactive Mermaid Diagrams<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
       class ee0d244ddc9aac8f userRequirement;
       click ee0d244ddc9aac8f "Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams";
     end
@@ -932,7 +926,6 @@ blockquote {
   1f2f1e74fb06dae9 -->|satisfiedBy| d3d2eb1636d763ca;
   1f2f1e74fb06dae9 -->|satisfiedBy| a7802cc8074affd0;
   b7bd2696af5e74d1 -.->|deriveReqT| cb2d46c673c86826;
-  b7bd2696af5e74d1 -.->|deriveReqT| 46ce32751add1793;
   5962c1ae315af2be -.->|deriveReqT| a293baca57a9e3b3;
   5962c1ae315af2be -.->|deriveReqT| 43eafdd22a501023;
   5962c1ae315af2be -.->|deriveReqT| c1fde7d1c17c2acb;
@@ -1002,13 +995,15 @@ blockquote {
   a39347281679d203 -.->|deriveReqT| 9bbe93242c4454b;
   a39347281679d203 -.->|deriveReqT| 1e0f7595bc684d1;
   ee0d244ddc9aac8f -.->|deriveReqT| b1a0db26e90f239f;
+  ee0d244ddc9aac8f -->|satisfiedBy| ac522a615450fded;
   ee0d244ddc9aac8f -->|satisfiedBy| b214580f5133dc42;
+  ee0d244ddc9aac8f -->|satisfiedBy| ec385316ac867c67;
   b37b9282f6da886 -.->|deriveReqT| 80f699a01d9db166;
   39bccf245057be71 -.->|deriveReqT| 80f699a01d9db166;
   20f690d9cd389f10 -.->|deriveReqT| 176bc8c4eb6608de;
   20f690d9cd389f10 -.->|deriveReqT| 8ab6eb6e6ddc46cc;
   20f690d9cd389f10 -.->|deriveReqT| cc7864983ff441c7;
-  20f690d9cd389f10 -.->|deriveReqT| cdc082002507d4df;
+  20f690d9cd389f10 -.->|deriveReqT| 5f8fafa1901435c;
   20f690d9cd389f10 -.->|deriveReqT| 500be52cc121e6f2;
   20f690d9cd389f10 -->|satisfiedBy| b8a5e3adb9b5d82d;
   20f690d9cd389f10 -.->|verifiedBy| a967e55b50b57d2;
@@ -1030,6 +1025,7 @@ blockquote {
   40dc720d7c510af0 -.->|deriveReqT| c17deaee6f88323a;
   40dc720d7c510af0 -.->|deriveReqT| a0f7724a2ceac1ec;
   40dc720d7c510af0 -.->|deriveReqT| befd27abaf2aae8b;
+  40dc720d7c510af0 -->|satisfiedBy| d415e0f99fc5ad0c;
   40dc720d7c510af0 -->|satisfiedBy| e8918fd8f69a1f0a;
   40dc720d7c510af0 -->|satisfiedBy| 38c3e6e7692e0875;
   40dc720d7c510af0 -->|satisfiedBy| 64319236fb27fe2;
@@ -1048,6 +1044,7 @@ blockquote {
   click 637652e86464c11b "../core/src/error.rs";
   a869d98120d611e3 -->|satisfiedBy| 637652e86464c11b;
   a869d98120d611e3 -->|satisfiedBy| fc1df5aa988472a;
+  a869d98120d611e3 -.->|verifiedBy| f7d422af274a64cf;
   6226bc768d0185df -.->|deriveReqT| df9b3eb5275616dd;
   ff8ff08f0c0500f0 -.->|deriveReqT| fcfc76ba4d193d75;
   ff8ff08f0c0500f0 -.->|deriveReqT| f1ee9af5e71df06a;
@@ -1099,7 +1096,6 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="Functional/Integration/CodeAlignment.html#code-traceability">Code Traceability</a></li>
-<li>derive: <a href="Functional/Integration/CodeAlignment.html#suggest-code-refactoring">Suggest Code Refactoring</a></li>
 </ul>
 <hr />
 <h3 id="defining-model-structure">Defining Model Structure</h3>
@@ -1162,27 +1158,6 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="Functional/Operations/Linting.html#model-linting">Model Linting</a></li>
-</ul>
-<hr />
-<h3 id="model-export">Model Export</h3>
-<p>As a <strong>Manager</strong>, I want to export specifications into diferent formats including HTML, so that I can communicate system architecture effectively.</p>
-<h4>Details</h4>
-<p>All exports shall produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.</p>
-<p>The system shall ensure deterministic export output by:</p>
-<ul>
-<li>Sorting elements by identifier before processing</li>
-<li>Sorting relations by type and target identifier</li>
-<li>Maintaining consistent file ordering alphabetically</li>
-</ul>
-<p>This determinism ensures that:</p>
-<ul>
-<li>Running exports multiple times produces byte-identical output</li>
-<li>Version control diffs reflect actual content changes</li>
-<li>Continuous integration pipelines produce reproducible results</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
 </ul>
 <hr />
 <h3 id="operating-on-model-elements">Operating on Model Elements</h3>

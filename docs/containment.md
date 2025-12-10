@@ -728,11 +728,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Integration/CodeAlignment.html#sql-style-comment"
                     },
                     {
-                      "name": "Suggest Code Refactoring",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Integration/CodeAlignment.html#suggest-code-refactoring"
-                    },
-                    {
                       "name": "Traceability Format",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Integration/CodeAlignment.html#traceability-format"
@@ -807,6 +802,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Add Command Duplicate Detection Test",
                           "type": "verification",
                           "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-duplicate-detection-test"
+                        },
+                        {
+                          "name": "Add Command Error Messages Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test"
                         },
                         {
                           "name": "CLI Add Element Test",
@@ -1349,9 +1349,9 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Linting.html#redundant-hierarchical-attachment-detection"
                     },
                     {
-                      "name": "Redundant Hierarchical Relations Detection",
+                      "name": "Redundant Hierarchical Relations Detection and Auto-Removal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/Linting.html#redundant-hierarchical-relations-detection",
+                      "link": "requirements/Functional/Operations/Linting.html#redundant-hierarchical-relations-detection-and-auto-removal",
                       "children": [
                         {
                           "name": "Verification Trace Tree Construction",
@@ -1371,11 +1371,6 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
                         }
                       ]
-                    },
-                    {
-                      "name": "Safe Redundant Hierarchical Relations Auto-Removal",
-                      "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/Linting.html#safe-redundant-hierarchical-relations-auto-removal"
                     }
                   ]
                 },
@@ -1384,6 +1379,16 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Functional/Operations/Specifications.html",
                   "children": [
+                    {
+                      "name": "Create Element Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification"
+                    },
+                    {
+                      "name": "Delete Element Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#delete-element-workflow-specification"
+                    },
                     {
                       "name": "Document Structure Specification",
                       "type": "refinement",
@@ -1400,9 +1405,29 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Specifications.html#lint-output-specification"
                     },
                     {
+                      "name": "Merge Element Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#merge-element-workflow-specification"
+                    },
+                    {
+                      "name": "Move Element Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#move-element-workflow-specification"
+                    },
+                    {
+                      "name": "Multi-Branch Convergence Detection Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#multi-branch-convergence-detection-specification"
+                    },
+                    {
                       "name": "Orphaned Children Error Message Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#orphaned-children-error-message-specification"
+                    },
+                    {
+                      "name": "Redundant Hierarchical Relations Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#redundant-hierarchical-relations-specification"
                     },
                     {
                       "name": "Relation Operations Specification",
@@ -1637,27 +1662,77 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Diagram Generation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#diagram-generation"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#diagram-generation",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Mermaid Interactive Features Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "File Diagram Attachment Display",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#file-diagram-attachment-display"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#file-diagram-attachment-display",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Mermaid Interactive Features Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Interactive Mermaid Diagram Node Behavior",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior",
+                      "children": [
+                        {
+                          "name": "Mermaid Interactive Features Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams",
+                      "children": [
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "SysML-Compatible Relationship Rendering",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Trace Relation Non-Directional Behavior",
@@ -1674,7 +1749,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Collect Content from Requirement Chain",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#collect-content-from-requirement-chain"
+                      "link": "requirements/Functional/Output/Reporting.html#collect-content-from-requirement-chain",
+                      "children": [
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Comma-Separated Type Filter Parsing",
@@ -1695,6 +1777,21 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Containment Specification",
                           "type": "attachment-element",
                           "link": "requirements/Refinements.html#containment-specification"
+                        },
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        },
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Resources Report Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
                         }
                       ]
                     },
@@ -1706,12 +1803,36 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Forward-Only Relation Traversal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal"
+                      "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal",
+                      "children": [
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Model Diagram Output Formats",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#model-diagram-output-formats"
+                      "link": "requirements/Functional/Output/Reporting.html#model-diagram-output-formats",
+                      "children": [
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        },
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Model Reports",
@@ -1743,7 +1864,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Reverse Relation Traversal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#reverse-relation-traversal"
+                      "link": "requirements/Functional/Output/Reporting.html#reverse-relation-traversal",
+                      "children": [
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Search Report Generator",
@@ -1769,6 +1897,16 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Text Output Formatting",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#text-output-formatting"
+                        },
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        },
+                        {
+                          "name": "Resources Report Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
                         }
                       ]
                     },
@@ -1801,6 +1939,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Verification Trace Tree Construction",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
+                        },
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
                         }
                       ]
                     },
@@ -1819,7 +1962,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Validation Report Generator",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#validation-report-generator"
+                      "link": "requirements/Functional/Output/Reporting.html#validation-report-generator",
+                      "children": [
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Verification Coverage Report",
@@ -1850,6 +2000,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Verification Type Selection Guidelines",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Core/Specifications.html#verification-type-selection-guidelines"
+                        },
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
                         }
                       ]
                     }
@@ -1876,6 +2031,16 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#color-scheme-specification"
                     },
                     {
+                      "name": "Deterministic Output Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                    },
+                    {
+                      "name": "Diagram Relation Filtering Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                    },
+                    {
                       "name": "Diff Output Format Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
@@ -1896,9 +2061,24 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#markdown-report-style-specification"
                     },
                     {
+                      "name": "Mermaid Diagram Generation Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                    },
+                    {
                       "name": "Mermaid Diagram Style Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "Mermaid Interactive Features Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                    },
+                    {
+                      "name": "Resources Report Format Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
                     },
                     {
                       "name": "SysML Rendering Specification",
@@ -2187,6 +2367,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Create Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification"
                         }
                       ]
                     },
@@ -2258,6 +2443,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "ContainmentView.md",
                           "type": "attachment-file",
                           "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.md"
+                        },
+                        {
+                          "name": "D3.js Containment Tree Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#d3js-containment-tree-specification"
                         }
                       ]
                     },
@@ -2312,6 +2502,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Text Output Formatting",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#text-output-formatting"
+                        },
+                        {
+                          "name": "Multi-Branch Convergence Detection Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#multi-branch-convergence-detection-specification"
                         }
                       ]
                     },
@@ -2334,6 +2529,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Merge Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#merge-element-workflow-specification"
                         }
                       ]
                     },
@@ -2425,6 +2625,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Move Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#move-element-workflow-specification"
                         }
                       ]
                     },
@@ -2506,6 +2711,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Delete Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#delete-element-workflow-specification"
                         }
                       ]
                     },
@@ -2776,7 +2986,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Containment View Attachment Links",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#containment-view-attachment-links"
+                      "link": "requirements/Interfaces/WebInterface/Features.html#containment-view-attachment-links",
+                      "children": [
+                        {
+                          "name": "D3.js Containment Tree Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#d3js-containment-tree-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Diagram Attachment Display",
@@ -2811,6 +3028,16 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Mermaid Diagram Style Specification",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
+                        },
+                        {
+                          "name": "HTML Export Pipeline Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-export-pipeline-specification"
+                        },
+                        {
+                          "name": "HTML Navigation Bar Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-navigation-bar-specification"
                         }
                       ]
                     },
@@ -2822,12 +3049,31 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Serve Command",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#serve-command"
+                      "link": "requirements/Interfaces/WebInterface/Features.html#serve-command",
+                      "children": [
+                        {
+                          "name": "HTML Export Pipeline Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-export-pipeline-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Web Interface Color Scheme",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#web-interface-color-scheme"
+                      "link": "requirements/Interfaces/WebInterface/Features.html#web-interface-color-scheme",
+                      "children": [
+                        {
+                          "name": "HTML Navigation Bar Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-navigation-bar-specification"
+                        },
+                        {
+                          "name": "HTML Branding Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-branding-specification"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -2836,6 +3082,26 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Interfaces/WebInterface/Specifications.html",
                   "children": [
+                    {
+                      "name": "D3.js Containment Tree Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#d3js-containment-tree-specification"
+                    },
+                    {
+                      "name": "HTML Branding Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#html-branding-specification"
+                    },
+                    {
+                      "name": "HTML Export Pipeline Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#html-export-pipeline-specification"
+                    },
+                    {
+                      "name": "HTML Navigation Bar Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#html-navigation-bar-specification"
+                    },
                     {
                       "name": "Web Interface Style Specification",
                       "type": "refinement",
@@ -2950,11 +3216,6 @@ The containment view shows the physical organization of the model—how requirem
               "name": "Linting Model Quality",
               "type": "user-requirement",
               "link": "requirements/UserStories.html#linting-model-quality"
-            },
-            {
-              "name": "Model Export",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#model-export"
             },
             {
               "name": "Operating on Model Elements",
@@ -3723,11 +3984,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Integration/CodeAlignment.html#sql-style-comment"
                     },
                     {
-                      "name": "Suggest Code Refactoring",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Integration/CodeAlignment.html#suggest-code-refactoring"
-                    },
-                    {
                       "name": "Traceability Format",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Integration/CodeAlignment.html#traceability-format"
@@ -3802,6 +4058,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Add Command Duplicate Detection Test",
                           "type": "verification",
                           "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-duplicate-detection-test"
+                        },
+                        {
+                          "name": "Add Command Error Messages Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test"
                         },
                         {
                           "name": "CLI Add Element Test",
@@ -4344,9 +4605,9 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Linting.html#redundant-hierarchical-attachment-detection"
                     },
                     {
-                      "name": "Redundant Hierarchical Relations Detection",
+                      "name": "Redundant Hierarchical Relations Detection and Auto-Removal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/Linting.html#redundant-hierarchical-relations-detection",
+                      "link": "requirements/Functional/Operations/Linting.html#redundant-hierarchical-relations-detection-and-auto-removal",
                       "children": [
                         {
                           "name": "Verification Trace Tree Construction",
@@ -4366,11 +4627,6 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
                         }
                       ]
-                    },
-                    {
-                      "name": "Safe Redundant Hierarchical Relations Auto-Removal",
-                      "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/Linting.html#safe-redundant-hierarchical-relations-auto-removal"
                     }
                   ]
                 },
@@ -4379,6 +4635,16 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Functional/Operations/Specifications.html",
                   "children": [
+                    {
+                      "name": "Create Element Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification"
+                    },
+                    {
+                      "name": "Delete Element Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#delete-element-workflow-specification"
+                    },
                     {
                       "name": "Document Structure Specification",
                       "type": "refinement",
@@ -4395,9 +4661,29 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Specifications.html#lint-output-specification"
                     },
                     {
+                      "name": "Merge Element Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#merge-element-workflow-specification"
+                    },
+                    {
+                      "name": "Move Element Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#move-element-workflow-specification"
+                    },
+                    {
+                      "name": "Multi-Branch Convergence Detection Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#multi-branch-convergence-detection-specification"
+                    },
+                    {
                       "name": "Orphaned Children Error Message Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#orphaned-children-error-message-specification"
+                    },
+                    {
+                      "name": "Redundant Hierarchical Relations Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#redundant-hierarchical-relations-specification"
                     },
                     {
                       "name": "Relation Operations Specification",
@@ -4632,27 +4918,77 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Diagram Generation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#diagram-generation"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#diagram-generation",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Mermaid Interactive Features Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "File Diagram Attachment Display",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#file-diagram-attachment-display"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#file-diagram-attachment-display",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Mermaid Interactive Features Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Interactive Mermaid Diagram Node Behavior",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior",
+                      "children": [
+                        {
+                          "name": "Mermaid Interactive Features Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Interactive Mermaid Diagrams",
                       "type": "user-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams",
+                      "children": [
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "SysML-Compatible Relationship Rendering",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering"
+                      "link": "requirements/Functional/Output/DiagramGeneration.html#sysml-compatible-relationship-rendering",
+                      "children": [
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Trace Relation Non-Directional Behavior",
@@ -4669,7 +5005,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Collect Content from Requirement Chain",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#collect-content-from-requirement-chain"
+                      "link": "requirements/Functional/Output/Reporting.html#collect-content-from-requirement-chain",
+                      "children": [
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Comma-Separated Type Filter Parsing",
@@ -4690,6 +5033,21 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Containment Specification",
                           "type": "attachment-element",
                           "link": "requirements/Refinements.html#containment-specification"
+                        },
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        },
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Resources Report Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
                         }
                       ]
                     },
@@ -4701,12 +5059,36 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Forward-Only Relation Traversal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal"
+                      "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal",
+                      "children": [
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Model Diagram Output Formats",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#model-diagram-output-formats"
+                      "link": "requirements/Functional/Output/Reporting.html#model-diagram-output-formats",
+                      "children": [
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        },
+                        {
+                          "name": "Mermaid Diagram Generation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                        },
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Model Reports",
@@ -4738,7 +5120,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Reverse Relation Traversal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#reverse-relation-traversal"
+                      "link": "requirements/Functional/Output/Reporting.html#reverse-relation-traversal",
+                      "children": [
+                        {
+                          "name": "Diagram Relation Filtering Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Search Report Generator",
@@ -4764,6 +5153,16 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Text Output Formatting",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#text-output-formatting"
+                        },
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        },
+                        {
+                          "name": "Resources Report Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
                         }
                       ]
                     },
@@ -4796,6 +5195,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Verification Trace Tree Construction",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
+                        },
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
                         }
                       ]
                     },
@@ -4814,7 +5218,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Validation Report Generator",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#validation-report-generator"
+                      "link": "requirements/Functional/Output/Reporting.html#validation-report-generator",
+                      "children": [
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Verification Coverage Report",
@@ -4845,6 +5256,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Verification Type Selection Guidelines",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Core/Specifications.html#verification-type-selection-guidelines"
+                        },
+                        {
+                          "name": "Deterministic Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
                         }
                       ]
                     }
@@ -4871,6 +5287,16 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#color-scheme-specification"
                     },
                     {
+                      "name": "Deterministic Output Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
+                    },
+                    {
+                      "name": "Diagram Relation Filtering Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
+                    },
+                    {
                       "name": "Diff Output Format Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
@@ -4891,9 +5317,24 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#markdown-report-style-specification"
                     },
                     {
+                      "name": "Mermaid Diagram Generation Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-generation-specification"
+                    },
+                    {
                       "name": "Mermaid Diagram Style Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
+                    },
+                    {
+                      "name": "Mermaid Interactive Features Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                    },
+                    {
+                      "name": "Resources Report Format Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
                     },
                     {
                       "name": "SysML Rendering Specification",
@@ -5182,6 +5623,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Create Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification"
                         }
                       ]
                     },
@@ -5253,6 +5699,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "ContainmentView.md",
                           "type": "attachment-file",
                           "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.md"
+                        },
+                        {
+                          "name": "D3.js Containment Tree Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#d3js-containment-tree-specification"
                         }
                       ]
                     },
@@ -5307,6 +5758,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Text Output Formatting",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#text-output-formatting"
+                        },
+                        {
+                          "name": "Multi-Branch Convergence Detection Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#multi-branch-convergence-detection-specification"
                         }
                       ]
                     },
@@ -5329,6 +5785,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Merge Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#merge-element-workflow-specification"
                         }
                       ]
                     },
@@ -5420,6 +5881,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Move Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#move-element-workflow-specification"
                         }
                       ]
                     },
@@ -5501,6 +5967,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "JSON Output Structure",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Delete Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#delete-element-workflow-specification"
                         }
                       ]
                     },
@@ -5771,7 +6242,14 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Containment View Attachment Links",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#containment-view-attachment-links"
+                      "link": "requirements/Interfaces/WebInterface/Features.html#containment-view-attachment-links",
+                      "children": [
+                        {
+                          "name": "D3.js Containment Tree Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#d3js-containment-tree-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Diagram Attachment Display",
@@ -5806,6 +6284,16 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Mermaid Diagram Style Specification",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
+                        },
+                        {
+                          "name": "HTML Export Pipeline Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-export-pipeline-specification"
+                        },
+                        {
+                          "name": "HTML Navigation Bar Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-navigation-bar-specification"
                         }
                       ]
                     },
@@ -5817,12 +6305,31 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Serve Command",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#serve-command"
+                      "link": "requirements/Interfaces/WebInterface/Features.html#serve-command",
+                      "children": [
+                        {
+                          "name": "HTML Export Pipeline Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-export-pipeline-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Web Interface Color Scheme",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#web-interface-color-scheme"
+                      "link": "requirements/Interfaces/WebInterface/Features.html#web-interface-color-scheme",
+                      "children": [
+                        {
+                          "name": "HTML Navigation Bar Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-navigation-bar-specification"
+                        },
+                        {
+                          "name": "HTML Branding Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/WebInterface/Specifications.html#html-branding-specification"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -5831,6 +6338,26 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Interfaces/WebInterface/Specifications.html",
                   "children": [
+                    {
+                      "name": "D3.js Containment Tree Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#d3js-containment-tree-specification"
+                    },
+                    {
+                      "name": "HTML Branding Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#html-branding-specification"
+                    },
+                    {
+                      "name": "HTML Export Pipeline Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#html-export-pipeline-specification"
+                    },
+                    {
+                      "name": "HTML Navigation Bar Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#html-navigation-bar-specification"
+                    },
                     {
                       "name": "Web Interface Style Specification",
                       "type": "refinement",
@@ -5945,11 +6472,6 @@ The containment view shows the physical organization of the model—how requirem
               "name": "Linting Model Quality",
               "type": "user-requirement",
               "link": "requirements/UserStories.html#linting-model-quality"
-            },
-            {
-              "name": "Model Export",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#model-export"
             },
             {
               "name": "Operating on Model Elements",

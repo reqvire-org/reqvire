@@ -740,6 +740,9 @@ blockquote {
       9ce04315a8dd0d88["Add Command Duplicate Detection Test"];
       class 9ce04315a8dd0d88 verification;
       click 9ce04315a8dd0d88 "ElementManipulationVerifications.html#add-command-duplicate-detection-test";
+      f7d422af274a64cf["Add Command Error Messages Test"];
+      class f7d422af274a64cf verification;
+      click f7d422af274a64cf "ElementManipulationVerifications.html#add-command-error-messages-test";
       868e15205b620ba2["CLI Add Element Test<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
       class 868e15205b620ba2 verification;
       click 868e15205b620ba2 "ElementManipulationVerifications.html#cli-add-element-test";
@@ -797,6 +800,10 @@ blockquote {
   class 4179509ffe0be04b default;
   click 4179509ffe0be04b "../../../../tests/test-duplicate-detection/test.sh";
   9ce04315a8dd0d88 -->|satisfiedBy| 4179509ffe0be04b;
+  fe0a74a2cd2af425["test.sh"];
+  class fe0a74a2cd2af425 default;
+  click fe0a74a2cd2af425 "../../../../tests/test-add-command-error-messages/test.sh";
+  f7d422af274a64cf -->|satisfiedBy| fe0a74a2cd2af425;
   7f91546dcec3d680["test.sh"];
   class 7f91546dcec3d680 default;
   click 7f91546dcec3d680 "../../../../tests/test-crud-manipulation/test.sh";
@@ -856,6 +863,77 @@ blockquote {
 <ul>
 <li>satisfiedBy: <a href="../../../../tests/test-duplicate-detection/test.sh">test.sh</a></li>
 <li>verify: <a href="../../../Interfaces/CLI/Commands.html#cli-add-element-command">CLI Add Element Command</a></li>
+</ul>
+<hr />
+<h3 id="add-command-error-messages-test">Add Command Error Messages Test</h3>
+<p>Test verifies that the add command provides contextual error messages with examples when format parsing fails.</p>
+<h4>Details</h4>
+<p><strong>Test Cases:</strong></p>
+<ol>
+<li>
+<p><strong>Missing ### header</strong>: Provide markdown without element header</p>
+<ul>
+<li>Verify error message includes “Example of correctly formatted element”</li>
+<li>Verify example shows “### Element Name”</li>
+</ul>
+</li>
+<li>
+<p><strong>Multiple ### headers</strong>: Provide markdown with multiple element headers</p>
+<ul>
+<li>Verify error message includes example</li>
+<li>Verify example includes Metadata subsection</li>
+</ul>
+</li>
+<li>
+<p><strong>Invalid metadata format</strong>: Provide metadata without bullet point</p>
+<ul>
+<li>Verify error message includes “Expected format: ’  * key: value’”</li>
+<li>Verify example shows correct metadata format</li>
+</ul>
+</li>
+<li>
+<p><strong>Invalid relation format</strong>: Provide relation without proper markdown link</p>
+<ul>
+<li>Verify error message includes “Expected format: ’  * relationType: <a href="link">Text</a>’”</li>
+<li>Verify example includes Relations subsection</li>
+</ul>
+</li>
+<li>
+<p><strong>Invalid attachment format</strong>: Provide attachment without proper markdown link</p>
+<ul>
+<li>Verify error message includes “Expected format: ’  * <a href="link">Text</a>’”</li>
+<li>Verify example includes Attachments subsection</li>
+</ul>
+</li>
+<li>
+<p><strong>Example completeness</strong>: Verify example includes all subsections</p>
+<ul>
+<li>Details subsection with markdown formatting</li>
+<li>Metadata subsection with type</li>
+<li>Relations subsection with derivedFrom and satisfiedBy examples</li>
+<li>Attachments subsection</li>
+<li>Separator (—)</li>
+</ul>
+</li>
+</ol>
+<p><strong>Success Criteria:</strong></p>
+<ul>
+<li>Command exits with non-zero code for all invalid inputs</li>
+<li>Error messages include “Example of correctly formatted element”</li>
+<li>Examples show proper structure for all subsections</li>
+<li>Format guidance is specific to the error type</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-add-command-error-messages/test.sh">test.sh</a></li>
+<li>verify: <a href="../../Core/Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
+<li>verify: <a href="../../Core/Validation.html#markdown-structure-validator">Markdown Structure Validator</a></li>
+<li>verify: <a href="../../../Interfaces/CLI/Commands.html#cli-add-element-command">CLI Add Element Command</a></li>
+<li>verify: <a href="../../../Interfaces/CLI/Commands.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></li>
 </ul>
 <hr />
 <h3 id="cli-add-element-test">CLI Add Element Test</h3>

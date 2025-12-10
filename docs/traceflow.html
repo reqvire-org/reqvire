@@ -728,7 +728,7 @@ blockquote {
 <p>The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from stakeholder needs (user requirements) through system specifications (system requirements) to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.</p>
 <p><strong>Instructions:</strong> Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control.</p>
 <p>
-<div class="d3-sankey-container" id="d3sankey_55676fb2af90">
+<div class="d3-sankey-container" id="d3sankey_564bba1acca0">
     <svg class="d3-sankey-svg"></svg>
 </div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -1143,6 +1143,16 @@ blockquote {
       "link": "requirements/Interfaces/CLI/Commands.md#cli-add-element-command"
     },
     {
+      "name": "Add Command Error Messages Test",
+      "type": "verification",
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#add-command-error-messages-test"
+    },
+    {
+      "name": "Detailed Error Handling and Logging",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#detailed-error-handling-and-logging"
+    },
+    {
       "name": "CLI Add Element Test",
       "type": "verification",
       "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test"
@@ -1398,19 +1408,14 @@ blockquote {
       "link": "requirements/Functional/Operations/Linting.md#multi-branch-convergence-detection"
     },
     {
+      "name": "Redundant Hierarchical Relations Detection and Auto-Removal",
+      "type": "requirement",
+      "link": "requirements/Functional/Operations/Linting.md#redundant-hierarchical-relations-detection-and-auto-removal"
+    },
+    {
       "name": "Redundant Verify Relations Detection",
       "type": "requirement",
       "link": "requirements/Functional/Operations/Linting.md#redundant-verify-relations-detection"
-    },
-    {
-      "name": "Safe Redundant Hierarchical Relations Auto-Removal",
-      "type": "requirement",
-      "link": "requirements/Functional/Operations/Linting.md#safe-redundant-hierarchical-relations-auto-removal"
-    },
-    {
-      "name": "Redundant Hierarchical Relations Detection",
-      "type": "requirement",
-      "link": "requirements/Functional/Operations/Linting.md#redundant-hierarchical-relations-detection"
     },
     {
       "name": "Redundant Hierarchical Attachment Test",
@@ -2420,6 +2425,56 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Enhanced Validation Error Reporting",
+      "target": "Add Command Error Messages Test",
+      "value": 1
+    },
+    {
+      "source": "Validating Structures",
+      "target": "Enhanced Validation Error Reporting",
+      "value": 1
+    },
+    {
+      "source": "Markdown Structure Validator",
+      "target": "Add Command Error Messages Test",
+      "value": 1
+    },
+    {
+      "source": "Validate Markdown Structure",
+      "target": "Markdown Structure Validator",
+      "value": 1
+    },
+    {
+      "source": "CLI Add Element Command",
+      "target": "Add Command Error Messages Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Add Element Command",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
+      "source": "Detailed Error Handling and Logging",
+      "target": "Add Command Error Messages Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Detailed Error Handling and Logging",
+      "value": 1
+    },
+    {
+      "source": "System Model Interfaces",
+      "target": "CLI interface",
+      "value": 1
+    },
+    {
       "source": "CLI Add Element Command",
       "target": "CLI Add Element Test",
       "value": 1
@@ -2900,18 +2955,13 @@ blockquote {
       "value": 1
     },
     {
+      "source": "Redundant Hierarchical Relations Detection and Auto-Removal",
+      "target": "Lint Command Verification",
+      "value": 1
+    },
+    {
       "source": "Redundant Verify Relations Detection",
       "target": "Lint Command Verification",
-      "value": 1
-    },
-    {
-      "source": "Safe Redundant Hierarchical Relations Auto-Removal",
-      "target": "Lint Command Verification",
-      "value": 1
-    },
-    {
-      "source": "Redundant Hierarchical Relations Detection",
-      "target": "Safe Redundant Hierarchical Relations Auto-Removal",
       "value": 1
     },
     {
@@ -3621,7 +3671,7 @@ blockquote {
     }
   ]
 };
-    const container = document.getElementById("d3sankey_55676fb2af90");
+    const container = document.getElementById("d3sankey_564bba1acca0");
     const svg = d3.select(container).select("svg");
 
     // Configuration

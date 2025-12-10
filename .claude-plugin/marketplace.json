@@ -9,9 +9,9 @@
     },
     "plugins": [
         {
-            "version": "1.4.0",
+            "version": "1.5.0",
             "name": "reqvire",
-            "description": "The Requirements As Code framework for Modern Engineering Teams. Includes specialized skills for requirements and context engineering and task planning.",
+            "description": "The Requirements As Context framework for Modern Engineering Teams. Includes specialized skills for requirements and context engineering and task planning.",
             "author": {
                 "name": "Ilija Ljubicic",
                 "email": "ilijaljubicic@users.noreply.github.com"
@@ -49,6 +49,9 @@
                 "./commands/rm.md",
                 "./commands/link.md",
                 "./commands/unlink.md"
+            ],
+            "skills": [
+                "./skills/syseng/SKILL.md"
             ],
             "source": "./reqvire-claude-plugin",
             "strict": false

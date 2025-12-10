@@ -737,6 +737,12 @@ blockquote {
 
   subgraph 91eede421faaa553["📁 requirements/Functional/Operations"]
     subgraph 7c2e7eef0051f760["📄 Specifications.md"]
+      3c85593db589fd04["Create Element Workflow Specification"];
+      class 3c85593db589fd04 default;
+      click 3c85593db589fd04 "Specifications.html#create-element-workflow-specification";
+      bc1f889f5f12a980["Delete Element Workflow Specification"];
+      class bc1f889f5f12a980 default;
+      click bc1f889f5f12a980 "Specifications.html#delete-element-workflow-specification";
       7f30e57cc80e9b87["Document Structure Specification"];
       class 7f30e57cc80e9b87 default;
       click 7f30e57cc80e9b87 "Specifications.html#document-structure-specification";
@@ -746,9 +752,21 @@ blockquote {
       b8a5e3adb9b5d82d["Lint Output Specification"];
       class b8a5e3adb9b5d82d default;
       click b8a5e3adb9b5d82d "Specifications.html#lint-output-specification";
+      9a6c593ffee9a214["Merge Element Workflow Specification"];
+      class 9a6c593ffee9a214 default;
+      click 9a6c593ffee9a214 "Specifications.html#merge-element-workflow-specification";
+      c75283445bce637a["Move Element Workflow Specification"];
+      class c75283445bce637a default;
+      click c75283445bce637a "Specifications.html#move-element-workflow-specification";
+      c5d346cc41243982["Multi-Branch Convergence Detection Specification"];
+      class c5d346cc41243982 default;
+      click c5d346cc41243982 "Specifications.html#multi-branch-convergence-detection-specification";
       4366fe5150f6d7c2["Orphaned Children Error Message Specification"];
       class 4366fe5150f6d7c2 default;
       click 4366fe5150f6d7c2 "Specifications.html#orphaned-children-error-message-specification";
+      6a995b12e8da977a["Redundant Hierarchical Relations Specification"];
+      class 6a995b12e8da977a default;
+      click 6a995b12e8da977a "Specifications.html#redundant-hierarchical-relations-specification";
       2a23f1dee6913aeb["Relation Operations Specification"];
       class 2a23f1dee6913aeb default;
       click 2a23f1dee6913aeb "Specifications.html#relation-operations-specification";
@@ -761,6 +779,72 @@ blockquote {
     end
   end
 </div>
+<h3 id="create-element-workflow-specification">Create Element Workflow Specification</h3>
+<p>Detailed workflow for creating new model elements.</p>
+<h4>Details</h4>
+<p>When creating a new element, the system shall:</p>
+<ul>
+<li>Accept a string containing the full element definition in Markdown format</li>
+<li>Accept target location: file path</li>
+<li>Validate the target location using path validation rules</li>
+<li>Create target file if it does not exist (subject to validation constraints)</li>
+<li>Parse and validate the element definition string</li>
+<li>Verify the element name is globally unique in the model</li>
+<li>Validate and normalize all relations following clearly defined specifications</li>
+<li>Insert the element into the target file following Element Ordering Behavior</li>
+<li>Reject the operation and report validation errors if validation fails</li>
+<li>Provide updates report following Diff Output Format Specification</li>
+<li>The system shall support override mode to replace existing element with same name following rules defined in Create Element Override Behavior</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+</ul>
+<hr />
+<h3 id="delete-element-workflow-specification">Delete Element Workflow Specification</h3>
+<p>Detailed workflow for deleting existing model elements.</p>
+<h4>Details</h4>
+<p>When deleting an element, the system shall:</p>
+<ul>
+<li>Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)</li>
+<li>Reject the operation if any child would become orphaned</li>
+<li>Provide clear error message listing orphaned children with resolution guidance</li>
+<li>Allow deletion if children have other parent hierarchical relations</li>
+<li>Remove the element and all its content from the source file</li>
+<li>Identify all relations pointing to the deleted element (incoming relations)</li>
+<li>Remove all relations that reference the deleted element from other elements</li>
+<li>Identify all relations from the deleted element (outgoing relations)</li>
+<li>Remove the complete element section including separators</li>
+<li>Maintain file structure and formatting after deletion</li>
+<li>Provide updates report following Diff Output Format Specification</li>
+</ul>
+<p><strong>Empty File Cleanup:</strong></p>
+<ul>
+<li>After deleting the element, check if the source file contains any remaining elements</li>
+<li>If no elements remain and all sections are empty (only page content, headers, or whitespace), remove the file from the filesystem</li>
+<li>If the file is removed, report the file deletion in the operation output</li>
+</ul>
+<p><strong>Relation Handling:</strong></p>
+<ul>
+<li>All <code>derivedFrom</code> relations pointing to the deleted element shall be removed</li>
+<li>All <code>verifiedBy</code> relations pointing to the deleted element shall be removed</li>
+<li>All <code>verify</code> relations pointing to the deleted element shall be removed</li>
+<li>All <code>satisfiedBy</code> relations pointing to the deleted element shall be removed</li>
+<li>Relations from the deleted element are automatically removed with the element</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
+</ul>
+<hr />
 <h3 id="document-structure-specification">Document Structure Specification</h3>
 <p>Rules for normalizing document hierarchical structure during formatting.</p>
 <h4>Details</h4>
@@ -867,6 +951,125 @@ blockquote {
 <li>satisfy: <a href="Linting.html#model-linting">Model Linting</a></li>
 </ul>
 <hr />
+<h3 id="merge-element-workflow-specification">Merge Element Workflow Specification</h3>
+<p>Detailed workflow for merging multiple source elements into a target element.</p>
+<h4>Details</h4>
+<p>When merging elements, the system shall:</p>
+<ul>
+<li>Accept target element name (must exist in the model)</li>
+<li>Accept one or more source element names (must exist in the model)</li>
+<li>Validate type compatibility following clearly defined rules in Merge Type Compatibility Constraint</li>
+<li>Transform and merge content following clearly defined rules in Merge Content Transformation Behavior</li>
+<li>Preserve target element’s metadata (discard source metadata)</li>
+<li>Delete source elements after successful merge</li>
+<li>Update all relations pointing to source elements to point to target</li>
+<li>Remove empty source files when no elements remain</li>
+<li>Provide updates report following Diff Output Format Specification</li>
+</ul>
+<p>The system shall reject the operation with a clear error message if:</p>
+<ul>
+<li>The target element does not exist</li>
+<li>Any source element does not exist</li>
+<li>Source and target element types are incompatible per Merge Type Compatibility Constraint</li>
+<li>Merged result would have cross-section duplicates per Merge Content Transformation Behavior</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ElementManipulation.html#merge-element-operation">Merge Element Operation</a></li>
+</ul>
+<hr />
+<h3 id="move-element-workflow-specification">Move Element Workflow Specification</h3>
+<p>Detailed workflow for moving existing model elements to different file locations.</p>
+<h4>Details</h4>
+<p>When moving an element, the system shall:</p>
+<ul>
+<li>Validate the target location using path validation rules</li>
+<li>Create target file if it does not exist (subject to validation constraints)</li>
+<li>Remove the element from the source file</li>
+<li>Insert the element into the target file following Element Ordering Behavior</li>
+<li>Preserve all element content, metadata, and relations</li>
+<li>Update the element’s identifier to reflect the new location</li>
+<li>Identify all relations pointing to the moved element (incoming relations)</li>
+<li>Update all relations that reference the moved element with the new identifier</li>
+<li>Maintain file structure and formatting in both source and target files</li>
+<li>Ensure the element name is globally unique in the model</li>
+<li>Provide updates report following Diff Output Format Specification</li>
+</ul>
+<p><strong>Empty Source File Cleanup:</strong></p>
+<ul>
+<li>After moving the element, check if the source file contains any remaining elements</li>
+<li>If no elements remain (only page content, headers, or whitespace), remove the source file from the filesystem</li>
+<li>If the file is removed, report the file deletion in the operation output</li>
+</ul>
+<p><strong>Relation Update Requirements:</strong></p>
+<ul>
+<li>All relations (both forward and backward) pointing to the moved element shall be updated to the new identifier</li>
+<li>Relations within the moved element (outgoing relations) shall be preserved unchanged</li>
+</ul>
+<p><strong>Identifier Update:</strong></p>
+<ul>
+<li>The element’s identifier changes from <code>&lt;old-file&gt;#&lt;element-name&gt;</code> to <code>&lt;new-file&gt;#&lt;element-name&gt;</code></li>
+<li>All references to the old identifier shall be updated to the new identifier</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="ElementManipulation.html#move-element-operation">Move Element Operation</a></li>
+</ul>
+<hr />
+<h3 id="multi-branch-convergence-detection-specification">Multi-Branch Convergence Detection Specification</h3>
+<p>Technical specification for detecting when an element reaches a common ancestor through multiple distinct branch paths.</p>
+<h4>Details</h4>
+<p>A multi-branch convergence occurs when:</p>
+<ul>
+<li>An element reaches a common ancestor through two or more distinct derivedFrom branch paths</li>
+<li>There is NO direct derivedFrom relation from the element to the ancestor</li>
+<li>Each branch represents a potentially different semantic relationship</li>
+<li>The convergence may be intentional (element truly derives from ancestor through multiple contexts) OR may represent redundant modeling</li>
+</ul>
+<p><strong>Key Distinction from Redundant Hierarchical Relations:</strong></p>
+<ul>
+<li><strong>Redundant Hierarchical Relations</strong>: Element has a DIRECT relation to ancestor PLUS alternate paths → auto-fixable (remove direct relation)</li>
+<li><strong>Multi-Branch Convergence</strong>: Element reaches ancestor through MULTIPLE branches with NO direct relation → needs manual review (determine if branches are semantically distinct)</li>
+</ul>
+<p><strong>Example:</strong></p>
+<pre><code>Authorization (root)
+  → Management API
+    → API Specification
+  → Public API
+    → API Specification
+</code></pre>
+<p>API Specification reaches Authorization through two branches (Management API and Public API). Both branches might be semantically valid (spec derives from auth in context of both APIs), OR one might be a modeling error that should be removed.</p>
+<p>Detection shall:</p>
+<ul>
+<li>Use the trace tree building logic to identify elements that reach common ancestors through multiple distinct branch paths</li>
+<li>Exclude cases where a direct relation exists (those are handled by Redundant Hierarchical Relations Detection)</li>
+<li>Report the element, the common ancestor, and all distinct branch paths</li>
+<li>Categorize as <strong>needs manual review</strong> since determining semantic necessity requires human judgment</li>
+<li>Explain that the user must decide whether all branches represent valid semantic relationships or if one is redundant</li>
+</ul>
+<p>This enables the model author to review and decide:</p>
+<ul>
+<li>Are both branches semantically necessary? (keep both)</li>
+<li>Is one branch a modeling error? (remove that branch’s intermediate relations)</li>
+<li>Should there be a direct relation instead? (restructure the model)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Linting.html#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></li>
+</ul>
+<hr />
 <h3 id="orphaned-children-error-message-specification">Orphaned Children Error Message Specification</h3>
 <p>The error message for orphaned children prevention shall include:</p>
 <ul>
@@ -883,6 +1086,76 @@ blockquote {
 <h4>Relations</h4>
 <ul>
 <li>satisfy: <a href="ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
+</ul>
+<hr />
+<h3 id="redundant-hierarchical-relations-specification">Redundant Hierarchical Relations Specification</h3>
+<p>Technical specification for detecting and auto-removing redundant derivedFrom relations in the requirement hierarchy.</p>
+<h4>Details</h4>
+<p><strong>What is Redundant:</strong></p>
+<p>A derivedFrom relation is redundant when:</p>
+<ul>
+<li>An element has a direct derivedFrom relation to an ancestor requirement</li>
+<li>The same element also reaches that ancestor through other derivedFrom relations via intermediate elements</li>
+<li>The hierarchy chain is already established through other paths (single or multiple convergent paths)</li>
+</ul>
+<p><strong>Core Principle</strong>: If an element has a direct relation to an ancestor AND that ancestor is reachable through any other path(s), the direct relation adds no traceability value and can be safely auto-removed.</p>
+<p>This applies to:</p>
+<ul>
+<li><strong>Single-chain redundancy</strong>: Element reaches ancestor through exactly one intermediate path</li>
+<li><strong>Multi-path/branching redundancy</strong>: Element reaches ancestor through multiple convergent paths</li>
+</ul>
+<p><strong>Detection Logic:</strong></p>
+<p>The system shall use verification trace tree logic for detection:</p>
+<ul>
+<li>Create a virtual/dummy verification element</li>
+<li>Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations</li>
+<li>Apply the same trace tree building logic used for verification upward traceability</li>
+<li>The trace tree will naturally identify when leaf requirements have derivedFrom relations to both a parent and its ancestor</li>
+<li>Identify which intermediate paths provide the alternate routes to the ancestor</li>
+</ul>
+<p>This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.</p>
+<p><strong>Safe Auto-Removal Criteria:</strong></p>
+<p>A redundant hierarchical derivation relation shall be considered safe to auto-remove when ALL of the following conditions are met:</p>
+<ol>
+<li><strong>Direct relation exists</strong>: Element A has a direct derivedFrom relation to element C</li>
+<li><strong>Alternate path exists</strong>: There exists at least one path from A to C through intermediate elements (single or multiple convergent paths)</li>
+<li><strong>Transitive redundancy</strong>: The direct A → C relation is redundant because C is reachable through other derivedFrom relations</li>
+</ol>
+<p><strong>Examples:</strong></p>
+<p><em>Single-chain redundancy (auto-removable):</em></p>
+<pre><code>User Requirement A
+  → System Requirement B
+    → Implementation C
+
+Redundant: A → C (can be safely auto-removed)
+Reason: C is reachable via A → B → C
+</code></pre>
+<p><em>Multi-path/branching redundancy (auto-removable):</em></p>
+<pre><code>Authorization A
+  → Public API B → API Specification D
+  → Management API C → API Specification D
+
+Redundant: A → D (can be safely auto-removed)
+Reason: D is reachable via A → B → D and A → C → D
+</code></pre>
+<p><strong>Auto-Removal Behavior:</strong></p>
+<p>When auto-fix mode is activated, the system shall:</p>
+<ul>
+<li>Remove ALL redundant derivedFrom relations where alternate paths exist</li>
+<li>Preserve traceability through intermediate elements</li>
+<li>Maintain model coherence by ensuring all elements remain reachable through non-redundant paths</li>
+<li>Report removed relations to the user for transparency</li>
+<li>Show which intermediate paths provide the alternate routes</li>
+<li>Categorize ALL redundant hierarchical relations as <strong>auto-fixable</strong> since the direct relation adds no value when alternate paths exist</li>
+</ul>
+<p><strong>Implementation Note</strong>: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfy: <a href="Linting.html#redundant-hierarchical-relations-detection-and-auto-removal">Redundant Hierarchical Relations Detection and Auto-Removal</a></li>
 </ul>
 <hr />
 <h3 id="relation-operations-specification">Relation Operations Specification</h3>

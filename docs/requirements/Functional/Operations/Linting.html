@@ -749,20 +749,23 @@ blockquote {
       cc7864983ff441c7["Redundant Hierarchical Attachment Detection"];
       class cc7864983ff441c7 systemRequirement;
       click cc7864983ff441c7 "Linting.html#redundant-hierarchical-attachment-detection";
-      cdc082002507d4df["Redundant Hierarchical Relations Detection<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
-      class cdc082002507d4df systemRequirement;
-      click cdc082002507d4df "Linting.html#redundant-hierarchical-relations-detection";
+      5f8fafa1901435c["Redundant Hierarchical Relations Detection and Auto-Removal<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
+      class 5f8fafa1901435c systemRequirement;
+      click 5f8fafa1901435c "Linting.html#redundant-hierarchical-relations-detection-and-auto-removal";
       500be52cc121e6f2["Redundant Verify Relations Detection<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
       class 500be52cc121e6f2 systemRequirement;
       click 500be52cc121e6f2 "Linting.html#redundant-verify-relations-detection";
-      979e46c91787cd55["Safe Redundant Hierarchical Relations Auto-Removal"];
-      class 979e46c91787cd55 systemRequirement;
-      click 979e46c91787cd55 "Linting.html#safe-redundant-hierarchical-relations-auto-removal";
     end
     subgraph 7c2e7eef0051f760["📄 Specifications.md"]
       b8a5e3adb9b5d82d["Lint Output Specification"];
       class b8a5e3adb9b5d82d default;
       click b8a5e3adb9b5d82d "Specifications.html#lint-output-specification";
+      c5d346cc41243982["Multi-Branch Convergence Detection Specification"];
+      class c5d346cc41243982 default;
+      click c5d346cc41243982 "Specifications.html#multi-branch-convergence-detection-specification";
+      6a995b12e8da977a["Redundant Hierarchical Relations Specification"];
+      class 6a995b12e8da977a default;
+      click 6a995b12e8da977a "Specifications.html#redundant-hierarchical-relations-specification";
     end
   end
   subgraph 75874bcc96c01d2f["📁 requirements/Functional/Operations/Verifications"]
@@ -779,7 +782,7 @@ blockquote {
   20f690d9cd389f10 -.->|deriveReqT| 176bc8c4eb6608de;
   20f690d9cd389f10 -.->|deriveReqT| 8ab6eb6e6ddc46cc;
   20f690d9cd389f10 -.->|deriveReqT| cc7864983ff441c7;
-  20f690d9cd389f10 -.->|deriveReqT| cdc082002507d4df;
+  20f690d9cd389f10 -.->|deriveReqT| 5f8fafa1901435c;
   20f690d9cd389f10 -.->|deriveReqT| 500be52cc121e6f2;
   20f690d9cd389f10 -->|satisfiedBy| b8a5e3adb9b5d82d;
   20f690d9cd389f10 -.->|verifiedBy| a967e55b50b57d2;
@@ -787,13 +790,14 @@ blockquote {
   class bff128c40d23f061 default;
   click bff128c40d23f061 "../../../core/src/lint.rs";
   8ab6eb6e6ddc46cc -->|satisfiedBy| bff128c40d23f061;
+  8ab6eb6e6ddc46cc -->|satisfiedBy| c5d346cc41243982;
   8ab6eb6e6ddc46cc -.->|verifiedBy| a967e55b50b57d2;
   cc7864983ff441c7 -->|satisfiedBy| bff128c40d23f061;
   cc7864983ff441c7 -.->|verifiedBy| d57f3715f551dd1f;
-  cdc082002507d4df -.->|deriveReqT| 979e46c91787cd55;
+  5f8fafa1901435c -->|satisfiedBy| bff128c40d23f061;
+  5f8fafa1901435c -->|satisfiedBy| 6a995b12e8da977a;
+  5f8fafa1901435c -.->|verifiedBy| a967e55b50b57d2;
   500be52cc121e6f2 -.->|verifiedBy| a967e55b50b57d2;
-  979e46c91787cd55 -->|satisfiedBy| bff128c40d23f061;
-  979e46c91787cd55 -.->|verifiedBy| a967e55b50b57d2;
   627c92e05bc78e3b["test.sh"];
   class 627c92e05bc78e3b default;
   click 627c92e05bc78e3b "../../../tests/test-lint-command/test.sh";
@@ -820,7 +824,7 @@ blockquote {
 <li>derive: <a href="#lint-auto-fix-capability">Lint Auto-fix Capability</a></li>
 <li>derive: <a href="#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></li>
 <li>derive: <a href="#redundant-hierarchical-attachment-detection">Redundant Hierarchical Attachment Detection</a></li>
-<li>derive: <a href="#redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</a></li>
+<li>derive: <a href="#redundant-hierarchical-relations-detection-and-auto-removal">Redundant Hierarchical Relations Detection and Auto-Removal</a></li>
 <li>derive: <a href="#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></li>
 <li>derivedFrom: <a href="../../UserStories.html#linting-model-quality">Linting Model Quality</a></li>
 <li>satisfiedBy: <a href="Specifications.html#lint-output-specification">Lint Output Specification</a></li>
@@ -856,41 +860,6 @@ blockquote {
 <hr />
 <h3 id="multi-branch-convergence-detection">Multi-Branch Convergence Detection</h3>
 <p>The system shall detect when an element reaches a common ancestor through multiple distinct branch paths without a direct relation, reporting these cases as needing manual review to determine if both branches are semantically necessary or if one represents a modeling error.</p>
-<h4>Details</h4>
-<p>A multi-branch convergence occurs when:</p>
-<ul>
-<li>An element reaches a common ancestor through two or more distinct derivedFrom branch paths</li>
-<li>There is NO direct derivedFrom relation from the element to the ancestor</li>
-<li>Each branch represents a potentially different semantic relationship</li>
-<li>The convergence may be intentional (element truly derives from ancestor through multiple contexts) OR may represent redundant modeling</li>
-</ul>
-<p><strong>Key Distinction from Redundant Hierarchical Relations:</strong></p>
-<ul>
-<li><strong>Redundant Hierarchical Relations</strong>: Element has a DIRECT relation to ancestor PLUS alternate paths → auto-fixable (remove direct relation)</li>
-<li><strong>Multi-Branch Convergence</strong>: Element reaches ancestor through MULTIPLE branches with NO direct relation → needs manual review (determine if branches are semantically distinct)</li>
-</ul>
-<p><strong>Example:</strong></p>
-<pre><code>Authorization (root)
-  → Management API
-    → API Specification
-  → Public API
-    → API Specification
-</code></pre>
-<p>API Specification reaches Authorization through two branches (Management API and Public API). Both branches might be semantically valid (spec derives from auth in context of both APIs), OR one might be a modeling error that should be removed.</p>
-<p>Detection shall:</p>
-<ul>
-<li>Use the trace tree building logic to identify elements that reach common ancestors through multiple distinct branch paths</li>
-<li>Exclude cases where a direct relation exists (those are handled by Redundant Hierarchical Relations Detection)</li>
-<li>Report the element, the common ancestor, and all distinct branch paths</li>
-<li>Categorize as <strong>needs manual review</strong> since determining semantic necessity requires human judgment</li>
-<li>Explain that the user must decide whether all branches represent valid semantic relationships or if one is redundant</li>
-</ul>
-<p>This enables the model author to review and decide:</p>
-<ul>
-<li>Are both branches semantically necessary? (keep both)</li>
-<li>Is one branch a modeling error? (remove that branch’s intermediate relations)</li>
-<li>Should there be a direct relation instead? (restructure the model)</li>
-</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -903,6 +872,7 @@ blockquote {
 <ul>
 <li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
 <li>satisfiedBy: <a href="../../../core/src/lint.rs">lint.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#multi-branch-convergence-detection-specification">Multi-Branch Convergence Detection Specification</a></li>
 <li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
 </ul>
 <hr />
@@ -939,33 +909,8 @@ blockquote {
 <li>verifiedBy: <a href="Verifications/LintingVerifications.html#redundant-hierarchical-attachment-test">Redundant Hierarchical Attachment Test</a></li>
 </ul>
 <hr />
-<h3 id="redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</h3>
-<p>The system shall detect redundant derivedFrom relations where an element has direct derivedFrom relations to both a requirement and its ancestor in the requirement hierarchy, by leveraging the existing verification trace tree logic with a virtual verification element.</p>
-<h4>Details</h4>
-<p>A derivedFrom relation is redundant when:</p>
-<ul>
-<li>An element has a derivedFrom relation to an ancestor requirement</li>
-<li>The same element also reaches that ancestor through other derivedFrom relations via intermediate elements</li>
-<li>The hierarchy chain is already established through other paths (single or multiple convergent paths)</li>
-</ul>
-<p><strong>Core Rule</strong>: If an element has a direct relation to a parent, AND that parent is also reachable through ANY other path(s), then the direct relation is redundant and can be safely auto-removed.</p>
-<p>This applies to:</p>
-<ul>
-<li><strong>Single-chain redundancy</strong>: Element reaches ancestor through exactly one intermediate path (e.g., A → B → C, with redundant A → C)</li>
-<li><strong>Multi-path/branching redundancy</strong>: Element reaches ancestor through multiple convergent paths (e.g., A → B → D and A → C → D, with redundant A → D)</li>
-</ul>
-<p>Detection shall:</p>
-<ul>
-<li>Create a virtual/dummy verification element</li>
-<li>Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations</li>
-<li>Apply the same trace tree building logic used for verification upward traceability</li>
-<li>The trace tree will naturally identify when leaf requirements have derivedFrom relations to both a parent and its ancestor</li>
-<li>Report these as redundant hierarchical relations</li>
-<li>Categorize ALL redundant hierarchical relations as <strong>auto-fixable</strong> since the direct relation adds no value when alternate paths exist</li>
-<li>Identify which intermediate paths provide the alternate routes to the ancestor</li>
-</ul>
-<p>This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.</p>
-<p><strong>Note</strong>: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.</p>
+<h3 id="redundant-hierarchical-relations-detection-and-auto-removal">Redundant Hierarchical Relations Detection and Auto-Removal</h3>
+<p>The system shall detect and auto-remove redundant derivedFrom relations where an element has direct derivedFrom relations to both a requirement and its ancestor in the requirement hierarchy.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -976,54 +921,9 @@ blockquote {
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="#safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</a></li>
 <li>derivedFrom: <a href="#model-linting">Model Linting</a></li>
-</ul>
-<hr />
-<h3 id="safe-redundant-hierarchical-relations-auto-removal">Safe Redundant Hierarchical Relations Auto-Removal</h3>
-<p>The system shall provide safe auto-removal of redundant hierarchical derivation relations when alternate paths to the target exist, ensuring model integrity is preserved while reducing redundancy.</p>
-<h4>Details</h4>
-<p>A redundant hierarchical derivation relation shall be considered safe to auto-remove when ALL of the following conditions are met:</p>
-<p><strong>Safe Auto-Removal Criteria:</strong></p>
-<ol>
-<li><strong>Direct relation exists</strong>: Element A has a direct derivedFrom relation to element C</li>
-<li><strong>Alternate path exists</strong>: There exists at least one path from A to C through intermediate elements (single or multiple convergent paths)</li>
-<li><strong>Transitive redundancy</strong>: The direct A → C relation is redundant because C is reachable through other derivedFrom relations</li>
-</ol>
-<p><strong>Core Principle</strong>: If an element has a direct relation to an ancestor AND that ancestor is reachable through any other path(s), the direct relation adds no traceability value and can be safely removed. This applies whether there is a single intermediate path or multiple convergent paths.</p>
-<p><strong>Examples:</strong></p>
-<p><em>Single-chain redundancy (auto-removable):</em></p>
-<pre><code>User Requirement A
-  → System Requirement B
-    → Implementation C
-
-Redundant: A → C (can be safely auto-removed)
-Reason: C is reachable via A → B → C
-</code></pre>
-<p><em>Multi-path/branching redundancy (auto-removable):</em></p>
-<pre><code>Authorization A
-  → Public API B → API Specification D
-  → Management API C → API Specification D
-
-Redundant: A → D (can be safely auto-removed)
-Reason: D is reachable via A → B → D and A → C → D
-</code></pre>
-<p><strong>Auto-Removal Behavior:</strong></p>
-<ul>
-<li>Remove ALL redundant derivedFrom relations where alternate paths exist</li>
-<li>Preserve traceability through intermediate elements</li>
-<li>Maintain model coherence by ensuring all elements remain reachable through non-redundant paths</li>
-<li>Report removed relations to the user for transparency</li>
-<li>Show which intermediate paths provide the alternate routes</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#redundant-hierarchical-relations-detection">Redundant Hierarchical Relations Detection</a></li>
 <li>satisfiedBy: <a href="../../../core/src/lint.rs">lint.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#redundant-hierarchical-relations-specification">Redundant Hierarchical Relations Specification</a></li>
 <li>verifiedBy: <a href="Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a></li>
 </ul>
 <hr />

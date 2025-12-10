@@ -782,6 +782,18 @@ blockquote {
       click 9cdb6297e49a3802 "ElementManipulation.html#target-location-validation-and-auto-creation";
     end
     subgraph 7c2e7eef0051f760["📄 Specifications.md"]
+      3c85593db589fd04["Create Element Workflow Specification"];
+      class 3c85593db589fd04 default;
+      click 3c85593db589fd04 "Specifications.html#create-element-workflow-specification";
+      bc1f889f5f12a980["Delete Element Workflow Specification"];
+      class bc1f889f5f12a980 default;
+      click bc1f889f5f12a980 "Specifications.html#delete-element-workflow-specification";
+      9a6c593ffee9a214["Merge Element Workflow Specification"];
+      class 9a6c593ffee9a214 default;
+      click 9a6c593ffee9a214 "Specifications.html#merge-element-workflow-specification";
+      c75283445bce637a["Move Element Workflow Specification"];
+      class c75283445bce637a default;
+      click c75283445bce637a "Specifications.html#move-element-workflow-specification";
       4366fe5150f6d7c2["Orphaned Children Error Message Specification"];
       class 4366fe5150f6d7c2 default;
       click 4366fe5150f6d7c2 "Specifications.html#orphaned-children-error-message-specification";
@@ -851,6 +863,7 @@ blockquote {
   click bdf9762d399478a5 "../../../core/src/utils.rs";
   bf9a2f73b67492b9 -->|satisfiedBy| bdf9762d399478a5;
   bf9a2f73b67492b9 -->|satisfiedBy| 40714cbda978a508;
+  bf9a2f73b67492b9 -->|satisfiedBy| 3c85593db589fd04;
   bf9a2f73b67492b9 -->|satisfiedBy| 86e301b42cc16d0d;
   bf9a2f73b67492b9 -.->|verifiedBy| 221f6c008823a4d0;
   bf9a2f73b67492b9 -.->|verifiedBy| d5bf7d0addaf6d19;
@@ -858,6 +871,7 @@ blockquote {
   591265fa14ecd72d -->|satisfiedBy| 993c12e82435a78e;
   591265fa14ecd72d -->|satisfiedBy| d07e49b06be4058e;
   591265fa14ecd72d -->|satisfiedBy| 95cf526671ec752c;
+  591265fa14ecd72d -->|satisfiedBy| bc1f889f5f12a980;
   591265fa14ecd72d -->|satisfiedBy| 4366fe5150f6d7c2;
   591265fa14ecd72d -.->|verifiedBy| bfd28e1e74918526;
   cab861a199d11c3c -->|satisfiedBy| 993c12e82435a78e;
@@ -869,11 +883,13 @@ blockquote {
   451abcac00b45de4 -->|satisfiedBy| 95cf526671ec752c;
   451abcac00b45de4 -->|satisfiedBy| 2a2729a903e6692f;
   451abcac00b45de4 -->|satisfiedBy| 3e506d76554b3740;
+  451abcac00b45de4 -->|satisfiedBy| 9a6c593ffee9a214;
   451abcac00b45de4 -.->|verifiedBy| c7b35d6963f1017;
   c68daf5bfafc5a05 -->|satisfiedBy| 25bf5cc42f41e395;
   c68daf5bfafc5a05 -->|satisfiedBy| 993c12e82435a78e;
   c68daf5bfafc5a05 -->|satisfiedBy| d07e49b06be4058e;
   c68daf5bfafc5a05 -->|satisfiedBy| 95cf526671ec752c;
+  c68daf5bfafc5a05 -->|satisfiedBy| c75283445bce637a;
   c68daf5bfafc5a05 -.->|verifiedBy| 9ae2cd53e62b6a33;
   b9c9829782477a6c -.->|verifiedBy| af599fec38b8c0bf;
   f006550e707e055f -->|satisfiedBy| 95cf526671ec752c;
@@ -918,21 +934,6 @@ blockquote {
 </div>
 <h3 id="create-element-operation">Create Element Operation</h3>
 <p>The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file.</p>
-<h4>Details</h4>
-<p>When creating a new element, the system shall:</p>
-<ul>
-<li>Accept a string containing the full element definition in Markdown format</li>
-<li>Accept target location: file path</li>
-<li>Validate the target location using path validation rules</li>
-<li>Create target file if it does not exist (subject to validation constraints)</li>
-<li>Parse and validate the element definition string</li>
-<li>Verify the element name is globally unique in the model</li>
-<li>Validate and normalize all relations following clearly defined specifications</li>
-<li>Insert the element into the target file following Element Ordering Behavior</li>
-<li>Reject the operation and report validation errors if validation fails</li>
-<li>Provide updates report following Diff Output Format Specification</li>
-<li>The system shall support override mode to replace existing element with same name following rules defined in Create Element Override Behavior</li>
-</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -956,6 +957,7 @@ blockquote {
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
 <li>satisfiedBy: <a href="Behaviors.html#create-element-override-behavior">Create Element Override Behavior</a></li>
+<li>satisfiedBy: <a href="Specifications.html#create-element-workflow-specification">Create Element Workflow Specification</a></li>
 <li>satisfiedBy: <a href="Specifications.html#relation-validation-specification">Relation Validation Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#create-element-override-test">Create Element Override Test</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#create-element-test">Create Element Test</a></li>
@@ -963,35 +965,6 @@ blockquote {
 <hr />
 <h3 id="delete-element-operation">Delete Element Operation</h3>
 <p>The system shall provide the capability to delete existing model elements while automatically removing or updating all relations that reference the deleted element, and removing empty files when no elements remain.</p>
-<h4>Details</h4>
-<p>When deleting an element, the system shall:</p>
-<ul>
-<li>Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)</li>
-<li>Reject the operation if any child would become orphaned</li>
-<li>Provide clear error message listing orphaned children with resolution guidance</li>
-<li>Allow deletion if children have other parent hierarchical relations</li>
-<li>Remove the element and all its content from the source file</li>
-<li>Identify all relations pointing to the deleted element (incoming relations)</li>
-<li>Remove all relations that reference the deleted element from other elements</li>
-<li>Identify all relations from the deleted element (outgoing relations)</li>
-<li>Remove the complete element section including separators</li>
-<li>Maintain file structure and formatting after deletion</li>
-<li>Provide updates report following Diff Output Format Specification</li>
-</ul>
-<p><strong>Empty File Cleanup:</strong></p>
-<ul>
-<li>After deleting the element, check if the source file contains any remaining elements</li>
-<li>If no elements remain and all sections are empty (only page content, headers, or whitespace), remove the file from the filesystem</li>
-<li>If the file is removed, report the file deletion in the operation output</li>
-</ul>
-<p><strong>Relation Handling:</strong></p>
-<ul>
-<li>All <code>derivedFrom</code> relations pointing to the deleted element shall be removed</li>
-<li>All <code>verifiedBy</code> relations pointing to the deleted element shall be removed</li>
-<li>All <code>verify</code> relations pointing to the deleted element shall be removed</li>
-<li>All <code>satisfiedBy</code> relations pointing to the deleted element shall be removed</li>
-<li>Relations from the deleted element are automatically removed with the element</li>
-</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1009,6 +982,7 @@ blockquote {
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#delete-element-workflow-specification">Delete Element Workflow Specification</a></li>
 <li>satisfiedBy: <a href="Specifications.html#orphaned-children-error-message-specification">Orphaned Children Error Message Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#delete-element-test">Delete Element Test</a></li>
 </ul>
@@ -1035,26 +1009,6 @@ blockquote {
 <hr />
 <h3 id="merge-element-operation">Merge Element Operation</h3>
 <p>The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and attachments while enforcing type compatibility and removing source elements after successful merge.</p>
-<h4>Details</h4>
-<p>When merging elements, the system shall:</p>
-<ul>
-<li>Accept target element name (must exist in the model)</li>
-<li>Accept one or more source element names (must exist in the model)</li>
-<li>Validate type compatibility following clearly defined rules in Merge Type Compatibility Constraint</li>
-<li>Transform and merge content following clearly defined rules in Merge Content Transformation Behavior</li>
-<li>Preserve target element’s metadata (discard source metadata)</li>
-<li>Delete source elements after successful merge</li>
-<li>Update all relations pointing to source elements to point to target</li>
-<li>Remove empty source files when no elements remain</li>
-<li>Provide updates report following Diff Output Format Specification</li>
-</ul>
-<p>The system shall reject the operation with a clear error message if:</p>
-<ul>
-<li>The target element does not exist</li>
-<li>Any source element does not exist</li>
-<li>Source and target element types are incompatible per Merge Type Compatibility Constraint</li>
-<li>Merged result would have cross-section duplicates per Merge Content Transformation Behavior</li>
-</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1073,42 +1027,12 @@ blockquote {
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="Behaviors.html#merge-content-transformation-behavior">Merge Content Transformation Behavior</a></li>
 <li>satisfiedBy: <a href="Constraints.html#merge-type-compatibility-constraint">Merge Type Compatibility Constraint</a></li>
+<li>satisfiedBy: <a href="Specifications.html#merge-element-workflow-specification">Merge Element Workflow Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#merge-elements-test">Merge Elements Test</a></li>
 </ul>
 <hr />
 <h3 id="move-element-operation">Move Element Operation</h3>
 <p>The system shall provide the capability to move existing model elements to different file locations while automatically updating all relations that reference the moved element, creating target files if needed, and removing empty source files when no elements remain.</p>
-<h4>Details</h4>
-<p>When moving an element, the system shall:</p>
-<ul>
-<li>Validate the target location using path validation rules</li>
-<li>Create target file if it does not exist (subject to validation constraints)</li>
-<li>Remove the element from the source file</li>
-<li>Insert the element into the target file following Element Ordering Behavior</li>
-<li>Preserve all element content, metadata, and relations</li>
-<li>Update the element’s identifier to reflect the new location</li>
-<li>Identify all relations pointing to the moved element (incoming relations)</li>
-<li>Update all relations that reference the moved element with the new identifier</li>
-<li>Maintain file structure and formatting in both source and target files</li>
-<li>Ensure the element name is globally unique in the model</li>
-<li>Provide updates report following Diff Output Format Specification</li>
-</ul>
-<p><strong>Empty Source File Cleanup:</strong></p>
-<ul>
-<li>After moving the element, check if the source file contains any remaining elements</li>
-<li>If no elements remain (only page content, headers, or whitespace), remove the source file from the filesystem</li>
-<li>If the file is removed, report the file deletion in the operation output</li>
-</ul>
-<p><strong>Relation Update Requirements:</strong></p>
-<ul>
-<li>All relations (both forward and backward) pointing to the moved element shall be updated to the new identifier</li>
-<li>Relations within the moved element (outgoing relations) shall be preserved unchanged</li>
-</ul>
-<p><strong>Identifier Update:</strong></p>
-<ul>
-<li>The element’s identifier changes from <code>&lt;old-file&gt;#&lt;element-name&gt;</code> to <code>&lt;new-file&gt;#&lt;element-name&gt;</code></li>
-<li>All references to the old identifier shall be updated to the new identifier</li>
-</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1128,6 +1052,7 @@ blockquote {
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#move-element-workflow-specification">Move Element Workflow Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#move-element-test">Move Element Test</a></li>
 </ul>
 <hr />

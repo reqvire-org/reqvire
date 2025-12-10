@@ -848,6 +848,13 @@ blockquote {
       click 2d8c79b0a3233f70 "Verifications/ValidationVerifications.html#unstructured-documents-test";
     end
   end
+  subgraph 75874bcc96c01d2f["📁 requirements/Functional/Operations/Verifications"]
+    subgraph 264302f069db5bdb["📄 ElementManipulationVerifications.md"]
+      f7d422af274a64cf["Add Command Error Messages Test"];
+      class f7d422af274a64cf verification;
+      click f7d422af274a64cf "../Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test";
+    end
+  end
   499d48218b73f571["model.rs"];
   class 499d48218b73f571 default;
   click 499d48218b73f571 "../../../core/src/model.rs";
@@ -872,6 +879,7 @@ blockquote {
   click 637652e86464c11b "../../../core/src/error.rs";
   a869d98120d611e3 -->|satisfiedBy| 637652e86464c11b;
   a869d98120d611e3 -->|satisfiedBy| fc1df5aa988472a;
+  a869d98120d611e3 -.->|verifiedBy| f7d422af274a64cf;
   327e10e1bebd5bde -->|satisfiedBy| 35bd98d101f36b62;
   327e10e1bebd5bde -.->|verifiedBy| 2d8c79b0a3233f70;
   95cf526671ec752c["graph_registry.rs"];
@@ -892,6 +900,7 @@ blockquote {
   4e665d02fddc5598 -->|satisfiedBy| 35bd98d101f36b62;
   4e665d02fddc5598 -.->|verifiedBy| 83d989f6ea529f74;
   4e665d02fddc5598 -.->|verifiedBy| ad323c8d4c0751e;
+  4e665d02fddc5598 -.->|verifiedBy| f7d422af274a64cf;
   9f1021634cff7f57 -->|satisfiedBy| 95cf526671ec752c;
   9f1021634cff7f57 -->|satisfiedBy| 499d48218b73f571;
   9f1021634cff7f57 -->|satisfiedBy| 35bd98d101f36b62;
@@ -936,6 +945,10 @@ blockquote {
   class 4179509ffe0be04b default;
   click 4179509ffe0be04b "../../../tests/test-duplicate-detection/test.sh";
   f0aeb8d3ad027b6e -->|satisfiedBy| 4179509ffe0be04b;
+  fe0a74a2cd2af425["test.sh"];
+  class fe0a74a2cd2af425 default;
+  click fe0a74a2cd2af425 "../../../tests/test-add-command-error-messages/test.sh";
+  f7d422af274a64cf -->|satisfiedBy| fe0a74a2cd2af425;
   3ee9a5ae2313e6b0["test.sh"];
   class 3ee9a5ae2313e6b0 default;
   click 3ee9a5ae2313e6b0 "../../../tests/test-valid-relations/test.sh";
@@ -974,6 +987,7 @@ blockquote {
 <li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
 <li>satisfiedBy: <a href="../../../core/src/error.rs">error.rs</a></li>
 <li>satisfiedBy: <a href="Behaviors.html#validation-error-reporting-behavior">Validation Error Reporting Behavior</a></li>
+<li>verifiedBy: <a href="../Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">Add Command Error Messages Test</a></li>
 </ul>
 <hr />
 <h3 id="relation-type-validation">Relation Type Validation</h3>
@@ -1296,6 +1310,7 @@ blockquote {
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-header-structure-test">Invalid Header Structure Test</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
+<li>verifiedBy: <a href="../Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">Add Command Error Messages Test</a></li>
 </ul>
 <hr />
 <h3 id="validate-relation-types">Validate Relation Types</h3>

@@ -761,7 +761,7 @@ blockquote {
       e03d9fc7fee23cbf["Attachment Export"];
       class e03d9fc7fee23cbf systemRequirement;
       click e03d9fc7fee23cbf "Features.html#attachment-export";
-      1a4bd1d4cf59c6c3["Containment View Attachment Links"];
+      1a4bd1d4cf59c6c3["Containment View Attachment Links<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#d3js-containment-tree-specification"];
       class 1a4bd1d4cf59c6c3 systemRequirement;
       click 1a4bd1d4cf59c6c3 "Features.html#containment-view-attachment-links";
       399558ec4fcaeca["Diagram Attachment Display<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification"];
@@ -770,20 +770,32 @@ blockquote {
       343e7b2d42df05e8["HTML Export<br/>📎 requirements/Interfaces/WebInterface/Behaviors.md#web-interface-navigation-behavior"];
       class 343e7b2d42df05e8 systemRequirement;
       click 343e7b2d42df05e8 "Features.html#html-export";
-      27d051a7dc8ddd3d["Model-Centric View Generation<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification"];
+      27d051a7dc8ddd3d["Model-Centric View Generation<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-export-pipeline-specification<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-navigation-bar-specification"];
       class 27d051a7dc8ddd3d systemRequirement;
       click 27d051a7dc8ddd3d "Features.html#model-centric-view-generation";
       d9d538e0add3a7ee["Model View Element Navigation"];
       class d9d538e0add3a7ee systemRequirement;
       click d9d538e0add3a7ee "Features.html#model-view-element-navigation";
-      9b566692fe070492["Serve Command"];
+      9b566692fe070492["Serve Command<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-export-pipeline-specification"];
       class 9b566692fe070492 systemRequirement;
       click 9b566692fe070492 "Features.html#serve-command";
-      965615d978d68cf5["Web Interface Color Scheme"];
+      965615d978d68cf5["Web Interface Color Scheme<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-navigation-bar-specification<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-branding-specification"];
       class 965615d978d68cf5 systemRequirement;
       click 965615d978d68cf5 "Features.html#web-interface-color-scheme";
     end
     subgraph 5d341d66c5d20d4a["📄 Specifications.md"]
+      2c269288950887aa["D3.js Containment Tree Specification"];
+      class 2c269288950887aa default;
+      click 2c269288950887aa "Specifications.html#d3js-containment-tree-specification";
+      ac8ced009233741a["HTML Branding Specification"];
+      class ac8ced009233741a default;
+      click ac8ced009233741a "Specifications.html#html-branding-specification";
+      32592aed4644ac95["HTML Export Pipeline Specification"];
+      class 32592aed4644ac95 default;
+      click 32592aed4644ac95 "Specifications.html#html-export-pipeline-specification";
+      1c6c804d67bc741e["HTML Navigation Bar Specification"];
+      class 1c6c804d67bc741e default;
+      click 1c6c804d67bc741e "Specifications.html#html-navigation-bar-specification";
       945adb3f0ea1012e["Web Interface Style Specification"];
       class 945adb3f0ea1012e default;
       click 945adb3f0ea1012e "Specifications.html#web-interface-style-specification";
@@ -856,6 +868,10 @@ blockquote {
   class 82ff2e2c4a363e59 default;
   click 82ff2e2c4a363e59 "../../../core/templates/model.html";
   343e7b2d42df05e8 -->|satisfiedBy| 82ff2e2c4a363e59;
+  343e7b2d42df05e8 -->|satisfiedBy| 2c269288950887aa;
+  343e7b2d42df05e8 -->|satisfiedBy| ac8ced009233741a;
+  343e7b2d42df05e8 -->|satisfiedBy| 32592aed4644ac95;
+  343e7b2d42df05e8 -->|satisfiedBy| 1c6c804d67bc741e;
   343e7b2d42df05e8 -->|satisfiedBy| 945adb3f0ea1012e;
   343e7b2d42df05e8 -.->|verifiedBy| bd0b4833b30da28;
   343e7b2d42df05e8 -.->|verifiedBy| a7eeaf4fd1d17030;
@@ -906,88 +922,6 @@ blockquote {
 </div>
 <h3 id="html-export">HTML Export</h3>
 <p>The system SHALL generate comprehensive HTML documentation with all model artifacts by creating a temporary working copy, generating all reports in that copy, and exporting to the output directory.</p>
-<h4>Details</h4>
-<p><strong>Working Directory Setup:</strong></p>
-<ul>
-<li>Create temporary working directory (e.g., in /tmp)</li>
-<li>Generate markdown files from registry with full relations (user-created and auto-generated inverse relations)</li>
-<li>Copy all related system elements (following satisfiedBy and other relations)</li>
-<li>Copy all attachment files to temporary directory preserving structure</li>
-</ul>
-<p><strong>Generation Pipeline (in temporary directory):</strong>
-Execute all generation commands treating temporary directory as repository root:</p>
-<ol>
-<li>Generate all Mermaid diagrams in markdown files</li>
-<li>Generate index.md (interactive D3.js tree showing containment hierarchy - main entry point)</li>
-<li>Generate model.md (model-centric visualization with nested relations from root requirements)</li>
-<li>Generate traces.md (verification upward traceability)</li>
-<li>Generate coverage.md (verification coverage report)</li>
-</ol>
-<p><strong>HTML Conversion:</strong></p>
-<ul>
-<li>Convert all markdown files to HTML with embedded styles</li>
-<li>Process Mermaid diagrams for web rendering</li>
-<li>Convert internal .md links to .html links</li>
-<li>Preserve directory structure</li>
-</ul>
-<p><strong>Output:</strong></p>
-<ul>
-<li>Accept optional <code>--output</code> option to specify output directory</li>
-<li>When <code>--output</code> is not specified, export to a temporary directory and print the path</li>
-<li>When <code>--output</code> is specified, create output folder if not existing</li>
-<li>Copy generated HTML and all artifacts from temp directory to output directory</li>
-<li>Clean up temporary working directory (except when output is temp directory)</li>
-</ul>
-<p><strong>Source Protection:</strong></p>
-<ul>
-<li>Never modify original repository files</li>
-<li>All generation happens in isolated temporary directory</li>
-</ul>
-<p><strong>Git Directory Exclusion:</strong></p>
-<ul>
-<li>The .git directory shall never be exported to the output folder</li>
-<li>This prevents internal git metadata from polluting the exported documentation</li>
-</ul>
-<p><strong>Export Related System Elements:</strong></p>
-<ul>
-<li>Ensure that any related system elements are also copied into output folder to ensure consistency of exported model</li>
-</ul>
-<p><strong>Containment Generation (D3.js Tree):</strong>
-The containment page (containment.html) shall display an interactive D3.js collapsible tree showing the containment hierarchy:</p>
-<ol>
-<li>Root node representing the model root</li>
-<li>Folder nodes that can be expanded/collapsed</li>
-<li>File nodes containing element children</li>
-<li>Element nodes with type-specific icons and colors</li>
-<li>Attachment nodes as children of elements (element and file attachments)</li>
-<li>Clickable elements that navigate to their definitions</li>
-<li>Expand All / Collapse All buttons for tree control</li>
-</ol>
-<p>The containment view serves as the primary entry point for HTML documentation, providing an interactive visual overview of the model structure.</p>
-<p><strong>HTML Navigation Bar:</strong>
-The system shall provide a fixed navigation bar in all HTML pages with links to key model artifacts for easy access.</p>
-<p>The navigation bar must include (left to right):</p>
-<ul>
-<li>Containment: Link to containment.html (interactive D3.js tree - main entry point)</li>
-<li>Model: Link to model.html (model-centric view with nested relations)</li>
-<li>Traces: Link to traces.html (verification upward traceability report)</li>
-<li>Coverage: Link to coverage.html (verification coverage report)</li>
-</ul>
-<p>The navigation bar must be:</p>
-<ul>
-<li>Always visible (fixed position) while scrolling</li>
-<li>Consistent across all HTML pages</li>
-<li>Clearly visible and accessible</li>
-</ul>
-<p><strong>HTML Design:</strong>
-The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.</p>
-<p><strong>Logo and Branding:</strong></p>
-<ul>
-<li>The navigation bar shall display the Reqvire logo on the left side before the navigation links</li>
-<li>A favicon shall be included for browser tab identification</li>
-<li>Apple touch icons shall be included for mobile device support</li>
-<li>All brand assets shall be exported to an assets folder during HTML export</li>
-</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1011,6 +945,10 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>satisfiedBy: <a href="../../../core/src/index_generator.rs">index_generator.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/templates/base.html">base.html</a></li>
 <li>satisfiedBy: <a href="../../../core/templates/model.html">model.html</a></li>
+<li>satisfiedBy: <a href="Specifications.html#d3js-containment-tree-specification">D3.js Containment Tree Specification</a></li>
+<li>satisfiedBy: <a href="Specifications.html#html-branding-specification">HTML Branding Specification</a></li>
+<li>satisfiedBy: <a href="Specifications.html#html-export-pipeline-specification">HTML Export Pipeline Specification</a></li>
+<li>satisfiedBy: <a href="Specifications.html#html-navigation-bar-specification">HTML Navigation Bar Specification</a></li>
 <li>satisfiedBy: <a href="Specifications.html#web-interface-style-specification">Web Interface Style Specification</a></li>
 <li>verifiedBy: <a href="../CLI/Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
 <li>verifiedBy: <a href="Verifications/WebInterfaceVerifications.html#html-export-verification">HTML Export Verification</a></li>
@@ -1052,6 +990,10 @@ The system shall design and implement HTML pages with consistent layout, styling
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#d3js-containment-tree-specification">D3.js Containment Tree Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1106,6 +1048,8 @@ The system shall design and implement HTML pages with consistent layout, styling
 <h4>Attachments</h4>
 <ul>
 <li><a href="../../Functional/Output/Specifications.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
+<li><a href="Specifications.html#html-export-pipeline-specification">HTML Export Pipeline Specification</a></li>
+<li><a href="Specifications.html#html-navigation-bar-specification">HTML Navigation Bar Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -1156,6 +1100,11 @@ The system shall design and implement HTML pages with consistent layout, styling
 <ul>
 <li>type: requirement</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#html-navigation-bar-specification">HTML Navigation Bar Specification</a></li>
+<li><a href="Specifications.html#html-branding-specification">HTML Branding Specification</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#html-export">HTML Export</a></li>
@@ -1182,6 +1131,10 @@ The system shall design and implement HTML pages with consistent layout, styling
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#html-export-pipeline-specification">HTML Export Pipeline Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
