@@ -4,6 +4,8 @@ Use this reference when reorganizing the model structure without changing requir
 
 **Key principle**: The system behavior specification remains unchanged - only the model structure improves.
 
+**For common commands** (search, merge, link, validate, etc.), see [SKILL.md Command Reference](../SKILL.md#command-reference).
+
 ## Refactoring Activities
 
 - Splitting mixed-type requirements (user vs system)
@@ -114,24 +116,9 @@ reqvire mv "Element Name" "requirements/Archive.md"
 
 ### Step 6: Validate After Each Change
 
-Run validation and linting after each refactoring step:
+After each refactoring step, follow the standard validation workflow. See [SKILL.md Validation & Quality Checklist](../SKILL.md#validation--quality-checklist) for the complete procedure.
 
-```bash
-# Check model consistency
-reqvire validate
-
-# Show all linting issues
-reqvire lint
-
-# Show only auto-fixable issues
-reqvire lint --fixable
-
-# Show issues needing manual review
-reqvire lint --auditable
-
-# Apply automatic fixes
-reqvire lint --fix
-```
+Quick validation: `reqvire validate && reqvire lint --fix && reqvire coverage`
 
 
 ## Identifying Missing Relations

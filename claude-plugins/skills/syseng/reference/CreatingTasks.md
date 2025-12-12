@@ -4,6 +4,8 @@ This workflow bridges the gap between requirements and implementation by analyzi
 
 **Key principle**: Every implementation task maintains traceability to requirements, implementations, and tests.
 
+**For common commands** (change-impact, collect, search, validate), see [SKILL.md Command Reference](../SKILL.md#command-reference). For validation workflow, see [SKILL.md Validation & Quality Checklist](../SKILL.md#validation--quality-checklist).
+
 ## When to Use This Workflow
 
 - Generating implementation plans from requirement changes

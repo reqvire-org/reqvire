@@ -2,6 +2,8 @@
 
 Use this reference when you need to understand the model structure, search for requirements, or browse the specifications.
 
+**For common commands** (search, validate, lint, link, etc.), see [SKILL.md Command Reference](../SKILL.md#command-reference). This reference focuses on advanced search patterns and model exploration workflows.
+
 ## Quick Model Overview
 
 Start exploring your model with these commands to understand its structure:

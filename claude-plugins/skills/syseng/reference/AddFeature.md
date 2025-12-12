@@ -2,6 +2,8 @@
 
 **Key principle**: Requirements drive everything - no implementation without requirements. Follow the MBSE workflow to ensure properly specified functionality with full traceability.
 
+**For common commands** (link, add, validate, etc.), see [SKILL.md Command Reference](../SKILL.md#command-reference) and [Quick Start Guide](../SKILL.md#quick-start-common-workflows).
+
 ## MBSE Workflow
 
 ```
@@ -231,29 +233,14 @@ reqvire link "Feature Test" "satisfiedBy" "tests/test_feature.rs"
 
 ## Step 5: Validate and Check Coverage
 
-After adding requirements and verifications, validate the model and check coverage:
+After adding requirements and verifications, follow the standard validation workflow. See [SKILL.md Validation & Quality Checklist](../SKILL.md#validation--quality-checklist) for the complete procedure:
 
-```bash
-# Check model consistency
-reqvire validate
+1. `reqvire validate` - Check model structure
+2. `reqvire lint --fix` - Fix auto-fixable issues
+3. `reqvire coverage` - Verify all leaf requirements have verifications
+4. `reqvire format --fix` - Normalize formatting
 
-# Check verification coverage (text format)
-reqvire coverage
-
-# Check coverage with JSON for programmatic analysis
-reqvire coverage --json
-
-# List files referenced by model
-reqvire resources [--json]
-
-# Fix any formatting or validation issues
-reqvire lint --fix
-```
-
-Use `reqvire resources` to see all files referenced by the model through `satisfiedBy`, `trace` relations and attachments. This helps identify:
-- Which implementation files are linked to requirements
-- Which design documents are traced
-- Orphaned files that should be linked
+Additionally, use `reqvire resources` to see all files referenced by the model through `satisfiedBy`, `trace` relations and attachments.
 
 ## Complete Example
 

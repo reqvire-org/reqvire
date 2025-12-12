@@ -1,5 +1,7 @@
 # Specifications Extraction Logic
 
+**For common commands and validation workflow**, see [SKILL.md Command Reference](../SKILL.md#command-reference) and [Validation & Quality Checklist](../SKILL.md#validation--quality-checklist).
+
 ## Purpose
 
 This document describes the logic and methodology for refactoring requirements to separate EARS statements (what/why) from technical specifications (how), following MBSE best practices.
@@ -405,21 +407,9 @@ reqvire search --filter-type="specification,constraint,behavior" --not-have-rela
 
 ### Validation Commands (Phase 5)
 
-After extracting specifications, validate the refactored model:
+After extracting specifications, validate the refactored model using the standard validation workflow. See [SKILL.md Validation & Quality Checklist](../SKILL.md#validation--quality-checklist) for the complete procedure.
 
-```bash
-# Validate model structure and relations
-reqvire validate
-
-# Preview formatting changes
-reqvire format
-
-# Apply formatting fixes
-reqvire format --fix
-
-# Apply formatting with full relation expansion
-reqvire format --fix --with-full-relations
-```
+Quick validation: `reqvire validate && reqvire lint --fix && reqvire format --fix`
 
 ### Finding Candidates (Manual Review)
 
