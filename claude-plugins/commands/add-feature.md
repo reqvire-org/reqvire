@@ -35,7 +35,7 @@ This command orchestrates the complete workflow:
 
 2. **Create parent requirement (if needed):**
    ```bash
-   /add-requirement
+   /reqvire:add-requirement
    ```
 
    This creates the high-level feature requirement.
@@ -44,7 +44,7 @@ This command orchestrates the complete workflow:
 
    For each specific capability:
    ```bash
-   /add-requirement
+   /reqvire:add-requirement
    ```
 
    Link each to the parent via `derivedFrom`.
@@ -53,7 +53,7 @@ This command orchestrates the complete workflow:
 
    For each leaf requirement:
    ```bash
-   /add-verification
+   /reqvire:add-verification
    ```
 
    This will:
@@ -77,14 +77,14 @@ This command orchestrates the complete workflow:
 ## Command Flow
 
 ```
-/add-feature
-  ├─> /add-requirement (parent)
-  ├─> /add-requirement (leaf 1)
-  ├─> /add-requirement (leaf 2)
-  ├─> /add-requirement (leaf 3)
-  ├─> /add-verification (for leaf 1)
-  ├─> /add-verification (for leaf 2)
-  ├─> /add-verification (for leaf 3)
+/reqvire:add-feature
+  ├─> /reqvire:add-requirement (parent)
+  ├─> /reqvire:add-requirement (leaf 1)
+  ├─> /reqvire:add-requirement (leaf 2)
+  ├─> /reqvire:add-requirement (leaf 3)
+  ├─> /reqvire:add-verification (for leaf 1)
+  ├─> /reqvire:add-verification (for leaf 2)
+  ├─> /reqvire:add-verification (for leaf 3)
   └─> reqvire lint --fix
 ```
 
@@ -92,7 +92,7 @@ This command orchestrates the complete workflow:
 
 - **Requirements first**: Create all requirements before verifications
 - **Hierarchical**: Parent requirement → leaf requirements
-- **Verify leaves only**: Use `/add-verification` for leaf requirements
+- **Verify leaves only**: Use `/reqvire:add-verification` for leaf requirements
 - **Delegate**: Let individual commands handle their specific logic
 - **Validate often**: Run validation after each major step
 

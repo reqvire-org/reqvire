@@ -7,10 +7,10 @@ This document describes the logic and methodology for refactoring requirements t
 ## Problem Statement
 
 Requirements with embedded technical specifications suffer from:
-- **Reduced Clarity**: User needs obscured by implementation details
+- **Reduced Clarity**: User needs are obscured by implementation details
 - **Poor Reusability**: Technical specs can't be referenced by multiple requirements
 - **Maintenance Burden**: Changing implementation details requires editing requirements
-- **Reduced Traceability**: Ownership relationships unclear between requirements and specifications
+- **Reduced Traceability**: Ownership relationships are unclear between requirements and specifications
 
 ## Solution: Separation of Concerns
 
@@ -32,7 +32,7 @@ Extract technical specifications from requirement Details sections into separate
 - Requirements with ordering rules or processing workflows
 
 **NOT Candidates:**
-- Elements already typed as `specification` or `constraints` (refirement elements)
+- Elements already typed as `specification` or `constraints` (refinement elements)
 - Requirements where Details add essential context without implementation details like success criteria and such
 
 **Examples of hardcoded limits to extract as constraints:**
@@ -84,7 +84,7 @@ Brief description of what this specification defines.
   * satisfy: [Parent Requirement](path#requirement-name)
 ```
 
-`  * type: specification` can be other refirement type depending on what this refirement element represent.
+`  * type: specification` can be other refinement type depending on what this refinement element represents.
 
 **Reducing the Requirement:**
 

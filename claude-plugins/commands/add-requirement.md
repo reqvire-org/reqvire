@@ -156,4 +156,4 @@ Reqvire uses **bottom roll-up verification coverage**:
 - Element names become URL fragments (spaces → hyphens, lowercase)
 - Use two-space indentation for Relations entries
 - Use `#### Details` for refinements that don't add capabilities
-- For complete feature (requirement + verification + test), use `/add-feature`
+- For complete feature (requirement + verification + test), use `/reqvire:add-feature`

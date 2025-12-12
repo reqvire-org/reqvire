@@ -102,7 +102,7 @@ Implementation                       Verification Element
 ```markdown
 #### Attachments
   * [Drop Down Constraints](path.md#drop-down-constraints)
-  * [Desing Documents](../relative/path/to/DesignDocument.md)
+  * [Design Documents](../relative/path/to/DesignDocument.md)
 ```
 
 **Relations syntax** (two-space indentation):
@@ -123,13 +123,13 @@ Use for requirement statements:
 - **Unwanted**: "If [condition] then the system shall [response]"
 - **Optional**: "Where [feature] the system shall [capability]"
 
-Requirement element mostly should only contain EARS statements: one in main body and other in '#### Details'. All specifications and constraints must go into refirement elements.
-Requirement that defines refirements must by satisfiedBy such and all other must attach them but not those that are childrens as those inherit them.
+Requirement element mostly should only contain EARS statements: one in main body and other in '#### Details'. All specifications and constraints must go into refinement elements.
+Requirement that defines refinements must be satisfiedBy such and all other must attach them but not those that are children as those inherit them.
 
 ## Important Notes
 
 1. Always run commands from the git root folder
-2. Use full paths starting with `requirements/`: if not available (has other content) aks for new main specification folder name
+2. Use full paths starting with `requirements/`: if not available (has other content) ask for new main specification folder name
 3. Never guess - read files before making changes
 4. Validate after each significant change
 5. When reading requirements, always check for **attachments** (documents, diagrams, images)
@@ -290,13 +290,13 @@ reqvire serve --host 0.0.0.0 --port 3000
 - Navigate traceability interactively
 - Present verification coverage
 
-## This about task being given to you and explore relevant references in order to complete it
+## Think about the task being given to you and explore relevant references in order to complete it
 
 
 **Understanding System Model**:
 - For understanding model structure, searching, browsing requirements, and when needed to answer questions about the model see  [Explore](reference/explore.md)
 
-**When the model becomes cluttered with duplicate or over-fragmented requirements and spagetti kind of model, it must be refactored**:
+**When the model becomes cluttered with duplicate or over-fragmented requirements and spaghetti kind of model, it must be refactored**:
 - When reorganizing the model structure without changing requirements intent when the goal is better organization, traceability, and maintainability see [Consolidate Requirements](reference/ConsolidateRequirements.md)
 - For extracting inline constraints/specifications into dedicated elements** see [Specifications Extraction Logic](reference/SpecificationsExtractionLogic.md)
 
