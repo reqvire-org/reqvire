@@ -1,20 +1,5 @@
 # Elements
 
-### Coexistence of Structured and Unstructured Documents
-
-The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same System model.
-
-#### Metadata
-  * type: user-requirement
-
-#### Attachments
-  * [Refinement Specification](../../Refinements.md#refinement-specification)
-
-#### Relations
-  * derive: [Ignoring Unstructured Documents](Configuration.md#ignoring-unstructured-documents)
-  * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
----
-
 ### Default Requirement Type Assignment
 
 The system shall automatically assign the **default type `requirement`** to all elements if not explicitly specified in their `metadata` subsection.
@@ -83,6 +68,11 @@ All manipulation operations shall:
 
 #### Metadata
   * type: user-requirement
+
+#### Attachments
+  * [File Persistence Behavior](../Operations/Behaviors.md#file-persistence-behavior)
+  * [Dry-Run Mode Behavior](../Operations/Behaviors.md#dry-run-mode-behavior)
+  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derive: [Attachment Identifier Updates](#attachment-identifier-updates)

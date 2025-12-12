@@ -8,11 +8,8 @@ The system shall provide the capability to create new model elements by acceptin
   * type: requirement
 
 #### Attachments
-  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
-  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -36,11 +33,6 @@ The system shall provide the capability to delete existing model elements while 
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
-
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
@@ -59,7 +51,6 @@ The system shall persist all element manipulation operations to the source files
   * type: requirement
 
 #### Attachments
-  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
 
 #### Relations
@@ -76,11 +67,6 @@ The system shall provide the capability to merge multiple source elements into a
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -101,11 +87,8 @@ The system shall provide the capability to move existing model elements to diffe
   * type: requirement
 
 #### Attachments
-  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
-  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -148,10 +131,7 @@ When the --squash flag is provided and the target file already exists, the syste
   * type: requirement
 
 #### Attachments
-  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](Constraints.md#target-location-constraint)
-  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -204,11 +184,6 @@ The system shall reject the operation with a clear error message if:
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [File Persistence Behavior](Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)

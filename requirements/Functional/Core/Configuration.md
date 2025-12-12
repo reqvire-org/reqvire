@@ -1,5 +1,20 @@
 # Elements
 
+### Coexistence of Structured and Unstructured Documents
+
+The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same System model.
+
+#### Metadata
+  * type: user-requirement
+
+#### Attachments
+  * [Refinement Specification](../../Refinements.md#refinement-specification)
+
+#### Relations
+  * derive: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
+  * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
+---
+
 ### Ignoring Unstructured Documents
 
 The system shall support configurable glob patterns to exclude specific files from requirement processing.
@@ -25,7 +40,7 @@ The `.reqvireignore` file provides Reqvire-specific exclusions for files that sh
   * derive: [Requirements Processing](#requirements-processing)
   * derive: [Reserved Repository Files Exclusion](#reserved-repository-files-exclusion)
   * derive: [File Pattern Exclusion for Format](../Operations/Formatting.md#file-pattern-exclusion-for-format)
-  * derivedFrom: [Coexistence of Structured and Unstructured Documents](ModelManagement.md#coexistence-of-structured-and-unstructured-documents)
+  * derivedFrom: [Coexistence of Structured and Unstructured Documents](#coexistence-of-structured-and-unstructured-documents)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
 ---
 

@@ -1,7 +1,8 @@
 {
     "name": "reqvire-org-marketplace",
     "metadata": {
-        "description": "Official marketplace for reqvire-org plugins."
+        "description": "Official marketplace for reqvire-org plugins.",
+        "version": "1.0.0"        
     },
     "owner": {
         "name": "Ilija Ljubicic",
@@ -11,7 +12,7 @@
         {
             "version": "1.5.0",
             "name": "reqvire",
-            "description": "The Requirements As Context framework for Modern Engineering Teams. Includes specialized skills for requirements and context engineering and task planning.",
+            "description": " Expert MBSE engineer for system models, specifications and architectures. Use when exploring, updating and refactoring requirements, specifications and system model, adding features, managing verifications and creating tasks from introduced changes in requirements and system model.",
             "author": {
                 "name": "Ilija Ljubicic",
                 "email": "ilijaljubicic@users.noreply.github.com"
@@ -51,9 +52,9 @@
                 "./commands/unlink.md"
             ],
             "skills": [
-                "./skills/syseng/SKILL.md"
+                "./"
             ],
-            "source": "./reqvire-claude-plugin",
+            "source": "./claude-plugins/syseng",
             "strict": false
         }
     ]
