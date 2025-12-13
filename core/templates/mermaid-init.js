@@ -35,6 +35,11 @@ mermaid.initialize({
     logLevel: 'error'
 });
 
+// Store original mermaid content before rendering (for resize refreshes)
+document.querySelectorAll('.mermaid').forEach(el => {
+    el.setAttribute('data-original-content', el.textContent);
+});
+
 await mermaid.run();
 window.mermaid = mermaid;
 
@@ -461,16 +466,14 @@ window.addEventListener('resize', function() {
         // Re-run mermaid on all diagrams
         const mermaidElements = document.querySelectorAll('.mermaid');
         mermaidElements.forEach(el => {
-            // Store the original content
-            const originalContent = el.getAttribute('data-original-content') || el.textContent;
-            if (!el.getAttribute('data-original-content')) {
-                el.setAttribute('data-original-content', originalContent);
+            // Restore original markdown content
+            const originalContent = el.getAttribute('data-original-content');
+            if (originalContent) {
+                el.innerHTML = originalContent;
+                el.removeAttribute('data-processed');
             }
-            // Clear the rendered diagram
-            el.innerHTML = originalContent;
-            el.removeAttribute('data-processed');
         });
-        // Re-render
+        // Re-render diagrams
         await mermaid.run();
         // Re-initialize pan-zoom after re-render
         waitForSvgs(initializePanZoom);

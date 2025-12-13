@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>StructureAndParsing</title><link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>HTMLGeneration</title><link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
                 :root {
                     /* Primary Colors */
                     --color-primary: #3F51B5;
@@ -358,355 +358,199 @@
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
-  subgraph 8735c0a811307e57["📁 requirements/Functional/Core"]
-    subgraph 193cce1f294b91c8["📄 ModelManagement.md"]
-      15293612289d990c["Relation Types and behaviors<br/>📎 RelationTypes.md<br/>📎 requirements/Refinements.md#relation-semantics-specification"];
-      class 15293612289d990c systemRequirement;
-      click 15293612289d990c "ModelManagement.html#relation-types-and-behaviors";
-      1275026756e287b9["Verification Type Categories<br/>📎 requirements/Refinements.md#supported-element-types-specification"];
-      class 1275026756e287b9 systemRequirement;
-      click 1275026756e287b9 "ModelManagement.html#verification-type-categories";
-    end
-    subgraph 525b4b735cf204bb["📄 Specifications.md"]
-      ad64383b5bdb4b7b["Element Type Metadata Specification"];
-      class ad64383b5bdb4b7b default;
-      click ad64383b5bdb4b7b "Specifications.html#element-type-metadata-specification";
-    end
-    subgraph b88b5e4ef23c0883["📄 StructureAndParsing.md"]
-      136749f37a361991["Element Identity Model<br/>📎 ElementIdentity.md"];
-      class 136749f37a361991 systemRequirement;
-      click 136749f37a361991 "StructureAndParsing.html#element-identity-model";
-      7971fe15dab8f0b7["Identifiers and Relations<br/>📎 IdentifiersAndRelations.md"];
-      class 7971fe15dab8f0b7 systemRequirement;
-      click 7971fe15dab8f0b7 "StructureAndParsing.html#identifiers-and-relations";
-      9e793aabc302d0d5["Reserved Subsections Support<br/>📎 ReservedSubsections.md"];
-      class 9e793aabc302d0d5 systemRequirement;
-      click 9e793aabc302d0d5 "StructureAndParsing.html#reserved-subsections-support";
-      c1fde7d1c17c2acb["Specification File Identification"];
-      class c1fde7d1c17c2acb systemRequirement;
-      click c1fde7d1c17c2acb "StructureAndParsing.html#specification-file-identification";
-      625bdde09d955477["Structure and Addressing in Markdown Documents<br/>📎 MarkdownStructure.md"];
-      class 625bdde09d955477 systemRequirement;
-      click 625bdde09d955477 "StructureAndParsing.html#structure-and-addressing-in-markdown-documents";
-    end
-    subgraph 98067cc5207d6b91["📄 Validation.md"]
-      fcfc76ba4d193d75["Attachment Target Validation<br/>📎 ReservedSubsections.md"];
-      class fcfc76ba4d193d75 systemRequirement;
-      click fcfc76ba4d193d75 "Validation.html#attachment-target-validation";
-      fed54223697ea04e["Internal Consistency Validator"];
-      class fed54223697ea04e systemRequirement;
-      click fed54223697ea04e "Validation.html#internal-consistency-validator";
+  subgraph 46bd8996ef832bd8["📁 requirements/Interfaces/WebInterface"]
+    subgraph c7d31f0c38cfb0c5["📄 HTMLGeneration.md"]
+      fa0ecb1299582ab["Component-Based HTML Architecture"];
+      class fa0ecb1299582ab systemRequirement;
+      click fa0ecb1299582ab "HTMLGeneration.html#component-based-html-architecture";
+      ac6971954304c571["CSS Framework Integration"];
+      class ac6971954304c571 systemRequirement;
+      click ac6971954304c571 "HTMLGeneration.html#css-framework-integration";
+      bb0ee0a283e500e8["Mobile-Friendly Documentation"];
+      class bb0ee0a283e500e8 userRequirement;
+      click bb0ee0a283e500e8 "HTMLGeneration.html#mobile-friendly-documentation";
+      4e47e768f2a254cb["Responsive HTML Generation"];
+      class 4e47e768f2a254cb systemRequirement;
+      click 4e47e768f2a254cb "HTMLGeneration.html#responsive-html-generation";
+      f5edec5aaf14290d["Type-Safe HTML Generation"];
+      class f5edec5aaf14290d systemRequirement;
+      click f5edec5aaf14290d "HTMLGeneration.html#type-safe-html-generation";
     end
   end
-  subgraph 6c93988fc728d1f8["📁 requirements/Functional/Core/Verifications"]
-    subgraph 622a654342e7abad["📄 AttachmentsVerifications.md"]
-      43a55500f0bebfda["Attachment Output Rendering Verification"];
-      class 43a55500f0bebfda verification;
-      click 43a55500f0bebfda "Verifications/AttachmentsVerifications.html#attachment-output-rendering-verification";
-      18307065fb353848["Attachments Subsection Parsing Verification"];
-      class 18307065fb353848 verification;
-      click 18307065fb353848 "Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification";
-      ff62a0266193ee63["Attachments Validation Verification"];
-      class ff62a0266193ee63 verification;
-      click ff62a0266193ee63 "Verifications/AttachmentsVerifications.html#attachments-validation-verification";
-    end
-    subgraph 83363717080555bd["📄 ParsingVerifications.md"]
-      98ae4e1997fb1002["Element Subsection Parsing Test"];
-      class 98ae4e1997fb1002 verification;
-      click 98ae4e1997fb1002 "Verifications/ParsingVerifications.html#element-subsection-parsing-test";
-      49c372fbdf0ebe68["Fragment Normalization Test"];
-      class 49c372fbdf0ebe68 verification;
-      click 49c372fbdf0ebe68 "Verifications/ParsingVerifications.html#fragment-normalization-test";
-      55d54f4d3853a23b["Non-Reserved Subsections Content Test"];
-      class 55d54f4d3853a23b verification;
-      click 55d54f4d3853a23b "Verifications/ParsingVerifications.html#non-reserved-subsections-content-test";
-      6cf270efbdc5a78["Specification File Identification Test"];
-      class 6cf270efbdc5a78 verification;
-      click 6cf270efbdc5a78 "Verifications/ParsingVerifications.html#specification-file-identification-test";
-    end
-    subgraph 46a9d0ceb9db210e["📄 ValidationVerifications.md"]
-      83d989f6ea529f74["Invalid Header Structure Test"];
-      class 83d989f6ea529f74 verification;
-      click 83d989f6ea529f74 "Verifications/ValidationVerifications.html#invalid-header-structure-test";
+  subgraph 7b06d045a68fb066["📁 requirements/Interfaces/WebInterface/Verifications"]
+    subgraph 1002260922c26344["📄 HTMLGenerationVerifications.md"]
+      cd4d13fa425c5ad["Component Reuse Verification"];
+      class cd4d13fa425c5ad verification;
+      click cd4d13fa425c5ad "Verifications/HTMLGenerationVerifications.html#component-reuse-verification";
+      73786e8c37d9673f["HTML Validity Verification"];
+      class 73786e8c37d9673f verification;
+      click 73786e8c37d9673f "Verifications/HTMLGenerationVerifications.html#html-validity-verification";
+      79ec057500b741e["Integration Test Verification"];
+      class 79ec057500b741e verification;
+      click 79ec057500b741e "Verifications/HTMLGenerationVerifications.html#integration-test-verification";
+      3d80dd755086873a["Mobile Responsiveness Verification"];
+      class 3d80dd755086873a verification;
+      click 3d80dd755086873a "Verifications/HTMLGenerationVerifications.html#mobile-responsiveness-verification";
+      6c8b966ffd2cffc4["Responsive Design Verification"];
+      class 6c8b966ffd2cffc4 verification;
+      click 6c8b966ffd2cffc4 "Verifications/HTMLGenerationVerifications.html#responsive-design-verification";
     end
   end
-  subgraph 91eede421faaa553["📁 requirements/Functional/Operations"]
-    subgraph e1e686bef27807d6["📄 ElementManipulation.md"]
-      bf9a2f73b67492b9["Create Element Operation<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
-      class bf9a2f73b67492b9 systemRequirement;
-      click bf9a2f73b67492b9 "../Operations/ElementManipulation.html#create-element-operation";
-    end
-  end
-  subgraph 75874bcc96c01d2f["📁 requirements/Functional/Operations/Verifications"]
-    subgraph cae715fe712bf6a2["📄 FormattingVerifications.md"]
-      ccbfdf0d74ac48bf["Format Command Requirements Verification"];
-      class ccbfdf0d74ac48bf verification;
-      click ccbfdf0d74ac48bf "../Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification";
-    end
-  end
-  subgraph e57e8ed6cc4cc063["📁 requirements/Functional/Processing"]
-    subgraph 743a852fd07358e8["📄 ChangeImpact.md"]
-      a27cb4ff2637ed4a["Change Impact Detection"];
-      class a27cb4ff2637ed4a systemRequirement;
-      click a27cb4ff2637ed4a "../Processing/ChangeImpact.html#change-impact-detection";
-    end
-  end
-  subgraph cfe1eea0278796bc["📁 requirements/Interfaces/CLI"]
-    subgraph 43307c569ff89429["📄 Commands.md"]
-      457ab64992d42aa4["Attachment Commands<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Core/Behaviors.md#attachment-input-auto-detection-behavior"];
-      class 457ab64992d42aa4 systemRequirement;
-      click 457ab64992d42aa4 "../../Interfaces/CLI/Commands.html#attachment-commands";
-    end
-  end
-  136749f37a361991 -.->|deriveReqT| 7971fe15dab8f0b7;
-  136749f37a361991 -.->|deriveReqT| fed54223697ea04e;
-  136749f37a361991 -.->|deriveReqT| a27cb4ff2637ed4a;
-  e068cb8b03a77b4d["element.rs"];
-  class e068cb8b03a77b4d default;
-  click e068cb8b03a77b4d "../../../core/src/element.rs";
-  136749f37a361991 -->|satisfiedBy| e068cb8b03a77b4d;
-  35bd98d101f36b62["parser.rs"];
-  class 35bd98d101f36b62 default;
-  click 35bd98d101f36b62 "../../../core/src/parser.rs";
-  136749f37a361991 -->|satisfiedBy| 35bd98d101f36b62;
-  136749f37a361991 -.->|verifiedBy| 49c372fbdf0ebe68;
-  7971fe15dab8f0b7 -.->|deriveReqT| 15293612289d990c;
-  1cfe88f8d3cc7aac["relation.rs"];
-  class 1cfe88f8d3cc7aac default;
-  click 1cfe88f8d3cc7aac "../../../core/src/relation.rs";
-  7971fe15dab8f0b7 -->|satisfiedBy| 1cfe88f8d3cc7aac;
-  9e793aabc302d0d5 -.->|deriveReqT| 1275026756e287b9;
-  9e793aabc302d0d5 -.->|deriveReqT| fcfc76ba4d193d75;
-  9e793aabc302d0d5 -.->|deriveReqT| bf9a2f73b67492b9;
-  9e793aabc302d0d5 -.->|deriveReqT| 457ab64992d42aa4;
-  9e793aabc302d0d5 -->|satisfiedBy| e068cb8b03a77b4d;
-  9e793aabc302d0d5 -->|satisfiedBy| 35bd98d101f36b62;
-  9e793aabc302d0d5 -->|satisfiedBy| ad64383b5bdb4b7b;
-  9e793aabc302d0d5 -.->|verifiedBy| 43a55500f0bebfda;
-  9e793aabc302d0d5 -.->|verifiedBy| 18307065fb353848;
-  9e793aabc302d0d5 -.->|verifiedBy| ff62a0266193ee63;
-  9e793aabc302d0d5 -.->|verifiedBy| 98ae4e1997fb1002;
-  9e793aabc302d0d5 -.->|verifiedBy| 55d54f4d3853a23b;
-  499d48218b73f571["model.rs"];
-  class 499d48218b73f571 default;
-  click 499d48218b73f571 "../../../core/src/model.rs";
-  c1fde7d1c17c2acb -->|satisfiedBy| 499d48218b73f571;
-  c1fde7d1c17c2acb -->|satisfiedBy| 35bd98d101f36b62;
-  c1fde7d1c17c2acb -.->|verifiedBy| 6cf270efbdc5a78;
-  625bdde09d955477 -.->|deriveReqT| 136749f37a361991;
-  625bdde09d955477 -.->|deriveReqT| 9e793aabc302d0d5;
-  625bdde09d955477 -->|satisfiedBy| e068cb8b03a77b4d;
-  625bdde09d955477 -->|satisfiedBy| 499d48218b73f571;
-  625bdde09d955477 -->|satisfiedBy| 35bd98d101f36b62;
-  625bdde09d955477 -->|satisfiedBy| 1cfe88f8d3cc7aac;
-  bfee2085e3bb9f2b["subsection.rs"];
-  class bfee2085e3bb9f2b default;
-  click bfee2085e3bb9f2b "../../../core/src/subsection.rs";
-  625bdde09d955477 -->|satisfiedBy| bfee2085e3bb9f2b;
-  625bdde09d955477 -.->|verifiedBy| 83d989f6ea529f74;
-  625bdde09d955477 -.->|verifiedBy| ccbfdf0d74ac48bf;
-  fed54223697ea04e -.->|deriveReqT| 14c74cc4fb33d735;
-  fed54223697ea04e -->|satisfiedBy| 499d48218b73f571;
-  fed54223697ea04e -->|satisfiedBy| 35bd98d101f36b62;
-  fed54223697ea04e -.->|verifiedBy| ad323c8d4c0751e;
-  a27cb4ff2637ed4a -.->|deriveReqT| 1868da177a2e8ffd;
-  a27cb4ff2637ed4a -.->|deriveReqT| 27ee21b54c142739;
-  4391424e97bc407a["change_impact.rs"];
-  class 4391424e97bc407a default;
-  click 4391424e97bc407a "../../../core/src/change_impact.rs";
-  a27cb4ff2637ed4a -->|satisfiedBy| 4391424e97bc407a;
-  a27cb4ff2637ed4a -.->|verifiedBy| 3758f5f1c504cd42;
-  5f9cbc6f907e8045["test.sh"];
-  class 5f9cbc6f907e8045 default;
-  click 5f9cbc6f907e8045 "../../../tests/test-parsing-functionality/test.sh";
-  49c372fbdf0ebe68 -->|satisfiedBy| 5f9cbc6f907e8045;
-  15293612289d990c -.->|deriveReqT| 3b924660b3d92e9d;
-  15293612289d990c -.->|deriveReqT| 7b8a81499865dbaa;
-  15293612289d990c -.->|deriveReqT| ac192cac778569d0;
-  15293612289d990c -.->|deriveReqT| 4a77e514d9e5539b;
-  15293612289d990c -.->|deriveReqT| 6a54472e974b0c63;
-  15293612289d990c -->|satisfiedBy| 1cfe88f8d3cc7aac;
-  15293612289d990c -.->|verifiedBy| 98ae4e1997fb1002;
-  1275026756e287b9 -->|satisfiedBy| 75dfb35477f838d5;
-  fcfc76ba4d193d75 -->|satisfiedBy| 499d48218b73f571;
-  fcfc76ba4d193d75 -->|satisfiedBy| 35bd98d101f36b62;
-  fcfc76ba4d193d75 -.->|verifiedBy| 18307065fb353848;
-  fcfc76ba4d193d75 -.->|verifiedBy| ff62a0266193ee63;
-  25bf5cc42f41e395["cli.rs"];
-  class 25bf5cc42f41e395 default;
-  click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| 25bf5cc42f41e395;
-  993c12e82435a78e["crud.rs"];
-  class 993c12e82435a78e default;
-  click 993c12e82435a78e "../../../core/src/crud.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| 993c12e82435a78e;
-  d07e49b06be4058e["diff.rs"];
-  class d07e49b06be4058e default;
-  click d07e49b06be4058e "../../../core/src/diff.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| d07e49b06be4058e;
-  95cf526671ec752c["graph_registry.rs"];
-  class 95cf526671ec752c default;
-  click 95cf526671ec752c "../../../core/src/graph_registry.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| 95cf526671ec752c;
-  bf9a2f73b67492b9 -->|satisfiedBy| 35bd98d101f36b62;
-  bdf9762d399478a5["utils.rs"];
-  class bdf9762d399478a5 default;
-  click bdf9762d399478a5 "../../../core/src/utils.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| bdf9762d399478a5;
-  bf9a2f73b67492b9 -->|satisfiedBy| 40714cbda978a508;
-  bf9a2f73b67492b9 -->|satisfiedBy| 3c85593db589fd04;
-  bf9a2f73b67492b9 -->|satisfiedBy| 86e301b42cc16d0d;
-  bf9a2f73b67492b9 -.->|verifiedBy| 221f6c008823a4d0;
-  bf9a2f73b67492b9 -.->|verifiedBy| d5bf7d0addaf6d19;
-  457ab64992d42aa4 -.->|verifiedBy| 1c80039ebf669864;
-  457ab64992d42aa4 -.->|verifiedBy| 285be0a87e4eada0;
-  d882e7ff8e1ffe95["test.sh"];
-  class d882e7ff8e1ffe95 default;
-  click d882e7ff8e1ffe95 "../../../tests/test-assets/test.sh";
-  43a55500f0bebfda -->|satisfiedBy| d882e7ff8e1ffe95;
-  18307065fb353848 -->|satisfiedBy| d882e7ff8e1ffe95;
-  ff62a0266193ee63 -->|satisfiedBy| d882e7ff8e1ffe95;
-  98ae4e1997fb1002 -->|satisfiedBy| 5f9cbc6f907e8045;
-  ea6a90c3d551dae4["test.sh"];
-  class ea6a90c3d551dae4 default;
-  click ea6a90c3d551dae4 "../../../tests/test-search-all-features/test.sh";
-  55d54f4d3853a23b -->|satisfiedBy| ea6a90c3d551dae4;
-  94d34e73992ff9ac["test.sh"];
-  class 94d34e73992ff9ac default;
-  click 94d34e73992ff9ac "../../../tests/test-gitignore-integration/test.sh";
-  6cf270efbdc5a78 -->|satisfiedBy| 94d34e73992ff9ac;
-  5150ae05d0a88a84["test.sh"];
-  class 5150ae05d0a88a84 default;
-  click 5150ae05d0a88a84 "../../../tests/test-invalid-relations/test.sh";
-  83d989f6ea529f74 -->|satisfiedBy| 5150ae05d0a88a84;
-  aaf45a054cfa1d47["test.sh"];
-  class aaf45a054cfa1d47 default;
-  click aaf45a054cfa1d47 "../../../tests/test-advanced-format/test.sh";
-  ccbfdf0d74ac48bf -->|satisfiedBy| aaf45a054cfa1d47;
+  fa0ecb1299582ab -.->|verifiedBy| cd4d13fa425c5ad;
+  fa0ecb1299582ab -.->|verifiedBy| 79ec057500b741e;
+  ac6971954304c571 -.->|verifiedBy| 6c8b966ffd2cffc4;
+  bb0ee0a283e500e8 -.->|deriveReqT| fa0ecb1299582ab;
+  bb0ee0a283e500e8 -.->|deriveReqT| 4e47e768f2a254cb;
+  bb0ee0a283e500e8 -.->|deriveReqT| f5edec5aaf14290d;
+  bb0ee0a283e500e8 -.->|verifiedBy| 3d80dd755086873a;
+  4e47e768f2a254cb -.->|deriveReqT| ac6971954304c571;
+  4e47e768f2a254cb -.->|verifiedBy| 79ec057500b741e;
+  4e47e768f2a254cb -.->|verifiedBy| 3d80dd755086873a;
+  4e47e768f2a254cb -.->|verifiedBy| 6c8b966ffd2cffc4;
+  f5edec5aaf14290d -.->|verifiedBy| 73786e8c37d9673f;
+  effc979c2c2475cf["test.sh"];
+  class effc979c2c2475cf default;
+  click effc979c2c2475cf "../../../tests/test-html-generation/test.sh";
+  79ec057500b741e -->|satisfiedBy| effc979c2c2475cf;
+  6c8b966ffd2cffc4 -->|satisfiedBy| effc979c2c2475cf;
+  3d80dd755086873a -->|satisfiedBy| effc979c2c2475cf;
+  73786e8c37d9673f -->|satisfiedBy| effc979c2c2475cf;
 </div>
-<h3 id="specification-file-identification">Specification File Identification</h3>
-<p>The system shall only parse markdown files that are identified as specification files. A markdown file is considered a specification file if and only if its first level-1 heading (<code>#</code>) is exactly <code># Elements</code>. Files not meeting this criterion shall be ignored during model parsing, even if they have a <code>.md</code> extension.</p>
+<h3 id="mobile-friendly-documentation">Mobile-Friendly Documentation</h3>
+<p>The system shall provide mobile-friendly HTML documentation accessible on smartphones and tablets.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#component-based-html-architecture">Component-Based HTML Architecture</a></li>
+<li>derive: <a href="#responsive-html-generation">Responsive HTML Generation</a></li>
+<li>derive: <a href="#type-safe-html-generation">Type-Safe HTML Generation</a></li>
+<li>derivedFrom: <a href="../Interfaces.html#web-interface">Web Interface</a></li>
+<li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#mobile-responsiveness-verification">Mobile Responsiveness Verification</a></li>
+</ul>
+<hr />
+<h3 id="component-based-html-architecture">Component-Based HTML Architecture</h3>
+<p>The system shall use component-based architecture for HTML generation to eliminate duplication and improve maintainability.</p>
 <h4>Details</h4>
+<p>The HTML generation system shall be organized into reusable components:</p>
+<p><strong>Shared components:</strong></p>
 <ul>
-<li>The <code># Elements</code> heading must be the first H1 header in the file</li>
-<li>Leading whitespace, blank lines, or frontmatter before the heading are allowed</li>
-<li>Files without <code># Elements</code> as first H1 are silently skipped (no error)</li>
-<li>This rule applies in addition to <code>.gitignore</code> and <code>.reqvireignore</code> exclusions</li>
-<li>The page title is not stored or tracked by the system</li>
+<li>Navigation menu (with mobile/desktop variants)</li>
+<li>Page header with metadata</li>
+<li>Footer</li>
+<li>Mobile menu toggle</li>
 </ul>
+<p><strong>Reusable layouts:</strong></p>
+<ul>
+<li>Base layout for standard pages</li>
+<li>Diagram layout for full-height visualizations</li>
+</ul>
+<p><strong>Page-specific modules:</strong></p>
+<ul>
+<li>Index/Containment page</li>
+<li>Model view page</li>
+<li>Traces page</li>
+<li>TraceFlow page</li>
+<li>Coverage page</li>
+<li>Resources page</li>
+<li>Individual specification pages</li>
+</ul>
+<p>Each component shall be defined once and reused across all generated pages to eliminate code duplication.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../../UserStories.html#defining-model-structure">Defining Model Structure</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#specification-file-identification-test">Specification File Identification Test</a></li>
+<li>derivedFrom: <a href="#mobile-friendly-documentation">Mobile-Friendly Documentation</a></li>
+<li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#component-reuse-verification">Component Reuse Verification</a></li>
+<li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#integration-test-verification">Integration Test Verification</a></li>
 </ul>
 <hr />
-<h3 id="structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</h3>
-<p>The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of <strong>Elements</strong>, <strong>Subsections</strong>, <strong>Relations</strong>, and <strong>Identifiers</strong> in Markdown (<code>.md</code>) documents following clearly defined specifications.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/MarkdownStructure.html">MarkdownStructure.html</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derive: <a href="#element-identity-model">Element Identity Model</a></li>
-<li>derive: <a href="#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#defining-model-structure">Defining Model Structure</a></li>
-<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/subsection.rs">subsection.rs</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-header-structure-test">Invalid Header Structure Test</a></li>
-<li>verifiedBy: <a href="../Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
-</ul>
-<hr />
-<h3 id="element-identity-model">Element Identity Model</h3>
-<p>The system shall distinguish between element identity (ID) and element addressing (identifier) to support stable element tracking independent of file location.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/ElementIdentity.html">ElementIdentity.html</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derive: <a href="#identifiers-and-relations">Identifiers and Relations</a></li>
-<li>derive: <a href="Validation.html#internal-consistency-validator">Internal Consistency Validator</a></li>
-<li>derive: <a href="../Processing/ChangeImpact.html#change-impact-detection">Change Impact Detection</a></li>
-<li>derivedFrom: <a href="#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
-<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#fragment-normalization-test">Fragment Normalization Test</a></li>
-</ul>
-<hr />
-<h3 id="identifiers-and-relations">Identifiers and Relations</h3>
-<p>The system shall implement  <strong>Identifiers</strong> and <strong>Relations</strong> following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/IdentifiersAndRelations.html">IdentifiersAndRelations.html</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derive: <a href="ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
-<li>derivedFrom: <a href="#element-identity-model">Element Identity Model</a></li>
-<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
-</ul>
-<hr />
-<h3 id="reserved-subsections-support">Reserved Subsections Support</h3>
-<p>The system shall support the following reserved subsections with predefined structure and behavior: Relations, Details, Metadata, and Attachments.</p>
+<h3 id="responsive-html-generation">Responsive HTML Generation</h3>
+<p>The system shall generate HTML documentation with responsive design supporting desktop, tablet, and mobile viewports.</p>
 <h4>Details</h4>
-<p>The system shall support following reserved subsections:</p>
+<p>The system shall:</p>
 <ul>
-<li><strong>Relations</strong>: Define relationships between elements</li>
-<li><strong>Details</strong>: Extend requirement text with additional information</li>
-<li><strong>Metadata</strong>: Define element type and classification</li>
-<li><strong>Attachments</strong>: Link external documents and Refinement elements
+<li>Support viewport widths from 320px (mobile) to 1920px+ (desktop)</li>
+<li>Use mobile-first CSS approach with progressive enhancement</li>
+<li>Provide hamburger navigation menu for screens &lt; 768px</li>
+<li>Scale typography and spacing based on viewport size using responsive breakpoints</li>
+</ul>
+<p>Responsive breakpoints:</p>
 <ul>
-<li>Can contain file paths (markdown links where text equals href)</li>
-<li>Can contain element identifiers (markdown links to Refinement elements ONLY)</li>
+<li>sm: 640px and up (small tablets)</li>
+<li>md: 768px and up (tablets)</li>
+<li>lg: 1024px and up (desktops)</li>
+<li>xl: 1280px and up (large desktops)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#css-framework-integration">CSS Framework Integration</a></li>
+<li>derivedFrom: <a href="#mobile-friendly-documentation">Mobile-Friendly Documentation</a></li>
+<li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#integration-test-verification">Integration Test Verification</a></li>
+<li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#mobile-responsiveness-verification">Mobile Responsiveness Verification</a></li>
+<li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#responsive-design-verification">Responsive Design Verification</a></li>
+</ul>
+<hr />
+<h3 id="css-framework-integration">CSS Framework Integration</h3>
+<p>The system shall integrate Tailwind CSS utility framework for consistent responsive styling.</p>
+<h4>Details</h4>
+<p>The system shall:</p>
+<ul>
+<li>Include Tailwind CSS via CDN for development</li>
+<li>Use mobile-first utility classes for responsive design</li>
+<li>Apply responsive breakpoints (sm, md, lg, xl) for layout adaptation</li>
+<li>Define custom theme colors for Reqvire branding:
+<ul>
+<li>Primary: Indigo (#3F51B5)</li>
+<li>Requirement: Deep Purple (#673AB7)</li>
+<li>Verification: Emerald Green (#4CAF50)</li>
 </ul>
 </li>
 </ul>
-<p>Each reserved subsection has specific parsing rules, validation requirements, and behaviors.</p>
+<p>Tailwind provides:</p>
+<ul>
+<li>Utility-first CSS for rapid development</li>
+<li>Built-in responsive modifiers (e.g., <code>md:hidden</code>, <code>lg:flex</code>)</li>
+<li>Consistent spacing, colors, and typography scale</li>
+<li>Small bundle size with tree-shaking capability</li>
+</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
 </ul>
-<h4>Attachments</h4>
+<h4>Relations</h4>
 <ul>
-<li><a href="DesignDocuments/ReservedSubsections.html">ReservedSubsections.html</a></li>
+<li>derivedFrom: <a href="#responsive-html-generation">Responsive HTML Generation</a></li>
+<li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#responsive-design-verification">Responsive Design Verification</a></li>
+</ul>
+<hr />
+<h3 id="type-safe-html-generation">Type-Safe HTML Generation</h3>
+<p>The system shall generate HTML using type-safe Rust macros to prevent invalid HTML at compile time.</p>
+<h4>Details</h4>
+<p>The system shall:</p>
+<ul>
+<li>Use Maud crate for compile-time HTML generation</li>
+<li>Validate HTML structure at compile time through Rust’s type system</li>
+<li>Prevent malformed HTML tags, unclosed elements, and invalid nesting</li>
+<li>Generate well-formed HTML5 output conforming to W3C standards</li>
+</ul>
+<p>This ensures HTML validity errors are caught during compilation rather than at runtime or by users.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="ModelManagement.html#verification-type-categories">Verification Type Categories</a></li>
-<li>derive: <a href="Validation.html#attachment-target-validation">Attachment Target Validation</a></li>
-<li>derive: <a href="../Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
-<li>derive: <a href="../../Interfaces/CLI/Commands.html#attachment-commands">Attachment Commands</a></li>
-<li>derivedFrom: <a href="#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
-<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#element-type-metadata-specification">Element Type Metadata Specification</a></li>
-<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachment-output-rendering-verification">Attachment Output Rendering Verification</a></li>
-<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</a></li>
-<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-validation-verification">Attachments Validation Verification</a></li>
-<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></li>
-<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#non-reserved-subsections-content-test">Non-Reserved Subsections Content Test</a></li>
+<li>derivedFrom: <a href="#mobile-friendly-documentation">Mobile-Friendly Documentation</a></li>
+<li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#html-validity-verification">HTML Validity Verification</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';

@@ -271,6 +271,18 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Core/Configuration.html",
                   "children": [
                     {
+                      "name": "Coexistence of Structured and Unstructured Documents",
+                      "type": "user-requirement",
+                      "link": "requirements/Functional/Core/Configuration.html#coexistence-of-structured-and-unstructured-documents",
+                      "children": [
+                        {
+                          "name": "Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#refinement-specification"
+                        }
+                      ]
+                    },
+                    {
                       "name": "Ignore Files Integration",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Configuration.html#ignore-files-integration"
@@ -332,18 +344,6 @@ The containment view shows the physical organization of the model—how requirem
                       ]
                     },
                     {
-                      "name": "Coexistence of Structured and Unstructured Documents",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#coexistence-of-structured-and-unstructured-documents",
-                      "children": [
-                        {
-                          "name": "Refinement Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#refinement-specification"
-                        }
-                      ]
-                    },
-                    {
                       "name": "Default Requirement Type Assignment",
                       "type": "user-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#default-requirement-type-assignment",
@@ -363,7 +363,24 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Element Manipulation Operations",
                       "type": "user-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#element-manipulation-operations"
+                      "link": "requirements/Functional/Core/ModelManagement.html#element-manipulation-operations",
+                      "children": [
+                        {
+                          "name": "File Persistence Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
+                        },
+                        {
+                          "name": "Dry-Run Mode Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
+                        },
+                        {
+                          "name": "Diff Output Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Element Type Relation Compatibility",
@@ -1046,11 +1063,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/ElementManipulation.html#create-element-operation",
                       "children": [
                         {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
                           "name": "Target Location Constraint",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Constraints.html#target-location-constraint"
@@ -1059,51 +1071,19 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Element Ordering Behavior",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Behaviors.html#element-ordering-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
                         }
                       ]
                     },
                     {
                       "name": "Delete Element Operation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/ElementManipulation.html#delete-element-operation",
-                      "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#delete-element-operation"
                     },
                     {
                       "name": "Element Manipulation File Persistence",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Operations/ElementManipulation.html#element-manipulation-file-persistence",
                       "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
                         {
                           "name": "Element Ordering Behavior",
                           "type": "attachment-element",
@@ -1114,35 +1094,13 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Merge Element Operation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/ElementManipulation.html#merge-element-operation",
-                      "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#merge-element-operation"
                     },
                     {
                       "name": "Move Element Operation",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Operations/ElementManipulation.html#move-element-operation",
                       "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
                         {
                           "name": "Target Location Constraint",
                           "type": "attachment-element",
@@ -1152,16 +1110,6 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Element Ordering Behavior",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Behaviors.html#element-ordering-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
                         }
                       ]
                     },
@@ -1171,24 +1119,9 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/ElementManipulation.html#move-file-operation",
                       "children": [
                         {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
                           "name": "Target Location Constraint",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Constraints.html#target-location-constraint"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
                         }
                       ]
                     },
@@ -1200,24 +1133,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Rename Element Operation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/ElementManipulation.html#rename-element-operation",
-                      "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#rename-element-operation"
                     },
                     {
                       "name": "Target Location Validation and Auto-Creation",
@@ -2923,6 +2839,38 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "folder",
                   "children": [
                     {
+                      "name": "HTMLGenerationVerifications.md",
+                      "type": "file",
+                      "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html",
+                      "children": [
+                        {
+                          "name": "Component Reuse Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#component-reuse-verification"
+                        },
+                        {
+                          "name": "HTML Validity Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#html-validity-verification"
+                        },
+                        {
+                          "name": "Integration Test Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#integration-test-verification"
+                        },
+                        {
+                          "name": "Mobile Responsiveness Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#mobile-responsiveness-verification"
+                        },
+                        {
+                          "name": "Responsive Design Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#responsive-design-verification"
+                        }
+                      ]
+                    },
+                    {
                       "name": "WebInterfaceVerifications.md",
                       "type": "file",
                       "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html",
@@ -3074,6 +3022,38 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Interfaces/WebInterface/Specifications.html#html-branding-specification"
                         }
                       ]
+                    }
+                  ]
+                },
+                {
+                  "name": "HTMLGeneration.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html",
+                  "children": [
+                    {
+                      "name": "Component-Based HTML Architecture",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#component-based-html-architecture"
+                    },
+                    {
+                      "name": "CSS Framework Integration",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#css-framework-integration"
+                    },
+                    {
+                      "name": "Mobile-Friendly Documentation",
+                      "type": "user-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#mobile-friendly-documentation"
+                    },
+                    {
+                      "name": "Responsive HTML Generation",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#responsive-html-generation"
+                    },
+                    {
+                      "name": "Type-Safe HTML Generation",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#type-safe-html-generation"
                     }
                   ]
                 },
@@ -3527,6 +3507,18 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Core/Configuration.html",
                   "children": [
                     {
+                      "name": "Coexistence of Structured and Unstructured Documents",
+                      "type": "user-requirement",
+                      "link": "requirements/Functional/Core/Configuration.html#coexistence-of-structured-and-unstructured-documents",
+                      "children": [
+                        {
+                          "name": "Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#refinement-specification"
+                        }
+                      ]
+                    },
+                    {
                       "name": "Ignore Files Integration",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Configuration.html#ignore-files-integration"
@@ -3588,18 +3580,6 @@ The containment view shows the physical organization of the model—how requirem
                       ]
                     },
                     {
-                      "name": "Coexistence of Structured and Unstructured Documents",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#coexistence-of-structured-and-unstructured-documents",
-                      "children": [
-                        {
-                          "name": "Refinement Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#refinement-specification"
-                        }
-                      ]
-                    },
-                    {
                       "name": "Default Requirement Type Assignment",
                       "type": "user-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#default-requirement-type-assignment",
@@ -3619,7 +3599,24 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Element Manipulation Operations",
                       "type": "user-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#element-manipulation-operations"
+                      "link": "requirements/Functional/Core/ModelManagement.html#element-manipulation-operations",
+                      "children": [
+                        {
+                          "name": "File Persistence Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
+                        },
+                        {
+                          "name": "Dry-Run Mode Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
+                        },
+                        {
+                          "name": "Diff Output Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Element Type Relation Compatibility",
@@ -4302,11 +4299,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/ElementManipulation.html#create-element-operation",
                       "children": [
                         {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
                           "name": "Target Location Constraint",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Constraints.html#target-location-constraint"
@@ -4315,51 +4307,19 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Element Ordering Behavior",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Behaviors.html#element-ordering-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
                         }
                       ]
                     },
                     {
                       "name": "Delete Element Operation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/ElementManipulation.html#delete-element-operation",
-                      "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#delete-element-operation"
                     },
                     {
                       "name": "Element Manipulation File Persistence",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Operations/ElementManipulation.html#element-manipulation-file-persistence",
                       "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
                         {
                           "name": "Element Ordering Behavior",
                           "type": "attachment-element",
@@ -4370,35 +4330,13 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Merge Element Operation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/ElementManipulation.html#merge-element-operation",
-                      "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#merge-element-operation"
                     },
                     {
                       "name": "Move Element Operation",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Operations/ElementManipulation.html#move-element-operation",
                       "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
                         {
                           "name": "Target Location Constraint",
                           "type": "attachment-element",
@@ -4408,16 +4346,6 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Element Ordering Behavior",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Behaviors.html#element-ordering-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
                         }
                       ]
                     },
@@ -4427,24 +4355,9 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/ElementManipulation.html#move-file-operation",
                       "children": [
                         {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
                           "name": "Target Location Constraint",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Constraints.html#target-location-constraint"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
                         }
                       ]
                     },
@@ -4456,24 +4369,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Rename Element Operation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/ElementManipulation.html#rename-element-operation",
-                      "children": [
-                        {
-                          "name": "File Persistence Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
-                        },
-                        {
-                          "name": "Dry-Run Mode Behavior",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
-                        },
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#rename-element-operation"
                     },
                     {
                       "name": "Target Location Validation and Auto-Creation",
@@ -6179,6 +6075,38 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "folder",
                   "children": [
                     {
+                      "name": "HTMLGenerationVerifications.md",
+                      "type": "file",
+                      "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html",
+                      "children": [
+                        {
+                          "name": "Component Reuse Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#component-reuse-verification"
+                        },
+                        {
+                          "name": "HTML Validity Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#html-validity-verification"
+                        },
+                        {
+                          "name": "Integration Test Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#integration-test-verification"
+                        },
+                        {
+                          "name": "Mobile Responsiveness Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#mobile-responsiveness-verification"
+                        },
+                        {
+                          "name": "Responsive Design Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.html#responsive-design-verification"
+                        }
+                      ]
+                    },
+                    {
                       "name": "WebInterfaceVerifications.md",
                       "type": "file",
                       "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html",
@@ -6330,6 +6258,38 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Interfaces/WebInterface/Specifications.html#html-branding-specification"
                         }
                       ]
+                    }
+                  ]
+                },
+                {
+                  "name": "HTMLGeneration.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html",
+                  "children": [
+                    {
+                      "name": "Component-Based HTML Architecture",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#component-based-html-architecture"
+                    },
+                    {
+                      "name": "CSS Framework Integration",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#css-framework-integration"
+                    },
+                    {
+                      "name": "Mobile-Friendly Documentation",
+                      "type": "user-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#mobile-friendly-documentation"
+                    },
+                    {
+                      "name": "Responsive HTML Generation",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#responsive-html-generation"
+                    },
+                    {
+                      "name": "Type-Safe HTML Generation",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#type-safe-html-generation"
                     }
                   ]
                 },
