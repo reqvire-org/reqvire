@@ -126,26 +126,27 @@ fi
 echo "PASS: traceflow.html has TraceFlow title"
 
 echo "Test 5: Navigation contains TraceFlow link"
-if ! grep -q 'traceflow.html">TraceFlow' "$OUTPUT_DIR/index.html"; then
+if ! grep -q 'traceflow.html.*TraceFlow' "$OUTPUT_DIR/index.html"; then
     echo "FAIL: Navigation does not contain TraceFlow link"
     exit 1
 fi
 echo "PASS: Navigation contains TraceFlow link"
 
 echo "Test 6: TraceFlow link is positioned after Traces"
-# Check that traceflow appears after traces in navigation by looking at line numbers
-TRACES_LINE=$(grep -n 'traces.html">Traces</a>' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
-TRACEFLOW_LINE=$(grep -n 'traceflow.html">TraceFlow</a>' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
-if [ -z "$TRACES_LINE" ]; then
+# Check that traceflow appears after traces in navigation by checking character positions
+# (Maud generates minified HTML so line numbers don't work)
+TRACES_POS=$(grep -b -o 'traces.html.*Traces<' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
+TRACEFLOW_POS=$(grep -b -o 'traceflow.html.*TraceFlow<' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
+if [ -z "$TRACES_POS" ]; then
     echo "FAIL: Traces link not found"
     exit 1
 fi
-if [ -z "$TRACEFLOW_LINE" ]; then
+if [ -z "$TRACEFLOW_POS" ]; then
     echo "FAIL: TraceFlow link not found"
     exit 1
 fi
-if [ "$TRACEFLOW_LINE" -le "$TRACES_LINE" ]; then
-    echo "FAIL: TraceFlow link is not positioned after Traces (traces line: $TRACES_LINE, traceflow line: $TRACEFLOW_LINE)"
+if [ "$TRACEFLOW_POS" -le "$TRACES_POS" ]; then
+    echo "FAIL: TraceFlow link is not positioned after Traces (traces pos: $TRACES_POS, traceflow pos: $TRACEFLOW_POS)"
     exit 1
 fi
 echo "PASS: TraceFlow link is positioned after Traces"

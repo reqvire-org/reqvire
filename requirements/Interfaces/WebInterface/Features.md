@@ -19,11 +19,10 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * derivedFrom: [Web Interface](../Interfaces.md#web-interface)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
-  * satisfiedBy: [html.rs](../../../core/src/html.rs)
+  * satisfiedBy: [html/mod.rs](../../../core/src/html/mod.rs)
+  * satisfiedBy: [html/layouts.rs](../../../core/src/html/layouts.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
-  * satisfiedBy: [base.html](../../../core/templates/base.html)
-  * satisfiedBy: [model.html](../../../core/templates/model.html)
   * satisfiedBy: [D3.js Containment Tree Specification](Specifications.md#d3js-containment-tree-specification)
   * satisfiedBy: [HTML Branding Specification](Specifications.md#html-branding-specification)
   * satisfiedBy: [HTML Export Pipeline Specification](Specifications.md#html-export-pipeline-specification)
@@ -180,8 +179,8 @@ The system shall ensure color consistency between:
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
-  * satisfiedBy: [html.rs](../../../core/src/html.rs)
-  * satisfiedBy: [base.html](../../../core/templates/base.html)
+  * satisfiedBy: [html/styles.rs](../../../core/src/html/styles.rs)
+  * satisfiedBy: [html/layouts.rs](../../../core/src/html/layouts.rs)
   * satisfiedBy: [Color Scheme Specification](../../Functional/Output/Specifications.md#color-scheme-specification)
 ---
 

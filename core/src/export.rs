@@ -543,9 +543,96 @@ function showView(view) {{
     filesystem::write_file("resources.md", resources_content.as_bytes())?;
 
     // Step 6: Convert markdown to HTML
-    info!("Converting markdown to HTML...");
+    info!("Converting remaining markdown to HTML...");
     let html_count = html_export::export_markdown_to_html(&temp_dir, &temp_dir)?;
     info!("✅ Converted {} markdown files to HTML", html_count);
+
+    // Step 6.5: Generate responsive HTML for migrated pages (overwrites old templates)
+    info!("Generating responsive HTML pages...");
+
+    // Generate coverage.html with responsive design
+    let coverage_md_path = temp_dir.join("coverage.md");
+    if coverage_md_path.exists() {
+        let coverage_md = fs::read_to_string(&coverage_md_path)?;
+        let coverage_html_content = crate::html::markdown::markdown_to_html_content(
+            &coverage_md_path,
+            &coverage_md,
+            &temp_dir
+        )?;
+        let coverage_page = crate::html::generate_coverage_page(&coverage_html_content, "");
+        fs::write(temp_dir.join("coverage.html"), coverage_page)?;
+        info!("✅ Generated coverage.html");
+    }
+
+    // Generate model.html with responsive design
+    let model_md_path = temp_dir.join("model.md");
+    if model_md_path.exists() {
+        let model_md = fs::read_to_string(&model_md_path)?;
+        let model_html_content = crate::html::markdown::markdown_to_html_content(
+            &model_md_path,
+            &model_md,
+            &temp_dir
+        )?;
+        let model_page = crate::html::generate_model_page(&model_html_content, "");
+        fs::write(temp_dir.join("model.html"), model_page)?;
+        info!("✅ Generated model.html");
+    }
+
+    // Generate containment.html with responsive design (will be renamed to index.html later)
+    let containment_md_path = temp_dir.join("containment.md");
+    if containment_md_path.exists() {
+        let containment_md = fs::read_to_string(&containment_md_path)?;
+        let containment_html_content = crate::html::markdown::markdown_to_html_content(
+            &containment_md_path,
+            &containment_md,
+            &temp_dir
+        )?;
+        let containment_page = crate::html::generate_index_page(&containment_html_content, "");
+        fs::write(temp_dir.join("containment.html"), containment_page)?;
+        info!("✅ Generated containment.html");
+    }
+
+    // Generate traces.html with responsive design
+    let traces_md_path = temp_dir.join("traces.md");
+    if traces_md_path.exists() {
+        let traces_md = fs::read_to_string(&traces_md_path)?;
+        let traces_html_content = crate::html::markdown::markdown_to_html_content(
+            &traces_md_path,
+            &traces_md,
+            &temp_dir
+        )?;
+        let traces_page = crate::html::generate_traces_page(&traces_html_content, "");
+        fs::write(temp_dir.join("traces.html"), traces_page)?;
+        info!("✅ Generated traces.html");
+    }
+
+    // Generate traceflow.html with responsive design
+    let traceflow_md_path = temp_dir.join("traceflow.md");
+    if traceflow_md_path.exists() {
+        let traceflow_md = fs::read_to_string(&traceflow_md_path)?;
+        let traceflow_html_content = crate::html::markdown::markdown_to_html_content(
+            &traceflow_md_path,
+            &traceflow_md,
+            &temp_dir
+        )?;
+        let traceflow_page = crate::html::generate_traceflow_page(&traceflow_html_content, "");
+        fs::write(temp_dir.join("traceflow.html"), traceflow_page)?;
+        info!("✅ Generated traceflow.html");
+    }
+
+    // Generate resources.html with responsive design
+    let resources_md_path = temp_dir.join("resources.md");
+    if resources_md_path.exists() {
+        let resources_md = fs::read_to_string(&resources_md_path)?;
+        let resources_html_content = crate::html::markdown::markdown_to_html_content(
+            &resources_md_path,
+            &resources_md,
+            &temp_dir
+        )?;
+        let resources_page = crate::html::generate_resources_page(&resources_html_content, "");
+        fs::write(temp_dir.join("resources.html"), resources_page)?;
+        info!("✅ Generated resources.html");
+    }
 
     // Step 6.4: Rename containment.html to index.html (for web server compatibility)
     let containment_html = temp_dir.join("containment.html");
