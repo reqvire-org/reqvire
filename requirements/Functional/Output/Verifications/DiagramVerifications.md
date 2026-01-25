@@ -23,7 +23,7 @@ This test verifies that the system automatically exports and updates HTML docume
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [update_docs.yml](../../../../.github/workflows/update_docs.yml)
+  * satisfiedBy: [update_docs.yml_disabled](../../../../.github/workflows/update_docs.yml_disabled)
   * verify: [Automated Documentation Export on PR Merge](../../Integration/GitHubIntegration.md#automated-documentation-export-on-pr-merge)
 ---
 

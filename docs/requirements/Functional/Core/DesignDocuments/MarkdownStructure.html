@@ -1,0 +1,477 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MarkdownStructure</title><link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
+                :root {
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
+
+                    /* Element Type Colors */
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
+
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
+
+                    /* Interactive Colors */
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
+
+                    /* Text Colors */
+                    --color-text-primary: #212121;
+                    --color-text-secondary: #424242;
+                    --color-text-muted: #757575;
+                    --color-background: #FAFAFA;
+                    --color-border: #EEEEEE;
+                }
+
+                /* Ensure body takes full height */
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #FAFAFA;
+                    color: var(--color-text-secondary);
+                }
+
+                /* Navigation bar */
+                .reqvire-nav {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    background-color: var(--color-nav);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 20px;
+                }
+
+                .reqvire-nav a {
+                    color: white;
+                    text-decoration: none;
+                    padding: 0 15px;
+                    font-weight: 500;
+                    transition: background-color 0.2s;
+                }
+
+                .reqvire-nav a:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: none;
+                }
+
+                .nav-logo {
+                    margin-right: 20px;
+                }
+
+                .nav-logo:hover {
+                    background-color: transparent !important;
+                    text-decoration: none !important;
+                }
+
+                .nav-logo img {
+                    height: 24px;
+                    width: auto;
+                    vertical-align: middle;
+                }
+
+                .nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 10px 20px;
+                    margin-right: 5px;
+                    border-radius: 3px;
+                    transition: background-color 0.2s, text-decoration 0.2s;
+                }
+
+                .nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .nav-link:active {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .mobile-nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 20px;
+                    display: block;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: background-color 0.2s;
+                }
+
+                .mobile-nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    color: white;
+                }
+
+                .reqvire-nav-spacer {
+                    height: 50px;
+                }
+
+                /* Content container */
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+
+                .content {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                /* Content area typography and styling - matches old template exactly */
+                /* Use higher specificity to override Tailwind reset */
+                .bg-white h1, .content h1, h1 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 2px solid #EEEEEE !important;
+                    padding-bottom: 10px !important;
+                    margin-top: 0 !important;
+                    font-size: 2em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h2, .content h2, h2 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 1px solid #EEEEEE !important;
+                    padding-bottom: 5px !important;
+                    font-size: 1.5em !important;
+                    font-weight: bold !important;
+                    margin-top: 20px !important;
+                }
+
+                .bg-white h3, .content h3, h3 {
+                    color: var(--color-text-primary) !important;
+                    margin-top: 25px !important;
+                    font-size: 1.17em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h4, .content h4, h4 {
+                    color: var(--color-text-secondary) !important;
+                    font-weight: 600 !important;
+                    font-size: 1em !important;
+                    margin-top: 15px !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                .content a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                div.bg-white > a {
+                    color: var(--color-primary) !important;
+                    text-decoration: none !important;
+                    font-weight: 500 !important;
+                    transition: text-decoration 0.15s ease !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):hover,
+                .content a:not(.nav-link):not(.mobile-nav-link):hover {
+                    text-decoration: underline !important;
+                }
+
+                .bg-white a:focus, .content a:focus {
+                    outline: 2px solid var(--color-primary);
+                    outline-offset: 2px;
+                }
+
+                .bg-white table, .content table, table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    margin: 20px 0 !important;
+                }
+
+                .bg-white table, .bg-white th, .bg-white td,
+                .content table, .content th, .content td {
+                    border: 1px solid #EEEEEE !important;
+                }
+
+                .bg-white th, .bg-white td,
+                .content th, .content td {
+                    padding: 8px 12px !important;
+                    text-align: left !important;
+                }
+
+                .bg-white th, .content th {
+                    background-color: #F5F5F5 !important;
+                    color: #212121 !important;
+                    font-weight: 600 !important;
+                }
+
+                .bg-white tr:hover td, .content tr:hover td {
+                    background-color: #FFF8E1 !important;
+                }
+
+                .bg-white code, .content code, code {
+                    background: #f6f8fa !important;
+                    padding: 2px 4px !important;
+                    border-radius: 3px !important;
+                    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+                    font-size: 90% !important;
+                }
+
+                .bg-white pre, .content pre, pre {
+                    background: #f6f8fa !important;
+                    border-radius: 3px !important;
+                    padding: 16px !important;
+                    overflow: auto !important;
+                }
+
+                .bg-white pre code, .content pre code {
+                    background: transparent !important;
+                    padding: 0 !important;
+                }
+
+                .bg-white blockquote, .content blockquote, blockquote {
+                    margin: 0 !important;
+                    padding: 0 15px !important;
+                    color: var(--color-text-muted) !important;
+                    border-left: 4px solid var(--color-primary) !important;
+                }
+
+                .bg-white p, .content p {
+                    margin: 10px 0 !important;
+                    line-height: 1.6 !important;
+                }
+
+                .bg-white ul, .content ul,
+                .bg-white ol, .content ol {
+                    margin: 10px 0 !important;
+                    padding-left: 30px !important;
+                }
+
+                .bg-white li, .content li {
+                    margin: 5px 0 !important;
+                }
+
+                /* Custom Mermaid diagram styles - matches old template */
+                .mermaid {
+                    margin: 20px 0;
+                    text-align: center;
+                    height: calc(100vh - 150px);
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    border: 1px solid #EEEEEE;
+                    border-radius: 3px;
+                    background-color: #FAFAFA;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: center;
+                    /* Hide raw markdown text until rendered */
+                    color: transparent;
+                }
+
+                .mermaid svg {
+                    /* Show rendered diagram */
+                    color: initial;
+                }
+
+                .mermaid svg {
+                    width: 100%;
+                    height: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                /* Diagram navigation buttons */
+                .diagram-nav-buttons {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    z-index: 999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    background-color: rgba(255, 255, 255, 0.85);
+                    padding: 3px;
+                    border-radius: 3px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+                }
+
+                .diagram-nav-row {
+                    display: flex;
+                    gap: 2px;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn {
+                    width: 22px;
+                    height: 22px;
+                    background-color: var(--color-primary);
+                    color: white;
+                    border: none;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn:hover {
+                    background-color: var(--color-primary-hover);
+                }
+
+                .diagram-nav-btn:active {
+                    background-color: var(--color-primary-active);
+                }
+
+                /* Smooth transitions for interactive elements */
+                a, button {
+                    transition: all 0.2s ease-in-out;
+                }
+
+                /* Responsive typography */
+                @media (max-width: 640px) {
+                    h1 { font-size: 1.5rem; }
+                    h2 { font-size: 1.25rem; }
+                    h3 { font-size: 1.125rem; }
+                }
+
+                /* Print styles */
+                @media print {
+                    nav, .no-print { display: none; }
+                }
+            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../../coverage.html" class="nav-link">Coverage</a><a href="../../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../../model.html" class="mobile-nav-link">Model</a><a href="../../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="markdown-structure-specification">Markdown Structure Specification</h1>
+<h2 id="elements-in-markdown-documents">Elements in Markdown Documents</h2>
+<p>An <strong>Element</strong> is a uniquely identifiable system element within a Markdown document. It starts with a <code>###</code> header and includes all content under that header until the next header of the same or higher hierarchy.</p>
+<h3 id="structure-of-an-element">Structure of an Element</h3>
+<ol>
+<li><strong>Element Header</strong></li>
+</ol>
+<ul>
+<li>The <code>###</code> header defines the start of an element.</li>
+<li>The text of the <code>###</code> header serves as the <strong>element name</strong>.</li>
+<li>The element name must be globally unique to ensure unambiguous references.</li>
+</ul>
+<ol start="2">
+<li><strong>Element Content</strong></li>
+</ol>
+<ul>
+<li>The element includes all content under the <code>###</code> header until:
+<ul>
+<li>The next <code>###</code> header, or</li>
+<li>A higher-level header (<code>##</code>, <code>#</code>), or</li>
+<li>The end of the document.</li>
+</ul>
+</li>
+<li>The content can include:
+<ul>
+<li>Text</li>
+<li>Subheaders (e.g., <code>####</code>)</li>
+<li>Bullet points, code blocks, tables, etc.</li>
+</ul>
+</li>
+</ul>
+<h2 id="rules-for-elements">Rules for Elements</h2>
+<ol>
+<li>
+<p><strong>Header Format</strong>:</p>
+<ul>
+<li>An element must start with a <code>###</code> header.</li>
+<li>The <code>###</code> header text must not be empty.</li>
+</ul>
+</li>
+<li>
+<p><strong>Global Uniqueness</strong>:</p>
+<ul>
+<li>Element names must be globally unique across all files in the model.</li>
+<li>Element names serve as stable IDs for element identity independent of file location.</li>
+<li>File location is the only containment property tracked by the system.</li>
+</ul>
+</li>
+<li>
+<p><strong>Nested Subheaders</strong>:</p>
+<ul>
+<li>Subheaders within an element defined with <code>####</code> header are part of the same element and do not create new elements.</li>
+</ul>
+</li>
+<li>
+<p><strong>No Overlapping Content</strong>:</p>
+<ul>
+<li>Content in an element belongs exclusively to that element and cannot overlap with another.</li>
+</ul>
+</li>
+</ol>
+<h2 id="section-headers-(h2)---not-tracked">Section Headers (H2) - Not Tracked</h2>
+<p>Section headers (<code>## Header</code>) may exist in markdown documents for visual organization but are <strong>not tracked</strong> by the system:</p>
+<ul>
+<li>The parser ignores <code>##</code> headers during model construction</li>
+<li>Elements are indexed by their position within the file, not within sections</li>
+<li>When writing/formatting files, existing <code>##</code> headers are preserved but not managed</li>
+<li>The <code>--index</code> parameter in CLI commands refers to element position in the entire file</li>
+</ul>
+<h3 id="examples-of-elements">Examples of Elements</h3>
+<p>Single Element:</p>
+<pre><code class="language-markdown">### My Element
+
+This is the content of My Element.
+
+#### Subsection
+Additional details about My Element.
+</code></pre>
+<p>Multiple Elements:</p>
+<pre><code class="language-markdown">### Element One
+
+This is the content of Element One.
+
+### Element Two
+
+This is the content of Element Two.
+</code></pre>
+<p>Nested Subheaders:</p>
+<pre><code class="language-markdown">### Main Element
+This is the main element content.
+
+#### Subsection
+Details about the subsection.
+
+#### Another Subsection
+More details about another subsection.
+</code></pre>
+<h3 id="invalid-cases">Invalid Cases</h3>
+<p>Element headers empty:</p>
+<pre><code>###
+</code></pre>
+<p>Headers not unique within the model:</p>
+<pre><code class="language-markdown">### Duplicate
+Content of the first duplicate.
+
+### Duplicate
+Content of the second duplicate.
+</code></pre>
+<h2 id="subsections-in-markdown-documents">Subsections in Markdown documents</h2>
+<p>An element may contain different <strong>Subsections</strong>, some of which are strictly defined, while others allow free-form content.</p>
+<ul>
+<li><strong>Reserved Subsections</strong>: These subsections follow a predefined structure and behavior.</li>
+<li><strong>Other Subsections</strong>: These allow additional descriptive or supporting information.</li>
+</ul>
+<p>Subsections starts with the <code>#### Subsection Name</code> and ends either with new element or next subsection.
+Subsection must be located <strong>within an element chunk</strong>.</p>
+<p>The <code>#### </code> header marks the beginning of the subsection.
+It must appear directly within an element chunk, <strong>following</strong> the <code>###</code> header of the parent element and any preceding content, including previous subsections.
+Each element chunk can have <strong>at most one</strong> <code>#### SubsectionName</code> subsection where ‘SubsectionName’ is a unique name of the subsection within an element.</p>
+<p>Some subsections are <strong>reserved</strong> with predefined structure and behavior, while others allow free-form content. The specific reserved subsections are defined separately as capabilities of the system.</p>
+<footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
+                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                            var menu = document.getElementById('mobile-menu');
+                            menu.classList.toggle('hidden');
+                        });
+                    </script></body></html>

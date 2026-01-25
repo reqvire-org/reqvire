@@ -1,0 +1,458 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>SearchFiltering</title><link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
+                :root {
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
+
+                    /* Element Type Colors */
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
+
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
+
+                    /* Interactive Colors */
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
+
+                    /* Text Colors */
+                    --color-text-primary: #212121;
+                    --color-text-secondary: #424242;
+                    --color-text-muted: #757575;
+                    --color-background: #FAFAFA;
+                    --color-border: #EEEEEE;
+                }
+
+                /* Ensure body takes full height */
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #FAFAFA;
+                    color: var(--color-text-secondary);
+                }
+
+                /* Navigation bar */
+                .reqvire-nav {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    background-color: var(--color-nav);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 20px;
+                }
+
+                .reqvire-nav a {
+                    color: white;
+                    text-decoration: none;
+                    padding: 0 15px;
+                    font-weight: 500;
+                    transition: background-color 0.2s;
+                }
+
+                .reqvire-nav a:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: none;
+                }
+
+                .nav-logo {
+                    margin-right: 20px;
+                }
+
+                .nav-logo:hover {
+                    background-color: transparent !important;
+                    text-decoration: none !important;
+                }
+
+                .nav-logo img {
+                    height: 24px;
+                    width: auto;
+                    vertical-align: middle;
+                }
+
+                .nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 10px 20px;
+                    margin-right: 5px;
+                    border-radius: 3px;
+                    transition: background-color 0.2s, text-decoration 0.2s;
+                }
+
+                .nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .nav-link:active {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .mobile-nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 20px;
+                    display: block;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: background-color 0.2s;
+                }
+
+                .mobile-nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    color: white;
+                }
+
+                .reqvire-nav-spacer {
+                    height: 50px;
+                }
+
+                /* Content container */
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+
+                .content {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                /* Content area typography and styling - matches old template exactly */
+                /* Use higher specificity to override Tailwind reset */
+                .bg-white h1, .content h1, h1 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 2px solid #EEEEEE !important;
+                    padding-bottom: 10px !important;
+                    margin-top: 0 !important;
+                    font-size: 2em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h2, .content h2, h2 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 1px solid #EEEEEE !important;
+                    padding-bottom: 5px !important;
+                    font-size: 1.5em !important;
+                    font-weight: bold !important;
+                    margin-top: 20px !important;
+                }
+
+                .bg-white h3, .content h3, h3 {
+                    color: var(--color-text-primary) !important;
+                    margin-top: 25px !important;
+                    font-size: 1.17em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h4, .content h4, h4 {
+                    color: var(--color-text-secondary) !important;
+                    font-weight: 600 !important;
+                    font-size: 1em !important;
+                    margin-top: 15px !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                .content a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                div.bg-white > a {
+                    color: var(--color-primary) !important;
+                    text-decoration: none !important;
+                    font-weight: 500 !important;
+                    transition: text-decoration 0.15s ease !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):hover,
+                .content a:not(.nav-link):not(.mobile-nav-link):hover {
+                    text-decoration: underline !important;
+                }
+
+                .bg-white a:focus, .content a:focus {
+                    outline: 2px solid var(--color-primary);
+                    outline-offset: 2px;
+                }
+
+                .bg-white table, .content table, table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    margin: 20px 0 !important;
+                }
+
+                .bg-white table, .bg-white th, .bg-white td,
+                .content table, .content th, .content td {
+                    border: 1px solid #EEEEEE !important;
+                }
+
+                .bg-white th, .bg-white td,
+                .content th, .content td {
+                    padding: 8px 12px !important;
+                    text-align: left !important;
+                }
+
+                .bg-white th, .content th {
+                    background-color: #F5F5F5 !important;
+                    color: #212121 !important;
+                    font-weight: 600 !important;
+                }
+
+                .bg-white tr:hover td, .content tr:hover td {
+                    background-color: #FFF8E1 !important;
+                }
+
+                .bg-white code, .content code, code {
+                    background: #f6f8fa !important;
+                    padding: 2px 4px !important;
+                    border-radius: 3px !important;
+                    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+                    font-size: 90% !important;
+                }
+
+                .bg-white pre, .content pre, pre {
+                    background: #f6f8fa !important;
+                    border-radius: 3px !important;
+                    padding: 16px !important;
+                    overflow: auto !important;
+                }
+
+                .bg-white pre code, .content pre code {
+                    background: transparent !important;
+                    padding: 0 !important;
+                }
+
+                .bg-white blockquote, .content blockquote, blockquote {
+                    margin: 0 !important;
+                    padding: 0 15px !important;
+                    color: var(--color-text-muted) !important;
+                    border-left: 4px solid var(--color-primary) !important;
+                }
+
+                .bg-white p, .content p {
+                    margin: 10px 0 !important;
+                    line-height: 1.6 !important;
+                }
+
+                .bg-white ul, .content ul,
+                .bg-white ol, .content ol {
+                    margin: 10px 0 !important;
+                    padding-left: 30px !important;
+                }
+
+                .bg-white li, .content li {
+                    margin: 5px 0 !important;
+                }
+
+                /* Custom Mermaid diagram styles - matches old template */
+                .mermaid {
+                    margin: 20px 0;
+                    text-align: center;
+                    height: calc(100vh - 150px);
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    border: 1px solid #EEEEEE;
+                    border-radius: 3px;
+                    background-color: #FAFAFA;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: center;
+                    /* Hide raw markdown text until rendered */
+                    color: transparent;
+                }
+
+                .mermaid svg {
+                    /* Show rendered diagram */
+                    color: initial;
+                }
+
+                .mermaid svg {
+                    width: 100%;
+                    height: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                /* Diagram navigation buttons */
+                .diagram-nav-buttons {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    z-index: 999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    background-color: rgba(255, 255, 255, 0.85);
+                    padding: 3px;
+                    border-radius: 3px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+                }
+
+                .diagram-nav-row {
+                    display: flex;
+                    gap: 2px;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn {
+                    width: 22px;
+                    height: 22px;
+                    background-color: var(--color-primary);
+                    color: white;
+                    border: none;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn:hover {
+                    background-color: var(--color-primary-hover);
+                }
+
+                .diagram-nav-btn:active {
+                    background-color: var(--color-primary-active);
+                }
+
+                /* Smooth transitions for interactive elements */
+                a, button {
+                    transition: all 0.2s ease-in-out;
+                }
+
+                /* Responsive typography */
+                @media (max-width: 640px) {
+                    h1 { font-size: 1.5rem; }
+                    h2 { font-size: 1.25rem; }
+                    h3 { font-size: 1.125rem; }
+                }
+
+                /* Print styles */
+                @media print {
+                    nav, .no-print { display: none; }
+                }
+            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../../coverage.html" class="nav-link">Coverage</a><a href="../../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../../model.html" class="mobile-nav-link">Model</a><a href="../../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="search-filtering-specification">Search Filtering Specification</h1>
+<h2 id="summary">Summary</h2>
+<p>This specification defines the functional requirements for a filtering subsystem used within the <code>search</code> reporting feature. The system must allow clients to selectively include or exclude elements from the search output based on metadata, content, and traceability properties.</p>
+<p>The filters shall be composable and applied conjunctively (i.e., all active filters must match for an element to be included). The filtering system must support both human-readable text output and structured machine-readable output (e.g., JSON), as well as abbreviated short mode output.</p>
+<hr />
+<h2 id="filtering-scope">Filtering Scope</h2>
+<p>Filtering shall operate on the level of individual <code>Element</code> objects in the model registry. Each <code>Element</code> has the following relevant properties:</p>
+<ul>
+<li><code>file_path: String</code></li>
+<li><code>name: String</code></li>
+<li><code>element_type: ElementType</code></li>
+<li><code>content: String</code></li>
+<li><code>relations: Vec&lt;Relation&gt;</code></li>
+<li><code>page_content: String</code> (from parent file)</li>
+</ul>
+<hr />
+<h2 id="supported-filters">Supported Filters</h2>
+<p>The filtering system <strong>must support the following filters</strong>, which may be active simultaneously.</p>
+<h3 id="1.-file-path-filter-(glob)">1. File Path Filter (Glob)</h3>
+<p><strong>Purpose:</strong> Restrict search to elements defined in files whose paths match a given glob pattern.</p>
+<p><strong>Input:</strong> A single string pattern using glob syntax (e.g., <code>"src/**/*Spec.md"</code>)</p>
+<p><strong>Match Target:</strong> <code>Element.file_path</code></p>
+<p><strong>Behavior:</strong> Case-sensitive glob match. If the glob does not match any file, no elements are included.</p>
+<hr />
+<h3 id="2.-name-filter-(regex)">2. Name Filter (Regex)</h3>
+<p><strong>Purpose:</strong> Include only elements whose <code>name</code> matches a regular expression.</p>
+<p><strong>Input:</strong> A valid Rust-compatible regular expression (e.g., <code>"autonomous.*"</code>)</p>
+<p><strong>Match Target:</strong> <code>Element.name</code></p>
+<p><strong>Behavior:</strong> Case-sensitive match by default. The filter is considered invalid if the regex fails to compile.</p>
+<hr />
+<h3 id="3.-type-filter-(exact-match)">3. Type Filter (Exact Match)</h3>
+<p><strong>Purpose:</strong> Include only elements of a specific type.</p>
+<p><strong>Input:</strong> One of the following valid string identifiers:</p>
+<ul>
+<li><code>"requirement"</code> - System requirement (default type)</li>
+<li><code>"user-requirement"</code> - User requirement</li>
+<li><code>"verification"</code> / <code>"test-verification"</code> - Test verification</li>
+<li><code>"analysis-verification"</code> - Analysis verification</li>
+<li><code>"inspection-verification"</code> - Inspection verification</li>
+<li><code>"demonstration-verification"</code> - Demonstration verification</li>
+<li><code>"constraint"</code> - Refinement documenting constraints</li>
+<li><code>"behavior"</code> - Refinement documenting behavior details</li>
+<li><code>"specification"</code> - Refinement documenting specifications</li>
+<li><code>"file"</code> - File element</li>
+<li>Any user-defined type (e.g., <code>"interface"</code>, <code>"design"</code>)</li>
+</ul>
+<p><strong>Match Target:</strong> <code>Element.element_type</code></p>
+<p><strong>Behavior:</strong> Matching must be exact. Internally, the filter string shall be mapped to an <code>ElementType</code> via a deterministic lookup function.</p>
+<hr />
+<h3 id="4.-content-filter-(regex)">4. Content Filter (Regex)</h3>
+<p><strong>Purpose:</strong> Include only elements whose body content matches a regular expression.</p>
+<p><strong>Input:</strong> A valid regex pattern applied to the element’s <code>content</code>.</p>
+<p><strong>Match Target:</strong> <code>Element.content</code></p>
+<p><strong>Behavior:</strong> Case-sensitive regex match. Invalid patterns must cause an immediate user-facing error.</p>
+<hr />
+<h3 id="5.-page-content-filter-(regex)">5. Page Content Filter (Regex)</h3>
+<p><strong>Purpose:</strong> Include only elements whose parent file’s page content (frontmatter) matches a regular expression.</p>
+<p><strong>Input:</strong> A valid regex pattern applied to the file’s page content.</p>
+<p><strong>Match Target:</strong> Page content (frontmatter) of the element’s parent file</p>
+<p><strong>Behavior:</strong> Case-sensitive regex match. Invalid patterns must cause an immediate user-facing error.</p>
+<hr />
+<h3 id="6.-have-relations-filter-(comma-separated-list)">6. Have Relations Filter (Comma-separated list)</h3>
+<p><strong>Purpose:</strong> Include only elements that have ALL specified relation types.</p>
+<p><strong>Input:</strong> Comma-separated list of relation type names (e.g., <code>"verifiedBy,satisfiedBy"</code>)</p>
+<p><strong>Match Target:</strong> <code>Element.relations</code></p>
+<p><strong>Behavior:</strong> When specified, element must have at least one relation of each specified type to be included. Invalid relation type names shall cause an error with a list of valid relation types.</p>
+<hr />
+<h3 id="7.-not-have-relations-filter-(comma-separated-list)">7. Not Have Relations Filter (Comma-separated list)</h3>
+<p><strong>Purpose:</strong> Include only elements that do NOT have ALL specified relation types.</p>
+<p><strong>Input:</strong> Comma-separated list of relation type names (e.g., <code>"verifiedBy"</code>)</p>
+<p><strong>Match Target:</strong> <code>Element.relations</code></p>
+<p><strong>Behavior:</strong> When specified, element must NOT have all the specified relation types to be included. If element has all specified relation types, it is excluded. Invalid relation type names shall cause an error with a list of valid relation types.</p>
+<hr />
+<h2 id="filter-composition">Filter Composition</h2>
+<p>All filters are applied <strong>conjunctively</strong>. That is, an element is included in the search results <strong>only if all active filters return <code>true</code></strong> for that element.</p>
+<hr />
+<h2 id="error-handling">Error Handling</h2>
+<ul>
+<li>Invalid regular expressions must produce a fatal error with a descriptive message.</li>
+<li>Invalid glob patterns should fail at startup with appropriate feedback.</li>
+<li>Unknown or malformed <code>type</code> filters should be rejected with a list of accepted values.</li>
+<li>Invalid relation type names in <code>--have-relations</code> or <code>--not-have-relations</code> shall produce an error listing valid relation types.</li>
+</ul>
+<hr />
+<h2 id="output-behavior">Output Behavior</h2>
+<p>Filtered results must be consistent across all output modes (text, JSON, short text, short JSON). The final search results must include only elements passing the full filter set, and global counters should reflect the filtered subset.</p>
+<hr />
+<h2 id="performance-considerations">Performance Considerations</h2>
+<p>The filtering system must evaluate filters with minimal passes over element data. Repeated relation scans should be avoided in favor of single-pass accumulation.</p>
+<hr />
+<h2 id="test-cases-(examples)">Test Cases (Examples)</h2>
+<table><thead><tr><th>Filter Combination</th><th>Expected Result</th></tr></thead><tbody>
+<tr><td><code>type = verification</code></td><td>Only verification elements</td></tr>
+<tr><td><code>type = constraint</code></td><td>Only constraint refinement elements</td></tr>
+<tr><td><code>type = behavior</code></td><td>Only behavior refinement elements</td></tr>
+<tr><td><code>type = specification</code></td><td>Only specification refinement elements</td></tr>
+<tr><td><code>filter-file = "System*"</code> + <code>name = ".*GPS.*"</code></td><td>Elements in System files with GPS in name</td></tr>
+<tr><td><code>have-relations = verifiedBy,satisfiedBy</code></td><td>Elements that have both verifiedBy AND satisfiedBy relations</td></tr>
+<tr><td><code>not-have-relations = verifiedBy</code></td><td>Elements that do NOT have any verifiedBy relations</td></tr>
+<tr><td><code>filter-page-content = "architecture"</code></td><td>Elements in files whose frontmatter contains “architecture”</td></tr>
+</tbody></table>
+<footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
+                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                            var menu = document.getElementById('mobile-menu');
+                            menu.classList.toggle('hidden');
+                        });
+                    </script></body></html>

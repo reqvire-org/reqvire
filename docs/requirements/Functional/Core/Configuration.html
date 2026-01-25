@@ -1,0 +1,1092 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Configuration</title><link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
+                :root {
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
+
+                    /* Element Type Colors */
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
+
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
+
+                    /* Interactive Colors */
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
+
+                    /* Text Colors */
+                    --color-text-primary: #212121;
+                    --color-text-secondary: #424242;
+                    --color-text-muted: #757575;
+                    --color-background: #FAFAFA;
+                    --color-border: #EEEEEE;
+                }
+
+                /* Ensure body takes full height */
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #FAFAFA;
+                    color: var(--color-text-secondary);
+                }
+
+                /* Navigation bar */
+                .reqvire-nav {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    background-color: var(--color-nav);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 20px;
+                }
+
+                .reqvire-nav a {
+                    color: white;
+                    text-decoration: none;
+                    padding: 0 15px;
+                    font-weight: 500;
+                    transition: background-color 0.2s;
+                }
+
+                .reqvire-nav a:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: none;
+                }
+
+                .nav-logo {
+                    margin-right: 20px;
+                }
+
+                .nav-logo:hover {
+                    background-color: transparent !important;
+                    text-decoration: none !important;
+                }
+
+                .nav-logo img {
+                    height: 24px;
+                    width: auto;
+                    vertical-align: middle;
+                }
+
+                .nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 10px 20px;
+                    margin-right: 5px;
+                    border-radius: 3px;
+                    transition: background-color 0.2s, text-decoration 0.2s;
+                }
+
+                .nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .nav-link:active {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .mobile-nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 20px;
+                    display: block;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: background-color 0.2s;
+                }
+
+                .mobile-nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    color: white;
+                }
+
+                .reqvire-nav-spacer {
+                    height: 50px;
+                }
+
+                /* Content container */
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+
+                .content {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                /* Content area typography and styling - matches old template exactly */
+                /* Use higher specificity to override Tailwind reset */
+                .bg-white h1, .content h1, h1 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 2px solid #EEEEEE !important;
+                    padding-bottom: 10px !important;
+                    margin-top: 0 !important;
+                    font-size: 2em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h2, .content h2, h2 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 1px solid #EEEEEE !important;
+                    padding-bottom: 5px !important;
+                    font-size: 1.5em !important;
+                    font-weight: bold !important;
+                    margin-top: 20px !important;
+                }
+
+                .bg-white h3, .content h3, h3 {
+                    color: var(--color-text-primary) !important;
+                    margin-top: 25px !important;
+                    font-size: 1.17em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h4, .content h4, h4 {
+                    color: var(--color-text-secondary) !important;
+                    font-weight: 600 !important;
+                    font-size: 1em !important;
+                    margin-top: 15px !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                .content a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                div.bg-white > a {
+                    color: var(--color-primary) !important;
+                    text-decoration: none !important;
+                    font-weight: 500 !important;
+                    transition: text-decoration 0.15s ease !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):hover,
+                .content a:not(.nav-link):not(.mobile-nav-link):hover {
+                    text-decoration: underline !important;
+                }
+
+                .bg-white a:focus, .content a:focus {
+                    outline: 2px solid var(--color-primary);
+                    outline-offset: 2px;
+                }
+
+                .bg-white table, .content table, table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    margin: 20px 0 !important;
+                }
+
+                .bg-white table, .bg-white th, .bg-white td,
+                .content table, .content th, .content td {
+                    border: 1px solid #EEEEEE !important;
+                }
+
+                .bg-white th, .bg-white td,
+                .content th, .content td {
+                    padding: 8px 12px !important;
+                    text-align: left !important;
+                }
+
+                .bg-white th, .content th {
+                    background-color: #F5F5F5 !important;
+                    color: #212121 !important;
+                    font-weight: 600 !important;
+                }
+
+                .bg-white tr:hover td, .content tr:hover td {
+                    background-color: #FFF8E1 !important;
+                }
+
+                .bg-white code, .content code, code {
+                    background: #f6f8fa !important;
+                    padding: 2px 4px !important;
+                    border-radius: 3px !important;
+                    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+                    font-size: 90% !important;
+                }
+
+                .bg-white pre, .content pre, pre {
+                    background: #f6f8fa !important;
+                    border-radius: 3px !important;
+                    padding: 16px !important;
+                    overflow: auto !important;
+                }
+
+                .bg-white pre code, .content pre code {
+                    background: transparent !important;
+                    padding: 0 !important;
+                }
+
+                .bg-white blockquote, .content blockquote, blockquote {
+                    margin: 0 !important;
+                    padding: 0 15px !important;
+                    color: var(--color-text-muted) !important;
+                    border-left: 4px solid var(--color-primary) !important;
+                }
+
+                .bg-white p, .content p {
+                    margin: 10px 0 !important;
+                    line-height: 1.6 !important;
+                }
+
+                .bg-white ul, .content ul,
+                .bg-white ol, .content ol {
+                    margin: 10px 0 !important;
+                    padding-left: 30px !important;
+                }
+
+                .bg-white li, .content li {
+                    margin: 5px 0 !important;
+                }
+
+                /* Custom Mermaid diagram styles - matches old template */
+                .mermaid {
+                    margin: 20px 0;
+                    text-align: center;
+                    height: calc(100vh - 150px);
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    border: 1px solid #EEEEEE;
+                    border-radius: 3px;
+                    background-color: #FAFAFA;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: center;
+                    /* Hide raw markdown text until rendered */
+                    color: transparent;
+                }
+
+                .mermaid svg {
+                    /* Show rendered diagram */
+                    color: initial;
+                }
+
+                .mermaid svg {
+                    width: 100%;
+                    height: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                /* Diagram navigation buttons */
+                .diagram-nav-buttons {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    z-index: 999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    background-color: rgba(255, 255, 255, 0.85);
+                    padding: 3px;
+                    border-radius: 3px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+                }
+
+                .diagram-nav-row {
+                    display: flex;
+                    gap: 2px;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn {
+                    width: 22px;
+                    height: 22px;
+                    background-color: var(--color-primary);
+                    color: white;
+                    border: none;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn:hover {
+                    background-color: var(--color-primary-hover);
+                }
+
+                .diagram-nav-btn:active {
+                    background-color: var(--color-primary-active);
+                }
+
+                /* Smooth transitions for interactive elements */
+                a, button {
+                    transition: all 0.2s ease-in-out;
+                }
+
+                /* Responsive typography */
+                @media (max-width: 640px) {
+                    h1 { font-size: 1.5rem; }
+                    h2 { font-size: 1.25rem; }
+                    h3 { font-size: 1.125rem; }
+                }
+
+                /* Print styles */
+                @media print {
+                    nav, .no-print { display: none; }
+                }
+            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph 8735c0a811307e57["📁 requirements/Functional/Core"]
+    subgraph ce194c8f6727a221["📄 Configuration.md"]
+      f02dac6e75313544["Coexistence of Structured and Unstructured Documents<br/>📎 requirements/Refinements.md#refinement-specification"];
+      class f02dac6e75313544 userRequirement;
+      click f02dac6e75313544 "Configuration.html#coexistence-of-structured-and-unstructured-documents";
+      66f4b835345ddf91["Ignore Files Integration"];
+      class 66f4b835345ddf91 systemRequirement;
+      click 66f4b835345ddf91 "Configuration.html#ignore-files-integration";
+      a1795409a371f481["Ignoring Unstructured Documents"];
+      class a1795409a371f481 systemRequirement;
+      click a1795409a371f481 "Configuration.html#ignoring-unstructured-documents";
+      f225228c6f9046e1["Requirements Processing"];
+      class f225228c6f9046e1 systemRequirement;
+      click f225228c6f9046e1 "Configuration.html#requirements-processing";
+      fdaf3aa93f19ec5["Reserved Repository Files Exclusion"];
+      class fdaf3aa93f19ec5 systemRequirement;
+      click fdaf3aa93f19ec5 "Configuration.html#reserved-repository-files-exclusion";
+      9577f209f3e80942["Structured Markdown Files Search and Detection"];
+      class 9577f209f3e80942 systemRequirement;
+      click 9577f209f3e80942 "Configuration.html#structured-markdown-files-search-and-detection";
+    end
+    subgraph 525b4b735cf204bb["📄 Specifications.md"]
+      bce2fe8ffb765797["Ignore Files Specification"];
+      class bce2fe8ffb765797 default;
+      click bce2fe8ffb765797 "Specifications.html#ignore-files-specification";
+      973db75b41c8556d["Reserved Files Specification"];
+      class 973db75b41c8556d default;
+      click 973db75b41c8556d "Specifications.html#reserved-files-specification";
+    end
+  end
+  subgraph 6c93988fc728d1f8["📁 requirements/Functional/Core/Verifications"]
+    subgraph 46a9d0ceb9db210e["📄 ValidationVerifications.md"]
+      f8b4586a036406cd["File Exclusion Test"];
+      class f8b4586a036406cd verification;
+      click f8b4586a036406cd "Verifications/ValidationVerifications.html#file-exclusion-test";
+      cd31aec9ae0c3ed3["Requirements Files Search and Detection Test"];
+      class cd31aec9ae0c3ed3 verification;
+      click cd31aec9ae0c3ed3 "Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test";
+      5352180257d54fb2["Same-File Fragment Relations Test"];
+      class 5352180257d54fb2 verification;
+      click 5352180257d54fb2 "Verifications/ValidationVerifications.html#same-file-fragment-relations-test";
+    end
+  end
+  subgraph 91eede421faaa553["📁 requirements/Functional/Operations"]
+    subgraph e1e686bef27807d6["📄 ElementManipulation.md"]
+      9cdb6297e49a3802["Target Location Validation and Auto-Creation"];
+      class 9cdb6297e49a3802 systemRequirement;
+      click 9cdb6297e49a3802 "../Operations/ElementManipulation.html#target-location-validation-and-auto-creation";
+    end
+    subgraph e87e3ee72f8fcc8a["📄 Formatting.md"]
+      3126a7da8d2fc941["File Pattern Exclusion for Format"];
+      class 3126a7da8d2fc941 systemRequirement;
+      click 3126a7da8d2fc941 "../Operations/Formatting.html#file-pattern-exclusion-for-format";
+    end
+  end
+  subgraph 11bcfbac66c238f6["📁 requirements/Functional/Processing/Verifications"]
+    subgraph de803263fbe70715["📄 ChangeImpactVerifications.md"]
+      d7a45cebd272c16["Element Content Extraction Test"];
+      class d7a45cebd272c16 verification;
+      click d7a45cebd272c16 "../Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test";
+    end
+  end
+  f02dac6e75313544 -.->|deriveReqT| a1795409a371f481;
+  66f4b835345ddf91 -.->|deriveReqT| 9cdb6297e49a3802;
+  ff93ce3d1f286d8a["config.rs"];
+  class ff93ce3d1f286d8a default;
+  click ff93ce3d1f286d8a "../../../cli/src/config.rs";
+  66f4b835345ddf91 -->|satisfiedBy| ff93ce3d1f286d8a;
+  66f4b835345ddf91 -->|satisfiedBy| bce2fe8ffb765797;
+  66f4b835345ddf91 -.->|verifiedBy| f8b4586a036406cd;
+  a1795409a371f481 -.->|deriveReqT| 66f4b835345ddf91;
+  a1795409a371f481 -.->|deriveReqT| f225228c6f9046e1;
+  a1795409a371f481 -.->|deriveReqT| fdaf3aa93f19ec5;
+  a1795409a371f481 -.->|deriveReqT| 3126a7da8d2fc941;
+  a1795409a371f481 -->|satisfiedBy| ff93ce3d1f286d8a;
+  f225228c6f9046e1 -.->|deriveReqT| 9577f209f3e80942;
+  499d48218b73f571["model.rs"];
+  class 499d48218b73f571 default;
+  click 499d48218b73f571 "../../../core/src/model.rs";
+  f225228c6f9046e1 -->|satisfiedBy| 499d48218b73f571;
+  35bd98d101f36b62["parser.rs"];
+  class 35bd98d101f36b62 default;
+  click 35bd98d101f36b62 "../../../core/src/parser.rs";
+  f225228c6f9046e1 -->|satisfiedBy| 35bd98d101f36b62;
+  f225228c6f9046e1 -.->|verifiedBy| 5352180257d54fb2;
+  f225228c6f9046e1 -.->|verifiedBy| d7a45cebd272c16;
+  fdaf3aa93f19ec5 -->|satisfiedBy| ff93ce3d1f286d8a;
+  fdaf3aa93f19ec5 -->|satisfiedBy| 973db75b41c8556d;
+  fdaf3aa93f19ec5 -.->|verifiedBy| f8b4586a036406cd;
+  9577f209f3e80942 -->|satisfiedBy| 499d48218b73f571;
+  9577f209f3e80942 -.->|verifiedBy| cd31aec9ae0c3ed3;
+  95cf526671ec752c["graph_registry.rs"];
+  class 95cf526671ec752c default;
+  click 95cf526671ec752c "../../../core/src/graph_registry.rs";
+  9cdb6297e49a3802 -->|satisfiedBy| 95cf526671ec752c;
+  bdf9762d399478a5["utils.rs"];
+  class bdf9762d399478a5 default;
+  click bdf9762d399478a5 "../../../core/src/utils.rs";
+  9cdb6297e49a3802 -->|satisfiedBy| bdf9762d399478a5;
+  9cdb6297e49a3802 -->|satisfiedBy| 1dc0e8b76789ffce;
+  9cdb6297e49a3802 -.->|verifiedBy| c0a8cdea5e5972df;
+  94d34e73992ff9ac["test.sh"];
+  class 94d34e73992ff9ac default;
+  click 94d34e73992ff9ac "../../../tests/test-gitignore-integration/test.sh";
+  f8b4586a036406cd -->|satisfiedBy| 94d34e73992ff9ac;
+  3126a7da8d2fc941 -.->|deriveReqT| 327e10e1bebd5bde;
+  3126a7da8d2fc941 -->|satisfiedBy| bdf9762d399478a5;
+  f0923d0189e77f4c["test.sh"];
+  class f0923d0189e77f4c default;
+  click f0923d0189e77f4c "../../../tests/test-fragment-relations/test.sh";
+  5352180257d54fb2 -->|satisfiedBy| f0923d0189e77f4c;
+  dd7cc79a76771691["test.sh"];
+  class dd7cc79a76771691 default;
+  click dd7cc79a76771691 "../../../tests/test-element-content-extraction/test.sh";
+  d7a45cebd272c16 -->|satisfiedBy| dd7cc79a76771691;
+  b3573dfcbb8f5f40["test.sh"];
+  class b3573dfcbb8f5f40 default;
+  click b3573dfcbb8f5f40 "../../../tests/test-excluded-patterns/test.sh";
+  cd31aec9ae0c3ed3 -->|satisfiedBy| b3573dfcbb8f5f40;
+</div>
+<h3 id="coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</h3>
+<p>The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same System model.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: user-requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../../Refinements.html#refinement-specification">Refinement Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>derivedFrom: <a href="../../UserStories.html#defining-model-structure">Defining Model Structure</a></li>
+</ul>
+<hr />
+<h3 id="ignoring-unstructured-documents">Ignoring Unstructured Documents</h3>
+<p>The system shall support configurable glob patterns to exclude specific files from requirement processing.</p>
+<h4>Details</h4>
+<p>Exclusion patterns are defined in <code>.reqvireignore</code> file at the repository root, using the same format as <code>.gitignore</code>:</p>
+<pre><code class="language-.reqvireignore"># Example patterns to exclude from structured documents processing
+**/Logical*.md
+**/Physical*.md
+**/draft-*.md
+examples/**
+</code></pre>
+<p>The <code>.reqvireignore</code> file provides Reqvire-specific exclusions for files that should remain in version control but not be processed as requirements.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#ignore-files-integration">Ignore Files Integration</a></li>
+<li>derive: <a href="#requirements-processing">Requirements Processing</a></li>
+<li>derive: <a href="#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a></li>
+<li>derive: <a href="../Operations/Formatting.html#file-pattern-exclusion-for-format">File Pattern Exclusion for Format</a></li>
+<li>derivedFrom: <a href="#coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
+</ul>
+<hr />
+<h3 id="ignore-files-integration">Ignore Files Integration</h3>
+<p>The system shall integrate with Git workflows by reading exclusion patterns from .gitignore and .reqvireignore files.</p>
+<h4>Details</h4>
+<ul>
+<li>The system shall read exclusion patterns from repository root .gitignore and .reqvireignore files</li>
+<li>The system shall exclude files matching patterns from being parsed as structured markdown</li>
+<li>The system shall differentiate between .gitignore exclusions (complete) and .reqvireignore exclusions (parsing only)</li>
+<li>The system shall implement ignore file processing following clearly defined specifications</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="../Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
+<li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#ignore-files-specification">Ignore Files Specification</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a></li>
+</ul>
+<hr />
+<h3 id="requirements-processing">Requirements Processing</h3>
+<p>The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.</p>
+<h4>Details</h4>
+<p>File exclusion is handled through:</p>
+<ul>
+<li>.gitignore patterns (files not in version control)</li>
+<li>.reqvireignore patterns (files in version control but excluded from requirements processing)</li>
+<li>Reserved repository files (README.md, LICENSE.md, etc.)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a></li>
+<li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#same-file-fragment-relations-test">Same-File Fragment Relations Test</a></li>
+<li>verifiedBy: <a href="../Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test">Element Content Extraction Test</a></li>
+</ul>
+<hr />
+<h3 id="structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</h3>
+<p>The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.</p>
+<h4>Details</h4>
+<p>Identification Process:</p>
+<ol>
+<li><strong>File Selection</strong>: The process scans all files in the the git repository root and all sub folders.</li>
+<li><strong>Excluded Patterns Check</strong>: If a file matches any excluded patterns, it is marked as <strong>not a structured document file</strong>.</li>
+<li><strong>File Extension Check</strong>: If the file does not have a <code>.md</code> extension, it is marked as <strong>not a structured document file</strong>.</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#requirements-processing">Requirements Processing</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></li>
+</ul>
+<hr />
+<h3 id="reserved-repository-files-exclusion">Reserved Repository Files Exclusion</h3>
+<p>The system shall automatically exclude certain common repository documentation files from structured markdown processing.</p>
+<h4>Details</h4>
+<p>The system shall define which repository documentation filenames are reserved and excluded from parsing.</p>
+<p>Reserved files serve general repository documentation purposes rather than structured requirements. This automatic exclusion prevents confusion and reduces the need for explicit .reqvireignore patterns.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
+<li>satisfiedBy: <a href="Specifications.html#reserved-files-specification">Reserved Files Specification</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a></li>
+</ul>
+<hr />
+</div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+// Register ELK layout for large diagrams
+mermaid.registerLayoutLoaders(elkLayouts);
+
+// Capture Mermaid errors
+mermaid.parseError = function(err, hash) {
+    console.error('Mermaid Parse Error:', err);
+    console.error('Error details:', {
+        str: err.str,
+        hash: err.hash,
+        message: err.message,
+        stack: err.stack
+    });
+};
+
+mermaid.initialize({
+    startOnLoad: false,
+    theme: 'neutral',
+    maxTextSize: 5000000,
+    maxEdges: 50000,
+    flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis',
+        defaultRenderer: 'elk'
+    },
+    layout: 'elk',
+    elk: {
+        mergeEdges: true,
+        nodePlacementStrategy: 'SIMPLE'
+    },
+    securityLevel: 'loose',
+    logLevel: 'error'
+});
+
+// Store original mermaid content before rendering (for resize refreshes)
+document.querySelectorAll('.mermaid').forEach(el => {
+    el.setAttribute('data-original-content', el.textContent);
+});
+
+await mermaid.run();
+window.mermaid = mermaid;
+
+// Wait for SVGs to be fully rendered, then initialize
+function waitForSvgs(callback) {
+    var containers = document.querySelectorAll('.mermaid');
+    var allReady = true;
+    containers.forEach(function(c) {
+        var svg = c.querySelector('svg');
+        if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+            allReady = false;
+        }
+    });
+    if (allReady && containers.length > 0) {
+        callback();
+    } else {
+        requestAnimationFrame(function() { waitForSvgs(callback); });
+    }
+}
+
+// Function to initialize pan/zoom on all Mermaid diagrams
+function initializePanZoom() {
+    document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+            var svg = mermaidContainer.querySelector('svg');
+            if (!svg) return;
+
+            // Get the natural size of the diagram
+            var bbox = svg.getBBox();
+            var containerWidth = mermaidContainer.clientWidth;
+            var containerHeight = mermaidContainer.clientHeight;
+
+            // Check if diagram fits within container (with some padding)
+            var padding = 40;
+            var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+            if (fitsInContainer) {
+                // Diagram fits - use natural size, shrink container to fit content
+                svg.style.width = 'auto';
+                svg.style.height = 'auto';
+                mermaidContainer.style.height = 'auto';
+                mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                // No pan/zoom needed for small diagrams
+                return;
+            }
+
+            // Large diagram - enable pan/zoom
+            svg.style.maxWidth = 'none';
+            svg.style.maxHeight = 'none';
+
+            var eventsHandler = {
+                haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                init: function(options) {
+                    var instance = options.instance;
+                    var initialScale = 1;
+                    var pannedX = 0;
+                    var pannedY = 0;
+
+                    this.hammer = Hammer(options.svgElement, {
+                        inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                    });
+
+                    this.hammer.get('pinch').set({enable: true});
+
+                    this.hammer.on('doubletap', function(ev){
+                        instance.zoomIn();
+                    });
+
+                    this.hammer.on('panstart panmove', function(ev){
+                        if (ev.type === 'panstart') {
+                            pannedX = 0;
+                            pannedY = 0;
+                        }
+                        instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                        pannedX = ev.deltaX;
+                        pannedY = ev.deltaY;
+                    });
+
+                    this.hammer.on('pinchstart pinchmove', function(ev){
+                        if (ev.type === 'pinchstart') {
+                            initialScale = instance.getZoom();
+                        }
+                        instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                    });
+
+                    options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                },
+                destroy: function(){
+                    this.hammer.destroy();
+                }
+            };
+
+            // Diagrams with default zoom (no auto-fit)
+            var panZoomInstance = svgPanZoom(svg, {
+                zoomEnabled: true,
+                controlIconsEnabled: true,
+                fit: false,
+                center: false,
+                contain: false,
+                minZoom: 0.5,
+                maxZoom: 10,
+                zoomScaleSensitivity: 0.3,
+                customEventsHandler: eventsHandler
+            });
+
+            // Add navigation buttons
+            var navButtons = document.createElement('div');
+            navButtons.className = 'diagram-nav-buttons';
+            navButtons.innerHTML = `
+                <div class="diagram-nav-row">
+                    <button class="diagram-nav-btn" data-action="up">▲</button>
+                </div>
+                <div class="diagram-nav-row">
+                    <button class="diagram-nav-btn" data-action="left">◀</button>
+                    <button class="diagram-nav-btn" data-action="down">▼</button>
+                    <button class="diagram-nav-btn" data-action="right">▶</button>
+                </div>
+            `;
+            mermaidContainer.appendChild(navButtons);
+
+            // Wire up navigation buttons
+            var panStep = 100;
+            navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var action = this.getAttribute('data-action');
+                    switch(action) {
+                        case 'up':
+                            panZoomInstance.panBy({x: 0, y: panStep});
+                            break;
+                        case 'down':
+                            panZoomInstance.panBy({x: 0, y: -panStep});
+                            break;
+                        case 'left':
+                            panZoomInstance.panBy({x: panStep, y: 0});
+                            break;
+                        case 'right':
+                            panZoomInstance.panBy({x: -panStep, y: 0});
+                            break;
+                    }
+                });
+            });
+    });
+
+    // Add CSS for edge highlighting (high specificity for SVG)
+    var style = document.createElement('style');
+    style.textContent = `
+        path.edge-highlighted,
+        .edge-highlighted path,
+        svg path.edge-highlighted {
+            stroke: #FFAB91 !important;
+            stroke-width: 3px !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Add edge highlighting on node hover
+    document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+        var nodes = svg.querySelectorAll('.node');
+
+        // Find flowchart-link paths (actual edges)
+        var edgePaths = svg.querySelectorAll('path.flowchart-link');
+        // Fallback: find paths in .edges group
+        if (edgePaths.length === 0) {
+            var edgesGroup = svg.querySelector('.edges');
+            if (edgesGroup) {
+                edgePaths = edgesGroup.querySelectorAll('path');
+            }
+        }
+
+        // Get SVG point for coordinate transforms
+        var svgPoint = svg.createSVGPoint();
+
+        // Helper: transform point through element's CTM
+        function getTransformedBBox(element) {
+            var bbox = element.getBBox();
+            var ctm = element.getCTM();
+            if (!ctm) return bbox;
+
+            // Transform all four corners
+            var corners = [
+                {x: bbox.x, y: bbox.y},
+                {x: bbox.x + bbox.width, y: bbox.y},
+                {x: bbox.x, y: bbox.y + bbox.height},
+                {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+            ];
+
+            var transformed = corners.map(function(c) {
+                svgPoint.x = c.x;
+                svgPoint.y = c.y;
+                var tp = svgPoint.matrixTransform(ctm);
+                return {x: tp.x, y: tp.y};
+            });
+
+            var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+            var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+            var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+            var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+            return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+        }
+
+        // Helper: get all points from path
+        function getPathPoints(path) {
+            var d = path.getAttribute('d') || '';
+            var points = [];
+            var ctm = path.getCTM();
+
+            // Match all coordinate pairs in the path
+            var regex = /([ML])\s*([\d.-]+)[,\s]+([\d.-]+)|([CQ])[^MLCQZ]*/gi;
+            var match;
+
+            // Get M (start) point
+            var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+            if (startMatch) {
+                var sx = parseFloat(startMatch[1]);
+                var sy = parseFloat(startMatch[2]);
+                if (ctm) {
+                    svgPoint.x = sx; svgPoint.y = sy;
+                    var tp = svgPoint.matrixTransform(ctm);
+                    points.push({x: tp.x, y: tp.y});
+                } else {
+                    points.push({x: sx, y: sy});
+                }
+            }
+
+            // Get last point - find last number pair before Z or end
+            var allNums = d.match(/[\d.-]+/g);
+            if (allNums && allNums.length >= 2) {
+                var ex = parseFloat(allNums[allNums.length - 2]);
+                var ey = parseFloat(allNums[allNums.length - 1]);
+                if (ctm) {
+                    svgPoint.x = ex; svgPoint.y = ey;
+                    var tp = svgPoint.matrixTransform(ctm);
+                    points.push({x: tp.x, y: tp.y});
+                } else {
+                    points.push({x: ex, y: ey});
+                }
+            }
+
+            return points;
+        }
+
+        // Build node bounding boxes with transforms
+        var nodeData = {};
+        nodes.forEach(function(node) {
+            var nodeId = node.id || '';
+            var parts = nodeId.split('-');
+            var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+            nodeData[hashId] = {
+                node: node,
+                bbox: getTransformedBBox(node)
+            };
+        });
+
+        // Calculate distance from point to bbox center
+        function distToBboxCenter(pt, bbox) {
+            var centerX = bbox.x + bbox.width / 2;
+            var centerY = bbox.y + bbox.height / 2;
+            return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+        }
+
+        // Check if point is near bbox
+        function isNearBbox(pt, bbox, margin) {
+            margin = margin || 10;
+            return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                   pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+        }
+
+        // Build edge connections with direction tracking
+        var edgeConnections = []; // [{path, source, target}]
+        var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+        var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+        Object.keys(nodeData).forEach(function(hashId) {
+            upstreamOf[hashId] = [];
+            downstreamOf[hashId] = [];
+        });
+
+        edgePaths.forEach(function(path) {
+            var points = getPathPoints(path);
+            if (points.length < 2) return;
+
+            var startPt = points[0];
+            var endPt = points[points.length - 1];
+
+            var sourceNode = null;
+            var targetNode = null;
+            var sourceMinDist = Infinity;
+            var targetMinDist = Infinity;
+
+            // Find closest source and target nodes for this edge
+            Object.keys(nodeData).forEach(function(hashId) {
+                var bbox = nodeData[hashId].bbox;
+
+                // Find closest node to start point (source)
+                if (isNearBbox(startPt, bbox, 30)) {
+                    var dist = distToBboxCenter(startPt, bbox);
+                    if (dist < sourceMinDist) {
+                        sourceMinDist = dist;
+                        sourceNode = hashId;
+                    }
+                }
+
+                // Find closest node to end point (target)
+                if (isNearBbox(endPt, bbox, 30)) {
+                    var dist = distToBboxCenter(endPt, bbox);
+                    if (dist < targetMinDist) {
+                        targetMinDist = dist;
+                        targetNode = hashId;
+                    }
+                }
+            });
+
+            if (sourceNode && targetNode && sourceNode !== targetNode) {
+                edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                // source -> target means: target's upstream includes source
+                if (!upstreamOf[targetNode].includes(sourceNode)) {
+                    upstreamOf[targetNode].push(sourceNode);
+                }
+                // source -> target means: source's downstream includes target
+                if (!downstreamOf[sourceNode].includes(targetNode)) {
+                    downstreamOf[sourceNode].push(targetNode);
+                }
+            }
+        });
+
+        // Traverse only upstream (to parents/ancestors)
+        function findUpstream(startNodeId) {
+            var visited = {};
+            var queue = [startNodeId];
+            visited[startNodeId] = true;
+
+            while (queue.length > 0) {
+                var current = queue.shift();
+                var parents = upstreamOf[current] || [];
+                parents.forEach(function(parent) {
+                    if (!visited[parent]) {
+                        visited[parent] = true;
+                        queue.push(parent);
+                    }
+                });
+            }
+            return visited;
+        }
+
+        // Traverse only downstream (to children/descendants)
+        function findDownstream(startNodeId) {
+            var visited = {};
+            var queue = [startNodeId];
+            visited[startNodeId] = true;
+
+            while (queue.length > 0) {
+                var current = queue.shift();
+                var children = downstreamOf[current] || [];
+                children.forEach(function(child) {
+                    if (!visited[child]) {
+                        visited[child] = true;
+                        queue.push(child);
+                    }
+                });
+            }
+            return visited;
+        }
+
+        // Get edges for connected nodes
+        function getChainEdges(nodeSet) {
+            var edges = [];
+            edgeConnections.forEach(function(conn) {
+                if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                    edges.push(conn.path);
+                }
+            });
+            return edges;
+        }
+
+        // Attach hover handlers
+        nodes.forEach(function(node) {
+            var nodeId = node.id || '';
+            var parts = nodeId.split('-');
+            var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+            node.style.cursor = 'pointer';
+
+            node.addEventListener('mouseenter', function(e) {
+                e.stopPropagation();
+                nodes.forEach(function(n) { n.style.filter = ''; });
+                node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                // Find upstream (ancestors) and downstream (descendants) separately
+                var upstream = findUpstream(hashId);
+                var downstream = findDownstream(hashId);
+                // Merge both sets
+                var allConnected = {};
+                Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                var chainEdges = getChainEdges(allConnected);
+                chainEdges.forEach(function(path) {
+                    path.classList.add('edge-highlighted');
+                });
+            });
+
+            node.addEventListener('mouseleave', function() {
+                node.style.filter = '';
+                // Remove highlight from all edges
+                edgePaths.forEach(function(path) {
+                    path.classList.remove('edge-highlighted');
+                });
+            });
+        });
+    });
+}
+
+// Initialize pan/zoom after page load
+waitForSvgs(initializePanZoom);
+
+// Refresh diagrams on window resize (debounced to avoid performance issues)
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(async function() {
+        // Re-run mermaid on all diagrams
+        const mermaidElements = document.querySelectorAll('.mermaid');
+        mermaidElements.forEach(el => {
+            // Restore original markdown content
+            const originalContent = el.getAttribute('data-original-content');
+            if (originalContent) {
+                el.innerHTML = originalContent;
+                el.removeAttribute('data-processed');
+            }
+        });
+        // Re-render diagrams
+        await mermaid.run();
+        // Re-initialize pan-zoom after re-render
+        waitForSvgs(initializePanZoom);
+    }, 250); // Wait 250ms after resize stops before re-rendering
+});
+</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
+                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                            var menu = document.getElementById('mobile-menu');
+                            menu.classList.toggle('hidden');
+                        });
+                    </script></body></html>

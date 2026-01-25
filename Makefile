@@ -10,7 +10,7 @@ define update_version
 	sed -i 's/^version = ".*"/version = "$(1)"/' $(CARGO_TOML)
 endef
 
-.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major
+.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major docs
 
 # Version update targets
 update-patch:
@@ -187,4 +187,8 @@ release-major:
 		echo "   Title: Update version to v$(NEW_VERSION)"; \
 	fi
 
-
+# Documentation export
+docs:
+	@echo "Exporting documentation to docs/..."
+	cargo run -- export --output docs
+	@echo "Documentation exported to docs/"

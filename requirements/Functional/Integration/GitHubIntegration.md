@@ -34,7 +34,7 @@ This ensures that the HTML documentation in the `docs/` folder is always up-to-d
 #### Relations
   * derivedFrom: [Automate Documentation Export](#automate-documentation-export)
   * derivedFrom: [Automate Pull Request Validations](#automate-pull-request-validations)
-  * satisfiedBy: [update_docs.yml](../../../.github/workflows/update_docs.yml)
+  * satisfiedBy: [update_docs.yml_disabled](../../../.github/workflows/update_docs.yml_disabled)
   * verifiedBy: [Automated Documentation Export on PR Merge Verification](../Output/Verifications/DiagramVerifications.md#automated-documentation-export-on-pr-merge-verification)
 ---
 

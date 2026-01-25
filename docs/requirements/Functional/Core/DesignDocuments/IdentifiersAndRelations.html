@@ -1,0 +1,630 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>IdentifiersAndRelations</title><link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
+                :root {
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
+
+                    /* Element Type Colors */
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
+
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
+
+                    /* Interactive Colors */
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
+
+                    /* Text Colors */
+                    --color-text-primary: #212121;
+                    --color-text-secondary: #424242;
+                    --color-text-muted: #757575;
+                    --color-background: #FAFAFA;
+                    --color-border: #EEEEEE;
+                }
+
+                /* Ensure body takes full height */
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #FAFAFA;
+                    color: var(--color-text-secondary);
+                }
+
+                /* Navigation bar */
+                .reqvire-nav {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    background-color: var(--color-nav);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 20px;
+                }
+
+                .reqvire-nav a {
+                    color: white;
+                    text-decoration: none;
+                    padding: 0 15px;
+                    font-weight: 500;
+                    transition: background-color 0.2s;
+                }
+
+                .reqvire-nav a:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: none;
+                }
+
+                .nav-logo {
+                    margin-right: 20px;
+                }
+
+                .nav-logo:hover {
+                    background-color: transparent !important;
+                    text-decoration: none !important;
+                }
+
+                .nav-logo img {
+                    height: 24px;
+                    width: auto;
+                    vertical-align: middle;
+                }
+
+                .nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 10px 20px;
+                    margin-right: 5px;
+                    border-radius: 3px;
+                    transition: background-color 0.2s, text-decoration 0.2s;
+                }
+
+                .nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .nav-link:active {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .mobile-nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 20px;
+                    display: block;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: background-color 0.2s;
+                }
+
+                .mobile-nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    color: white;
+                }
+
+                .reqvire-nav-spacer {
+                    height: 50px;
+                }
+
+                /* Content container */
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+
+                .content {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                /* Content area typography and styling - matches old template exactly */
+                /* Use higher specificity to override Tailwind reset */
+                .bg-white h1, .content h1, h1 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 2px solid #EEEEEE !important;
+                    padding-bottom: 10px !important;
+                    margin-top: 0 !important;
+                    font-size: 2em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h2, .content h2, h2 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 1px solid #EEEEEE !important;
+                    padding-bottom: 5px !important;
+                    font-size: 1.5em !important;
+                    font-weight: bold !important;
+                    margin-top: 20px !important;
+                }
+
+                .bg-white h3, .content h3, h3 {
+                    color: var(--color-text-primary) !important;
+                    margin-top: 25px !important;
+                    font-size: 1.17em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h4, .content h4, h4 {
+                    color: var(--color-text-secondary) !important;
+                    font-weight: 600 !important;
+                    font-size: 1em !important;
+                    margin-top: 15px !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                .content a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                div.bg-white > a {
+                    color: var(--color-primary) !important;
+                    text-decoration: none !important;
+                    font-weight: 500 !important;
+                    transition: text-decoration 0.15s ease !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):hover,
+                .content a:not(.nav-link):not(.mobile-nav-link):hover {
+                    text-decoration: underline !important;
+                }
+
+                .bg-white a:focus, .content a:focus {
+                    outline: 2px solid var(--color-primary);
+                    outline-offset: 2px;
+                }
+
+                .bg-white table, .content table, table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    margin: 20px 0 !important;
+                }
+
+                .bg-white table, .bg-white th, .bg-white td,
+                .content table, .content th, .content td {
+                    border: 1px solid #EEEEEE !important;
+                }
+
+                .bg-white th, .bg-white td,
+                .content th, .content td {
+                    padding: 8px 12px !important;
+                    text-align: left !important;
+                }
+
+                .bg-white th, .content th {
+                    background-color: #F5F5F5 !important;
+                    color: #212121 !important;
+                    font-weight: 600 !important;
+                }
+
+                .bg-white tr:hover td, .content tr:hover td {
+                    background-color: #FFF8E1 !important;
+                }
+
+                .bg-white code, .content code, code {
+                    background: #f6f8fa !important;
+                    padding: 2px 4px !important;
+                    border-radius: 3px !important;
+                    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+                    font-size: 90% !important;
+                }
+
+                .bg-white pre, .content pre, pre {
+                    background: #f6f8fa !important;
+                    border-radius: 3px !important;
+                    padding: 16px !important;
+                    overflow: auto !important;
+                }
+
+                .bg-white pre code, .content pre code {
+                    background: transparent !important;
+                    padding: 0 !important;
+                }
+
+                .bg-white blockquote, .content blockquote, blockquote {
+                    margin: 0 !important;
+                    padding: 0 15px !important;
+                    color: var(--color-text-muted) !important;
+                    border-left: 4px solid var(--color-primary) !important;
+                }
+
+                .bg-white p, .content p {
+                    margin: 10px 0 !important;
+                    line-height: 1.6 !important;
+                }
+
+                .bg-white ul, .content ul,
+                .bg-white ol, .content ol {
+                    margin: 10px 0 !important;
+                    padding-left: 30px !important;
+                }
+
+                .bg-white li, .content li {
+                    margin: 5px 0 !important;
+                }
+
+                /* Custom Mermaid diagram styles - matches old template */
+                .mermaid {
+                    margin: 20px 0;
+                    text-align: center;
+                    height: calc(100vh - 150px);
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    border: 1px solid #EEEEEE;
+                    border-radius: 3px;
+                    background-color: #FAFAFA;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: center;
+                    /* Hide raw markdown text until rendered */
+                    color: transparent;
+                }
+
+                .mermaid svg {
+                    /* Show rendered diagram */
+                    color: initial;
+                }
+
+                .mermaid svg {
+                    width: 100%;
+                    height: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                /* Diagram navigation buttons */
+                .diagram-nav-buttons {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    z-index: 999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    background-color: rgba(255, 255, 255, 0.85);
+                    padding: 3px;
+                    border-radius: 3px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+                }
+
+                .diagram-nav-row {
+                    display: flex;
+                    gap: 2px;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn {
+                    width: 22px;
+                    height: 22px;
+                    background-color: var(--color-primary);
+                    color: white;
+                    border: none;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn:hover {
+                    background-color: var(--color-primary-hover);
+                }
+
+                .diagram-nav-btn:active {
+                    background-color: var(--color-primary-active);
+                }
+
+                /* Smooth transitions for interactive elements */
+                a, button {
+                    transition: all 0.2s ease-in-out;
+                }
+
+                /* Responsive typography */
+                @media (max-width: 640px) {
+                    h1 { font-size: 1.5rem; }
+                    h2 { font-size: 1.25rem; }
+                    h3 { font-size: 1.125rem; }
+                }
+
+                /* Print styles */
+                @media print {
+                    nav, .no-print { display: none; }
+                }
+            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../../coverage.html" class="nav-link">Coverage</a><a href="../../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../../model.html" class="mobile-nav-link">Model</a><a href="../../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="identifiers-and-relations-specification">Identifiers and Relations Specification</h1>
+<h2 id="identifiers-in-markdown-documents">Identifiers in Markdown Documents</h2>
+<p>An <strong>identifier</strong> is a location-based reference for addressing elements in markdown documents.
+It consists of a file path and optionally an element name (fragment).</p>
+<p><strong>Distinction from Element ID</strong>:</p>
+<ul>
+<li><strong>Identifier</strong>: Location-based address for targeting elements in relations (<code>file.md#element-name</code>)</li>
+<li><strong>Element ID</strong>: Stable identity independent of location (derived from element name)</li>
+</ul>
+<p>Identifiers are used for writing relations in markdown and cross-referencing between elements. The system resolves identifiers to Element IDs during parsing for internal tracking and change detection. When an element is relocated to a different file or section, its identifier changes but its Element ID remains stable.</p>
+<h2 id="identifier-in-markdown-document-can-be-of-several-types">Identifier in markdown document can be of several types</h2>
+<p>-<strong>Identifier</strong></p>
+<ul>
+<li>An internal system element reference with fragment, pointing to specific elements within markdown documents.</li>
+<li>Used for element-to-element relations (e.g., <code>derivedFrom</code>, <code>verifiedBy</code>, <code>verify</code>)</li>
+<li><strong>Example</strong>: <code>"file.md#element-name"</code></li>
+<li><strong>ExternalUrl</strong>
+<ul>
+<li>An external URL represented as a string.</li>
+<li>Used for references to external resources</li>
+<li><strong>Example</strong>: <code>"https://example.com"</code></li>
+</ul>
+</li>
+<li><strong>InternalPath</strong>
+<ul>
+<li>An internal filesystem file path without fragment, pointing to implementation files.</li>
+<li>Used for satisfaction and traceability relations (e.g., <code>satisfiedBy</code>, <code>satisfy</code>, <code>trace</code>)</li>
+<li><strong>Example</strong>: <code>"../../core/src/diagrams.rs"</code></li>
+</ul>
+</li>
+</ul>
+<h3 id="identifier-path-resolution-rules">Identifier Path Resolution Rules</h3>
+<ul>
+<li>If an identifier <strong>starts with <code>/</code></strong>, it is considered relative to the <strong>git repository root folder</strong>.</li>
+<li>If an identifier <strong>does not start with <code>/</code></strong>, it is considered <strong>relative</strong> to the path of the document in which it appears.</li>
+</ul>
+<p>Each <strong>identifier</strong> must uniquely reference either:</p>
+<ul>
+<li>A <strong>file</strong>, or</li>
+<li>An <strong>element within a file</strong>.</li>
+</ul>
+<h4>Identifier Path Resolution Examples</h4>
+<p>Assuming the <strong><git repository root> folder</strong> is <code>project</code> and a file exists at <code>/path/to/project/documents/File1.md</code>:</p>
+<table><thead><tr><th>Identifier</th><th>Resolves to</th><th>Type</th></tr></thead><tbody>
+<tr><td><code>File2.md</code></td><td><code>project/documents/File2.md</code></td><td>InternalPath</td></tr>
+<tr><td><code>subfolder/File3.md</code></td><td><code>project/documents/subfolder/File3.md</code></td><td>InternalPath</td></tr>
+<tr><td><code>../File4.md</code></td><td><code>project/File4.md</code></td><td>InternalPath</td></tr>
+<tr><td><code>/project/File4.md</code></td><td><code>project/File4.md</code></td><td>InternalPath</td></tr>
+<tr><td><code>https://example.com</code></td><td><code>https://example.com</code></td><td>ExternalUrl</td></tr>
+<tr><td><code>../Requirments#element-name</code></td><td><code>project/Requirments#element-name</code></td><td>Identifier</td></tr>
+</tbody></table>
+<hr />
+<h3 id="identifier-form-variations-and-examples">Identifier Form Variations and Examples</h3>
+<p>System recognises 2 kinds of identifier that may appear in documents and relations:</p>
+<ul>
+<li>Simple identifiers</li>
+<li>GitHub-style Markdown Link Identifiers</li>
+</ul>
+<p>Both Simple identifier and link part of GitHub-style markdown identifier can be etiher internal internal paths or external links (eg. starting with known scheme eg. https://)</p>
+<p>When parsing identifiers, both styles are nomarlized into the same form used internally by the system.</p>
+<p>As part of normailization process, element names are converted to <strong>GitHub-style anchor link</strong> fragments which are internal identifer representations:</p>
+<ul>
+<li>Convert to <strong>lowercase</strong>.</li>
+<li>Replace <strong>spaces with hyphens (<code>-</code>)</strong>.</li>
+<li>Remove <strong>disallowed characters</strong>.</li>
+<li>Remove <strong>leading and trailing whitespace</strong>.</li>
+</ul>
+<h4>1. Simple Identifiers</h4>
+<p>Plain file or element references, following the path resolution rules.</p>
+<p>Examples:</p>
+<ul>
+<li>File only identifier found in the document ‘<git repository root>/path/to/document.md’</li>
+</ul>
+<pre><code>file.md
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<git repository root>/path/to/file.md’</p>
+</li>
+<li>
+<p>File with an element fragment in the document ‘<git repository root>/path/to/document.md’:</p>
+</li>
+</ul>
+<pre><code>file.md#element name
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<git repository root>/path/to/file.md#element-name’</p>
+</li>
+<li>
+<p>Relative path with an element fragment in the document ‘<git repository root>/path/to/document.md’:</p>
+</li>
+</ul>
+<pre><code>../relative_path/file.md#element name
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<git repository root>/path/file.md#element-name’</p>
+</li>
+<li>
+<p>Element name fragment only (within the same file) in the document ‘<git repository root>/path/to/document.md’:</p>
+</li>
+</ul>
+<pre><code>#element name
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<git repository root>/path/to/document.md#element-name’</p>
+</li>
+<li>
+<p>Relative path with the element fragment with special characters in the document ‘<git repository root>/path/to/document.md’:</p>
+</li>
+</ul>
+<pre><code>path/file.md#My Element (Draft)
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<git repository root>/path/to/path/file.md##my-element-draft’</p>
+</li>
+<li>
+<p>Absolute path with the element fragment in any document:</p>
+</li>
+</ul>
+<pre><code>/path/file.md#Elements
+</code></pre>
+<ul>
+<li>Normalized to ‘<git repository root>/path/file.md#elements’</li>
+</ul>
+<h4>2. GitHub-style Markdown Link Identifiers</h4>
+<p>A valid GitHub-style Markdown link to a file or a fragment within a file.
+Identifier is considered the <strong>link</strong> part of the markdown link: everything inside ‘(identifier)’.</p>
+<p>Once link part is obtained from GitHub-style Markdown link, it is following same rules for normalization as <strong>simple identifiers</strong>.</p>
+<p>Examples:</p>
+<ul>
+<li>File link in ‘<git repository root>/path/to/document.md’:</li>
+</ul>
+<pre><code>[Specification](documents/specification.html)
+</code></pre>
+<ul>
+<li>
+<p>Normalized to ‘<git repository root>/path/to/path/documents/specification.md’</p>
+</li>
+<li>
+<p>Fragment link in ‘<git repository root>/path/to/document.md’:  :</p>
+</li>
+</ul>
+<pre><code>[My Element](documents/specification.html#my-element)
+</code></pre>
+<ul>
+<li>Normalized to ‘<git repository root>/path/to/path/documents/specification.md#my-element’</li>
+</ul>
+<hr />
+<h2 id="relations-in-markdown-documents">Relations in Markdown Documents</h2>
+<p>The <code>#### Relations</code> subsection specifies associations between elements, files, or other resources, forming the logical and dependency structure of the model.</p>
+<p>The <code>#### Relations</code> subsection:</p>
+<ul>
+<li>Is a dedicated part of an <strong>element</strong> section in Markdown document.</li>
+<li>Starts with the <code>#### Relations</code> header.</li>
+<li>Contains a list of relations in a specific format.</li>
+</ul>
+<p>The <code>#### Relations</code> subsection must be located within an element chunk.
+Each element chunk can have at most one <code>#### Relations</code> subsection.</p>
+<p>The <code>#### Relations</code> header marks the beginning of the subsection.</p>
+<p>The <code>#### Relations</code> subsection must appear directly within an element  chunk.
+It must follow the <code>###</code> header of the parent element and any preceding content.</p>
+<h3 id="relation-structure">Relation Structure</h3>
+<ul>
+<li>Relation entries are listed as bullet points (<code>*</code>), with <strong>two spaces</strong> (<code>  *</code>) of indentation.</li>
+</ul>
+<h4><strong>Relation Format</strong></h4>
+<ul>
+<li>Relations follow this format:
+<pre><code>* relationType: **identifier**
+</code></pre>
+</li>
+<li>Example:
+<pre><code>* dependsOn: [Element2](#element2)
+</code></pre>
+</li>
+</ul>
+<h4><strong>Relation Type</strong></h4>
+<ul>
+<li>Specifies the type of the relationship.</li>
+<li>Allowed characters: <code>[a-zA-Z]</code></li>
+<li>Minimum length: <strong>2 characters</strong></li>
+<li>Maximum length: <strong>80 characters</strong></li>
+<li>Must be one of the predefined, case-sensitive types</li>
+</ul>
+<h4><strong>Target Identifier</strong></h4>
+<ul>
+<li>Specifies the target of the relation.</li>
+<li>Must be a valid <strong>Simple Identifier</strong> or <strong>Git Valid Markdown Link Identifier</strong> as defined in this document.</li>
+</ul>
+<hr />
+<h3>Examples of <code>#### Relations</code></h3>
+<h4>1. <strong>Simple Relations</strong></h4>
+<pre><code class="language-markdown">
+
+### My Element
+This is the content of My Element.
+
+#### Relations
+  * dependsOn: [Element2](#element2)
+  * relatedTo: [path/to/anotherFile.md/Section3](path/to/anotherFile.html#section3)
+  * uses: [file.html](file.html)
+</code></pre>
+<h4>2. <strong>Relations with Special Characters</strong></h4>
+<pre><code class="language-markdown">
+
+### API v2.0
+Details about API version 2.0.
+
+#### Relations
+  * satisfies: [documents/specification.md#API: v2.0](documents/specification.html#api-v20)
+
+</code></pre>
+<h4>3. <strong>Relation to an Element in the Same File</strong></h4>
+<p>If the referenced element exists within the same file, the identifier can be a fragment only.</p>
+<pre><code class="language-markdown">
+#### Relations
+  * extends: [Another Section](#another-section)
+</code></pre>
+<h4>4. <strong>Relative Path Relations</strong></h4>
+<p>If the referenced file is located in a subfolder relative to the current document, use a relative path.</p>
+<pre><code class="language-markdown">
+#### Relations
+  * derive: [subfolder/details.md#refined-section](subfolder/details.html#refined-section)
+
+</code></pre>
+<h4>5. <strong>Absolute Path Relations</strong></h4>
+<p>If the reference starts with /, it points to a file or element relative to the git repository root folder.</p>
+<pre><code class="language-markdown">
+#### Relations
+  * verifiedBy: [/specifications.md#verification-steps](/specifications.html#verification-steps)
+
+</code></pre>
+<h4>6. <strong>Invalid Relations Example</strong></h4>
+<pre><code class="language-markdown">
+This element contains invalid relation entries.
+
+#### Relations
+  * derivedFrom: [Element2](#element2)
+* InvalidEntry
+* : MissingRelationType
+  * trace: [path/to/file.html](path/to/file.html)
+</code></pre>
+<h2 id="identifier-usage-in-relations">Identifier Usage in Relations</h2>
+<p>Identifiers are used in relations to reference files or specific elements within files. Examples:</p>
+<ol>
+<li>
+<p><strong>Relation to a File</strong>:</p>
+<pre><code class="language-markdown">#### Relations
+  * satisfiedBy: [documents/specification.html](documents/specification.html)
+</code></pre>
+</li>
+<li>
+<p><strong>Relation to an Element</strong>:</p>
+<pre><code class="language-markdown">#### Relations
+  * derivedFrom: [documents/specification.md/section one](documents/specification.html#section-one)
+</code></pre>
+</li>
+</ol>
+<h2 id="validation-rules">Validation rules</h2>
+<p>The system must validate relation usage according to these rules:</p>
+<ul>
+<li>Only the relation types defined in this registry are allowed</li>
+<li>Relations should connect elements of appropriate types</li>
+<li>Circular dependencies should be detected and reported</li>
+<li>Duplicate relation entries of same type and target are not allowed</li>
+<li><strong>Identifier</strong> targets (with fragments) must reference existing elements in markdown documents</li>
+<li><strong>InternalPath</strong> targets (without fragments) must reference existing files in the filesystem</li>
+<li><strong>ExternalUrl</strong> targets are not validated for existence</li>
+</ul>
+<footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
+                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+                            var menu = document.getElementById('mobile-menu');
+                            menu.classList.toggle('hidden');
+                        });
+                    </script></body></html>
