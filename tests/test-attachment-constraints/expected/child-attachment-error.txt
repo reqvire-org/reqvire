@@ -1,0 +1,4 @@
+❌ 1 validation failed with error(s):
+
+  1. Invalid attachment scope: 'Spec-1' cannot be attached to 'Child Attaching Spec' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the satisfiedBy chain. (file: specifications/TestChildAttachment.md, element: Child Attaching Spec)
+

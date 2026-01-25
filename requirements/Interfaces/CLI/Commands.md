@@ -34,6 +34,8 @@ Attachment management has been consolidated into the Relation Commands. The atta
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
   * [Attachment Input Auto-Detection Behavior](../../Functional/Core/Behaviors.md#attachment-input-auto-detection-behavior)
+  * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * verifiedBy: [Attach Command Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#attach-command-verification)
@@ -143,6 +145,8 @@ The `add` command shall:
   * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Create Element Workflow Specification](../../Functional/Operations/Specifications.md#create-element-workflow-specification)
+  * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -356,6 +360,8 @@ The `merge` command shall:
   * [Merge Type Compatibility Constraint](../../Functional/Operations/Constraints.md#merge-type-compatibility-constraint)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Merge Element Workflow Specification](../../Functional/Operations/Specifications.md#merge-element-workflow-specification)
+  * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -882,6 +888,8 @@ The system shall provide a validation command that executes model validation and
   * [Validation Error Reporting Behavior](../../Functional/Core/Behaviors.md#validation-error-reporting-behavior)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Error Message Format Specification](../../Functional/Output/Specifications.md#error-message-format-specification)
+  * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)

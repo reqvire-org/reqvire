@@ -65,6 +65,9 @@ String fields have maximum length of 255 characters.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * satisfy: [Top Level Requirement](#top-level-requirement)
 ---
 
 ### Independent Requirement With Same Attachment

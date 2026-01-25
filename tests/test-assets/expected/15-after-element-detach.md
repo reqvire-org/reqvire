@@ -68,6 +68,9 @@ This constraint defines limits on system behavior.
 
 #### Metadata
   * type: constraint
+
+#### Relations
+  * satisfy: [System Requirements](#system-requirements)
 ---
 
 ### Test Behavior Element
@@ -79,5 +82,8 @@ This behavior defines expected system operation.
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [System Requirements](#system-requirements)
 ---
 

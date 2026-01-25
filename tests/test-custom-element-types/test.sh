@@ -213,6 +213,8 @@ EOF
 # Initialize git repo for the test
 cd "${TEMP_NO_CUSTOM}"
 git init > /dev/null 2>&1
+git config user.email "test@example.com" > /dev/null 2>&1
+git config user.name "Test User" > /dev/null 2>&1
 git add . > /dev/null 2>&1
 git commit -m "Initial commit" > /dev/null 2>&1
 cd - > /dev/null 2>&1
