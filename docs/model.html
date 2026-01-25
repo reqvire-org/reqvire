@@ -833,7 +833,7 @@ window.addEventListener('resize', function() {
 </script></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="index.html" class="nav-logo flex items-center pr-4"><img src="assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="index.html" class="nav-link">Containment</a><a href="model.html" class="nav-link">Model</a><a href="traces.html" class="nav-link">Traces</a><a href="traceflow.html" class="nav-link">TraceFlow</a><a href="coverage.html" class="nav-link">Coverage</a><a href="resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="index.html" class="mobile-nav-link">Containment</a><a href="model.html" class="mobile-nav-link">Model</a><a href="traces.html" class="mobile-nav-link">Traces</a><a href="traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="coverage.html" class="mobile-nav-link">Coverage</a><a href="resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="model-view w-full h-full p-4"><h1 id="model">Model</h1>
 <p>The model view displays the logical structure starting from root requirements—requirements without parent derivations. Each element shows its complete relation tree: derived child requirements, verifications, and implementations. This follows MBSE principles where stakeholder needs flow down through requirement hierarchies to verifiable, implementable specifications.</p>
 <p><strong>Total Elements</strong>: 15
-<strong>Total Relations</strong>: 617
+<strong>Total Relations</strong>: 613
 <strong>Direction</strong>: Forward</p>
 <h2><a href="requirements/UserStories.html#ai-assisted-system-model-management">AI-Assisted System Model Management</a></h2>
 <p><strong>Type</strong>: user-requirement
@@ -1017,7 +1017,7 @@ window.addEventListener('resize', function() {
       click c1660a11594249ca "requirements/Functional/Core/Constraints.html#element-type-relation-compatibility-constraint";
     end
     subgraph 193cce1f294b91c8["📄 ModelManagement.md"]
-      c36682220045e7c5["Attachment Scope Constraints<br/>📎 requirements/Refinements.md#relation-semantics-specification"];
+      c36682220045e7c5["Attachment Scope Constraints"];
       class c36682220045e7c5 systemRequirement;
       click c36682220045e7c5 "requirements/Functional/Core/ModelManagement.html#attachment-scope-constraints";
       3b924660b3d92e9d["Element Type Relation Compatibility<br/>📎 requirements/Refinements.md#supported-element-types-specification"];
@@ -1026,7 +1026,7 @@ window.addEventListener('resize', function() {
       43eafdd22a501023["Git Repository as Project Root<br/>📎 requirements/Refinements.md#containment-specification"];
       class 43eafdd22a501023 userRequirement;
       click 43eafdd22a501023 "requirements/Functional/Core/ModelManagement.html#git-repository-as-project-root";
-      7b8a81499865dbaa["Refinement Element Structure Constraints<br/>📎 requirements/Functional/Core/DesignDocuments/RelationTypes.md<br/>📎 requirements/Refinements.md#supported-element-types-specification"];
+      7b8a81499865dbaa["Refinement Element Structure Constraints<br/>📎 requirements/Refinements.md#supported-element-types-specification"];
       class 7b8a81499865dbaa systemRequirement;
       click 7b8a81499865dbaa "requirements/Functional/Core/ModelManagement.html#refinement-element-structure-constraints";
       ac192cac778569d0["Relation Management Operations<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
@@ -1077,7 +1077,7 @@ window.addEventListener('resize', function() {
       38109a2549fc3c4f["Attachment Scope Validation<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
       class 38109a2549fc3c4f systemRequirement;
       click 38109a2549fc3c4f "requirements/Functional/Core/Validation.html#attachment-scope-validation";
-      fcfc76ba4d193d75["Attachment Target Validation<br/>📎 requirements/Functional/Core/DesignDocuments/ReservedSubsections.md"];
+      fcfc76ba4d193d75["Attachment Target Validation"];
       class fcfc76ba4d193d75 systemRequirement;
       click fcfc76ba4d193d75 "requirements/Functional/Core/Validation.html#attachment-target-validation";
       14c74cc4fb33d735["Cross-Section Duplicate Validation"];
@@ -1092,7 +1092,7 @@ window.addEventListener('resize', function() {
       9f1021634cff7f57["Relation Element Type Validator"];
       class 9f1021634cff7f57 systemRequirement;
       click 9f1021634cff7f57 "requirements/Functional/Core/Validation.html#relation-element-type-validator";
-      4a77e514d9e5539b["Validate Relation Types<br/>📎 requirements/Refinements.md#relation-semantics-specification"];
+      4a77e514d9e5539b["Validate Relation Types"];
       class 4a77e514d9e5539b userRequirement;
       click 4a77e514d9e5539b "requirements/Functional/Core/Validation.html#validate-relation-types";
     end
@@ -1973,9 +1973,6 @@ window.addEventListener('resize', function() {
       8ab6eb6e6ddc46cc["Multi-Branch Convergence Detection<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
       class 8ab6eb6e6ddc46cc systemRequirement;
       click 8ab6eb6e6ddc46cc "requirements/Functional/Operations/Linting.html#multi-branch-convergence-detection";
-      cc7864983ff441c7["Redundant Hierarchical Attachment Detection"];
-      class cc7864983ff441c7 systemRequirement;
-      click cc7864983ff441c7 "requirements/Functional/Operations/Linting.html#redundant-hierarchical-attachment-detection";
       5f8fafa1901435c["Redundant Hierarchical Relations Detection and Auto-Removal<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
       class 5f8fafa1901435c systemRequirement;
       click 5f8fafa1901435c "requirements/Functional/Operations/Linting.html#redundant-hierarchical-relations-detection-and-auto-removal";
@@ -2000,9 +1997,6 @@ window.addEventListener('resize', function() {
       a967e55b50b57d2["Lint Command Verification"];
       class a967e55b50b57d2 verification;
       click a967e55b50b57d2 "requirements/Functional/Operations/Verifications/LintingVerifications.html#lint-command-verification";
-      d57f3715f551dd1f["Redundant Hierarchical Attachment Test"];
-      class d57f3715f551dd1f verification;
-      click d57f3715f551dd1f "requirements/Functional/Operations/Verifications/LintingVerifications.html#redundant-hierarchical-attachment-test";
     end
   end
   72aa2e113883d4a9 -->|derive| 20f690d9cd389f10;
@@ -2018,16 +2012,6 @@ window.addEventListener('resize', function() {
   click bd9918df0c2783d5 "core/src/lint.rs";
   8ab6eb6e6ddc46cc -->|satisfiedBy| bd9918df0c2783d5;
   8ab6eb6e6ddc46cc -->|satisfiedBy| c5d346cc41243982;
-  20f690d9cd389f10 -->|derive| cc7864983ff441c7;
-  c1c24aaf3793de71["core/src/lint.rs"];
-  class c1c24aaf3793de71 default;
-  click c1c24aaf3793de71 "core/src/lint.rs";
-  cc7864983ff441c7 -->|satisfiedBy| c1c24aaf3793de71;
-  cc7864983ff441c7 -->|verifiedBy| d57f3715f551dd1f;
-  ffd803ba768c3cd["tests/test-lint-redundant-attachments/test.sh"];
-  class ffd803ba768c3cd default;
-  click ffd803ba768c3cd "tests/test-lint-redundant-attachments/test.sh";
-  d57f3715f551dd1f -->|satisfiedBy| ffd803ba768c3cd;
   20f690d9cd389f10 -->|derive| 5f8fafa1901435c;
   cb970a75ab797614["core/src/lint.rs"];
   class cb970a75ab797614 default;
@@ -2524,7 +2508,7 @@ window.addEventListener('resize', function() {
       5aa1c66a1962bbcf["Flexible Search Type Filtering"];
       class 5aa1c66a1962bbcf userRequirement;
       click 5aa1c66a1962bbcf "requirements/Functional/Output/Reporting.html#flexible-search-type-filtering";
-      98610608d81a8fde["Forward-Only Relation Traversal<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
+      98610608d81a8fde["Forward-Only Relation Traversal"];
       class 98610608d81a8fde systemRequirement;
       click 98610608d81a8fde "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal";
       f8301585b3d30631["Model Diagram Output Formats<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
@@ -2542,7 +2526,7 @@ window.addEventListener('resize', function() {
       a0f7724a2ceac1ec["Resources Report"];
       class a0f7724a2ceac1ec userRequirement;
       click a0f7724a2ceac1ec "requirements/Functional/Output/Reporting.html#resources-report";
-      6a3c5a7153a49a89["Reverse Relation Traversal<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
+      6a3c5a7153a49a89["Reverse Relation Traversal"];
       class 6a3c5a7153a49a89 systemRequirement;
       click 6a3c5a7153a49a89 "requirements/Functional/Output/Reporting.html#reverse-relation-traversal";
       f484430652f48bac["Search Report Generator<br/>📎 requirements/Functional/Output/DesignDocuments/SearchFiltering.md<br/>📎 requirements/Refinements.md#supported-element-types-specification<br/>📎 requirements/Functional/Output/Specifications.md#resources-report-format-specification"];
@@ -2551,7 +2535,7 @@ window.addEventListener('resize', function() {
       f941bbbbf5db2d8c["Start Element Type Filtering"];
       class f941bbbbf5db2d8c systemRequirement;
       click f941bbbbf5db2d8c "requirements/Functional/Output/Reporting.html#start-element-type-filtering";
-      c52fdde1821f5cf2["TraceFlow View Report Generation<br/>📎 requirements/Functional/Output/DesignDocuments/TraceFlowView.md<br/>📎 requirements/Refinements.md#traceability-reporting-specification<br/>📎 requirements/Functional/Processing/Specifications.md#verification-roll-up-specification<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
+      c52fdde1821f5cf2["TraceFlow View Report Generation<br/>📎 requirements/Functional/Output/DesignDocuments/TraceFlowView.md<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
       class c52fdde1821f5cf2 systemRequirement;
       click c52fdde1821f5cf2 "requirements/Functional/Output/Reporting.html#traceflow-view-report-generation";
       c988fb8451de7d2d["Validation Report Generator"];
@@ -3754,7 +3738,7 @@ window.addEventListener('resize', function() {
       38109a2549fc3c4f["Attachment Scope Validation<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
       class 38109a2549fc3c4f systemRequirement;
       click 38109a2549fc3c4f "requirements/Functional/Core/Validation.html#attachment-scope-validation";
-      fcfc76ba4d193d75["Attachment Target Validation<br/>📎 requirements/Functional/Core/DesignDocuments/ReservedSubsections.md"];
+      fcfc76ba4d193d75["Attachment Target Validation"];
       class fcfc76ba4d193d75 systemRequirement;
       click fcfc76ba4d193d75 "requirements/Functional/Core/Validation.html#attachment-target-validation";
       df9b3eb5275616dd["Cross-Component Dependency Validator"];
@@ -3802,7 +3786,7 @@ window.addEventListener('resize', function() {
       76fbd08929220b2f["Validate Markdown Structure"];
       class 76fbd08929220b2f userRequirement;
       click 76fbd08929220b2f "requirements/Functional/Core/Validation.html#validate-markdown-structure";
-      4a77e514d9e5539b["Validate Relation Types<br/>📎 requirements/Refinements.md#relation-semantics-specification"];
+      4a77e514d9e5539b["Validate Relation Types"];
       class 4a77e514d9e5539b userRequirement;
       click 4a77e514d9e5539b "requirements/Functional/Core/Validation.html#validate-relation-types";
       e5ee40ed53dd3c3["Validation Error Handling<br/>📎 requirements/Functional/Output/Specifications.md#error-message-format-specification"];

@@ -507,15 +507,36 @@
 </ul>
 <hr />
 <h3 id="attachment-scope-constraints-test">Attachment Scope Constraints Test</h3>
-<p>Verify that attachment scope constraints (hierarchical independence and satisfy requirement) are enforced.</p>
+<p>Verify that attachment scope constraints (hierarchical independence, satisfy requirement, and upstream propagation) are enforced for both refinement elements and file assets.</p>
 <h4>Details</h4>
-<p><strong>Test cases for hierarchical independence:</strong></p>
+<p><strong>Test cases for refinement hierarchical independence:</strong></p>
 <ul>
 <li>Model with attachment to refinement from same hierarchy causes <code>validate</code> to fail</li>
 <li>Error when attaching requirement has <code>satisfiedBy</code> to the refinement</li>
 <li>Error when attaching requirement is parent of the defining requirement</li>
 <li>Error when attaching requirement is child/grandchild of the defining requirement</li>
 <li>Accept attachment when attaching requirement is in a separate branch</li>
+</ul>
+<p><strong>Test cases for file attachment hierarchical independence:</strong></p>
+<ul>
+<li>Error when attaching file that is owned via <code>satisfiedBy</code> by the same requirement</li>
+<li>Error when attaching file owned by parent requirement in hierarchy</li>
+<li>Error when attaching file owned by child requirement in hierarchy</li>
+<li>Accept file attachment when attaching requirement is in a separate branch from owner</li>
+</ul>
+<p><strong>Test cases for upstream attachment propagation:</strong></p>
+<ul>
+<li>Error when ancestor requirement already has the same attachment (refinement or file)</li>
+<li>Error when descendant requirement already has the same attachment (suggest move)</li>
+<li>Attachments propagate downstream - descendants cannot re-attach</li>
+<li>Accept attachment when no ancestor or descendant has the same attachment</li>
+</ul>
+<p><strong>Error message formats:</strong></p>
+<ul>
+<li>Refinement hierarchy: <code>'&lt;refinement&gt;' cannot be attached to '&lt;element&gt;' because it is within the refinement's defining hierarchy</code></li>
+<li>File ownership: <code>'&lt;file&gt;' cannot be attached to '&lt;element&gt;' because it is within the file owner's hierarchy (owned by '&lt;owner&gt;')</code></li>
+<li>Ancestor propagation: <code>'&lt;attachment&gt;' is already attached at '&lt;ancestor&gt;' which is an ancestor. Attachments propagate downstream.</code></li>
+<li>Descendant conflict: <code>'&lt;attachment&gt;' is already attached at '&lt;descendant&gt;' which is a descendant. Move attachment to '&lt;element&gt;' if you want it at higher level.</code></li>
 </ul>
 <p><strong>Test cases for satisfy requirement:</strong></p>
 <ul>
@@ -527,6 +548,7 @@
 <ul>
 <li><code>link REQ attaching REFINEMENT</code> fails when REQ is in same hierarchy</li>
 <li><code>link REQ attaching ORPHAN-REFINEMENT</code> fails when refinement has no satisfy</li>
+<li><code>link REQ attaching FILE</code> fails when FILE is owned by requirement in same hierarchy</li>
 <li>Error messages are consistent with validate error format</li>
 </ul>
 <p><strong>Test cases for merge command:</strong></p>

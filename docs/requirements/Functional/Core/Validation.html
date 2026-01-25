@@ -386,7 +386,7 @@
       38109a2549fc3c4f["Attachment Scope Validation<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
       class 38109a2549fc3c4f systemRequirement;
       click 38109a2549fc3c4f "Validation.html#attachment-scope-validation";
-      fcfc76ba4d193d75["Attachment Target Validation<br/>📎 ReservedSubsections.md"];
+      fcfc76ba4d193d75["Attachment Target Validation"];
       class fcfc76ba4d193d75 systemRequirement;
       click fcfc76ba4d193d75 "Validation.html#attachment-target-validation";
       df9b3eb5275616dd["Cross-Component Dependency Validator"];
@@ -437,7 +437,7 @@
       76fbd08929220b2f["Validate Markdown Structure"];
       class 76fbd08929220b2f userRequirement;
       click 76fbd08929220b2f "Validation.html#validate-markdown-structure";
-      4a77e514d9e5539b["Validate Relation Types<br/>📎 requirements/Refinements.md#relation-semantics-specification"];
+      4a77e514d9e5539b["Validate Relation Types"];
       class 4a77e514d9e5539b userRequirement;
       click 4a77e514d9e5539b "Validation.html#validate-relation-types";
       e5ee40ed53dd3c3["Validation Error Handling<br/>📎 requirements/Functional/Output/Specifications.md#error-message-format-specification"];
@@ -792,10 +792,6 @@
 <ul>
 <li>type: requirement</li>
 </ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/ReservedSubsections.html">ReservedSubsections.html</a></li>
-</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#attachment-scope-validation">Attachment Scope Validation</a></li>
@@ -810,7 +806,7 @@
 <h3 id="attachment-scope-validation">Attachment Scope Validation</h3>
 <p>The system shall validate attachment scope constraints and report validation errors for violations.</p>
 <h4>Details</h4>
-<p>When validating attachments to refinement elements, the system shall enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the refinement, and the reason for the violation.</p>
+<p>When validating attachments (both refinement elements and file assets), the system shall enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -980,10 +976,6 @@
 <h4>Metadata</h4>
 <ul>
 <li>type: user-requirement</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../../Refinements.html#relation-semantics-specification">Relation Semantics Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>

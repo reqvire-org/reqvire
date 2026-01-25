@@ -379,14 +379,29 @@
 </div>
 <h3 id="attachment-hierarchical-independence-constraint">Attachment Hierarchical Independence Constraint</h3>
 <p>Rules for preventing attachments within the same requirement hierarchy.</p>
-<p>A refinement element can only be attached to a requirement if that requirement has NO hierarchical relationship with the requirement that defines the refinement via <code>satisfiedBy</code>:</p>
+<p><strong>For refinement elements:</strong>
+A refinement element can only be attached to a requirement if that requirement has NO hierarchical relationship with the requirement that defines the refinement via <code>satisfiedBy</code>:</p>
 <ul>
 <li>Cannot attach to the requirement that has <code>satisfiedBy</code> to this refinement</li>
 <li>Cannot attach to any parent (ancestor) of that requirement via derivedFrom chain</li>
 <li>Cannot attach to any child (descendant) of that requirement via derive chain</li>
 </ul>
-<p>Only requirements in a separate branch of the hierarchy (no derivedFrom chain connecting them) may attach the refinement.</p>
-<p><strong>Rationale</strong>: Attachments enable cross-submodel traceability while maintaining stakeholder separation. Attachments within the same hierarchy are redundant since traceability already flows through the satisfiedBy relationship.</p>
+<p><strong>For file attachments (assets):</strong>
+When a file is referenced via <code>satisfiedBy</code> from a requirement (establishing ownership), the same hierarchical independence rules apply:</p>
+<ul>
+<li>Cannot attach to the requirement that owns the file via <code>satisfiedBy</code></li>
+<li>Cannot attach to any parent (ancestor) of the owner via derivedFrom chain</li>
+<li>Cannot attach to any child (descendant) of the owner via derive chain</li>
+</ul>
+<p><strong>Upstream attachment propagation:</strong>
+If an attachment (refinement or file) is already attached to an ancestor requirement in the derivation hierarchy, descendants cannot attach the same target:</p>
+<ul>
+<li>Attachments propagate downstream through the derivedFrom chain</li>
+<li>Re-attaching at a descendant level is redundant</li>
+<li>Only the highest-level requirement in a hierarchy branch should attach</li>
+</ul>
+<p>Only requirements in a separate branch of the hierarchy (no derivedFrom chain connecting them to the owner or existing attacher) may attach the refinement or file.</p>
+<p><strong>Rationale</strong>: Attachments enable cross-submodel traceability while maintaining stakeholder separation. Attachments within the same hierarchy are redundant since traceability already flows through the satisfiedBy relationship and propagates to derived requirements.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: constraint</li>

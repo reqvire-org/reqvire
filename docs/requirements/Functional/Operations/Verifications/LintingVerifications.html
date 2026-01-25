@@ -365,19 +365,12 @@
       a967e55b50b57d2["Lint Command Verification"];
       class a967e55b50b57d2 verification;
       click a967e55b50b57d2 "LintingVerifications.html#lint-command-verification";
-      d57f3715f551dd1f["Redundant Hierarchical Attachment Test"];
-      class d57f3715f551dd1f verification;
-      click d57f3715f551dd1f "LintingVerifications.html#redundant-hierarchical-attachment-test";
     end
   end
   627c92e05bc78e3b["test.sh"];
   class 627c92e05bc78e3b default;
   click 627c92e05bc78e3b "../../../../tests/test-lint-command/test.sh";
   a967e55b50b57d2 -->|satisfiedBy| 627c92e05bc78e3b;
-  f6021060dbf21d0c["test.sh"];
-  class f6021060dbf21d0c default;
-  click f6021060dbf21d0c "../../../../tests/test-lint-redundant-attachments/test.sh";
-  d57f3715f551dd1f -->|satisfiedBy| f6021060dbf21d0c;
 </div>
 <h3 id="lint-command-verification">Lint Command Verification</h3>
 <p>This test verifies that the lint command analyzes model quality, detects issues in requirements relations, and provides categorized output distinguishing between auto-fixable issues and those requiring manual review.</p>
@@ -500,38 +493,6 @@
 <li>verify: <a href="../Linting.html#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></li>
 <li>verify: <a href="../Linting.html#redundant-hierarchical-relations-detection-and-auto-removal">Redundant Hierarchical Relations Detection and Auto-Removal</a></li>
 <li>verify: <a href="../Linting.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></li>
-</ul>
-<hr />
-<h3 id="redundant-hierarchical-attachment-test">Redundant Hierarchical Attachment Test</h3>
-<p>This test verifies that the lint command detects redundant attachments that exist on both child elements and their ancestors in the derivedFrom hierarchy, and can auto-fix by removing duplicates from children.</p>
-<h4>Details</h4>
-<h5>Acceptance Criteria:</h5>
-<ul>
-<li>System shall detect when a child element has the same attachment as an ancestor</li>
-<li>System shall report which attachment is redundant and on which ancestor it exists</li>
-<li>System shall categorize as auto-fixable</li>
-<li>System shall remove the redundant attachment from the child when –fix is used</li>
-<li>System shall preserve the attachment on the ancestor</li>
-</ul>
-<h5>Test Criteria:</h5>
-<ol>
-<li>Create parent requirement with attachment</li>
-<li>Create child requirement derived from parent with same attachment</li>
-<li>Run lint –fixable to detect redundant attachment</li>
-<li>Verify issue is reported with correct element, attachment, and ancestor info</li>
-<li>Run lint –fix to apply fix</li>
-<li>Verify child’s attachment is removed</li>
-<li>Verify parent’s attachment is preserved</li>
-<li>Verify no more issues after fix</li>
-</ol>
-<h4>Metadata</h4>
-<ul>
-<li>type: test-verification</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>satisfiedBy: <a href="../../../../tests/test-lint-redundant-attachments/test.sh">test.sh</a></li>
-<li>verify: <a href="../Linting.html#redundant-hierarchical-attachment-detection">Redundant Hierarchical Attachment Detection</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';

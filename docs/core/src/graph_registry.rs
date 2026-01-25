@@ -588,6 +588,54 @@ impl GraphRegistry {
                                     file_path.display()
                                 ),
                             ));
+                            continue;
+                        }
+
+                        // Check file ownership hierarchy constraint
+                        let file_owners = self.get_file_owners(file_path);
+                        for owner_id in &file_owners {
+                            if self.is_in_hierarchy(&element.identifier, owner_id) {
+                                let owner_name = self.nodes.get(owner_id)
+                                    .map(|n| n.element.name.as_str())
+                                    .unwrap_or(owner_id);
+                                errors.push(ReqvireError::InvalidAttachmentScope(
+                                    format!(
+                                        "'{}' cannot be attached to '{}' because it is within the file owner's hierarchy (owned by '{}'). (file: {}, element: {})",
+                                        file_path.display(),
+                                        element.name,
+                                        owner_name,
+                                        element.file_path,
+                                        element.name
+                                    ),
+                                ));
+                                break;
+                            }
+                        }
+
+                        // Check upstream propagation constraint
+                        if let Some((direction, other_id)) = self.find_duplicate_attachment_in_hierarchy(&element.identifier, &attachment.target) {
+                            let other_name = self.nodes.get(&other_id)
+                                .map(|n| n.element.name.as_str())
+                                .unwrap_or(&other_id);
+                            let msg = if direction == "ancestor" {
+                                format!(
+                                    "'{}' is already attached at '{}' which is an ancestor. Attachments propagate downstream. (file: {}, element: {})",
+                                    file_path.display(),
+                                    other_name,
+                                    element.file_path,
+                                    element.name
+                                )
+                            } else {
+                                format!(
+                                    "'{}' is already attached at '{}' which is a descendant. Move attachment to '{}' if you want it at higher level. (file: {}, element: {})",
+                                    file_path.display(),
+                                    other_name,
+                                    element.name,
+                                    element.file_path,
+                                    element.name
+                                )
+                            };
+                            errors.push(ReqvireError::InvalidAttachmentScope(msg));
                         }
                     }
                     crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
@@ -621,6 +669,7 @@ impl GraphRegistry {
 
                             // Check 2: Hierarchical Independence Constraint - attaching element must not be in defining hierarchy
                             let defining_reqs = self.get_defining_requirements(identifier);
+                            let mut hierarchy_violation = false;
                             for defining_req_id in defining_reqs {
                                 if self.is_in_hierarchy(&element.identifier, &defining_req_id) {
                                     errors.push(ReqvireError::InvalidAttachmentScope(
@@ -632,7 +681,36 @@ impl GraphRegistry {
                                             element.name
                                         ),
                                     ));
+                                    hierarchy_violation = true;
                                     break;
+                                }
+                            }
+
+                            // Check 3: Upstream propagation constraint (only if no hierarchy violation)
+                            if !hierarchy_violation {
+                                if let Some((direction, other_id)) = self.find_duplicate_attachment_in_hierarchy(&element.identifier, &attachment.target) {
+                                    let other_name = self.nodes.get(&other_id)
+                                        .map(|n| n.element.name.as_str())
+                                        .unwrap_or(&other_id);
+                                    let msg = if direction == "ancestor" {
+                                        format!(
+                                            "'{}' is already attached at '{}' which is an ancestor. Attachments propagate downstream. (file: {}, element: {})",
+                                            target_node.element.name,
+                                            other_name,
+                                            element.file_path,
+                                            element.name
+                                        )
+                                    } else {
+                                        format!(
+                                            "'{}' is already attached at '{}' which is a descendant. Move attachment to '{}' if you want it at higher level. (file: {}, element: {})",
+                                            target_node.element.name,
+                                            other_name,
+                                            element.name,
+                                            element.file_path,
+                                            element.name
+                                        )
+                                    };
+                                    errors.push(ReqvireError::InvalidAttachmentScope(msg));
                                 }
                             }
                         } else {
@@ -759,6 +837,137 @@ impl GraphRegistry {
     fn is_descendant_of(&self, potential_descendant: &str, element_id: &str) -> bool {
         // A is descendant of B means B is ancestor of A
         self.is_ancestor_of(element_id, potential_descendant)
+    }
+
+    /// Get the owner requirements for a file attachment (via satisfiedBy relation).
+    pub fn get_file_owners(&self, file_path: &std::path::Path) -> Vec<String> {
+        let mut owners = Vec::new();
+        let file_path_str = file_path.to_string_lossy();
+
+        for (element_id, node) in &self.nodes {
+            for relation in &node.element.relations {
+                if relation::is_satisfaction_relation(relation.relation_type)
+                    && relation.relation_type.name == SATISFACTION_RELATIONS[1] // satisfiedBy
+                {
+                    if let LinkType::InternalPath(ref target_path) = relation.target.link {
+                        if target_path.to_string_lossy() == file_path_str {
+                            owners.push(element_id.clone());
+                        }
+                    }
+                }
+            }
+        }
+        owners
+    }
+
+    /// Find if the same attachment exists in hierarchy (ancestor or descendant).
+    /// Returns (direction, element_id) where direction is "ancestor" or "descendant".
+    pub fn find_duplicate_attachment_in_hierarchy(
+        &self,
+        element_id: &str,
+        attachment: &crate::element::AttachmentTarget,
+    ) -> Option<(&'static str, String)> {
+        // Check ancestors
+        if let Some(ancestor) = self.find_attachment_in_ancestors(element_id, attachment) {
+            return Some(("ancestor", ancestor));
+        }
+        // Check descendants
+        if let Some(descendant) = self.find_attachment_in_descendants(element_id, attachment) {
+            return Some(("descendant", descendant));
+        }
+        None
+    }
+
+    fn find_attachment_in_ancestors(
+        &self,
+        element_id: &str,
+        attachment: &crate::element::AttachmentTarget,
+    ) -> Option<String> {
+        let hierarchical_types = get_hierarchical_relation_types();
+        let mut visited = HashSet::new();
+        self.find_attachment_in_ancestors_recursive(element_id, attachment, &hierarchical_types, &mut visited)
+    }
+
+    fn find_attachment_in_ancestors_recursive(
+        &self,
+        element_id: &str,
+        attachment: &crate::element::AttachmentTarget,
+        hierarchical_types: &[&str],
+        visited: &mut HashSet<String>,
+    ) -> Option<String> {
+        if visited.contains(element_id) {
+            return None;
+        }
+        visited.insert(element_id.to_string());
+
+        if let Some(node) = self.nodes.get(element_id) {
+            for relation in &node.element.relations {
+                if hierarchical_types.contains(&relation.relation_type.name) {
+                    if let LinkType::Identifier(parent_id) = &relation.target.link {
+                        if let Some(parent_node) = self.nodes.get(parent_id) {
+                            // Check if parent has this attachment
+                            if parent_node.element.attachments.iter().any(|a| self.attachments_equal(&a.target, attachment)) {
+                                return Some(parent_id.clone());
+                            }
+                        }
+                        // Check ancestors recursively
+                        if let Some(found) = self.find_attachment_in_ancestors_recursive(parent_id, attachment, hierarchical_types, visited) {
+                            return Some(found);
+                        }
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    fn find_attachment_in_descendants(
+        &self,
+        element_id: &str,
+        attachment: &crate::element::AttachmentTarget,
+    ) -> Option<String> {
+        let mut visited = HashSet::new();
+        self.find_attachment_in_descendants_recursive(element_id, attachment, &mut visited)
+    }
+
+    fn find_attachment_in_descendants_recursive(
+        &self,
+        element_id: &str,
+        attachment: &crate::element::AttachmentTarget,
+        visited: &mut HashSet<String>,
+    ) -> Option<String> {
+        if visited.contains(element_id) {
+            return None;
+        }
+        visited.insert(element_id.to_string());
+
+        // Find all elements that have derivedFrom pointing to element_id
+        for (child_id, child_node) in &self.nodes {
+            let is_child = child_node.element.relations.iter().any(|r| {
+                get_hierarchical_relation_types().contains(&r.relation_type.name)
+                    && matches!(&r.target.link, LinkType::Identifier(id) if id == element_id)
+            });
+
+            if is_child {
+                // Check if child has this attachment
+                if child_node.element.attachments.iter().any(|a| self.attachments_equal(&a.target, attachment)) {
+                    return Some(child_id.clone());
+                }
+                // Check descendants recursively
+                if let Some(found) = self.find_attachment_in_descendants_recursive(child_id, attachment, visited) {
+                    return Some(found);
+                }
+            }
+        }
+        None
+    }
+
+    fn attachments_equal(&self, a: &crate::element::AttachmentTarget, b: &crate::element::AttachmentTarget) -> bool {
+        match (a, b) {
+            (crate::element::AttachmentTarget::FilePath(p1), crate::element::AttachmentTarget::FilePath(p2)) => p1 == p2,
+            (crate::element::AttachmentTarget::ElementIdentifier(id1), crate::element::AttachmentTarget::ElementIdentifier(id2)) => id1 == id2,
+            _ => false,
+        }
     }
 
     /// Validate Refinement element constraints

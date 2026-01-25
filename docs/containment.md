@@ -354,14 +354,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Attachment Scope Constraints",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#attachment-scope-constraints",
-                      "children": [
-                        {
-                          "name": "Relation Semantics Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#relation-semantics-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/ModelManagement.html#attachment-scope-constraints"
                     },
                     {
                       "name": "Default Requirement Type Assignment",
@@ -421,11 +414,6 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#refinement-element-structure-constraints",
                       "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.md"
-                        },
                         {
                           "name": "Supported Element Types Specification",
                           "type": "attachment-element",
@@ -608,14 +596,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Attachment Target Validation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/Validation.html#attachment-target-validation",
-                      "children": [
-                        {
-                          "name": "ReservedSubsections.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/Validation.html#attachment-target-validation"
                     },
                     {
                       "name": "Cross-Component Dependency Validator",
@@ -707,14 +688,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Validate Relation Types",
                       "type": "user-requirement",
-                      "link": "requirements/Functional/Core/Validation.html#validate-relation-types",
-                      "children": [
-                        {
-                          "name": "Relation Semantics Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#relation-semantics-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/Validation.html#validate-relation-types"
                     },
                     {
                       "name": "Validation Error Handling",
@@ -1020,11 +994,6 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Lint Command Verification",
                           "type": "verification",
                           "link": "requirements/Functional/Operations/Verifications/LintingVerifications.html#lint-command-verification"
-                        },
-                        {
-                          "name": "Redundant Hierarchical Attachment Test",
-                          "type": "verification",
-                          "link": "requirements/Functional/Operations/Verifications/LintingVerifications.html#redundant-hierarchical-attachment-test"
                         }
                       ]
                     }
@@ -1298,11 +1267,6 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
                         }
                       ]
-                    },
-                    {
-                      "name": "Redundant Hierarchical Attachment Detection",
-                      "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/Linting.html#redundant-hierarchical-attachment-detection"
                     },
                     {
                       "name": "Redundant Hierarchical Relations Detection and Auto-Removal",
@@ -1697,14 +1661,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Forward-Only Relation Traversal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal",
-                      "children": [
-                        {
-                          "name": "Diagram Relation Filtering Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal"
                     },
                     {
                       "name": "Model Diagram Output Formats",
@@ -1753,14 +1710,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Reverse Relation Traversal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#reverse-relation-traversal",
-                      "children": [
-                        {
-                          "name": "Diagram Relation Filtering Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Output/Reporting.html#reverse-relation-traversal"
                     },
                     {
                       "name": "Search Report Generator",
@@ -1798,16 +1748,6 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "TraceFlowView.md",
                           "type": "attachment-file",
                           "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.md"
-                        },
-                        {
-                          "name": "Traceability Reporting Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#traceability-reporting-specification"
-                        },
-                        {
-                          "name": "Verification Roll-up Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Processing/Specifications.html#verification-roll-up-specification"
                         },
                         {
                           "name": "Verification Trace Tree Construction",
@@ -3503,14 +3443,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Attachment Scope Constraints",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#attachment-scope-constraints",
-                      "children": [
-                        {
-                          "name": "Relation Semantics Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#relation-semantics-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/ModelManagement.html#attachment-scope-constraints"
                     },
                     {
                       "name": "Default Requirement Type Assignment",
@@ -3570,11 +3503,6 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#refinement-element-structure-constraints",
                       "children": [
-                        {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.md"
-                        },
                         {
                           "name": "Supported Element Types Specification",
                           "type": "attachment-element",
@@ -3757,14 +3685,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Attachment Target Validation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/Validation.html#attachment-target-validation",
-                      "children": [
-                        {
-                          "name": "ReservedSubsections.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/Validation.html#attachment-target-validation"
                     },
                     {
                       "name": "Cross-Component Dependency Validator",
@@ -3856,14 +3777,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Validate Relation Types",
                       "type": "user-requirement",
-                      "link": "requirements/Functional/Core/Validation.html#validate-relation-types",
-                      "children": [
-                        {
-                          "name": "Relation Semantics Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#relation-semantics-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/Validation.html#validate-relation-types"
                     },
                     {
                       "name": "Validation Error Handling",
@@ -4169,11 +4083,6 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Lint Command Verification",
                           "type": "verification",
                           "link": "requirements/Functional/Operations/Verifications/LintingVerifications.html#lint-command-verification"
-                        },
-                        {
-                          "name": "Redundant Hierarchical Attachment Test",
-                          "type": "verification",
-                          "link": "requirements/Functional/Operations/Verifications/LintingVerifications.html#redundant-hierarchical-attachment-test"
                         }
                       ]
                     }
@@ -4447,11 +4356,6 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
                         }
                       ]
-                    },
-                    {
-                      "name": "Redundant Hierarchical Attachment Detection",
-                      "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/Linting.html#redundant-hierarchical-attachment-detection"
                     },
                     {
                       "name": "Redundant Hierarchical Relations Detection and Auto-Removal",
@@ -4846,14 +4750,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Forward-Only Relation Traversal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal",
-                      "children": [
-                        {
-                          "name": "Diagram Relation Filtering Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal"
                     },
                     {
                       "name": "Model Diagram Output Formats",
@@ -4902,14 +4799,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Reverse Relation Traversal",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#reverse-relation-traversal",
-                      "children": [
-                        {
-                          "name": "Diagram Relation Filtering Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Output/Reporting.html#reverse-relation-traversal"
                     },
                     {
                       "name": "Search Report Generator",
@@ -4947,16 +4837,6 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "TraceFlowView.md",
                           "type": "attachment-file",
                           "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.md"
-                        },
-                        {
-                          "name": "Traceability Reporting Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#traceability-reporting-specification"
-                        },
-                        {
-                          "name": "Verification Roll-up Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Processing/Specifications.html#verification-roll-up-specification"
                         },
                         {
                           "name": "Verification Trace Tree Construction",
