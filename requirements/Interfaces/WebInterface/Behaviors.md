@@ -20,4 +20,7 @@ Navigation behavior in HTML export.
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [HTML Export](Features.md#html-export)
 ---

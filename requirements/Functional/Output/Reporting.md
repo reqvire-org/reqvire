@@ -38,9 +38,6 @@ The system shall define:
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
-
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
   * satisfiedBy: [report_collect.rs](../../../core/src/report_collect.rs)
@@ -87,7 +84,6 @@ The system shall include design documents:
 #### Attachments
   * [ContainmentView.md](DesignDocuments/ContainmentView.md)
   * [Containment Specification](../../Refinements.md#containment-specification)
-  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
   * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
@@ -113,7 +109,6 @@ System shall support markdown and JSON output formats.
   * type: requirement
 
 #### Attachments
-  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
   * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
 
@@ -203,9 +198,6 @@ The system shall define custom element type tracking:
 #### Attachments
   * [SearchFiltering.md](DesignDocuments/SearchFiltering.md)
   * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
-  * [JSON Output Structure](Specifications.md#json-output-structure)
-  * [Text Output Formatting](Specifications.md#text-output-formatting)
-  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
@@ -282,9 +274,6 @@ The system shall implement a validation report generator that compiles and forma
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
-
 #### Relations
   * derivedFrom: [Provide Validation Reports](#provide-validation-reports)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
@@ -326,12 +315,9 @@ The report helps track verification completeness and identify gaps in requiremen
   * type: user-requirement
 
 #### Attachments
-  * [JSON Output Structure](Specifications.md#json-output-structure)
-  * [Text Output Formatting](Specifications.md#text-output-formatting)
   * [Verification Coverage Specification](../../Refinements.md#verification-coverage-specification)
   * [Verification Roll-up Specification](../Processing/Specifications.md#verification-roll-up-specification)
   * [Verification Type Selection Guidelines](../Core/Specifications.md#verification-type-selection-guidelines)
-  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
@@ -351,7 +337,6 @@ The system shall generate a TraceFlow view page showing the verification traceab
   * [Traceability Reporting Specification](../../Refinements.md#traceability-reporting-specification)
   * [Verification Roll-up Specification](../Processing/Specifications.md#verification-roll-up-specification)
   * [Verification Trace Tree Construction](../Processing/Specifications.md#verification-trace-tree-construction)
-  * [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
 
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)

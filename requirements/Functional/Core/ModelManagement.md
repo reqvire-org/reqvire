@@ -70,8 +70,6 @@ All manipulation operations shall:
   * type: user-requirement
 
 #### Attachments
-  * [File Persistence Behavior](../Operations/Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
@@ -85,6 +83,8 @@ All manipulation operations shall:
   * derive: [Rename Element Operation](../Operations/ElementManipulation.md#rename-element-operation)
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
+  * satisfiedBy: [Dry-Run Mode Behavior](../Operations/Behaviors.md#dry-run-mode-behavior)
+  * satisfiedBy: [File Persistence Behavior](../Operations/Behaviors.md#file-persistence-behavior)
 ---
 
 ### Attachment Identifier Updates
@@ -102,12 +102,10 @@ This requirement ensures consistency between relation updates and attachment ide
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
-
 #### Relations
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
   * verifiedBy: [Attachment Identifier CRUD Verification](Verifications/AttachmentsVerifications.md#attachment-identifier-crud-verification)
 ---
 

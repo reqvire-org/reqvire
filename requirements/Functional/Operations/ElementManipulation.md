@@ -208,9 +208,6 @@ The system shall define target location validation constraints.
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Git Repository Scope Specification](../Core/Specifications.md#git-repository-scope-specification)
-
 #### Relations
   * derivedFrom: [Ignore Files Integration](../Core/Configuration.md#ignore-files-integration)
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)

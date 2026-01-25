@@ -43,7 +43,7 @@ Added element: Feature D (specifications/Requirements.md#feature-d)
   [37m58     #### Metadata[0m
   [37m59       * type: requirement[0m
 
-  [37m61     #### Relations[0m
-  [37m62       * derivedFrom: [Feature A](#feature-a)[0m
-  [37m63     ---[0m
-  [32m64 +   ␤[0m
+  [37m69     #### Metadata[0m
+  [37m70       * type: user-requirement[0m
+  [37m71     ---[0m
+  [32m72 +   ␤[0m

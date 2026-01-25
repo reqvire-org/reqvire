@@ -100,6 +100,9 @@ Specification for how requirements files are discovered and processed.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * satisfy: [GraphRegistry as Primary Registry](Validation.md#graphregistry-as-primary-registry)
 ---
 
 ### Reserved Files Specification

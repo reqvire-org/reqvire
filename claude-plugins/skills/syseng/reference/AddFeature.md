@@ -153,11 +153,12 @@ EOF
 Link refinements to requirements using relations or attachments:
 
 ```bash
-# Link refinement to requirement using satisfiedBy relation
+# Link refinement to requirement using satisfiedBy relation (owner defines it)
 reqvire link "Data Processing Requirement" "satisfiedBy" "Data Format Specification"
 
-# Attach refinement element (when requirement references but doesn't define it)
-reqvire link "Feature Requirement" attaching "Performance Constraint"
+# Attach refinement element (only from requirements OUTSIDE the owner's hierarchy)
+# The refinement must first satisfy its owner requirement
+reqvire link "Other Feature Requirement" attaching "Performance Constraint"
 
 # Attach file (design document, specification document)
 reqvire link "Architecture Requirement" attaching "docs/architecture.pdf"
@@ -166,6 +167,11 @@ reqvire link "Architecture Requirement" attaching "docs/architecture.pdf"
 reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
 reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 ```
+
+**Attachment constraints:**
+- Refinements must have a `satisfy` relation (establishing an owner) before being attached
+- Only requirements OUTSIDE the owner's derivation hierarchy can attach a refinement
+- Requirements in the same hierarchy access refinements through the hierarchy, not attachments
 
 ## Step 4: Add Verifications
 
@@ -278,9 +284,7 @@ The system shall create and manage user sessions after successful authentication
 
 #### Relations
   * derivedFrom: [User Authentication](../UserStories.md#user-authentication)
-
-#### Attachments
-  * [Session Timeout Constraint](../Constraints.md#session-timeout)
+  * satisfiedBy: [Session Timeout Constraint](../Constraints.md#session-timeout)
 ```
 
 ### 3. Constraint
@@ -293,7 +297,7 @@ User sessions shall expire after 30 minutes of inactivity.
   * type: constraint
 
 #### Relations
-  * satisfy: [User Authentication](../UserStories.md#user-authentication)
+  * satisfy: [Session Management](../System/Auth.md#session-management)
 ```
 
 ### 4. Verification

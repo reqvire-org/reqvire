@@ -59,6 +59,14 @@ This requirement has no attachments.
   * derivedFrom: [System Requirements](#system-requirements)
 ---
 
+### Refinement Target Requirement
+
+A separate requirement that refinements can satisfy (outside main hierarchy).
+
+#### Metadata
+  * type: user-requirement
+---
+
 ### Test Constraint Element
 
 This is a constraint Refinement element for testing element attachments.
@@ -70,7 +78,7 @@ This constraint defines limits on system behavior.
   * type: constraint
 
 #### Relations
-  * satisfy: [System Requirements](#system-requirements)
+  * satisfy: [Refinement Target Requirement](#refinement-target-requirement)
 ---
 
 ### Test Behavior Element
@@ -84,6 +92,6 @@ This behavior defines expected system operation.
   * type: behavior
 
 #### Relations
-  * satisfy: [System Requirements](#system-requirements)
+  * satisfy: [Refinement Target Requirement](#refinement-target-requirement)
 ---
 

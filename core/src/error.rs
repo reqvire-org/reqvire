@@ -130,6 +130,10 @@ pub enum ReqvireError {
     InvalidAttachmentTarget(String),
 
     #[allow(dead_code)]
+    #[error("Invalid attachment scope: {0}")]
+    InvalidAttachmentScope(String),
+
+    #[allow(dead_code)]
     #[error("Duplicate attachment: {0}")]
     DuplicateAttachment(String),
 

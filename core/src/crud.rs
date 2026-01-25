@@ -573,6 +573,23 @@ pub fn attach_element(
     }
 
     let attachment_identifier = attachment_element.identifier.clone();
+
+    // Check 1: Satisfied Refinement Constraint - refinement must have satisfy relations
+    if !model_manager.graph_registry.refinement_has_satisfy_relations(&attachment_identifier) {
+        return Err(ReqvireError::InvalidAttachmentTarget(
+            format!("'{}' has no satisfy relations. Refinements must satisfy a requirement before they can be attached.", attachment_element.name)
+        ));
+    }
+
+    // Check 2: Hierarchical Independence Constraint - target element must not be in defining hierarchy
+    let defining_reqs = model_manager.graph_registry.get_defining_requirements(&attachment_identifier);
+    for defining_req_id in defining_reqs {
+        if model_manager.graph_registry.is_in_hierarchy(&element_id, &defining_req_id) {
+            return Err(ReqvireError::InvalidAttachmentScope(
+                format!("'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the satisfiedBy chain.", attachment_element.name, element_name)
+            ));
+        }
+    }
     let attachment_display_name = attachment_element.name.clone();
 
     // Check if already attached - return error

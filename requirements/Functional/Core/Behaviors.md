@@ -18,6 +18,9 @@ This behavior mirrors the existing relation target update behavior used when mov
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [Attachment Identifier Updates](ModelManagement.md#attachment-identifier-updates)
 ---
 
 ### Attachment Input Auto-Detection Behavior
@@ -43,6 +46,9 @@ This behavior ensures backward compatibility (existing file attachments work unc
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [Attachment Commands](../../Interfaces/CLI/Commands.md#attachment-commands)
 ---
 
 ### Subdirectory Auto-Detection Behavior

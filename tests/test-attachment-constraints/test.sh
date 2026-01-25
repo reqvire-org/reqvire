@@ -76,7 +76,7 @@ cat > "$TEST_DIR/specifications/TestOrphanAttachment.md" <<'EOF'
 A requirement that tries to attach an orphan refinement.
 
 #### Metadata
-  * type: requirement
+  * type: user-requirement
 
 #### Attachments
   * [Orphan-Spec](Refinements.md#orphan-spec)
@@ -285,7 +285,7 @@ if [ $LINK_ORPHAN_EXIT -eq 0 ]; then
   exit 1
 fi
 
-SANITIZED_LINK_ORPHAN=$(echo "$LINK_ORPHAN_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g')
+SANITIZED_LINK_ORPHAN=$(echo "$LINK_ORPHAN_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g' | sed 's|\[.*ERROR reqvire\] |error: |g')
 
 assert_output_matches "${TEST_SCRIPT_DIR}/expected/link-orphan-error.txt" \
   "$SANITIZED_LINK_ORPHAN" \
@@ -305,7 +305,7 @@ if [ $LINK_HIERARCHY_EXIT -eq 0 ]; then
   exit 1
 fi
 
-SANITIZED_LINK_HIERARCHY=$(echo "$LINK_HIERARCHY_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g')
+SANITIZED_LINK_HIERARCHY=$(echo "$LINK_HIERARCHY_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g' | sed 's|\[.*ERROR reqvire\] |error: |g')
 
 assert_output_matches "${TEST_SCRIPT_DIR}/expected/link-hierarchy-error.txt" \
   "$SANITIZED_LINK_HIERARCHY" \
@@ -345,7 +345,7 @@ if [ $MERGE_HIERARCHY_EXIT -eq 0 ]; then
   exit 1
 fi
 
-SANITIZED_MERGE_HIERARCHY=$(echo "$MERGE_HIERARCHY_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g')
+SANITIZED_MERGE_HIERARCHY=$(echo "$MERGE_HIERARCHY_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g' | sed 's|\[.*ERROR reqvire\] |error: |g')
 
 assert_output_matches "${TEST_SCRIPT_DIR}/expected/merge-hierarchy-error.txt" \
   "$SANITIZED_MERGE_HIERARCHY" \
@@ -387,7 +387,7 @@ if [ $MERGE_ORPHAN_EXIT -eq 0 ]; then
   exit 1
 fi
 
-SANITIZED_MERGE_ORPHAN=$(echo "$MERGE_ORPHAN_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g')
+SANITIZED_MERGE_ORPHAN=$(echo "$MERGE_ORPHAN_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g' | sed 's|\[.*ERROR reqvire\] |error: |g')
 
 assert_output_matches "${TEST_SCRIPT_DIR}/expected/merge-orphan-error.txt" \
   "$SANITIZED_MERGE_ORPHAN" \

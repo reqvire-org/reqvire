@@ -113,20 +113,22 @@ Concise EARS-style statement (1 sentence).
 **Ownership vs Reference:**
 
 - **satisfiedBy Relation**: Used by the requirement that OWNS the specification (one-to-one or one-to-many)
-- **Attachment Relation**: Used by requirements that REFERENCE the specification for context (many-to-one) and ARE NOT children of  specification owner requiremnent
+- **Attachment Relation**: Used by requirements OUTSIDE the owner's derivation hierarchy
 
-**Hierarchical Attachment Pattern:**
+**Attachment Scope Constraints:**
 
-When adding attachments, DO NOT ATTACH same attachment if any depth parent already has attachment attached.
+1. Refinements must have a `satisfy` relation first (establishing an owner requirement)
+2. Only requirements OUTSIDE the owner's hierarchy can attach the refinement
+3. Requirements in the same hierarchy (ancestors or descendants of owner) CANNOT attach
 
 **Example:**
 ```markdown
 # In the plan
 **Deterministic Output Specification** - Owned by `Model Reports`, attach to:
-- `Collect Content from Requirement Chain` - *cross reference requirement, not direct child* ✓
-  - MUST NOT ATTACH TO:
-     - `Model Diagram Output Formats` - *grandchild ofCollect Content from Requirement Chain* X
-     - `Validation Report Generator` - *grandchild of Model Diagram Output Formats* X
+- `Some Other Feature` - *not in Model Reports hierarchy* ✓
+  - MUST NOT ATTACH TO (in owner's hierarchy):
+     - `Model Structure and Summaries` - *child of Model Reports* ✗
+     - `Validation Report Generator` - *grandchild of Model Reports* ✗
 ```
 
 ### Phase 5: Validation
@@ -319,14 +321,14 @@ Specifications MUST NOT use EARS statements as those are not requirements.
 
 **Use Attachment when:**
 - Requirement REFERENCES specification for context
-- Specification owned by another requirement
+- Specification owned by a requirement in a DIFFERENT derivation hierarchy
 - Specification provides supporting technical details
-- Multiple requirements benefit from this specification and must adhere / implement it
+- Multiple requirements (from different hierarchies) benefit from this specification
 
-**Hierarchical Priority:**
-- Attachments are inherit from parent and if ALL childrend must adhere to same specifications attach it to parent then
-- Child should not inherit specification if not relevant to it
-- Mark hierarchical relationships in refactoring plans for clarity
+**Attachment Constraint:**
+- Requirements in the same hierarchy as the owner CANNOT attach the refinement
+- They access the refinement through the hierarchy relationship instead
+- Cross-hierarchy attachments enable requirements from separate branches to reference shared specs
 
 ## Quality Metrics
 

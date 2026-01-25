@@ -54,6 +54,14 @@ The system shall validate data according to the format specification.
   * verifiedBy: [Validation Test](Verifications.md#validation-test)
 ---
 
+### Specification Owner Requirement
+
+Owner requirement for specifications (separate from main hierarchy).
+
+#### Metadata
+  * type: user-requirement
+---
+
 ### Data Format Spec
 
 Specifies the JSON format for data exchange.
@@ -67,7 +75,7 @@ String fields have maximum length of 255 characters.
   * type: specification
 
 #### Relations
-  * satisfy: [Top Level Requirement](#top-level-requirement)
+  * satisfy: [Specification Owner Requirement](#specification-owner-requirement)
 ---
 
 ### Independent Requirement With Same Attachment

@@ -60,6 +60,9 @@ Short mode reduces output verbosity for quick scanning:
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [CLI Containment Command](../../Interfaces/CLI/Commands.md#cli-containment-command)
 ---
 
 ### Start Element Type Filter Behavior

@@ -75,7 +75,13 @@ reqvire link "Authorization System Specification" "satisfy" "API Authorization S
 **When to keep attachments:**
 - Requirement references but doesn't define the specification
 - Specification is defined by a different requirement
+- The attaching requirement is OUTSIDE the owner's derivation hierarchy
 - The attachment is a design document or external file (not an element)
+
+**Attachment constraints:**
+- Refinements must have a `satisfy` relation first (establishing an owner)
+- Only requirements outside the owner's hierarchy can attach a refinement
+- Requirements in the same hierarchy cannot attach - they access through the hierarchy
 
 ### Step 4: Consolidate Constraints
 

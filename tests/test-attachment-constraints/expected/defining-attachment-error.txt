@@ -1,4 +1,6 @@
-❌ 1 validation failed with error(s):
+
+❌ 2 validation failed with error(s):
 
   1. Invalid attachment scope: 'Spec-1' cannot be attached to 'User Req A With Attachment' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the satisfiedBy chain. (file: specifications/TestDefiningAttachment.md, element: User Req A With Attachment)
 
+  2. Cross-section duplicate: Cross-section duplicate in element 'User Req A With Attachment': target 'specifications/Refinements.md#spec-1' appears in both Relations and Attachments (file: specifications/TestDefiningAttachment.md)

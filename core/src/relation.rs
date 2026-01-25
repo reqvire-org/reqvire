@@ -111,6 +111,13 @@ pub const BACKWARD_RELATIONS: &[&str] = &[
 /// Relation type for verification
 pub const VERIFY_RELATION: &str = "verify";
 
+/// Relations for satisfaction connections (refinement-to-requirement ownership)
+/// Used to determine if refinements are connected and find defining requirements
+pub const SATISFACTION_RELATIONS: &[&str] = &[
+    "satisfy",       // Refinement satisfies requirement (forward from refinement)
+    "satisfiedBy",   // Requirement satisfied by refinement (forward from requirement)
+];
+
 /// Relations that trace verification propagation in verification traces
 pub const VERIFICATION_TRACES_RELATIONS: &[&str] = &[
     "derivedFrom",

@@ -221,13 +221,11 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
-
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
   * verifiedBy: [Requirements Files Search and Detection Test](Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---
 

@@ -68,12 +68,23 @@ Child of Branch B with a refinement attachment.
   * derivedFrom: [Branch B](#branch-b)
 ---
 
+### Refinement Owner
+
+Owner for the refinement (separate from main hierarchy).
+
+#### Metadata
+  * type: user-requirement
+---
+
 ### Design Details Refinement
 
 A refinement element attached to Leaf From B.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * satisfy: [Refinement Owner](#refinement-owner)
 ---
 
 ### Deep Leaf

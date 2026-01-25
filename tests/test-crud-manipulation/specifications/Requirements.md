@@ -53,3 +53,11 @@ This feature has special characters in its name including commas and slashes.
 #### Relations
   * derivedFrom: [Feature A](#feature-a)
 ---
+
+### Separate Requirement Branch
+
+A separate requirement hierarchy for testing attachments.
+
+#### Metadata
+  * type: user-requirement
+---

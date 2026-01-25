@@ -102,6 +102,8 @@ The link operation will fail with a clear error if:
 - The target element does not exist (for element relations)
 - The relation type is invalid
 - For attaching: the target element is not a Refinement type
+- For attaching: the refinement has no `satisfy` relations (must satisfy a requirement first)
+- For attaching: source and refinement's owner are in the same derivation hierarchy
 - The relation or attachment already exists (duplicate)
 - The target already exists in the other section (cross-section duplicate)
 

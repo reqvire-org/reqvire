@@ -5,7 +5,7 @@ use log::{debug, warn};
 use serde::Serialize;
 
 use crate::Relation;
-use crate::relation::{self, LinkType, get_hierarchical_relation_types, IMPACT_PROPAGATION_RELATIONS};
+use crate::relation::{self, LinkType, get_hierarchical_relation_types, IMPACT_PROPAGATION_RELATIONS, SATISFACTION_RELATIONS};
 use crate::element::{Element, ElementType, RequirementType};
 use crate::error::ReqvireError;
 use crate::git_commands;
@@ -603,6 +603,37 @@ impl GraphRegistry {
                                         identifier
                                     ),
                                 ));
+                                continue;
+                            }
+
+                            // Check 1: Satisfied Refinement Constraint - refinement must have satisfy relations
+                            if !self.refinement_has_satisfy_relations(identifier) {
+                                errors.push(ReqvireError::InvalidAttachmentTarget(
+                                    format!(
+                                        "'{}' has no satisfy relations. Refinements must satisfy a requirement before they can be attached. (file: {}, element: {})",
+                                        target_node.element.name,
+                                        element.file_path,
+                                        element.name
+                                    ),
+                                ));
+                                continue;
+                            }
+
+                            // Check 2: Hierarchical Independence Constraint - attaching element must not be in defining hierarchy
+                            let defining_reqs = self.get_defining_requirements(identifier);
+                            for defining_req_id in defining_reqs {
+                                if self.is_in_hierarchy(&element.identifier, &defining_req_id) {
+                                    errors.push(ReqvireError::InvalidAttachmentScope(
+                                        format!(
+                                            "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the satisfiedBy chain. (file: {}, element: {})",
+                                            target_node.element.name,
+                                            element.name,
+                                            element.file_path,
+                                            element.name
+                                        ),
+                                    ));
+                                    break;
+                                }
                             }
                         } else {
                             errors.push(ReqvireError::MissingAttachmentTarget(
@@ -626,6 +657,108 @@ impl GraphRegistry {
         }
 
         Ok(errors)
+    }
+
+    /// Get the defining requirements for a refinement element.
+    /// A defining requirement is one that has a `satisfiedBy` relation pointing to the refinement.
+    /// Returns a list of requirement identifiers.
+    pub fn get_defining_requirements(&self, refinement_id: &str) -> Vec<String> {
+        let mut defining_reqs = Vec::new();
+
+        for (element_id, element_node) in &self.nodes {
+            // Check if this element has a satisfiedBy relation pointing to the refinement
+            for relation in &element_node.element.relations {
+                // Use SATISFACTION_RELATIONS - satisfiedBy is the forward satisfaction relation from requirement
+                if relation::is_satisfaction_relation(relation.relation_type)
+                    && relation.relation_type.name == SATISFACTION_RELATIONS[1] // satisfiedBy
+                {
+                    if let LinkType::Identifier(target_id) = &relation.target.link {
+                        if target_id == refinement_id {
+                            defining_reqs.push(element_id.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        defining_reqs
+    }
+
+    /// Check if a refinement element has at least one `satisfy` relation.
+    /// Returns true if the refinement has satisfy relations, false otherwise.
+    pub fn refinement_has_satisfy_relations(&self, refinement_id: &str) -> bool {
+        if let Some(node) = self.nodes.get(refinement_id) {
+            node.element.relations.iter()
+                // Use SATISFACTION_RELATIONS - satisfy is the backward satisfaction relation from refinement
+                .any(|r| relation::is_satisfaction_relation(r.relation_type)
+                    && r.relation_type.name == SATISFACTION_RELATIONS[0]) // satisfy
+        } else {
+            false
+        }
+    }
+
+    /// Check if an element is in the derivation hierarchy of a root element.
+    /// Returns true if element_id is the root itself, an ancestor, or a descendant of root_id.
+    /// Used for attachment scope validation to check hierarchical independence.
+    pub fn is_in_hierarchy(&self, element_id: &str, root_id: &str) -> bool {
+        // Same element
+        if element_id == root_id {
+            return true;
+        }
+
+        // Check if element_id is an ancestor of root_id (element_id is above root_id)
+        if self.is_ancestor_of(element_id, root_id) {
+            return true;
+        }
+
+        // Check if element_id is a descendant of root_id (element_id is below root_id)
+        if self.is_descendant_of(element_id, root_id) {
+            return true;
+        }
+
+        false
+    }
+
+    /// Check if potential_ancestor is an ancestor of element_id via hierarchical relations.
+    fn is_ancestor_of(&self, potential_ancestor: &str, element_id: &str) -> bool {
+        let hierarchical_types = get_hierarchical_relation_types();
+        let mut visited = HashSet::new();
+        self.is_ancestor_of_recursive(potential_ancestor, element_id, &hierarchical_types, &mut visited)
+    }
+
+    fn is_ancestor_of_recursive(
+        &self,
+        potential_ancestor: &str,
+        element_id: &str,
+        hierarchical_types: &[&str],
+        visited: &mut HashSet<String>,
+    ) -> bool {
+        if visited.contains(element_id) {
+            return false;
+        }
+        visited.insert(element_id.to_string());
+
+        if let Some(node) = self.nodes.get(element_id) {
+            for relation in &node.element.relations {
+                if hierarchical_types.contains(&relation.relation_type.name) {
+                    if let LinkType::Identifier(parent_id) = &relation.target.link {
+                        if parent_id == potential_ancestor {
+                            return true;
+                        }
+                        if self.is_ancestor_of_recursive(potential_ancestor, parent_id, hierarchical_types, visited) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        false
+    }
+
+    /// Check if potential_descendant is a descendant of element_id via hierarchical relations.
+    fn is_descendant_of(&self, potential_descendant: &str, element_id: &str) -> bool {
+        // A is descendant of B means B is ancestor of A
+        self.is_ancestor_of(element_id, potential_descendant)
     }
 
     /// Validate Refinement element constraints
@@ -3064,6 +3197,41 @@ impl GraphRegistry {
                 true
             }
         });
+
+        // Validate attachment scope constraints for target element
+        for attachment in &merged_attachments {
+            if let crate::element::AttachmentTarget::ElementIdentifier(ref att_id) = attachment.target {
+                // Check orphan refinement constraint
+                if !self.refinement_has_satisfy_relations(att_id) {
+                    let att_name = self.nodes.get(att_id)
+                        .map(|n| n.element.name.as_str())
+                        .unwrap_or(att_id);
+                    return Err(ReqvireError::InvalidAttachmentTarget(
+                        format!(
+                            "'{}' has no satisfy relations. Refinements must satisfy a requirement before they can be attached.",
+                            att_name
+                        ),
+                    ));
+                }
+
+                // Check hierarchical independence constraint
+                let defining_reqs = self.get_defining_requirements(att_id);
+                for defining_req_id in defining_reqs {
+                    if self.is_in_hierarchy(target_id, &defining_req_id) {
+                        let att_name = self.nodes.get(att_id)
+                            .map(|n| n.element.name.as_str())
+                            .unwrap_or(att_id);
+                        return Err(ReqvireError::InvalidAttachmentScope(
+                            format!(
+                                "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the satisfiedBy chain.",
+                                att_name,
+                                target_name
+                            ),
+                        ));
+                    }
+                }
+            }
+        }
 
         // Check for cross-section duplicates
         let relation_targets: HashSet<String> = merged_relations.iter()

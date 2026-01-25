@@ -82,6 +82,42 @@ Test cases for element identifiers:
   * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
 ---
 
+### Attachment Scope Constraints Test
+
+Verify that attachment scope constraints (hierarchical independence and satisfy requirement) are enforced.
+
+#### Details
+**Test cases for hierarchical independence:**
+- Model with attachment to refinement from same hierarchy causes `validate` to fail
+- Error when attaching requirement has `satisfiedBy` to the refinement
+- Error when attaching requirement is parent of the defining requirement
+- Error when attaching requirement is child/grandchild of the defining requirement
+- Accept attachment when attaching requirement is in a separate branch
+
+**Test cases for satisfy requirement:**
+- Model with attachment to orphan refinement (no satisfy relations) causes `validate` to fail
+- Error message indicates refinement must satisfy a requirement
+- Accept attachment to refinement with satisfy relations
+
+**Test cases for attach command:**
+- `link REQ attaching REFINEMENT` fails when REQ is in same hierarchy
+- `link REQ attaching ORPHAN-REFINEMENT` fails when refinement has no satisfy
+- Error messages are consistent with validate error format
+
+**Test cases for merge command:**
+- `merge TARGET SOURCE` fails when SOURCE has attachment that violates hierarchy constraint for TARGET
+- `merge TARGET SOURCE` fails when SOURCE has attachment to orphan refinement
+- Error message indicates which attachment violates the constraint
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-attachment-constraints/test.sh)
+  * verify: [Attachment Scope Constraints](../ModelManagement.md#attachment-scope-constraints)
+  * verify: [Attachment Scope Validation](../Validation.md#attachment-scope-validation)
+---
+
 ### Attachment Search Filters Verification
 
 Verify search filters correctly find elements by attachments.
@@ -272,40 +308,4 @@ Test cases for filesystem and reporting:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
   * verify: [CLI Remove Asset Command](../../../Interfaces/CLI/Commands.md#cli-remove-asset-command)
----
-
-### Attachment Scope Constraints Test
-
-Verify that attachment scope constraints (hierarchical independence and satisfy requirement) are enforced.
-
-#### Details
-**Test cases for hierarchical independence:**
-- Model with attachment to refinement from same hierarchy causes `validate` to fail
-- Error when attaching requirement has `satisfiedBy` to the refinement
-- Error when attaching requirement is parent of the defining requirement
-- Error when attaching requirement is child/grandchild of the defining requirement
-- Accept attachment when attaching requirement is in a separate branch
-
-**Test cases for satisfy requirement:**
-- Model with attachment to orphan refinement (no satisfy relations) causes `validate` to fail
-- Error message indicates refinement must satisfy a requirement
-- Accept attachment to refinement with satisfy relations
-
-**Test cases for attach command:**
-- `link REQ attaching REFINEMENT` fails when REQ is in same hierarchy
-- `link REQ attaching ORPHAN-REFINEMENT` fails when refinement has no satisfy
-- Error messages are consistent with validate error format
-
-**Test cases for merge command:**
-- `merge TARGET SOURCE` fails when SOURCE has attachment that violates hierarchy constraint for TARGET
-- `merge TARGET SOURCE` fails when SOURCE has attachment to orphan refinement
-- Error message indicates which attachment violates the constraint
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-attachment-constraints/test.sh)
-  * verify: [Attachment Scope Constraints](../ModelManagement.md#attachment-scope-constraints)
-  * verify: [Attachment Scope Validation](../Validation.md#attachment-scope-validation)
 ---

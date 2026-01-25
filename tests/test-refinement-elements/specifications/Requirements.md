@@ -50,6 +50,14 @@ This is a detailed specification document containing technical requirements and 
   * satisfy: [Parent Requirement](#parent-requirement)
 ---
 
+### Separate Branch Requirement
+
+A separate requirement hierarchy for testing attachments.
+
+#### Metadata
+  * type: user-requirement
+---
+
 ### Requirement With Refinement Attachment
 
 This requirement has a Refinement element attached to it.
@@ -61,5 +69,5 @@ This requirement has a Refinement element attached to it.
   * [Test Constraint Element](#test-constraint-element)
 
 #### Relations
-  * derivedFrom: [Parent Requirement](#parent-requirement)
+  * derivedFrom: [Separate Branch Requirement](#separate-branch-requirement)
 ---
