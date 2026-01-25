@@ -98,9 +98,6 @@ The system shall export data in the specified format.
 
 The system shall implement export functionality.
 
-#### Attachments
-  * [docs/export-spec.md](docs/export-spec.md)
-
 #### Metadata
   * type: requirement
 

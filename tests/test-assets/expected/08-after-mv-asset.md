@@ -41,9 +41,6 @@ The implementation shall follow the SLA guidelines.
 
 #### Relations
   * derivedFrom: [Performance Requirement](#performance-requirement)
-
-#### Attachments
-* [../documents/SLA.txt](../documents/SLA.txt)
 ---
 
 ### No Attachments Requirement
@@ -63,6 +60,9 @@ A separate requirement that refinements can satisfy (outside main hierarchy).
 
 #### Metadata
   * type: user-requirement
+
+#### Attachments
+* [../documents/SLA.txt](../documents/SLA.txt)
 ---
 
 ### Test Constraint Element

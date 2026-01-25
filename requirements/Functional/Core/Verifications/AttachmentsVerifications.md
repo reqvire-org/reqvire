@@ -84,15 +84,33 @@ Test cases for element identifiers:
 
 ### Attachment Scope Constraints Test
 
-Verify that attachment scope constraints (hierarchical independence and satisfy requirement) are enforced.
+Verify that attachment scope constraints (hierarchical independence, satisfy requirement, and upstream propagation) are enforced for both refinement elements and file assets.
 
 #### Details
-**Test cases for hierarchical independence:**
+**Test cases for refinement hierarchical independence:**
 - Model with attachment to refinement from same hierarchy causes `validate` to fail
 - Error when attaching requirement has `satisfiedBy` to the refinement
 - Error when attaching requirement is parent of the defining requirement
 - Error when attaching requirement is child/grandchild of the defining requirement
 - Accept attachment when attaching requirement is in a separate branch
+
+**Test cases for file attachment hierarchical independence:**
+- Error when attaching file that is owned via `satisfiedBy` by the same requirement
+- Error when attaching file owned by parent requirement in hierarchy
+- Error when attaching file owned by child requirement in hierarchy
+- Accept file attachment when attaching requirement is in a separate branch from owner
+
+**Test cases for upstream attachment propagation:**
+- Error when ancestor requirement already has the same attachment (refinement or file)
+- Error when descendant requirement already has the same attachment (suggest move)
+- Attachments propagate downstream - descendants cannot re-attach
+- Accept attachment when no ancestor or descendant has the same attachment
+
+**Error message formats:**
+- Refinement hierarchy: `'<refinement>' cannot be attached to '<element>' because it is within the refinement's defining hierarchy`
+- File ownership: `'<file>' cannot be attached to '<element>' because it is within the file owner's hierarchy (owned by '<owner>')`
+- Ancestor propagation: `'<attachment>' is already attached at '<ancestor>' which is an ancestor. Attachments propagate downstream.`
+- Descendant conflict: `'<attachment>' is already attached at '<descendant>' which is a descendant. Move attachment to '<element>' if you want it at higher level.`
 
 **Test cases for satisfy requirement:**
 - Model with attachment to orphan refinement (no satisfy relations) causes `validate` to fail
@@ -102,6 +120,7 @@ Verify that attachment scope constraints (hierarchical independence and satisfy 
 **Test cases for attach command:**
 - `link REQ attaching REFINEMENT` fails when REQ is in same hierarchy
 - `link REQ attaching ORPHAN-REFINEMENT` fails when refinement has no satisfy
+- `link REQ attaching FILE` fails when FILE is owned by requirement in same hierarchy
 - Error messages are consistent with validate error format
 
 **Test cases for merge command:**

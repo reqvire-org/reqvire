@@ -1,2 +1,2 @@
-[requirement] specifications/Requirements.md#implementation-detail - Implementation Detail
 [requirement] specifications/Requirements.md#performance-requirement - Performance Requirement
+[user-requirement] specifications/Requirements.md#refinement-target-requirement - Refinement Target Requirement

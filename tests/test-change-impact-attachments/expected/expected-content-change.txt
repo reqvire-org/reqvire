@@ -16,7 +16,6 @@
     * 📎 [specifications/docs/export-spec.md](specifications/docs/export-spec.md)
     * verifiedBy -> [Export Test](specifications/Verifications.md#export-test)
     * derive -> [Export Implementation](specifications/Requirements.md#export-implementation)
-        * 📎 [specifications/docs/export-spec.md](specifications/docs/export-spec.md)
 
 
 ---

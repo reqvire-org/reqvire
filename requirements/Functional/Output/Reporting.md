@@ -133,9 +133,6 @@ When filtering by root element, system shall traverse only forward relations dow
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
-
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
@@ -148,9 +145,6 @@ The system shall support reverse relation traversal for model views, following d
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
 
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
@@ -334,8 +328,6 @@ The system shall generate a TraceFlow view page showing the verification traceab
 
 #### Attachments
   * [TraceFlowView.md](DesignDocuments/TraceFlowView.md)
-  * [Traceability Reporting Specification](../../Refinements.md#traceability-reporting-specification)
-  * [Verification Roll-up Specification](../Processing/Specifications.md#verification-roll-up-specification)
   * [Verification Trace Tree Construction](../Processing/Specifications.md#verification-trace-tree-construction)
 
 #### Relations

@@ -171,9 +171,6 @@ This validation ensures that attachments either reference existing files or vali
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [ReservedSubsections.md](DesignDocuments/ReservedSubsections.md)
-
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
@@ -187,7 +184,7 @@ This validation ensures that attachments either reference existing files or vali
 The system shall validate attachment scope constraints and report validation errors for violations.
 
 #### Details
-When validating attachments to refinement elements, the system shall enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the refinement, and the reason for the violation.
+When validating attachments (both refinement elements and file assets), the system shall enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
 
 #### Metadata
   * type: requirement
@@ -357,9 +354,6 @@ The system shall validate relation types and allow only supported types.
 
 #### Metadata
   * type: user-requirement
-
-#### Attachments
-  * [Relation Semantics Specification](../../Refinements.md#relation-semantics-specification)
 
 #### Relations
   * derive: [Relation Element Type Validator](#relation-element-type-validator)

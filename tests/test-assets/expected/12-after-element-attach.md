@@ -42,7 +42,6 @@ The implementation shall follow the SLA guidelines.
 
 #### Relations
   * derivedFrom: [Performance Requirement](#performance-requirement)
-
 ---
 
 ### No Attachments Requirement
@@ -62,6 +61,7 @@ A separate requirement that refinements can satisfy (outside main hierarchy).
 
 #### Metadata
   * type: user-requirement
+
 ---
 
 ### Test Constraint Element

@@ -1,2 +1,0 @@
-# Exclude expected files from reqvire parsing (they contain # Elements headers)
-expected/

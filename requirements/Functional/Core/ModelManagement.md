@@ -191,7 +191,6 @@ When a Refinement element contains relations other than `satisfy`, the validator
   * type: requirement
 
 #### Attachments
-  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
   * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
 
 #### Relations
@@ -202,13 +201,10 @@ When a Refinement element contains relations other than `satisfy`, the validator
 
 ### Attachment Scope Constraints
 
-The system shall enforce scope constraints on refinement element attachments to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.
+The system shall enforce scope constraints on attachments (both refinement elements and file assets) to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [Relation Semantics Specification](../../Refinements.md#relation-semantics-specification)
 
 #### Relations
   * derivedFrom: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)

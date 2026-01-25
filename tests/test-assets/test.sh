@@ -81,11 +81,12 @@ echo "✅ Test 3 passed"
 echo ""
 
 # ==================================
-# Test 4: Same file to multiple elements
+# Test 4: Same file to multiple elements (in different hierarchies)
 # ==================================
 echo "Test 4: Same file attached to multiple elements..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Implementation Detail" attaching "docs/SLA.txt" > /dev/null 2>&1
+# Note: Elements must be in different hierarchies to comply with attachment scope constraints
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Refinement Target Requirement" attaching "docs/SLA.txt" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/04-many-to-many.md" "$TEST_DIR/specifications/Requirements.md" "Many-to-many attachment result does not match expected"
 

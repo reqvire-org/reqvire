@@ -33,14 +33,6 @@ pub enum AutoFixableIssue {
         redundant_relations: Vec<RelationInfo>,
         rationale: String,
     },
-    /// Redundant attachment that duplicates an ancestor's attachment
-    #[serde(rename = "redundant_hierarchical_attachment")]
-    RedundantHierarchicalAttachment {
-        element: ElementInfo,
-        redundant_attachment: String,
-        ancestor_with_attachment: ElementInfo,
-        rationale: String,
-    },
 }
 
 #[derive(Debug, Serialize, Clone)]
@@ -141,21 +133,6 @@ impl LintReport {
                             println!("  * {}: [{}]({})", rel.relation_type, rel.target, rel.target);
                         }
                         println!("\nReason: {}\n", rationale);
-                        println!("---\n");
-                    }
-                    AutoFixableIssue::RedundantHierarchicalAttachment {
-                        element,
-                        redundant_attachment,
-                        ancestor_with_attachment,
-                        rationale,
-                    } => {
-                        println!("### Redundant Hierarchical Attachment\n");
-                        println!("**Element: {}**", element.name);
-                        println!("File: [{}]({})\n", element.identifier, element.identifier);
-                        println!("Redundant attachment: `{}`", redundant_attachment);
-                        println!("Already attached on ancestor: [{}]({})\n",
-                            ancestor_with_attachment.name, ancestor_with_attachment.identifier);
-                        println!("Reason: {}\n", rationale);
                         println!("---\n");
                     }
                 }
@@ -270,24 +247,6 @@ impl LintReport {
                         }
                     }
                 }
-                AutoFixableIssue::RedundantHierarchicalAttachment {
-                    element,
-                    redundant_attachment,
-                    ..
-                } => {
-                    // Remove the attachment from the element
-                    match registry.remove_element_attachment(&element.identifier, redundant_attachment) {
-                        Ok(()) => {
-                            relations_removed += 1;
-                        }
-                        Err(e) => {
-                            eprintln!(
-                                "Warning: Failed to remove attachment '{}' from '{}': {}",
-                                redundant_attachment, element.name, e
-                            );
-                        }
-                    }
-                }
             }
         }
 
@@ -311,20 +270,15 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
     // Detect multi-branch convergence (needs manual review)
     needs_manual_review.extend(detect_multi_branch_convergence(registry));
 
-    // Detect redundant hierarchical attachments
-    auto_fixable.extend(detect_redundant_hierarchical_attachments(registry));
-
     // Sort issues by element identifier for deterministic output
     auto_fixable.sort_by(|a, b| {
         let id_a = match a {
             AutoFixableIssue::RedundantVerifyRelations { verification, .. } => &verification.identifier,
             AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => &element.identifier,
-            AutoFixableIssue::RedundantHierarchicalAttachment { element, .. } => &element.identifier,
         };
         let id_b = match b {
             AutoFixableIssue::RedundantVerifyRelations { verification, .. } => &verification.identifier,
             AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => &element.identifier,
-            AutoFixableIssue::RedundantHierarchicalAttachment { element, .. } => &element.identifier,
         };
         id_a.cmp(id_b)
     });
@@ -573,62 +527,6 @@ fn detect_hierarchical_redundancies(
     }
 
     (safe_issues, unsafe_issues)
-}
-
-/// Detect redundant attachments that exist on both child and ancestor elements
-fn detect_redundant_hierarchical_attachments(registry: &GraphRegistry) -> Vec<AutoFixableIssue> {
-    let mut issues = Vec::new();
-
-    for element in registry.get_all_elements() {
-        // Skip elements without attachments
-        if element.attachments.is_empty() {
-            continue;
-        }
-
-        // Collect all ancestors via derivedFrom chain
-        let ancestors = collect_ancestors(&element.identifier, registry);
-        // Sort ancestors for deterministic output (alphabetical by identifier)
-        let mut sorted_ancestors: Vec<_> = ancestors.iter().collect();
-        sorted_ancestors.sort();
-
-        // For each attachment, check if any ancestor has the same attachment
-        for attachment in &element.attachments {
-            let attachment_str = attachment.target.as_str();
-
-            // Find first ancestor with this attachment (alphabetically first)
-            for ancestor_id in &sorted_ancestors {
-                if let Some(ancestor) = registry.get_element(ancestor_id) {
-                    let ancestor_has_attachment = ancestor.attachments.iter()
-                        .any(|a| a.target.as_str() == attachment_str);
-
-                    if ancestor_has_attachment {
-                        issues.push(AutoFixableIssue::RedundantHierarchicalAttachment {
-                            element: ElementInfo {
-                                identifier: element.identifier.clone(),
-                                name: element.name.clone(),
-                                file: element.file_path.clone(),
-                            },
-                            redundant_attachment: attachment_str.clone(),
-                            ancestor_with_attachment: ElementInfo {
-                                identifier: ancestor.identifier.clone(),
-                                name: ancestor.name.clone(),
-                                file: ancestor.file_path.clone(),
-                            },
-                            rationale: format!(
-                                "Attachment '{}' is already present on ancestor '{}'. \
-                                 Attachments propagate through hierarchical relations, \
-                                 so the child's duplicate can be safely removed.",
-                                attachment_str, ancestor.name
-                            ),
-                        });
-                        break; // Only report once per attachment (first ancestor found)
-                    }
-                }
-            }
-        }
-    }
-
-    issues
 }
 
 /// Collect all ancestors of a requirement by traversing upward through hierarchical relations
