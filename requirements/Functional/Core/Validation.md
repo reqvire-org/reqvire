@@ -182,6 +182,26 @@ This validation ensures that attachments either reference existing files or vali
   * verifiedBy: [Attachments Validation Verification](Verifications/AttachmentsVerifications.md#attachments-validation-verification)
 ---
 
+### Attachment Scope Validation
+
+The system shall validate attachment scope constraints and report validation errors for violations.
+
+#### Details
+When validating attachments to refinement elements, the system shall enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the refinement, and the reason for the violation.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
+
+#### Relations
+  * derivedFrom: [Attachment Target Validation](#attachment-target-validation)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * verifiedBy: [Attachment Scope Constraints Test](Verifications/AttachmentsVerifications.md#attachment-scope-constraints-test)
+---
+
 ### GraphRegistry as Primary Registry
 
 The system shall enhance GraphRegistry to serve as the primary structure for relation operations and validation during Pass 2.
@@ -201,13 +221,11 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
-
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * satisfiedBy: [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
   * verifiedBy: [Requirements Files Search and Detection Test](Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---
 

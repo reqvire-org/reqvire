@@ -134,14 +134,23 @@ Styling conventions for HTML export web interface.
 - Monospace for code and identifiers
 - Heading hierarchy matches markdown levels
 
-**Color Palette:**
-| Usage | Light Mode | Dark Mode |
-|-------|------------|-----------|
-| Background | #FFFFFF | #1a1a1a |
-| Text | #333333 | #e0e0e0 |
-| Links | #0066CC | #6699FF |
-| Borders | #DDDDDD | #444444 |
-| Code background | #F5F5F5 | #2d2d2d |
+**Color Palette (MONO Theme):**
+The web interface uses a monochrome grayscale theme for consistent, professional appearance.
+
+| Usage | Color | Notes |
+|-------|-------|-------|
+| Navigation background | #1c1c1c | Dark gray for main nav bar |
+| Navigation hover | #2a2a2a | Subtle highlight on hover |
+| Primary/Buttons | #333333 | Lighter gray for interactive elements |
+| Primary hover | #4a4a4a | Button hover state |
+| Page background | #FAFAFA | Light gray page background |
+| Content background | #FFFFFF | White content cards |
+| Text primary | #212121 | Dark gray for headings |
+| Text secondary | #424242 | Medium gray for body text |
+| Text muted | #757575 | Light gray for secondary info |
+| Links | #4a4a4a | Grayscale links |
+| Borders | #EEEEEE | Light borders |
+| Highlight | #d0d0d0 | Selection/highlight color |
 
 **Element Cards:**
 | Element Type | Border Color | Background |

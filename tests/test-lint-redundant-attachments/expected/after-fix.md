@@ -6,6 +6,17 @@ A refinement element attached to Leaf From B.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * satisfy: [Refinement Owner](#refinement-owner)
+---
+
+### Refinement Owner
+
+Owner for the refinement (separate from main hierarchy).
+
+#### Metadata
+  * type: user-requirement
 ---
 
 ### Root Requirement

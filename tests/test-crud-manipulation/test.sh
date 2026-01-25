@@ -86,12 +86,16 @@ echo ""
 echo "Test 1b: Add element with attachments..."
 
 # First add a refinement element (constraint) that will be attached
+# The constraint must satisfy a requirement, and Feature E must be outside that hierarchy
 CONSTRAINT_ELEMENT='### Feature D Constraint
 
 Rate limiting constraint for Feature D.
 
 #### Metadata
   * type: constraint
+
+#### Relations
+  * satisfy: [Separate Requirement Branch](#separate-requirement-branch)
 '
 
 set +e

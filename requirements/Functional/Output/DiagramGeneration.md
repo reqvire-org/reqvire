@@ -7,13 +7,11 @@ The system shall produce interactive visual representations of relationships wit
 #### Metadata
   * type: user-requirement
 
-#### Attachments
-  * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
-
 #### Relations
   * derive: [Diagram Generation](#diagram-generation)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
   * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
+  * satisfiedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
   * satisfiedBy: [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * satisfiedBy: [Mermaid Diagram Style Specification](Specifications.md#mermaid-diagram-style-specification)
   * satisfiedBy: [Mermaid Interactive Features Specification](Specifications.md#mermaid-interactive-features-specification)
@@ -26,10 +24,6 @@ When requested, the system shall automatically generate diagrams with relation f
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
-  * [Mermaid Interactive Features Specification](Specifications.md#mermaid-interactive-features-specification)
-
 #### Relations
   * derive: [File Diagram Attachment Display](#file-diagram-attachment-display)
   * derive: [Interactive Mermaid Diagram Node Behavior](#interactive-mermaid-diagram-node-behavior)
@@ -37,7 +31,6 @@ When requested, the system shall automatically generate diagrams with relation f
   * derivedFrom: [Interactive Mermaid Diagrams](#interactive-mermaid-diagrams)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
-  * satisfiedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
   * verifiedBy: [Diagram Generation Test](Verifications/DiagramVerifications.md#diagram-generation-test)
   * verifiedBy: [Diagram Relation Filtering Verification](Verifications/DiagramVerifications.md#diagram-relation-filtering-verification)
   * verifiedBy: [Visualize Model Relationships Verification](Verifications/DiagramVerifications.md#visualize-model-relationships-verification)
@@ -59,10 +52,6 @@ Format: `Element Name<br/>📎 attachment1.md<br/>📎 attachment2.md`
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
-  * [Mermaid Interactive Features Specification](Specifications.md#mermaid-interactive-features-specification)
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
@@ -97,9 +86,6 @@ The `change-impact` command shall continue to use GitHub blob URLs by default (u
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Mermaid Interactive Features Specification](Specifications.md#mermaid-interactive-features-specification)
-
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
@@ -121,10 +107,6 @@ Each relation type has specific visual properties and directional semantics defi
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
-  * [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)

@@ -6,25 +6,27 @@ pub fn custom() -> Markup {
         style {
             (PreEscaped(r#"
                 :root {
-                    /* Primary Colors */
-                    --color-primary: #3F51B5;
-                    --color-primary-hover: #7986CB;
-                    --color-primary-active: #303F9F;
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
 
                     /* Element Type Colors */
-                    --color-requirement: #673AB7;
-                    --color-verification: #4CAF50;
-                    --color-other: #9E9E9E;
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
 
-                    /* Status Colors */
-                    --color-verified: #4CAF50;
-                    --color-pending: #FFB74D;
-                    --color-error: #F44336;
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
 
                     /* Interactive Colors */
-                    --color-highlight: #FFAB91;
-                    --color-link: #3F51B5;
-                    --color-link-hover: #303F9F;
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
 
                     /* Text Colors */
                     --color-text-primary: #212121;
@@ -51,7 +53,7 @@ pub fn custom() -> Markup {
                     left: 0;
                     right: 0;
                     height: 50px;
-                    background-color: var(--color-primary);
+                    background-color: var(--color-nav);
                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                     z-index: 1000;
                     display: flex;
@@ -68,7 +70,7 @@ pub fn custom() -> Markup {
                 }
 
                 .reqvire-nav a:hover {
-                    background-color: var(--color-primary-hover);
+                    background-color: var(--color-nav-hover);
                     text-decoration: none;
                 }
 
@@ -97,13 +99,13 @@ pub fn custom() -> Markup {
                 }
 
                 .nav-link:hover {
-                    background-color: var(--color-primary-hover);
+                    background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
                 }
 
                 .nav-link:active {
-                    background-color: var(--color-primary-active);
+                    background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
                 }
@@ -118,7 +120,7 @@ pub fn custom() -> Markup {
                 }
 
                 .mobile-nav-link:hover {
-                    background-color: var(--color-primary-hover);
+                    background-color: var(--color-nav-hover);
                     color: white;
                 }
 

@@ -66,9 +66,10 @@ CRITICAL PATH REQUIREMENT:
 - System requirement derives from user requirement
 - Detailed requirement derives from high-level requirement
 
-**`Attachments`** - Requirement *references* or *depends on* existing specs:
-- Use when requirement references a specification for implementation details and is not direct child of requirement defining specifications
-- NOT for defining the specification (use satisfiedBy instead)
+**`Attachments`** - Requirement *references* or *depends on* existing refinements:
+- Refinements must have `satisfy` relations first (establishing an owner requirement)
+- Only requirements OUTSIDE the owner's derivation hierarchy can attach it
+- NOT for defining the refinement (owner uses satisfiedBy, refinement uses satisfy)
 
 ### MBSE Traceability Flow
 
@@ -128,7 +129,7 @@ Use for requirement statements:
 - **Optional**: "Where [feature] the system shall [capability]"
 
 Requirement element mostly should only contain EARS statements: one in main body and other in '#### Details'. All specifications and constraints must go into refinement elements.
-Requirement that defines refinements must be satisfiedBy such and all other must attach them but not those that are children as those inherit them.
+Refinements must `satisfy` their owner requirement (owner gets auto-generated `satisfiedBy`). Other requirements can attach refinements only if they're outside the owner's derivation hierarchy.
 
 ## Important Notes
 

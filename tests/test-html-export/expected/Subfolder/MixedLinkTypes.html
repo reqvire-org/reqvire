@@ -1,24 +1,26 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MixedLinkTypes</title><link rel="icon" type="image/x-icon" href="../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
                 :root {
-                    /* Primary Colors */
-                    --color-primary: #3F51B5;
-                    --color-primary-hover: #7986CB;
-                    --color-primary-active: #303F9F;
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
 
                     /* Element Type Colors */
-                    --color-requirement: #673AB7;
-                    --color-verification: #4CAF50;
-                    --color-other: #9E9E9E;
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
 
-                    /* Status Colors */
-                    --color-verified: #4CAF50;
-                    --color-pending: #FFB74D;
-                    --color-error: #F44336;
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
 
                     /* Interactive Colors */
-                    --color-highlight: #FFAB91;
-                    --color-link: #3F51B5;
-                    --color-link-hover: #303F9F;
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
 
                     /* Text Colors */
                     --color-text-primary: #212121;
@@ -45,7 +47,7 @@
                     left: 0;
                     right: 0;
                     height: 50px;
-                    background-color: var(--color-primary);
+                    background-color: var(--color-nav);
                     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
                     z-index: 1000;
                     display: flex;
@@ -62,7 +64,7 @@
                 }
 
                 .reqvire-nav a:hover {
-                    background-color: var(--color-primary-hover);
+                    background-color: var(--color-nav-hover);
                     text-decoration: none;
                 }
 
@@ -91,13 +93,13 @@
                 }
 
                 .nav-link:hover {
-                    background-color: var(--color-primary-hover);
+                    background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
                 }
 
                 .nav-link:active {
-                    background-color: var(--color-primary-active);
+                    background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
                 }
@@ -112,7 +114,7 @@
                 }
 
                 .mobile-nav-link:hover {
-                    background-color: var(--color-primary-hover);
+                    background-color: var(--color-nav-hover);
                     color: white;
                 }
 
@@ -347,7 +349,7 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #3F51B5;"><a href="../../index.html" class="nav-logo flex items-center pr-4"><img src="../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../index.html" class="nav-link">Containment</a><a href="../../model.html" class="nav-link">Model</a><a href="../../traces.html" class="nav-link">Traces</a><a href="../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../coverage.html" class="nav-link">Coverage</a><a href="../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#7986CB'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #3F51B5;"><div class="flex flex-col"><a href="../../index.html" class="mobile-nav-link">Containment</a><a href="../../model.html" class="mobile-nav-link">Model</a><a href="../../traces.html" class="mobile-nav-link">Traces</a><a href="../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../index.html" class="nav-logo flex items-center pr-4"><img src="../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../index.html" class="nav-link">Containment</a><a href="../../model.html" class="nav-link">Model</a><a href="../../traces.html" class="nav-link">Traces</a><a href="../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../coverage.html" class="nav-link">Coverage</a><a href="../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../index.html" class="mobile-nav-link">Containment</a><a href="../../model.html" class="mobile-nav-link">Model</a><a href="../../traces.html" class="mobile-nav-link">Traces</a><a href="../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
@@ -886,7 +888,7 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-indigo-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
+</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
                         document.getElementById('mobile-menu-btn').addEventListener('click', function() {
                             var menu = document.getElementById('mobile-menu');
                             menu.classList.toggle('hidden');

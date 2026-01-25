@@ -10,6 +10,8 @@ The system shall provide the capability to create new model elements by acceptin
 #### Attachments
   * [Target Location Constraint](Constraints.md#target-location-constraint)
   * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
+  * [Attachment Hierarchical Independence Constraint](../Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -67,6 +69,10 @@ The system shall provide the capability to merge multiple source elements into a
 
 #### Metadata
   * type: requirement
+
+#### Attachments
+  * [Attachment Hierarchical Independence Constraint](../Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
@@ -201,9 +207,6 @@ The system shall define target location validation constraints.
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [Git Repository Scope Specification](../Core/Specifications.md#git-repository-scope-specification)
 
 #### Relations
   * derivedFrom: [Ignore Files Integration](../Core/Configuration.md#ignore-files-integration)

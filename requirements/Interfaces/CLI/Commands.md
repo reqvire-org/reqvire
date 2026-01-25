@@ -33,9 +33,11 @@ Attachment management has been consolidated into the Relation Commands. The atta
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
-  * [Attachment Input Auto-Detection Behavior](../../Functional/Core/Behaviors.md#attachment-input-auto-detection-behavior)
+  * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
+  * satisfiedBy: [Attachment Input Auto-Detection Behavior](../../Functional/Core/Behaviors.md#attachment-input-auto-detection-behavior)
   * verifiedBy: [Attach Command Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#attach-command-verification)
   * verifiedBy: [Detach Command Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#detach-command-verification)
 ---
@@ -143,6 +145,8 @@ The `add` command shall:
   * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Create Element Workflow Specification](../../Functional/Operations/Specifications.md#create-element-workflow-specification)
+  * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -182,12 +186,12 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 #### Attachments
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Text Output Formatting](../../Functional/Output/Specifications.md#text-output-formatting)
-  * [Change Propagation Behavior](../../Functional/Processing/Behaviors.md#change-propagation-behavior)
   * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [Change Propagation Behavior](../../Functional/Processing/Behaviors.md#change-propagation-behavior)
   * verifiedBy: [Change Impact Analysis Verification](../../Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification)
   * verifiedBy: [Change Impact Detection Test](../../Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test)
   * verifiedBy: [Change Impact Relations Test](../../Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test)
@@ -248,7 +252,6 @@ The markdown output shall include:
 
 #### Attachments
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
-  * [Short Mode Behavior](../../Functional/Output/Behaviors.md#short-mode-behavior)
   * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
   * [ContainmentView.md](../../Functional/Output/DesignDocuments/ContainmentView.md)
   * [D3.js Containment Tree Specification](../WebInterface/Specifications.md#d3js-containment-tree-specification)
@@ -258,6 +261,7 @@ The markdown output shall include:
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * satisfiedBy: [Short Mode Behavior](../../Functional/Output/Behaviors.md#short-mode-behavior)
 ---
 
 ### CLI Coverage Command
@@ -356,6 +360,8 @@ The `merge` command shall:
   * [Merge Type Compatibility Constraint](../../Functional/Operations/Constraints.md#merge-type-compatibility-constraint)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Merge Element Workflow Specification](../../Functional/Operations/Specifications.md#merge-element-workflow-specification)
+  * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -613,9 +619,6 @@ Command output shall be written to stdout for easy redirection to files.
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [Text Output Formatting](../../Functional/Output/Specifications.md#text-output-formatting)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -882,6 +885,8 @@ The system shall provide a validation command that executes model validation and
   * [Validation Error Reporting Behavior](../../Functional/Core/Behaviors.md#validation-error-reporting-behavior)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Error Message Format Specification](../../Functional/Output/Specifications.md#error-message-format-specification)
+  * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)

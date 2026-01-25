@@ -70,8 +70,6 @@ All manipulation operations shall:
   * type: user-requirement
 
 #### Attachments
-  * [File Persistence Behavior](../Operations/Behaviors.md#file-persistence-behavior)
-  * [Dry-Run Mode Behavior](../Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
 
 #### Relations
@@ -85,6 +83,8 @@ All manipulation operations shall:
   * derive: [Rename Element Operation](../Operations/ElementManipulation.md#rename-element-operation)
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
+  * satisfiedBy: [Dry-Run Mode Behavior](../Operations/Behaviors.md#dry-run-mode-behavior)
+  * satisfiedBy: [File Persistence Behavior](../Operations/Behaviors.md#file-persistence-behavior)
 ---
 
 ### Attachment Identifier Updates
@@ -102,12 +102,10 @@ This requirement ensures consistency between relation updates and attachment ide
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
-
 #### Relations
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
   * verifiedBy: [Attachment Identifier CRUD Verification](Verifications/AttachmentsVerifications.md#attachment-identifier-crud-verification)
 ---
 
@@ -202,6 +200,23 @@ When a Refinement element contains relations other than `satisfy`, the validator
   * verifiedBy: [Refinement Relations Rejection Test](Verifications/ParsingVerifications.md#refinement-relations-rejection-test)
 ---
 
+### Attachment Scope Constraints
+
+The system shall enforce scope constraints on refinement element attachments to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Relation Semantics Specification](../../Refinements.md#relation-semantics-specification)
+
+#### Relations
+  * derivedFrom: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
+  * satisfiedBy: [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
+  * satisfiedBy: [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
+  * verifiedBy: [Attachment Scope Constraints Test](Verifications/AttachmentsVerifications.md#attachment-scope-constraints-test)
+---
+
 ### Relation Management Operations
 
 The system shall provide programmatic manipulation of element relations through link and unlink operations while maintaining model integrity.
@@ -219,6 +234,10 @@ When unlinking, the system shall:
 
 #### Metadata
   * type: requirement
+
+#### Attachments
+  * [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)

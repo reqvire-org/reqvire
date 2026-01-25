@@ -16,11 +16,22 @@ This is the target element that will be linked to.
   * type: user-requirement
 ---
 
+### Refinement Target
+
+A separate requirement for refinement satisfaction.
+
+#### Metadata
+  * type: user-requirement
+---
+
 ### Refinement Element
 
 This is a refinement element.
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [Refinement Target](#refinement-target)
 ---
 

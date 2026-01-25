@@ -17,6 +17,9 @@ This element documents a constraint for testing purposes.
 
 #### Details
 This is a constraint that limits system behavior. It specifies boundaries and limitations.
+
+#### Relations
+  * satisfy: [Parent Requirement](#parent-requirement)
 ---
 
 ### Test Behavior Element
@@ -28,6 +31,9 @@ This element documents behavior details for testing purposes.
 
 #### Details
 This is a behavior specification that describes how the system operates under certain conditions.
+
+#### Relations
+  * satisfy: [Parent Requirement](#parent-requirement)
 ---
 
 ### Test Specification Element
@@ -39,6 +45,17 @@ This element documents a specification for testing purposes.
 
 #### Details
 This is a detailed specification document containing technical requirements and parameters.
+
+#### Relations
+  * satisfy: [Parent Requirement](#parent-requirement)
+---
+
+### Separate Branch Requirement
+
+A separate requirement hierarchy for testing attachments.
+
+#### Metadata
+  * type: user-requirement
 ---
 
 ### Requirement With Refinement Attachment
@@ -52,5 +69,5 @@ This requirement has a Refinement element attached to it.
   * [Test Constraint Element](#test-constraint-element)
 
 #### Relations
-  * derivedFrom: [Parent Requirement](#parent-requirement)
+  * derivedFrom: [Separate Branch Requirement](#separate-branch-requirement)
 ---

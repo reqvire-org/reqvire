@@ -7,9 +7,6 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Web Interface Navigation Behavior](Behaviors.md#web-interface-navigation-behavior)
-
 #### Relations
   * derive: [Attachment Export](#attachment-export)
   * derive: [Containment View Attachment Links](#containment-view-attachment-links)
@@ -19,10 +16,11 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * derivedFrom: [Web Interface](../Interfaces.md#web-interface)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
-  * satisfiedBy: [html/mod.rs](../../../core/src/html/mod.rs)
-  * satisfiedBy: [html/layouts.rs](../../../core/src/html/layouts.rs)
+  * satisfiedBy: [layouts.rs](../../../core/src/html/layouts.rs)
+  * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
+  * satisfiedBy: [Web Interface Navigation Behavior](Behaviors.md#web-interface-navigation-behavior)
   * satisfiedBy: [D3.js Containment Tree Specification](Specifications.md#d3js-containment-tree-specification)
   * satisfiedBy: [HTML Branding Specification](Specifications.md#html-branding-specification)
   * satisfiedBy: [HTML Export Pipeline Specification](Specifications.md#html-export-pipeline-specification)
@@ -68,9 +66,6 @@ For each element with attachments:
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [D3.js Containment Tree Specification](Specifications.md#d3js-containment-tree-specification)
 
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
@@ -123,8 +118,6 @@ The system shall generate a model-centric visualization during HTML export showi
 
 #### Attachments
   * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
-  * [HTML Export Pipeline Specification](Specifications.md#html-export-pipeline-specification)
-  * [HTML Navigation Bar Specification](Specifications.md#html-navigation-bar-specification)
 
 #### Relations
   * derive: [Model View Element Navigation](#model-view-element-navigation)
@@ -172,15 +165,11 @@ The system shall ensure color consistency between:
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [HTML Navigation Bar Specification](Specifications.md#html-navigation-bar-specification)
-  * [HTML Branding Specification](Specifications.md#html-branding-specification)
-
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
-  * satisfiedBy: [html/styles.rs](../../../core/src/html/styles.rs)
-  * satisfiedBy: [html/layouts.rs](../../../core/src/html/layouts.rs)
+  * satisfiedBy: [layouts.rs](../../../core/src/html/layouts.rs)
+  * satisfiedBy: [styles.rs](../../../core/src/html/styles.rs)
   * satisfiedBy: [Color Scheme Specification](../../Functional/Output/Specifications.md#color-scheme-specification)
 ---
 

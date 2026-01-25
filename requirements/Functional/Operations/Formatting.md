@@ -86,11 +86,9 @@ When formatting or persisting specification files, the system shall reorder elem
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
-
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
+  * satisfiedBy: [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
   * verifiedBy: [Element Ordering Verification](Verifications/FormattingVerifications.md#element-ordering-verification)
 ---
 

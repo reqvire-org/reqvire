@@ -31,6 +31,9 @@ Preview mode behavior for modification commands.
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
 ---
 
 ### Element Ordering Behavior
@@ -76,6 +79,9 @@ Elements shall be ordered so that parent elements appear before their children (
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [Element Ordering Normalization](Formatting.md#element-ordering-normalization)
 ---
 
 ### File Persistence Behavior
@@ -92,6 +98,9 @@ How element manipulation operations persist changes to files:
 
 #### Metadata
   * type: behavior
+
+#### Relations
+  * satisfy: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
 ---
 
 ### Format Duplicate Removal Behavior

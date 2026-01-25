@@ -5,20 +5,20 @@ Removed element: Feature B (specifications/Requirements.md#feature-b)
   [37m02[0m
   [37m03     ### Feature D Constraint[0m
 
-  [37m37     #### Relations[0m
-  [37m38       * derivedFrom: [Feature A](#feature-a)[0m
-  [37m39     ---[0m
-  [31m40 -   ### Feature B[0m
-  [31m40 -   ␤[0m
-  [31m40 -   This is a test requirement for feature B.[0m
-  [31m40 -   ␤[0m
-  [31m40 -   #### Metadata[0m
-  [31m40 -     * type: requirement[0m
-  [31m40 -   ␤[0m
-  [31m40 -   #### Relations[0m
-  [31m40 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [31m40 -   ---[0m
-  [31m40 -   ␤[0m
-  [37m40     ### Feature C[0m
-  [37m41[0m
-  [37m42     This is a test requirement for feature C with relations.[0m
+  [37m40     #### Relations[0m
+  [37m41       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m42     ---[0m
+  [31m43 -   ### Feature B[0m
+  [31m43 -   ␤[0m
+  [31m43 -   This is a test requirement for feature B.[0m
+  [31m43 -   ␤[0m
+  [31m43 -   #### Metadata[0m
+  [31m43 -     * type: requirement[0m
+  [31m43 -   ␤[0m
+  [31m43 -   #### Relations[0m
+  [31m43 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [31m43 -   ---[0m
+  [31m43 -   ␤[0m
+  [37m43     ### Feature C[0m
+  [37m44[0m
+  [37m45     This is a test requirement for feature C with relations.[0m

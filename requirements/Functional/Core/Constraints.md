@@ -1,5 +1,42 @@
 # Elements
 
+### Attachment Hierarchical Independence Constraint
+
+Rules for preventing attachments within the same requirement hierarchy.
+
+A refinement element can only be attached to a requirement if that requirement has NO hierarchical relationship with the requirement that defines the refinement via `satisfiedBy`:
+- Cannot attach to the requirement that has `satisfiedBy` to this refinement
+- Cannot attach to any parent (ancestor) of that requirement via derivedFrom chain
+- Cannot attach to any child (descendant) of that requirement via derive chain
+
+Only requirements in a separate branch of the hierarchy (no derivedFrom chain connecting them) may attach the refinement.
+
+**Rationale**: Attachments enable cross-submodel traceability while maintaining stakeholder separation. Attachments within the same hierarchy are redundant since traceability already flows through the satisfiedBy relationship.
+
+#### Metadata
+  * type: constraint
+
+#### Relations
+  * satisfy: [Attachment Scope Constraints](ModelManagement.md#attachment-scope-constraints)
+---
+
+### Attachment Satisfied Refinement Constraint
+
+Rules requiring refinements to have satisfy relations before being attachable.
+
+A refinement element can only be attached to requirements if:
+- The refinement has at least one `satisfy` relation to a requirement
+- Refinements without satisfy relations cannot be attached anywhere
+
+**Rationale**: Enforces model hygiene by ensuring refinements are properly integrated into the model through explicit satisfaction relationships before being referenced elsewhere.
+
+#### Metadata
+  * type: constraint
+
+#### Relations
+  * satisfy: [Attachment Scope Constraints](ModelManagement.md#attachment-scope-constraints)
+---
+
 ### Cross-Section Duplicate Constraint
 
 Rules for detecting duplicate link targets across subsections.
