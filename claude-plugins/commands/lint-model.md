@@ -24,7 +24,6 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
    - Syntax and formatting issues
    - Redundant verify relations (verification verifying both leaf and parent)
    - Safe redundant hierarchical relations (single-chain derivedFrom paths)
-   - Redundant hierarchical attachments (child has same attachment as ancestor)
 
 2. **Check for manual review items:**
    ```bash
@@ -55,7 +54,6 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
 - **Redundant verify relations**: Verification verifies both leaf and parent requirement
 - **Safe redundant hierarchical relations**: Single-chain derivedFrom paths that can be safely removed
-- **Redundant hierarchical attachments**: Child element has same attachment as an ancestor (attachment propagates through hierarchy)
 
 ### Needs Review (requires judgment)
 

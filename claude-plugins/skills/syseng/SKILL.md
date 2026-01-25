@@ -558,7 +558,7 @@ reqvire lint --fixable    # Show auto-fixable issues
 reqvire lint --auditable  # Show manual review items
 reqvire lint --fix        # Apply automatic fixes
 ```
-- Auto-fixes: redundant verify relations, safe hierarchical relations, redundant attachments
+- Auto-fixes: redundant verify relations, safe hierarchical relations
 - Manual review: multi-path convergence, complex hierarchies
 
 **3. Check coverage:**
