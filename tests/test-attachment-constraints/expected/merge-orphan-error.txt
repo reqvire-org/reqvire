@@ -1,4 +1,4 @@
 
 ❌ 1 validation failed with error(s):
 
-  1. Invalid attachment target: 'Orphan-Spec' has no satisfy relations. Refinements must satisfy a requirement before they can be attached. (file: specifications/TestMergeOrphan.md, element: Merge Orphan Source)
+  1. Invalid attachment target: 'Orphan-Spec' has no refine relation. Refinements must refine a requirement before they can be attached. (file: specifications/TestMergeOrphan.md, element: Merge Orphan Source)

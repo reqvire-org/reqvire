@@ -60,8 +60,8 @@ The system shall integrate with Git workflows by reading exclusion patterns from
 #### Relations
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
+  * refinedBy: [Ignore Files Specification](Specifications.md#ignore-files-specification)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
-  * satisfiedBy: [Ignore Files Specification](Specifications.md#ignore-files-specification)
   * verifiedBy: [File Exclusion Test](Verifications/ValidationVerifications.md#file-exclusion-test)
 ---
 
@@ -120,7 +120,7 @@ Reserved files serve general repository documentation purposes rather than struc
 
 #### Relations
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
+  * refinedBy: [Reserved Files Specification](Specifications.md#reserved-files-specification)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
-  * satisfiedBy: [Reserved Files Specification](Specifications.md#reserved-files-specification)
   * verifiedBy: [File Exclusion Test](Verifications/ValidationVerifications.md#file-exclusion-test)
 ---

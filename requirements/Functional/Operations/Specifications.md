@@ -20,9 +20,6 @@ When creating a new element, the system shall:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Create Element Operation](ElementManipulation.md#create-element-operation)
 ---
 
 ### Delete Element Workflow Specification
@@ -57,9 +54,6 @@ When deleting an element, the system shall:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Delete Element Operation](ElementManipulation.md#delete-element-operation)
 ---
 
 ### Document Structure Specification
@@ -85,9 +79,6 @@ Rules for normalizing document hierarchical structure during formatting.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Document Structure Normalization](Formatting.md#document-structure-normalization)
 ---
 
 ### Format Consistency Specification
@@ -119,9 +110,6 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Format Consistency Enforcement](Formatting.md#format-consistency-enforcement)
 ---
 
 ### Lint Output Specification
@@ -149,9 +137,6 @@ Specification for lint command output format and content structure.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Model Linting](Linting.md#model-linting)
 ---
 
 ### Merge Element Workflow Specification
@@ -178,9 +163,6 @@ The system shall reject the operation with a clear error message if:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Merge Element Operation](ElementManipulation.md#merge-element-operation)
 ---
 
 ### Move Element Workflow Specification
@@ -216,9 +198,6 @@ When moving an element, the system shall:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Move Element Operation](ElementManipulation.md#move-element-operation)
 ---
 
 ### Multi-Branch Convergence Detection Specification
@@ -260,9 +239,6 @@ This enables the model author to review and decide:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Multi-Branch Convergence Detection](Linting.md#multi-branch-convergence-detection)
 ---
 
 ### Orphaned Children Error Message Specification
@@ -276,9 +252,6 @@ The error message for orphaned children prevention shall include:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Delete Element Operation](ElementManipulation.md#delete-element-operation)
 ---
 
 ### Redundant Hierarchical Relations Specification
@@ -353,9 +326,6 @@ When auto-fix mode is activated, the system shall:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Redundant Hierarchical Relations Detection and Auto-Removal](Linting.md#redundant-hierarchical-relations-detection-and-auto-removal)
 ---
 
 ### Relation Operations Specification
@@ -386,9 +356,6 @@ Technical specification for relation link and unlink operations.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Relation Management Operations](../Core/ModelManagement.md#relation-management-operations)
 ---
 
 ### Relation Ordering Specification
@@ -407,9 +374,6 @@ Rules for sorting relations within elements for deterministic output.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Relation Ordering Normalization](Formatting.md#relation-ordering-normalization)
 ---
 
 ### Relation Validation Specification
@@ -436,7 +400,4 @@ Rules for validating and normalizing relation targets during element creation an
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Create Element Operation](ElementManipulation.md#create-element-operation)
 ---

@@ -32,9 +32,6 @@ Provide reviewers with a high-level scope summary by finding the per-branch lowe
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Change Impact Detection](ChangeImpact.md#change-impact-detection)
 ---
 
 ### Verification Roll-up Specification
@@ -53,9 +50,6 @@ This strategy applies to all verification matrices, coverage reports, and trace 
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Verification Roll-up Strategy](VerificationTraces.md#verification-roll-up-strategy)
 ---
 
 ### Verification Trace Tree Construction

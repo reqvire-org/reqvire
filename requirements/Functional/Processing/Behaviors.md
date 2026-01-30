@@ -20,7 +20,4 @@ How changes propagate through model based on relation types.
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [CLI Change Impact Report Command](../../Interfaces/CLI/Commands.md#cli-change-impact-report-command)
 ---

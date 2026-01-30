@@ -27,9 +27,8 @@ Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#fea
   [37m06     #### Metadata[0m
   [31m07 -     * type: constraint[0m
   [32m07 +     * type: requirement[0m
-  [37m08[0m
-  [37m09     #### Relations[0m
-  [31m10 -     * satisfy: [Separate Requirement Branch](#separate-requirement-branch)[0m
+  [32m08 +   ␤[0m
+  [32m09 +   #### Relations[0m
   [32m10 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
   [37m11     ---[0m
   [31m12 -   ### Parent Feature[0m
@@ -53,54 +52,53 @@ Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#fea
   [37m25[0m
   [37m26     #### Metadata[0m
   [31m27 -     * type: requirement[0m
+  [31m27 -   ␤[0m
+  [31m27 -   #### Relations[0m
+  [31m27 -     * derivedFrom: [Parent Feature](#parent-feature)[0m
   [32m27 +     * type: constraint[0m
-  [37m28[0m
-  [37m29     #### Relations[0m
-  [31m30 -     * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [32m30 +     * satisfy: [Separate Requirement Branch](#separate-requirement-branch)[0m
-  [37m31     ---[0m
-  [31m32 -   ### Complex chars, element/name example[0m
-  [32m32 +   ### Feature E[0m
-  [37m33[0m
-  [31m34 -   This feature has special characters in its name including commas and slashes.[0m
-  [32m34 +   This feature has an attachment to a refinement element.[0m
-  [37m35[0m
-  [37m36     #### Metadata[0m
-  [37m37       * type: requirement[0m
-  [32m38 +   #### Attachments[0m
-  [32m39 +     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
-  [32m40 +   ␤[0m
-  [37m41     #### Relations[0m
-  [31m42 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m42 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
-  [37m43     ---[0m
-  [31m44 -   ### Feature D[0m
-  [32m44 +   ### Parent Feature[0m
-  [37m45[0m
-  [31m46 -   This is a newly added feature.[0m
-  [32m46 +   This is a parent requirement.[0m
-  [37m47[0m
-  [37m48     #### Metadata[0m
-  [31m49 -     * type: requirement[0m
-  [31m49 -   ␤[0m
-  [31m49 -   #### Relations[0m
-  [31m49 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m49 +     * type: user-requirement[0m
-  [37m50     ---[0m
-  [31m51 -   ### Feature E[0m
-  [32m51 +   ### Feature Alpha[0m
-  [37m52[0m
-  [31m53 -   This feature has an attachment to a refinement element.[0m
-  [32m53 +   This is a test requirement for feature A.[0m
-  [37m54[0m
-  [37m55     #### Metadata[0m
-  [37m56       * type: requirement[0m
-  [31m57 -   #### Attachments[0m
-  [31m57 -     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
-  [31m57 -   ␤[0m
-  [37m57     #### Relations[0m
-  [31m58 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m58 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [37m59     ---[0m
-  [37m60[0m
-  [37m61     ### Separate Requirement Branch[0m
+  [37m28     ---[0m
+  [31m29 -   ### Complex chars, element/name example[0m
+  [32m29 +   ### Feature E[0m
+  [37m30[0m
+  [31m31 -   This feature has special characters in its name including commas and slashes.[0m
+  [32m31 +   This feature has an attachment to a refinement element.[0m
+  [37m32[0m
+  [37m33     #### Metadata[0m
+  [37m34       * type: requirement[0m
+  [32m35 +   #### Attachments[0m
+  [32m36 +     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
+  [32m37 +   ␤[0m
+  [37m38     #### Relations[0m
+  [31m39 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m39 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [37m40     ---[0m
+  [31m41 -   ### Feature D[0m
+  [32m41 +   ### Parent Feature[0m
+  [37m42[0m
+  [31m43 -   This is a newly added feature.[0m
+  [32m43 +   This is a parent requirement.[0m
+  [37m44[0m
+  [37m45     #### Metadata[0m
+  [31m46 -     * type: requirement[0m
+  [31m46 -   ␤[0m
+  [31m46 -   #### Relations[0m
+  [31m46 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m46 +     * type: user-requirement[0m
+  [37m47     ---[0m
+  [31m48 -   ### Feature E[0m
+  [32m48 +   ### Feature Alpha[0m
+  [37m49[0m
+  [31m50 -   This feature has an attachment to a refinement element.[0m
+  [32m50 +   This is a test requirement for feature A.[0m
+  [37m51[0m
+  [37m52     #### Metadata[0m
+  [37m53       * type: requirement[0m
+  [31m54 -   #### Attachments[0m
+  [31m54 -     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
+  [31m54 -   ␤[0m
+  [37m54     #### Relations[0m
+  [31m55 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m55 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m56     ---[0m
+  [37m57[0m
+  [37m58     ### Separate Requirement Branch[0m

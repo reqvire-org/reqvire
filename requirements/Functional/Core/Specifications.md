@@ -16,9 +16,6 @@ Element types are identified through a reserved `type` metadata property in the 
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Reserved Subsections Support](StructureAndParsing.md#reserved-subsections-support)
 ---
 
 ### Git Repository Scope Specification
@@ -47,9 +44,6 @@ Path resolution and scope validation rules for Git repository-based project mana
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
 ---
 
 ### Ignore Files Specification
@@ -78,9 +72,6 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Ignore Files Integration](Configuration.md#ignore-files-integration)
 ---
 
 ### Requirements Processing Specification
@@ -100,9 +91,6 @@ Specification for how requirements files are discovered and processed.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [GraphRegistry as Primary Registry](Validation.md#graphregistry-as-primary-registry)
 ---
 
 ### Reserved Files Specification
@@ -135,9 +123,6 @@ The following filenames are reserved for general repository documentation and ar
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Reserved Repository Files Exclusion](Configuration.md#reserved-repository-files-exclusion)
 ---
 
 ### Verification Type Selection Guidelines
@@ -156,7 +141,4 @@ Usage guidelines for selecting appropriate verification types.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Verification Type Categories](ModelManagement.md#verification-type-categories)
 ---

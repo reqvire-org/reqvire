@@ -2,57 +2,53 @@
 
 ### Target User Requirement
 
-A user requirement that refinements can satisfy.
+A user requirement that refinements can refine.
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * refinedBy: [Specification with Satisfy](#specification-with-satisfy)
 
 ---
 
 ### Target System Requirement
 
-A system requirement that refinements can satisfy.
+A system requirement that refinements can refine.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * refinedBy: [Constraint with Satisfy](#constraint-with-satisfy)
+  * refinedBy: [Behavior with Satisfy](#behavior-with-satisfy)
 
 ---
 
 ### Constraint with Satisfy
 
-VALID: Constraint (refinement type) can have satisfy relation to requirement.
+VALID: Constraint (refinement type) can refine requirement via refinedBy.
 
 #### Metadata
   * type: constraint
-
-#### Relations
-  * satisfy: [Target System Requirement](#target-system-requirement)
 
 ---
 
 ### Behavior with Satisfy
 
-VALID: Behavior (refinement type) can have satisfy relation to requirement.
+VALID: Behavior (refinement type) can refine requirement via refinedBy.
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Target System Requirement](#target-system-requirement)
 
 ---
 
 ### Specification with Satisfy
 
-VALID: Specification (refinement type) can have satisfy relation to requirement.
+VALID: Specification (refinement type) can refine requirement via refinedBy.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Target User Requirement](#target-user-requirement)
 
 ---

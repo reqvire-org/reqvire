@@ -52,7 +52,7 @@ Detect the operating system and install reqvire accordingly:
 #### Linux x86_64
 ```bash
 mkdir -p ~/.local/bin
-curl -fsSL -o /tmp/reqvire.tar.gz https://github.com/Reqvire/reqvire/releases/download/v0.9.0/reqvire-linux-x86_64.tar.gz
+curl -fsSL -o /tmp/reqvire.tar.gz https://github.com/Reqvire/reqvire/releases/download/v0.11.0/reqvire-linux-x86_64.tar.gz
 tar -xzf /tmp/reqvire.tar.gz -C ~/.local/bin
 mv ~/.local/bin/reqvire-linux-x86_64 ~/.local/bin/reqvire
 chmod +x ~/.local/bin/reqvire
@@ -61,7 +61,7 @@ chmod +x ~/.local/bin/reqvire
 #### Mac Silicon (ARM64)
 ```bash
 mkdir -p ~/.local/bin
-curl -fsSL -o /tmp/reqvire.tar.gz https://github.com/Reqvire/reqvire/releases/download/v0.9.0/reqvire-darwin-aarch64.tar.gz
+curl -fsSL -o /tmp/reqvire.tar.gz https://github.com/Reqvire/reqvire/releases/download/v0.11.0/reqvire-darwin-aarch64.tar.gz
 tar -xzf /tmp/reqvire.tar.gz -C ~/.local/bin
 mv ~/.local/bin/reqvire-darwin-aarch64 ~/.local/bin/reqvire
 chmod +x ~/.local/bin/reqvire
@@ -70,7 +70,7 @@ chmod +x ~/.local/bin/reqvire
 #### Mac Intel (x86_64)
 ```bash
 mkdir -p ~/.local/bin
-curl -fsSL -o /tmp/reqvire.tar.gz https://github.com/Reqvire/reqvire/releases/download/v0.9.0/reqvire-darwin-x86_64.tar.gz
+curl -fsSL -o /tmp/reqvire.tar.gz https://github.com/Reqvire/reqvire/releases/download/v0.11.0/reqvire-darwin-x86_64.tar.gz
 tar -xzf /tmp/reqvire.tar.gz -C ~/.local/bin
 mv ~/.local/bin/reqvire-darwin-x86_64 ~/.local/bin/reqvire
 chmod +x ~/.local/bin/reqvire
@@ -79,7 +79,7 @@ chmod +x ~/.local/bin/reqvire
 #### Windows (PowerShell)
 ```powershell
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.local\bin"
-Invoke-WebRequest -Uri "https://github.com/Reqvire/reqvire/releases/download/v0.9.0/reqvire-windows-x86_64.zip" -OutFile "$env:TEMP\reqvire.zip"
+Invoke-WebRequest -Uri "https://github.com/Reqvire/reqvire/releases/download/v0.11.0/reqvire-windows-x86_64.zip" -OutFile "$env:TEMP\reqvire.zip"
 Expand-Archive -Path "$env:TEMP\reqvire.zip" -DestinationPath "$env:USERPROFILE\.local\bin" -Force
 Rename-Item "$env:USERPROFILE\.local\bin\reqvire-windows-x86_64.exe" "reqvire.exe"
 ```

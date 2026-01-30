@@ -14,18 +14,18 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * derive: [Model-Centric View Generation](#model-centric-view-generation)
   * derive: [Web Interface Color Scheme](#web-interface-color-scheme)
   * derivedFrom: [Web Interface](../Interfaces.md#web-interface)
+  * refinedBy: [Web Interface Navigation Behavior](Behaviors.md#web-interface-navigation-behavior)
+  * refinedBy: [D3.js Containment Tree Specification](Specifications.md#d3js-containment-tree-specification)
+  * refinedBy: [HTML Branding Specification](Specifications.md#html-branding-specification)
+  * refinedBy: [HTML Export Pipeline Specification](Specifications.md#html-export-pipeline-specification)
+  * refinedBy: [HTML Navigation Bar Specification](Specifications.md#html-navigation-bar-specification)
+  * refinedBy: [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [layouts.rs](../../../core/src/html/layouts.rs)
   * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
-  * satisfiedBy: [Web Interface Navigation Behavior](Behaviors.md#web-interface-navigation-behavior)
-  * satisfiedBy: [D3.js Containment Tree Specification](Specifications.md#d3js-containment-tree-specification)
-  * satisfiedBy: [HTML Branding Specification](Specifications.md#html-branding-specification)
-  * satisfiedBy: [HTML Export Pipeline Specification](Specifications.md#html-export-pipeline-specification)
-  * satisfiedBy: [HTML Navigation Bar Specification](Specifications.md#html-navigation-bar-specification)
-  * satisfiedBy: [Web Interface Style Specification](Specifications.md#web-interface-style-specification)
   * verifiedBy: [CLI Help Structure Verification](../CLI/Verifications/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [HTML Export Verification](Verifications/WebInterfaceVerifications.md#html-export-verification)
 ---
@@ -167,10 +167,10 @@ The system shall ensure color consistency between:
 
 #### Relations
   * derivedFrom: [HTML Export](#html-export)
+  * refinedBy: [Color Scheme Specification](../../Functional/Output/Specifications.md#color-scheme-specification)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
   * satisfiedBy: [layouts.rs](../../../core/src/html/layouts.rs)
   * satisfiedBy: [styles.rs](../../../core/src/html/styles.rs)
-  * satisfiedBy: [Color Scheme Specification](../../Functional/Output/Specifications.md#color-scheme-specification)
 ---
 
 ### Serve Command

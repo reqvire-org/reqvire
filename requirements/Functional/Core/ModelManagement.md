@@ -83,8 +83,8 @@ All manipulation operations shall:
   * derive: [Rename Element Operation](../Operations/ElementManipulation.md#rename-element-operation)
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
-  * satisfiedBy: [Dry-Run Mode Behavior](../Operations/Behaviors.md#dry-run-mode-behavior)
-  * satisfiedBy: [File Persistence Behavior](../Operations/Behaviors.md#file-persistence-behavior)
+  * refinedBy: [Dry-Run Mode Behavior](../Operations/Behaviors.md#dry-run-mode-behavior)
+  * refinedBy: [File Persistence Behavior](../Operations/Behaviors.md#file-persistence-behavior)
 ---
 
 ### Attachment Identifier Updates
@@ -104,8 +104,8 @@ This requirement ensures consistency between relation updates and attachment ide
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](#element-manipulation-operations)
+  * refinedBy: [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
-  * satisfiedBy: [Attachment Identifier CRUD Update Behavior](Behaviors.md#attachment-identifier-crud-update-behavior)
   * verifiedBy: [Attachment Identifier CRUD Verification](Verifications/AttachmentsVerifications.md#attachment-identifier-crud-verification)
 ---
 
@@ -129,8 +129,9 @@ The system shall use the Git repository root as the project base for path resolu
 #### Relations
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
+  * refinedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
+  * refinedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
   * satisfiedBy: [git_commands.rs](../../../core/src/git_commands.rs)
-  * satisfiedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
   * verifiedBy: [Subdirectory Processing Verification](Verifications/ValidationVerifications.md#subdirectory-processing-verification)
 ---
 
@@ -171,21 +172,22 @@ The system shall define element type relation compatibility constraints.
 #### Relations
   * derive: [Relation Element Type Validator](Validation.md#relation-element-type-validator)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * satisfiedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
+  * refinedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 
 ### Refinement Element Structure Constraints
 
-The system shall restrict Refinement elements (constraint, behavior, specification) to only allow `satisfy` relations.
+The system shall restrict Refinement elements (constraint, behavior, specification) to only allow `refine` relations.
 
 #### Details
-Refinement elements serve as detailed documentation that can be attached to other elements. Their relation usage is restricted because:
+Refinement elements serve as detailed documentation that augments requirements and drives implementation. Their relation usage is restricted because:
 - They represent atomic pieces of information focused on documenting requirements
 - They are primarily referenced through the Attachments subsection of other elements
-- Their `satisfy` relation links back to the requirement they fulfill
+- Their `refine` relation links back to the requirement they refine, establishing ownership
+- Each refinement can only be owned by one requirement (uniqueness constraint)
 
-When a Refinement element contains relations other than `satisfy`, the validator shall report an error indicating that only `satisfy` relations are allowed for refinement types.
+When a Refinement element contains relations other than `refine`, the validator shall report an error indicating that only `refine` relations are allowed for refinement types.
 
 #### Metadata
   * type: requirement
@@ -208,8 +210,8 @@ The system shall enforce scope constraints on attachments (both refinement eleme
 
 #### Relations
   * derivedFrom: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
-  * satisfiedBy: [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
-  * satisfiedBy: [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
+  * refinedBy: [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
+  * refinedBy: [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
   * verifiedBy: [Attachment Scope Constraints Test](Verifications/AttachmentsVerifications.md#attachment-scope-constraints-test)
 ---
 
@@ -237,6 +239,7 @@ When unlinking, the system shall:
 
 #### Relations
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
+  * refinedBy: [Relation Operations Specification](../Operations/Specifications.md#relation-operations-specification)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Link Command Verification](../Operations/Verifications/ElementManipulationVerifications.md#link-command-verification)
@@ -282,5 +285,5 @@ The system shall support defined verification categories following clearly defin
   * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
 
 #### Relations
-  * satisfiedBy: [Verification Type Selection Guidelines](Specifications.md#verification-type-selection-guidelines)
+  * refinedBy: [Verification Type Selection Guidelines](Specifications.md#verification-type-selection-guidelines)
 ---

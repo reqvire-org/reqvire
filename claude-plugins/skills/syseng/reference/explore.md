@@ -117,7 +117,7 @@ reqvire search --filter-type="test-verification" --not-have-relations="satisfied
 reqvire search --have-relations="verifiedBy,satisfiedBy" --short
 
 # Find specifications not linked to any requirement
-reqvire search --filter-type="specification" --not-have-relations="satisfy" --short
+reqvire search --filter-type="specification" --not-have-relations="refine" --short
 ```
 
 ### By Attachments
@@ -218,8 +218,8 @@ reqvire coverage --json | jq '.summary'
 
 ### Find orphaned elements
 ```bash
-# Specifications not satisfying any requirement
-reqvire search --filter-type="specification" --not-have-relations="satisfy" --short --json
+# Specifications not refining any requirement
+reqvire search --filter-type="specification" --not-have-relations="refine" --short --json
 
 # Verifications not verifying any requirement
 reqvire search --filter-type="verification" --not-have-relations="verify" --short

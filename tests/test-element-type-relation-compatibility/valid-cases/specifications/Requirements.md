@@ -172,41 +172,41 @@ A constraint element describing system constraints.
 
 ---
 
-### Requirement Satisfied By Behavior
+### Requirement Refined By Behavior
 
-Requirement that asks for behavior definition, satisfied by a behavior element.
+Requirement that asks for behavior definition, refined by a behavior element.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [User Requirement Parent](#user-requirement-parent)
-  * satisfiedBy: [Behavior Element](#behavior-element)
+  * refinedBy: [Behavior Element](#behavior-element)
 
 ---
 
-### Requirement Satisfied By Specification
+### Requirement Refined By Specification
 
-Requirement that asks for specification, satisfied by a specification element.
+Requirement that asks for specification, refined by a specification element.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [User Requirement Parent](#user-requirement-parent)
-  * satisfiedBy: [Specification Element](#specification-element)
+  * refinedBy: [Specification Element](#specification-element)
 
 ---
 
-### Requirement Satisfied By Constraint
+### Requirement Refined By Constraint
 
-Requirement that asks for constraint definition, satisfied by a constraint element.
+Requirement that asks for constraint definition, refined by a constraint element.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [User Requirement Parent](#user-requirement-parent)
-  * satisfiedBy: [Constraint Element](#constraint-element)
+  * refinedBy: [Constraint Element](#constraint-element)
 
 ---

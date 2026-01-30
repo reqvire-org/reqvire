@@ -24,7 +24,7 @@ When filtering lint results, the system shall allow focusing on specific categor
   * derive: [Redundant Hierarchical Relations Detection and Auto-Removal](#redundant-hierarchical-relations-detection-and-auto-removal)
   * derive: [Redundant Verify Relations Detection](#redundant-verify-relations-detection)
   * derivedFrom: [Linting Model Quality](../../UserStories.md#linting-model-quality)
-  * satisfiedBy: [Lint Output Specification](Specifications.md#lint-output-specification)
+  * refinedBy: [Lint Output Specification](Specifications.md#lint-output-specification)
 ---
 
 ### Lint Auto-fix Capability
@@ -63,8 +63,8 @@ The system shall detect when an element reaches a common ancestor through multip
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
+  * refinedBy: [Multi-Branch Convergence Detection Specification](Specifications.md#multi-branch-convergence-detection-specification)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
-  * satisfiedBy: [Multi-Branch Convergence Detection Specification](Specifications.md#multi-branch-convergence-detection-specification)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 
@@ -80,8 +80,8 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
+  * refinedBy: [Redundant Hierarchical Relations Specification](Specifications.md#redundant-hierarchical-relations-specification)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
-  * satisfiedBy: [Redundant Hierarchical Relations Specification](Specifications.md#redundant-hierarchical-relations-specification)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 

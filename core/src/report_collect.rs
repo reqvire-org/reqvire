@@ -13,6 +13,10 @@ use std::path::Path;
 pub enum SourceType {
     /// Content from a model element
     Element,
+    /// Content from a refinement element (via refinedBy relation)
+    RefinedByElement,
+    /// Content from a refinement file (via refinedBy relation)
+    RefinedByFile,
     /// Content from an attached file
     AttachmentFile,
     /// Content from an attached refinement element
@@ -37,6 +41,7 @@ pub struct CollectedItem {
 #[derive(Debug, Serialize)]
 pub struct CollectMetadata {
     pub element_count: usize,
+    pub refinement_count: usize,
     pub attachment_count: usize,
     pub total_items: usize,
 }
@@ -96,6 +101,7 @@ pub fn generate_collect_report(
     // Build collected items
     let mut items: Vec<CollectedItem> = Vec::new();
     let mut element_count = 0;
+    let mut refinement_count = 0;
     let mut attachment_count = 0;
 
     // Process ancestors first (root first, depth 0)
@@ -115,6 +121,18 @@ pub fn generate_collect_report(
             });
             element_count += 1;
 
+            // Collect refinedBy targets (refinement elements and files)
+            for rel in &elem.relations {
+                if rel.relation_type.name == "refinedBy" {
+                    if let Some(item) =
+                        collect_refinement_content(registry, &rel.target, &elem.identifier, depth, git_root)
+                    {
+                        refinement_count += 1;
+                        items.push(item);
+                    }
+                }
+            }
+
             // Collect attachment contents
             for attachment in &elem.attachments {
                 if let Some(item) =
@@ -132,8 +150,9 @@ pub fn generate_collect_report(
         items,
         metadata: CollectMetadata {
             element_count,
+            refinement_count,
             attachment_count,
-            total_items: element_count + attachment_count,
+            total_items: element_count + refinement_count + attachment_count,
         },
     };
 
@@ -271,6 +290,90 @@ fn collect_attachment_content(
     }
 }
 
+/// Collect content from a refinedBy relation target
+fn collect_refinement_content(
+    registry: &GraphRegistry,
+    target: &relation::RelationTarget,
+    parent_identifier: &str,
+    depth: usize,
+    git_root: &Path,
+) -> Option<CollectedItem> {
+    match &target.link {
+        relation::LinkType::Identifier(elem_id) => {
+            // Element identifier - look up refinement element content
+            if let Some(elem) = registry.get_element(elem_id) {
+                Some(CollectedItem {
+                    name: elem.name.clone(),
+                    identifier: elem.identifier.clone(),
+                    file_path: elem.file_path.clone(),
+                    element_type: elem.element_type.as_str().to_string(),
+                    content: elem.content.clone(),
+                    depth,
+                    source_type: SourceType::RefinedByElement,
+                    attached_to: Some(parent_identifier.to_string()),
+                })
+            } else {
+                None
+            }
+        }
+        relation::LinkType::InternalPath(path) => {
+            // File path - read file content (same logic as attachment file handling)
+            let full_path = git_root.join(path);
+            let path_str = path.to_string_lossy().to_string();
+
+            if path_str.ends_with(".md") {
+                match fs::read_to_string(&full_path) {
+                    Ok(content) => Some(CollectedItem {
+                        name: path
+                            .file_name()
+                            .map(|n| n.to_string_lossy().to_string())
+                            .unwrap_or_else(|| path_str.clone()),
+                        identifier: path_str,
+                        file_path: path.to_string_lossy().to_string(),
+                        element_type: "refinement".to_string(),
+                        content,
+                        depth,
+                        source_type: SourceType::RefinedByFile,
+                        attached_to: Some(parent_identifier.to_string()),
+                    }),
+                    Err(_) => Some(CollectedItem {
+                        name: path
+                            .file_name()
+                            .map(|n| n.to_string_lossy().to_string())
+                            .unwrap_or_else(|| path_str.clone()),
+                        identifier: path_str.clone(),
+                        file_path: path.to_string_lossy().to_string(),
+                        element_type: "refinement".to_string(),
+                        content: format!("[{}]({})", path_str, path_str),
+                        depth,
+                        source_type: SourceType::RefinedByFile,
+                        attached_to: Some(parent_identifier.to_string()),
+                    }),
+                }
+            } else {
+                // Non-markdown file - create link
+                Some(CollectedItem {
+                    name: path
+                        .file_name()
+                        .map(|n| n.to_string_lossy().to_string())
+                        .unwrap_or_else(|| path_str.clone()),
+                    identifier: path_str.clone(),
+                    file_path: path.to_string_lossy().to_string(),
+                    element_type: "refinement".to_string(),
+                    content: format!("[{}]({})", path_str, path_str),
+                    depth,
+                    source_type: SourceType::RefinedByFile,
+                    attached_to: Some(parent_identifier.to_string()),
+                })
+            }
+        }
+        relation::LinkType::ExternalUrl(_) => {
+            // Skip external URLs
+            None
+        }
+    }
+}
+
 /// Generate text output with source citations
 fn generate_text_output(report: &CollectReport) -> String {
     let mut output = String::new();
@@ -287,6 +390,34 @@ fn generate_text_output(report: &CollectReport) -> String {
                     "— Source: [{}]({})\n",
                     item.name, item.identifier
                 ));
+            }
+            SourceType::RefinedByElement => {
+                if let Some(ref parent) = item.attached_to {
+                    output.push_str(&format!(
+                        "— Source: [{}]({}) refining [{}]({})\n",
+                        item.name, item.identifier,
+                        extract_element_name(parent), parent
+                    ));
+                } else {
+                    output.push_str(&format!(
+                        "— Source: [{}]({})\n",
+                        item.name, item.identifier
+                    ));
+                }
+            }
+            SourceType::RefinedByFile => {
+                if let Some(ref parent) = item.attached_to {
+                    output.push_str(&format!(
+                        "— Source: [{}]({}) refining [{}]({})\n",
+                        item.name, item.identifier,
+                        extract_element_name(parent), parent
+                    ));
+                } else {
+                    output.push_str(&format!(
+                        "— Source: [{}]({})\n",
+                        item.name, item.identifier
+                    ));
+                }
             }
             SourceType::AttachmentFile => {
                 if let Some(ref parent) = item.attached_to {
@@ -305,7 +436,7 @@ fn generate_text_output(report: &CollectReport) -> String {
             SourceType::AttachmentElement => {
                 if let Some(ref parent) = item.attached_to {
                     output.push_str(&format!(
-                        "— Source: [{}]({}) satisfying [{}]({})\n",
+                        "— Source: [{}]({}) attached to [{}]({})\n",
                         item.name, item.identifier,
                         extract_element_name(parent), parent
                     ));

@@ -13,8 +13,8 @@ The system shall define validation error reporting behavior.
 #### Relations
   * derive: [Relation Type Validation](#relation-type-validation)
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * refinedBy: [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
-  * satisfiedBy: [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
 ---
 
 ### Relation Type Validation
@@ -46,9 +46,9 @@ The system shall display all valid type options when type validation fails.
 
 #### Relations
   * derivedFrom: [Enhanced Validation Error Reporting](#enhanced-validation-error-reporting)
+  * refinedBy: [Type Validation Error Behavior](Behaviors.md#type-validation-error-behavior)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
-  * satisfiedBy: [Type Validation Error Behavior](Behaviors.md#type-validation-error-behavior)
   * verifiedBy: [Type Validation Errors Test](Verifications/ValidationVerifications.md#type-validation-errors-test)
 ---
 
@@ -220,9 +220,9 @@ The GraphRegistry shall be constructed from the ElementRegistry after Pass 1 com
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * refinedBy: [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [Requirements Processing Specification](Specifications.md#requirements-processing-specification)
   * verifiedBy: [Requirements Files Search and Detection Test](Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---
 
@@ -300,8 +300,8 @@ Within-section duplicates (same entry repeated within Relations OR within Attach
 
 #### Relations
   * derivedFrom: [Internal Consistency Validator](#internal-consistency-validator)
+  * refinedBy: [Cross-Section Duplicate Constraint](Constraints.md#cross-section-duplicate-constraint)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [Cross-Section Duplicate Constraint](Constraints.md#cross-section-duplicate-constraint)
   * verifiedBy: [Cross-Section Duplicate Validation Test](Verifications/ValidationVerifications.md#cross-section-duplicate-validation-test)
 ---
 
@@ -317,8 +317,8 @@ The system shall define two-pass validation behavior.
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * refinedBy: [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * satisfiedBy: [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
 ---
 
 ### Validate Markdown Structure

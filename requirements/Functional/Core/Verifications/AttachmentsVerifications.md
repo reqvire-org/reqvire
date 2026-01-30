@@ -84,18 +84,18 @@ Test cases for element identifiers:
 
 ### Attachment Scope Constraints Test
 
-Verify that attachment scope constraints (hierarchical independence, satisfy requirement, and upstream propagation) are enforced for both refinement elements and file assets.
+Verify that attachment scope constraints (hierarchical independence, refine requirement, and upstream propagation) are enforced for both refinement elements and file assets.
 
 #### Details
 **Test cases for refinement hierarchical independence:**
 - Model with attachment to refinement from same hierarchy causes `validate` to fail
-- Error when attaching requirement has `satisfiedBy` to the refinement
+- Error when attaching requirement has `refinedBy` to the refinement
 - Error when attaching requirement is parent of the defining requirement
 - Error when attaching requirement is child/grandchild of the defining requirement
 - Accept attachment when attaching requirement is in a separate branch
 
 **Test cases for file attachment hierarchical independence:**
-- Error when attaching file that is owned via `satisfiedBy` by the same requirement
+- Error when attaching file that is owned via `refinedBy` by the same requirement
 - Error when attaching file owned by parent requirement in hierarchy
 - Error when attaching file owned by child requirement in hierarchy
 - Accept file attachment when attaching requirement is in a separate branch from owner
@@ -112,14 +112,14 @@ Verify that attachment scope constraints (hierarchical independence, satisfy req
 - Ancestor propagation: `'<attachment>' is already attached at '<ancestor>' which is an ancestor. Attachments propagate downstream.`
 - Descendant conflict: `'<attachment>' is already attached at '<descendant>' which is a descendant. Move attachment to '<element>' if you want it at higher level.`
 
-**Test cases for satisfy requirement:**
-- Model with attachment to orphan refinement (no satisfy relations) causes `validate` to fail
-- Error message indicates refinement must satisfy a requirement
-- Accept attachment to refinement with satisfy relations
+**Test cases for refine requirement:**
+- Model with attachment to orphan refinement (no refine relations) causes `validate` to fail
+- Error message indicates refinement must refine a requirement
+- Accept attachment to refinement with refine relations
 
 **Test cases for attach command:**
 - `link REQ attaching REFINEMENT` fails when REQ is in same hierarchy
-- `link REQ attaching ORPHAN-REFINEMENT` fails when refinement has no satisfy
+- `link REQ attaching ORPHAN-REFINEMENT` fails when refinement has no refine
 - `link REQ attaching FILE` fails when FILE is owned by requirement in same hierarchy
 - Error messages are consistent with validate error format
 

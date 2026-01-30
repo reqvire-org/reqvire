@@ -65,6 +65,8 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 | `verify` | Source verifies target | Verification to requirement |
 | `satisfiedBy` | Source is satisfied by target | Requirement to implementation |
 | `satisfy` | Source satisfies target | Implementation to requirement |
+| `refinedBy` | Source owns target as refinement | Requirement to refinement element |
+| `refine` | Source refines target | Refinement element to requirement (auto-generated) |
 | `trace` | General traceability link | Any traceability relationship |
 | `attaching` | Attach file or element | Attach documents or refinements |
 
@@ -102,7 +104,7 @@ The link operation will fail with a clear error if:
 - The target element does not exist (for element relations)
 - The relation type is invalid
 - For attaching: the target element is not a Refinement type
-- For attaching: the refinement has no `satisfy` relations (must satisfy a requirement first)
+- For attaching: the refinement has no `refine` relation (must be owned by a requirement via `refinedBy` first)
 - For attaching: source and refinement's owner are in the same derivation hierarchy
 - The relation or attachment already exists (duplicate)
 - The target already exists in the other section (cross-section duplicate)

@@ -56,7 +56,7 @@ The JSON structure includes:
 - **`attachments`**: Specifications, constraints, and behaviors attached to requirements
 - **`documents`**: Related markdown documentation files with content
 - **`citations`**: Source file paths and anchors for traceability
-- **`relations`**: verifiedBy and satisfiedBy links to other elements
+- **`relations`**: verifiedBy, satisfiedBy, and refinedBy links to other elements
 
 Extract and organize:
 - **Target element details**: Name, type, full content
@@ -65,6 +65,7 @@ Extract and organize:
 - **Documentation**: Content from attached markdown files
 - **Verification info**: verifiedBy relations and test criteria
 - **Implementation info**: satisfiedBy relations and code references
+- **Refinement info**: refinedBy relations to specifications, constraints, behaviors
 - **Source locations**: File paths and anchors for all elements
 
 ### 3. Generate Comprehensive Context Document
@@ -99,9 +100,10 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ### Implementation Details
 
-[Describe how this requirement is satisfied. Extract information from satisfiedBy relations and attached specifications:]
+[Describe how this requirement is implemented and refined. Extract information from satisfiedBy and refinedBy relations and attached specifications:]
 
 - **Code/Components**: [List and describe all satisfiedBy elements - what they are and how they satisfy the requirement]
+- **Refinements**: [List and describe all refinedBy elements - specifications, constraints, behaviors that refine the requirement]
 - **API Endpoints**: [If applicable, detail all API specifications including methods, paths, parameters, responses]
 - **Algorithms**: [If applicable, describe technical approaches and logic]
 - **Data Structures**: [If applicable, describe data models and schemas]
@@ -147,9 +149,14 @@ Create a complete, readable markdown document that synthesizes all collected inf
 - [Verification 2](path/to/file.md#verification-2)
 
 **Satisfied By:**
-[List all implementations that satisfy this requirement]
+[List all code implementations that satisfy this requirement]
 - [Implementation 1](path/to/file.md#impl-1)
 - [Implementation 2](path/to/file.md#impl-2)
+
+**Refined By:**
+[List all refinement elements owned by this requirement]
+- [Specification 1](path/to/file.md#spec-1)
+- [Constraint 1](path/to/file.md#constraint-1)
 
 **Attached Elements:**
 [List all attached specifications, constraints, behaviors]

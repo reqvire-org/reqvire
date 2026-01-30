@@ -144,7 +144,7 @@ Element identifier attachments link to Refinement elements (constraint, behavior
 - Target element must exist in the model
 - Target element must be a Refinement type (constraint, behavior, specification)
 - Non-Refinement element identifiers are rejected with a validation error
-- Target refinement must have at least one `satisfy` relation (no orphan refinements)
+- Target refinement must have at least one `refine` relation (no orphan refinements)
 - Attaching requirement must be outside the refinement's defining hierarchy (hierarchical independence)
 
 **Examples:**

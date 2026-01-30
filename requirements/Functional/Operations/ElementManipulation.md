@@ -16,15 +16,15 @@ The system shall provide the capability to create new model elements by acceptin
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Reserved Subsections Support](../Core/StructureAndParsing.md#reserved-subsections-support)
+  * refinedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
+  * refinedBy: [Create Element Workflow Specification](Specifications.md#create-element-workflow-specification)
+  * refinedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
-  * satisfiedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
-  * satisfiedBy: [Create Element Workflow Specification](Specifications.md#create-element-workflow-specification)
-  * satisfiedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
   * verifiedBy: [Create Element Test](Verifications/ElementManipulationVerifications.md#create-element-test)
 ---
 
@@ -37,11 +37,12 @@ The system shall provide the capability to delete existing model elements while 
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * refinedBy: [Delete Element Workflow Specification](Specifications.md#delete-element-workflow-specification)
+  * refinedBy: [Orphaned Children Error Message Specification](Specifications.md#orphaned-children-error-message-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [Delete Element Workflow Specification](Specifications.md#delete-element-workflow-specification)
   * verifiedBy: [Delete Element Test](Verifications/ElementManipulationVerifications.md#delete-element-test)
 ---
 
@@ -76,12 +77,12 @@ The system shall provide the capability to merge multiple source elements into a
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * refinedBy: [Merge Content Transformation Behavior](Behaviors.md#merge-content-transformation-behavior)
+  * refinedBy: [Merge Type Compatibility Constraint](Constraints.md#merge-type-compatibility-constraint)
+  * refinedBy: [Merge Element Workflow Specification](Specifications.md#merge-element-workflow-specification)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [Merge Content Transformation Behavior](Behaviors.md#merge-content-transformation-behavior)
-  * satisfiedBy: [Merge Type Compatibility Constraint](Constraints.md#merge-type-compatibility-constraint)
-  * satisfiedBy: [Merge Element Workflow Specification](Specifications.md#merge-element-workflow-specification)
   * verifiedBy: [Merge Elements Test](Verifications/ElementManipulationVerifications.md#merge-elements-test)
 ---
 
@@ -98,11 +99,11 @@ The system shall provide the capability to move existing model elements to diffe
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * refinedBy: [Move Element Workflow Specification](Specifications.md#move-element-workflow-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [Move Element Workflow Specification](Specifications.md#move-element-workflow-specification)
   * verifiedBy: [Move Element Test](Verifications/ElementManipulationVerifications.md#move-element-test)
 ---
 
@@ -212,8 +213,8 @@ The system shall define target location validation constraints.
   * derivedFrom: [Ignore Files Integration](../Core/Configuration.md#ignore-files-integration)
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * derivedFrom: [Git Repository as Project Root](../Core/ModelManagement.md#git-repository-as-project-root)
+  * refinedBy: [Target Location Constraint](Constraints.md#target-location-constraint)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
-  * satisfiedBy: [Target Location Constraint](Constraints.md#target-location-constraint)
   * verifiedBy: [Target Location Validation Test](Verifications/ElementManipulationVerifications.md#target-location-validation-test)
 ---

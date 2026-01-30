@@ -22,9 +22,6 @@ Reqvire implements containment hierarchy through filesystem structure.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Align with Industry Standards](UserStories.md#align-with-industry-standards)
 ---
 
 ### Refinement Specification
@@ -45,9 +42,6 @@ Reqvire implements requirement refinement through the Details subsection.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Align with Industry Standards](UserStories.md#align-with-industry-standards)
 ---
 
 ### Relation Semantics Specification
@@ -67,8 +61,14 @@ Reqvire implements SysML relation stereotypes for requirements management.
 
 **Implementation Satisfaction:**
 - `satisfy`/`satisfiedBy`: SysML Satisfy stereotype
-- Links implementation artifacts (code, designs) to requirements
+- Links implementation artifacts (code) to requirements
 - Demonstrates requirement fulfillment
+
+**Refinement Ownership:**
+- `refine`/`refinedBy`: SysML Refine stereotype
+- Links refinement elements (specification, constraint, behavior) and specification files to requirements
+- Establishes ownership: each refinement can only be owned by one requirement
+- Together with the requirement, refinements drive implementation
 
 **General Traceability:**
 - `trace`: SysML Trace stereotype
@@ -77,9 +77,6 @@ Reqvire implements SysML relation stereotypes for requirements management.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Align with Industry Standards](UserStories.md#align-with-industry-standards)
 ---
 
 ### Supported Element Types Specification
@@ -108,9 +105,9 @@ Element types supported by the system for classification and behavior determinat
 
 | Type | Description | Constraints |
 |------|-------------|-------------|
-| `constraint` | Documents constraints that limit or bound the system | Only `satisfy` relations allowed |
-| `behavior` | Documents behavior details and operational specifications | Only `satisfy` relations allowed |
-| `specification` | Documents detailed specifications and technical descriptions | Only `satisfy` relations allowed |
+| `constraint` | Documents constraints that limit or bound the system | Only `refine` relations allowed |
+| `behavior` | Documents behavior details and operational specifications | Only `refine` relations allowed |
+| `specification` | Documents detailed specifications and technical descriptions | Only `refine` relations allowed |
 
 **Other Types:**
 
@@ -126,9 +123,6 @@ Element types supported by the system for classification and behavior determinat
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Align with Industry Standards](UserStories.md#align-with-industry-standards)
 ---
 
 ### Traceability Reporting Specification
@@ -153,9 +147,6 @@ Reqvire provides traceability reports per ISO/IEC/IEEE 29148.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Align with Industry Standards](UserStories.md#align-with-industry-standards)
 ---
 
 ### Verification Coverage Specification
@@ -181,7 +172,4 @@ Reqvire supports verification coverage analysis per INCOSE best practices.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Align with Industry Standards](UserStories.md#align-with-industry-standards)
 ---

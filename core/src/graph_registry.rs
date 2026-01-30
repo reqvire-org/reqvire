@@ -5,7 +5,7 @@ use log::{debug, warn};
 use serde::Serialize;
 
 use crate::Relation;
-use crate::relation::{self, LinkType, get_hierarchical_relation_types, IMPACT_PROPAGATION_RELATIONS, SATISFACTION_RELATIONS};
+use crate::relation::{self, LinkType, get_hierarchical_relation_types, IMPACT_PROPAGATION_RELATIONS, SATISFACTION_RELATIONS, REFINEMENT_RELATIONS};
 use crate::element::{Element, ElementType, RequirementType};
 use crate::error::ReqvireError;
 use crate::git_commands;
@@ -101,8 +101,11 @@ impl GraphRegistry {
         // Validate attachments exist
         errors.extend(self.validate_attachments()?);
 
-        // Validate Refinement elements have no relations
+        // Validate Refinement elements have only refine relations
         errors.extend(self.validate_refinement_elements()?);
+
+        // Validate refinement ownership uniqueness (each refinement owned by at most one requirement)
+        errors.extend(self.validate_refinement_ownership_uniqueness()?);
 
         // Validate 'other' type elements only use trace relations
         errors.extend(self.validate_other_element_relations()?);
@@ -654,11 +657,11 @@ impl GraphRegistry {
                                 continue;
                             }
 
-                            // Check 1: Satisfied Refinement Constraint - refinement must have satisfy relations
-                            if !self.refinement_has_satisfy_relations(identifier) {
+                            // Check 1: Satisfied Refinement Constraint - refinement must have a refine relation
+                            if !self.refinement_has_refine_relation(identifier) {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "'{}' has no satisfy relations. Refinements must satisfy a requirement before they can be attached. (file: {}, element: {})",
+                                        "'{}' has no refine relation. Refinements must refine a requirement before they can be attached. (file: {}, element: {})",
                                         target_node.element.name,
                                         element.file_path,
                                         element.name
@@ -674,7 +677,7 @@ impl GraphRegistry {
                                 if self.is_in_hierarchy(&element.identifier, &defining_req_id) {
                                     errors.push(ReqvireError::InvalidAttachmentScope(
                                         format!(
-                                            "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the satisfiedBy chain. (file: {}, element: {})",
+                                            "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the refinedBy chain. (file: {}, element: {})",
                                             target_node.element.name,
                                             element.name,
                                             element.file_path,
@@ -738,17 +741,17 @@ impl GraphRegistry {
     }
 
     /// Get the defining requirements for a refinement element.
-    /// A defining requirement is one that has a `satisfiedBy` relation pointing to the refinement.
+    /// A defining requirement is one that has a `refinedBy` relation pointing to the refinement.
     /// Returns a list of requirement identifiers.
     pub fn get_defining_requirements(&self, refinement_id: &str) -> Vec<String> {
         let mut defining_reqs = Vec::new();
 
         for (element_id, element_node) in &self.nodes {
-            // Check if this element has a satisfiedBy relation pointing to the refinement
+            // Check if this element has a refinedBy relation pointing to the refinement
             for relation in &element_node.element.relations {
-                // Use SATISFACTION_RELATIONS - satisfiedBy is the forward satisfaction relation from requirement
-                if relation::is_satisfaction_relation(relation.relation_type)
-                    && relation.relation_type.name == SATISFACTION_RELATIONS[1] // satisfiedBy
+                // Use REFINEMENT_RELATIONS - refinedBy is the forward refinement relation from requirement
+                if relation::is_refinement_relation(relation.relation_type)
+                    && relation.relation_type.name == REFINEMENT_RELATIONS[1] // refinedBy
                 {
                     if let LinkType::Identifier(target_id) = &relation.target.link {
                         if target_id == refinement_id {
@@ -762,14 +765,14 @@ impl GraphRegistry {
         defining_reqs
     }
 
-    /// Check if a refinement element has at least one `satisfy` relation.
-    /// Returns true if the refinement has satisfy relations, false otherwise.
-    pub fn refinement_has_satisfy_relations(&self, refinement_id: &str) -> bool {
+    /// Check if a refinement element has at least one `refine` relation.
+    /// Returns true if the refinement has a refine relation, false otherwise.
+    pub fn refinement_has_refine_relation(&self, refinement_id: &str) -> bool {
         if let Some(node) = self.nodes.get(refinement_id) {
             node.element.relations.iter()
-                // Use SATISFACTION_RELATIONS - satisfy is the backward satisfaction relation from refinement
-                .any(|r| relation::is_satisfaction_relation(r.relation_type)
-                    && r.relation_type.name == SATISFACTION_RELATIONS[0]) // satisfy
+                // Use REFINEMENT_RELATIONS - refine is the backward refinement relation from refinement
+                .any(|r| relation::is_refinement_relation(r.relation_type)
+                    && r.relation_type.name == REFINEMENT_RELATIONS[0]) // refine
         } else {
             false
         }
@@ -839,16 +842,19 @@ impl GraphRegistry {
         self.is_ancestor_of(element_id, potential_descendant)
     }
 
-    /// Get the owner requirements for a file attachment (via satisfiedBy relation).
+    /// Get the owner requirements for a file attachment (via satisfiedBy or refinedBy relation).
     pub fn get_file_owners(&self, file_path: &std::path::Path) -> Vec<String> {
         let mut owners = Vec::new();
         let file_path_str = file_path.to_string_lossy();
 
         for (element_id, node) in &self.nodes {
             for relation in &node.element.relations {
-                if relation::is_satisfaction_relation(relation.relation_type)
-                    && relation.relation_type.name == SATISFACTION_RELATIONS[1] // satisfiedBy
-                {
+                // File ownership can come from satisfiedBy (implementations) or refinedBy (refinements)
+                let is_ownership_relation = (relation::is_satisfaction_relation(relation.relation_type)
+                    && relation.relation_type.name == SATISFACTION_RELATIONS[1]) // satisfiedBy
+                    || (relation::is_refinement_relation(relation.relation_type)
+                    && relation.relation_type.name == REFINEMENT_RELATIONS[1]); // refinedBy
+                if is_ownership_relation {
                     if let LinkType::InternalPath(ref target_path) = relation.target.link {
                         if target_path.to_string_lossy() == file_path_str {
                             owners.push(element_id.clone());
@@ -971,7 +977,7 @@ impl GraphRegistry {
     }
 
     /// Validate Refinement element constraints
-    /// Refinement elements (constraint, behavior, specification) can only have satisfy relations
+    /// Refinement elements (constraint, behavior, specification) can only have refine relations
     /// and cannot have attachments.
     fn validate_refinement_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating Refinement element constraints...");
@@ -982,10 +988,10 @@ impl GraphRegistry {
 
             // Check if this is a Refinement element type
             if element.element_type.is_refinement() {
-                // Refinement elements can only have satisfy relations
+                // Refinement elements can only have refine relations
                 let invalid_relations: Vec<_> = element.relations.iter()
                     .filter(|r| r.user_created)
-                    .filter(|r| r.relation_type.name.to_lowercase() != "satisfy")
+                    .filter(|r| r.relation_type.name.to_lowercase() != "refine")
                     .collect();
 
                 if !invalid_relations.is_empty() {
@@ -994,7 +1000,7 @@ impl GraphRegistry {
                         .collect();
                     errors.push(ReqvireError::InvalidMarkdownStructure(
                         format!(
-                            "File {}: Refinement element '{}' (type: {}) can only have satisfy relations. Invalid relations: {:?}",
+                            "File {}: Refinement element '{}' (type: {}) can only have refine relations. Invalid relations: {:?}",
                             element.file_path,
                             element.name,
                             element.element_type.as_str(),
@@ -1021,6 +1027,55 @@ impl GraphRegistry {
             debug!("No Refinement element validation errors found.");
         } else {
             debug!("{} Refinement element validation errors found.", errors.len());
+        }
+
+        Ok(errors)
+    }
+
+    /// Validates that each refinement is owned by at most one requirement via refinedBy.
+    /// A refinement element or file can only appear as a target of refinedBy from one requirement.
+    fn validate_refinement_ownership_uniqueness(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating refinement ownership uniqueness...");
+        let mut errors = Vec::new();
+        // Map from refinement target (identifier or file path) to owning requirement identifier
+        let mut ownership_map: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+
+        for (element_id, element_node) in &self.nodes {
+            for relation in &element_node.element.relations {
+                if relation::is_refinement_relation(relation.relation_type)
+                    && relation.relation_type.name == REFINEMENT_RELATIONS[1] // refinedBy
+                {
+                    let target_key = relation.target.link.as_str().to_string();
+                    if let Some(existing_owner) = ownership_map.get(&target_key) {
+                        let target_name = &relation.target.text;
+                        let owner_name = self.nodes.get(existing_owner)
+                            .map(|n| n.element.name.as_str())
+                            .unwrap_or(existing_owner);
+                        let current_name = element_node.element.name.as_str();
+                        let (first, second) = if owner_name < current_name {
+                            (owner_name, current_name)
+                        } else {
+                            (current_name, owner_name)
+                        };
+                        errors.push(ReqvireError::InvalidMarkdownStructure(
+                            format!(
+                                "Refinement '{}' is owned by multiple requirements: '{}' and '{}'. Each refinement can only be owned by one requirement via refinedBy.",
+                                target_name,
+                                first,
+                                second
+                            ),
+                        ));
+                    } else {
+                        ownership_map.insert(target_key, element_id.clone());
+                    }
+                }
+            }
+        }
+
+        if errors.is_empty() {
+            debug!("No refinement ownership uniqueness violations found.");
+        } else {
+            debug!("{} refinement ownership uniqueness violations found.", errors.len());
         }
 
         Ok(errors)
@@ -3411,13 +3466,13 @@ impl GraphRegistry {
         for attachment in &merged_attachments {
             if let crate::element::AttachmentTarget::ElementIdentifier(ref att_id) = attachment.target {
                 // Check orphan refinement constraint
-                if !self.refinement_has_satisfy_relations(att_id) {
+                if !self.refinement_has_refine_relation(att_id) {
                     let att_name = self.nodes.get(att_id)
                         .map(|n| n.element.name.as_str())
                         .unwrap_or(att_id);
                     return Err(ReqvireError::InvalidAttachmentTarget(
                         format!(
-                            "'{}' has no satisfy relations. Refinements must satisfy a requirement before they can be attached.",
+                            "'{}' has no refine relation. Refinements must refine a requirement before they can be attached.",
                             att_name
                         ),
                     ));
@@ -3432,7 +3487,7 @@ impl GraphRegistry {
                             .unwrap_or(att_id);
                         return Err(ReqvireError::InvalidAttachmentScope(
                             format!(
-                                "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the satisfiedBy chain.",
+                                "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the refinedBy chain.",
                                 att_name,
                                 target_name
                             ),

@@ -21,9 +21,6 @@ Type compatibility rules for merging elements.
 
 #### Metadata
   * type: constraint
-
-#### Relations
-  * satisfy: [Merge Element Operation](ElementManipulation.md#merge-element-operation)
 ---
 
 ### Target Location Constraint
@@ -43,7 +40,4 @@ Validation rules for target paths in element operations.
 
 #### Metadata
   * type: constraint
-
-#### Relations
-  * satisfy: [Target Location Validation and Auto-Creation](ElementManipulation.md#target-location-validation-and-auto-creation)
 ---

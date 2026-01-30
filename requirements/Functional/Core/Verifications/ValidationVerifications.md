@@ -92,11 +92,11 @@ This test verifies that the system correctly validates relation types based on e
 - System shall reject `verify` relations to non-requirement elements
 
 **Refinement Type Validation:**
-- System shall allow `satisfy` relations on `constraint` type elements pointing to requirements
-- System shall allow `satisfy` relations on `behavior` type elements pointing to requirements
-- System shall allow `satisfy` relations on `specification` type elements pointing to requirements
+- System shall allow `refine` relations on `constraint` type elements pointing to requirements
+- System shall allow `refine` relations on `behavior` type elements pointing to requirements
+- System shall allow `refine` relations on `specification` type elements pointing to requirements
 - System shall reject all other relation types on refinement elements (derivedFrom, verifiedBy, trace, satisfiedBy)
-- System shall provide clear error message indicating refinement types can only have satisfy relations
+- System shall provide clear error message indicating refinement types can only have refine relations
 
 **trace Relation Validation:**
 - System shall allow `trace` relations for any non-refinement element type
@@ -116,13 +116,13 @@ This test verifies that the system correctly validates relation types based on e
    - Verify error message indicates only test-verification can use satisfiedBy
 
 3. **Refinement type relation tests:**
-   - Create constraint element with `satisfy` relation to requirement - PASS
-   - Create behavior element with `satisfy` relation to requirement - PASS
-   - Create specification element with `satisfy` relation to requirement - PASS
+   - Create constraint element with `refine` relation to requirement - PASS
+   - Create behavior element with `refine` relation to requirement - PASS
+   - Create specification element with `refine` relation to requirement - PASS
    - Create constraint element with `trace` relation - FAIL with error
    - Create behavior element with `derivedFrom` relation - FAIL with error
    - Create specification element with `satisfiedBy` relation - FAIL with error
-   - Verify error messages indicate refinement types can only have satisfy relations
+   - Verify error messages indicate refinement types can only have refine relations
    - Create constraint element with Attachments subsection - FAIL with error
    - Verify error message indicates refinement types cannot have attachments
 

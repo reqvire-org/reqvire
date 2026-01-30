@@ -51,10 +51,15 @@ CRITICAL PATH REQUIREMENT:
 
 ## Relation Types
 
-**`satisfiedBy`** - Requirement is fulfilled by:
-- Specification elements - Detailed definitions in the model
-- Design documents - DD.md files with architectural details
+**`satisfiedBy`** - Requirement is satisfied by code implementations:
 - Code implementations - Source code that implements the requirement
+- Design documents - DD.md files with architectural details
+
+**`refinedBy`** - Requirement is refined by refinement elements:
+- Specification elements - Detailed definitions in the model
+- Constraint elements - Design and implementation constraints
+- Behavior elements - Behavioral specifications
+- Each refinement can only be owned by one requirement (uniqueness constraint)
 
 **`verifiedBy`** - Requirement is verified by verification elements:
 - `test` - Verification by testing (can have satisfiedBy to test code)
@@ -67,9 +72,9 @@ CRITICAL PATH REQUIREMENT:
 - Detailed requirement derives from high-level requirement
 
 **`Attachments`** - Requirement *references* or *depends on* existing refinements:
-- Refinements must have `satisfy` relations first (establishing an owner requirement)
+- Refinements must have a `refine` relation (established via requirement's `refinedBy`)
 - Only requirements OUTSIDE the owner's derivation hierarchy can attach it
-- NOT for defining the refinement (owner uses satisfiedBy, refinement uses satisfy)
+- NOT for defining the refinement (owner uses refinedBy)
 
 ### MBSE Traceability Flow
 
@@ -77,10 +82,10 @@ CRITICAL PATH REQUIREMENT:
 User Requirement (Stakeholder Need)
     ↓ derive
 System Requirement (Technical Implementation)
-    ↓ satisfiedBy                    ↓ verifiedBy
-Implementation                       Verification Element
-(Specification/Design/Code)              ↓ satisfiedBy (for test type)
-                                     Test Code Implementation
+    ↓ refinedBy              ↓ satisfiedBy        ↓ verifiedBy
+Refinement Elements      Code Implementation   Verification Element
+(Spec/Constraint/Behavior)                         ↓ satisfiedBy (for test type)
+                                               Test Code Implementation
 ```
 
 ## Document Structure
@@ -116,7 +121,8 @@ Implementation                       Verification Element
   * derivedFrom: [Parent](path.md#parent)
   * verifiedBy: [Verification](path.md#verification)
   * satisfiedBy: path/to/implementation
-  * satisfy: [Requirement](path.md#requirement)
+  * refinedBy: [Constraint Element](path.md#constraint-element)
+  * refine: [Requirement](path.md#requirement)
 ```
 
 ## EARS Patterns
@@ -129,7 +135,7 @@ Use for requirement statements:
 - **Optional**: "Where [feature] the system shall [capability]"
 
 Requirement element mostly should only contain EARS statements: one in main body and other in '#### Details'. All specifications and constraints must go into refinement elements.
-Refinements must `satisfy` their owner requirement (owner gets auto-generated `satisfiedBy`). Other requirements can attach refinements only if they're outside the owner's derivation hierarchy.
+Refinements are owned via `refinedBy` on the requirement (refinement gets auto-generated `refine`). Other requirements can attach refinements only if they're outside the owner's derivation hierarchy.
 
 ## Important Notes
 

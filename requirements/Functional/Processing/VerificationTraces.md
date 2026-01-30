@@ -32,7 +32,7 @@ The system shall implement a verification roll-up strategy where parent requirem
 
 #### Relations
   * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
-  * satisfiedBy: [Verification Roll-up Specification](Specifications.md#verification-roll-up-specification)
+  * refinedBy: [Verification Roll-up Specification](Specifications.md#verification-roll-up-specification)
 ---
 
 ### Verification Trace Builder
@@ -44,5 +44,5 @@ The system shall provide functionality to build upward trace trees from verifica
 
 #### Relations
   * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
-  * satisfiedBy: [Verification Trace Tree Construction](Specifications.md#verification-trace-tree-construction)
+  * refinedBy: [Verification Trace Tree Construction](Specifications.md#verification-trace-tree-construction)
 ---

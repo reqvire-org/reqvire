@@ -10,7 +10,7 @@ Use this reference when reorganizing the model structure without changing requir
 
 - Splitting mixed-type requirements (user vs system)
 - Moving elements between files for better organization
-- Adding missing relations (satisfiedBy, derivedFrom)
+- Adding missing relations (refinedBy, derivedFrom)
 - Removing redundant verify relations
 - Consolidating scattered specifications
 
@@ -22,10 +22,10 @@ Find elements that need attention during refactoring:
 
 ```bash
 # Find specifications not linked to any requirement
-reqvire search --filter-type='specification' --not-have-relations='satisfy' --short --json
+reqvire search --filter-type='specification' --not-have-relations='refine' --short --json
 
 # Find constraints without satisfy relations
-reqvire search --filter-type='constraint' --not-have-relations='satisfy' --short
+reqvire search --filter-type='constraint' --not-have-relations='refine' --short
 
 # Find requirements with attachments (candidates for conversion to relations)
 reqvire search --has-attachments --short
@@ -38,8 +38,8 @@ reqvire search --filter-file="requirements/System/**" --short
 ```
 
 These findings guide the refactoring work:
-- Orphaned specifications need `satisfiedBy` relations from appropriate requirements
-- Attachments may need conversion to `satisfiedBy` relations
+- Orphaned specifications need `refinedBy` relations from appropriate requirements
+- Attachments may need conversion to `refinedBy` relations
 - Duplicate names suggest potential merge candidates
 
 ### Step 2: Find Requirements Asking for Specifications
@@ -51,12 +51,12 @@ Search for patterns like:
 - "shall implement constraints"
 - "shall enforce standardized policies"
 
-These requirements should have `satisfiedBy` relations to the specifications they ask for.
+These requirements should have `refinedBy` relations to the specifications they ask for.
 
-### Step 3: Convert Attachments to satisfiedBy Where Appropriate
+### Step 3: Convert Attachments to refinedBy Where Appropriate
 
 For each specification attachment, ask:
-- Does this requirement *define* this specification? → Use `satisfiedBy`
+- Does this requirement *define* this specification? → Use `refinedBy`
 - Does this requirement *reference* or *depend on* this specification? → Keep as `Attachment`
 
 Convert attachments to relations using link and unlink commands:
@@ -65,11 +65,8 @@ Convert attachments to relations using link and unlink commands:
 # Remove attachment from requirement
 reqvire unlink "API Authorization Specification" "Authorization System Specification"
 
-# Add satisfiedBy relation instead
-reqvire link "API Authorization Specification" "satisfiedBy" "Authorization System Specification"
-
-# Or add satisfy relation from opposite direction
-reqvire link "Authorization System Specification" "satisfy" "API Authorization Specification"
+# Add refinedBy relation instead
+reqvire link "API Authorization Specification" "refinedBy" "Authorization System Specification"
 ```
 
 **When to keep attachments:**
@@ -79,21 +76,18 @@ reqvire link "Authorization System Specification" "satisfy" "API Authorization S
 - The attachment is a design document or external file (not an element)
 
 **Attachment constraints:**
-- Refinements must have a `satisfy` relation first (establishing an owner)
+- Refinements must have a `refine` relation (established via requirement's `refinedBy`)
 - Only requirements outside the owner's hierarchy can attach a refinement
 - Requirements in the same hierarchy cannot attach - they access through the hierarchy
 
 ### Step 4: Consolidate Constraints
 
-Find a root requirement that asks for constraints to be defined. Add `satisfiedBy` relations to all constraint elements using the link command:
+Find a root requirement that asks for constraints to be defined. Add `refinedBy` relations to all constraint elements using the link command:
 
 ```bash
 # Link constraint to requirement that defines it
-reqvire link "System Constraints Requirement" "satisfiedBy" "Performance Constraint"
-reqvire link "System Constraints Requirement" "satisfiedBy" "Security Constraint"
-
-# Or link from constraint to requirement
-reqvire link "Performance Constraint" "satisfy" "System Constraints Requirement"
+reqvire link "System Constraints Requirement" "refinedBy" "Performance Constraint"
+reqvire link "System Constraints Requirement" "refinedBy" "Security Constraint"
 ```
 
 When you find duplicate constraints, merge them:
@@ -132,7 +126,7 @@ Quick validation: `reqvire validate && reqvire lint --fix && reqvire coverage`
 Look for specification elements with empty relations. For each:
 
 1. Find which requirement asks for this specification to be defined
-2. Change the attachment to a `satisfiedBy` relation on that requirement
+2. Change the attachment to a `refinedBy` relation on that requirement
 3. Keep attachments on other requirements that just reference (don't define) the specification
 
 ## Merging Duplicate Requirements
@@ -200,7 +194,7 @@ The system shall implement API Access Authorization following clearly defined sp
   * [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
 ```
 
-### After (satisfiedBy):
+### After (refinedBy):
 ```markdown
 ### API Authorization Specification
 
@@ -210,7 +204,7 @@ The system shall implement API Access Authorization following clearly defined sp
   * type: user-requirement
 
 #### Relations
-  * satisfiedBy: [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
+  * refinedBy: [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
 ```
 
 Referencing requirement (keeps attachment):

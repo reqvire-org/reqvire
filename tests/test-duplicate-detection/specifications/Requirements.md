@@ -18,10 +18,13 @@ This is the target element that will be linked to.
 
 ### Refinement Target
 
-A separate requirement for refinement satisfaction.
+A separate requirement for refinement ownership.
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * refinedBy: [Refinement Element](#refinement-element)
 ---
 
 ### Refinement Element
@@ -31,7 +34,5 @@ This is a refinement element.
 #### Metadata
   * type: behavior
 
-#### Relations
-  * satisfy: [Refinement Target](#refinement-target)
 ---
 

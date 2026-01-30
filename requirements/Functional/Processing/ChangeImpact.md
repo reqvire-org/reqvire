@@ -24,8 +24,8 @@ When generating a change impact report, the system shall compute and display the
   * derive: [Requirements Change Propagation](#requirements-change-propagation)
   * derive: [Structural Change Analyzer](#structural-change-analyzer)
   * derivedFrom: [Tracing Structural Changes](../Output/Reporting.md#tracing-structural-changes)
+  * refinedBy: [Impact Scope Computation Specification](Specifications.md#impact-scope-computation-specification)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
-  * satisfiedBy: [Impact Scope Computation Specification](Specifications.md#impact-scope-computation-specification)
   * verifiedBy: [Attachments Change Impact Verification](../Core/Verifications/AttachmentsVerifications.md#attachments-change-impact-verification)
   * verifiedBy: [Impact Scope Summary Test](Verifications/ChangeImpactVerifications.md#impact-scope-summary-test)
 ---

@@ -30,9 +30,6 @@ When reverse mode is enabled for model traversal:
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Reverse Relation Traversal](Reporting.md#reverse-relation-traversal)
 ---
 
 ### Short Mode Behavior
@@ -60,9 +57,6 @@ Short mode reduces output verbosity for quick scanning:
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [CLI Containment Command](../../Interfaces/CLI/Commands.md#cli-containment-command)
 ---
 
 ### Start Element Type Filter Behavior
@@ -76,9 +70,6 @@ When start element type filtering is enabled:
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Start Element Type Filtering](Reporting.md#start-element-type-filtering)
 ---
 
 ### Verification Coverage Philosophy Behavior
@@ -108,7 +99,4 @@ Coverage evaluation philosophy for verification reporting.
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Verification Coverage Report](Reporting.md#verification-coverage-report)
 ---

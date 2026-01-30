@@ -37,7 +37,7 @@ Attachment management has been consolidated into the Relation Commands. The atta
   * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
-  * satisfiedBy: [Attachment Input Auto-Detection Behavior](../../Functional/Core/Behaviors.md#attachment-input-auto-detection-behavior)
+  * refinedBy: [Attachment Input Auto-Detection Behavior](../../Functional/Core/Behaviors.md#attachment-input-auto-detection-behavior)
   * verifiedBy: [Attach Command Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#attach-command-verification)
   * verifiedBy: [Detach Command Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#detach-command-verification)
 ---
@@ -190,8 +190,8 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [Change Propagation Behavior](../../Functional/Processing/Behaviors.md#change-propagation-behavior)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [Change Propagation Behavior](../../Functional/Processing/Behaviors.md#change-propagation-behavior)
   * verifiedBy: [Change Impact Analysis Verification](../../Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification)
   * verifiedBy: [Change Impact Detection Test](../../Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test)
   * verifiedBy: [Change Impact Relations Test](../../Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test)
@@ -258,10 +258,10 @@ The markdown output shall include:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [Short Mode Behavior](../../Functional/Output/Behaviors.md#short-mode-behavior)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
-  * satisfiedBy: [Short Mode Behavior](../../Functional/Output/Behaviors.md#short-mode-behavior)
 ---
 
 ### CLI Coverage Command

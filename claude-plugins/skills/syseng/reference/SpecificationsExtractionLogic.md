@@ -20,7 +20,7 @@ Extract technical specifications from requirement Details sections into separate
 - **Concise Requirements**: EARS-style statements focused on user value (under 15 lines)
  - Main body has one more general statement and all other must be written in '#### Details' subsection
 - **Reusable Specifications**: Technical details in standalone elements
-- **Clear Ownership**: `satisfiedBy` relations show which requirement owns the specification
+- **Clear Ownership**: `refinedBy` relations show which requirement owns the specification
 - **Cross-References**: Attachment relations provide supporting context without ownership
 
 ## Refactoring Methodology
@@ -82,8 +82,6 @@ Brief description of what this specification defines.
 #### Metadata
   * type: specification
 
-#### Relations
-  * satisfy: [Parent Requirement](path#requirement-name)
 ```
 
 `  * type: specification` can be other refinement type depending on what this refinement element represents.
@@ -104,7 +102,7 @@ Concise EARS-style statement (1 sentence).
   * type: requirement
 
 #### Relations
-  * satisfiedBy: [Specification Name](path#specification-name)
+  * refinedBy: [Specification Name](path#specification-name)
   [... other existing relations ...]
 ```
 
@@ -112,12 +110,12 @@ Concise EARS-style statement (1 sentence).
 
 **Ownership vs Reference:**
 
-- **satisfiedBy Relation**: Used by the requirement that OWNS the specification (one-to-one or one-to-many)
+- **refinedBy Relation**: Used by the requirement that OWNS the specification (one-to-one or one-to-many)
 - **Attachment Relation**: Used by requirements OUTSIDE the owner's derivation hierarchy
 
 **Attachment Scope Constraints:**
 
-1. Refinements must have a `satisfy` relation first (establishing an owner requirement)
+1. Refinements must have a `refine` relation (established via requirement's `refinedBy`)
 2. Only requirements OUTSIDE the owner's hierarchy can attach the refinement
 3. Requirements in the same hierarchy (ancestors or descendants of owner) CANNOT attach
 
@@ -172,7 +170,7 @@ Applies to: model summary, verification tracing, coverage, change impact, valida
 When requested the system shall provide human readable and machine readable System model reports with deterministic output and consistent ordering following clearly defined specifications.
 
 #### Relations
-  * satisfiedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
+  * refinedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
 
 ---
 
@@ -221,8 +219,8 @@ System shall produce interactive visual representations.
 System shall produce interactive visual representations enabling users to explore relations and navigate model structure following clearly defined specifications.
 
 #### Relations
-  * satisfiedBy: [Mermaid Diagram Generation Specification](...)
-  * satisfiedBy: [Mermaid Interactive Features Specification](...)
+  * refinedBy: [Mermaid Diagram Generation Specification](...)
+  * refinedBy: [Mermaid Interactive Features Specification](...)
 
 ---
 
@@ -269,8 +267,8 @@ The system shall implement operational constraints and rate limits.
   * type: user-requirement
 
 #### Relations
-  * satisfiedBy: [Rate Limits](../Specifications/Constraints.md#rate-limits)
-  * satisfiedBy: [Session Limits](../Specifications/Constraints.md#session-limits)
+  * refinedBy: [Rate Limits](../Specifications/Constraints.md#rate-limits)
+  * refinedBy: [Session Limits](../Specifications/Constraints.md#session-limits)
 ```
 
 
@@ -312,9 +310,9 @@ Examples:
 
 Specifications MUST NOT use EARS statements as those are not requirements.
 
-### Attachment vs satisfiedBy
+### Attachment vs refinedBy
 
-**Use satisfiedBy when:**
+**Use refinedBy when:**
 - Requirement OWNS the specification
 - Specification was extracted FROM this requirement
 - Requirement has primary responsibility for the technical content
@@ -338,7 +336,7 @@ After refactoring, verify:
 1. **Conciseness**: All requirements have Details under 15 lines
 2. **Clarity**: Requirements focus on user value, not implementation
 3. **Reusability**: Specifications referenced by multiple requirements where appropriate
-4. **Traceability**: Clear ownership via satisfiedBy relations
+4. **Traceability**: Clear ownership via refinedBy relations
 5. **Validation**: `reqvire validate` shows no errors
 7. **Formatting**: All files properly formatted
 
@@ -374,13 +372,13 @@ Validation Errors:            0
 
 ### Pitfall 3: Unclear Ownership
 
-**Problem**: Multiple requirements use satisfiedBy for same specification
-**Solution**: Only owner uses satisfiedBy, others use attachments
+**Problem**: Multiple requirements use refinedBy for same specification
+**Solution**: Only owner uses refinedBy, others use attachments
 
 ### Pitfall 4: Orphaned Specifications
 
 **Problem**: Creating specifications not owned by any requirement
-**Solution**: Always create satisfiedBy relation from owner to specification
+**Solution**: Always create refinedBy relation from owner to specification
 
 ### Pitfall 5: Inconsistent Granularity
 
@@ -403,8 +401,8 @@ reqvire search --filter-type="requirement" --filter-file="requirements/System/**
 # Find requirements with attachments (may need conversion to satisfiedBy)
 reqvire search --filter-type="requirement" --has-attachments --short
 
-# Find refinements without satisfy relations (orphaned specifications, constraints, behaviors)
-reqvire search --filter-type="specification,constraint,behavior" --not-have-relations="satisfy" --short
+# Find refinements without refine relations (orphaned specifications, constraints, behaviors)
+reqvire search --filter-type="specification,constraint,behavior" --not-have-relations="refine" --short
 ```
 
 ### Validation Commands (Phase 5)

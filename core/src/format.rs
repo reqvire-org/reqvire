@@ -105,7 +105,7 @@ fn apply_formatting_rules(content: &str) -> String {
 pub fn render_diff(format_result: &FormatResult) {
     if format_result.dry_run {
         if format_result.diffs.is_empty() {
-            println!("No formatting changes needed.");
+            println!("✅ No formatting changes needed.");
         } else {
             println!("Found {} file(s) with formatting changes:\n", format_result.diffs.len());
             render_file_diffs(&format_result.diffs);
@@ -114,7 +114,7 @@ pub fn render_diff(format_result: &FormatResult) {
     } else {
         // Actual formatting - show diffs when changes are applied
         if format_result.files_changed == 0 {
-            println!("No files needed formatting.");
+            println!("✅ No files needed formatting.");
         } else {
             println!("Formatted {} file(s):\n", format_result.files_changed);
             render_file_diffs(&format_result.diffs);

@@ -26,12 +26,12 @@ As a **System Engineer**, I want to work with a system that adheres to widely re
   * type: user-requirement
 
 #### Relations
-  * satisfiedBy: [Containment Specification](Refinements.md#containment-specification)
-  * satisfiedBy: [Refinement Specification](Refinements.md#refinement-specification)
-  * satisfiedBy: [Relation Semantics Specification](Refinements.md#relation-semantics-specification)
-  * satisfiedBy: [Supported Element Types Specification](Refinements.md#supported-element-types-specification)
-  * satisfiedBy: [Traceability Reporting Specification](Refinements.md#traceability-reporting-specification)
-  * satisfiedBy: [Verification Coverage Specification](Refinements.md#verification-coverage-specification)
+  * refinedBy: [Containment Specification](Refinements.md#containment-specification)
+  * refinedBy: [Refinement Specification](Refinements.md#refinement-specification)
+  * refinedBy: [Relation Semantics Specification](Refinements.md#relation-semantics-specification)
+  * refinedBy: [Supported Element Types Specification](Refinements.md#supported-element-types-specification)
+  * refinedBy: [Traceability Reporting Specification](Refinements.md#traceability-reporting-specification)
+  * refinedBy: [Verification Coverage Specification](Refinements.md#verification-coverage-specification)
 ---
 
 ### Aligning Design with Code

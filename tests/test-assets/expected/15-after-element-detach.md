@@ -60,10 +60,14 @@ This requirement has no attachments.
 
 ### Refinement Target Requirement
 
-A separate requirement that refinements can satisfy (outside main hierarchy).
+A separate requirement that owns refinements (outside main hierarchy).
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * refinedBy: [Test Constraint Element](#test-constraint-element)
+  * refinedBy: [Test Behavior Element](#test-behavior-element)
 
 ---
 
@@ -77,8 +81,6 @@ This constraint defines limits on system behavior.
 #### Metadata
   * type: constraint
 
-#### Relations
-  * satisfy: [Refinement Target Requirement](#refinement-target-requirement)
 ---
 
 ### Test Behavior Element
@@ -91,7 +93,5 @@ This behavior defines expected system operation.
 #### Metadata
   * type: behavior
 
-#### Relations
-  * satisfy: [Refinement Target Requirement](#refinement-target-requirement)
 ---
 

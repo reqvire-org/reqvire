@@ -87,7 +87,7 @@ reqvire link "System Feature Implementation" "derivedFrom" "Feature Name"
 reqvire link "Feature Name" "derive" "System Feature Implementation"
 ```
 
-**Relation types**: `derivedFrom` (child → parent), `derive` (parent → child), `verifiedBy` (requirement → verification), `verify` (verification → requirement), `satisfiedBy` (requirement → implementation), `satisfy` (implementation → requirement), `trace` (non-directional traceability)
+**Relation types**: `derivedFrom` (child → parent), `derive` (parent → child), `verifiedBy` (requirement → verification), `verify` (verification → requirement), `satisfiedBy` (requirement → code implementation), `satisfy` (code → requirement), `refinedBy` (requirement → refinement), `refine` (refinement → requirement), `trace` (non-directional traceability)
 
 ## Step 3: Add Refinements (if needed)
 
@@ -96,7 +96,7 @@ Add refinements only when:
 - **Constraints** - Limits/boundaries exist (add to Constraints.md)
 - **Behaviors** - Complex state/flow logic needs documentation
 
-Link via `satisfiedBy` from the requirement that asks for the refinement.
+Link via `refinedBy` from the requirement that owns the refinement.
 
 ### Refinement Best Practices
 
@@ -118,9 +118,6 @@ The data format shall follow JSON Schema version 7 with strict validation.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Data Processing Requirement](System/Processing.md#data-processing-requirement)
 EOF
 
 # Add constraint element
@@ -131,9 +128,6 @@ All API responses shall complete within 200ms under normal load.
 
 #### Metadata
   * type: constraint
-
-#### Relations
-  * satisfy: [API Performance Requirement](System/API.md#api-performance-requirement)
 EOF
 
 # Add behavior element
@@ -144,20 +138,17 @@ When an error occurs, the system shall log the error, notify the user, and attem
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Error Handling Requirement](System/ErrorHandling.md#error-handling-requirement)
 EOF
 ```
 
 Link refinements to requirements using relations or attachments:
 
 ```bash
-# Link refinement to requirement using satisfiedBy relation (owner defines it)
-reqvire link "Data Processing Requirement" "satisfiedBy" "Data Format Specification"
+# Link refinement to requirement using refinedBy relation (owner defines it)
+reqvire link "Data Processing Requirement" "refinedBy" "Data Format Specification"
 
 # Attach refinement element (only from requirements OUTSIDE the owner's hierarchy)
-# The refinement must first satisfy its owner requirement
+# The refinement must be owned by a requirement via refinedBy
 reqvire link "Other Feature Requirement" attaching "Performance Constraint"
 
 # Attach file (design document, specification document)
@@ -169,7 +160,7 @@ reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 ```
 
 **Attachment constraints:**
-- Refinements must have a `satisfy` relation (establishing an owner) before being attached
+- Refinements must have a `refine` relation (established via requirement's `refinedBy`) before being attached
 - Only requirements OUTSIDE the owner's derivation hierarchy can attach a refinement
 - Requirements in the same hierarchy access refinements through the hierarchy, not attachments
 
@@ -284,7 +275,7 @@ The system shall create and manage user sessions after successful authentication
 
 #### Relations
   * derivedFrom: [User Authentication](../UserStories.md#user-authentication)
-  * satisfiedBy: [Session Timeout Constraint](../Constraints.md#session-timeout)
+  * refinedBy: [Session Timeout Constraint](../Constraints.md#session-timeout)
 ```
 
 ### 3. Constraint
@@ -295,9 +286,6 @@ User sessions shall expire after 30 minutes of inactivity.
 
 #### Metadata
   * type: constraint
-
-#### Relations
-  * satisfy: [Session Management](../System/Auth.md#session-management)
 ```
 
 ### 4. Verification

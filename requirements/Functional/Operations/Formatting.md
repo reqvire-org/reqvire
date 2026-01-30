@@ -44,8 +44,8 @@ The system shall provide formatting capability to ensure consistent formatting i
   * derive: [Element Ordering Normalization](#element-ordering-normalization)
   * derive: [Relation Ordering Normalization](#relation-ordering-normalization)
   * derivedFrom: [Model Formatting](#model-formatting)
+  * refinedBy: [Format Consistency Specification](Specifications.md#format-consistency-specification)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
-  * satisfiedBy: [Format Consistency Specification](Specifications.md#format-consistency-specification)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
@@ -73,9 +73,9 @@ When generating formatted output, the system shall:
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
+  * refinedBy: [Document Structure Specification](Specifications.md#document-structure-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
-  * satisfiedBy: [Document Structure Specification](Specifications.md#document-structure-specification)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
@@ -88,7 +88,7 @@ When formatting or persisting specification files, the system shall reorder elem
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * satisfiedBy: [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
+  * refinedBy: [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
   * verifiedBy: [Element Ordering Verification](Verifications/FormattingVerifications.md#element-ordering-verification)
 ---
 
@@ -106,8 +106,8 @@ This operation only removes within-section duplicates (entries repeated in the s
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
+  * refinedBy: [Format Duplicate Removal Behavior](Behaviors.md#format-duplicate-removal-behavior)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
-  * satisfiedBy: [Format Duplicate Removal Behavior](Behaviors.md#format-duplicate-removal-behavior)
   * verifiedBy: [Format Duplicate Removal Test](Verifications/FormattingVerifications.md#format-duplicate-removal-test)
 ---
 
@@ -130,8 +130,8 @@ This ensures:
 
 #### Relations
   * derivedFrom: [Format Consistency Enforcement](#format-consistency-enforcement)
+  * refinedBy: [Relation Ordering Specification](Specifications.md#relation-ordering-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [Relation Ordering Specification](Specifications.md#relation-ordering-specification)
   * verifiedBy: [Relation Ordering Verification](Verifications/FormattingVerifications.md#relation-ordering-verification)
 ---
 

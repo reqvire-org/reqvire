@@ -5,7 +5,7 @@
 
   2. Invalid relation format: Element 'Requirement with Invalid Relation Format' has invalid relations format: 'This is not ok - invalid format.' (file: Requirements.md, line 48)
 
-  3. Unsupported relation type: 'satisfiedBBy' in element 'Requirement with Invalid Relation Type': (file: Requirements.md, line 61). Valid types: derive, derivedFrom, satisfiedBy, satisfy, trace, verifiedBy, verify
+  3. Unsupported relation type: 'satisfiedBBy' in element 'Requirement with Invalid Relation Type': (file: Requirements.md, line 61). Valid types: derive, derivedFrom, refine, refinedBy, satisfiedBy, satisfy, trace, verifiedBy, verify
 
   4. Duplicate subsection: Duplicate subsection 'Relations' in element 'Requirement with Duplicate Subsection' (file: pass1-errors/specifications/Requirements.md, line 75)
 

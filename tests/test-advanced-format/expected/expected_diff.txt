@@ -1,4 +1,4 @@
-Found 6 file(s) with formatting changes:
+Found 7 file(s) with formatting changes:
 
 📄 AttachmentTest.md
   01     # Elements
@@ -17,6 +17,19 @@ Found 6 file(s) with formatting changes:
   11     #### Relations
   12       * derivedFrom: [Managing MBSE Models](UserStories.md#managing-mbse-models)
   13     ---
+
+
+
+📄 Behaviors.md
+  01     # Elements
+  02
+  03     ### Behavior Owner
+
+  17
+  18     #### Metadata
+  19       * type: behavior
+  20 -   ␤
+  20     ---
 
 
 

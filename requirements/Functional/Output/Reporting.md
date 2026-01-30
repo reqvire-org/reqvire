@@ -18,21 +18,21 @@ When requested the system shall provide human readable and machine readable Syst
   * derive: [Resources Report](#resources-report)
   * derive: [Verification Coverage Report](#verification-coverage-report)
   * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
-  * satisfiedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
-  * satisfiedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * satisfiedBy: [Error Message Format Specification](Specifications.md#error-message-format-specification)
-  * satisfiedBy: [JSON Output Structure](Specifications.md#json-output-structure)
-  * satisfiedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
-  * satisfiedBy: [Text Output Formatting](Specifications.md#text-output-formatting)
+  * refinedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
+  * refinedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * refinedBy: [Error Message Format Specification](Specifications.md#error-message-format-specification)
+  * refinedBy: [JSON Output Structure](Specifications.md#json-output-structure)
+  * refinedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
+  * refinedBy: [Text Output Formatting](Specifications.md#text-output-formatting)
 ---
 
 ### Collect Content from Requirement Chain
 
-The system shall collect and consolidate all content from a requirement element and its ancestors via derivedFrom relations, including attachment contents, and output with source citations in text or JSON format.
+The system shall collect and consolidate all content from a requirement element and its ancestors via derivedFrom relations, including refinedBy targets (refinement elements and specification files) and attachment contents, and output with source citations in text or JSON format.
 
 #### Details
 The system shall define:
-- Content collection rules for elements and attachments
+- Content collection rules for elements, refinedBy targets, and attachments
 - Output format specifications for text and JSON modes
 
 #### Metadata
@@ -40,9 +40,9 @@ The system shall define:
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
+  * refinedBy: [Collect Content Specification](Specifications.md#collect-content-specification)
+  * refinedBy: [Collect Output Format Specification](Specifications.md#collect-output-format-specification)
   * satisfiedBy: [report_collect.rs](../../../core/src/report_collect.rs)
-  * satisfiedBy: [Collect Content Specification](Specifications.md#collect-content-specification)
-  * satisfiedBy: [Collect Output Format Specification](Specifications.md#collect-output-format-specification)
 ---
 
 ### Model Structure and Summaries
@@ -148,8 +148,8 @@ The system shall support reverse relation traversal for model views, following d
 
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
+  * refinedBy: [Reverse Relation Traversal Behavior](Behaviors.md#reverse-relation-traversal-behavior)
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
-  * satisfiedBy: [Reverse Relation Traversal Behavior](Behaviors.md#reverse-relation-traversal-behavior)
   * verifiedBy: [Reverse Model Traversal Test](Verifications/ReportingVerifications.md#reverse-model-traversal-test)
 ---
 
@@ -162,8 +162,8 @@ The system shall support filtering starting elements by type for model traversal
 
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
+  * refinedBy: [Start Element Type Filter Behavior](Behaviors.md#start-element-type-filter-behavior)
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
-  * satisfiedBy: [Start Element Type Filter Behavior](Behaviors.md#start-element-type-filter-behavior)
   * verifiedBy: [Start Type Filter Test](Verifications/ReportingVerifications.md#start-type-filter-test)
 ---
 
@@ -283,8 +283,8 @@ The system shall provide a resources report showing all files referenced by the 
 #### Relations
   * derive: [CLI Resources Command](../../Interfaces/CLI/Commands.md#cli-resources-command)
   * derivedFrom: [Model Reports](#model-reports)
+  * refinedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
   * satisfiedBy: [report_resources.rs](../../../core/src/report_resources.rs)
-  * satisfiedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
   * verifiedBy: [Resources Report Verification](Verifications/ReportingVerifications.md#resources-report-verification)
 ---
 
@@ -315,8 +315,8 @@ The report helps track verification completeness and identify gaps in requiremen
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
+  * refinedBy: [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
   * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
-  * satisfiedBy: [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
 ---
 
 ### TraceFlow View Report Generation
@@ -332,8 +332,8 @@ The system shall generate a TraceFlow view page showing the verification traceab
 
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
+  * refinedBy: [Verification Trace Diagram Specification](Specifications.md#verification-trace-diagram-specification)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
-  * satisfiedBy: [Verification Trace Diagram Specification](Specifications.md#verification-trace-diagram-specification)
   * verifiedBy: [TraceFlow View Test](Verifications/ReportingVerifications.md#traceflow-view-test)
 ---
 

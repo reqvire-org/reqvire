@@ -18,9 +18,6 @@ The containment view serves as the primary entry point for HTML documentation, p
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [HTML Export](Features.md#html-export)
 ---
 
 ### HTML Branding Specification
@@ -39,9 +36,6 @@ The system shall design and implement HTML pages with consistent layout, styling
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [HTML Export](Features.md#html-export)
 ---
 
 ### HTML Export Pipeline Specification
@@ -89,9 +83,6 @@ Execute all generation commands treating temporary directory as repository root:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [HTML Export](Features.md#html-export)
 ---
 
 ### HTML Navigation Bar Specification
@@ -114,9 +105,6 @@ The navigation bar must be:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [HTML Export](Features.md#html-export)
 ---
 
 ### Web Interface Style Specification

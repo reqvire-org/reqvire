@@ -60,6 +60,9 @@ Owner requirement for specifications (separate from main hierarchy).
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * refinedBy: [Data Format Spec](#data-format-spec)
 ---
 
 ### Data Format Spec
@@ -73,9 +76,6 @@ String fields have maximum length of 255 characters.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Specification Owner Requirement](#specification-owner-requirement)
 ---
 
 ### Independent Requirement With Same Attachment

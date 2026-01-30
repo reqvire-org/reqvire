@@ -51,7 +51,7 @@ Generate implementation task plan from requirement changes on a feature branch.
    This provides:
    - Complete requirement chain via derivedFrom relations
    - All parent requirements for context
-   - Specifications that satisfy the requirement
+   - Refinement elements (specifications, constraints, behaviors) that refine the requirement
    - Attached design documents
    - Full implementation context
 

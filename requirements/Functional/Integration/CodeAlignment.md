@@ -57,7 +57,7 @@ The system shall define comment style specification for each file extension.
   * derive: [SQL style comment](#sql-style-comment)
   * derive: [XML style comment](#xml-style-comment)
   * derivedFrom: [Traceability Format](#traceability-format)
-  * satisfiedBy: [Comment Style Specification](Specifications.md#comment-style-specification)
+  * refinedBy: [Comment Style Specification](Specifications.md#comment-style-specification)
 ---
 
 ### BAT style comment

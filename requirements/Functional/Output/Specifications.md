@@ -19,6 +19,10 @@ Technical specification for content collection from requirement chains.
 
 **Content Collection:**
 - Collect element content field (main body text including Details section)
+- For each refinedBy target:
+  - ElementIdentifier (refinement element): Include element's content
+  - FilePath pointing to .md file: Read and include file content
+  - FilePath pointing to other file types: Include as markdown link
 - For each attachment:
   - FilePath pointing to .md file: Read and include file content
   - FilePath pointing to other file types: Include as markdown link
@@ -38,9 +42,6 @@ Technical specification for content collection from requirement chains.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Collect Content from Requirement Chain](Reporting.md#collect-content-from-requirement-chain)
 ---
 
 ### Collect Output Format Specification
@@ -63,8 +64,10 @@ Each collected content block followed by source citation and separator:
 | Source Type | Citation Format |
 |-------------|-----------------|
 | Element | `— Source: [Element Name](file.md#element-id)` |
+| Refinement Element (via refinedBy) | `— Source: [Refinement Name](file.md#refinement-id) refining [Element Name](file.md#element-id)` |
+| Refinement File (via refinedBy) | `— Source: [filename.md](path/to/file.md) refining [Element Name](file.md#element-id)` |
 | Attachment File | `— Source: [filename.md](path/to/file.md) attached to [Element Name](file.md#element-id)` |
-| Refinement Element | `— Source: [Refinement Name](file.md#refinement-id) satisfying [Element Name](file.md#element-id)` |
+| Attachment Element | `— Source: [Refinement Name](file.md#refinement-id) attached to [Element Name](file.md#element-id)` |
 
 **JSON Format:**
 ```json
@@ -93,22 +96,22 @@ Each collected content block followed by source citation and separator:
   ],
   "metadata": {
     "element_count": 5,
+    "refinement_count": 3,
     "attachment_count": 2,
-    "total_items": 7
+    "total_items": 10
   }
 }
 ```
 
 **Source Type Values:**
 - `element` - Content from model element
+- `refined_by_element` - Content from refinement element (via refinedBy relation)
+- `refined_by_file` - Content from refinement file (via refinedBy relation)
 - `attachment_file` - Content from attached file
 - `attachment_element` - Content from attached refinement element
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Collect Content from Requirement Chain](Reporting.md#collect-content-from-requirement-chain)
 ---
 
 ### Color Scheme Specification
@@ -171,9 +174,6 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Web Interface Color Scheme](../../Interfaces/WebInterface/Features.md#web-interface-color-scheme)
 ---
 
 ### Deterministic Output Specification
@@ -206,9 +206,6 @@ All generated reports shall produce deterministic output with consistent orderin
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Model Reports](Reporting.md#model-reports)
 ---
 
 ### Diagram Relation Filtering Specification
@@ -243,9 +240,6 @@ The filtering ensures that:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Diagram Generation](DiagramGeneration.md#diagram-generation)
 ---
 
 ### Diff Output Format Specification
@@ -403,9 +397,6 @@ The system shall provide visualization of the complete model structure showing a
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
 ---
 
 ### Mermaid Diagram Style Specification
@@ -461,9 +452,6 @@ Styling conventions for Mermaid diagrams in CLI output and HTML export.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
 ---
 
 ### Mermaid Interactive Features Specification
@@ -490,9 +478,6 @@ The visualization helps users:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
 ---
 
 ### Resources Report Format Specification
@@ -539,9 +524,6 @@ The resources report shall consist of two sections:
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [Resources Report](Reporting.md#resources-report)
 ---
 
 ### SysML Rendering Specification
@@ -579,9 +561,6 @@ All relation types use open (hollow) arrowheads per SysML specification.
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [SysML-Compatible Relationship Rendering](DiagramGeneration.md#sysml-compatible-relationship-rendering)
 ---
 
 ### Text Output Formatting
@@ -629,7 +608,4 @@ Verification trace diagrams shall use the same visual styling as other mermaid d
 
 #### Metadata
   * type: specification
-
-#### Relations
-  * satisfy: [TraceFlow View Report Generation](Reporting.md#traceflow-view-report-generation)
 ---

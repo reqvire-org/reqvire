@@ -14,9 +14,6 @@ When the create element operation is invoked with override mode:
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Create Element Operation](ElementManipulation.md#create-element-operation)
 ---
 
 ### Dry-Run Mode Behavior
@@ -31,9 +28,6 @@ Preview mode behavior for modification commands.
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
 ---
 
 ### Element Ordering Behavior
@@ -79,9 +73,6 @@ Elements shall be ordered so that parent elements appear before their children (
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Element Ordering Normalization](Formatting.md#element-ordering-normalization)
 ---
 
 ### File Persistence Behavior
@@ -98,9 +89,6 @@ How element manipulation operations persist changes to files:
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
 ---
 
 ### Format Duplicate Removal Behavior
@@ -118,9 +106,6 @@ Deduplication rules for format fix operations.
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Format Duplicate Removal](Formatting.md#format-duplicate-removal)
 ---
 
 ### Merge Content Transformation Behavior
@@ -156,7 +141,4 @@ Content transformation rules for the merge elements operation.
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Merge Element Operation](ElementManipulation.md#merge-element-operation)
 ---

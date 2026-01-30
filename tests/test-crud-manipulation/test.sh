@@ -86,16 +86,13 @@ echo ""
 echo "Test 1b: Add element with attachments..."
 
 # First add a refinement element (constraint) that will be attached
-# The constraint must satisfy a requirement, and Feature E must be outside that hierarchy
+# The constraint must be owned by a requirement (via refinedBy), and Feature E must be outside that hierarchy
 CONSTRAINT_ELEMENT='### Feature D Constraint
 
 Rate limiting constraint for Feature D.
 
 #### Metadata
   * type: constraint
-
-#### Relations
-  * satisfy: [Separate Requirement Branch](#separate-requirement-branch)
 '
 
 set +e
@@ -106,6 +103,18 @@ set -e
 if [ $ADD_CONSTRAINT_EXIT -ne 0 ]; then
   echo "❌ FAILED: Add constraint element failed with exit code $ADD_CONSTRAINT_EXIT"
   echo "$ADD_CONSTRAINT_OUTPUT"
+  exit 1
+fi
+
+# Link the constraint to its owning requirement via refinedBy
+set +e
+LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Separate Requirement Branch" refinedBy "Feature D Constraint" 2>&1)
+LINK_EXIT=$?
+set -e
+
+if [ $LINK_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Link refinedBy failed with exit code $LINK_EXIT"
+  echo "$LINK_OUTPUT"
   exit 1
 fi
 

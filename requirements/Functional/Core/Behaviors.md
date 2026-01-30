@@ -18,9 +18,6 @@ This behavior mirrors the existing relation target update behavior used when mov
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Attachment Identifier Updates](ModelManagement.md#attachment-identifier-updates)
 ---
 
 ### Attachment Input Auto-Detection Behavior
@@ -46,9 +43,6 @@ This behavior ensures backward compatibility (existing file attachments work unc
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Attachment Commands](../../Interfaces/CLI/Commands.md#attachment-commands)
 ---
 
 ### Subdirectory Auto-Detection Behavior
@@ -71,9 +65,6 @@ This behavior enables focused work on specific areas of large models while maint
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Git Repository as Project Root](ModelManagement.md#git-repository-as-project-root)
 ---
 
 ### Two-Pass Validation Behavior
@@ -95,9 +86,6 @@ Two-phase validation process for model parsing.
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Two-Pass Validation Strategy](Validation.md#two-pass-validation-strategy)
 ---
 
 ### Type Validation Error Behavior
@@ -120,9 +108,6 @@ This enables users to quickly identify and fix type errors without consulting do
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Type Validation Error Requirement](Validation.md#type-validation-error-requirement)
 ---
 
 ### Validation Error Reporting Behavior
@@ -137,7 +122,4 @@ Error message structure for validation issues.
 
 #### Metadata
   * type: behavior
-
-#### Relations
-  * satisfy: [Enhanced Validation Error Reporting](Validation.md#enhanced-validation-error-reporting)
 ---

@@ -11,10 +11,10 @@ The system shall produce interactive visual representations of relationships wit
   * derive: [Diagram Generation](#diagram-generation)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
   * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
-  * satisfiedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
-  * satisfiedBy: [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
-  * satisfiedBy: [Mermaid Diagram Style Specification](Specifications.md#mermaid-diagram-style-specification)
-  * satisfiedBy: [Mermaid Interactive Features Specification](Specifications.md#mermaid-interactive-features-specification)
+  * refinedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
+  * refinedBy: [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
+  * refinedBy: [Mermaid Diagram Style Specification](Specifications.md#mermaid-diagram-style-specification)
+  * refinedBy: [Mermaid Interactive Features Specification](Specifications.md#mermaid-interactive-features-specification)
 ---
 
 ### Diagram Generation
@@ -110,8 +110,8 @@ Each relation type has specific visual properties and directional semantics defi
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
+  * refinedBy: [SysML Rendering Specification](Specifications.md#sysml-rendering-specification)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
-  * satisfiedBy: [SysML Rendering Specification](Specifications.md#sysml-rendering-specification)
 ---
 
 ### Trace Relation Non-Directional Behavior
