@@ -11,6 +11,12 @@
 
 ---
 
+### Impact Scope
+
+* [Deployment Plugins](Requirements.md#deployment-plugins)
+
+---
+
 ## Invalidated Verifications
 
 - [ ] [Validate Plugin Management](Verifications.md#validate-plugin-management)

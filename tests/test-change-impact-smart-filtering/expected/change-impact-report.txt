@@ -10,6 +10,13 @@
 
 ---
 
+### Impact Scope
+
+* [New Child Requirement](Requirements.md#new-child-requirement)
+* [New Parent Requirement](Requirements.md#new-parent-requirement)
+
+---
+
 ## Invalidated Verifications
 
 - [ ] [New Verification](Requirements.md#new-verification)

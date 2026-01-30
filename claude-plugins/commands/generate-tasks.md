@@ -37,7 +37,11 @@ Generate implementation task plan from requirement changes on a feature branch.
    reqvire change-impact --git-commit=$BASE_COMMIT --json > /tmp/impact.json
    ```
 
-3. **For each changed requirement:**
+3. **Review impact scope** (from JSON `impact_scope[]`):
+
+   The `impact_scope` array shows the per-branch common parent requirements covering all impacted elements. Use this to understand the high-level affected model areas before diving into details.
+
+4. **For each changed requirement:**
 
    Get full context using collect:
    ```bash
@@ -62,7 +66,7 @@ Generate implementation task plan from requirement changes on a feature branch.
    - satisfiedBy relations (code to update)
    - derivedFrom relations (context)
 
-4. **For each verification:**
+5. **For each verification:**
 
    Get test paths:
    ```bash
@@ -71,7 +75,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 
    Extract satisfiedBy relations (test files).
 
-5. **Generate TodoWrite task plan:**
+6. **Generate TodoWrite task plan:**
 
    **Use collected context** from `/tmp/req_<requirement-id>.json` to create concise summaries:
    - Extract parent requirement purpose (why this exists)
@@ -108,13 +112,13 @@ Generate implementation task plan from requirement changes on a feature branch.
      ☐ Validate: reqvire validate
    ```
 
-6. **Generate git blob links:**
+7. **Generate git blob links:**
    ```bash
    REPO_URL=$(git remote get-url origin | sed 's/\.git$//' | sed 's/git@github.com:/https:\/\/github.com\//')
    BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/${file_path}#${element-anchor}"
    ```
 
-7. **Save collected context for reference:**
+8. **Save collected context for reference:**
 
    For each requirement, save a formatted summary:
    ```bash
@@ -124,7 +128,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 
    This provides developers with full context documents they can reference during implementation.
 
-8. **Present task plan:**
+9. **Present task plan:**
    - Phase 1: New requirements to implement (with context summaries)
    - Phase 2: Modified requirements to update (with impact analysis)
    - Phase 3: Affected verifications to review
@@ -139,6 +143,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 **Feature**: {current_branch}
 
 ## Summary
+- Impact scope: {scope root names from impact_scope[]}
 - New requirements: X
 - Modified requirements: Y
 - Tests to run: Z

@@ -348,9 +348,10 @@ reqvire change-impact --git-commit=HEAD~1
 ```
 
 The change-impact command shows:
-- Which requirements were modified
+- Which requirements were added, changed, removed, or relocated
 - Which downstream elements are affected (via derivedFrom, verifiedBy)
-- Impact scope and traceability
+- **Impact scope**: Per-branch common parent requirements covering all impacted elements (high-level summary of affected areas)
+- Invalidated verifications that need re-review
 
 For detailed analysis workflows, see [Explore](reference/explore.md).
 

@@ -9,6 +9,9 @@ Change impact detection encompasses:
 1. **Detection**: Identify what changed (content, additions, removals, relocations)
 2. **Propagation**: Determine how changes flow through model relationships
 3. **Reporting**: Present change analysis results to users
+4. **Impact Scope**: Compute the minimal set of common parent requirements covering all impacted elements
+
+When generating a change impact report, the system shall compute and display the per-branch lowest common ancestors of all impacted, added, and deleted requirements through the derivedFrom hierarchy, providing reviewers with a summary of affected model areas.
 
 **Refinement Element Changes:**
 - Refinement element content changes (hash changes) shall propagate change impact through the model via their attachment relationships
@@ -22,7 +25,9 @@ Change impact detection encompasses:
   * derive: [Structural Change Analyzer](#structural-change-analyzer)
   * derivedFrom: [Tracing Structural Changes](../Output/Reporting.md#tracing-structural-changes)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
+  * satisfiedBy: [Impact Scope Computation Specification](Specifications.md#impact-scope-computation-specification)
   * verifiedBy: [Attachments Change Impact Verification](../Core/Verifications/AttachmentsVerifications.md#attachments-change-impact-verification)
+  * verifiedBy: [Impact Scope Summary Test](Verifications/ChangeImpactVerifications.md#impact-scope-summary-test)
 ---
 
 ### Requirements Change Propagation

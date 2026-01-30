@@ -11,6 +11,12 @@
 
 ---
 
+### Impact Scope
+
+* [Independent Requirement With Same Attachment](specifications/Requirements.md#independent-requirement-with-same-attachment)
+
+---
+
 ## Invalidated Verifications
 
 - [ ] [Export Test](specifications/Verifications.md#export-test)

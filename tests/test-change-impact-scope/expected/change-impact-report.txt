@@ -1,0 +1,28 @@
+## Change Impact Report
+
+### Removed Elements
+
+* [Leaf B1](Requirements.md#leaf-b1)
+
+---
+
+### Changed Elements
+
+* [Branch B](Requirements.md#branch-b)
+
+* [Leaf A1](Requirements.md#leaf-a1) ⚠️
+
+* [Leaf A2](Requirements.md#leaf-a2) ⚠️
+
+* [Standalone Req](Requirements.md#standalone-req) ⚠️
+
+
+---
+
+### Impact Scope
+
+* [Branch A](Requirements.md#branch-a)
+* [Branch B](Requirements.md#branch-b)
+* [Standalone Req](Requirements.md#standalone-req)
+
+---

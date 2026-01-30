@@ -1,4 +1,4 @@
-use std::collections::{HashSet, BTreeSet};
+use std::collections::{HashSet, HashMap, BTreeSet};
 use serde::Serialize;
 use std::path::PathBuf;
 use crate::relation::{Relation, RelationTarget, LinkType};
@@ -68,6 +68,13 @@ pub struct InvalidatedVerification {
     pub content: String,
 }
 
+/// A scope root representing a common parent requirement covering impacted elements.
+#[derive(Debug, Clone, Serialize)]
+pub struct ImpactScopeRoot {
+    pub element_id: String,
+    pub name: String,
+}
+
 /// Report for an element that exists in both registries but has differences.
 #[derive(Debug,Serialize)]
 pub struct ChangedElement {
@@ -98,9 +105,12 @@ pub struct ChangeImpactReport {
     pub removed: Vec<RemovedElement>,
     pub changed: Vec<ChangedElement>,
     pub relocated: Vec<RelocatedElement>,
+    pub impact_scope: Vec<ImpactScopeRoot>,
     pub invalidated_verifications: Vec<InvalidatedVerification>,
     #[serde(skip)]
     pub all_added_element_ids: HashSet<String>,
+    #[serde(skip)]
+    pub all_changed_element_ids: HashSet<String>,
 }
 
 impl ChangeImpactReport {
@@ -110,8 +120,10 @@ impl ChangeImpactReport {
             removed: Vec::new(),
             changed: Vec::new(),
             relocated: Vec::new(),
+            impact_scope: Vec::new(),
             invalidated_verifications: Vec::new(),
             all_added_element_ids: HashSet::new(),
+            all_changed_element_ids: HashSet::new(),
         }
     }
    
@@ -223,11 +235,19 @@ impl ChangeImpactReport {
                 "content": invalidated_ver.content
             })
         }).collect();
+        let impact_scope: Vec<_> = self.impact_scope.iter().map(|scope| {
+            let element_url = format!("{}/blob/{}/{}", base_url, git_commit, scope.element_id);
+            json!({
+                "name": scope.name,
+                "element_id": element_url
+            })
+        }).collect();
         json!({
             "added": added,
             "removed": removed,
             "changed": changed,
             "relocated": relocated,
+            "impact_scope": impact_scope,
             "invalidated_verifications": invalidated_verifications
         })
     }
@@ -331,8 +351,17 @@ impl ChangeImpactReport {
         if !self.changed.is_empty() {
             output.push_str("\n---\n\n");
         }
-           
-       
+
+        // Impact Scope section
+        if !self.impact_scope.is_empty() {
+            output.push_str("### Impact Scope\n\n");
+            for scope in &self.impact_scope {
+                let element_url = format!("{}/blob/{}/{}", base_url, git_commit, scope.element_id);
+                output.push_str(&format!("* [{}]({})\n", scope.name, element_url));
+            }
+            output.push_str("\n---\n\n");
+        }
+
         // Invalidated Verifications Section
         if !self.invalidated_verifications.is_empty() {
             output.push_str("## Invalidated Verifications\n\n");
@@ -794,6 +823,146 @@ fn normalize_relation_for_comparison(rel: &Relation) -> (String, String) {
     (relation_type, rel.target.link.as_str().to_string())
 }
 
+/// Compute the impact scope: the per-branch lowest common ancestors of all
+/// impacted requirements through the derivedFrom hierarchy.
+///
+/// Algorithm:
+/// 1. Collect requirement IDs from changed + added elements
+/// 2. For removed elements: walk derivedFrom in reference registry to find
+///    first parent still existing in current registry
+/// 3. Bottom-up merge: group siblings by parent, replace groups of 2+ with parent
+/// 4. Repeat until stable
+/// 5. Return sorted by element_id for deterministic output
+pub fn compute_impact_scope(
+    current: &graph_registry::GraphRegistry,
+    reference: &graph_registry::GraphRegistry,
+    report: &ChangeImpactReport,
+) -> Vec<ImpactScopeRoot> {
+    let hierarchical_relations = relation::get_hierarchical_relation_types();
+
+    // Step 1: Collect requirement element IDs from changed + added
+    // Use all_changed/all_added IDs (pre-smart-filtering) for complete scope
+    let mut scope_set: HashSet<String> = HashSet::new();
+
+    for id in report.all_changed_element_ids.iter().chain(report.all_added_element_ids.iter()) {
+        if let Some(elem) = current.get_element(id) {
+            if matches!(elem.element_type, element::ElementType::Requirement(_)) {
+                scope_set.insert(id.clone());
+            }
+        }
+    }
+
+    // Step 2: For removed elements, walk derivedFrom in reference to find
+    // first parent that still exists in current registry
+    for removed in &report.removed {
+        if let Some(ref_elem) = reference.get_element(&removed.element_id) {
+            if !matches!(ref_elem.element_type, element::ElementType::Requirement(_)) {
+                continue;
+            }
+            let mut visited = HashSet::new();
+            let mut current_id = removed.element_id.clone();
+            visited.insert(current_id.clone());
+
+            loop {
+                // Find derivedFrom parent in reference registry
+                let parent_id = reference.get_element(&current_id).and_then(|elem| {
+                    elem.relations.iter()
+                        .find(|r| hierarchical_relations.contains(&r.relation_type.name))
+                        .and_then(|r| match &r.target.link {
+                            LinkType::Identifier(id) => Some(id.clone()),
+                            _ => None,
+                        })
+                });
+
+                match parent_id {
+                    Some(pid) => {
+                        if !visited.insert(pid.clone()) {
+                            break; // circular reference
+                        }
+                        // Check if this parent exists in current registry
+                        if current.get_element(&pid).is_some() {
+                            if let Some(elem) = current.get_element(&pid) {
+                                if matches!(elem.element_type, element::ElementType::Requirement(_)) {
+                                    scope_set.insert(pid);
+                                }
+                            }
+                            break;
+                        }
+                        // Parent also deleted, walk further up
+                        current_id = pid;
+                    }
+                    None => break, // no parent, exclude
+                }
+            }
+        }
+    }
+
+    if scope_set.is_empty() {
+        return Vec::new();
+    }
+
+    // Step 3: Bottom-up merge loop
+    loop {
+        // For each element in scope_set, find its derivedFrom parent in current registry
+        let mut parent_map: HashMap<String, Vec<String>> = HashMap::new();
+        let mut no_parent: Vec<String> = Vec::new();
+
+        for id in &scope_set {
+            let parent_id = current.get_element(id).and_then(|elem| {
+                elem.relations.iter()
+                    .find(|r| hierarchical_relations.contains(&r.relation_type.name))
+                    .and_then(|r| match &r.target.link {
+                        LinkType::Identifier(pid) => Some(pid.clone()),
+                        _ => None,
+                    })
+            });
+
+            match parent_id {
+                Some(pid) => {
+                    parent_map.entry(pid).or_default().push(id.clone());
+                }
+                None => {
+                    no_parent.push(id.clone());
+                }
+            }
+        }
+
+        // Merge: for parents with 2+ children, replace children with parent
+        let mut new_set: HashSet<String> = HashSet::new();
+        for id in &no_parent {
+            new_set.insert(id.clone());
+        }
+
+        for (parent_id, children) in &parent_map {
+            if children.len() >= 2 {
+                new_set.insert(parent_id.clone());
+            } else {
+                // Single child: keep child as-is
+                for child in children {
+                    new_set.insert(child.clone());
+                }
+            }
+        }
+
+        if new_set == scope_set {
+            break; // stable
+        }
+        scope_set = new_set;
+    }
+
+    // Step 4: Build result sorted by element_id for deterministic output
+    let mut result: Vec<ImpactScopeRoot> = scope_set.into_iter()
+        .filter_map(|id| {
+            current.get_element(&id).map(|elem| ImpactScopeRoot {
+                element_id: id,
+                name: elem.name.clone(),
+            })
+        })
+        .collect();
+    result.sort_by(|a, b| a.element_id.cmp(&b.element_id));
+    result
+}
+
 pub fn compute_change_impact(
     current: &graph_registry::GraphRegistry,
     reference: &graph_registry::GraphRegistry,
@@ -1051,13 +1220,19 @@ pub fn compute_change_impact(
     report.removed.sort_by(|a, b| a.element_id.cmp(&b.element_id));
     report.changed.sort_by(|a, b| a.element_id.cmp(&b.element_id));
 
-    // Store all added element IDs before smart filtering is applied
+    // Store all added and changed element IDs before smart filtering is applied
     report.all_added_element_ids = report.added.iter()
+        .map(|elem| elem.element_id.clone())
+        .collect();
+    report.all_changed_element_ids = report.changed.iter()
         .map(|elem| elem.element_id.clone())
         .collect();
 
     // Apply smart filtering to eliminate redundant new elements
     apply_smart_filtering(&mut report, current);
+
+    // Compute impact scope (per-branch LCAs of impacted requirements)
+    report.impact_scope = compute_impact_scope(current, reference, &report);
 
     Ok(report)
 }
@@ -1079,6 +1254,7 @@ mod tests {
             Some(crate::element::ElementType::Requirement(crate::element::RequirementType::System))
         );
         element.add_content(content);
+        element.freeze_content();
         element
     }
        
@@ -1469,5 +1645,204 @@ mod tests {
             !parent_in_changed,
             "Parent Element should NOT be in changed elements - auto-generated relation unchanged"
         );
+    }
+
+    /// Helper: add a derivedFrom relation (backward/hierarchical) from child to parent
+    fn add_derived_from(child: &mut Element, parent_id: &str) {
+        let element_id = crate::utils::extract_path_and_fragment(parent_id).1.map(|f| f.to_string());
+        child.relations.push(Relation {
+            relation_type: &RelationTypeInfo {
+                name: "derivedFrom",
+                opposite: Some("derive"),
+                description: "Derived from parent",
+                arrow: "<--",
+                label: "derivedFrom",
+            },
+            target: RelationTarget {
+                text: parent_id.to_string(),
+                link: LinkType::Identifier(parent_id.to_string()),
+                element_id,
+            },
+            user_created: true,
+        });
+    }
+
+    /// Helper: add forward derive relation from parent to child
+    fn add_derive(parent: &mut Element, child_id: &str) {
+        let element_id = crate::utils::extract_path_and_fragment(child_id).1.map(|f| f.to_string());
+        parent.relations.push(Relation {
+            relation_type: &RelationTypeInfo {
+                name: "derive",
+                opposite: Some("derivedFrom"),
+                description: "Parent derives child",
+                arrow: "-->",
+                label: "derive",
+            },
+            target: RelationTarget {
+                text: child_id.to_string(),
+                link: LinkType::Identifier(child_id.to_string()),
+                element_id,
+            },
+            user_created: false,
+        });
+    }
+
+    #[test]
+    fn test_impact_scope_merges_siblings() {
+        // Two sibling requirements changed -> their parent should be scope root
+        //   parent
+        //   ├── child_a (changed)
+        //   └── child_b (changed)
+
+        let mut current = GraphRegistry::new();
+        let mut reference = GraphRegistry::new();
+
+        let mut parent = create_element("req.md#parent", "Parent Req", "Parent content");
+        add_derive(&mut parent, "req.md#child-a");
+        add_derive(&mut parent, "req.md#child-b");
+
+        let mut child_a = create_element("req.md#child-a", "Child A", "Content A v2");
+        add_derived_from(&mut child_a, "req.md#parent");
+        let mut child_b = create_element("req.md#child-b", "Child B", "Content B v2");
+        add_derived_from(&mut child_b, "req.md#parent");
+
+        current.register_element(parent.clone(), "req.md").unwrap();
+        current.register_element(child_a, "req.md").unwrap();
+        current.register_element(child_b, "req.md").unwrap();
+
+        // Reference: same structure, different content for children
+        let mut ref_parent = create_element("req.md#parent", "Parent Req", "Parent content");
+        add_derive(&mut ref_parent, "req.md#child-a");
+        add_derive(&mut ref_parent, "req.md#child-b");
+
+        let mut ref_child_a = create_element("req.md#child-a", "Child A", "Content A v1");
+        add_derived_from(&mut ref_child_a, "req.md#parent");
+        let mut ref_child_b = create_element("req.md#child-b", "Child B", "Content B v1");
+        add_derived_from(&mut ref_child_b, "req.md#parent");
+
+        reference.register_element(ref_parent, "req.md").unwrap();
+        reference.register_element(ref_child_a, "req.md").unwrap();
+        reference.register_element(ref_child_b, "req.md").unwrap();
+
+        let report = compute_change_impact(&current, &reference).unwrap();
+
+        // Both children changed, so they should merge into parent
+        assert!(!report.impact_scope.is_empty(), "Impact scope should not be empty");
+        assert_eq!(report.impact_scope.len(), 1, "Should have exactly 1 scope root");
+        assert_eq!(report.impact_scope[0].element_id, "req.md#parent");
+        assert_eq!(report.impact_scope[0].name, "Parent Req");
+    }
+
+    #[test]
+    fn test_impact_scope_deleted_parent() {
+        // Deleted requirement whose parent still exists in current model
+        //   parent (exists in both)
+        //   └── child (deleted)
+
+        let mut current = GraphRegistry::new();
+        let mut reference = GraphRegistry::new();
+
+        let parent = create_element("req.md#parent", "Parent Req", "Parent content");
+        current.register_element(parent.clone(), "req.md").unwrap();
+
+        // Reference has both parent and child
+        let ref_parent = create_element("req.md#parent", "Parent Req", "Parent content");
+        let mut ref_child = create_element("req.md#child", "Child Req", "Child content");
+        add_derived_from(&mut ref_child, "req.md#parent");
+
+        reference.register_element(ref_parent, "req.md").unwrap();
+        reference.register_element(ref_child, "req.md").unwrap();
+
+        let report = compute_change_impact(&current, &reference).unwrap();
+
+        // Deleted child's parent should appear in scope
+        assert_eq!(report.impact_scope.len(), 1, "Should have 1 scope root");
+        assert_eq!(report.impact_scope[0].element_id, "req.md#parent");
+    }
+
+    #[test]
+    fn test_impact_scope_disjoint_branches() {
+        // Changes in separate branches should produce separate scope roots
+        //   root_a
+        //   └── child_a (changed)
+        //   root_b
+        //   └── child_b (changed)
+
+        let mut current = GraphRegistry::new();
+        let mut reference = GraphRegistry::new();
+
+        // Branch A
+        let mut root_a = create_element("req.md#root-a", "Root A", "Root A content");
+        add_derive(&mut root_a, "req.md#child-a");
+        let mut child_a = create_element("req.md#child-a", "Child A", "Child A v2");
+        add_derived_from(&mut child_a, "req.md#root-a");
+
+        // Branch B
+        let mut root_b = create_element("req.md#root-b", "Root B", "Root B content");
+        add_derive(&mut root_b, "req.md#child-b");
+        let mut child_b = create_element("req.md#child-b", "Child B", "Child B v2");
+        add_derived_from(&mut child_b, "req.md#root-b");
+
+        current.register_element(root_a, "req.md").unwrap();
+        current.register_element(child_a, "req.md").unwrap();
+        current.register_element(root_b, "req.md").unwrap();
+        current.register_element(child_b, "req.md").unwrap();
+
+        // Reference: same structure, different content
+        let mut ref_root_a = create_element("req.md#root-a", "Root A", "Root A content");
+        add_derive(&mut ref_root_a, "req.md#child-a");
+        let mut ref_child_a = create_element("req.md#child-a", "Child A", "Child A v1");
+        add_derived_from(&mut ref_child_a, "req.md#root-a");
+
+        let mut ref_root_b = create_element("req.md#root-b", "Root B", "Root B content");
+        add_derive(&mut ref_root_b, "req.md#child-b");
+        let mut ref_child_b = create_element("req.md#child-b", "Child B", "Child B v1");
+        add_derived_from(&mut ref_child_b, "req.md#root-b");
+
+        reference.register_element(ref_root_a, "req.md").unwrap();
+        reference.register_element(ref_child_a, "req.md").unwrap();
+        reference.register_element(ref_root_b, "req.md").unwrap();
+        reference.register_element(ref_child_b, "req.md").unwrap();
+
+        let report = compute_change_impact(&current, &reference).unwrap();
+
+        // Each branch has only 1 changed child, so no merging happens
+        // Both children remain as separate scope roots
+        assert_eq!(report.impact_scope.len(), 2, "Should have 2 scope roots");
+        let ids: Vec<&str> = report.impact_scope.iter().map(|s| s.element_id.as_str()).collect();
+        assert!(ids.contains(&"req.md#child-a"), "Child A should be a scope root");
+        assert!(ids.contains(&"req.md#child-b"), "Child B should be a scope root");
+    }
+
+    #[test]
+    fn test_impact_scope_single_element() {
+        // Single changed element with no sibling -> stays as-is
+        //   parent
+        //   └── only_child (changed)
+
+        let mut current = GraphRegistry::new();
+        let mut reference = GraphRegistry::new();
+
+        let mut parent = create_element("req.md#parent", "Parent Req", "Parent content");
+        add_derive(&mut parent, "req.md#only-child");
+        let mut only_child = create_element("req.md#only-child", "Only Child", "Child v2");
+        add_derived_from(&mut only_child, "req.md#parent");
+
+        current.register_element(parent.clone(), "req.md").unwrap();
+        current.register_element(only_child, "req.md").unwrap();
+
+        let mut ref_parent = create_element("req.md#parent", "Parent Req", "Parent content");
+        add_derive(&mut ref_parent, "req.md#only-child");
+        let mut ref_child = create_element("req.md#only-child", "Only Child", "Child v1");
+        add_derived_from(&mut ref_child, "req.md#parent");
+
+        reference.register_element(ref_parent, "req.md").unwrap();
+        reference.register_element(ref_child, "req.md").unwrap();
+
+        let report = compute_change_impact(&current, &reference).unwrap();
+
+        // Only one child changed, no sibling to merge with -> child stays as scope root
+        assert_eq!(report.impact_scope.len(), 1, "Should have 1 scope root");
+        assert_eq!(report.impact_scope[0].element_id, "req.md#only-child");
     }
 }

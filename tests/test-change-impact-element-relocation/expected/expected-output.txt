@@ -28,3 +28,9 @@
 
 
 ---
+
+### Impact Scope
+
+* [Battery Saver](specifications/SecondFile/Requirements.md#battery-saver)
+
+---

@@ -46,9 +46,12 @@ ${1:-Comparing against: HEAD~1 (previous commit)}
 3. **Analyze the results:**
 
    Extract from JSON:
-   - `added_elements[]` - New requirements/verifications
-   - `modified_elements[]` - Changed requirements/verifications
-   - `affected_elements[]` - Elements impacted by changes
+   - `added[]` - New requirements/verifications
+   - `changed[]` - Changed requirements/verifications
+   - `removed[]` - Removed elements
+   - `relocated[]` - Relocated elements (same name, different path)
+   - `impact_scope[]` - Per-branch scope roots (common parent requirements covering all impacted elements)
+   - `invalidated_verifications[]` - Verifications that need re-review
 
 4. **For each modified requirement:**
 
@@ -65,19 +68,22 @@ ${1:-Comparing against: HEAD~1 (previous commit)}
 
 5. **Present impact findings:**
 
+   **Impact Scope** (high-level affected areas):
+   - [Parent Requirement A](file.md#parent-a) - covers changed children
+   - [Standalone Req](file.md#standalone) - directly changed
+
    **Added Elements:**
    - [New Requirement](file.md#new-req) - type: requirement
 
    **Modified Elements:**
    - [Changed Requirement](file.md#changed) - review needed
 
-   **Affected Elements (propagation):**
-   - Verifications needing review: X
-   - Implementations needing update: Y
-   - Child requirements affected: Z
+   **Invalidated Verifications:**
+   - Verifications needing re-review: X
 
 6. **Provide recommendations:**
-   - Review and update affected verifications
+   - Start with impact scope to understand affected model areas
+   - Review and update invalidated verifications
    - Update test criteria if requirements changed
    - Review implementations marked with satisfiedBy
    - Run tests for affected verifications

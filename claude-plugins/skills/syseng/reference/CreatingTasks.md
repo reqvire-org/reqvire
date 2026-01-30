@@ -36,9 +36,12 @@ reqvire change-impact --git-commit=HEAD~1
 ```
 
 The change-impact command identifies:
-- `added_elements[]` - New requirements/verifications
-- `modified_elements[]` - Changed requirements/verifications
-- `affected_elements[]` - Elements impacted by changes (via derivedFrom, verifiedBy)
+- `added[]` - New requirements/verifications
+- `changed[]` - Changed requirements/verifications
+- `removed[]` - Removed elements
+- `relocated[]` - Relocated elements (same name, different path)
+- `impact_scope[]` - Per-branch scope roots: common parent requirements covering all impacted elements. Use this for a high-level summary of affected model areas
+- `invalidated_verifications[]` - Verifications that need re-review
 
 **Change Propagation Rules:**
 - **Parent → Child**: Parent changes propagate to all derived children

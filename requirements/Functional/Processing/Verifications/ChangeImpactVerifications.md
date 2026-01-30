@@ -170,6 +170,32 @@ This test verifies that the system correctly extracts element content for change
   * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
 ---
 
+### Impact Scope Summary Test
+
+This test verifies that the change impact report correctly computes and displays the impact scope summary showing common parent requirements.
+
+#### Details
+
+##### Acceptance Criteria
+- System computes per-branch lowest common ancestors for changed+added requirements
+- Deleted requirements' parents (if still in current model) are included in scope
+- Siblings under the same parent are merged into the parent
+- Single impacted elements without siblings remain as-is
+- Scope roots are listed between Changed Elements and Invalidated Verifications
+
+##### Test Criteria
+- When two sibling requirements change, their parent appears as scope root
+- When a requirement is deleted, its parent (if still in model) appears in scope
+- Elements in different branches produce separate scope roots
+- Both text and JSON outputs include impact scope data
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Change Impact Detection](../ChangeImpact.md#change-impact-detection)
+---
+
 ### Structural Change Reports Verification
 
 This test verifies that the system analyzes and reports on structural changes in the System model.
