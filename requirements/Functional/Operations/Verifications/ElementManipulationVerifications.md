@@ -87,9 +87,9 @@ The test shall verify that the `add` command creates new elements from stdin or 
 4. Verify git-style diff is output showing changes
 5. Verify file is modified on disk
 
-**Test Steps - Inline String:**
-1. Run `reqvire add <file> "### Element..."`
-2. Verify element is read from inline argument
+**Test Steps - Content Flag:**
+1. Run `reqvire add <file> --content "### Element..."`
+2. Verify element is read from --content argument
 3. Verify element is validated and inserted
 4. Verify git-style diff is output
 
@@ -117,7 +117,7 @@ The test shall verify that the `add` command creates new elements from stdin or 
 
 **Success Criteria:**
 - Reads from stdin when piped
-- Reads from inline argument when provided
+- Reads from --content argument when provided
 - Validates before insertion
 - Inserts following Element Ordering Behavior
 - Shows git-style diff by default

@@ -89,6 +89,7 @@ LINT OPTIONS:
 
 ADD OPTIONS:
        <FILE>                   Target file path (relative to git repository root)
+      --content <MARKDOWN>      Element markdown content (alternative to stdin)
       --override                Replace existing element with same name
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format

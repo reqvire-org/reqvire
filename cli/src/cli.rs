@@ -234,10 +234,14 @@ pub enum Commands {
     },
 
     /// Add new element to model from Markdown definition
-    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --override                 Replace existing element with same name\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>  # reads element from stdin")]
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --content <MARKDOWN>       Element markdown content (alternative to stdin)\n      --override                 Replace existing element with same name\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>                          # reads from stdin\n    reqvire add <file> --content \"### Name...\"   # reads from argument")]
     Add {
         /// Target file path (relative to git repository root)
         file: String,
+
+        /// Element markdown content (alternative to stdin)
+        #[clap(long, value_name = "MARKDOWN", help_heading = "ADD OPTIONS")]
+        content: Option<String>,
 
         /// Replace existing element with same name
         #[clap(long = "override", help_heading = "ADD OPTIONS")]
@@ -929,15 +933,20 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Add { file, override_existing, dry_run, json }) => {
-            // Read element markdown from stdin
-            use std::io::Read;
-            let mut element_markdown = String::new();
-            std::io::stdin().read_to_string(&mut element_markdown)?;
+        Some(Commands::Add { file, content, override_existing, dry_run, json }) => {
+            // Use --content if provided, otherwise read from stdin
+            let element_markdown = if let Some(content_str) = content {
+                content_str
+            } else {
+                use std::io::Read;
+                let mut stdin_content = String::new();
+                std::io::stdin().read_to_string(&mut stdin_content)?;
+                stdin_content
+            };
 
             if element_markdown.trim().is_empty() {
                 return Err(ReqvireError::ProcessError(
-                    "Element markdown is empty. Pipe element content to stdin.".to_string()
+                    "Element markdown is empty. Provide content via --content or pipe to stdin.".to_string()
                 ));
             }
 

@@ -116,13 +116,15 @@ Options:
 
 ### CLI Add Element Command
 
-The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin, validating the structure, and inserting it into the target file.
+The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin or the `--content` argument, validating the structure, and inserting it into the target file.
 
 #### Details
 The `add` command shall:
-- Accept element definition input from standard input (stdin)
+- Accept element definition input from standard input (stdin) by default
+- Support `--content <string>` option as alternative to stdin input
+- When `--content` is provided, use its value instead of reading stdin
 - Accept target file path as required positional argument (resolved relative to Git repository root)
-- Support command syntax: `reqvire add <file>`
+- Support command syntax: `reqvire add <file>` (stdin) or `reqvire add <file> --content "..."`
 - Validate element structure before insertion
 - Insert element into file following Element Ordering Behavior
 - Apply changes immediately by default

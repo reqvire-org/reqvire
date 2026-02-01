@@ -81,6 +81,64 @@ echo "✓ Element added successfully"
 echo ""
 
 # ==================================
+# Test 1a: Add Element via --content flag
+# ==================================
+echo "Test 1a: Add element via --content flag..."
+
+CONTENT_ELEMENT='### Feature F
+
+This feature was added via --content flag.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature A](#feature-a)
+'
+
+set +e
+ADD_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" add specifications/Requirements.md --content "$CONTENT_ELEMENT" 2>&1)
+ADD_CONTENT_EXIT=$?
+set -e
+
+if [ $ADD_CONTENT_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Add with --content flag failed with exit code $ADD_CONTENT_EXIT"
+  echo "$ADD_CONTENT_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "### Feature F" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Element was not added via --content flag"
+  exit 1
+fi
+
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed after --content add"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+# Clean up: remove the element to keep file state consistent for subsequent tests
+set +e
+RM_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Feature F" 2>&1)
+RM_CONTENT_EXIT=$?
+set -e
+
+if [ $RM_CONTENT_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Cleanup rm of Feature F failed with exit code $RM_CONTENT_EXIT"
+  echo "$RM_CONTENT_OUTPUT"
+  exit 1
+fi
+
+echo "✓ Element added via --content flag successfully"
+echo ""
+
+# ==================================
 # Test 1b: Add Element with Attachments
 # ==================================
 echo "Test 1b: Add element with attachments..."

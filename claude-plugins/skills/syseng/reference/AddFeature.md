@@ -37,10 +37,22 @@ System Requirement(s) (technical implementation)
 
 ### Adding Requirements
 
-Create requirements by piping element content to the add command:
+Create requirements using the `--content` flag or by piping element content to the add command:
 
 ```bash
-# Add user requirement to file (reads from stdin)
+# Add user requirement using --content flag (preferred)
+reqvire add requirements/UserStories.md --content '### Feature Name
+
+The system shall provide feature capability.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Parent Requirement](path.md#parent)
+'
+
+# Add user requirement to file via stdin
 echo '### Feature Name
 
 The system shall provide feature capability.
@@ -52,8 +64,8 @@ The system shall provide feature capability.
   * derivedFrom: [Parent Requirement](path.md#parent)
 ' | reqvire add requirements/UserStories.md
 
-# Add system requirement at specific position (0-based index)
-reqvire add requirements/System/Features.md 2 <<'EOF'
+# Add system requirement using heredoc (stdin)
+reqvire add requirements/System/Features.md <<'EOF'
 ### System Feature Implementation
 
 The system shall implement the feature using defined algorithms.
