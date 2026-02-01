@@ -144,29 +144,32 @@ Refinements are owned via `refinedBy` on the requirement (refinement gets auto-g
 3. Never guess - read files before making changes
 4. Validate after each significant change
 5. When reading requirements, always check for **attachments** (documents, diagrams, images)
-6. Use `reqvire collect` to gather full context from requirement chains (ancestors + attachments)
+6. Use `reqvire collect` to gather full context from requirement chains (ancestors or descendants + attachments)
 
 Use `reqvire collect` to gather complete context for a requirement:
 
 ```bash
-# Get full requirement chain with all ancestor content and attachments
+# Get ancestor chain (upstream - default)
 reqvire collect "Feature Requirement"
+
+# Get all descendants (downstream)
+reqvire collect "Feature Requirement" --direction DOWNSTREAM
 
 # JSON format for programmatic use
 reqvire collect "Feature Requirement" --json
+reqvire collect "Feature Requirement" --direction DOWNSTREAM --json
 ```
 
 **When to use collect:**
-- Before implementing a requirement - get full specification context
+- **Upstream (default)**: Get full ancestor specification context before implementing
+- **Downstream**: Enumerate all children under a parent (e.g., from impact_scope entries)
 - When analyzing impact of changes - understand complete requirement chain
 - When creating tasks from requirements - gather all related specifications
 - When reviewing requirements - see full derivation hierarchy with sources
 
-The collect command traverses `derivedFrom` relations upward and includes:
-- All ancestor requirement content
-- Attached markdown files (read as content)
-- Attached refinement elements (specifications, constraints, behaviors)
-- Source citations for traceability
+The collect command supports two directions:
+- **UPSTREAM** (default): Traverses `derivedFrom` relations upward — ancestors, specs, attachments
+- **DOWNSTREAM**: Traverses `derive` relations downward — all children to leaf elements
 
 ## Command Reference
 

@@ -490,11 +490,15 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Collect content from requirement chain via derivedFrom relations
-    #[clap(override_help = "Collect content from requirement chain via derivedFrom relations\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>    Name of the requirement element to collect from\n      --json            Output results in JSON format\n      --output <FILE>   Save JSON output to file (requires --json)")]
+    /// Collect content from requirement chain
+    #[clap(override_help = "Collect content from requirement chain\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the requirement element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)")]
     Collect {
         /// Name of the requirement element to collect from
         element_name: String,
+
+        /// Traversal direction: UPSTREAM (ancestors) or DOWNSTREAM (descendants)
+        #[clap(long, value_name = "DIRECTION", default_value = "UPSTREAM", help_heading = "COLLECT OPTIONS")]
+        direction: String,
 
         /// Output results in JSON format
         #[clap(long, help_heading = "COLLECT OPTIONS")]
@@ -1365,14 +1369,23 @@ pub fn handle_command(
             }
             return Ok(0);
         },
-        Some(Commands::Collect { element_name, json, output }) => {
+        Some(Commands::Collect { element_name, direction, json, output }) => {
             validate_output_requires_json(&output, json)?;
+            let collect_direction = match direction.to_uppercase().as_str() {
+                "UPSTREAM" => report_collect::CollectDirection::Upstream,
+                "DOWNSTREAM" => report_collect::CollectDirection::Downstream,
+                _ => {
+                    eprintln!("error: invalid direction '{}'. Valid values: UPSTREAM, DOWNSTREAM", direction);
+                    return Ok(1);
+                }
+            };
             let git_root = git_commands::get_git_root_dir()?;
             let report_output = report_collect::generate_collect_report(
                 &model_manager.graph_registry,
                 &element_name,
                 &git_root,
                 json,
+                collect_direction,
             )?;
             if json {
                 handle_json_output(&report_output, &output)?;

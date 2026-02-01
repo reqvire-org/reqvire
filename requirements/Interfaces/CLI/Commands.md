@@ -228,17 +228,18 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 The system shall provide a `collect` command that performs content collection as specified in the attached specifications.
 
 #### Details
-Command syntax: `reqvire collect <element-name> [--json]`
+Command syntax: `reqvire collect <element-name> [--direction UPSTREAM|DOWNSTREAM] [--json]`
 
 **Arguments:**
 - `<element-name>` - Required. Name of the requirement element to collect from.
 
 **Options:**
+- `--direction <DIRECTION>` - Traversal direction. Values: `UPSTREAM` (default) or `DOWNSTREAM`. UPSTREAM traverses derivedFrom relations to ancestors; DOWNSTREAM traverses derive relations to descendants.
 - `--json` - Output in JSON format instead of text
 
 **Exit codes:**
 - 0 on success
-- Non-zero on error (element not found, invalid type, etc.)
+- Non-zero on error (element not found, invalid type, invalid direction, etc.)
 
 #### Metadata
   * type: requirement

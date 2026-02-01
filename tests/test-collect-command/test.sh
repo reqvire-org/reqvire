@@ -90,4 +90,67 @@ if ! echo "$OUTPUT" | grep -q "not a requirement type"; then
   exit 1
 fi
 
+# Test 5: Downstream text output from root requirement
+cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Root Requirement" --direction DOWNSTREAM > /tmp/collect-downstream-text.txt 2>&1
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: Downstream collect command returned error: $EXIT_CODE"
+  cat /tmp/collect-downstream-text.txt
+  exit 1
+fi
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/downstream-text-output.txt" \
+  /tmp/collect-downstream-text.txt \
+  "Downstream text output does not match expected"
+
+# Test 6: Downstream JSON output
+cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Root Requirement" --direction DOWNSTREAM --json > /tmp/collect-downstream-json.json 2>&1
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: Downstream JSON collect command returned error: $EXIT_CODE"
+  cat /tmp/collect-downstream-json.json
+  exit 1
+fi
+
+if ! jq . /tmp/collect-downstream-json.json >/dev/null 2>&1; then
+  echo "❌ FAILED: Invalid downstream JSON output"
+  cat /tmp/collect-downstream-json.json
+  exit 1
+fi
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/downstream-json-output.json" \
+  /tmp/collect-downstream-json.json \
+  "Downstream JSON output does not match expected"
+
+# Test 7: Explicit UPSTREAM direction matches default
+cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Leaf Requirement" --direction UPSTREAM > /tmp/collect-upstream-explicit.txt 2>&1
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "❌ FAILED: Explicit UPSTREAM collect returned error: $EXIT_CODE"
+  cat /tmp/collect-upstream-explicit.txt
+  exit 1
+fi
+
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/text-output.txt" \
+  /tmp/collect-upstream-explicit.txt \
+  "Explicit UPSTREAM output should match default output"
+
+# Test 8: Invalid direction returns error
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Leaf Requirement" --direction INVALID 2>&1)
+EXIT_CODE=$?
+
+if [ $EXIT_CODE -eq 0 ]; then
+  echo "❌ FAILED: Should have returned error for invalid direction"
+  exit 1
+fi
+
+if ! echo "$OUTPUT" | grep -qi "invalid direction"; then
+  echo "❌ FAILED: Error message should mention 'invalid direction'"
+  echo "$OUTPUT"
+  exit 1
+fi
+
 exit 0

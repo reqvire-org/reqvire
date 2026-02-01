@@ -37,19 +37,24 @@ Generate implementation task plan from requirement changes on a feature branch.
    reqvire change-impact --git-commit=$BASE_COMMIT --json --output /tmp/impact.json
    ```
 
-3. **Review impact scope** (from JSON `impact_scope[]`):
+3. **Review impact scope and enumerate covered elements** (from JSON `impact_scope[]`):
 
-   The `impact_scope` array shows the per-branch common parent requirements covering all impacted elements. Use this to understand the high-level affected model areas before diving into details.
+   The `impact_scope` array shows the per-branch common parent requirements covering all impacted elements. For each scope root, use downstream collect to enumerate all covered children:
+   ```bash
+   reqvire collect "<scope-root-name>" --direction DOWNSTREAM --json --output /tmp/scope_<name>.json
+   ```
+
+   This returns the scope root and all its descendants, giving you the complete list of affected elements under each scope entry.
 
 4. **For each changed requirement:**
 
-   Get full context using collect:
+   Get full upstream context using collect:
    ```bash
    reqvire collect "<requirement-name>" --json --output /tmp/req_<requirement-id>.json
    ```
 
    This provides:
-   - Complete requirement chain via derivedFrom relations
+   - Complete ancestor chain via derivedFrom relations (upstream)
    - All parent requirements for context
    - Refinement elements (specifications, constraints, behaviors) that refine the requirement
    - Attached design documents

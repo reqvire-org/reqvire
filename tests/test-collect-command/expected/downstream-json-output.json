@@ -1,6 +1,6 @@
 {
-  "starting_element": "specifications/Requirements.md#leaf-requirement",
-  "direction": "upstream",
+  "starting_element": "specifications/Requirements.md#root-requirement",
+  "direction": "downstream",
   "items": [
     {
       "name": "Root Requirement",

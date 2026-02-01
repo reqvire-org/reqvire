@@ -49,31 +49,46 @@ The change-impact command identifies:
 - **Requirement → Implementation**: May need implementation updates
 - **Verification changes**: Generally don't propagate upward
 
-### Step 2: Gather Full Requirement Context
+### Step 1.5: Enumerate Covered Elements from Impact Scope
 
-For each changed requirement, collect complete context:
+For each entry in `impact_scope[]`, use downstream collect to find all covered children:
 
 ```bash
-# Get full requirement chain with ancestors and attachments
+# Get all descendants under each scope root
+reqvire collect "<scope-root-name>" --direction DOWNSTREAM --json --output /tmp/scope_<name>.json
+```
+
+This ensures no elements are missed — `impact_scope` entries are common parents that may cover multiple added/changed children.
+
+### Step 2: Gather Full Requirement Context
+
+For each changed requirement (from `added[]`, `changed[]`, or enumerated via downstream collect), gather upstream context:
+
+```bash
+# Get full ancestor chain with attachments (upstream - default)
 reqvire collect "<requirement-name>" --json --output /tmp/req_<requirement-id>.json
 
 # Also save human-readable format for reference
 reqvire collect "<requirement-name>" > /tmp/req_context_<requirement-id>.md
+
+# Get all descendants under a requirement (downstream)
+reqvire collect "<requirement-name>" --direction DOWNSTREAM --json --output /tmp/req_<requirement-id>_tree.json
 
 # Get direct requirement details
 reqvire search --filter-id="<requirement-id>" --json
 ```
 
 **Why use `reqvire collect` for task generation:**
-- Gathers complete requirement chain via `derivedFrom` relations
-- Shows parent requirements (the "why" context)
+- **Upstream (default)**: Gathers ancestor chain via `derivedFrom` — the "why" context
+- **Downstream**: Enumerates all children via `derive` — find everything under a scope root
 - Includes all specifications and design documents
 - Captures constraints and validation rules
 - Provides full implementation context in one command
 - Saves to `/tmp` for developer reference during implementation
 
 **What collect provides:**
-- All ancestor requirement content
+- **Upstream**: All ancestor requirement content (parent chain to root)
+- **Downstream**: All descendant requirement content (children to leaves)
 - Attached markdown files (read as content)
 - Attached refinement elements (specifications, constraints, behaviors)
 - Source citations for traceability
@@ -205,12 +220,13 @@ When analyzing requirements for task generation:
 | To Understand This | Use This Command |
 |--------------------|------------------|
 | What requirements changed | `reqvire change-impact --git-commit=<hash> --json` |
-| **Full requirement context** | `reqvire collect "<name>" --json --output /tmp/req_<id>.json` |
+| **Full requirement context (ancestors)** | `reqvire collect "<name>" --json --output /tmp/req_<id>.json` |
 | Requirement direct content | `reqvire search --filter-id="<id>" --json` |
 | What verifies a requirement | `reqvire traces --filter-id="<id>" --json` |
 | Which tests to run | Extract `satisfiedBy` from verification via `reqvire search` |
 | Implementation status | Check `satisfiedBy` relations in requirement |
-| Requirement hierarchy | `reqvire collect "<name>"` shows complete derivedFrom chain |
+| Requirement hierarchy (up) | `reqvire collect "<name>"` shows derivedFrom ancestor chain |
+| Requirement hierarchy (down) | `reqvire collect "<name>" --direction DOWNSTREAM` shows all descendants |
 
 **Why use commands instead of reading files:**
 - Automatic relation following

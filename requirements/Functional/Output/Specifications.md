@@ -13,8 +13,12 @@ Technical specification for content collection from requirement chains.
 
 **Traversal Rules:**
 - Start from specified requirement element
-- Traverse derivedFrom relations in reverse direction (child to parents)
-- Continue until root ancestors reached (elements with no derivedFrom)
+- When direction is UPSTREAM (default):
+  - Traverse derivedFrom relations in reverse direction (child to parents)
+  - Continue until root ancestors reached (elements with no derivedFrom)
+- When direction is DOWNSTREAM:
+  - Traverse derive relations in forward direction (parent to children)
+  - Continue until leaf descendants reached (elements with no derive to other requirements)
 - Include the starting element in output
 
 **Content Collection:**
@@ -31,8 +35,9 @@ Technical specification for content collection from requirement chains.
 
 **Output Ordering:**
 - Flat list structure (no nesting)
-- Ancestors first (depth 0 = root), then descendants
-- Same-level elements sorted alphabetically by name or file path
+- When direction is UPSTREAM: ancestors first (depth 0 = root), then starting element
+- When direction is DOWNSTREAM: starting element first (depth 0), then descendants at increasing depth
+- Same-depth elements sorted alphabetically by name or file path
 
 **Error Handling:**
 - Element not found: Error with message

@@ -1,0 +1,44 @@
+The root requirement for testing content collection.
+
+
+#### Details
+This is the top-level requirement that has no derivedFrom relations.
+
+— Source: [Root Requirement](specifications/Requirements.md#root-requirement)
+
+---
+
+The mid-level requirement derives from the root.
+
+
+#### Details
+This requirement sits in the middle of the hierarchy.
+
+— Source: [Mid-Level Requirement](specifications/Requirements.md#mid-level-requirement)
+
+---
+
+The leaf requirement at the bottom of the hierarchy.
+
+
+#### Details
+This is the leaf requirement that derives from the mid-level.
+
+— Source: [Leaf Requirement](specifications/Requirements.md#leaf-requirement)
+
+---
+
+# Design Document
+
+This is attached design documentation content.
+
+## Purpose
+
+This document provides additional context for the leaf requirement.
+
+
+— Source: [DesignDoc.md](specifications/DesignDoc.md) attached to [Leaf Requirement](specifications/Requirements.md#leaf-requirement)
+
+---
+
+

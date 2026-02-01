@@ -1,13 +1,13 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
 argument-hint: <element-name>
-description: Collect and summarize requirement context via derivedFrom chain
+description: Collect and summarize requirement context via derivedFrom chain (upstream) or derive chain (downstream)
 model: claude-sonnet-4-5
 ---
 
 # Collect Requirement Context
 
-Collect and present a comprehensive summary of requirement context via the derivedFrom chain.
+Collect and present a comprehensive summary of requirement context via the derivedFrom chain (upstream, default) or derive chain (downstream).
 
 ## Model Context
 

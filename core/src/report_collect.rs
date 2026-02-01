@@ -7,6 +7,25 @@ use std::collections::HashSet;
 use std::fs;
 use std::path::Path;
 
+/// Direction of traversal for content collection
+#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum CollectDirection {
+    /// Traverse derivedFrom relations upward to ancestors (default)
+    Upstream,
+    /// Traverse derive relations downward to descendants
+    Downstream,
+}
+
+impl std::fmt::Display for CollectDirection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CollectDirection::Upstream => write!(f, "upstream"),
+            CollectDirection::Downstream => write!(f, "downstream"),
+        }
+    }
+}
+
 /// Source type for collected content items
 #[derive(Debug, Clone, Serialize)]
 #[serde(rename_all = "snake_case")]
@@ -50,6 +69,7 @@ pub struct CollectMetadata {
 #[derive(Debug, Serialize)]
 pub struct CollectReport {
     pub starting_element: String,
+    pub direction: CollectDirection,
     pub items: Vec<CollectedItem>,
     pub metadata: CollectMetadata,
 }
@@ -60,6 +80,7 @@ pub fn generate_collect_report(
     element_name: &str,
     git_root: &Path,
     json_output: bool,
+    direction: CollectDirection,
 ) -> Result<String, ReqvireError> {
     // Find element by name
     let element_id = registry
@@ -95,8 +116,11 @@ pub fn generate_collect_report(
         }
     }
 
-    // Collect ancestor chain via derivedFrom relations
-    let ancestor_chain = collect_ancestor_chain(registry, &element_id);
+    // Collect chain based on direction
+    let chain = match direction {
+        CollectDirection::Upstream => collect_ancestor_chain(registry, &element_id),
+        CollectDirection::Downstream => collect_descendant_chain(registry, &element_id),
+    };
 
     // Build collected items
     let mut items: Vec<CollectedItem> = Vec::new();
@@ -104,9 +128,14 @@ pub fn generate_collect_report(
     let mut refinement_count = 0;
     let mut attachment_count = 0;
 
-    // Process ancestors first (root first, depth 0)
-    // ancestor_chain is ordered from starting element to root, so we reverse
-    for (depth, elem_id) in ancestor_chain.iter().rev().enumerate() {
+    // For upstream: chain is start→root, reverse to get root first (depth 0)
+    // For downstream: chain is already start→leaves (start at depth 0)
+    let ordered_chain: Vec<&String> = match direction {
+        CollectDirection::Upstream => chain.iter().rev().collect(),
+        CollectDirection::Downstream => chain.iter().collect(),
+    };
+
+    for (depth, elem_id) in ordered_chain.iter().enumerate() {
         if let Some(elem) = registry.get_element(elem_id) {
             // Add element content
             items.push(CollectedItem {
@@ -147,6 +176,7 @@ pub fn generate_collect_report(
 
     let report = CollectReport {
         starting_element: element_id,
+        direction,
         items,
         metadata: CollectMetadata {
             element_count,
@@ -190,6 +220,47 @@ fn collect_ancestor_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Strin
                 for rel in &elem.relations {
                     // Only follow derivedFrom relations (backward/reverse direction)
                     if rel.relation_type.name == "derivedFrom" {
+                        if let relation::LinkType::Identifier(target_id) = &rel.target.link {
+                            if !visited.contains(target_id) {
+                                next_level.push(target_id.clone());
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        current_level = next_level;
+    }
+
+    chain
+}
+
+/// Collect the descendant chain following derive relations (parent to children)
+fn collect_descendant_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+    let mut chain = Vec::new();
+    let mut visited = HashSet::new();
+    let mut current_level = vec![start_id.to_string()];
+
+    while !current_level.is_empty() {
+        // Sort for deterministic ordering
+        let mut sorted_level = current_level.clone();
+        sorted_level.sort();
+
+        for elem_id in &sorted_level {
+            if visited.contains(elem_id) {
+                continue;
+            }
+            visited.insert(elem_id.clone());
+            chain.push(elem_id.clone());
+        }
+
+        // Find next level (children via derive)
+        let mut next_level = Vec::new();
+        for elem_id in &sorted_level {
+            if let Some(elem) = registry.get_element(elem_id) {
+                for rel in &elem.relations {
+                    if rel.relation_type.name == "derive" {
                         if let relation::LinkType::Identifier(target_id) = &rel.target.link {
                             if !visited.contains(target_id) {
                                 next_level.push(target_id.clone());
@@ -480,6 +551,12 @@ fn extract_element_name(identifier: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn test_collect_direction_display() {
+        assert_eq!(format!("{}", CollectDirection::Upstream), "upstream");
+        assert_eq!(format!("{}", CollectDirection::Downstream), "downstream");
+    }
 
     #[test]
     fn test_extract_element_name() {

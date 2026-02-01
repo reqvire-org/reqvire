@@ -56,7 +56,9 @@ This test verifies that the collect command aggregates content from a requiremen
 - System shall provide CLI command `collect` that aggregates content from requirement chains
 - Command shall accept requirement element name as positional argument
 - Command shall support `--json` flag for JSON output format
-- Command shall traverse derivedFrom relations in reverse direction (child to parents)
+- Command shall support `--direction` flag with values UPSTREAM (default) and DOWNSTREAM
+- When direction is UPSTREAM, command shall traverse derivedFrom relations in reverse direction (child to parents)
+- When direction is DOWNSTREAM, command shall traverse derive relations in forward direction (parent to children)
 - Command shall collect element content and attachment contents
 - Command shall output with source citations
 - Command shall reject non-requirement element types with error
@@ -104,6 +106,41 @@ This test verifies that the collect command aggregates content from a requiremen
    - Flat list structure
    - Ancestors first (depth 0 = root)
    - Same-depth elements sorted alphabetically by name
+
+8. **Downstream Text Output**
+   Command: `reqvire collect <root-requirement-name> --direction DOWNSTREAM`
+   - exits code **0**
+   - output contains content from starting requirement (depth 0)
+   - output contains content from child requirements
+   - each content block followed by source citation
+   - starting element appears first, children appear after
+
+9. **Downstream JSON Output**
+   Command: `reqvire collect <root-requirement-name> --direction DOWNSTREAM --json`
+   - exits code **0**
+   - output parses as valid JSON
+   - JSON contains `direction` field with value `downstream`
+   - JSON items ordered: starting element at depth 0, children at depth 1, etc.
+   - each item has correct depth reflecting distance from starting element
+
+10. **Downstream Descendant Chain Collection**
+    - Starting from root requirement
+    - Collects content from all derive descendants
+    - Starting element at depth 0
+    - Same-depth elements sorted alphabetically
+
+11. **Default Direction is UPSTREAM**
+    Command: `reqvire collect <requirement-name>` (no --direction flag)
+    - behavior identical to `--direction UPSTREAM`
+
+12. **Explicit UPSTREAM Direction**
+    Command: `reqvire collect <requirement-name> --direction UPSTREAM`
+    - behavior identical to omitting --direction
+
+13. **Invalid Direction Error**
+    Command: `reqvire collect <requirement-name> --direction INVALID`
+    - exits non-zero
+    - error message indicates invalid direction
 
 #### Metadata
   * type: test-verification

@@ -28,12 +28,13 @@ When requested the system shall provide human readable and machine readable Syst
 
 ### Collect Content from Requirement Chain
 
-The system shall collect and consolidate all content from a requirement element and its ancestors via derivedFrom relations, including refinedBy targets (refinement elements and specification files) and attachment contents, and output with source citations in text or JSON format.
+The system shall collect and consolidate all content from a requirement element and its related requirements via derivedFrom relations (upstream to ancestors) or derive relations (downstream to descendants), including refinedBy targets (refinement elements and specification files) and attachment contents, and output with source citations in text or JSON format.
 
 #### Details
 The system shall define:
 - Content collection rules for elements, refinedBy targets, and attachments
 - Output format specifications for text and JSON modes
+- Direction-based traversal: upstream (ancestors via derivedFrom) or downstream (descendants via derive)
 
 #### Metadata
   * type: requirement
