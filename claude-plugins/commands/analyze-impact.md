@@ -40,7 +40,7 @@ ${1:-Comparing against: HEAD~1 (previous commit)}
 2. **Run change impact analysis:**
    ```bash
    reqvire change-impact --git-commit=${1:-HEAD~1}
-   reqvire change-impact --git-commit=${1:-HEAD~1} --json > /tmp/impact.json
+   reqvire change-impact --git-commit=${1:-HEAD~1} --json --output /tmp/impact.json
    ```
 
 3. **Analyze the results:**

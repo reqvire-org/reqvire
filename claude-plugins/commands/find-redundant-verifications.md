@@ -16,7 +16,7 @@ Analyze the verification traces to find redundant verify relations in the model.
 
 1. Run the lint command to find redundancies:
    ```bash
-   reqvire lint --json > /tmp/lint.json
+   reqvire lint --json --output /tmp/lint.json
    ```
 
 2. Parse the JSON to find redundant verify relations:

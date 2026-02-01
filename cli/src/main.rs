@@ -20,7 +20,7 @@ fn main() {
         Some(cli::Commands::Format { json, .. }) => *json,
         Some(cli::Commands::Search { json, .. }) => *json,
         Some(cli::Commands::Traces { json, .. }) => *json,
-        Some(cli::Commands::Coverage { json }) => *json,
+        Some(cli::Commands::Coverage { json, .. }) => *json,
         _ => false,
     };
 

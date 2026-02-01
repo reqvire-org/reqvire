@@ -114,6 +114,28 @@ Options:
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
+### CLI JSON File Output Option
+
+The system shall provide an `--output <FILE>` option on all commands that support `--json`, allowing JSON output to be written to a file instead of stdout.
+
+#### Details
+The `--output` option shall:
+- Be available on every command that has a `--json` flag
+- Require `--json` to also be set; report an error if `--output` is used without `--json`
+- Write JSON content to the specified file path
+- Create the file if it does not exist, overwrite if it does
+- Print a confirmation message to stdout: `✅ Output saved to <filepath>`
+- Exit with code 0 on success, non-zero on file write error
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * verifiedBy: [CLI JSON File Output Test](../../Functional/Output/Verifications/ReportingVerifications.md#cli-json-file-output-test)
+---
+
 ### CLI Add Element Command
 
 The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin or the `--content` argument, validating the structure, and inserting it into the target file.

@@ -378,9 +378,13 @@ impl ChangeImpactReport {
         output
     }
    
+    pub fn to_json_string(&self, base_url: &str, git_commit: &str, previous_git_commit: &str) -> String {
+        serde_json::to_string_pretty(&self.to_json(base_url, git_commit, previous_git_commit)).unwrap()
+    }
+
     pub fn print(&self, base_url: &str, git_commit: &str, previous_git_commit: &str, as_json: bool) {
         if as_json {
-            println!("{}",serde_json::to_string_pretty(&self.to_json(base_url, git_commit, previous_git_commit)).unwrap());
+            println!("{}", self.to_json_string(base_url, git_commit, previous_git_commit));
         } else {
             println!("{}", self.to_text(base_url, git_commit, previous_git_commit));
         }

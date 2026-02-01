@@ -42,13 +42,16 @@ SERVE OPTIONS:
 FORMAT OPTIONS:
       --fix                     Apply formatting changes to files
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
       --with-full-relations     Include all relations (user-created and auto-generated inverse relations)
 
 VALIDATE OPTIONS:
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 SEARCH OPTIONS:
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
       --short                   Output abbreviated format (one-line per element in text, omit fields in JSON)
       --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
       --filter-name <REGEX>     Only include elements whose name matches this regular expression
@@ -63,9 +66,11 @@ SEARCH OPTIONS:
 CHANGE IMPACT OPTIONS:
       --git-commit <GIT_COMMIT> Git commit hash to use when comparing models
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 TRACES OPTIONS:
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
       --from-folder <PATH>      Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
       --links-with-blobs        Use GitHub blob URLs in diagram links instead of relative paths
       --filter-id <ID>          Only include verification with this specific identifier
@@ -74,18 +79,21 @@ TRACES OPTIONS:
 
 COVERAGE OPTIONS:
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 MODEL OPTIONS:
       --from <NAME>             Start from specific element by name
       --reverse                 Traverse from leaves to roots (follow backward relations)
       --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
       --json                    Output results in JSON format (nested structure)
+      --output <FILE>           Save JSON output to file (requires --json)
 
 LINT OPTIONS:
       --fixable                 Show only auto-fixable issues
       --auditable               Show only issues requiring manual review
       --fix                     Apply automatic fixes for auto-fixable issues
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 ADD OPTIONS:
        <FILE>                   Target file path (relative to git repository root)
@@ -93,29 +101,34 @@ ADD OPTIONS:
       --override                Replace existing element with same name
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 RM OPTIONS:
        <ELEMENT_NAME>           Element name
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 MV OPTIONS:
        <ELEMENT_NAME>           Element name
        <FILE>                   Target file path (relative to git repository root)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 RENAME OPTIONS:
        <ELEMENT_NAME>           Current element name
        <NEW_NAME>               New element name
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 MERGE OPTIONS:
        <TARGET>                 Target element name (receives merged content)
        <SOURCES>                One or more source element names to merge into target
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 MV FILE OPTIONS:
        <SOURCE_FILE>            Source file path (relative to current working directory)
@@ -123,6 +136,7 @@ MV FILE OPTIONS:
       --squash                  Move all elements to target file's first section (if target exists)
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 LINK OPTIONS:
        <SOURCE>                 Source element name
@@ -146,11 +160,14 @@ RM ASSET OPTIONS:
 
 CONTAINMENT OPTIONS:
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
       --short                   Show only root elements (without hierarchical parents in same file)
 
 RESOURCES OPTIONS:
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 COLLECT OPTIONS:
        <ELEMENT_NAME>           Name of the requirement element to collect from
       --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)

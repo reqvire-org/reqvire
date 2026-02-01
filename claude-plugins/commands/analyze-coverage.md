@@ -20,7 +20,7 @@ Analyze verification coverage to identify gaps and unverified requirements.
 1. **Generate coverage report:**
    ```bash
    reqvire coverage
-   reqvire coverage --json > /tmp/coverage.json
+   reqvire coverage --json --output /tmp/coverage.json
    ```
 
 2. **Analyze coverage statistics:**

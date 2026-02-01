@@ -151,7 +151,7 @@ ${1:-The user will specify which requirement needs verification.}
 10. **Verify roll-up and check for redundancies:**
     ```bash
     reqvire traces --filter-name="<verification-name>"
-    reqvire lint --json > /tmp/lint.json
+    reqvire lint --json --output /tmp/lint.json
     ```
 
     Check if verification creates redundant verify relations (verifying both leaf and parent).

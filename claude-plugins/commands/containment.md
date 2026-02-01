@@ -111,7 +111,7 @@ Use containment analysis when:
 
 ```bash
 # 1. Get containment structure (folder/file hierarchy)
-reqvire containment --json > /tmp/containment.json
+reqvire containment --json --output /tmp/containment.json
 
 # 2. Get actual element counts per file
 reqvire search --json | jq -r '.files | to_entries[] | "\(.key): \(.value.total_elements) elements"' > /tmp/file_sizes.txt

@@ -19,24 +19,24 @@ Perform comprehensive analysis of the current Reqvire model.
 
 1. **Run validation:**
    ```bash
-   reqvire validate --json > /tmp/validation.json
+   reqvire validate --json --output /tmp/validation.json
    ```
 
 2. **Generate model search:**
    ```bash
-   reqvire search --short --json > /tmp/search.json
+   reqvire search --short --json --output /tmp/search.json
    ```
 
    Use `--short` to get model structure without full content.
 
 3. **Check coverage:**
    ```bash
-   reqvire coverage --json > /tmp/coverage.json
+   reqvire coverage --json --output /tmp/coverage.json
    ```
 
 4. **Run lint checks:**
    ```bash
-   reqvire lint --json > /tmp/lint.json
+   reqvire lint --json --output /tmp/lint.json
    ```
 
 5. **Analyze the results:**

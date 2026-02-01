@@ -65,7 +65,7 @@ pub enum Commands {
     },
 
     /// Format and normalize requirements files. By default, shows preview without applying changes
-    #[clap(override_help = "Format and normalize requirements files. By default, shows preview without applying changes\n\nFORMAT OPTIONS:\n      --fix                   Apply formatting changes to files\n      --json                  Output results in JSON format\n      --with-full-relations   Include all relations (user-created and auto-generated)")]
+    #[clap(override_help = "Format and normalize requirements files. By default, shows preview without applying changes\n\nFORMAT OPTIONS:\n      --fix                   Apply formatting changes to files\n      --json                  Output results in JSON format\n      --output <FILE>         Save JSON output to file (requires --json)\n      --with-full-relations   Include all relations (user-created and auto-generated)")]
     Format {
         /// Apply formatting changes to files
         #[clap(long, help_heading = "FORMAT OPTIONS")]
@@ -75,26 +75,38 @@ pub enum Commands {
         #[clap(long, help_heading = "FORMAT OPTIONS")]
         json: bool,
 
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "FORMAT OPTIONS")]
+        output: Option<String>,
+
         /// Include all relations (user-created and auto-generated inverse relations)
         #[clap(long, help_heading = "FORMAT OPTIONS")]
         with_full_relations: bool,
     },
 
     /// Validate model
-    #[clap(override_help = "Validate model\n\nVALIDATION OPTIONS:\n      --json     Output results in JSON format")]
+    #[clap(override_help = "Validate model\n\nVALIDATION OPTIONS:\n      --json              Output results in JSON format\n      --output <FILE>     Save JSON output to file (requires --json)")]
     Validate {
         /// Output results in JSON format
         #[clap(long, help_heading = "VALIDATION OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "VALIDATION OPTIONS")]
+        output: Option<String>,
     },
     
 
     /// Search and filter model elements with comprehensive filtering options
-    #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
+    #[clap(override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)")]
     Search {
         /// Output results in JSON format
         #[clap(long, help_heading = "SEARCH OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "SEARCH OPTIONS")]
+        output: Option<String>,
 
         /// Output abbreviated format (one-line per element in text, omit fields in JSON)
         #[clap(long, help_heading = "SEARCH OPTIONS")]
@@ -138,7 +150,7 @@ pub enum Commands {
     },
 
     /// Analise change impact and provides report
-    #[clap(override_help = "Analise change impact and provides report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format")]
+    #[clap(override_help = "Analise change impact and provides report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)")]
     ChangeImpact {
         /// Git commit hash to use when comparing models
         #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]
@@ -147,14 +159,22 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "CHANGE IMPACT OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "CHANGE IMPACT OPTIONS")]
+        output: Option<String>,
     },
 
     /// Generate verification traces showing upward paths from verifications to root requirements
-    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type. Valid types: test-verification, analysis-verification, inspection-verification, demonstration-verification")]
+    #[clap(override_help = "Generate verification traces showing upward paths from verifications to root requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type. Valid types: test-verification, analysis-verification, inspection-verification, demonstration-verification")]
     Traces {
         /// Output results in JSON format
         #[clap(long, help_heading = "TRACES OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "TRACES OPTIONS")]
+        output: Option<String>,
 
         /// Relative path to folder where output will be saved (for generating relative links in Mermaid diagrams)
         #[clap(long, value_name = "PATH", help_heading = "TRACES OPTIONS")]
@@ -178,11 +198,15 @@ pub enum Commands {
     },
 
     /// Generate verification coverage report for leaf requirements
-    #[clap(override_help = "Generate verification coverage report for leaf requirements\n\nCOVERAGE OPTIONS:\n      --json                      Output results in JSON format")]
+    #[clap(override_help = "Generate verification coverage report for leaf requirements\n\nCOVERAGE OPTIONS:\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)")]
     Coverage {
         /// Output results in JSON format
         #[clap(long, help_heading = "COVERAGE OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "COVERAGE OPTIONS")]
+        output: Option<String>,
     },
 
     /// Generate model-centric structure with nested relations
@@ -194,7 +218,7 @@ pub enum Commands {
     /// Output formats:
     /// - JSON: Nested structure with element details in relations
     /// - Markdown: Mermaid diagrams with all nested relationships
-    #[clap(override_help = "Generate model-centric structure with nested relations\n\nBy default, shows root requirements (no hierarchical parent).\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)")]
+    #[clap(override_help = "Generate model-centric structure with nested relations\n\nBy default, shows root requirements (no hierarchical parent).\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --output <FILE>             Save JSON output to file (requires --json)")]
     Model {
         /// Start from specific element by name
         #[clap(long, value_name = "NAME", help_heading = "MODEL OPTIONS")]
@@ -211,10 +235,14 @@ pub enum Commands {
         /// Output results in JSON format (nested structure)
         #[clap(long, help_heading = "MODEL OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "MODEL OPTIONS")]
+        output: Option<String>,
     },
 
     /// Analyze model quality and detect issues in requirements relations
-    #[clap(override_help = "Analyze model quality and detect issues in requirements relations\n\nLINT OPTIONS:\n      --fixable                   Show only auto-fixable issues\n      --auditable                 Show only issues requiring manual review\n      --fix                       Apply automatic fixes for auto-fixable issues\n      --json                      Output results in JSON format")]
+    #[clap(override_help = "Analyze model quality and detect issues in requirements relations\n\nLINT OPTIONS:\n      --fixable                   Show only auto-fixable issues\n      --auditable                 Show only issues requiring manual review\n      --fix                       Apply automatic fixes for auto-fixable issues\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)")]
     Lint {
         /// Show only auto-fixable issues
         #[clap(long, help_heading = "LINT OPTIONS", conflicts_with = "auditable")]
@@ -231,10 +259,14 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "LINT OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "LINT OPTIONS")]
+        output: Option<String>,
     },
 
     /// Add new element to model from Markdown definition
-    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --content <MARKDOWN>       Element markdown content (alternative to stdin)\n      --override                 Replace existing element with same name\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n\nUSAGE:\n    reqvire add <file>                          # reads from stdin\n    reqvire add <file> --content \"### Name...\"   # reads from argument")]
+    #[clap(override_help = "Add new element to model from Markdown definition\n\nADD OPTIONS:\n       <FILE>                    Target file path (relative to git repository root)\n      --content <MARKDOWN>       Element markdown content (alternative to stdin)\n      --override                 Replace existing element with same name\n      --dry-run                  Preview changes without applying\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire add <file>                          # reads from stdin\n    reqvire add <file> --content \"### Name...\"   # reads from argument")]
     Add {
         /// Target file path (relative to git repository root)
         file: String,
@@ -254,10 +286,14 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "ADD OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "ADD OPTIONS")]
+        output: Option<String>,
     },
 
     /// Remove element from model
-    #[clap(override_help = "Remove element from model\n\nRM OPTIONS:\n       <ELEMENT_NAME>           Element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire rm <element-name>")]
+    #[clap(override_help = "Remove element from model\n\nRM OPTIONS:\n       <ELEMENT_NAME>           Element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rm <element-name>")]
     Rm {
         /// Element name
         element_name: String,
@@ -269,10 +305,14 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "RM OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "RM OPTIONS")]
+        output: Option<String>,
     },
 
     /// Move element to different location
-    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to git repository root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv <element-name> <file>")]
+    #[clap(override_help = "Move element to different location\n\nMV OPTIONS:\n       <ELEMENT_NAME>           Element name\n       <FILE>                   Target file path (relative to git repository root)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv <element-name> <file>")]
     Mv {
         /// Element name
         element_name: String,
@@ -287,10 +327,14 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "MV OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "MV OPTIONS")]
+        output: Option<String>,
     },
 
     /// Rename element
-    #[clap(override_help = "Rename element\n\nRENAME OPTIONS:\n       <ELEMENT_NAME>           Current element name\n       <NEW_NAME>               New element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire rename <element-name> <new-name>")]
+    #[clap(override_help = "Rename element\n\nRENAME OPTIONS:\n       <ELEMENT_NAME>           Current element name\n       <NEW_NAME>               New element name\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rename <element-name> <new-name>")]
     Rename {
         /// Current element name
         element_name: String,
@@ -305,10 +349,14 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "RENAME OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "RENAME OPTIONS")]
+        output: Option<String>,
     },
 
     /// Merge multiple elements into target element
-    #[clap(override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and attachments are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Verifications can merge into verifications (of any subtype)\n    - Refinements can merge into refinements (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Feature A\" \"Feature B\" --dry-run")]
+    #[clap(override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and attachments are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Verifications can merge into verifications (of any subtype)\n    - Refinements can merge into refinements (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Feature A\" \"Feature B\" --dry-run")]
     Merge {
         /// Target element name (receives merged content)
         target: String,
@@ -324,10 +372,14 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "MERGE OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "MERGE OPTIONS")]
+        output: Option<String>,
     },
 
     /// Move entire specification file with all its elements
-    #[clap(name = "mv-file", override_help = "Move entire specification file with all its elements\n\nMV-FILE OPTIONS:\n       <SOURCE_FILE>            Source file path (relative to current working directory)\n       <TARGET_FILE>            Target file path (relative to current working directory)\n      --squash                  Move all elements to target file's first section (if target exists)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n\nUSAGE:\n    reqvire mv-file <source-file> <target-file>\n    reqvire mv-file <source-file> <target-file> --squash")]
+    #[clap(name = "mv-file", override_help = "Move entire specification file with all its elements\n\nMV-FILE OPTIONS:\n       <SOURCE_FILE>            Source file path (relative to current working directory)\n       <TARGET_FILE>            Target file path (relative to current working directory)\n      --squash                  Move all elements to target file's first section (if target exists)\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv-file <source-file> <target-file>\n    reqvire mv-file <source-file> <target-file> --squash")]
     MvFile {
         /// Source file path (relative to current working directory)
         source_file: String,
@@ -346,6 +398,10 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "MV-FILE OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "MV-FILE OPTIONS")]
+        output: Option<String>,
     },
 
     /// Add relation or attachment between elements
@@ -407,11 +463,15 @@ pub enum Commands {
     },
 
     /// Generate containment view showing folder/file/element hierarchy
-    #[clap(override_help = "Generate containment view showing folder/file/element hierarchy\n\nCONTAINMENT OPTIONS:\n      --json     Output results in JSON format\n      --short    Show only root elements (without hierarchical parents)")]
+    #[clap(override_help = "Generate containment view showing folder/file/element hierarchy\n\nCONTAINMENT OPTIONS:\n      --json              Output results in JSON format\n      --output <FILE>     Save JSON output to file (requires --json)\n      --short             Show only root elements (without hierarchical parents)")]
     Containment {
         /// Output results in JSON format
         #[clap(long, help_heading = "CONTAINMENT OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "CONTAINMENT OPTIONS")]
+        output: Option<String>,
 
         /// Show only root elements (without hierarchical parents in same file)
         #[clap(long, help_heading = "CONTAINMENT OPTIONS")]
@@ -419,15 +479,19 @@ pub enum Commands {
     },
 
     /// Generate resources report showing files referenced by the model
-    #[clap(override_help = "Generate resources report showing files referenced by the model\n\nRESOURCES OPTIONS:\n      --json     Output results in JSON format")]
+    #[clap(override_help = "Generate resources report showing files referenced by the model\n\nRESOURCES OPTIONS:\n      --json              Output results in JSON format\n      --output <FILE>     Save JSON output to file (requires --json)")]
     Resources {
         /// Output results in JSON format
         #[clap(long, help_heading = "RESOURCES OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "RESOURCES OPTIONS")]
+        output: Option<String>,
     },
 
     /// Collect content from requirement chain via derivedFrom relations
-    #[clap(override_help = "Collect content from requirement chain via derivedFrom relations\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>    Name of the requirement element to collect from\n      --json            Output results in JSON format")]
+    #[clap(override_help = "Collect content from requirement chain via derivedFrom relations\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>    Name of the requirement element to collect from\n      --json            Output results in JSON format\n      --output <FILE>   Save JSON output to file (requires --json)")]
     Collect {
         /// Name of the requirement element to collect from
         element_name: String,
@@ -435,6 +499,10 @@ pub enum Commands {
         /// Output results in JSON format
         #[clap(long, help_heading = "COLLECT OPTIONS")]
         json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "COLLECT OPTIONS")]
+        output: Option<String>,
     },
 
     /// Interactive shell for GraphRegistry operations (undocumented)
@@ -634,15 +702,37 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
 fn wants_json(args: &Args) -> bool {
     match &args.command {
         Some(Commands::Format { json, .. }) => *json,
-        Some(Commands::Validate { json }) => *json,
+        Some(Commands::Validate { json, .. }) => *json,
         Some(Commands::ChangeImpact { json, .. }) => *json,
         Some(Commands::Search { json, .. }) => *json,
         Some(Commands::Traces { json, .. }) => *json,
-        Some(Commands::Coverage { json }) => *json,
+        Some(Commands::Coverage { json, .. }) => *json,
         Some(Commands::Model { json, .. }) => *json,
         Some(Commands::Lint { json, .. }) => *json,
         _ => false,
     }
+}
+
+/// Write JSON content to file or stdout
+fn handle_json_output(json_content: &str, output: &Option<String>) -> Result<(), ReqvireError> {
+    if let Some(path) = output {
+        std::fs::write(path, json_content)
+            .map_err(|e| ReqvireError::ProcessError(format!("Failed to write output file '{}': {}", path, e)))?;
+        println!("✅ Output saved to {}", path);
+    } else {
+        println!("{}", json_content);
+    }
+    Ok(())
+}
+
+/// Validate that --output is only used with --json
+fn validate_output_requires_json(output: &Option<String>, json: bool) -> Result<(), ReqvireError> {
+    if output.is_some() && !json {
+        return Err(ReqvireError::ProcessError(
+            "--output requires --json flag".to_string()
+        ));
+    }
+    Ok(())
 }
 
 pub fn handle_command(
@@ -654,6 +744,35 @@ pub fn handle_command(
     if args.command.is_none() {
         Args::print_help();
         return Ok(0);
+    }
+
+    // Early validation: --output requires --json
+    // Check before model parsing so we can fail fast with a clear error
+    if let Some(ref cmd) = args.command {
+        let (has_output, has_json) = match cmd {
+            Commands::Format { output, json, .. } => (output.is_some(), *json),
+            Commands::Validate { output, json, .. } => (output.is_some(), *json),
+            Commands::Search { output, json, .. } => (output.is_some(), *json),
+            Commands::ChangeImpact { output, json, .. } => (output.is_some(), *json),
+            Commands::Traces { output, json, .. } => (output.is_some(), *json),
+            Commands::Coverage { output, json, .. } => (output.is_some(), *json),
+            Commands::Model { output, json, .. } => (output.is_some(), *json),
+            Commands::Lint { output, json, .. } => (output.is_some(), *json),
+            Commands::Add { output, json, .. } => (output.is_some(), *json),
+            Commands::Rm { output, json, .. } => (output.is_some(), *json),
+            Commands::Mv { output, json, .. } => (output.is_some(), *json),
+            Commands::Rename { output, json, .. } => (output.is_some(), *json),
+            Commands::Merge { output, json, .. } => (output.is_some(), *json),
+            Commands::MvFile { output, json, .. } => (output.is_some(), *json),
+            Commands::Containment { output, json, .. } => (output.is_some(), *json),
+            Commands::Resources { output, json, .. } => (output.is_some(), *json),
+            Commands::Collect { output, json, .. } => (output.is_some(), *json),
+            _ => (false, false),
+        };
+        if has_output && !has_json {
+            eprintln!("error: --output requires --json flag");
+            return Ok(1);
+        }
     }
 
     // Get current working directory once at the start
@@ -691,13 +810,15 @@ pub fn handle_command(
     }
 
     match args.command {
-        Some(Commands::Validate { json }) => {
+        Some(Commands::Validate { json, output }) => {
+            validate_output_requires_json(&output, json)?;
             // For validate command, if we get here it means no validation errors
             if json {
                 let json_result = ValidationResult {
                     errors: vec![],
                 };
-                println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
+                let json_str = serde_json::to_string_pretty(&json_result).unwrap();
+                handle_json_output(&json_str, &output)?;
             } else {
                 println!("✅ No validation issues found");
             }
@@ -705,6 +826,7 @@ pub fn handle_command(
         },
         Some(Commands::Search {
             json,
+            output,
             short,
             filter_file,
             filter_name,
@@ -716,6 +838,7 @@ pub fn handle_command(
             has_attachments,
             filter_attachment,
         }) => {
+            validate_output_requires_json(&output, json)?;
             // Build search filters
             let filters = reqvire::search::SearchFilters::new(
                 filter_file.as_deref(),
@@ -730,17 +853,22 @@ pub fn handle_command(
             )?;
 
             // Generate search report
-            let output = reqvire::search::generate_search_report(
+            let report_output = reqvire::search::generate_search_report(
                 &model_manager.graph_registry,
                 &filters,
                 json,
                 short,
             )?;
 
-            println!("{}", output);
+            if json {
+                handle_json_output(&report_output, &output)?;
+            } else {
+                println!("{}", report_output);
+            }
             return Ok(0);
         },
-        Some(Commands::ChangeImpact { json, git_commit }) => {
+        Some(Commands::ChangeImpact { json, git_commit, output }) => {
+            validate_output_requires_json(&output, json)?;
             let base_url = git_commands::get_repository_base_url().map_err(|_| {
                 ReqvireError::ProcessError("❌ Failed to determine repository base url.".to_string())
             })?;
@@ -748,28 +876,35 @@ pub fn handle_command(
             let current_commit = git_commands::get_commit_hash().map_err(|_| {
                 ReqvireError::ProcessError("❌ Failed to retrieve the current commit hash.".to_string())
             })?;
-                 
+
             let mut refference_model_manager = ModelManager::new();
             // Use lenient mode for reference registry to handle historical commits with validation issues
             let _not_interested=refference_model_manager.parse_and_validate_with_mode(Some(&git_commit), excluded_filename_patterns, true);
-                                    
+
             let report=change_impact::compute_change_impact(
-                &model_manager.graph_registry, 
+                &model_manager.graph_registry,
                 &refference_model_manager.graph_registry
             )
             .map_err(|e| ReqvireError::ProcessError(format!("❌ Failed to generate change impact report: {:?}", e)))?;
-             
-            report.print(&base_url, &current_commit, &git_commit, json);
-                
+
+            if json {
+                let json_str = report.to_json_string(&base_url, &current_commit, &git_commit);
+                handle_json_output(&json_str, &output)?;
+            } else {
+                println!("{}", report.to_text(&base_url, &current_commit, &git_commit));
+            }
+
             return Ok(0);
         },
-        Some(Commands::Format { fix, json, with_full_relations }) => {
+        Some(Commands::Format { fix, json, output, with_full_relations }) => {
+            validate_output_requires_json(&output, json)?;
             // Default is dry-run mode (preview only), --fix flag applies changes
             let dry_run = !fix;
             let format_result = format_files(&model_manager.graph_registry, dry_run, with_full_relations)?;
 
             if json {
-                println!("{}", render_diff_json(&format_result));
+                let json_str = render_diff_json(&format_result);
+                handle_json_output(&json_str, &output)?;
             } else {
                 render_diff(&format_result);
             }
@@ -777,12 +912,14 @@ pub fn handle_command(
         },
         Some(Commands::Traces {
             json,
+            output,
             from_folder,
             links_with_blobs,
             filter_id,
             filter_name,
             filter_type
         }) => {
+            validate_output_requires_json(&output, json)?;
             // Generate verification traces report (upward paths from verifications to requirements)
             let generator = verification_trace::VerificationTraceGenerator::new(
                 &model_manager.graph_registry,
@@ -804,9 +941,9 @@ pub fn handle_command(
 
             // Output the report
             if json {
-                let json_output = serde_json::to_string_pretty(&report)
+                let json_str = serde_json::to_string_pretty(&report)
                     .map_err(|e| ReqvireError::ProcessError(format!("Failed to serialize report: {}", e)))?;
-                println!("{}", json_output);
+                handle_json_output(&json_str, &output)?;
             } else {
                 let markdown_output = generator.generate_markdown(&report);
                 println!("{}", markdown_output);
@@ -814,19 +951,25 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Coverage { json }) => {
+        Some(Commands::Coverage { json, output }) => {
+            validate_output_requires_json(&output, json)?;
             let coverage_report = report_coverage::generate_coverage_report(&model_manager.graph_registry);
-            coverage_report.print(json);
+            if json {
+                handle_json_output(&coverage_report.to_json_string(), &output)?;
+            } else {
+                coverage_report.print(false);
+            }
             return Ok(0);
         },
-        Some(Commands::Model { from, reverse, filter_type, json }) => {
+        Some(Commands::Model { from, reverse, filter_type, json, output }) => {
+            validate_output_requires_json(&output, json)?;
             // Parse filter types if provided
             let type_filter: Option<Vec<&str>> = filter_type.as_ref().map(|s| {
                 s.split(',').map(|t| t.trim()).collect()
             });
 
             // Generate model-centric report with optional filtering
-            let output = report_model::generate_model_report(
+            let report_output = report_model::generate_model_report(
                 &model_manager.graph_registry,
                 from.as_deref(),
                 reverse,
@@ -834,10 +977,15 @@ pub fn handle_command(
                 json,
                 "LR"  // Left-to-right diagrams for markdown output
             )?;
-            println!("{}", output);
+            if json {
+                handle_json_output(&report_output, &output)?;
+            } else {
+                println!("{}", report_output);
+            }
             return Ok(0);
         },
-        Some(Commands::Lint { fixable, auditable, fix, json }) => {
+        Some(Commands::Lint { fixable, auditable, fix, json, output }) => {
+            validate_output_requires_json(&output, json)?;
             // Run lint analysis
             let lint_report = lint::analyze_model(&model_manager.graph_registry);
 
@@ -856,13 +1004,21 @@ pub fn handle_command(
 
                             // Show remaining issues that need manual review
                             if !lint_report.needs_manual_review.is_empty() {
-                                lint_report.print(json, false, true);  // Only show auditable issues
+                                if json {
+                                    handle_json_output(&lint_report.to_json_string(false, true), &output)?;
+                                } else {
+                                    lint_report.print(false, false, true);
+                                }
                             }
                         } else {
                             if !json {
                                 println!("No auto-fixable issues found.\n");
                             }
-                            lint_report.print(json, fixable, auditable);
+                            if json {
+                                handle_json_output(&lint_report.to_json_string(fixable, auditable), &output)?;
+                            } else {
+                                lint_report.print(false, fixable, auditable);
+                            }
                         }
                     }
                     Err(e) => {
@@ -872,7 +1028,11 @@ pub fn handle_command(
                 }
             } else {
                 // Just print the report based on flags
-                lint_report.print(json, fixable, auditable);
+                if json {
+                    handle_json_output(&lint_report.to_json_string(fixable, auditable), &output)?;
+                } else {
+                    lint_report.print(false, fixable, auditable);
+                }
             }
 
             return Ok(0);
@@ -933,7 +1093,8 @@ pub fn handle_command(
 
             return Ok(0);
         },
-        Some(Commands::Add { file, content, override_existing, dry_run, json }) => {
+        Some(Commands::Add { file, content, override_existing, dry_run, json, output }) => {
+            validate_output_requires_json(&output, json)?;
             // Use --content if provided, otherwise read from stdin
             let element_markdown = if let Some(content_str) = content {
                 content_str
@@ -965,14 +1126,15 @@ pub fn handle_command(
 
             // Output result
             if json {
-                println!("{}", render_crud_json(&result));
+                handle_json_output(&render_crud_json(&result), &output)?;
             } else {
                 render_crud_result(&result);
             }
 
             return Ok(0);
         },
-        Some(Commands::Rm { element_name, dry_run, json }) => {
+        Some(Commands::Rm { element_name, dry_run, json, output }) => {
+            validate_output_requires_json(&output, json)?;
             // Resolve element name to identifier
             let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
 
@@ -987,14 +1149,15 @@ pub fn handle_command(
 
             // Output result
             if json {
-                println!("{}", render_crud_json(&result));
+                handle_json_output(&render_crud_json(&result), &output)?;
             } else {
                 render_crud_result(&result);
             }
 
             return Ok(0);
         },
-        Some(Commands::Mv { element_name, file, dry_run, json }) => {
+        Some(Commands::Mv { element_name, file, dry_run, json, output }) => {
+            validate_output_requires_json(&output, json)?;
             // Resolve element name to identifier
             let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
 
@@ -1012,14 +1175,15 @@ pub fn handle_command(
 
             // Output result
             if json {
-                println!("{}", render_crud_json(&result));
+                handle_json_output(&render_crud_json(&result), &output)?;
             } else {
                 render_crud_result(&result);
             }
 
             return Ok(0);
         },
-        Some(Commands::Rename { element_name, new_name, dry_run, json }) => {
+        Some(Commands::Rename { element_name, new_name, dry_run, json, output }) => {
+            validate_output_requires_json(&output, json)?;
             // Resolve element name to identifier
             let element_id = model_manager.graph_registry.find_element_by_name(&element_name)?;
 
@@ -1035,14 +1199,15 @@ pub fn handle_command(
 
             // Output result
             if json {
-                println!("{}", render_crud_json(&result));
+                handle_json_output(&render_crud_json(&result), &output)?;
             } else {
                 render_crud_result(&result);
             }
 
             return Ok(0);
         },
-        Some(Commands::Merge { target, sources, dry_run, json }) => {
+        Some(Commands::Merge { target, sources, dry_run, json, output }) => {
+            validate_output_requires_json(&output, json)?;
             // Call CRUD operation
             let git_root = git_commands::get_git_root_dir()?;
             let result = crud::merge_elements(
@@ -1055,14 +1220,15 @@ pub fn handle_command(
 
             // Output result
             if json {
-                println!("{}", render_crud_json(&result));
+                handle_json_output(&render_crud_json(&result), &output)?;
             } else {
                 render_crud_result(&result);
             }
 
             return Ok(0);
         },
-        Some(Commands::MvFile { source_file, target_file, squash, dry_run, json }) => {
+        Some(Commands::MvFile { source_file, target_file, squash, dry_run, json, output }) => {
+            validate_output_requires_json(&output, json)?;
             // Call CRUD operation
             let git_root = git_commands::get_git_root_dir()?;
             let result = crud::move_file(
@@ -1077,7 +1243,7 @@ pub fn handle_command(
 
             // Output result
             if json {
-                println!("{}", render_crud_json(&result));
+                handle_json_output(&render_crud_json(&result), &output)?;
             } else {
                 render_crud_result(&result);
             }
@@ -1174,34 +1340,45 @@ pub fn handle_command(
             render_crud_result(&result);
             return Ok(0);
         },
-        Some(Commands::Containment { json, short }) => {
+        Some(Commands::Containment { json, output, short }) => {
+            validate_output_requires_json(&output, json)?;
             if json {
                 // Build containment hierarchy
                 let hierarchy = reqvire::containment::ContainmentHierarchy::build(&model_manager.graph_registry, short)?;
                 // Serialize to JSON
-                let json_output = serde_json::to_string_pretty(&hierarchy)
+                let json_str = serde_json::to_string_pretty(&hierarchy)
                     .map_err(|e| ReqvireError::ElementError(format!("JSON serialization error: {}", e)))?;
-                println!("{}", json_output);
+                handle_json_output(&json_str, &output)?;
             } else {
-                let output = diagrams::generate_containment_diagram(&model_manager.graph_registry, short)?;
-                println!("{}", output);
+                let diagram_output = diagrams::generate_containment_diagram(&model_manager.graph_registry, short)?;
+                println!("{}", diagram_output);
             }
             return Ok(0);
         },
-        Some(Commands::Resources { json }) => {
-            let report = report_resources::generate_resources_report(&model_manager.graph_registry);
-            report.print(json);
+        Some(Commands::Resources { json, output }) => {
+            validate_output_requires_json(&output, json)?;
+            if json {
+                handle_json_output(&report_resources::generate_resources_report(&model_manager.graph_registry).to_json_string(), &output)?;
+            } else {
+                let report = report_resources::generate_resources_report(&model_manager.graph_registry);
+                report.print(false);
+            }
             return Ok(0);
         },
-        Some(Commands::Collect { element_name, json }) => {
+        Some(Commands::Collect { element_name, json, output }) => {
+            validate_output_requires_json(&output, json)?;
             let git_root = git_commands::get_git_root_dir()?;
-            let output = report_collect::generate_collect_report(
+            let report_output = report_collect::generate_collect_report(
                 &model_manager.graph_registry,
                 &element_name,
                 &git_root,
                 json,
             )?;
-            println!("{}", output);
+            if json {
+                handle_json_output(&report_output, &output)?;
+            } else {
+                println!("{}", report_output);
+            }
             return Ok(0);
         },
         Some(Commands::Shell) => {

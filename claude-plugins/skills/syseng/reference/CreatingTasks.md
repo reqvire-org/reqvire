@@ -26,7 +26,7 @@ BASE_COMMIT=$(git merge-base main HEAD)
 reqvire change-impact --git-commit=$BASE_COMMIT
 
 # Save to JSON for programmatic analysis
-reqvire change-impact --git-commit=$BASE_COMMIT --json > /tmp/impact.json
+reqvire change-impact --git-commit=$BASE_COMMIT --json --output /tmp/impact.json
 
 # Compare against specific commit
 reqvire change-impact --git-commit=<commit-hash>
@@ -55,7 +55,7 @@ For each changed requirement, collect complete context:
 
 ```bash
 # Get full requirement chain with ancestors and attachments
-reqvire collect "<requirement-name>" --json > /tmp/req_<requirement-id>.json
+reqvire collect "<requirement-name>" --json --output /tmp/req_<requirement-id>.json
 
 # Also save human-readable format for reference
 reqvire collect "<requirement-name>" > /tmp/req_context_<requirement-id>.md
@@ -205,7 +205,7 @@ When analyzing requirements for task generation:
 | To Understand This | Use This Command |
 |--------------------|------------------|
 | What requirements changed | `reqvire change-impact --git-commit=<hash> --json` |
-| **Full requirement context** | `reqvire collect "<name>" --json > /tmp/req_<id>.json` |
+| **Full requirement context** | `reqvire collect "<name>" --json --output /tmp/req_<id>.json` |
 | Requirement direct content | `reqvire search --filter-id="<id>" --json` |
 | What verifies a requirement | `reqvire traces --filter-id="<id>" --json` |
 | Which tests to run | Extract `satisfiedBy` from verification via `reqvire search` |
@@ -250,10 +250,10 @@ BASE_BRANCH="main"
 BASE_COMMIT=$(git merge-base $BASE_BRANCH HEAD)
 
 # 2. Run change impact analysis
-reqvire change-impact --git-commit=$BASE_COMMIT --json > /tmp/impact.json
+reqvire change-impact --git-commit=$BASE_COMMIT --json --output /tmp/impact.json
 
 # 3. For each changed requirement, gather context
-reqvire collect "Authentication Feature" --json > /tmp/req_auth_feature.json
+reqvire collect "Authentication Feature" --json --output /tmp/req_auth_feature.json
 reqvire collect "Authentication Feature" > /tmp/req_context_auth_feature.md
 
 # 4. Get requirement details

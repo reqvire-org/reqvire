@@ -81,9 +81,13 @@ fn format_identifier_link(identifier: &str) -> String {
 }
 
 impl CoverageReport {
+    pub fn to_json_string(&self) -> String {
+        serde_json::to_string_pretty(&self).unwrap()
+    }
+
     pub fn print(&self, json_output: bool) {
         if json_output {
-            println!("{}", serde_json::to_string_pretty(&self).unwrap());
+            println!("{}", self.to_json_string());
         } else {
             print!("{}", self.format_text());
         }

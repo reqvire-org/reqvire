@@ -34,7 +34,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 
 2. **Run change impact:**
    ```bash
-   reqvire change-impact --git-commit=$BASE_COMMIT --json > /tmp/impact.json
+   reqvire change-impact --git-commit=$BASE_COMMIT --json --output /tmp/impact.json
    ```
 
 3. **Review impact scope** (from JSON `impact_scope[]`):
@@ -45,7 +45,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 
    Get full context using collect:
    ```bash
-   reqvire collect "<requirement-name>" --json > /tmp/req_<requirement-id>.json
+   reqvire collect "<requirement-name>" --json --output /tmp/req_<requirement-id>.json
    ```
 
    This provides:

@@ -1,5 +1,51 @@
 # Elements
 
+### CLI JSON File Output Test
+
+This test verifies that the `--output` flag writes JSON output to a file when used with `--json` across CLI commands.
+
+#### Details
+
+##### Acceptance Criteria
+- `--output <FILE>` writes JSON to file when combined with `--json`
+- Confirmation message printed to stdout: `✅ Output saved to <filepath>`
+- File contains valid JSON identical to what `--json` alone would produce on stdout
+- `--output` without `--json` produces an error and non-zero exit code
+- File is created if it doesn't exist
+- File is overwritten if it exists
+
+##### Test Criteria
+1. **JSON file output with validate**
+   Command: `reqvire validate --json --output output.json`
+   - exits code **0**
+   - stdout contains `✅ Output saved to output.json`
+   - `output.json` exists and contains valid JSON
+   - JSON content matches `reqvire validate --json` stdout output
+
+2. **JSON file output with search**
+   Command: `reqvire search --json --output search.json`
+   - exits code **0**
+   - stdout contains `✅ Output saved to search.json`
+   - `search.json` exists and contains valid JSON
+
+3. **Error when --output used without --json**
+   Command: `reqvire validate --output output.json`
+   - exits non-zero
+   - stderr contains error message about requiring --json
+
+4. **File overwrite behavior**
+   - Create a file with existing content
+   - Run command with `--json --output <same-file>`
+   - Verify file is overwritten with new JSON content
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-json-file-output/test.sh)
+  * verify: [CLI JSON File Output Option](../../../Interfaces/CLI/Commands.md#cli-json-file-output-option)
+---
+
 ### CLI Collect Command Test
 
 This test verifies that the collect command aggregates content from a requirement chain with proper source citations.

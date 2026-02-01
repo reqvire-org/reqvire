@@ -67,24 +67,26 @@ pub struct RelationInfo {
 }
 
 impl LintReport {
+    pub fn to_json_string(&self, show_only_fixable: bool, show_only_auditable: bool) -> String {
+        let filtered_report = if show_only_fixable {
+            LintReport {
+                auto_fixable: self.auto_fixable.clone(),
+                needs_manual_review: vec![],
+            }
+        } else if show_only_auditable {
+            LintReport {
+                auto_fixable: vec![],
+                needs_manual_review: self.needs_manual_review.clone(),
+            }
+        } else {
+            self.clone()
+        };
+        serde_json::to_string_pretty(&filtered_report).unwrap()
+    }
+
     pub fn print(&self, json: bool, show_only_fixable: bool, show_only_auditable: bool) {
         if json {
-            // Filter the report based on flags before serializing
-            let filtered_report = if show_only_fixable {
-                LintReport {
-                    auto_fixable: self.auto_fixable.clone(),
-                    needs_manual_review: vec![],
-                }
-            } else if show_only_auditable {
-                LintReport {
-                    auto_fixable: vec![],
-                    needs_manual_review: self.needs_manual_review.clone(),
-                }
-            } else {
-                // Show both
-                self.clone()
-            };
-            println!("{}", serde_json::to_string_pretty(&filtered_report).unwrap());
+            println!("{}", self.to_json_string(show_only_fixable, show_only_auditable));
         } else {
             self.print_text(show_only_fixable, show_only_auditable);
         }

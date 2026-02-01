@@ -300,6 +300,7 @@ reqvire unlink "Element" "Parent" --dry-run
 ### Common Command Flags
 
 - `--json`: Output in JSON format for programmatic processing
+- `--output <FILE>`: Save JSON output to file instead of stdout (requires `--json`)
 - `--short`: Show minimal output (element names only, no content)
 - `--dry-run`: Preview changes without applying them
 
@@ -501,8 +502,8 @@ For complete feature workflows (requirements + verifications + tests), use `/req
 reqvire validate && reqvire lint && reqvire coverage
 
 # Detailed validation
-reqvire validate --json > /tmp/validation.json
-reqvire coverage --json > /tmp/coverage.json
+reqvire validate --json --output /tmp/validation.json
+reqvire coverage --json --output /tmp/coverage.json
 ```
 
 ### I need to refactor the model
@@ -538,7 +539,7 @@ reqvire mv-file "old-path.md" "new-path.md" --dry-run
 ```bash
 # Get full chain with ancestors and attachments
 reqvire collect "Requirement Name"
-reqvire collect "Requirement Name" --json > /tmp/req-context.json
+reqvire collect "Requirement Name" --json --output /tmp/req-context.json
 
 # See model hierarchy from element
 reqvire model --from "Requirement Name"

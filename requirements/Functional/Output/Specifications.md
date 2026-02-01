@@ -327,6 +327,11 @@ JSON output conventions:
 - Successful responses omit error field entirely
 - Exit code accompanies JSON (0=success, non-zero=error)
 
+**File Output:**
+- When `--output <FILE>` is provided alongside `--json`, write JSON to file instead of stdout
+- Print confirmation message to stdout: `✅ Output saved to <filepath>`
+- `--output` without `--json` is an error
+
 #### Metadata
   * type: specification
 ---

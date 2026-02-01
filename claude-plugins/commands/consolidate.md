@@ -61,7 +61,7 @@ First, analyze the model to identify consolidation candidates:
 
 ```bash
 # Get model structure
-reqvire search --short --json > /tmp/search.json
+reqvire search --short --json --output /tmp/search.json
 ```
 
 Review the model structure and identify parent-child requirement pairs based on:

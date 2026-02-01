@@ -82,6 +82,7 @@ This test verifies that the CLI help output displays all commands and their opti
   * satisfiedBy: [test.sh](../../../../tests/test-cli-help-structure/test.sh)
   * verify: [CLI Change Impact Report Command](../Commands.md#cli-change-impact-report-command)
   * verify: [CLI Coverage Command](../Commands.md#cli-coverage-command)
+  * verify: [CLI JSON File Output Option](../Commands.md#cli-json-file-output-option)
   * verify: [CLI Search Command](../Commands.md#cli-search-command)
   * verify: [CLI Traces Command](../Commands.md#cli-traces-command)
   * verify: [Format Command](../Commands.md#format-command)

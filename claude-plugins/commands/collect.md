@@ -26,7 +26,7 @@ ${1:-The user will provide the element name.}
 Run the `reqvire collect` command to gather the complete requirement context:
 
 ```bash
-reqvire collect "${1}" --json > /tmp/collect_output.json
+reqvire collect "${1}" --json --output /tmp/collect_output.json
 ```
 
 This command collects:

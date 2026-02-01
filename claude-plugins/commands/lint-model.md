@@ -27,7 +27,7 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
 2. **Check for manual review items:**
    ```bash
-   reqvire lint --json > /tmp/lint.json
+   reqvire lint --json --output /tmp/lint.json
    jq '.needs_manual_review' /tmp/lint.json
    ```
 
