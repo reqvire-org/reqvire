@@ -46,7 +46,7 @@ pub fn format_files(registry: &GraphRegistry, dry_run: bool, with_full_relations
         // Read current content if file exists
         let current_content = if full_file_path.exists() {
             fs::read_to_string(&full_file_path)
-                .map_err(|e| ReqvireError::IoError(e))?
+                .map_err(ReqvireError::IoError)?
         } else {
             String::new() // File doesn't exist, treat as empty
         };
@@ -66,12 +66,12 @@ pub fn format_files(registry: &GraphRegistry, dry_run: bool, with_full_relations
                 // Create parent directories if needed
                 if let Some(parent_dir) = full_file_path.parent() {
                     fs::create_dir_all(parent_dir)
-                        .map_err(|e| ReqvireError::IoError(e))?;
+                        .map_err(ReqvireError::IoError)?;
                 }
 
                 // Write the new content
                 fs::write(&full_file_path, new_content)
-                    .map_err(|e| ReqvireError::IoError(e))?;
+                    .map_err(ReqvireError::IoError)?;
 
                 debug!("Formatted {} with {} elements", file_path, elements.len());
             }

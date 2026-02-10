@@ -207,7 +207,7 @@ fn build_element_recursive(
     let mut sorted_relations = element.relations.clone();
     sorted_relations.sort_by(|a, b| {
         // First sort by relation type
-        let type_cmp = a.relation_type.name.cmp(&b.relation_type.name);
+        let type_cmp = a.relation_type.name.cmp(b.relation_type.name);
         if type_cmp != std::cmp::Ordering::Equal {
             return type_cmp;
         }
@@ -316,7 +316,7 @@ fn count_relations_recursive(registry: &GraphRegistry, element_id: &str, visited
 
                 // Recurse for identifier targets
                 if let relation::LinkType::Identifier(target_id) = &relation.target.link {
-                    count_relations_recursive(registry, &target_id, visited, count, direction);
+                    count_relations_recursive(registry, target_id, visited, count, direction);
                 }
             }
         }
@@ -337,7 +337,7 @@ fn generate_model_text(report: &ModelCentricReport, diagram_direction: &str) -> 
     if let Some(ref type_filter) = report.metadata.type_filter {
         output.push_str(&format!("**Type Filter**: {}\n", type_filter.join(", ")));
     }
-    output.push_str("\n");
+    output.push('\n');
 
     // Elements with mermaid diagrams
     for element in &report.elements {
@@ -407,9 +407,9 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
             .to_string();
 
         folders.entry(folder)
-            .or_insert_with(HashMap::new)
+            .or_default()
             .entry(file_name)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(*elem);
     }
 

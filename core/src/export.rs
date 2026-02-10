@@ -68,12 +68,12 @@ The resources view shows all files referenced by the model through relations and
 fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
     let assets_dir = output_dir.join("assets");
     fs::create_dir_all(&assets_dir)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
     for (filename, content) in ASSETS {
         let dest_path = assets_dir.join(filename);
         fs::write(&dest_path, content)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
         debug!("Copied asset: {}", filename);
     }
 
@@ -92,8 +92,8 @@ pub fn flush_model_to_temp(
 ) -> Result<(), ReqvireError> {
 
     // Determine if we're in a subdirectory and get the relative path prefix to strip
-    let subdir_prefix = if current_dir.starts_with(&git_root) && current_dir != git_root {
-        current_dir.strip_prefix(&git_root).ok()
+    let subdir_prefix = if current_dir.starts_with(git_root) && current_dir != git_root {
+        current_dir.strip_prefix(git_root).ok()
     } else {
         None
     };
@@ -124,12 +124,12 @@ pub fn flush_model_to_temp(
         // Create parent directories if needed
         if let Some(parent_dir) = dest_path.parent() {
             fs::create_dir_all(parent_dir)
-                .map_err(|e| ReqvireError::IoError(e))?;
+                .map_err(ReqvireError::IoError)?;
         }
 
         // Write the generated markdown file
         fs::write(&dest_path, markdown_content)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
 
         copied_files.insert(file_path.clone());
         markdown_files_written += 1;
@@ -213,12 +213,13 @@ pub fn copy_html_output(
 }
 
 /// Helper function to recursively copy files, skipping .md files that have .html equivalents
+#[allow(clippy::only_used_in_recursion)]
 fn copy_html_and_assets(src: &Path, dst: &Path, temp_root: &Path) -> Result<(), ReqvireError> {
     fs::create_dir_all(dst)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
-    for entry in fs::read_dir(src).map_err(|e| ReqvireError::IoError(e))? {
-        let entry = entry.map_err(|e| ReqvireError::IoError(e))?;
+    for entry in fs::read_dir(src).map_err(ReqvireError::IoError)? {
+        let entry = entry.map_err(ReqvireError::IoError)?;
         let src_path = entry.path();
         let dst_path = dst.join(entry.file_name());
 
@@ -272,7 +273,7 @@ fn post_process_html_files(temp_dir: &Path) -> Result<(), ReqvireError> {
         }
 
         let content = fs::read_to_string(&file_path)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
 
         // Convert .md references to .html ONLY in specific contexts:
         // 1. ID attributes: id="file:-path/file.md" → id="file:-path/file.html"
@@ -291,7 +292,7 @@ fn post_process_html_files(temp_dir: &Path) -> Result<(), ReqvireError> {
             .replace(".md</h6>", ".html</h6>");
 
         fs::write(&file_path, processed)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
 
         debug!("Post-processed HTML: {}", file_name);
     }
@@ -341,10 +342,10 @@ pub fn generate_artifacts_in_temp(
 
     // Step 4: Change to temp directory and create new model manager
     let original_dir = env::current_dir()
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
     env::set_current_dir(&temp_dir)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
     // Clear git cache so paths resolve to temp directory instead of original repo
     git_commands::clear_git_cache();
@@ -639,7 +640,7 @@ function showView(view) {{
     let index_html = temp_dir.join("index.html");
     if containment_html.exists() {
         fs::rename(&containment_html, &index_html)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
         info!("✅ Renamed containment.html to index.html");
     }
 
@@ -653,7 +654,7 @@ function showView(view) {{
 
     // Step 7: Restore original directory
     env::set_current_dir(&original_dir)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
     // Clear git cache again so it refreshes for original directory
     git_commands::clear_git_cache();
@@ -715,7 +716,7 @@ pub fn export_model(
     };
     
     // prepare output folder
-    prepare_output_folder(&output_folder)?;
+    prepare_output_folder(output_folder)?;
 
     let count = html_export::export_markdown_to_html(&base_dir, output_folder)?;
     

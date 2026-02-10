@@ -137,8 +137,8 @@ pub enum Commands {
         filter_attachment: Option<String>,
     },
 
-    /// Analise change impact and provides report
-    #[clap(override_help = "Analise change impact and provides report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format")]
+    /// Analyze change impact and provide report
+    #[clap(override_help = "Analyze change impact and provide report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format")]
     ChangeImpact {
         /// Git commit hash to use when comparing models
         #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]

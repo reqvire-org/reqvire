@@ -2,16 +2,15 @@ use std::process::Command;
 use anyhow::Result;
 use crate::error::ReqvireError;
 use std::path::PathBuf;
-use once_cell::sync::Lazy;
-use std::sync::Mutex;
+use std::sync::{LazyLock, Mutex};
 use std::collections::HashMap;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 
-static REPO_URL: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
-static COMMIT_HASH: Lazy<Mutex<Option<String>>> = Lazy::new(|| Mutex::new(None));
-static GIT_ROOT_DIR: Lazy<Mutex<Option<PathBuf>>> = Lazy::new(|| Mutex::new(None));
-static GIT_ROOT_CACHE: Lazy<Mutex<HashMap<PathBuf, String>>> = Lazy::new(|| Mutex::new(HashMap::new()));
+static REPO_URL: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
+static COMMIT_HASH: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
+static GIT_ROOT_DIR: LazyLock<Mutex<Option<PathBuf>>> = LazyLock::new(|| Mutex::new(None));
+static GIT_ROOT_CACHE: LazyLock<Mutex<HashMap<PathBuf, String>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
 
 // Disable caching in tests to prevent interference between parallel tests
 static DISABLE_CACHE_FOR_TESTS: AtomicBool = AtomicBool::new(false);
@@ -43,7 +42,7 @@ pub fn get_repository_base_url() -> Result<String, ReqvireError> {
     
     // Fetch the repository URL from git configuration
     let output = Command::new("git")
-        .args(&["config", "--get", "remote.origin.url"])
+        .args(["config", "--get", "remote.origin.url"])
         .output()?;
 
     if !output.status.success() {
@@ -89,7 +88,7 @@ pub fn get_commit_hash() -> Result<String,ReqvireError> {
     
     // Run the git command to get the current commit hash
     let output = Command::new("git")
-        .args(&["rev-parse", "HEAD"])
+        .args(["rev-parse", "HEAD"])
         .output()?;
     if !output.status.success() {
         let err = String::from_utf8_lossy(&output.stderr);
@@ -117,7 +116,7 @@ pub fn get_file_at_commit(file_path: &str,folder:&PathBuf, commit: &str) -> Resu
     match file_path.strip_prefix(&git_root) {
         Some(relative_path) => {           
               let output = Command::new("git")
-                  .args(&["show", &format!("{}:{}", commit, relative_path.trim_start_matches('/'))])
+                  .args(["show", &format!("{}:{}", commit, relative_path.trim_start_matches('/'))])
                   .current_dir(&git_root)
                   .output()?;
               if !output.status.success() {
@@ -178,7 +177,7 @@ pub fn get_git_root_dir() -> Result<PathBuf, ReqvireError> {
     }
 
     let output = Command::new("git")
-        .args(&["rev-parse", "--show-toplevel"])
+        .args(["rev-parse", "--show-toplevel"])
         .output()?;
 
     if !output.status.success() {
@@ -204,7 +203,7 @@ pub fn ls_tree_commit(commit: &str) -> Result<Vec<String>, ReqvireError> {
     let git_root = get_git_root_dir()?;
     
     let output = Command::new("git")
-        .args(&["ls-tree", "--name-only", "-r", commit])
+        .args(["ls-tree", "--name-only", "-r", commit])
         .current_dir(&git_root)
         .output()?;
 
@@ -230,7 +229,7 @@ pub fn ls_tree_commit(commit: &str) -> Result<Vec<String>, ReqvireError> {
 #[allow(dead_code)]
 fn get_changed_files_from_git() -> Result<Vec<String>, ReqvireError> {
     let output = Command::new("git")
-        .args(&["diff", "--name-only"])
+        .args(["diff", "--name-only"])
         .output()?;
     if !output.status.success() {
         let err = String::from_utf8_lossy(&output.stderr);
@@ -251,7 +250,7 @@ fn get_changed_files_from_git() -> Result<Vec<String>, ReqvireError> {
 /// with `folder` as the current directory. Returns a list of file paths.
 pub fn ls_tree_commit_in_folder(commit: &str, folder: &PathBuf) -> Result<Vec<String>,ReqvireError> {
     let output = Command::new("git")
-        .args(&["ls-tree", "--name-only", "-r", commit])
+        .args(["ls-tree", "--name-only", "-r", commit])
         .current_dir(folder)
         .output()?;
 

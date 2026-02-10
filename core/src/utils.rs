@@ -1,5 +1,6 @@
 use anyhow::Result;
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 use pathdiff::diff_paths;
 use log::debug;
 use walkdir::WalkDir;
@@ -12,7 +13,7 @@ use crate::git_commands;
 use std::cell::RefCell;
 
 thread_local! {
-    static QUIET_MODE: RefCell<bool> = RefCell::new(false);
+    static QUIET_MODE: RefCell<bool> = const { RefCell::new(false) };
 }
 
 /// Enable quiet mode (suppress verbose output)
@@ -56,7 +57,7 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
 
     // Convert absolute path to relative path from git root for pattern matching
     // This ensures patterns like "external/**/*.md" work correctly regardless of working directory
-    let relative_path = match get_relative_path(&path.to_path_buf()) {
+    let relative_path = match get_relative_path(path) {
         Ok(rel_path) => rel_path,
         Err(_) => {
             // If we can't get relative path, fall back to original behavior
@@ -222,7 +223,7 @@ pub fn scan_markdown_files(
             for entry in WalkDir::new(&scan_dir)
                 .into_iter()
                 .filter_map(Result::ok)
-                .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
+                .filter(|e| e.path().is_file() && e.path().extension().is_some_and(|ext| ext == "md"))
                 .filter(|e| !is_to_be_ignored(e.path(), excluded_filename_patterns))
             {
                 files.push(entry.path().to_path_buf());
@@ -255,7 +256,7 @@ pub fn scan_markdown_files_from_commit(
     };
 
     // Run git ls-tree command to get all files in the commit
-    let result = git_commands::ls_tree_commit(&commit);
+    let result = git_commands::ls_tree_commit(commit);
     let documents_vec = match result {
         Err(e) => {
             eprintln!("Error listing files in commit: {}", e);
@@ -267,7 +268,7 @@ pub fn scan_markdown_files_from_commit(
     let matching_paths = documents_vec
         .into_iter()
         .map(|p| git_root.join(p))
-        .filter(|p| p.extension().map_or(false, |ext| ext == "md"))
+        .filter(|p| p.extension().is_some_and(|ext| ext == "md"))
         .filter(|p| !is_to_be_ignored(p, excluded_filename_patterns))
         .collect::<Vec<PathBuf>>();
 
@@ -278,7 +279,7 @@ pub fn scan_markdown_files_from_commit(
 
 
 /// Gets the relative path of a file from the git repository root
-pub fn get_relative_path(path: &PathBuf) -> Result<PathBuf, ReqvireError> {
+pub fn get_relative_path(path: &Path) -> Result<PathBuf, ReqvireError> {
     let git_root = match git_commands::get_git_root_dir() {
         Ok(dir) => dir,
         Err(_) => {
@@ -310,8 +311,7 @@ pub fn extract_path_and_fragment(identifier: &str) -> (&str, Option<&str>) {
     if identifier.is_empty(){
         return ("",None);
     }
-    if identifier.starts_with('#') {
-        let frag = &identifier[1..];
+    if let Some(frag) = identifier.strip_prefix('#') {
         return ("", Some(frag));
     }
     // If identifier contains a '/' or a '.', assume it's a file reference.
@@ -381,7 +381,7 @@ pub fn is_external_url(s: &str) -> bool {
 /// - Paths starting with '/' are treated as relative to git repository root
 /// - Other paths are treated as relative to base_path
 /// - External URLs are passed through unchanged
-fn resolve_path_to_absolute(path_part: &str, base_path: &PathBuf) -> Result<PathBuf, ReqvireError> {
+fn resolve_path_to_absolute(path_part: &str, base_path: &Path) -> Result<PathBuf, ReqvireError> {
     // Check for external URLs first
     if EXTERNAL_SCHEMES.iter().any(|scheme| path_part.starts_with(scheme)) {
         return Err(ReqvireError::PathError("External URLs should not be resolved as paths".to_string()));
@@ -404,7 +404,7 @@ fn resolve_path_to_absolute(path_part: &str, base_path: &PathBuf) -> Result<Path
             Ok(canonical) => Ok(canonical),
             Err(_) => {
                 // Logical path resolution for non-existent files
-                let mut resolved_path = base_path.clone();
+                let mut resolved_path = base_path.to_path_buf();
                 for component in p.components() {
                     match component {
                         std::path::Component::Normal(_) => {
@@ -429,7 +429,7 @@ fn resolve_path_to_absolute(path_part: &str, base_path: &PathBuf) -> Result<Path
 
 pub fn normalize_identifier(
     identifier: &str,
-    base_path: &PathBuf,
+    base_path: &Path,
 ) -> Result<String, ReqvireError> {
     // 0) Extract the path and any trailing fragment
     let (path_part, fragment_opt) = extract_path_and_fragment(identifier);
@@ -465,7 +465,7 @@ pub fn normalize_identifier(
     // 5) Re-attach the fragment, if present
     let final_result = match fragment_opt {
         Some(frag) => {
-            let fragment = normalize_fragment(&frag);
+            let fragment = normalize_fragment(frag);
             format!("{}#{}", rel, fragment)
         }
         None => rel,
@@ -526,7 +526,7 @@ pub fn to_relative_identifier(
     let full = match fragment_opt {
         Some(frag) => {
             let fragment = if should_normalize_fragment {
-                normalize_fragment(&frag)
+                normalize_fragment(frag)
             } else {
                 frag.to_string()
             };
@@ -602,7 +602,7 @@ fn normalize_nonlink_identifier(input: &str) -> (String, String) {
 
     // Normalize the fragment if present
     let normalized_link = if let Some(frag) = fragment_opt {
-        let norm_frag = normalize_fragment(&frag);
+        let norm_frag = normalize_fragment(frag);
         if file_part.is_empty() {
             // For fragment-only references, always include a leading '#' in the target
             format!("#{}", norm_frag)
@@ -627,11 +627,15 @@ fn normalize_nonlink_identifier(input: &str) -> (String, String) {
     (display_text, normalized_link)
 }
 
+/// Cached regex for markdown link extraction
+static MARKDOWN_LINK_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"^\[(.+?)\]\((.+?)\)$").unwrap()
+});
+
 /// Extracts text and link from a Markdown-style link if present.
 fn extract_markdown_link(input: &str) -> Option<(String, String)> {
     let input = input.trim();
-    let markdown_regex = Regex::new(r"^\[(.+?)\]\((.+?)\)$").unwrap();
-    if let Some(captures) = markdown_regex.captures(input) {
+    if let Some(captures) = MARKDOWN_LINK_RE.captures(input) {
         let text = captures.get(1)?.as_str().to_string();
         let link = captures.get(2)?.as_str().to_string();
         Some((text, link))
@@ -1145,7 +1149,6 @@ mod tests {
 }
 
 /// Diagram utility functions for consistent filtering across the codebase
-
 /// Constant marker used to identify auto-generated diagrams
 pub const REQVIRE_AUTOGENERATED_DIAGRAM_MARKER: &str = "REQVIRE-AUTOGENERATED-DIAGRAM";
 
@@ -1163,7 +1166,7 @@ pub fn remove_autogenerated_diagrams(content: &str) -> String {
             let mut is_auto_generated = false;
 
             // Read until the closing ```
-            while let Some(block_line) = lines.next() {
+            for block_line in lines.by_ref() {
                 block_lines.push(block_line);
 
                 if block_line.contains(REQVIRE_AUTOGENERATED_DIAGRAM_MARKER) {

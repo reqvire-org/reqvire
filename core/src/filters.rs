@@ -18,6 +18,7 @@ pub struct Filters {
 
 impl Filters {
     /// Builds a Filters struct, or returns a ReqvireError::InvalidGlob / InvalidRegex
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         file: Option<&str>,
         name_regex: Option<&str>,
@@ -36,7 +37,7 @@ impl Filters {
 
         }
 
-        let file_glob = file.map(|p| compile_glob(p)).transpose()?;
+        let file_glob = file.map(compile_glob).transpose()?;
         let name_re = match name_regex {
             Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
             None => None,
@@ -59,7 +60,7 @@ impl Filters {
             Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
             None => None,
         };
-        let attachment_glob = attachment.map(|p| compile_glob(p)).transpose()?;
+        let attachment_glob = attachment.map(compile_glob).transpose()?;
 
         Ok(Filters {
             file_glob,
@@ -90,9 +91,8 @@ impl Filters {
         // 3) type filter
         if let Some(tp) = &self.type_pat {
             // Handle "other-TYPENAME" pattern for custom types
-            if tp.starts_with("other-") {
+            if let Some(custom_type_name) = tp.strip_prefix("other-") {
                 // Extract the custom type name after "other-"
-                let custom_type_name = &tp[6..];
                 match &e.element_type {
                     element::ElementType::Other(actual_name) => {
                         if actual_name.to_lowercase() != custom_type_name {
@@ -103,15 +103,14 @@ impl Filters {
                 }
             } else {
                 let filter_type = element::ElementType::from_metadata(tp);
-                if &e.element_type != &filter_type {
+                if e.element_type != filter_type {
                     return false;
                 }
             }
         }
         // 5) content regex
         if let Some(re) = &self.content_re {
-            let text = e.content.clone();
-            if !re.is_match(&text) {
+            if !re.is_match(&e.content) {
                 return false;
             }
         }

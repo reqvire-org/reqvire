@@ -12,7 +12,6 @@ documentation.workspace = true
 # Parsing and content manipulation
 pulldown-cmark = { workspace = true }
 regex = { workspace = true }
-lazy_static = { workspace = true }
 difference = { workspace = true }
 
 # Path handling
@@ -39,8 +38,6 @@ rustc-hash = { workspace = true }
 
 # Terminal output
 termcolor = { workspace = true }
-
-once_cell =  { workspace = true }
 
 [dev-dependencies]
 assert_fs = { workspace = true }

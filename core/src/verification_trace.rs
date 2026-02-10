@@ -5,7 +5,7 @@ use crate::relation::{VERIFY_RELATION, VERIFICATION_TRACES_RELATIONS};
 use crate::utils;
 use serde::Serialize;
 use std::collections::{BTreeMap, HashSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize)]
 pub struct VerificationTracesReport {
@@ -245,15 +245,9 @@ impl<'a> VerificationTraceGenerator<'a> {
             Err(_) => PathBuf::from(""),
         };
 
-        let base_url = match git_commands::get_repository_base_url() {
-            Ok(url) => url,
-            Err(_) => String::new(),
-        };
+        let base_url = git_commands::get_repository_base_url().unwrap_or_default();
 
-        let commit_hash = match git_commands::get_commit_hash() {
-            Ok(hash) => hash,
-            Err(_) => String::new(),
-        };
+        let commit_hash = git_commands::get_commit_hash().unwrap_or_default();
 
         let has_git_info = !repo_root.as_os_str().is_empty()
             && !base_url.is_empty()
@@ -284,6 +278,7 @@ impl<'a> VerificationTraceGenerator<'a> {
         self.collect_elements_from_tree(&tree_with_relations, &mut all_elements, &mut collected_ids);
 
         // Group elements by folder -> file for containment structure
+        #[allow(clippy::type_complexity)]
         let mut folders: HashMap<String, HashMap<String, Vec<(String, String, String, Vec<String>)>>> = HashMap::new();
 
         for (elem_id, elem_name, elem_type, attachments) in all_elements {
@@ -304,9 +299,9 @@ impl<'a> VerificationTraceGenerator<'a> {
                 .to_string();
 
             folders.entry(folder)
-                .or_insert_with(HashMap::new)
+                .or_default()
                 .entry(file_name)
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push((elem_id, elem_name, elem_type, attachments));
         }
 
@@ -320,7 +315,7 @@ impl<'a> VerificationTraceGenerator<'a> {
         diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
         diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
         diagram.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n");
-        diagram.push_str("\n");
+        diagram.push('\n');
 
         // Sort folders for deterministic output
         let mut folder_names: Vec<&String> = folders.keys().collect();
@@ -452,7 +447,7 @@ impl<'a> VerificationTraceGenerator<'a> {
                 }
 
                 // Recursively add relations for children
-                self.add_relations_from_tree(&[child.clone()], diagram, visited_edges);
+                self.add_relations_from_tree(std::slice::from_ref(child), diagram, visited_edges);
             }
         }
     }
@@ -461,7 +456,7 @@ impl<'a> VerificationTraceGenerator<'a> {
     fn get_click_target(
         &self,
         elem_id: &str,
-        repo_root: &PathBuf,
+        repo_root: &Path,
         base_url: &str,
         commit_hash: &str,
         has_git_info: bool,

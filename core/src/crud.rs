@@ -19,6 +19,7 @@ use std::path::Path;
 /// * `git_root` - Git root directory
 /// * `dry_run` - If true, don't write changes to disk
 /// * `override_existing` - If true, replace existing element with same name
+#[allow(clippy::too_many_arguments)]
 pub fn add_element(
     model_manager: &mut ModelManager,
     element_markdown: &str,
@@ -374,7 +375,7 @@ pub fn move_file(
         let source_path = git_root.join(&source_file_normalized);
         if source_path.exists() {
             std::fs::remove_file(&source_path)
-                .map_err(|e| ReqvireError::IoError(e))?;
+                .map_err(ReqvireError::IoError)?;
         }
     }
 
@@ -426,7 +427,7 @@ pub fn attach(
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
     // Check if attachment already exists - return error
     if element.attachments.iter().any(|a| a.target.as_str() == attachment_path) {
@@ -462,7 +463,7 @@ pub fn attach(
     // Write to file if not dry run
     if !dry_run {
         fs::write(&absolute_file_path, &new_content)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
 
         // Mark file as modified for re-parsing
         model_manager.graph_registry.modified_files.insert(file_path.clone());
@@ -500,7 +501,7 @@ pub fn detach(
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
     // Calculate file-relative path for finding the attachment link in markdown
     let file_dir = crate::utils::get_parent_dir(&file_path);
@@ -518,7 +519,7 @@ pub fn detach(
     // Write to file if not dry run
     if !dry_run {
         fs::write(&absolute_file_path, &new_content)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
 
         // Mark file as modified for re-parsing
         model_manager.graph_registry.modified_files.insert(file_path.clone());
@@ -613,7 +614,7 @@ pub fn attach_element(
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
     // Calculate relative identifier from target element's file to attachment element
     // If both elements are in the same file, use just #fragment format
@@ -646,7 +647,7 @@ pub fn attach_element(
     // Write to file if not dry run
     if !dry_run {
         fs::write(&absolute_file_path, &new_content)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
 
         // Mark file as modified for re-parsing
         model_manager.graph_registry.modified_files.insert(file_path.clone());
@@ -699,7 +700,7 @@ pub fn detach_element(
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
     // Calculate relative identifier from target element's file to attachment element
     let target_file_path = std::path::PathBuf::from(&file_path);
@@ -722,7 +723,7 @@ pub fn detach_element(
     // Write to file if not dry run
     if !dry_run {
         fs::write(&absolute_file_path, &new_content)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
 
         // Mark file as modified for re-parsing
         model_manager.graph_registry.modified_files.insert(file_path.clone());
@@ -790,7 +791,7 @@ pub fn mv_asset(
     for file_path in &affected_files {
         let absolute_file_path = git_root.join(file_path);
         let content = fs::read_to_string(&absolute_file_path)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
 
         let mut new_content = content.clone();
 
@@ -824,7 +825,7 @@ pub fn mv_asset(
 
             if !dry_run {
                 fs::write(&absolute_file_path, &new_content)
-                    .map_err(|e| ReqvireError::IoError(e))?;
+                    .map_err(ReqvireError::IoError)?;
 
                 model_manager.graph_registry.modified_files.insert(file_path.clone());
             }
@@ -838,10 +839,10 @@ pub fn mv_asset(
 
         // Create parent directory if needed
         if let Some(parent) = new_abs.parent() {
-            fs::create_dir_all(parent).map_err(|e| ReqvireError::IoError(e))?;
+            fs::create_dir_all(parent).map_err(ReqvireError::IoError)?;
         }
 
-        fs::rename(&old_abs, &new_abs).map_err(|e| ReqvireError::IoError(e))?;
+        fs::rename(&old_abs, &new_abs).map_err(ReqvireError::IoError)?;
     }
 
     Ok(CrudResult {
@@ -899,7 +900,7 @@ pub fn rm_asset(
     for spec_file_path in &affected_files {
         let absolute_file_path = git_root.join(spec_file_path);
         let content = fs::read_to_string(&absolute_file_path)
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
 
         // Paths in markdown are file-relative, calculate the relative path from this file
         let file_dir = crate::utils::get_parent_dir(spec_file_path);
@@ -919,7 +920,7 @@ pub fn rm_asset(
 
             if !dry_run {
                 fs::write(&absolute_file_path, &new_content)
-                    .map_err(|e| ReqvireError::IoError(e))?;
+                    .map_err(ReqvireError::IoError)?;
 
                 model_manager.graph_registry.modified_files.insert(spec_file_path.clone());
             }
@@ -930,7 +931,7 @@ pub fn rm_asset(
     if !dry_run {
         let abs_path = git_root.join(file_path_arg);
         if abs_path.exists() {
-            fs::remove_file(&abs_path).map_err(|e| ReqvireError::IoError(e))?;
+            fs::remove_file(&abs_path).map_err(ReqvireError::IoError)?;
         }
     }
 
@@ -1140,10 +1141,7 @@ fn add_attachment_to_element(content: &str, element_name: &str, attachment_path:
             // Add the new attachment after existing ones
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
-                if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
-                    result.push_str(lines_iter.next().unwrap());
-                    result.push('\n');
-                } else if next_trimmed.is_empty() {
+                if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") || next_trimmed.is_empty() {
                     result.push_str(lines_iter.next().unwrap());
                     result.push('\n');
                 } else {
@@ -1266,10 +1264,7 @@ fn add_element_attachment_to_element(content: &str, element_name: &str, display_
             // Add the new attachment after existing ones
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
-                if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") {
-                    result.push_str(lines_iter.next().unwrap());
-                    result.push('\n');
-                } else if next_trimmed.is_empty() {
+                if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") || next_trimmed.is_empty() {
                     result.push_str(lines_iter.next().unwrap());
                     result.push('\n');
                 } else {
@@ -1602,13 +1597,13 @@ pub fn unlink(
                 model_manager.graph_registry.flush_modified_files(git_root)?;
             }
 
-            return Ok(CrudResult {
+            Ok(CrudResult {
                 operation: CrudOperation::Update,
                 element_id: source_id,
                 element_name: format!("Unlinked {} {} {}", source_name, relation_type, target_display),
                 diffs,
                 dry_run,
-            });
+            })
         }
         None => {
             // No relation found - check if it's an attachment instead

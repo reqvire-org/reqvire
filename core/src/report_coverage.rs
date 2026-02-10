@@ -151,7 +151,7 @@ impl CoverageReport {
                         }
                     }
                 }
-                output.push_str("\n");
+                output.push('\n');
             }
         }
 
@@ -169,7 +169,7 @@ impl CoverageReport {
                 for requirement in sorted_requirements {
                     output.push_str(&format!("- ❌ **[{}]({})**\n", requirement.name, requirement.identifier));
                 }
-                output.push_str("\n");
+                output.push('\n');
             }
         }
 
@@ -193,7 +193,7 @@ impl CoverageReport {
                         }
                     }
                 }
-                output.push_str("\n");
+                output.push('\n');
             }
         }
 
@@ -211,7 +211,7 @@ impl CoverageReport {
                 for verification in sorted_verifications {
                     output.push_str(&format!("- ❌ **[{}]({})** ({})\n", verification.name, verification.identifier, verification.verification_type));
                 }
-                output.push_str("\n");
+                output.push('\n');
             }
         }
 
@@ -229,7 +229,7 @@ impl CoverageReport {
                 for verification in sorted_verifications {
                     output.push_str(&format!("- ⚠️  **[{}]({})** ({})\n", verification.name, verification.identifier, verification.verification_type));
                 }
-                output.push_str("\n");
+                output.push('\n');
             }
         }
 
@@ -299,13 +299,13 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                     if satisfied_by.is_empty() {
                         // Unsatisfied test verification
                         unsatisfied_test_files.entry(element.file_path.clone())
-                            .or_insert_with(Vec::new)
+                            .or_default()
                             .push(verification_details);
                     } else {
                         // Satisfied test verification
                         satisfied_test_verifications += 1;
                         satisfied_test_files.entry(element.file_path.clone())
-                            .or_insert_with(Vec::new)
+                            .or_default()
                             .push(verification_details);
                     }
                 }
@@ -330,7 +330,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                     satisfied_by: vec![], // Orphaned verifications don't need satisfied_by info here
                 };
                 orphaned_verifications_files.entry(element.file_path.clone())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push(orphaned_details);
             }
         }
@@ -381,13 +381,13 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                 if verified_by.is_empty() {
                     // Unverified leaf requirement
                     unverified_leaf_files.entry(element.file_path.clone())
-                        .or_insert_with(Vec::new)
+                        .or_default()
                         .push(requirement_details);
                 } else {
                     // Verified leaf requirement
                     verified_leaf_requirements += 1;
                     verified_leaf_files.entry(element.file_path.clone())
-                        .or_insert_with(Vec::new)
+                        .or_default()
                         .push(requirement_details);
                 }
             }

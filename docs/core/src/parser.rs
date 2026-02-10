@@ -139,7 +139,7 @@ pub fn parse_single_element(
 
         // Parse #### subsections
         } else if trimmed.starts_with("#### ") && current_element.is_some() {
-            let subsection = SubSection::from_str(&trimmed[5..].trim());
+            let subsection = SubSection::parse(&trimmed[5..].trim());
 
             if seen_subsections.contains(&subsection) {
                 return Err(ReqvireError::DuplicateSubsection(
@@ -523,7 +523,7 @@ pub fn parse_elements(
             debug!("Error: {}", msg);
 
         } else if trimmed.starts_with("#### ") && current_element.is_some() {
-            let subsection = SubSection::from_str(&trimmed[5..].trim());
+            let subsection = SubSection::parse(&trimmed[5..].trim());
 
             if !skip_current_element {
                 if seen_subsections.contains(&subsection) {

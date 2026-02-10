@@ -111,7 +111,7 @@ impl ContainmentHierarchy {
         let mut files_map: BTreeMap<String, Vec<&Element>> = BTreeMap::new();
         for element in registry.get_all_elements() {
             files_map.entry(element.file_path.clone())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(element);
         }
 
@@ -280,7 +280,7 @@ fn build_folder_structure(
         };
 
         folder_files.entry(folder_path)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(file);
     }
 
@@ -302,8 +302,7 @@ fn build_folder_recursive(
     all_folder_paths: &std::collections::HashSet<Vec<String>>,
     design_docs: &BTreeMap<Vec<String>, Vec<DesignDocument>>
 ) -> ContainmentFolder {
-    let folder_name = current_path.last()
-        .map(|s| s.clone())
+    let folder_name = current_path.last().cloned()
         .unwrap_or_else(|| "Reqvire root".to_string());
 
     // Get files directly in this folder

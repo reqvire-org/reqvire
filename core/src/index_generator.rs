@@ -19,7 +19,7 @@ pub fn generate_readme_index(
     for element in registry.get_all_elements() {
         grouped_elements
             .entry(element.file_path.clone())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(element);
     }
 
@@ -68,7 +68,7 @@ pub fn generate_readme_index(
             }
         }
 
-        index_content.push_str("\n"); // Add spacing between files
+        index_content.push('\n'); // Add spacing between files
     }
 
     let total_files = grouped_elements.len();

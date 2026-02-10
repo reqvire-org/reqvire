@@ -31,7 +31,7 @@ use std::path::Path;
 #[clap(
     author,
     version,
-    about = "Reqvire requirements & treacibility management tool",
+    about = "Reqvire requirements & traceability management tool",
     long_about = None,
     name = "reqvire"
 )]
@@ -149,8 +149,8 @@ pub enum Commands {
         filter_attachment: Option<String>,
     },
 
-    /// Analise change impact and provides report
-    #[clap(override_help = "Analise change impact and provides report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)")]
+    /// Analyze change impact and provide report
+    #[clap(override_help = "Analyze change impact and provide report\n\nCHANGE IMPACT OPTIONS:\n      --git-commit <GIT_COMMIT>  Git commit hash to use when comparing models [default: HEAD]\n      --json                     Output results in JSON format\n      --output <FILE>            Save JSON output to file (requires --json)")]
     ChangeImpact {
         /// Git commit hash to use when comparing models
         #[clap(long, default_value = "HEAD", help_heading = "CHANGE IMPACT OPTIONS")]
@@ -581,7 +581,7 @@ fn print_custom_help(cmd: &clap::Command) {
             let short = arg.get_short().map(|s| format!("-{}, ", s)).unwrap_or_default();
             let value_name = if arg.get_action().takes_values() {
                 let value = arg.get_value_names()
-                    .and_then(|v| v.get(0))
+                    .and_then(|v| v.first())
                     .map(|s| s.to_string())
                     .unwrap_or_else(|| "VALUE".to_string());
                 format!(" <{}>", value)
@@ -617,7 +617,7 @@ fn print_custom_help(cmd: &clap::Command) {
                         let long = arg.get_long().map(|l| format!("--{}", l)).unwrap_or_default();
                         let value_name = if arg.get_action().takes_values() {
                             let value = arg.get_value_names()
-                                .and_then(|v| v.get(0))
+                                .and_then(|v| v.first())
                                 .map(|s| s.to_string())
                                 .unwrap_or_else(|| "VALUE".to_string());
                             format!(" <{}>", value)
@@ -651,7 +651,7 @@ fn print_custom_help(cmd: &clap::Command) {
                     let long = arg.get_long().map(|l| format!("--{}", l)).unwrap_or_default();
                     let value_name = if arg.get_action().takes_values() {
                         let value = arg.get_value_names()
-                            .and_then(|v| v.get(0))
+                            .and_then(|v| v.first())
                             .map(|s| s.to_string())
                             .unwrap_or_else(|| "VALUE".to_string());
                         format!(" <{}>", value)
@@ -694,10 +694,10 @@ fn print_validation_results(errors: &[ReqvireError], json_output: bool) {
         println!("{}", serde_json::to_string_pretty(&json_result).unwrap());
     } else {
         println!("\n❌ {} validation failed with error(s):", errors.len());
-        println!("");        
+        println!();        
         for (i, error) in errors.iter().enumerate() {
             println!("  {}. {}", i + 1, error);
-            println!("");
+            println!();
         }
         println!();
     }
@@ -826,7 +826,7 @@ pub fn handle_command(
             } else {
                 println!("✅ No validation issues found");
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Search {
             json,
@@ -869,7 +869,7 @@ pub fn handle_command(
             } else {
                 println!("{}", report_output);
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::ChangeImpact { json, git_commit, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -898,7 +898,7 @@ pub fn handle_command(
                 println!("{}", report.to_text(&base_url, &current_commit, &git_commit));
             }
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Format { fix, json, output, with_full_relations }) => {
             validate_output_requires_json(&output, json)?;
@@ -912,7 +912,7 @@ pub fn handle_command(
             } else {
                 render_diff(&format_result);
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Traces {
             json,
@@ -953,7 +953,7 @@ pub fn handle_command(
                 println!("{}", markdown_output);
             }
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Coverage { json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -963,7 +963,7 @@ pub fn handle_command(
             } else {
                 coverage_report.print(false);
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Model { from, reverse, filter_type, json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -986,7 +986,7 @@ pub fn handle_command(
             } else {
                 println!("{}", report_output);
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Lint { fixable, auditable, fix, json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -1039,7 +1039,7 @@ pub fn handle_command(
                 }
             }
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Export { output }) => {
             let git_root = git_commands::get_git_root_dir()?;
@@ -1073,7 +1073,7 @@ pub fn handle_command(
                 )?;
                 println!("✅ Export completed successfully to: {}", temp_dir.display());
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Serve { host, port }) => {
             // Enable quiet mode for serve command (suppress verbose export output)
@@ -1095,7 +1095,7 @@ pub fn handle_command(
             // Cleanup temporary directory after server stops
             std::fs::remove_dir_all(&temp_dir)?;
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Add { file, content, override_existing, dry_run, json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -1135,7 +1135,7 @@ pub fn handle_command(
                 render_crud_result(&result);
             }
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Rm { element_name, dry_run, json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -1158,7 +1158,7 @@ pub fn handle_command(
                 render_crud_result(&result);
             }
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Mv { element_name, file, dry_run, json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -1184,7 +1184,7 @@ pub fn handle_command(
                 render_crud_result(&result);
             }
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Rename { element_name, new_name, dry_run, json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -1208,7 +1208,7 @@ pub fn handle_command(
                 render_crud_result(&result);
             }
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Merge { target, sources, dry_run, json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -1229,7 +1229,7 @@ pub fn handle_command(
                 render_crud_result(&result);
             }
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::MvFile { source_file, target_file, squash, dry_run, json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -1252,7 +1252,7 @@ pub fn handle_command(
                 render_crud_result(&result);
             }
 
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Link { source, relation_type, target, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
@@ -1305,7 +1305,7 @@ pub fn handle_command(
                 )?;
                 render_crud_result(&result);
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Unlink { source, target, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
@@ -1317,7 +1317,7 @@ pub fn handle_command(
                 dry_run,
             )?;
             render_crud_result(&result);
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::MvAsset { old_path, new_path, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
@@ -1330,7 +1330,7 @@ pub fn handle_command(
             )?;
 
             render_crud_result(&result);
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::RmAsset { file_path, dry_run }) => {
             let git_root = git_commands::get_git_root_dir()?;
@@ -1342,7 +1342,7 @@ pub fn handle_command(
             )?;
 
             render_crud_result(&result);
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Containment { json, output, short }) => {
             validate_output_requires_json(&output, json)?;
@@ -1357,7 +1357,7 @@ pub fn handle_command(
                 let diagram_output = diagrams::generate_containment_diagram(&model_manager.graph_registry, short)?;
                 println!("{}", diagram_output);
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Resources { json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -1367,7 +1367,7 @@ pub fn handle_command(
                 let report = report_resources::generate_resources_report(&model_manager.graph_registry);
                 report.print(false);
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Collect { element_name, direction, json, output }) => {
             validate_output_requires_json(&output, json)?;
@@ -1392,15 +1392,15 @@ pub fn handle_command(
             } else {
                 println!("{}", report_output);
             }
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Shell) => {
             run_shell(&mut model_manager)?;
-            return Ok(0);
+            Ok(0)
         },
         Some(Commands::Sout) => {
             run_sout(&model_manager.graph_registry)?;
-            return Ok(0);
+            Ok(0)
         },
         None => {
             // This case is handled at the beginning of handle_command

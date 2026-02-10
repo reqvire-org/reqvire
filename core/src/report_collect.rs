@@ -343,8 +343,7 @@ fn collect_attachment_content(
         }
         AttachmentTarget::ElementIdentifier(elem_id) => {
             // Look up element content from registry
-            if let Some(elem) = registry.get_element(elem_id) {
-                Some(CollectedItem {
+            registry.get_element(elem_id).map(|elem| CollectedItem {
                     name: elem.name.clone(),
                     identifier: elem.identifier.clone(),
                     file_path: elem.file_path.clone(),
@@ -354,9 +353,6 @@ fn collect_attachment_content(
                     source_type: SourceType::AttachmentElement,
                     attached_to: Some(parent_identifier.to_string()),
                 })
-            } else {
-                None
-            }
         }
     }
 }
@@ -372,8 +368,7 @@ fn collect_refinement_content(
     match &target.link {
         relation::LinkType::Identifier(elem_id) => {
             // Element identifier - look up refinement element content
-            if let Some(elem) = registry.get_element(elem_id) {
-                Some(CollectedItem {
+            registry.get_element(elem_id).map(|elem| CollectedItem {
                     name: elem.name.clone(),
                     identifier: elem.identifier.clone(),
                     file_path: elem.file_path.clone(),
@@ -383,9 +378,6 @@ fn collect_refinement_content(
                     source_type: SourceType::RefinedByElement,
                     attached_to: Some(parent_identifier.to_string()),
                 })
-            } else {
-                None
-            }
         }
         relation::LinkType::InternalPath(path) => {
             // File path - read file content (same logic as attachment file handling)

@@ -3,7 +3,6 @@
 /// This module provides linting functionality to detect issues in requirements relations:
 /// - Redundant verify relations (auto-fixable)
 /// - Redundant hierarchical relations (auto-fixable)
-
 use crate::element::ElementType;
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
@@ -658,7 +657,7 @@ fn detect_multi_branch_convergence(registry: &GraphRegistry) -> Vec<ManualReview
 
                 ancestor_counts
                     .entry(ancestor_id.clone())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push(parent_id.clone());
             }
         }

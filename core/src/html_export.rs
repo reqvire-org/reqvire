@@ -67,7 +67,7 @@ fn process_markdown_files(
     for entry in WalkDir::new(scan_folder)
         .into_iter()
         .filter_map(Result::ok)
-        .filter(|e| e.path().is_file() && e.path().extension().map_or(false, |ext| ext == "md"))
+        .filter(|e| e.path().is_file() && e.path().extension().is_some_and(|ext| ext == "md"))
     {
         let file_path = entry.path().to_path_buf();
         

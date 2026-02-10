@@ -224,7 +224,7 @@ impl<'a> ModelDiagramGenerator<'a> {
 
     /// Generate Mermaid diagram from model report
     pub fn generate_mermaid(&self, report: &ModelDiagramReport) -> String {
-        let mut diagram = String::from(format!("```mermaid\ngraph {};\n", DEFAULT_DIAGRAM_DIRECTION));
+        let mut diagram = format!("```mermaid\ngraph {};\n", DEFAULT_DIAGRAM_DIRECTION);
 
         // Add auto-generation marker
         diagram.push_str(&format!("  %% {}\n", AUTOGEN_DIAGRAM_MARKER));
@@ -329,7 +329,7 @@ impl<'a> ModelDiagramGenerator<'a> {
                     markdown.push_str(&format!("- **{}** ({}): `{}`\n", element.name, element.element_type, element.identifier));
                 }
 
-                markdown.push_str("\n");
+                markdown.push('\n');
             }
         }
 
@@ -367,7 +367,7 @@ pub fn generate_diagrams_by_file(
     for element in elements {
         grouped_elements
             .entry(element.file_path.clone())
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(element);
     }
 
@@ -397,10 +397,7 @@ fn generate_file_diagram(
         Err(_) => PathBuf::from(""),
     };
 
-    let base_url = match git_commands::get_repository_base_url() {
-        Ok(url) => url,
-        Err(_) => String::from(""),
-    };
+    let base_url = git_commands::get_repository_base_url().unwrap_or_default();
 
     let commit_hash = match git_commands::get_commit_hash() {
         Ok(hash) => hash,
@@ -458,14 +455,14 @@ fn generate_file_diagram(
             .to_string();
 
         folders.entry(folder)
-            .or_insert_with(HashMap::new)
+            .or_default()
             .entry(file_name)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(*elem);
     }
 
     // Use default diagram direction constant
-    let mut diagram = String::from(format!("```mermaid\ngraph {};\n", DEFAULT_DIAGRAM_DIRECTION));
+    let mut diagram = format!("```mermaid\ngraph {};\n", DEFAULT_DIAGRAM_DIRECTION);
 
     // Add auto-generation marker for identification
     diagram.push_str(&format!("  %% {}\n", AUTOGEN_DIAGRAM_MARKER));
@@ -594,14 +591,14 @@ fn generate_file_diagram(
                         relation::LinkType::ExternalUrl(url) => url.clone(),
                         relation::LinkType::InternalPath(path) => {
                             if diagrams_with_blobs && has_git_info {
-                                let relative_id = match utils::get_relative_path(&path) {
+                                let relative_id = match utils::get_relative_path(path) {
                                     Ok(rel_path) => rel_path.to_string_lossy().to_string(),
                                     Err(_) => path.to_string_lossy().to_string()
                                 };
                                 format!("{}/blob/{}/{}", base_url, commit_hash, relative_id)
                             } else {
                                 utils::to_relative_identifier(
-                                    &path.to_string_lossy().into_owned(),
+                                    &path.to_string_lossy(),
                                     &base_dir,
                                     false
                                 )?
@@ -666,7 +663,7 @@ pub fn process_diagrams(
     ) -> Result<(), ReqvireError> {
 
     // Generate diagrams by file
-    let diagrams = generate_diagrams_by_file(&registry, diagrams_with_blobs)?;
+    let diagrams = generate_diagrams_by_file(registry, diagrams_with_blobs)?;
 
     // Get git root for resolving relative paths
     let git_root = match git_commands::get_git_root_dir() {
@@ -743,7 +740,7 @@ fn replace_file_diagram(content: &str, new_diagram: &str) -> String {
                     mermaid_lines.push(lines.next().unwrap().to_string()); // mermaid start
 
                     let mut has_autogen_marker = false;
-                    while let Some(l) = lines.next() {
+                    for l in lines.by_ref() {
                         if l.contains(AUTOGEN_DIAGRAM_MARKER) {
                             has_autogen_marker = true;
                         }
@@ -794,7 +791,7 @@ fn remove_file_diagrams(content: &str) -> String {
             mermaid_lines.push(line.to_string());
 
             let mut has_autogen_marker = false;
-            while let Some(l) = lines.next() {
+            for l in lines.by_ref() {
                 if l.contains(AUTOGEN_DIAGRAM_MARKER) {
                     has_autogen_marker = true;
                 }
@@ -871,7 +868,7 @@ pub fn remove_diagrams(registry: &GraphRegistry) -> Result<(), ReqvireError> {
 /// # Arguments
 /// * `registry` - The graph registry containing all elements
 /// * `root_element_id` - Optional element ID to generate diagram from. If None, generates full model.
-///                        If Some, generates diagram starting from that element and its related elements.
+///   If Some, generates diagram starting from that element and its related elements.
 pub fn generate_model_diagram(registry: &GraphRegistry, root_element_id: Option<&str>) -> Result<String, ReqvireError> {
     let generator = ModelDiagramGenerator::new(registry, root_element_id);
     let report = generator.generate()?;
@@ -987,7 +984,7 @@ fn group_elements_by_file_filtered<'a>(registry: &'a GraphRegistry, filter: &Has
     for element in registry.get_all_elements() {
         if filter.contains(&element.identifier) {
             result.entry(element.file_path.clone())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(element);
         }
     }
@@ -1004,7 +1001,7 @@ fn group_files_by_folder(elements_by_file: &HashMap<String, Vec<&Element>>) -> H
             .unwrap_or("")
             .to_string();
         result.entry(folder)
-            .or_insert_with(Vec::new)
+            .or_default()
             .push(file_path.clone());
     }
     result
@@ -1053,7 +1050,7 @@ pub fn generate_containment_diagram(registry: &GraphRegistry, short: bool) -> Re
 
     // Generate tree structure from hierarchy
     generate_folder_tree(&hierarchy.root_folder, "root", &mut output)?;
-    output.push_str("\n");
+    output.push('\n');
 
     // Collect all elements for styling and links
     let all_elements = collect_all_elements(&hierarchy.root_folder);
