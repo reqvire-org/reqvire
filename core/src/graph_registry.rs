@@ -2519,32 +2519,40 @@ impl GraphRegistry {
         }
 
         // 2. Update relations FROM the moved element TO other elements
-        // First collect target file paths to avoid borrowing issues
-        let target_file_paths: std::collections::HashMap<String, String> = self.nodes.values()
-            .map(|node| (node.element.identifier.clone(), node.element.file_path.clone()))
-            .collect();
+        // Build lookup maps: full identifier -> file_path, and fragment -> (full_id, file_path)
+        // This allows resolving both full identifiers and bare fragments
+        let mut id_to_file: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+        let mut fragment_to_id_file: std::collections::HashMap<String, (String, String)> = std::collections::HashMap::new();
+        for node in self.nodes.values() {
+            let id = node.element.identifier.clone();
+            let file = node.element.file_path.clone();
+            id_to_file.insert(id.clone(), file.clone());
+            // Also index by bare fragment for fallback lookup
+            let fragment = id.split('#').next_back().unwrap_or(&id).to_string();
+            fragment_to_id_file.insert(fragment, (id, file));
+        }
 
         if let Some(moved_node) = self.nodes.get_mut(moved_element_id) {
             for relation in &mut moved_node.element.relations {
                 if let crate::relation::LinkType::Identifier(ref mut target_id) = relation.target.link {
-                    // Extract the original target identifier (remove any file path prefix)
-                    let original_target_id = if target_id.contains('#') {
-                        target_id.split('#').next_back().unwrap_or("").to_string()
-                    } else {
-                        target_id.clone()
-                    };
+                    // Extract the bare fragment (element name) from the target
+                    let fragment = target_id.split('#').next_back().unwrap_or(target_id).to_string();
 
-                    // Find the target element to check its file location
-                    if let Some(target_file_path) = target_file_paths.get(&original_target_id) {
-                        // If moved element is now in different file than target
+                    // Resolve target's file path: try full target_id first, then bare fragment
+                    let resolved = id_to_file.get(target_id.as_str())
+                        .map(|file| (fragment.clone(), file.clone()))
+                        .or_else(|| fragment_to_id_file.get(&fragment)
+                            .map(|(_full_id, file)| (fragment.clone(), file.clone())));
+
+                    if let Some((target_fragment, target_file_path)) = resolved {
                         if new_file_path != target_file_path {
-                            // Update to cross-file reference
-                            *target_id = format!("{}#{}", target_file_path, original_target_id);
-                            relation.target.text = format!("{}#{}", target_file_path, original_target_id);
+                            // Cross-file reference needed
+                            *target_id = format!("{}#{}", target_file_path, target_fragment);
+                            relation.target.text = format!("{}#{}", target_file_path, target_fragment);
                         } else {
-                            // Same file, use simple reference
-                            *target_id = original_target_id.clone();
-                            relation.target.text = original_target_id;
+                            // Same file, use simple fragment reference
+                            *target_id = target_fragment.clone();
+                            relation.target.text = target_fragment;
                         }
                     }
                 }
@@ -3317,9 +3325,10 @@ impl GraphRegistry {
         let fragment = old_identifier.split('#').next_back().unwrap_or("");
         let new_identifier = format!("{}#{}", target_file, fragment);
 
-        // Update the element's identifier field in the node
-        if let Some(node) = self.nodes.get_mut(&old_identifier) {
+        // Re-key the node in the HashMap: remove with old key, update identifier, insert with new key
+        if let Some(mut node) = self.nodes.remove(&old_identifier) {
             node.element.identifier = new_identifier.clone();
+            self.nodes.insert(new_identifier.clone(), node);
         }
 
         // Update all attachment identifiers pointing to this element
