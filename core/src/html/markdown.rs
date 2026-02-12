@@ -1,8 +1,57 @@
 use std::path::{Path, PathBuf};
 use pulldown_cmark::{html, Options, Parser};
-use lazy_static::lazy_static;
+use std::sync::LazyLock;
 use regex::{Captures, Regex};
 use crate::error::ReqvireError;
+
+// --- Module-level lazy statics (moved from function bodies) ---
+
+static HEADER_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"<(h[1-3])>([^<]+)</h[1-3]>").unwrap());
+
+/// Find each mermaid code-block in HTML output
+static MERMAID_HTML_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
+    r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#
+).unwrap());
+
+/// Find all .md links in mermaid diagrams
+static MERMAID_MD_LINK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
+    r#"(click\s+\S+\s+")([^"]*?)\.md(#[^"]*)?(")"#
+).unwrap());
+
+static MERMAID_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
+    r"(?s)(?P<full>```mermaid\s+(?P<code>.*?)```)"
+).unwrap());
+
+static D3_TREE_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
+    r"(?s)```d3-tree\s*\n(?P<json>.*?)```"
+).unwrap());
+
+static D3_SANKEY_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
+    r"(?s)```d3-sankey\s*\n(?P<json>.*?)```"
+).unwrap());
+
+static D3_SUNBURST_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
+    r"(?s)```d3-sunburst\s*\n(?P<json>.*?)```"
+).unwrap());
+
+static D3_ICICLE_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
+    r"(?s)```d3-icicle\s*\n(?P<json>.*?)```"
+).unwrap());
+
+// [text](../path/to/file.md#fragment)
+static MD_LINK_WITH_HASH_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(#[^)]+)(\))").unwrap()
+});
+
+// [text](../path/to/file.md)
+static MD_LINK_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(\))").unwrap()
+});
+
+// bare link text [foo.md]
+static MD_LINK_TEXT_REGEX: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\[([^]]+)\.md\]").unwrap()
+});
 
 pub fn markdown_to_html_content(
     file_path: &PathBuf,
@@ -48,12 +97,6 @@ pub fn markdown_to_html_content(
 
 /// Add id attributes to headers for anchor links
 fn add_anchor_ids(html_content: &str) -> String {
-    use regex::Regex;
-    
-    lazy_static::lazy_static! {
-        static ref HEADER_REGEX: Regex = Regex::new(r"<(h[1-3])>([^<]+)</h[1-3]>").unwrap();
-    }
-    
     HEADER_REGEX
         .replace_all(html_content, |caps: &regex::Captures| {
             let tag = &caps[1];
@@ -71,21 +114,8 @@ pub fn process_mermaid_diagrams(
     _file_path: &Path,     // Used to determine if we're in a specifications folder
     html_content: &str,    // the rendered HTML
 ) -> String {
-    lazy_static! {
-        /// 1) Find each mermaid code‐block
-        static ref MERMAID_BLOCK: Regex = Regex::new(
-            r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#
-        ).unwrap();
-
-        /// 2) Find all .md links, we'll filter GitHub links in the replacement code
-        /// Note: pulldown-cmark 0.13+ does NOT HTML-encode quotes inside code blocks
-        static ref MD_LINK: Regex = Regex::new(
-            r#"(click\s+\S+\s+")([^"]*?)\.md(#[^"]*)?(")"#
-        ).unwrap();
-    }
-    
     // Process mermaid blocks
-    let mermaid_processed = MERMAID_BLOCK
+    let mermaid_processed = MERMAID_HTML_BLOCK
         .replace_all(html_content, |caps: &regex::Captures| {
             let inner = &caps[1];
 
@@ -96,7 +126,7 @@ pub fn process_mermaid_diagrams(
                 .replace("&amp;", "&");
 
             // Handle .md links, but preserve GitHub blob links
-            let fixed = MD_LINK.replace_all(&decoded, |c: &regex::Captures| {
+            let fixed = MERMAID_MD_LINK.replace_all(&decoded, |c: &regex::Captures| {
                 let prefix = &c[1];          // click X "
                 let path = &c[2];            // path/to/file
                 let anchor = c.get(3).map_or("", |m| m.as_str());
@@ -125,12 +155,6 @@ use std::collections::HashMap;
 
 /// Extracts Mermaid blocks and replaces them with placeholders
 fn extract_mermaid_blocks(markdown: &str) -> (String, HashMap<String, String>) {
-    lazy_static! {
-        static ref MERMAID_BLOCK: Regex = Regex::new(
-            r"(?s)(?P<full>```mermaid\s+(?P<code>.*?)```)"
-        ).unwrap();
-    }
-
     let mut map = HashMap::new();
     let mut counter = 0;
     let result = MERMAID_BLOCK.replace_all(markdown, |caps: &Captures| {
@@ -146,12 +170,6 @@ fn extract_mermaid_blocks(markdown: &str) -> (String, HashMap<String, String>) {
 
 /// Extracts D3 tree blocks and replaces them with placeholders
 fn extract_d3_tree_blocks(markdown: &str) -> (String, HashMap<String, String>) {
-    lazy_static! {
-        static ref D3_TREE_BLOCK: Regex = Regex::new(
-            r"(?s)```d3-tree\s*\n(?P<json>.*?)```"
-        ).unwrap();
-    }
-
     let mut map = HashMap::new();
     let mut counter = 0;
     let result = D3_TREE_BLOCK.replace_all(markdown, |caps: &Captures| {
@@ -479,12 +497,6 @@ fn generate_d3_tree_html(json_data: &str) -> String {
 
 /// Extracts D3 Sankey blocks and replaces them with placeholders
 fn extract_d3_sankey_blocks(markdown: &str) -> (String, HashMap<String, String>) {
-    lazy_static! {
-        static ref D3_SANKEY_BLOCK: Regex = Regex::new(
-            r"(?s)```d3-sankey\s*\n(?P<json>.*?)```"
-        ).unwrap();
-    }
-
     let mut map = HashMap::new();
     let mut counter = 0;
     let result = D3_SANKEY_BLOCK.replace_all(markdown, |caps: &Captures| {
@@ -648,12 +660,6 @@ fn generate_d3_sankey_html(json_data: &str) -> String {
 
 /// Extracts D3 Sunburst blocks and replaces them with placeholders
 fn extract_d3_sunburst_blocks(markdown: &str) -> (String, HashMap<String, String>) {
-    lazy_static! {
-        static ref D3_SUNBURST_BLOCK: Regex = Regex::new(
-            r"(?s)```d3-sunburst\s*\n(?P<json>.*?)```"
-        ).unwrap();
-    }
-
     let mut map = HashMap::new();
     let mut counter = 0;
     let result = D3_SUNBURST_BLOCK.replace_all(markdown, |caps: &Captures| {
@@ -990,12 +996,6 @@ fn generate_d3_sunburst_html(json_data: &str) -> String {
 
 /// Extracts D3 Icicle blocks and replaces them with placeholders
 fn extract_d3_icicle_blocks(markdown: &str) -> (String, HashMap<String, String>) {
-    lazy_static! {
-        static ref D3_ICICLE_BLOCK: Regex = Regex::new(
-            r"(?s)```d3-icicle\s*\n(?P<json>.*?)```"
-        ).unwrap();
-    }
-
     let mut map = HashMap::new();
     let mut counter = 0;
     let result = D3_ICICLE_BLOCK.replace_all(markdown, |caps: &Captures| {
@@ -1297,20 +1297,6 @@ fn convert_markdown_links_to_html(
     markdown_content: &str,
     _base_folder: &PathBuf
 ) -> String {
-    lazy_static! {
-        // 1) [text](../path/to/file.md#fragment)
-        static ref MD_LINK_WITH_HASH_REGEX: Regex =
-            Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(#[^)]+)(\))").unwrap();
-
-        // 2) [text](../path/to/file.md)
-        static ref MD_LINK_REGEX: Regex =
-            Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(\))").unwrap();
-
-        // 3) bare link text [foo.md]
-        static ref MD_LINK_TEXT_REGEX: Regex =
-            Regex::new(r"\[([^]]+)\.md\]").unwrap();
-    }
-
     // 1) Links with a fragment
     let content = MD_LINK_WITH_HASH_REGEX.replace_all(markdown_content, |caps: &Captures| {
         let before   = &caps[1]; // "]("

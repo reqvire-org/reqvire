@@ -82,7 +82,7 @@ pub fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff
                 let line_count = if lines.last() == Some(&"") { lines.len() - 1 } else { lines.len() };
 
                 // Determine if we should show context lines
-                let next_has_change = changeset.diffs.get(i + 1).map_or(false, |d| !matches!(d, Difference::Same(_)));
+                let next_has_change = changeset.diffs.get(i + 1).is_some_and(|d| !matches!(d, Difference::Same(_)));
                 let show_context = previous_was_change || next_has_change;
 
                 // Special case: handle empty Same sections (blank lines)
@@ -138,7 +138,7 @@ pub fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff
 
                     // Show trailing context (before a change)
                     let next_is_removal = changeset.diffs.get(i + 1)
-                        .map_or(false, |d| matches!(d, Difference::Rem(_)));
+                        .is_some_and(|d| matches!(d, Difference::Rem(_)));
                     let start_end_lines = line_count.saturating_sub(end_lines);
                     for line_idx in start_end_lines..line_count {
                         if line_idx < lines.len() {
@@ -242,7 +242,7 @@ pub fn render_file_diffs(diffs: &[FileDiff]) {
                         println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content)
                     }
                 },
-                "separator" => println!(""),
+                "separator" => println!(),
                 _ => {
                     if line.content.is_empty() {
                         println!("  {}", line.prefix)

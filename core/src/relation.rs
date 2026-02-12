@@ -1,5 +1,5 @@
-use lazy_static::lazy_static;
 use std::collections::HashMap;
+use std::sync::LazyLock;
 use crate::error::ReqvireError;
 use serde::Serialize;
 use std::cmp::Ordering;
@@ -17,86 +17,84 @@ pub struct RelationTypeInfo {
     pub label: &'static str,
 }
 
-lazy_static! {
-    pub static ref RELATION_TYPES: HashMap<&'static str, RelationTypeInfo> = {
-        let mut m = HashMap::new();
+pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> = LazyLock::new(|| {
+    let mut m = HashMap::new();
 
-        // Derive relations
-        m.insert("derivedFrom", RelationTypeInfo {
-            name: "derivedFrom",
-            opposite: Some("derive"),
-            description: "Element is derived from another element",
-            arrow: "-.->",
-            label: "derivedFrom",
-        });
-        m.insert("derive", RelationTypeInfo {
-            name: "derive",
-            opposite: Some("derivedFrom"),
-            description: "Element is source for a derived element",
-            arrow: "-.->",
-            label: "deriveReqT",
-        });
+    // Derive relations
+    m.insert("derivedFrom", RelationTypeInfo {
+        name: "derivedFrom",
+        opposite: Some("derive"),
+        description: "Element is derived from another element",
+        arrow: "-.->",
+        label: "derivedFrom",
+    });
+    m.insert("derive", RelationTypeInfo {
+        name: "derive",
+        opposite: Some("derivedFrom"),
+        description: "Element is source for a derived element",
+        arrow: "-.->",
+        label: "deriveReqT",
+    });
 
-        // Satisfy relations (implementations only)
-        m.insert("satisfiedBy", RelationTypeInfo {
-            name: "satisfiedBy",
-            opposite: Some("satisfy"),
-            description: "A requirement being satisfied by an implementation.",
-            arrow: "-->",
-            label: "satisfiedBy",
-        });
-        m.insert("satisfy", RelationTypeInfo {
-            name: "satisfy",
-            opposite: Some("satisfiedBy"),
-            description: "Implementation satisfies a requirement",
-            arrow: "-->",
-            label: "satisfies",
-        });
+    // Satisfy relations (implementations only)
+    m.insert("satisfiedBy", RelationTypeInfo {
+        name: "satisfiedBy",
+        opposite: Some("satisfy"),
+        description: "A requirement being satisfied by an implementation.",
+        arrow: "-->",
+        label: "satisfiedBy",
+    });
+    m.insert("satisfy", RelationTypeInfo {
+        name: "satisfy",
+        opposite: Some("satisfiedBy"),
+        description: "Implementation satisfies a requirement",
+        arrow: "-->",
+        label: "satisfies",
+    });
 
-        // Refine relations (refinement ownership)
-        m.insert("refinedBy", RelationTypeInfo {
-            name: "refinedBy",
-            opposite: Some("refine"),
-            description: "A requirement being refined by a refinement element or specification file.",
-            arrow: "-->",
-            label: "refinedBy",
-        });
-        m.insert("refine", RelationTypeInfo {
-            name: "refine",
-            opposite: Some("refinedBy"),
-            description: "Element refines a requirement",
-            arrow: "-->",
-            label: "refines",
-        });
+    // Refine relations (refinement ownership)
+    m.insert("refinedBy", RelationTypeInfo {
+        name: "refinedBy",
+        opposite: Some("refine"),
+        description: "A requirement being refined by a refinement element or specification file.",
+        arrow: "-->",
+        label: "refinedBy",
+    });
+    m.insert("refine", RelationTypeInfo {
+        name: "refine",
+        opposite: Some("refinedBy"),
+        description: "Element refines a requirement",
+        arrow: "-->",
+        label: "refines",
+    });
 
-        // Verify relations
-        m.insert("verifiedBy", RelationTypeInfo {
-            name: "verifiedBy",
-            opposite: Some("verify"),
-            description: "A souce element being verified by other element.",
-            arrow: "-.->",
-            label: "verifiedBy",
-        });
-        m.insert("verify", RelationTypeInfo {
-            name: "verify",
-            opposite: Some("verifiedBy"),
-            description: "Element verifies another element",
-            arrow: "-.->",
-            label: "verifies",
-        });
+    // Verify relations
+    m.insert("verifiedBy", RelationTypeInfo {
+        name: "verifiedBy",
+        opposite: Some("verify"),
+        description: "A source element being verified by other element.",
+        arrow: "-.->",
+        label: "verifiedBy",
+    });
+    m.insert("verify", RelationTypeInfo {
+        name: "verify",
+        opposite: Some("verifiedBy"),
+        description: "Element verifies another element",
+        arrow: "-.->",
+        label: "verifies",
+    });
 
-        // Trace relations
-        m.insert("trace", RelationTypeInfo {
-            name: "trace",
-            opposite: None,
-            description: "Element is related to another element in a non-directional way",
-            arrow: "-.->",
-            label: "trace",
-        });
+    // Trace relations
+    m.insert("trace", RelationTypeInfo {
+        name: "trace",
+        opposite: None,
+        description: "Element is related to another element in a non-directional way",
+        arrow: "-.->",
+        label: "trace",
+    });
 
-        m
-    };
-}
+    m
+});
 
 /// Relations to show in diagrams (one from each pair to avoid duplicates)
 /// These are typically the "forward" relations from the old direction system
@@ -168,7 +166,7 @@ impl Eq for RelationTarget {}
 
 impl Ord for RelationTarget {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.link.as_str().cmp(&other.link.as_str())
+        self.link.as_str().cmp(other.link.as_str())
     }
 }
 
@@ -193,12 +191,13 @@ pub enum LinkType {
 }
 impl LinkType {
     /// Converts `LinkType` into a string representation.
+    /// For `InternalPath`, falls back to lossy UTF-8 conversion via the `Display` impl.
+    /// Use `as_string()` if you need an owned fallback for non-UTF-8 paths.
     pub fn as_str(&self) -> &str {
         match self {
             LinkType::Identifier(id) => id,
             LinkType::ExternalUrl(url) => url,
-            LinkType::InternalPath(path) =>  path.to_str()
-                    .expect(&format!("InternalPath is not valid UTF-8: {:?}", path))
+            LinkType::InternalPath(path) => path.to_str().unwrap_or_default(),
         }
     }
 }
@@ -224,7 +223,7 @@ impl Eq for Relation {}
 impl Ord for Relation {
     fn cmp(&self, other: &Self) -> Ordering {
         // Compare relation types by name first
-        let relation_cmp = self.relation_type.name.cmp(&other.relation_type.name);
+        let relation_cmp = self.relation_type.name.cmp(other.relation_type.name);
 
         // If relation types are equal, compare targets
         if relation_cmp == Ordering::Equal {
@@ -257,7 +256,7 @@ impl Relation {
             .ok_or_else(|| ReqvireError::UnsupportedRelationType(relation_type.to_string()))?;
         Ok(Self {
             relation_type: relation_info,
-            target: RelationTarget{text: text, link: link, element_id},
+            target: RelationTarget{text, link, element_id},
             user_created: true,  // Relations created via parsing are user-created
         })
     }
@@ -274,19 +273,14 @@ impl Relation {
     }    
 
     pub fn update_target_identifier_link_url(&mut self, url: &str)  {
-        match self.target.link {
-            LinkType::Identifier(_) =>  self.target.link=LinkType::Identifier(url.to_string()),
-            _ =>{}
-        };  
+        if let LinkType::Identifier(_) = self.target.link { self.target.link=LinkType::Identifier(url.to_string()) };  
     }
 
 
     /// Creates an opposite relation if possible for given target
     pub fn to_opposite(&self, name: &str, identifier: &str, element_id: &str) -> Option<Relation> {
         if let Some(opposite_name) = self.relation_type.opposite {
-            match RELATION_TYPES.get(opposite_name) {
-                Some(opposite_info) => {
-                    Some(Relation {
+            RELATION_TYPES.get(opposite_name).map(|opposite_info| Relation {
                         relation_type: opposite_info,
                         target: RelationTarget {
                             text: name.to_string(),
@@ -295,11 +289,6 @@ impl Relation {
                         },
                         user_created: false,  // Auto-generated opposite relations are not user-created
                     })
-                }
-                None => {
-                    None
-                }
-            }
         } else {
             None
         }

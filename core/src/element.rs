@@ -120,12 +120,12 @@ impl SubSection {
         }
     }
 
-    pub fn from_str(s: &str) -> Self {
+    pub fn parse(s: &str) -> Self {
         match s {
             "Requirement" => SubSection::Requirement,
             "Relations" => SubSection::Relations,
             "Metadata" => SubSection::Metadata,
-            "Details" =>   SubSection::Details,
+            "Details" => SubSection::Details,
             "Properties" => SubSection::Properties,
             "Attachments" => SubSection::Attachments,
             other => SubSection::Other(other.to_string()),
@@ -295,10 +295,8 @@ impl Element {
         }
     }
 
-    pub fn add_relation(&mut self, relation: Relation) -> () {
-    
-    
-      self.relations.push(relation);
+    pub fn add_relation(&mut self, relation: Relation) {
+        self.relations.push(relation);
     }
 
     pub fn add_content(&mut self, content: &str) {
@@ -307,13 +305,13 @@ impl Element {
 
     pub fn freeze_content(&mut self) {
         // Trim newlines and tabs from the beginning and end.
-        let trimmed = self.content.trim_matches(&['\n', '\t'][..]);     
-                
+        let trimmed = self.content.trim_matches(&['\n', '\t'][..]);
+
         // Normalize content by removing all whitespace (spaces, tabs, newlines, etc.)
         let normalized: String = trimmed.chars().filter(|c| !c.is_whitespace()).collect();
 
-        self.content=trimmed.to_string();
-        self.hash_impact_content=utils::hash_content(&normalized);
+        self.content = trimmed.to_string();
+        self.hash_impact_content = utils::hash_content(&normalized);
     }
         
     pub fn set_type_from_metadata(&mut self) {

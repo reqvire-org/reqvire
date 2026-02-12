@@ -113,6 +113,12 @@ pub struct ChangeImpactReport {
     pub all_changed_element_ids: HashSet<String>,
 }
 
+impl Default for ChangeImpactReport {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ChangeImpactReport {
     pub fn new() -> Self {
         Self {
@@ -308,7 +314,7 @@ impl ChangeImpactReport {
                 elem.name, element_url
             ));
             let empty_changed: HashSet<String> = HashSet::new();
-            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 1, base_url, git_commit, &new_element_ids, &empty_changed);
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 1, base_url, git_commit, new_element_ids, &empty_changed);
             if !rendered_tree.trim().is_empty() {
                 output.push_str(&rendered_tree);
                 output.push_str("\n\n");
@@ -342,11 +348,11 @@ impl ChangeImpactReport {
             }
 
             // Render relations tree
-            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 1, base_url, git_commit, &new_element_ids, &elem.changed_attachments);
+            let rendered_tree = render_change_impact_tree(&elem.change_impact_tree, 1, base_url, git_commit, new_element_ids, &elem.changed_attachments);
             if !rendered_tree.trim().is_empty() {
                 output.push_str(&rendered_tree);
             }
-            output.push_str("\n");
+            output.push('\n');
         }
         if !self.changed.is_empty() {
             output.push_str("\n---\n\n");
@@ -369,7 +375,7 @@ impl ChangeImpactReport {
                 let target_url = format!("{}/blob/{}/{}", base_url, git_commit, invalidated_ver.element_id);
                 output.push_str(&format!("- [ ] [{}]({})\n", invalidated_ver.name, target_url));
             }
-            output.push_str("\n");
+            output.push('\n');
         }
 
         if self.removed.is_empty() && self.added.is_empty() && self.changed.is_empty() && self.relocated.is_empty() {
@@ -399,21 +405,21 @@ fn _generate_markdown_diff(old: &str, new: &str) -> String {
         match diff {
             Difference::Same(ref x) => {
                 for line in x.lines() {
-                    diff_output.push_str(" ");
+                    diff_output.push(' ');
                     diff_output.push_str(line);
                     diff_output.push('\n');
                 }
             },
             Difference::Rem(ref x) => {
                 for line in x.lines() {
-                    diff_output.push_str("-");
+                    diff_output.push('-');
                     diff_output.push_str(line);
                     diff_output.push('\n');
                 }
             },
             Difference::Add(ref x) => {
                 for line in x.lines() {
-                    diff_output.push_str("+");
+                    diff_output.push('+');
                     diff_output.push_str(line);
                     diff_output.push('\n');
                 }
@@ -443,7 +449,7 @@ fn format_attachment_name(target: &element::AttachmentTarget) -> String {
         }
         element::AttachmentTarget::ElementIdentifier(id) => {
             // Extract element name from identifier (after #)
-            id.split('#').last().unwrap_or(id)
+            id.split('#').next_back().unwrap_or(id)
                 .split('-')
                 .map(|word| {
                     let mut chars = word.chars();
@@ -1159,8 +1165,7 @@ pub fn compute_change_impact(
             .relations
             .iter()
             .filter(|r| relation::IMPACT_PROPAGATION_RELATIONS.contains(&r.relation_type.name))
-            .cloned()
-            .map(|rel: Relation| convert_relation_to_summary(&rel))
+            .map(convert_relation_to_summary)
             .collect();
         let mut visited = BTreeSet::new();
         visited.insert(id.clone());
@@ -1183,8 +1188,7 @@ pub fn compute_change_impact(
         let removed_relations: Vec<_> = ref_elem
             .relations
             .iter()
-            .cloned()
-            .map(|rel: Relation| convert_relation_to_summary(&rel))
+            .map(convert_relation_to_summary)
             .collect();
         report.removed.push(RemovedElement {
             element_id: id.clone(),

@@ -13,7 +13,7 @@ impl<'a> FileReaderIterator<'a> {
     pub fn new(git_commit_hash: Option<&'a str>, files: Vec<PathBuf>) -> Self {
         Self {
             files: files.into_iter(),
-            git_commit_hash: git_commit_hash,            
+            git_commit_hash,            
         }
     }
 }
@@ -58,7 +58,7 @@ impl Iterator for FileReaderIterator<'_>{
 }
 /// Reads a file's content
 pub fn read_file(path: &Path) -> Result<String, ReqvireError> {
-    fs::read_to_string(path).map_err(|e| ReqvireError::IoError(e))
+    fs::read_to_string(path).map_err(ReqvireError::IoError)
 }
 
 
@@ -100,7 +100,7 @@ pub fn copy_file_with_structure(src: &Path, dst: &Path) -> Result<(), ReqvireErr
     }
 
     fs::copy(src, dst)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
     Ok(())
 }
@@ -108,11 +108,11 @@ pub fn copy_file_with_structure(src: &Path, dst: &Path) -> Result<(), ReqvireErr
 /// Recursively copies all files and directories from source to destination
 pub fn copy_dir_all(src: &Path, dst: &Path) -> Result<(), ReqvireError> {
     fs::create_dir_all(dst)
-        .map_err(|e| ReqvireError::IoError(e))?;
+        .map_err(ReqvireError::IoError)?;
 
-    for entry in fs::read_dir(src).map_err(|e| ReqvireError::IoError(e))? {
-        let entry = entry.map_err(|e| ReqvireError::IoError(e))?;
-        let ty = entry.file_type().map_err(|e| ReqvireError::IoError(e))?;
+    for entry in fs::read_dir(src).map_err(ReqvireError::IoError)? {
+        let entry = entry.map_err(ReqvireError::IoError)?;
+        let ty = entry.file_type().map_err(ReqvireError::IoError)?;
         let src_path = entry.path();
         let dst_path = dst.join(entry.file_name());
 
@@ -120,7 +120,7 @@ pub fn copy_dir_all(src: &Path, dst: &Path) -> Result<(), ReqvireError> {
             copy_dir_all(&src_path, &dst_path)?;
         } else {
             fs::copy(&src_path, &dst_path)
-                .map_err(|e| ReqvireError::IoError(e))?;
+                .map_err(ReqvireError::IoError)?;
         }
     }
     Ok(())
@@ -130,7 +130,7 @@ pub fn copy_dir_all(src: &Path, dst: &Path) -> Result<(), ReqvireError> {
 pub fn remove_dir_all<P: AsRef<Path>>(path: P) -> Result<(), ReqvireError> {
     if path.as_ref().exists() {
         fs::remove_dir_all(path.as_ref())
-            .map_err(|e| ReqvireError::IoError(e))?;
+            .map_err(ReqvireError::IoError)?;
     }
     Ok(())
 }

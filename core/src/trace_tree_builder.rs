@@ -4,7 +4,6 @@
 /// from requirements and detect redundant relations. Used by both:
 /// - verification_trace: for redundant verify relations
 /// - lint: for both redundant verify and maybe-redundant hierarchical relations
-
 use crate::element::Element;
 use crate::graph_registry::GraphRegistry;
 use crate::relation::VERIFICATION_TRACES_RELATIONS;

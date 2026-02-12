@@ -1,6 +1,7 @@
 use std::collections::{HashMap, BTreeSet, HashSet, BTreeMap};
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 use log::{debug, warn};
 use serde::Serialize;
 
@@ -11,6 +12,11 @@ use crate::error::ReqvireError;
 use crate::git_commands;
 use globset::GlobSet;
 use regex::Regex;
+
+/// Cached regex for matching .md file references in relation targets
+static MD_FILE_RE: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r"\.md(?:#|$)").unwrap()
+});
 
 
 #[derive(Debug, Clone, Serialize)]
@@ -44,6 +50,12 @@ pub struct GraphRegistry {
     pub nodes: HashMap<String, ElementNode>,
     pub pages: HashMap<String, Page>,
     pub modified_files: HashSet<String>, // Track files modified during CRUD operations
+}
+
+impl Default for GraphRegistry {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl GraphRegistry {
@@ -121,7 +133,7 @@ impl GraphRegistry {
         log::debug!("Running cross-section duplicate validation...");
         let mut errors = Vec::new();
 
-        for (_identifier, node) in &self.nodes {
+        for node in self.nodes.values() {
             let element = &node.element;
 
             // Collect all relation targets (normalized identifiers)
@@ -180,13 +192,11 @@ impl GraphRegistry {
         log::debug!("Propagating missing opposite relations...");
         let mut to_add: Vec<(String, crate::relation::Relation)> = Vec::new();
         let element_ids: Vec<String> = self.nodes.keys().cloned().collect();
-        let md_regex = Regex::new(r"\.md(?:#|$)").unwrap();
-
         for source_id in &element_ids {
             if let Some(source_node) = self.nodes.get(source_id) {
                 for relation in &source_node.element.relations {
                     if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
-                        if !md_regex.is_match(target_id) || excluded_filename_patterns.is_match(target_id) {
+                        if !MD_FILE_RE.is_match(target_id) || excluded_filename_patterns.is_match(target_id) {
                             continue;
                         }
 
@@ -1466,7 +1476,7 @@ impl GraphRegistry {
     /// Leaf elements are those that:
     /// 1. Have backward relations (derivedFrom, satisfy, verify) - they trace upward to something
     /// 2. Have no outgoing forward relations to other elements - nothing derives from them
-    /// Optionally filter by element types
+    ///    Optionally filter by element types
     pub fn find_leaf_elements(&self, type_filter: Option<&[&str]>) -> Vec<String> {
         let mut leaves: Vec<String> = self.nodes.values()
             .map(|node| &node.element)
@@ -1474,7 +1484,7 @@ impl GraphRegistry {
                 // Apply type filter if provided
                 if let Some(types) = type_filter {
                     let element_type_str = element.element_type.as_str();
-                    if !types.iter().any(|t| *t == element_type_str) {
+                    if !types.contains(&element_type_str) {
                         return false;
                     }
                 }
@@ -1513,7 +1523,7 @@ impl GraphRegistry {
             .map(|node| &node.element)
             .filter(|element| {
                 let element_type_str = element.element_type.as_str();
-                type_filter.iter().any(|t| *t == element_type_str)
+                type_filter.contains(&element_type_str)
             })
             .map(|e| e.identifier.clone())
             .collect();
@@ -1619,7 +1629,7 @@ impl GraphRegistry {
 
                 relations_by_target
                     .entry(target_id)
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push(relation.clone());
             }
 
@@ -1671,7 +1681,7 @@ impl GraphRegistry {
         // Add the element content
         if !element.content.trim().is_empty() {
             markdown.push_str(element.content.trim_end());
-            markdown.push_str("\n");
+            markdown.push('\n');
         }
 
         // Add metadata subsection
@@ -1690,7 +1700,7 @@ impl GraphRegistry {
         for (key, value) in custom_metadata {
             markdown.push_str(&format!("  * {}: {}\n", key, value));
         }
-        markdown.push_str("\n");
+        markdown.push('\n');
 
         // Add attachments subsection if there are attachments
         // Deduplicate attachments by target, keeping first occurrence
@@ -1749,13 +1759,13 @@ impl GraphRegistry {
                             .map(|e| e.name.clone())
                             .unwrap_or_else(|| {
                                 // Fallback to identifier fragment if element not found
-                                identifier.split('#').last().unwrap_or(identifier).to_string()
+                                identifier.split('#').next_back().unwrap_or(identifier).to_string()
                             });
                         markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_id));
                     }
                 }
             }
-            markdown.push_str("\n");
+            markdown.push('\n');
         }
 
         // Add relations subsection if there are relations to include
@@ -1873,7 +1883,7 @@ impl GraphRegistry {
                     target_text
                 ));
             }
-            markdown.push_str("\n");
+            markdown.push('\n');
         }
 
         // Apply generic formatting to ensure exactly one blank line before all #### headers
@@ -1909,7 +1919,7 @@ impl GraphRegistry {
             if !in_details && line.trim().is_empty() {
                 // Check if the previous line was a #### header
                 let prev_line_is_header = result.lines().last()
-                    .map_or(false, |l| l.trim_start().starts_with("####"));
+                    .is_some_and(|l| l.trim_start().starts_with("####"));
                 if prev_line_is_header {
                     continue;
                 }
@@ -1947,7 +1957,7 @@ impl GraphRegistry {
 
             file_elements
                 .entry(element.file_path.clone())
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push(element);
         }
 
@@ -1974,7 +1984,7 @@ impl GraphRegistry {
             .iter()
             .enumerate()
             .map(|(i, e)| {
-                let fragment = e.identifier.split('#').last().unwrap_or(&e.identifier).to_string();
+                let fragment = e.identifier.split('#').next_back().unwrap_or(&e.identifier).to_string();
                 (fragment, i)
             })
             .collect();
@@ -1996,7 +2006,7 @@ impl GraphRegistry {
                             // This element has a file-local parent
                             children_map
                                 .entry(parent_idx)
-                                .or_insert_with(Vec::new)
+                                .or_default()
                                 .push(idx);
                             has_parent.insert(idx);
                         }
@@ -2046,7 +2056,7 @@ impl GraphRegistry {
         }
 
         // Reorder elements based on ordered indices
-        let original: Vec<&Element> = elements.drain(..).collect();
+        let original: Vec<&Element> = std::mem::take(elements);
         for idx in ordered_indices {
             elements.push(original[idx]);
         }
@@ -2127,7 +2137,7 @@ impl GraphRegistry {
             // Create parent directories if needed
             if let Some(parent_dir) = dst_path.parent() {
                 fs::create_dir_all(parent_dir)
-                    .map_err(|e| ReqvireError::IoError(e))?;
+                    .map_err(ReqvireError::IoError)?;
             }
 
             // Copy the file
@@ -2377,7 +2387,7 @@ impl GraphRegistry {
         // Create output directory if it doesn't exist
         if !output_dir.exists() {
             fs::create_dir_all(output_dir)
-                .map_err(|e| ReqvireError::IoError(e))?;
+                .map_err(ReqvireError::IoError)?;
         }
 
         // Generate and write markdown files
@@ -2394,12 +2404,12 @@ impl GraphRegistry {
             // Create parent directories if needed
             if let Some(parent_dir) = output_file_path.parent() {
                 fs::create_dir_all(parent_dir)
-                    .map_err(|e| ReqvireError::IoError(e))?;
+                    .map_err(ReqvireError::IoError)?;
             }
 
             // Write the markdown file
             fs::write(&output_file_path, markdown_content)
-                .map_err(|e| ReqvireError::IoError(e))?;
+                .map_err(ReqvireError::IoError)?;
 
             debug!("Flushed {} elements to {}",
                 elements.len(),
@@ -2425,7 +2435,7 @@ impl GraphRegistry {
         // Create output directory if it doesn't exist
         if !output_dir.exists() {
             fs::create_dir_all(output_dir)
-                .map_err(|e| ReqvireError::IoError(e))?;
+                .map_err(ReqvireError::IoError)?;
         }
 
         let grouped_elements = self.group_elements_by_location();
@@ -2443,12 +2453,12 @@ impl GraphRegistry {
                 // Create parent directories if needed
                 if let Some(parent_dir) = output_file_path.parent() {
                     fs::create_dir_all(parent_dir)
-                        .map_err(|e| ReqvireError::IoError(e))?;
+                        .map_err(ReqvireError::IoError)?;
                 }
 
                 // Write the markdown file
                 fs::write(&output_file_path, markdown_content)
-                    .map_err(|e| ReqvireError::IoError(e))?;
+                    .map_err(ReqvireError::IoError)?;
 
                 // Collect InternalPath relations from elements in this file
                 for element in elements {
@@ -2483,7 +2493,7 @@ impl GraphRegistry {
     /// Updates relation identifiers when elements move between files
     fn update_relation_identifiers(&mut self, moved_element_id: &str, _old_file_path: &str, new_file_path: &str) {
         // Extract just the fragment (element name) from the moved element's identifier
-        let moved_fragment = moved_element_id.split('#').last().unwrap_or(moved_element_id);
+        let moved_fragment = moved_element_id.split('#').next_back().unwrap_or(moved_element_id);
 
         // 1. Update relations FROM other elements TO the moved element
         for (_id, node) in self.nodes.iter_mut() {
@@ -2496,45 +2506,55 @@ impl GraphRegistry {
             for relation in &mut node.element.relations {
                 if let crate::relation::LinkType::Identifier(ref mut target_id) = relation.target.link {
                     if target_id == moved_element_id {
-                        // The target element moved to a different file
                         if node.element.file_path != new_file_path {
-                            // Cross-file reference needed - use just the fragment
+                            // Cross-file reference needed
                             *target_id = format!("{}#{}", new_file_path, moved_fragment);
                             relation.target.text = format!("{}#{}", new_file_path, moved_fragment);
+                        } else {
+                            // Same file now — update to fragment-only reference
+                            *target_id = moved_fragment.to_string();
+                            relation.target.text = moved_fragment.to_string();
                         }
-                        // If same file, keep as-is
                     }
                 }
             }
         }
 
         // 2. Update relations FROM the moved element TO other elements
-        // First collect target file paths to avoid borrowing issues
-        let target_file_paths: std::collections::HashMap<String, String> = self.nodes.values()
-            .map(|node| (node.element.identifier.clone(), node.element.file_path.clone()))
-            .collect();
+        // Build lookup maps: full identifier -> file_path, and fragment -> (full_id, file_path)
+        // This allows resolving both full identifiers and bare fragments
+        let mut id_to_file: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+        let mut fragment_to_id_file: std::collections::HashMap<String, (String, String)> = std::collections::HashMap::new();
+        for node in self.nodes.values() {
+            let id = node.element.identifier.clone();
+            let file = node.element.file_path.clone();
+            id_to_file.insert(id.clone(), file.clone());
+            // Also index by bare fragment for fallback lookup
+            let fragment = id.split('#').next_back().unwrap_or(&id).to_string();
+            fragment_to_id_file.insert(fragment, (id, file));
+        }
 
         if let Some(moved_node) = self.nodes.get_mut(moved_element_id) {
             for relation in &mut moved_node.element.relations {
                 if let crate::relation::LinkType::Identifier(ref mut target_id) = relation.target.link {
-                    // Extract the original target identifier (remove any file path prefix)
-                    let original_target_id = if target_id.contains('#') {
-                        target_id.split('#').last().unwrap_or("").to_string()
-                    } else {
-                        target_id.clone()
-                    };
+                    // Extract the bare fragment (element name) from the target
+                    let fragment = target_id.split('#').next_back().unwrap_or(target_id).to_string();
 
-                    // Find the target element to check its file location
-                    if let Some(target_file_path) = target_file_paths.get(&original_target_id) {
-                        // If moved element is now in different file than target
+                    // Resolve target's file path: try full target_id first, then bare fragment
+                    let resolved = id_to_file.get(target_id.as_str())
+                        .map(|file| (fragment.clone(), file.clone()))
+                        .or_else(|| fragment_to_id_file.get(&fragment)
+                            .map(|(_full_id, file)| (fragment.clone(), file.clone())));
+
+                    if let Some((target_fragment, target_file_path)) = resolved {
                         if new_file_path != target_file_path {
-                            // Update to cross-file reference
-                            *target_id = format!("{}#{}", target_file_path, original_target_id);
-                            relation.target.text = format!("{}#{}", target_file_path, original_target_id);
+                            // Cross-file reference needed
+                            *target_id = format!("{}#{}", target_file_path, target_fragment);
+                            relation.target.text = format!("{}#{}", target_file_path, target_fragment);
                         } else {
-                            // Same file, use simple reference
-                            *target_id = original_target_id.clone();
-                            relation.target.text = original_target_id;
+                            // Same file, use simple fragment reference
+                            *target_id = target_fragment.clone();
+                            relation.target.text = target_fragment;
                         }
                     }
                 }
@@ -3138,7 +3158,7 @@ impl GraphRegistry {
         let mut orphaned_children: Vec<String> = Vec::new();
         let hierarchical_types = crate::relation::get_hierarchical_relation_types();
 
-        for (_child_id, child_node) in &self.nodes {
+        for child_node in self.nodes.values() {
             // Count how many hierarchical parent relations this child has to the element being deleted
             let mut parents_to_target = 0;
             let mut total_parents = 0;
@@ -3304,12 +3324,13 @@ impl GraphRegistry {
         self.update_relation_identifiers(&old_identifier, &source_file, target_file);
 
         // Construct the new identifier (file path changed, fragment stays the same)
-        let fragment = old_identifier.split('#').last().unwrap_or("");
+        let fragment = old_identifier.split('#').next_back().unwrap_or("");
         let new_identifier = format!("{}#{}", target_file, fragment);
 
-        // Update the element's identifier field in the node
-        if let Some(node) = self.nodes.get_mut(&old_identifier) {
+        // Re-key the node in the HashMap: remove with old key, update identifier, insert with new key
+        if let Some(mut node) = self.nodes.remove(&old_identifier) {
             node.element.identifier = new_identifier.clone();
+            self.nodes.insert(new_identifier.clone(), node);
         }
 
         // Update all attachment identifiers pointing to this element
@@ -3357,6 +3378,7 @@ impl GraphRegistry {
         let target_type = target_node.element.element_type.clone();
 
         // Validate all sources exist and collect their data
+        #[allow(clippy::type_complexity)]
         let mut source_data: Vec<(String, String, String, Vec<crate::relation::Relation>, Vec<crate::element::Attachment>)> = Vec::new();
         for source_id in source_ids {
             let source_node = self.nodes.get(source_id)
@@ -3674,7 +3696,7 @@ impl GraphRegistry {
                 let file_full_path = directory.join(file_path);
                 if file_full_path.exists() {
                     fs::remove_file(&file_full_path)
-                        .map_err(|e| ReqvireError::IoError(e))?;
+                        .map_err(ReqvireError::IoError)?;
                     log::info!("Deleted empty file: {}", file_path);
                 }
             }
@@ -3703,7 +3725,6 @@ fn extract_content_parts(content: &str) -> (String, String) {
 
         // Find end of details (next #### or end)
         let details_end = rest.find("\n#### ")
-            .map(|p| p)
             .unwrap_or(rest.len());
 
         (main, rest[..details_end].to_string())

@@ -16,14 +16,17 @@ pub struct ModelManager {
 
 }
 
+impl Default for ModelManager {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl ModelManager {
     /// Creates a new ModelManager
     pub fn new() -> Self {
-        // Initialize empty graph registry
-        let graph_registry = GraphRegistry::new();
-
         Self {
-            graph_registry
+            graph_registry: GraphRegistry::new(),
         }
     }
 
@@ -139,7 +142,7 @@ impl ModelManager {
         for (name, file_path, line_number) in all_element_locations {
             name_locations
                 .entry(name)
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push((file_path, line_number));
         }
 

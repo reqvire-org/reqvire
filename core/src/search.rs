@@ -25,6 +25,7 @@ pub struct SearchFilters {
 
 impl SearchFilters {
     /// Creates new search filters with validation
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         file: Option<&str>,
         name_regex: Option<&str>,
@@ -47,8 +48,8 @@ impl SearchFilters {
             Regex::new(pattern).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))
         }
 
-        let file_glob = file.map(|p| compile_glob(p)).transpose()?;
-        let name_re = name_regex.map(|r| compile_regex(r)).transpose()?;
+        let file_glob = file.map(compile_glob).transpose()?;
+        let name_re = name_regex.map(compile_regex).transpose()?;
 
         // Parse and validate comma-separated element types
         let type_patterns = if let Some(t) = typ {
@@ -72,9 +73,9 @@ impl SearchFilters {
             None
         };
 
-        let content_re = content.map(|r| compile_regex(r)).transpose()?;
-        let page_content_re = page_content.map(|r| compile_regex(r)).transpose()?;
-        let attachment_glob = attachment.map(|p| compile_glob(p)).transpose()?;
+        let content_re = content.map(compile_regex).transpose()?;
+        let page_content_re = page_content.map(compile_regex).transpose()?;
+        let attachment_glob = attachment.map(compile_glob).transpose()?;
 
         // Parse and validate comma-separated relation lists
         let have_relations = if let Some(s) = have_relations {
@@ -147,10 +148,9 @@ impl SearchFilters {
             let mut matches_any = false;
 
             for tp in types {
-                let matches = if tp.starts_with("other-") {
+                let matches = if let Some(custom_type_name) = tp.strip_prefix("other-") {
                     // Handle "other-TYPENAME" pattern for custom types
                     // Strip "other-" prefix and compare with stored custom type name
-                    let custom_type_name = &tp[6..];
                     match &elem.element_type {
                         element::ElementType::Other(actual_name) => {
                             actual_name.to_lowercase() == custom_type_name
@@ -159,7 +159,7 @@ impl SearchFilters {
                     }
                 } else {
                     let filter_type = element::ElementType::from_metadata(tp);
-                    &elem.element_type == &filter_type
+                    elem.element_type == filter_type
                 };
 
                 if matches {

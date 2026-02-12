@@ -14,7 +14,6 @@
 /// - `scripts`: JavaScript utilities (mobile menu toggle)
 /// - `pages`: Page-specific generators (to be implemented in Phase 2/3)
 /// - `visualizations`: Visualization components (to be implemented in Phase 2/3)
-
 mod components;
 mod layouts;
 mod scripts;
@@ -32,7 +31,7 @@ pub use maud::Markup;
 pub use pages::{coverage, index, model, resources, traces, traceflow};
 
 use crate::error::ReqvireError;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Convert markdown file to HTML using component-based architecture
 ///
@@ -127,7 +126,7 @@ pub fn convert_to_html(
 
 /// Calculate the relative path prefix needed for navigation links
 /// based on the depth of the current file relative to base_folder
-fn calculate_nav_prefix(file_path: &PathBuf, base_folder: &PathBuf) -> String {
+fn calculate_nav_prefix(file_path: &Path, base_folder: &Path) -> String {
     // Get relative path from base_folder
     let relative_path = match file_path.strip_prefix(base_folder) {
         Ok(rel) => rel,
@@ -187,7 +186,7 @@ pub fn generate_diagram_page(title: &str, diagram: Markup, nav_prefix: &str) -> 
 /// # Arguments
 /// * `html_content` - Pre-converted HTML content from markdown
 /// * `nav_prefix` - Relative path prefix for navigation links
-/// Generate coverage page with new component system
+///   Generate coverage page with new component system
 pub fn generate_coverage_page(html_content: &str, nav_prefix: &str) -> String {
     pages::coverage::render(html_content, nav_prefix).into_string()
 }
