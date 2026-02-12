@@ -2506,13 +2506,15 @@ impl GraphRegistry {
             for relation in &mut node.element.relations {
                 if let crate::relation::LinkType::Identifier(ref mut target_id) = relation.target.link {
                     if target_id == moved_element_id {
-                        // The target element moved to a different file
                         if node.element.file_path != new_file_path {
-                            // Cross-file reference needed - use just the fragment
+                            // Cross-file reference needed
                             *target_id = format!("{}#{}", new_file_path, moved_fragment);
                             relation.target.text = format!("{}#{}", new_file_path, moved_fragment);
+                        } else {
+                            // Same file now — update to fragment-only reference
+                            *target_id = moved_fragment.to_string();
+                            relation.target.text = moved_fragment.to_string();
                         }
-                        // If same file, keep as-is
                     }
                 }
             }
