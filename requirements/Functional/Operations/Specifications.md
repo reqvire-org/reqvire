@@ -82,6 +82,7 @@ Rules for normalizing document hierarchical structure during formatting.
 ---
 
 ### Element Manipulation File Persistence Refinement Specification
+
 Specification extracted from requirement "Element Manipulation File Persistence".
 
 #### Details
@@ -123,6 +124,7 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
 ---
 
 ### Full Relations Insertion Refinement Specification
+
 Specification extracted from requirement "Full Relations Insertion".
 
 #### Details
@@ -236,6 +238,7 @@ Document format rule:
 ---
 
 ### Move File Operation Refinement Specification
+
 Specification extracted from requirement "Move File Operation".
 
 #### Details
@@ -470,6 +473,7 @@ Rules for validating and normalizing relation targets during element creation an
 ---
 
 ### Rename Element Operation Refinement Specification
+
 Specification extracted from requirement "Rename Element Operation".
 
 #### Details

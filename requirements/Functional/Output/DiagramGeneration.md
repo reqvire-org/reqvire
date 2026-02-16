@@ -109,8 +109,7 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
-  * refinedBy: [Trace Relation Non Directional Behavior Refinement Specification](Specifications.md#trace-relation-non-directional-behavior-refinement-specification)
+  * refinedBy: [Trace Relation Non-Directional Behavior Refinement Specification](Specifications.md#trace-relation-non-directional-behavior-refinement-specification)
   * verifiedBy: [Invalid Relations Test](../Core/Verifications/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [Trace Relations No Cycles Verification](../Processing/Verifications/TraceVerifications.md#trace-relations-no-cycles-verification)
 ---
-

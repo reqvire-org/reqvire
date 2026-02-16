@@ -1,6 +1,7 @@
 # Elements
 
 ### Aligning Design with Code Refinement Specification
+
 Specification extracted from requirement "Aligning Design with Code".
 
 #### Details
@@ -35,6 +36,7 @@ Reqvire implements containment hierarchy through filesystem structure.
 ---
 
 ### Defining Model Structure Refinement Specification
+
 Specification extracted from requirement "Defining Model Structure".
 
 #### Details
@@ -49,6 +51,7 @@ This user story covers the foundational aspects of how System models are structu
 ---
 
 ### Formatting Model Documents Refinement Specification
+
 Specification extracted from requirement "Formatting Model Documents".
 
 #### Details

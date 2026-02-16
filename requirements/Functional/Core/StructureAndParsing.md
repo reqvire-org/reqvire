@@ -35,7 +35,7 @@ The system shall implement semi-structured markdown format specifications that d
   * derive: [Reserved Subsections Support](#reserved-subsections-support)
   * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
   * refinedBy: [MarkdownStructure](DesignDocuments/MarkdownStructure.md#markdownstructure)
-  * refinedBy: [Structure And Addressing In Markdown Documents Refinement Specification](Specifications.md#structure-and-addressing-in-markdown-documents-refinement-specification)
+  * refinedBy: [Structure and Addressing in Markdown Documents Refinement Specification](Specifications.md#structure-and-addressing-in-markdown-documents-refinement-specification)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)

@@ -229,4 +229,3 @@ TODO: write test procedure
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
   * verify: [Tracing Structural Changes](../../Output/Reporting.md#tracing-structural-changes)
 ---
-

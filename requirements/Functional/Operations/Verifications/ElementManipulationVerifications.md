@@ -757,8 +757,8 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-merge-elements/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-document-operation-constraints/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-merge-elements/test.sh)
   * verify: [Merge Element Operation](../ElementManipulation.md#merge-element-operation)
 ---
 

@@ -28,4 +28,3 @@ Implementation details shall follow the associated refinement specifications.
   * derivedFrom: [System Model Interfaces](../UserStories.md#system-model-interfaces)
   * refinedBy: [Web Interface Refinement Specification](WebInterface/Specifications.md#web-interface-refinement-specification)
 ---
-

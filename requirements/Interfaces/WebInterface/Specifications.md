@@ -1,6 +1,7 @@
 # Elements
 
 ### Component-Based HTML Architecture Refinement Specification
+
 Specification extracted from requirement "Component-Based HTML Architecture".
 
 #### Details
@@ -139,6 +140,7 @@ The navigation bar must be:
 ---
 
 ### Web Interface Refinement Specification
+
 Specification extracted from requirement "Web Interface".
 
 #### Details
@@ -218,4 +220,3 @@ The web interface uses a monochrome grayscale theme for consistent, professional
 #### Metadata
   * type: specification
 ---
-

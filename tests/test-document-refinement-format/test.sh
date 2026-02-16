@@ -28,8 +28,7 @@ normalize_error_output() {
     | sed 's/\x1b\[[0-9;]*m//g' \
     | sed -E 's/^\[[^]]+\][[:space:]]*//' \
     | grep -E "[Ii]ncompatible element types for relation: Relation 'refinedBy'|refinedBy target '.*' is invalid\\." \
-    | sed -E 's/^[[:space:]]+//' \
-    | sed -E 's/^[0-9]+\\. //' \
+    | sed -E 's/^[[:space:]]*[0-9]+\.[[:space:]]+//' \
     | head -n 1
 }
 
@@ -70,7 +69,7 @@ DOC_TYPE=$(echo "$SEARCH_JSON" | jq -r '.files["specifications/DesignDocuments/C
 [ "$DOC_TYPE" = "specification" ] || auto_fail "Document element type must come from metadata"
 
 # 3) refinedBy fails when targeted document element type is non-refinement
-perl -0777 -i -pe 's/type: specification/type: requirement/' "$DOC_FILE"
+sed -i "s@  \\* type: specification@  * type: requirement@" "$DOC_FILE"
 set +e
 OUT=$(run_validate)
 CODE=$?
@@ -81,7 +80,7 @@ assert_validate_failure_matches \
   "$OUT" "$CODE"
 
 # restore valid doc type
-perl -0777 -i -pe 's/type: requirement/type: specification/' "$DOC_FILE"
+sed -i "s@  \\* type: requirement@  * type: specification@" "$DOC_FILE"
 
 # 4) refinedBy file target fails (must point to element identifier, not plain document path)
 sed -i "s@  \\* refinedBy: \\[ChangePropagation\\](DesignDocuments/ChangePropagation.md#changepropagation)@  * refinedBy: [ChangePropagation.md](DesignDocuments/ChangePropagation.md)@" "$REQ_FILE"

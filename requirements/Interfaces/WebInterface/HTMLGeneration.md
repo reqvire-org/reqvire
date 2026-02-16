@@ -25,7 +25,7 @@ Implementation details shall follow the associated refinement specifications.
 
 #### Relations
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
-  * refinedBy: [Component Based Html Architecture Refinement Specification](Specifications.md#component-based-html-architecture-refinement-specification)
+  * refinedBy: [Component-Based HTML Architecture Refinement Specification](Specifications.md#component-based-html-architecture-refinement-specification)
   * verifiedBy: [Component Reuse Verification](Verifications/HTMLGenerationVerifications.md#component-reuse-verification)
 ---
 
@@ -103,4 +103,3 @@ This ensures HTML validity errors are caught during compilation rather than at r
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
   * verifiedBy: [HTML Validity Verification](Verifications/HTMLGenerationVerifications.md#html-validity-verification)
 ---
-

@@ -1,6 +1,7 @@
 # Elements
 
 ### CLI Add Element Command Refinement Specification
+
 Specification extracted from requirement "CLI Add Element Command".
 
 #### Details
@@ -25,6 +26,7 @@ The `add` command shall:
 ---
 
 ### CLI Collect Command Refinement Specification
+
 Specification extracted from requirement "CLI Collect Command".
 
 #### Details
@@ -46,6 +48,7 @@ Command syntax: `reqvire collect <element-name> [--direction UPSTREAM|DOWNSTREAM
 ---
 
 ### CLI Interface Structure Refinement Specification
+
 Specification extracted from requirement "CLI Interface Structure".
 
 #### Details
@@ -92,6 +95,7 @@ Each command has its own options displayed in a flattened section
 ---
 
 ### CLI Move Element Command Refinement Specification
+
 Specification extracted from requirement "CLI Move Element Command".
 
 #### Details
@@ -116,6 +120,7 @@ The `mv` command shall:
 ---
 
 ### CLI Move File Command Refinement Specification
+
 Specification extracted from requirement "CLI Move File Command".
 
 #### Details
@@ -133,6 +138,7 @@ The `mv-file` command shall:
 ---
 
 ### CLI Search Command Refinement Specification
+
 Specification extracted from requirement "CLI Search Command".
 
 #### Details
@@ -168,6 +174,7 @@ Default output:
 ---
 
 ### CLI Traces Command Refinement Specification
+
 Specification extracted from requirement "CLI Traces Command".
 
 #### Details
@@ -221,6 +228,7 @@ reqvire traces --from-folder=docs/reports > docs/reports/traces.md
 ---
 
 ### Format Command Refinement Specification
+
 Specification extracted from requirement "Format Command".
 
 #### Details

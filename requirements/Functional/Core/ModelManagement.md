@@ -128,7 +128,7 @@ The system shall implement relations following clearly defined specifications fo
   * derive: [Trace Relation Non-Directional Behavior](../Output/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
   * refinedBy: [RelationTypes](DesignDocuments/RelationTypes.md#relationtypes)
-  * refinedBy: [Relation Types And Behaviors Refinement Specification](Specifications.md#relation-types-and-behaviors-refinement-specification)
+  * refinedBy: [Relation Types and behaviors Refinement Specification](Specifications.md#relation-types-and-behaviors-refinement-specification)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
 ---

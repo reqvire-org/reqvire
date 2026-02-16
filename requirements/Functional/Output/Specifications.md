@@ -180,6 +180,7 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 ---
 
 ### Containment View Report Refinement Specification
+
 Specification extracted from requirement "Containment View Report".
 
 #### Details
@@ -327,6 +328,7 @@ Structure for error and warning messages.
 ---
 
 ### Flexible Search Type Filtering Refinement Specification
+
 Specification extracted from requirement "Flexible Search Type Filtering".
 
 #### Details
@@ -342,6 +344,7 @@ This capability enables:
 ---
 
 ### Interactive Mermaid Diagram Node Behavior Refinement Specification
+
 Specification extracted from requirement "Interactive Mermaid Diagram Node Behavior".
 
 #### Details
@@ -668,6 +671,7 @@ Default text output (when neither `--json` nor other format flags specified):
 ---
 
 ### Trace Relation Non-Directional Behavior Refinement Specification
+
 Specification extracted from requirement "Trace Relation Non-Directional Behavior".
 
 #### Details

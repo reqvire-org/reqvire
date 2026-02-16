@@ -1,6 +1,7 @@
 # Elements
 
 ### Attachment Scope Validation Refinement Specification
+
 Specification extracted from requirement "Attachment Scope Validation".
 
 #### Details
@@ -11,6 +12,7 @@ When validating attachments (both refinement elements and file assets), the syst
 ---
 
 ### Attachment Target Validation Refinement Specification
+
 Specification extracted from requirement "Attachment Target Validation".
 
 #### Details
@@ -34,6 +36,7 @@ This validation ensures that attachments either reference existing files or vali
 ---
 
 ### Default Requirement Type Assignment Refinement Specification
+
 Specification extracted from requirement "Default Requirement Type Assignment".
 
 #### Details
@@ -106,6 +109,7 @@ Path resolution and scope validation rules for Git repository-based project mana
 ---
 
 ### Identifiers and Relations Refinement Specification
+
 Specification extracted from requirement "Identifiers and Relations".
 
 #### Details
@@ -144,6 +148,7 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
 ---
 
 ### Internal Consistency Validator Refinement Specification
+
 Specification extracted from requirement "Internal Consistency Validator".
 
 #### Details
@@ -163,6 +168,7 @@ Rationale: Element names serve as stable IDs for element identity, independent o
 ---
 
 ### Refinement Element Structure Constraints Refinement Specification
+
 Specification extracted from requirement "Refinement Element Structure Constraints".
 
 #### Details
@@ -179,6 +185,7 @@ When a Refinement element contains relations other than `refine`, the validator 
 ---
 
 ### Relation Element Type Validator Refinement Specification
+
 Specification extracted from requirement "Relation Element Type Validator".
 
 #### Details
@@ -203,6 +210,7 @@ This validation occurs:
 ---
 
 ### Relation Types and behaviors Refinement Specification
+
 Specification extracted from requirement "Relation Types and behaviors".
 
 #### Details
@@ -264,6 +272,7 @@ The following filenames are reserved for general repository documentation and ar
 ---
 
 ### Specification File Identification Refinement Specification
+
 Specification extracted from requirement "Specification File Identification".
 
 #### Details
@@ -280,6 +289,7 @@ Specification extracted from requirement "Specification File Identification".
 ---
 
 ### Structure and Addressing in Markdown Documents Refinement Specification
+
 Specification extracted from requirement "Structure and Addressing in Markdown Documents".
 
 #### Details
