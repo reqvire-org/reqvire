@@ -43,21 +43,20 @@ As a **Developer**, I want to align code with System models, so that implementat
 
 #### Relations
   * derive: [Code Traceability](Functional/Integration/CodeAlignment.md#code-traceability)
-  * refinedBy: [Aligning Design with Code Refinement Specification](Refinements.md#aligning-design-with-code-refinement-specification)
 ---
 
 ### Defining Model Structure
 
 As a **System Engineer**, I want a well-defined model structure and file identification mechanism, so that I can organize system specifications in a consistent and predictable manner.
 
-#### Details
-Implementation details shall follow the associated refinement specifications.
-
 #### Metadata
   * type: user-requirement
 
 #### Relations
-  * refinedBy: [Defining Model Structure Refinement Specification](Refinements.md#defining-model-structure-refinement-specification)
+  * derive: [Specification File Identification](Functional/Core/StructureAndParsing.md#specification-file-identification)
+  * derive: [Structure and Addressing in Markdown Documents](Functional/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
+  * derive: [Coexistence of Structured and Unstructured Documents](Functional/Core/Configuration.md#coexistence-of-structured-and-unstructured-documents)
+  * derive: [Git Repository as Project Root](Functional/Core/ModelManagement.md#git-repository-as-project-root)
 ---
 
 ### Formatting Model Documents
@@ -67,8 +66,6 @@ As a **System Engineer**, I want to automatically format model documents to ensu
 #### Metadata
   * type: user-requirement
 
-#### Relations
-  * refinedBy: [Formatting Model Documents Refinement Specification](Refinements.md#formatting-model-documents-refinement-specification)
 ---
 
 ### Fostering Community Contributions

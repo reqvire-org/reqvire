@@ -48,6 +48,7 @@ Auto-fix shall:
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
+  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 
@@ -109,5 +110,7 @@ Detection shall:
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
+  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
+  * satisfiedBy: [trace_tree_builder.rs](../../../core/src/trace_tree_builder.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---

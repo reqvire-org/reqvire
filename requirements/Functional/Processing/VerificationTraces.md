@@ -33,6 +33,7 @@ The system shall implement a verification roll-up strategy where parent requirem
 #### Relations
   * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
   * refinedBy: [Verification Roll-up Specification](Specifications.md#verification-roll-up-specification)
+  * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
 ---
 
 ### Verification Trace Builder

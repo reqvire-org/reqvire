@@ -26,6 +26,7 @@ Implementation details shall follow the associated refinement specifications.
 #### Relations
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
   * refinedBy: [Component-Based HTML Architecture Refinement Specification](Specifications.md#component-based-html-architecture-refinement-specification)
+  * satisfiedBy: [components.rs](../../../core/src/html/components.rs)
   * verifiedBy: [Component Reuse Verification](Verifications/HTMLGenerationVerifications.md#component-reuse-verification)
 ---
 
@@ -52,6 +53,8 @@ Responsive breakpoints:
 #### Relations
   * derive: [CSS Framework Integration](#css-framework-integration)
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
+  * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
+  * satisfiedBy: [styles.rs](../../../core/src/html/styles.rs)
   * verifiedBy: [Responsive Design Verification](Verifications/HTMLGenerationVerifications.md#responsive-design-verification)
 ---
 
@@ -80,6 +83,7 @@ Tailwind provides:
 
 #### Relations
   * derivedFrom: [Responsive HTML Generation](#responsive-html-generation)
+  * satisfiedBy: [styles.rs](../../../core/src/html/styles.rs)
   * verifiedBy: [Responsive Design Verification](Verifications/HTMLGenerationVerifications.md#responsive-design-verification)
 ---
 
@@ -101,5 +105,6 @@ This ensures HTML validity errors are caught during compilation rather than at r
 
 #### Relations
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
+  * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
   * verifiedBy: [HTML Validity Verification](Verifications/HTMLGenerationVerifications.md#html-validity-verification)
 ---

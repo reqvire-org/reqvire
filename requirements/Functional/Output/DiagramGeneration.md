@@ -71,6 +71,7 @@ Implementation details shall follow the associated refinement specifications.
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
+  * refinedBy: [Mermaid Diagram Interaction Behavior](Behaviors.md#mermaid-diagram-interaction-behavior)
   * refinedBy: [Interactive Mermaid Diagram Node Behavior Refinement Specification](Specifications.md#interactive-mermaid-diagram-node-behavior-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
@@ -110,6 +111,8 @@ Implementation details shall follow the associated refinement specifications.
 
 #### Relations
   * refinedBy: [Trace Relation Non-Directional Behavior Refinement Specification](Specifications.md#trace-relation-non-directional-behavior-refinement-specification)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * verifiedBy: [Invalid Relations Test](../Core/Verifications/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [Trace Relations No Cycles Verification](../Processing/Verifications/TraceVerifications.md#trace-relations-no-cycles-verification)
 ---

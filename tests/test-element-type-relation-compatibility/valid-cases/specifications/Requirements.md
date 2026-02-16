@@ -58,18 +58,6 @@ Requirement satisfied by implementation file.
 
 ---
 
-### User Requirement with SatisfiedBy
-
-User requirement satisfied by implementation file.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * satisfiedBy: [impl.rs](impl.rs)
-
----
-
 ### Test Verification with SatisfiedBy
 
 Test verification can use satisfiedBy.

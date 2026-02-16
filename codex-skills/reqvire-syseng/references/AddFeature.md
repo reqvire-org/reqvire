@@ -10,14 +10,14 @@
 1. Requirements first → Define what the system shall do (never skip)
 2. Refinements       → Add specifications, constraints, behaviors as needed
 3. Verifications     → Add verification elements for leaf requirements
-4. Implementation    → Connect to code via satisfiedBy (when code exists)
+4. Implementation    → Connect `requirement` elements (and test verifications) to code via `satisfiedBy` (when code exists)
 ```
 
 ## Step 1: Understand the Feature Scope
 
 Before creating requirements, answer:
 - What stakeholder need does this address? (user-requirement)
-- What technical capabilities are needed? (system-requirement)
+- What technical capabilities are needed? (`requirement`)
 - Are there constraints or limits to define?
 - How will this be verified?
 
@@ -31,7 +31,7 @@ System Requirement(s) (technical implementation)
 
 **Guidelines:**
 - Start with user-requirement for the stakeholder need
-- Derive system-requirements for technical details
+- Derive `requirement` elements for technical details
 - Keep requirements atomic and testable
 - Use EARS patterns for clear statements
 
@@ -64,14 +64,14 @@ The system shall provide feature capability.
   * derivedFrom: [Parent Requirement](path.md#parent)
 ' | reqvire add requirements/UserStories.md
 
-# Add system requirement using heredoc (stdin)
+# Add requirement (system-level) using heredoc (stdin)
 reqvire add requirements/System/Features.md <<'EOF'
 ### System Feature Implementation
 
 The system shall implement the feature using defined algorithms.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Feature Name](../UserStories.md#feature-name)
@@ -92,14 +92,14 @@ EOF
 Once requirements are created, establish traceability using the link command:
 
 ```bash
-# Link system requirement to user requirement
+# Link requirement to user requirement
 reqvire link "System Feature Implementation" "derivedFrom" "Feature Name"
 
 # Link parent to child (opposite direction of derivedFrom)
 reqvire link "Feature Name" "derive" "System Feature Implementation"
 ```
 
-**Relation types**: `derivedFrom` (child → parent), `derive` (parent → child), `verifiedBy` (requirement → verification), `verify` (verification → requirement), `satisfiedBy` (requirement → code implementation), `satisfy` (code → requirement), `refinedBy` (requirement → refinement), `refine` (refinement → requirement), `trace` (non-directional traceability)
+**Relation types**: `derivedFrom` (child → parent), `derive` (parent → child), `verifiedBy` (requirement → verification), `verify` (verification → requirement), `satisfiedBy` (requirement/test-verification → implementation), `satisfy` (implementation → requirement/test-verification), `refinedBy` (requirement → refinement), `refine` (refinement → requirement), `trace` (non-directional traceability)
 
 ## Step 3: Add Refinements (if needed)
 
@@ -167,6 +167,7 @@ reqvire link "Other Feature Requirement" attaching "Performance Constraint"
 reqvire link "Architecture Requirement" attaching "docs/architecture.pdf"
 
 # Link to implementation file or external URL
+# Note: user-requirement must not use satisfiedBy/satisfy.
 reqvire link "System Requirement" "satisfiedBy" "src/auth/login.rs"
 reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 ```
@@ -246,7 +247,7 @@ After adding requirements and verifications, follow the standard validation work
 
 1. `reqvire validate` - Check model structure
 2. `reqvire lint --fix` - Fix auto-fixable issues
-3. `reqvire coverage` - Verify all leaf requirements have verifications
+3. `reqvire coverage` - Verify leaf verification coverage and requirement-only implementation coverage
 4. `reqvire format --fix` - Normalize formatting
 
 Additionally, use `reqvire resources` to see all files referenced by the model through `satisfiedBy`, `trace` relations and attachments.
@@ -270,7 +271,7 @@ The system shall authenticate users before granting access to protected resource
 The system shall validate user credentials against stored password hashes.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [User Authentication](../UserStories.md#user-authentication)
@@ -283,7 +284,7 @@ The system shall validate user credentials against stored password hashes.
 The system shall create and manage user sessions after successful authentication.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [User Authentication](../UserStories.md#user-authentication)

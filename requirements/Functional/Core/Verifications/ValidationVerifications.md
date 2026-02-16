@@ -113,10 +113,11 @@ This test verifies that the system correctly validates relation types based on e
 - System shall provide clear error message indicating element type incompatibility
 
 **satisfiedBy/satisfy Validation:**
-- System shall allow `satisfiedBy` relations from requirement types to implementation files
+- System shall allow `satisfiedBy` relations from `requirement` elements to implementation files
+- System shall reject `satisfiedBy` relations from `user-requirement` elements
 - System shall allow `satisfiedBy` relations from `test-verification` to test implementation files
 - System shall reject `satisfiedBy` relations from `analysis-verification`, `inspection-verification`, `demonstration-verification` elements
-- System shall provide clear error message for non-test-verification elements using satisfiedBy
+- System shall provide clear error message for invalid element types using satisfiedBy
 
 **verifiedBy/verify Validation:**
 - System shall allow `verifiedBy` relations from requirement types to any verification type
@@ -144,9 +145,10 @@ This test verifies that the system correctly validates relation types based on e
 
 2. **satisfiedBy type constraint tests:**
    - Create requirement with `satisfiedBy` to implementation file - PASS
+   - Create user-requirement with `satisfiedBy` to implementation file - FAIL with type error
    - Create test-verification with `satisfiedBy` to test file - PASS
    - Create analysis-verification with `satisfiedBy` to file - FAIL with type error
-   - Verify error message indicates only test-verification can use satisfiedBy
+   - Verify error message indicates `user-requirement` is not allowed for satisfiedBy
 
 3. **Refinement type relation tests:**
    - Create constraint element with `refine` relation to requirement - PASS

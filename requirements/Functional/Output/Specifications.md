@@ -234,6 +234,58 @@ All generated reports shall produce deterministic output with consistent orderin
   * type: specification
 ---
 
+### Requirement Implementation Coverage Logic Specification
+
+Technical specification for requirement implementation coverage classification logic.
+
+#### Details
+Implementation coverage scope includes only elements of type `requirement`. Elements of type `user-requirement` are excluded from implementation coverage.
+
+**Coverage Sources:**
+- `direct_satisfied`: requirement has one or more `satisfiedBy` relations.
+- `refinement_contract_satisfied_via_attachment`: requirement has no direct satisfaction but has owned refinements (`refinedBy`) attached by a directly satisfied requirement.
+- `refinement_contract_satisfied_via_child`: requirement has no direct satisfaction but owns refinements and has directly satisfied derived descendants.
+- `uncovered`: no implementation evidence from any source.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Requirement Implementation Coverage Report](Reporting.md#requirement-implementation-coverage-report)
+---
+
+### Implementation Coverage Output Structure Specification
+
+Technical specification for implementation coverage report output structure.
+
+#### Details
+**Output Requirements (Text):**
+- Summary subsection with totals, covered/uncovered counts, and percentage.
+- Covered requirements list grouped by file with source classification and evidence identifiers.
+- Uncovered requirements list grouped by file.
+
+**Output Requirements (JSON):**
+- `summary` includes:
+  - `total_requirements_in_scope`
+  - `covered_requirements`
+  - `uncovered_requirements`
+  - `implementation_coverage_percentage`
+  - `coverage_sources` object with counts for `direct_satisfied`, `refinement_contract_satisfied_via_attachment`, `refinement_contract_satisfied_via_child`
+- `covered_requirements` contains per-element:
+  - `identifier`, `name`
+  - `coverage_source`
+  - `evidence` (identifier list)
+- `uncovered_requirements` contains per-element:
+  - `identifier`, `name`
+- Coverage percentage values in summary shall be emitted with at most 2 decimal places.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Requirement Implementation Coverage Report](Reporting.md#requirement-implementation-coverage-report)
+---
+
 ### Diagram Relation Filtering Specification
 
 Technical specification for relation filtering in diagram generation to render only forward relations while ensuring complete element hierarchy representation.

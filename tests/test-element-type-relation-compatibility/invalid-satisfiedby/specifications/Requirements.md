@@ -60,6 +60,18 @@ INVALID: Demonstration verification cannot use satisfiedBy.
 
 ---
 
+### User Requirement with SatisfiedBy
+
+INVALID: User requirements cannot use satisfiedBy.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * satisfiedBy: [impl.txt](impl.txt)
+
+---
+
 ### Requirement SatisfiedBy Requirement
 
 INVALID: satisfiedBy must point to implementation file, not another requirement.

@@ -2,15 +2,24 @@
 
 This document contains correctly formatted relations to existing targets, to verify validation passes.
 
+### Root User Requirement
+
+Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+
+#### Metadata
+* type: user-requirement
+
+---
 
 ### Requirement with Valid Standard Relations
 
 This requirement has valid relations to existing files, using standard format.
 
 #### Metadata
-* type: user-requirement
+* type: requirement
 
 #### Relations
+* derivedFrom: #root-user-requirement
 * satisfiedBy: DesignSpecifications/SampleDSD.md
 
 ---
@@ -20,9 +29,10 @@ This requirement has valid relations to existing files, using standard format.
 This requirement has valid relations to existing files, using markdown link format.
 
 #### Metadata
-* type: user-requirement
+* type: requirement
 
 #### Relations
+* derivedFrom: #root-user-requirement
 * satisfiedBy: [./DesignSpecifications/SampleDSD.md](./DesignSpecifications/SampleDSD.md)
 * trace: [Design Specification](DesignSpecifications/SampleDSD.md)
 

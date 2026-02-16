@@ -65,7 +65,7 @@ validate          Validate model
 search            Search and filter model elements
 change-impact     Analyze change impact and provide report
 traces            Generate verification traces
-coverage          Generate verification coverage report
+coverage          Generate verification and implementation coverage report
 model             Generate model-centric structure diagram
 lint              Analyze model quality and detect issues
 add               Add new element to model

@@ -1,0 +1,73 @@
+{
+  "covered_requirements": {
+    "files": {
+      "specifications/Requirements.md": [
+        {
+          "coverage_source": "direct_satisfied",
+          "evidence": [
+            "specifications/src/contract_consumer.rs"
+          ],
+          "identifier": "specifications/Requirements.md#contract-consumer-implemented",
+          "name": "Contract Consumer Implemented"
+        },
+        {
+          "coverage_source": "refinement_contract_satisfied_via_attachment",
+          "evidence": [
+            "specifications/Requirements.md#contract-consumer-implemented"
+          ],
+          "identifier": "specifications/Requirements.md#contract-owner",
+          "name": "Contract Owner"
+        },
+        {
+          "coverage_source": "direct_satisfied",
+          "evidence": [
+            "specifications/src/derived_child.rs"
+          ],
+          "identifier": "specifications/Requirements.md#derived-child-implemented",
+          "name": "Derived Child Implemented"
+        },
+        {
+          "coverage_source": "refinement_contract_satisfied_via_child",
+          "evidence": [
+            "specifications/Requirements.md#derived-child-implemented"
+          ],
+          "identifier": "specifications/Requirements.md#derived-parent",
+          "name": "Derived Parent"
+        },
+        {
+          "coverage_source": "direct_satisfied",
+          "evidence": [
+            "specifications/src/direct.rs"
+          ],
+          "identifier": "specifications/Requirements.md#direct-implemented",
+          "name": "Direct Implemented"
+        }
+      ]
+    }
+  },
+  "summary": {
+    "coverage_sources": {
+      "direct_satisfied": 3,
+      "refinement_contract_satisfied_via_attachment": 1,
+      "refinement_contract_satisfied_via_child": 1
+    },
+    "covered_requirements": 5,
+    "implementation_coverage_percentage": 71.43,
+    "total_requirements_in_scope": 7,
+    "uncovered_requirements": 2
+  },
+  "uncovered_requirements": {
+    "files": {
+      "specifications/Requirements.md": [
+        {
+          "identifier": "specifications/Requirements.md#derived-intermediate",
+          "name": "Derived Intermediate"
+        },
+        {
+          "identifier": "specifications/Requirements.md#uncovered-requirement",
+          "name": "Uncovered Requirement"
+        }
+      ]
+    }
+  }
+}

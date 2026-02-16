@@ -100,3 +100,25 @@ Coverage evaluation philosophy for verification reporting.
 #### Metadata
   * type: behavior
 ---
+
+### Implementation Coverage Behavior
+
+Coverage behavior for requirement implementation reporting.
+
+#### Details
+Implementation coverage classification shall follow:
+
+- **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
+- **Refinement-contract via attachment**: requirement owns refinement elements via `refinedBy`, and at least one owned refinement is attached by a requirement that is directly satisfied.
+- **Refinement-contract via child**: requirement owns refinement elements via `refinedBy`, and at least one derived descendant requirement has `satisfiedBy`.
+- **Uncovered**: requirement has no coverage evidence from the above sources.
+
+Rules:
+- Scope includes only `requirement` elements (excludes `user-requirement`).
+- Refinement-contract attachment propagation uses only refinement element identifiers as contracts.
+- Generic derivation roll-up is not used for implementation coverage.
+- Coverage source and evidence identifiers shall be reported in text and JSON outputs.
+
+#### Metadata
+  * type: behavior
+---

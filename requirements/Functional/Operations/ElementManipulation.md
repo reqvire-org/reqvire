@@ -131,6 +131,10 @@ When `--squash` is requested, the operation shall reject squashing into an exist
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
   * refinedBy: [Move File Operation Refinement Specification](Specifications.md#move-file-operation-refinement-specification)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Move File Squash Test](Verifications/ElementManipulationVerifications.md#move-file-squash-test)
 ---
 

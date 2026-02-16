@@ -11,7 +11,7 @@ This is a valid user requirement that serves as a parent.
   * type: user-requirement
 
 #### Relations
-  * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
+  * trace: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
 

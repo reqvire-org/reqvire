@@ -1,16 +1,5 @@
 # Elements
 
-### Aligning Design with Code Refinement Specification
-
-Specification extracted from requirement "Aligning Design with Code".
-
-#### Details
-As a **Developer**, I want to align code with System models, so that implementation remains consistent with design specifications.
-
-#### Metadata
-  * type: specification
----
-
 ### Containment Specification
 
 Reqvire implements containment hierarchy through filesystem structure.
@@ -30,32 +19,6 @@ Reqvire implements containment hierarchy through filesystem structure.
 - Full identifier: `path/to/file.md#element-fragment`
 - Containment derived from file location
 - No explicit containment relations needed
-
-#### Metadata
-  * type: specification
----
-
-### Defining Model Structure Refinement Specification
-
-Specification extracted from requirement "Defining Model Structure".
-
-#### Details
-This user story covers the foundational aspects of how System models are structured:
-- Identification of specification files within the repository
-- Structure and addressing rules for markdown documents
-- Coexistence of structured and unstructured documents
-- Git repository as the project root for path resolution
-
-#### Metadata
-  * type: specification
----
-
-### Formatting Model Documents Refinement Specification
-
-Specification extracted from requirement "Formatting Model Documents".
-
-#### Details
-As a **System Engineer**, I want to automatically format model documents to ensure consistent structure and style across all specification files.
 
 #### Metadata
   * type: specification

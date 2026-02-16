@@ -145,6 +145,8 @@ The system shall display formatting changes suggestion in similar manner as git 
 #### Relations
   * derive: [Git-Style Diff Output for Format](#git-style-diff-output-for-format)
   * derivedFrom: [Model Formatting](#model-formatting)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+  * satisfiedBy: [format.rs](../../../core/src/format.rs)
 ---
 
 ### Git-Style Diff Output for Format
@@ -156,8 +158,6 @@ The system shall display formatting change suggestions in a git-style diff forma
 
 #### Relations
   * derivedFrom: [Formatting Output](#formatting-output)
-  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
-  * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
 
@@ -177,6 +177,8 @@ Implementation details shall follow the associated refinement specifications.
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)
   * refinedBy: [Full Relations Insertion Refinement Specification](Specifications.md#full-relations-insertion-refinement-specification)
+  * satisfiedBy: [format.rs](../../../core/src/format.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Full Relations Insertion Verification](Verifications/FormattingVerifications.md#full-relations-insertion-verification)
 ---
 
@@ -189,5 +191,7 @@ The system shall replace absolute links with relative links, where applicable an
 
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---

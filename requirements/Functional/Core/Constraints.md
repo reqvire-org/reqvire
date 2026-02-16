@@ -66,7 +66,7 @@ Validation rules for element type and relation type combinations.
 | Relation Type | Allowed Source Types | Allowed Target Types |
 |---------------|---------------------|---------------------|
 | derivedFrom/derive | requirement, user-requirement | requirement, user-requirement |
-| satisfiedBy/satisfy | requirement, user-requirement, test-verification | InternalPath |
+| satisfiedBy/satisfy | requirement, test-verification | InternalPath |
 | refinedBy/refine | requirement, user-requirement | refinement types, InternalPath |
 | verifiedBy/verify | requirement, user-requirement | All verification types |
 | trace | Any (except refinement types) | Any |

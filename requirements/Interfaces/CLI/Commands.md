@@ -38,6 +38,8 @@ Attachment management has been consolidated into the Relation Commands. The atta
 
 #### Relations
   * refinedBy: [Attachment Input Auto-Detection Behavior](../../Functional/Core/Behaviors.md#attachment-input-auto-detection-behavior)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * verifiedBy: [Attach Command Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#attach-command-verification)
   * verifiedBy: [Detach Command Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#detach-command-verification)
 ---
@@ -209,7 +211,7 @@ The markdown output shall include:
 
 ### CLI Coverage Command
 
-The system shall provide a `coverage` command that generates verification coverage reports focusing on leaf requirements, test-verification satisfaction status, and orphaned verifications.
+The system shall provide a `coverage` command that generates both verification coverage and requirement implementation coverage reports.
 
 #### Details
 The command shall:
@@ -221,6 +223,10 @@ The command shall:
 - Include breakdowns by file, section, and verification type
 - Show satisfaction status of test-verification elements (those with satisfiedBy relations)
 - Show orphaned verifications (verification elements without any verify relations to requirements)
+- Include requirement implementation coverage summary for `requirement` elements only (exclude `user-requirement`)
+- Classify covered requirements by implementation source (`direct_satisfied`, `refinement_contract_satisfied_via_attachment`, `refinement_contract_satisfied_via_child`)
+- Show implementation-uncovered requirements with identifiers and names
+- Emit all coverage percentages with at most 2 decimal places in text and JSON output
 - Follow [Verification Roll-up Strategy](../System/Processing/VerificationTraces.md#verification-roll-up-strategy)
 - Test-verification elements require satisfiedBy relations to be considered satisfied
 - Analysis, inspection, and demonstration verification elements are considered satisfied by default
@@ -235,6 +241,7 @@ Command output shall be written to stdout for easy redirection to files.
 #### Attachments
   * [Verification Type Selection Guidelines](../../Functional/Core/Specifications.md#verification-type-selection-guidelines)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
+  * [Implementation Coverage Output Structure Specification](../../Functional/Output/Specifications.md#implementation-coverage-output-structure-specification)
   * [Text Output Formatting](../../Functional/Output/Specifications.md#text-output-formatting)
 
 #### Relations

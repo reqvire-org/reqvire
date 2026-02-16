@@ -1,6 +1,6 @@
 ---
 name: reqvire-syseng
-description: MBSE and requirements engineering workflow for Reqvire. Use when exploring a Reqvire model, adding or refactoring requirements/specifications/verifications, running impact/coverage analysis, and generating implementation tasks with full traceability.
+description: MBSE and requirements engineering workflow for Reqvire. Use when exploring a Reqvire model, adding or refactoring requirements/specifications/verifications, running impact/coverage analysis (verification and implementation), and generating implementation tasks with full traceability.
 ---
 
 # Reqvire System Engineering Skill
@@ -12,7 +12,7 @@ Use this skill for any requirements, specifications, verifications, or system-mo
 - Exploring and understanding existing Reqvire models
 - Adding features in MBSE order
 - Refactoring or consolidating requirements/specifications
-- Analyzing change impact and verification coverage
+- Analyzing change impact and coverage (verification and implementation)
 - Generating implementation tasks from model changes
 
 ## Core Rules
@@ -29,6 +29,12 @@ Use this skill for any requirements, specifications, verifications, or system-mo
    - `reqvire lint`
    - `reqvire coverage`
 5. Use `reqvire collect` when implementing or reviewing requirements with trace dependencies.
+6. Relation/type guardrails:
+   - `satisfiedBy`/`satisfy` are allowed on `requirement` and `test-verification`.
+   - `user-requirement` must not use `satisfiedBy`/`satisfy`.
+7. Coverage interpretation:
+   - Verification coverage is reported for leaf requirements (roll-up logic applies).
+   - Implementation coverage scope includes `requirement` elements only.
 
 ## Quick Start: Common Workflows
 
@@ -169,7 +175,7 @@ Expected after extraction:
 
 - `validate`: no parse/relation/type errors.
 - `lint`: no structural regressions introduced by split.
-- `coverage`: verification links remain intact (no new orphaning from content-only refactor).
+- `coverage`: verification and implementation coverage remain consistent after refactor.
 - `collect`: requirement chain includes the new refinement content needed for implementation/review.
 
 ### How Not To Do It

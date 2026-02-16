@@ -81,6 +81,10 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 - `refinedBy` must target a refinement element (by name/identifier).
 - Plain file-path targets are invalid for `refinedBy` (including `DesignDocuments/*.md` without `#fragment`).
 
+`satisfiedBy` / `satisfy` rule:
+- Allowed source/target model element types are `requirement` and `test-verification`.
+- `user-requirement` is not allowed to use `satisfiedBy`/`satisfy`.
+
 **For attaching:**
 - Internal file path (e.g., "docs/SLA.pdf")
 - Refinement element name (e.g., "Performance Constraint")

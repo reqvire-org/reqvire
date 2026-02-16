@@ -831,7 +831,7 @@ This test verifies that the system provides a unified `search` command functiona
 
 6. **Filter combinations**
    Combine multiple filters and verify outputs contain exactly those elements passing ALL filters:
-   - `--filter-type=user-requirement --have-relations=verifiedBy,satisfiedBy`
+   - `--filter-type=requirement --have-relations=verifiedBy,satisfiedBy`
    - `--filter-file="System*" --filter-name=".*GPS.*"`
    - `--filter-content="MUST" --not-have-relations=verifiedBy`
 

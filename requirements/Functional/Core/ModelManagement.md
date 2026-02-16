@@ -107,7 +107,6 @@ The system shall use the Git repository root as the project base for path resolu
   * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
   * refinedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
   * refinedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
-  * satisfiedBy: [git_commands.rs](../../../core/src/git_commands.rs)
   * verifiedBy: [Subdirectory Processing Verification](Verifications/ValidationVerifications.md#subdirectory-processing-verification)
 ---
 
@@ -147,9 +146,10 @@ The system shall define element type relation compatibility constraints.
   * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
 
 #### Relations
-  * derive: [Relation Element Type Validator](Validation.md#relation-element-type-validator)
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * refinedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 

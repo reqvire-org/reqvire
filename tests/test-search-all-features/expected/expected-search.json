@@ -56,13 +56,20 @@
           "identifier": "specifications/Requirements.md#requirement-with-valid-markdown-relations",
           "name": "Requirement with Valid Markdown Relations",
           "file": "specifications/Requirements.md",
-          "type": "user-requirement",
+          "type": "requirement",
           "content": "This requirement has valid relations to existing files, using markdown link format.",
           "relations": [
             {
               "relation_type": "derive",
               "target": {
                 "target": "specifications/Requirements.md#requirement-with-valid-standard-relations",
+                "type": "identifier"
+              }
+            },
+            {
+              "relation_type": "derivedFrom",
+              "target": {
+                "target": "specifications/Requirements.md#root-user-requirement",
                 "type": "identifier"
               }
             },
@@ -101,7 +108,7 @@
           "identifier": "specifications/Requirements.md#requirement-with-valid-standard-relations",
           "name": "Requirement with Valid Standard Relations",
           "file": "specifications/Requirements.md",
-          "type": "user-requirement",
+          "type": "requirement",
           "content": "This requirement has valid relations to existing files, using standard format.",
           "relations": [
             {
@@ -143,6 +150,23 @@
               "relation_type": "verifiedBy",
               "target": {
                 "target": "specifications/Requirements.md#verification-of-standard-relations",
+                "type": "identifier"
+              }
+            }
+          ],
+          "attachments": []
+        },
+        {
+          "identifier": "specifications/Requirements.md#root-user-requirement",
+          "name": "Root User Requirement",
+          "file": "specifications/Requirements.md",
+          "type": "user-requirement",
+          "content": "Top-level user requirement used as hierarchy parent for system requirements in this fixture.",
+          "relations": [
+            {
+              "relation_type": "derive",
+              "target": {
+                "target": "specifications/Requirements.md#requirement-with-valid-markdown-relations",
                 "type": "identifier"
               }
             }
@@ -199,15 +223,15 @@
         }
       ],
       "page_content": "This document contains correctly formatted relations to existing targets, to verify validation passes.\n\nThis is page frontmatter content that should appear in the summary.\n\n```mermaid\ngraph TD;\n    A[Start] --> B[Process];\n    B --> C[End];\n```\n\nAdditional page content to test mermaid diagram inclusion in page summaries.",
-      "total_elements": 7
+      "total_elements": 8
     }
   },
   "global_counters": {
-    "total_elements": 7,
+    "total_elements": 8,
     "total_files": 1,
     "total_requirements_types": {
-      "system-requirement": 1,
-      "user-requirement": 4
+      "system-requirement": 3,
+      "user-requirement": 3
     },
     "total_verifications_types": {
       "analysis-verification": 0,

@@ -14,7 +14,6 @@ The system shall define validation error reporting behavior.
   * derive: [Relation Type Validation](#relation-type-validation)
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
   * refinedBy: [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
-  * satisfiedBy: [error.rs](../../../core/src/error.rs)
 ---
 
 ### Relation Type Validation

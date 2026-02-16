@@ -139,146 +139,142 @@ Found 7 file(s) with formatting changes:
 
 
 📄 UserStories.md
-  01     # Elements
-  02
-  03     Personas:
+  001     # Elements
+  002
+  003     Personas:
 
-  05     2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
-  06     3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
-  07     4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
-  08 +   ### Details Block Formatting Test
-  09
-  10 -   ### Managing MBSE Models
-  10 +   Element with details block that should not be formatted.
-  11 +   <details>
-  12 +   <summary>Click to expand</summary>
-  13
-  14 -   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
-  14 +   #### This Should Not Get Blank Line
-  15 +   Content inside details block.
-  16 +   ####Another Header Without Space
-  17 +   More content that should remain untouched.
-  18 +   </details>
-  19
-  20     #### Metadata
-  21       * type: user-requirement
-  22 +   ---
-  23
-  24 +   ### Exact Blank Line Count Test
-  25 +   ␤
-  26 +   Test that exactly one blank line is added before Metadata when repositioned.
-  27 +   Content line 1.
-  28 +   Content line 2.
-  29 +   Content line 3.
-  30 +   ␤
-  31 +   #### Details
-  32 +   Detail content here.
-  33 +   ␤
-  34 +   #### Metadata
-  35 +     * type: test-verification
-  36 +     * status: implemented
-  37 +   ---
-  38 +   ␤
-  39 +   ### External URL Preservation Test
-  40 +   ␤
-  41 +   This element tests that external URLs in relations are preserved exactly as written.
-  42 +   ␤
-  43 +   #### Metadata
-  44 +     * type: user-requirement
-  45 +   ␤
-  46     #### Relations
-  47 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  47 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
-  47 +     * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
-  48 +   ---
-  49
-  50     ### Generate Diagrams
-  51 +   ␤
-  52     As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
-  53
-  54     #### Metadata
-  55       * type: user-requirement
-  56
-  57     #### Relations
-  58 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  58 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  59 +   ---
-  60
-  61 -   ---
-  61 +   ### Managing MBSE Models
-  62
-  63 -   ### Missing Blank Line Test
-  63 -   This element has content but no blank line before metadata.
-  63 +   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
-  64 +   ␤
-  65     #### Metadata
-  66       * type: user-requirement
-  67 +   #### Relations
-  68 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
-  69 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  70     ---
-  71
-  72     ### Metadata Repositioning Test
-  73
-  74     Verify that metadata repositioning maintains blank line spacing.
-  75 -   #### Metadata
-  75 -     * type: verification
-  75 -     * status: implemented
-  75 -   ␤
-  75     #### Details
-  76 -   ␤
-  76     This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
-  77
-  78     ##### Acceptance Criteria
-  79 -   ␤
-  79       * [ ] Metadata is moved to end position
-  80       * [ ] Blank line exists before metadata after repositioning
-  81       * [ ] Content structure is preserved
-  82 -   ---
-  82 -   ␤
-  82 -   ### Details Block Formatting Test
-  82 -   ␤
-  82 -   Element with details block that should not be formatted.
-  82 -   <details>
-  82 -   <summary>Click to expand</summary>
-  82 -   ␤
-  82 -   #### This Should Not Get Blank Line
-  82 -   Content inside details block.
-  82 -   ####Another Header Without Space
-  82 -   More content that should remain untouched.
-  82 -   </details>
-  82     #### Metadata
-  83 -     * type: user-requirement
-  83 -   ␤
-  83 -   ---
-  83 -   ␤
-  83 -   ### Exact Blank Line Count Test
-  83 -   ␤
-  83 -   Test that exactly one blank line is added before Metadata when repositioned.
-  83 -   Content line 1.
-  83 -   Content line 2.
-  83 -   Content line 3.
-  83 -   #### Metadata
-  83 -     * type: verification
-  83 +     * type: test-verification
-  84       * status: implemented
-  85 -   #### Details
-  85 -   Detail content here.
-  85 -   ␤
-  85     ---
-  86 -   ### External URL Preservation Test
-  86 +   ### Missing Blank Line Test
-  87
-  88 -   This element tests that external URLs in relations are preserved exactly as written.
-  88 +   This element has content but no blank line before metadata.
-  89
-  90     #### Metadata
-  91       * type: user-requirement
-  92 -   ␤
-  92 -   #### Relations
-  92 -     * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
-  92 -   ␤
-  92     ---
+  005     2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
+  006     3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
+  007     4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  008 +   ### Details Block Formatting Test
+  009
+  010 -   ### Managing MBSE Models
+  010 +   Element with details block that should not be formatted.
+  011 +   <details>
+  012 +   <summary>Click to expand</summary>
+  013
+  014 -   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
+  014 +   #### This Should Not Get Blank Line
+  015 +   Content inside details block.
+  016 +   ####Another Header Without Space
+  017 +   More content that should remain untouched.
+  018 +   </details>
+  019
+  020     #### Metadata
+  021       * type: user-requirement
+  022 +   ---
+  023
+  024 -   #### Relations
+  024 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  024 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
+  024 +   ### Exact Blank Line Count Test
+  025
+  026 +   Test that exactly one blank line is added before Metadata when repositioned.
+  027 +   Content line 1.
+  028 +   Content line 2.
+  029 +   Content line 3.
+  030 +   ␤
+  031 +   #### Details
+  032 +   Detail content here.
+  033 +   ␤
+  034 +   #### Metadata
+  035 +     * type: test-verification
+  036 +     * status: implemented
+  037 +   ---
+  038 +   ␤
+  039     ### Generate Diagrams
+  040 +   ␤
+  041     As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+  042
+  043     #### Metadata
+  044       * type: user-requirement
+  045
+  046     #### Relations
+  047 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  047 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  048 +   ---
+  049
+  050 -   ---
+  050 +   ### Managing MBSE Models
+  051
+  052 -   ### Missing Blank Line Test
+  052 -   This element has content but no blank line before metadata.
+  052 +   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
+  053 +   ␤
+  054     #### Metadata
+  055       * type: user-requirement
+  056 +   #### Relations
+  057 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  058 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  059     ---
+  060
+  061     ### Metadata Repositioning Test
+  062
+  063     Verify that metadata repositioning maintains blank line spacing.
+  064 -   #### Metadata
+  064 -     * type: verification
+  064 -     * status: implemented
+  064 -   ␤
+  064     #### Details
+  065 -   ␤
+  065     This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+  066
+  067     ##### Acceptance Criteria
+  068 -   ␤
+  068       * [ ] Metadata is moved to end position
+  069       * [ ] Blank line exists before metadata after repositioning
+  070       * [ ] Content structure is preserved
+  071 +   #### Metadata
+  072 +     * type: test-verification
+  073 +     * status: implemented
+  074     ---
+  075 -   ### Details Block Formatting Test
+  075 +   ### Missing Blank Line Test
+  076
+  077 -   Element with details block that should not be formatted.
+  077 -   <details>
+  077 -   <summary>Click to expand</summary>
+  077 +   This element has content but no blank line before metadata.
+  078
+  079 -   #### This Should Not Get Blank Line
+  079 -   Content inside details block.
+  079 -   ####Another Header Without Space
+  079 -   More content that should remain untouched.
+  079 -   </details>
+  079     #### Metadata
+  080       * type: user-requirement
+  081 -   ␤
+  081     ---
+  082 -   ### Exact Blank Line Count Test
+  082 -   ␤
+  082 -   Test that exactly one blank line is added before Metadata when repositioned.
+  082 -   Content line 1.
+  082 -   Content line 2.
+  082 -   Content line 3.
+  082 -   #### Metadata
+  082 -     * type: verification
+  082 -     * status: implemented
+  082 -   #### Details
+  082 -   Detail content here.
+  082 -   ␤
+  082 -   ---
+  082 -   ␤
+  082     ### Root User Requirement
+  083
+  084     Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+  085
+  086     #### Metadata
+  087       * type: user-requirement
+  088 -   ␤
+  088     ---
+  089
+  090     ### External URL Preservation Test
+
+  097     #### Relations
+  098       * derivedFrom: [Root User Requirement](#root-user-requirement)
+  099       * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
+  100 -   ␤
+  100     ---
 
 
 

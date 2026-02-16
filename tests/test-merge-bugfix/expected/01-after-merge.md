@@ -24,7 +24,7 @@ Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
 
 Commands:
   search            Search and filter model elements
-  coverage          Generate verification coverage report
+  coverage          Generate verification and implementation coverage report
   help              Print help for commands
 
 Options:

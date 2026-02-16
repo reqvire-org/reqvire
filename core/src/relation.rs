@@ -371,7 +371,7 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// - derivedFrom/derive: Only requirement types (requirement, user-requirement) can use these
 /// - verifiedBy: Source must be requirement, target must be verification
 /// - verify: Source must be verification, target must be requirement
-/// - satisfiedBy: Source must be requirement or test-verification, target must be file (implementation)
+/// - satisfiedBy: Source must be system requirement (requirement) or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
 /// - refinedBy: Source must be requirement, target must be refinement element
 /// - refine: Source must be refinement element, target must be requirement
@@ -419,11 +419,11 @@ pub fn validate_relation_element_types(
             matches!(target_type, ElementType::Requirement(_))
         },
         "satisfiedBy" => {
-            // Source must be requirement or test-verification
+            // Source must be system requirement or test-verification
             // Target must be a file (implementation) - refinement types use refinedBy instead
             // Note: non-test-verification satisfiedBy is checked separately in graph_registry
             let source_valid = match source_type {
-                ElementType::Requirement(_) => true,
+                ElementType::Requirement(crate::element::RequirementType::System) => true,
                 ElementType::Verification(vtype) => {
                     matches!(vtype, crate::element::VerificationType::Default | crate::element::VerificationType::Test)
                 },
@@ -434,11 +434,11 @@ pub fn validate_relation_element_types(
             source_valid && target_valid
         },
         "satisfy" => {
-            // Source should be a file/implementation, target should be a requirement or test-verification
+            // Source should be a file/implementation, target should be a system requirement or test-verification
             // Refinement elements use refine instead of satisfy
             let source_valid = matches!(source_type, ElementType::File | ElementType::Other(_));
             let target_valid = match target_type {
-                ElementType::Requirement(_) => true,
+                ElementType::Requirement(crate::element::RequirementType::System) => true,
                 ElementType::Verification(vtype) => {
                     matches!(vtype, crate::element::VerificationType::Default | crate::element::VerificationType::Test)
                 },
@@ -475,8 +475,8 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "derive" => Some("'derive' can only be used between requirement types (requirement, user-requirement)".to_string()),
         "verifiedBy" => Some("'verifiedBy' should connect a requirement to a verification element".to_string()),
         "verify" => Some("'verify' should connect a verification element to a requirement".to_string()),
-        "satisfiedBy" => Some("'satisfiedBy' should connect a requirement or test-verification to an implementation file".to_string()),
-        "satisfy" => Some("'satisfy' should connect an implementation file to a requirement or test-verification".to_string()),
+        "satisfiedBy" => Some("'satisfiedBy' should connect a system requirement ('requirement') or test-verification to an implementation file; user-requirement is not allowed".to_string()),
+        "satisfy" => Some("'satisfy' should connect an implementation file to a system requirement ('requirement') or test-verification; user-requirement is not allowed".to_string()),
         "refinedBy" => Some("'refinedBy' should connect a requirement to a refinement element (constraint, behavior, specification)".to_string()),
         "refine" => Some("'refine' should connect a refinement element to a requirement".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),

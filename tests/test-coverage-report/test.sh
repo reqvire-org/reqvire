@@ -147,6 +147,47 @@ if ! echo "$OUTPUT" | jq '.summary | has("verification_types")' | grep -q true; 
     exit 1
 fi
 
+# Check summary structure - Implementation Coverage
+if ! echo "$OUTPUT" | jq '.summary | has("total_requirements_in_scope")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'total_requirements_in_scope'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary | has("covered_requirements")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'covered_requirements'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary | has("uncovered_requirements")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'uncovered_requirements'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary | has("implementation_coverage_percentage")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'implementation_coverage_percentage'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary | has("coverage_sources")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'coverage_sources'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("direct_satisfied")' | grep -q true; then
+    echo "❌ FAILED: JSON summary coverage_sources missing 'direct_satisfied'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("refinement_contract_satisfied_via_attachment")' | grep -q true; then
+    echo "❌ FAILED: JSON summary coverage_sources missing 'refinement_contract_satisfied_via_attachment'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("refinement_contract_satisfied_via_child")' | grep -q true; then
+    echo "❌ FAILED: JSON summary coverage_sources missing 'refinement_contract_satisfied_via_child'"
+    exit 1
+fi
+
 # Check verification_types structure
 if ! echo "$OUTPUT" | jq '.summary.verification_types | has("test")' | grep -q true; then
     echo "❌ FAILED: JSON verification_types missing 'test'"
@@ -186,6 +227,16 @@ fi
 
 if ! echo "$OUTPUT" | jq '.unsatisfied_test_verifications | has("files")' | grep -q true; then
     echo "❌ FAILED: JSON unsatisfied_test_verifications missing 'files'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.covered_requirements | has("files")' | grep -q true; then
+    echo "❌ FAILED: JSON covered_requirements missing 'files'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.uncovered_requirements | has("files")' | grep -q true; then
+    echo "❌ FAILED: JSON uncovered_requirements missing 'files'"
     exit 1
 fi
 

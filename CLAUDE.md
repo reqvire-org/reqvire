@@ -11,7 +11,7 @@ Reqvire is an AI-driven framework for system modeling and requirements managemen
 2. **Verifications**: Define how the feature will be verified before implementation
 3. **Tests**: Create tests to satisfy verifications (can be refined during implementation if needed)
 4. **Implementation**: Only after requirements and verifications are defined, implement the code
-5. **Satisfaction Links**: Link implementation to requirements via satisfiedBy relations
+5. **Satisfaction Links**: Link implementation to `requirement` elements (and test-verifications) via satisfiedBy relations
 
 **Never skip the requirements step.** Implementation without requirements violates the MBSE methodology and project principles.
 
@@ -114,7 +114,7 @@ cli/src/
 
 ### Architecture Principles
 - Follow the requirements and architecture defined in requirements/
-- Link code and implementations to requirements via satisfiedBy on requirement level
+- Link code and implementations via satisfiedBy only on `requirement` (system) and `test-verification` elements
 - Use Result with custom error types for error handling
 - Document all public APIs with rustdoc
 - Organize code in modules by functionality

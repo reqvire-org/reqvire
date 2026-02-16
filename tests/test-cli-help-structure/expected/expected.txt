@@ -10,7 +10,7 @@ Commands:
   search            Search and filter model elements with comprehensive filtering options
   change-impact     Analyze change impact and provide report
   traces            Generate verification traces showing upward paths from verifications to root requirements
-  coverage          Generate verification coverage report for leaf requirements
+  coverage          Generate verification and implementation coverage report
   model             Generate model-centric structure with nested relations
   lint              Analyze model quality and detect issues in requirements relations
   add               Add new element to model from Markdown definition

@@ -11,7 +11,7 @@ This is a valid requirement.
   * type: user-requirement
 
 #### Relations
-  * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
+  * trace: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
 

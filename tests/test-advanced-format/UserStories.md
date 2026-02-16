@@ -86,14 +86,24 @@ Detail content here.
 
 ---
 
+### Root User Requirement
+
+Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+
+#### Metadata
+  * type: user-requirement
+
+---
+
 ### External URL Preservation Test
 
 This element tests that external URLs in relations are preserved exactly as written.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
+  * derivedFrom: [Root User Requirement](#root-user-requirement)
   * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
 
 ---

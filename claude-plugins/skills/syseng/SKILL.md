@@ -32,7 +32,7 @@ CRITICAL PATH REQUIREMENT:
 - Customer needs - What end users need from the system
 - Compliance needs - GDPR, security audits, regulatory
 
-**System Requirements** (`type: system-requirement`) - Technical implementation:
+**System Requirements** (`type: requirement`) - Technical implementation:
 - Functional, Performance, Interface, Security, Reliability, Operational
 
 ### Refinements
@@ -51,9 +51,10 @@ CRITICAL PATH REQUIREMENT:
 
 ## Relation Types
 
-**`satisfiedBy`** - Requirement is satisfied by code implementations:
-- Code implementations - Source code that implements the requirement
-- Design documents - DD.md files with architectural details
+**`satisfiedBy`** - Requirement/test-verification is satisfied by implementation artifacts:
+- Allowed source types: `requirement`, `test-verification`
+- Not allowed on `user-requirement`
+- Typical targets: source code, tests, scripts, URLs
 
 **`refinedBy`** - Requirement is refined by refinement elements:
 - Specification elements - Detailed definitions in the model
@@ -81,7 +82,7 @@ CRITICAL PATH REQUIREMENT:
 ```
 User Requirement (Stakeholder Need)
     ↓ derive
-System Requirement (Technical Implementation)
+Requirement (Technical Implementation)
     ↓ refinedBy              ↓ satisfiedBy        ↓ verifiedBy
 Refinement Elements      Code Implementation   Verification Element
 (Spec/Constraint/Behavior)                         ↓ satisfiedBy (for test type)
@@ -146,6 +147,7 @@ Refinements are owned via `refinedBy` on the requirement (refinement gets auto-g
 4. Validate after each significant change
 5. When reading requirements, always check for **attachments** (documents, diagrams, images)
 6. Use `reqvire collect` to gather full context from requirement chains (ancestors or descendants + attachments)
+7. Implementation coverage (`reqvire coverage`) applies to `requirement` elements only (not `user-requirement`).
 
 Use `reqvire collect` to gather complete context for a requirement:
 
@@ -356,7 +358,7 @@ reqvire search --short --json | jq '.summary'
 
 # Find elements by type
 reqvire search --filter-type="requirement" --short
-reqvire search --filter-type="user-requirement,system-requirement" --short
+reqvire search --filter-type="user-requirement,requirement" --short
 
 # Find elements by name pattern
 reqvire search --filter-name=".*Auth.*" --short
@@ -423,7 +425,7 @@ reqvire lint --fixable        # Show auto-fixable issues
 reqvire lint --auditable      # Show manual review items
 reqvire lint --fix            # Apply automatic fixes
 
-# Check verification coverage
+# Check coverage (verification + implementation)
 reqvire coverage
 reqvire coverage --json
 
@@ -577,7 +579,7 @@ reqvire serve --host 0.0.0.0 --port 3000
 - Share model documentation with stakeholders
 - Review model structure in browser
 - Navigate traceability interactively
-- Present verification coverage
+- Present coverage summary (verification + implementation)
 
 ## Task Routing: When to Use Reference Files
 
@@ -640,7 +642,7 @@ reqvire search --filter-name=".*Authentication.*" --short
 
 # By type
 reqvire search --filter-type="user-requirement" --short
-reqvire search --filter-type="system-requirement" --short
+reqvire search --filter-type="requirement" --short
 
 # By content
 reqvire search --filter-content="SHALL.*validate" --short
@@ -659,7 +661,7 @@ reqvire add requirements/File.md <<'EOF'
 The system shall provide the required capability.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Parent Requirement](path.md#parent)

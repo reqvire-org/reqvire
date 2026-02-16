@@ -571,8 +571,8 @@ impl GraphRegistry {
                         }
                     }
                     _ => {
-                        // Requirements and other elements can have satisfiedBy relations
-                        // This is valid behavior
+                        // Requirement-type compatibility (including user-requirement restriction)
+                        // is validated by relation element-type checks.
                     }
                 }
             }

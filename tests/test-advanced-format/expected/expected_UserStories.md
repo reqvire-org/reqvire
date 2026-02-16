@@ -37,17 +37,6 @@ Detail content here.
   * status: implemented
 ---
 
-### External URL Preservation Test
-
-This element tests that external URLs in relations are preserved exactly as written.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
----
-
 ### Generate Diagrams
 
 As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
@@ -94,4 +83,24 @@ This element has content but no blank line before metadata.
 
 #### Metadata
   * type: user-requirement
+---
+
+### Root User Requirement
+
+Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### External URL Preservation Test
+
+This element tests that external URLs in relations are preserved exactly as written.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Root User Requirement](#root-user-requirement)
+  * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
 ---

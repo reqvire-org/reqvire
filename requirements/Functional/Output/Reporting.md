@@ -16,6 +16,7 @@ When requested the system shall provide human readable and machine readable Syst
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
   * derive: [Provide Validation Reports](#provide-validation-reports)
   * derive: [Resources Report](#resources-report)
+  * derive: [Requirement Implementation Coverage Report](#requirement-implementation-coverage-report)
   * derive: [Verification Coverage Report](#verification-coverage-report)
   * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
   * refinedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
@@ -79,7 +80,6 @@ Implementation details shall follow the associated refinement specifications.
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
   * refinedBy: [ContainmentView](DesignDocuments/ContainmentView.md#containmentview)
   * refinedBy: [Containment View Report Refinement Specification](Specifications.md#containment-view-report-refinement-specification)
-  * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
   * verifiedBy: [Containment View Design Documents Test](Verifications/ReportingVerifications.md#containment-view-design-documents-test)
 ---
 
@@ -270,7 +270,6 @@ The system shall provide a resources report showing all files referenced by the 
   * derive: [CLI Resources Command](../../Interfaces/CLI/Commands.md#cli-resources-command)
   * derivedFrom: [Model Reports](#model-reports)
   * refinedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
-  * satisfiedBy: [report_resources.rs](../../../core/src/report_resources.rs)
   * verifiedBy: [Resources Report Verification](Verifications/ReportingVerifications.md#resources-report-verification)
 ---
 
@@ -302,6 +301,35 @@ The report helps track verification completeness and identify gaps in requiremen
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
   * refinedBy: [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
+---
+
+### Requirement Implementation Coverage Report
+
+The system shall generate requirement implementation coverage reports that identify which requirements are implemented using direct `satisfiedBy` evidence and refinement-contract consumption evidence.
+
+#### Details
+The implementation coverage report shall provide:
+- Total count of requirements in scope (`requirement` only; excludes `user-requirement`)
+- Count and percentage of implementation-covered requirements
+- Count and percentage of implementation-uncovered requirements
+- Coverage source classification for covered requirements:
+  - direct `satisfiedBy` on the requirement
+  - refinement-contract coverage through owned refinement elements attached by directly satisfied requirements
+  - refinement-contract coverage when a requirement that owns refinement has directly satisfied derived descendants
+- Detailed lists grouped by file and section, including coverage source and evidence references
+- Output in both human-readable text and machine-readable JSON formats
+- Coverage percentages shall be reported with at most 2 decimal places
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+
+#### Relations
+  * derivedFrom: [Model Reports](#model-reports)
+  * refinedBy: [Requirement Implementation Coverage Logic Specification](Specifications.md#requirement-implementation-coverage-logic-specification)
+  * refinedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
+  * refinedBy: [Implementation Coverage Behavior](Behaviors.md#implementation-coverage-behavior)
   * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
 ---
 

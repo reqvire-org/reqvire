@@ -83,6 +83,13 @@ if ! echo "$OUTPUT_SATISFIEDBY" | grep -qi "satisfiedBy\|non-test-verification\|
   exit 1
 fi
 
+# Check user-requirement specific satisfiedBy restriction
+if ! echo "$OUTPUT_SATISFIEDBY" | grep -qi "user-requirement"; then
+  echo "FAILED: Expected error message mentioning user-requirement satisfiedBy restriction"
+  echo "Output: $OUTPUT_SATISFIEDBY"
+  exit 1
+fi
+
 # Test 4: Invalid verifiedBy cases should fail
 echo "Test 4: Invalid verifiedBy/verify relations"
 

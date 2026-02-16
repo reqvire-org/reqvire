@@ -1,12 +1,12 @@
 ---
 allowed-tools: Read, Bash(reqvire:*)
-description: Analyze verification coverage and identify unverified requirements
+description: Analyze coverage (verification and implementation) and identify gaps
 model: claude-sonnet-4-5
 ---
 
-# Analyze Verification Coverage
+# Analyze Coverage
 
-Analyze verification coverage to identify gaps and unverified requirements.
+Analyze verification and implementation coverage to identify gaps.
 
 ## Current Coverage
 
@@ -14,6 +14,10 @@ Analyze verification coverage to identify gaps and unverified requirements.
 - Verified: !`reqvire coverage --json | jq -r '.summary.verified_leaf_requirements'`
 - Coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
 - Unverified: !`reqvire coverage --json | jq -r '.summary.unverified_leaf_requirements'`
+- Implementation scope: !`reqvire coverage --json | jq -r '.summary.total_requirements_in_scope'`
+- Implementation covered: !`reqvire coverage --json | jq -r '.summary.covered_requirements'`
+- Implementation uncovered: !`reqvire coverage --json | jq -r '.summary.uncovered_requirements'`
+- Implementation coverage: !`reqvire coverage --json | jq -r '.summary.implementation_coverage_percentage'`%
 
 ## Steps
 
@@ -24,9 +28,10 @@ Analyze verification coverage to identify gaps and unverified requirements.
    ```
 
 2. **Analyze coverage statistics:**
-   - Extract total requirements count
+   - Extract total leaf requirements count (verification scope)
    - Calculate verification percentage
    - Identify unverified requirements count
+   - Extract implementation scope count (`requirement` elements only; excludes `user-requirement`)
 
 3. **Identify unverified leaf requirements:**
 
@@ -64,6 +69,7 @@ Analyze verification coverage to identify gaps and unverified requirements.
 
 6. **Provide recommendations:**
    - List leaf requirements needing verifications
+   - List implementation-uncovered `requirement` elements for `satisfiedBy` planning
    - Suggest using `/add-verification` for each
    - Explain which parents are OK (inherit from children)
 
@@ -71,5 +77,6 @@ Analyze verification coverage to identify gaps and unverified requirements.
 
 - Focus on leaf requirements for verification
 - Parent requirements inherit coverage from children
+- Implementation coverage does not include `user-requirement`
 - Use `/add-verification` to create missing verifications
 - Run `reqvire coverage` after adding verifications to confirm improvement

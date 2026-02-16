@@ -193,7 +193,7 @@ The validator enforces the constraints defined in the [Element Type Relation Com
 
 - For `derivedFrom`/`derive` relations, validate that both source and target are requirement types (`requirement` or `user-requirement`)
 - For `verifiedBy`/`verify` relations, validate that one endpoint is a requirement element and the other is a verification element
-- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a requirement or test-verification element and the other is an implementation element
+- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a system requirement (`requirement`) or test-verification element and the other is an implementation element; `user-requirement` shall not use `satisfiedBy`/`satisfy`
 - For `refinedBy`, require identifier targets that resolve to refinement elements (constraint, behavior, specification)
 - For `refinedBy`, reject plain file-path targets (InternalPath), including `# Documents` file links without element fragments
 - For verification elements with `satisfiedBy` relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)

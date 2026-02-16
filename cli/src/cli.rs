@@ -204,9 +204,9 @@ pub enum Commands {
         filter_type: Option<String>,
     },
 
-    /// Generate verification coverage report for leaf requirements
+    /// Generate verification and implementation coverage report
     #[clap(
-        override_help = "Generate verification coverage report for leaf requirements\n\nCOVERAGE OPTIONS:\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
+        override_help = "Generate verification and implementation coverage report\n\nCOVERAGE OPTIONS:\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)"
     )]
     Coverage {
         /// Output results in JSON format

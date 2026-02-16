@@ -129,8 +129,8 @@ This section defines which element types can use which relation types as source 
 |---------------|---------------------|---------------------|-------|
 | **derivedFrom** | requirement, user-requirement | requirement, user-requirement | Hierarchical requirement decomposition only |
 | **derive** | requirement, user-requirement | requirement, user-requirement | Inverse of derivedFrom |
-| **satisfiedBy** | requirement, user-requirement, test-verification | InternalPath (files) | Requirements/tests link to implementations |
-| **satisfy** | InternalPath (files) | requirement, user-requirement, test-verification | Inverse of satisfiedBy (auto-generated) |
+| **satisfiedBy** | requirement, test-verification | InternalPath (files) | System requirements/tests link to implementations |
+| **satisfy** | InternalPath (files) | requirement, test-verification | Inverse of satisfiedBy (auto-generated) |
 | **refinedBy** | requirement, user-requirement | refinement types | Requirements link to refinement elements (including elements defined in `# Documents` files via identifier links) |
 | **refine** | refinement types | requirement, user-requirement | Inverse of refinedBy (auto-generated) |
 | **verifiedBy** | requirement, user-requirement | All verification types | Requirements link to verifications |
@@ -142,7 +142,7 @@ This section defines which element types can use which relation types as source 
 | Element Type | Can Use as Source | Can Be Target Of |
 |--------------|-------------------|------------------|
 | **requirement** | derivedFrom, derive, satisfiedBy, refinedBy, verifiedBy, trace | derivedFrom, derive, satisfy, refine, verify, trace |
-| **user-requirement** | derivedFrom, derive, satisfiedBy, refinedBy, verifiedBy, trace | derivedFrom, derive, satisfy, refine, verify, trace |
+| **user-requirement** | derivedFrom, derive, refinedBy, verifiedBy, trace | derivedFrom, derive, refine, verify, trace |
 | **test-verification** | verify, satisfiedBy, trace | verifiedBy, satisfy, trace |
 | **analysis-verification** | verify, trace | verifiedBy, trace |
 | **inspection-verification** | verify, trace | verifiedBy, trace |
@@ -158,7 +158,7 @@ This section defines which element types can use which relation types as source 
 
 2. **Refinement types can only have refine relations**: Elements of type `constraint`, `behavior`, and `specification` can only use `refine` relations to link to the requirement they refine. Each refinement can only be owned by one requirement. They can also be referenced via the Attachments subsection of other elements.
 
-3. **satisfiedBy/satisfy restricted to implementations**: `satisfiedBy` links requirements to implementation files (code). Refinement elements are not valid targets for `satisfiedBy`; use `refinedBy` instead.
+3. **satisfiedBy/satisfy restricted to implementable elements**: `satisfiedBy` links system requirements (`requirement`) and test verifications to implementation files (code). `user-requirement` elements are not valid sources/targets for satisfaction relations. Refinement elements are not valid targets for `satisfiedBy`; use `refinedBy` instead.
 
 4. **test-verification special case**: Among verification types, only `test-verification` can use `satisfiedBy` relations (to link to test implementations). Other verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
 

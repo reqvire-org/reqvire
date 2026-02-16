@@ -5,7 +5,7 @@
 This element has the same target in both Relations and Attachments, which is a validation error.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Attachments
   * [Refinement Element](Requirements.md#refinement-element)
@@ -13,4 +13,3 @@ This element has the same target in both Relations and Attachments, which is a v
 #### Relations
   * satisfiedBy: [Refinement Element](Requirements.md#refinement-element)
 ---
-
