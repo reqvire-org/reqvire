@@ -18,6 +18,7 @@ This documentation is for those who want to contribute to Reqvire's development:
 - **[Contributing Guide](./CONTRIBUTING.md)** - How to contribute code, tests, and documentation
 - **[Code of Conduct](./code_of_conduct.md)** - Our community standards
 - **[Contributor License Agreement](./CLA.md)** - Legal terms for contributions
+- **[Codex Skills](./CODEX_SKILLS.md)** - Reqvire Codex skill package and global installation
 - **[Release Process](./RELEASE.md)** - How releases are created
 - **[Development Guide](../CLAUDE.md)** - Technical architecture and development workflow
 

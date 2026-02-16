@@ -22,9 +22,9 @@
 
 It unifies system modeling, requirements management, context engineering and AI-assisted development into a single workflow—providing complete traceability, intelligent automation, and faster delivery while staying fully aligned with your codebase.
 
-#### 🤖 Now Available for Claude Code
+#### 🤖 Now Available for Coding Assistants
 
-Use Reqvire inside Claude Code with specialized commands and AI-assisted engineering tools: **[Install and get started →](#installation)**
+Use Reqvire with coding assistants through Claude Code plugin workflows and Codex skills: **[Install and get started →](#installation)**
 
 ---
 
@@ -72,7 +72,9 @@ curl -fsSL https://raw.githubusercontent.com/reqvire-org/reqvire/main/scripts/in
 
 For detailed CLI installation options, see the [Installation Guide](https://www.reqvire.org/user_guide#installation).
 
-#### Installing the Claude Code Plugin
+#### Installing Assistant Integrations
+
+##### Claude Code Plugin
 
 Before installing the plugin, ensure you have:
 1. **Claude Code** installed (available at [claude.com/claude-code](https://claude.com/claude-code))
@@ -92,7 +94,19 @@ The Reqvire plugin is available through the reqvire-org marketplace for Claude C
 
 3. Restart Claude Code to activate the plugin
 
-To read more about plugin usage see the [Claude Plugin](https://www.reqvire.org/claude_plugin.html).
+To read more about assistant integrations, see [Coding Assistants](https://www.reqvire.org/coding_assistants.html).
+
+#### Codex Skill (Reqvire SysEng)
+
+This repository also includes a Codex skill package at `codex-skills/reqvire-syseng`.
+
+To install it globally on your machine (`$CODEX_HOME/skills`), run:
+
+```bash
+./scripts/install-codex-skill.sh
+```
+
+See [doc/CODEX_SKILLS.md](./doc/CODEX_SKILLS.md) for details.
 
 ### Next Steps
 
