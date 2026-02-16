@@ -91,8 +91,9 @@ Refinement Elements      Code Implementation   Verification Element
 ## Document Structure
 
 **File Header**:
-- All specification files must begin with `# Elements` as the first level-1 heading
-- Files without this header can be used as attachment documents
+- Supported model files begin with either `# Elements` (multi-element) or `# Documents` (single-element)
+- In `# Documents`, the first non-reserved `## <Element Name>` section defines the element identifier fragment
+- Files without a supported first heading can still be used as attachment documents
 
 **Elements** (`###` headers):
 - Must have unique names within each file
@@ -312,7 +313,7 @@ After correct extraction:
 
 ### Goal
 
-Normalize design document ownership so each design/refinement document is owned by exactly one requirement via `refinedBy`, while other requirements consume it through attachments.
+Normalize design document ownership so each design/refinement document element is owned by exactly one requirement via `refinedBy` (identifier target), while other requirements consume it through attachments.
 
 ### Mandatory Boundary Clarification (Human Checkpoint)
 
@@ -326,7 +327,7 @@ Confirm before bulk edits:
 
 1. Enumerate all references to `DesignDocuments/*.md`.
 2. Select a single owner requirement for each document by semantic/derivation fit.
-3. Convert owner requirement link to `refinedBy` file relation.
+3. Convert owner requirement link to `refinedBy` using document element identifier (`DesignDocuments/File.md#element-fragment`), not a plain file path.
 4. Keep all non-owner references as attachments.
 5. Verify no design document has multiple owner requirements.
 6. Run `reqvire validate`, `reqvire lint`, `reqvire coverage --json`.
@@ -334,7 +335,7 @@ Confirm before bulk edits:
 ### Example Report Expectations
 
 - `validate` passes with no relation/type errors.
-- `collect` on owner requirement includes the design document as part of refinement context.
+- `collect` on owner requirement includes the owned design document element as part of refinement context.
 - `change-impact` captures downstream impact via owner+attachment chain when the design doc changes.
 
 ### How Not To Do It
@@ -765,4 +766,3 @@ reqvire format --fix      # Apply formatting
 - `reqvire traces` - Verify verification traceability
 - `reqvire model` - Confirm hierarchy structure
 - `reqvire containment` - Check physical organization
-

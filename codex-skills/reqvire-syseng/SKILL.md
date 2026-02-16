@@ -190,7 +190,7 @@ Expected after extraction:
 
 ### Goal
 
-Assign each design/refinement document to a single owning requirement via `refinedBy`, and keep all other consumers as `Attachments`.
+Assign each design/refinement document element to a single owning requirement via `refinedBy` (identifier target), and keep all other consumers as `Attachments`.
 
 ### Mandatory Boundary Clarification (Human Checkpoint)
 
@@ -204,7 +204,7 @@ Before bulk normalization, confirm:
 
 1. Inventory all `DesignDocuments/*.md` references.
 2. For each document, pick one owning requirement based on derivation/semantic proximity.
-3. Convert owner link from attachment to `refinedBy` (file target).
+3. Convert owner link from attachment to `refinedBy` using the document element identifier (`DesignDocuments/File.md#element-fragment`), not a plain file path.
 4. Keep non-owner references as attachments.
 5. Validate one-owner rule (no second `refinedBy` owner for same file).
 6. Run:
@@ -215,7 +215,7 @@ Before bulk normalization, confirm:
 ### Example Report Expectations
 
 - `validate` passes with no relation/type violations.
-- `collect` on owner requirement includes the design document through refinement ownership.
+- `collect` on owner requirement includes the design document element through refinement ownership.
 - `change-impact` includes consumers when owned design contract changes and is attached downstream.
 
 ### How Not To Do It

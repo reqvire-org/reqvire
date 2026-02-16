@@ -77,6 +77,10 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 - Internal file path (e.g., "src/impl.rs")
 - External URL (e.g., "https://example.com/spec.html")
 
+`refinedBy` rule:
+- `refinedBy` must target a refinement element (by name/identifier).
+- Plain file-path targets are invalid for `refinedBy` (including `DesignDocuments/*.md` without `#fragment`).
+
 **For attaching:**
 - Internal file path (e.g., "docs/SLA.pdf")
 - Refinement element name (e.g., "Performance Constraint")
