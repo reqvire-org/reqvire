@@ -1,19 +1,18 @@
 use anyhow::Result;
 
-use log::debug;
-use crate::graph_registry::GraphRegistry;
 use crate::error::ReqvireError;
 use crate::filesystem;
+use crate::graph_registry::GraphRegistry;
+use log::debug;
 
-use crate::utils;
 use crate::parser;
+use crate::utils;
 use globset::GlobSet;
 
 #[derive(Debug)]
 pub struct ModelManager {
     /// In-memory graph registry of elements and relations
     pub graph_registry: GraphRegistry,
-
 }
 
 impl Default for ModelManager {
@@ -30,11 +29,10 @@ impl ModelManager {
         }
     }
 
-
     pub fn parse_and_validate(
         &mut self,
         git_commit_hash: Option<&str>,
-        excluded_filename_patterns: &GlobSet
+        excluded_filename_patterns: &GlobSet,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
         self.parse_and_validate_with_mode(git_commit_hash, excluded_filename_patterns, false)
     }
@@ -43,19 +41,25 @@ impl ModelManager {
         &mut self,
         git_commit_hash: Option<&str>,
         excluded_filename_patterns: &GlobSet,
-        lenient: bool
+        lenient: bool,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
-        debug!("Starting two-pass validation architecture (lenient={})", lenient);
+        debug!(
+            "Starting two-pass validation architecture (lenient={})",
+            lenient
+        );
+        // Reset state so repeated parse/validate calls always start from a clean model.
+        self.graph_registry = GraphRegistry::new();
 
         // Pass 1: Element collection with local validation
-        let pass1_errors = self.pass1_collect_elements(
-            git_commit_hash,
-            excluded_filename_patterns
-        )?;
+        let pass1_errors =
+            self.pass1_collect_elements(git_commit_hash, excluded_filename_patterns)?;
 
         // If Pass 1 has errors, return them as an error (unless lenient mode)
         if !pass1_errors.is_empty() {
-            debug!("Pass 1 validation failed with {} errors", pass1_errors.len());
+            debug!(
+                "Pass 1 validation failed with {} errors",
+                pass1_errors.len()
+            );
             if !lenient {
                 return Err(ReqvireError::ValidationError(pass1_errors));
             }
@@ -69,7 +73,10 @@ impl ModelManager {
 
         // If Pass 2 has errors, return them as an error (unless lenient mode)
         if !pass2_errors.is_empty() {
-            debug!("Pass 2 validation failed with {} errors", pass2_errors.len());
+            debug!(
+                "Pass 2 validation failed with {} errors",
+                pass2_errors.len()
+            );
             if !lenient {
                 return Err(ReqvireError::ValidationError(pass2_errors));
             }
@@ -84,7 +91,7 @@ impl ModelManager {
     fn pass1_collect_elements(
         &mut self,
         git_commit_hash: Option<&str>,
-        excluded_filename_patterns: &GlobSet
+        excluded_filename_patterns: &GlobSet,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
         let mut errors = Vec::new();
 
@@ -101,34 +108,36 @@ impl ModelManager {
                 Ok((path, file_name, file_content)) => {
                     debug!("Pass 1: Processing file: {}", file_name);
 
-                    let relative_path_str = utils::get_relative_path(&path)?.to_string_lossy().to_string();
+                    let relative_path_str = utils::get_relative_path(&path)?
+                        .to_string_lossy()
+                        .to_string();
 
                     // Parse Elements and page content
-                    let (elements, parse_errors, page_content) = parser::parse_elements(
-                        &file_name,
-                        &file_content,
-                        &path,
-                        git_commit_hash,
-                    );
+                    let (elements, parse_errors, page_content) =
+                        parser::parse_elements(&file_name, &file_content, &path, git_commit_hash);
 
                     // Collect parse-time errors
                     errors.extend(parse_errors);
 
                     // Register page content
-                    self.graph_registry.register_page(relative_path_str.clone(), page_content);
+                    self.graph_registry
+                        .register_page(relative_path_str.clone(), page_content);
 
                     // Track element locations for global uniqueness checking
                     for element in &elements {
                         all_element_locations.push((
                             element.name.clone(),
                             element.file_path.clone(),
-                            element.line_number
+                            element.line_number,
                         ));
                     }
 
                     // Register parsed elements with local validation
                     for element in elements {
-                        if let Err(e) = self.graph_registry.register_element(element, &relative_path_str) {
+                        if let Err(e) = self
+                            .graph_registry
+                            .register_element(element, &relative_path_str)
+                        {
                             errors.push(e);
                         }
                     }
@@ -137,7 +146,8 @@ impl ModelManager {
         }
 
         // Global uniqueness validation: Check for duplicate element names across all files
-        let mut name_locations: std::collections::HashMap<String, Vec<(String, usize)>> = std::collections::HashMap::new();
+        let mut name_locations: std::collections::HashMap<String, Vec<(String, usize)>> =
+            std::collections::HashMap::new();
 
         for (name, file_path, line_number) in all_element_locations {
             name_locations
@@ -151,9 +161,7 @@ impl ModelManager {
             if locations.len() > 1 {
                 // Sort locations for consistent error messages
                 let mut sorted_locations = locations.clone();
-                sorted_locations.sort_by(|a, b| {
-                    a.0.cmp(&b.0).then(a.1.cmp(&b.1))
-                });
+                sorted_locations.sort_by(|a, b| a.0.cmp(&b.0).then(a.1.cmp(&b.1)));
 
                 // For each duplicate after the first, report it with both locations
                 for i in 1..sorted_locations.len() {
@@ -176,13 +184,13 @@ impl ModelManager {
     /// Pass 2: Build relations and validate graph structure
     fn pass2_build_relations(
         &mut self,
-        excluded_filename_patterns: &GlobSet
+        excluded_filename_patterns: &GlobSet,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Pass 2: Delegating to GraphRegistry for relation building and validation");
-        self.graph_registry.build_relations(excluded_filename_patterns)
+        self.graph_registry
+            .build_relations(excluded_filename_patterns)
     }
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -214,8 +222,3 @@ mod tests {
         assert_eq!(frag, Some("onlyfragment"));
     }
 }
-
-
-
-
-

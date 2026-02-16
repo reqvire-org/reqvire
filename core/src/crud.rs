@@ -2,11 +2,54 @@
 // This module contains all business logic for Create, Read, Update, Delete operations
 // CLI should only parse arguments and call these functions
 
+use crate::diff::{generate_crud_diffs, generate_file_diff, CrudOperation, CrudResult, FileDiff};
 use crate::error::ReqvireError;
 use crate::model::ModelManager;
-use crate::diff::{CrudResult, CrudOperation, generate_crud_diffs, generate_file_diff};
 use globset::GlobSet;
+use std::collections::HashSet;
 use std::path::Path;
+
+fn snapshot_modified_files(model_manager: &ModelManager) -> HashSet<String> {
+    model_manager
+        .graph_registry
+        .modified_files
+        .iter()
+        .cloned()
+        .collect()
+}
+
+fn collect_new_modified_files(
+    model_manager: &ModelManager,
+    before: &HashSet<String>,
+) -> Vec<String> {
+    let mut modified_files: Vec<String> = model_manager
+        .graph_registry
+        .modified_files
+        .iter()
+        .filter(|f| !before.contains(*f))
+        .cloned()
+        .collect();
+    modified_files.sort();
+    modified_files
+}
+
+fn finalize_crud_operation(
+    model_manager: &mut ModelManager,
+    modified_before: &HashSet<String>,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<Vec<FileDiff>, ReqvireError> {
+    let modified_files = collect_new_modified_files(model_manager, modified_before);
+    let diffs = generate_crud_diffs(&model_manager.graph_registry, &modified_files, git_root)?;
+
+    if !dry_run {
+        model_manager
+            .graph_registry
+            .flush_modified_files(git_root)?;
+    }
+
+    Ok(diffs)
+}
 
 /// Add a new element to the model
 ///
@@ -39,10 +82,7 @@ pub fn add_element(
 
     // Track which files were modified before the operation
     // IMPORTANT: Must track BEFORE any modifications (including override removal)
-    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .cloned()
-        .collect();
+    let modified_before = snapshot_modified_files(model_manager);
 
     // If override is requested, extract element name and remove existing element first
     if override_existing {
@@ -51,9 +91,14 @@ pub fn add_element(
 
         // Check if element exists and remove it
         // Validation is handled by remove_element_with_cleanup
-        if let Some(existing_element) = model_manager.graph_registry.get_element_by_name(&element_name) {
+        if let Some(existing_element) = model_manager
+            .graph_registry
+            .get_element_by_name(&element_name)
+        {
             let existing_id = existing_element.identifier.clone();
-            model_manager.graph_registry.remove_element_with_cleanup(&existing_id)?;
+            model_manager
+                .graph_registry
+                .remove_element_with_cleanup(&existing_id)?;
         }
     }
 
@@ -64,25 +109,7 @@ pub fn add_element(
         excluded_patterns,
     )?;
 
-    // Get list of newly modified files (sorted for deterministic output)
-    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .filter(|f| !modified_before.contains(f))
-        .cloned()
-        .collect();
-    modified_files.sort();
-
-    // Generate diffs for output
-    let diffs = generate_crud_diffs(
-        &model_manager.graph_registry,
-        &modified_files,
-        git_root,
-    )?;
-
-    // Flush changes if not dry-run
-    if !dry_run {
-        model_manager.graph_registry.flush_modified_files(git_root)?;
-    }
+    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
 
     // Create result structure
     let operation = if override_existing {
@@ -113,7 +140,7 @@ fn extract_element_name_from_markdown(markdown: &str) -> Result<String, ReqvireE
         }
     }
     Err(ReqvireError::InvalidMarkdownStructure(
-        "Could not find element name in markdown. Expected '### Element Name' pattern.".to_string()
+        "Could not find element name in markdown. Expected '### Element Name' pattern.".to_string(),
     ))
 }
 
@@ -131,41 +158,24 @@ pub fn remove_element(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     // Get element name before removal (needed for result structure)
-    let element_name = model_manager.graph_registry.nodes
+    let element_name = model_manager
+        .graph_registry
+        .nodes
         .get(element_id)
-        .ok_or_else(|| ReqvireError::MissingElement(
-            format!("Element not found: {}", element_id)
-        ))?
-        .element.name.clone();
+        .ok_or_else(|| ReqvireError::MissingElement(format!("Element not found: {}", element_id)))?
+        .element
+        .name
+        .clone();
 
     // Track which files were modified before the operation
-    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .cloned()
-        .collect();
+    let modified_before = snapshot_modified_files(model_manager);
 
     // Remove element using core business logic (includes orphan validation)
-    let _affected_files = model_manager.graph_registry.remove_element_with_cleanup(element_id)?;
+    let _affected_files = model_manager
+        .graph_registry
+        .remove_element_with_cleanup(element_id)?;
 
-    // Get list of newly modified files (sorted for deterministic output)
-    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .filter(|f| !modified_before.contains(f))
-        .cloned()
-        .collect();
-    modified_files.sort();
-
-    // Generate diffs for output
-    let diffs = generate_crud_diffs(
-        &model_manager.graph_registry,
-        &modified_files,
-        git_root,
-    )?;
-
-    // Flush changes if not dry-run
-    if !dry_run {
-        model_manager.graph_registry.flush_modified_files(git_root)?;
-    }
+    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
 
     // Create result structure
     Ok(CrudResult {
@@ -204,17 +214,17 @@ pub fn move_element(
         .to_string();
 
     // Get element info before move
-    let element = model_manager.graph_registry.nodes.get(element_id)
-        .ok_or_else(|| ReqvireError::MissingElement(
-            format!("Element not found: {}", element_id)
-        ))?;
+    let element = model_manager
+        .graph_registry
+        .nodes
+        .get(element_id)
+        .ok_or_else(|| {
+            ReqvireError::MissingElement(format!("Element not found: {}", element_id))
+        })?;
     let element_name = element.element.name.clone();
 
     // Track which files were modified before the operation
-    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .cloned()
-        .collect();
+    let modified_before = snapshot_modified_files(model_manager);
 
     // Move element using core business logic
     let (new_id, _affected_files) = model_manager.graph_registry.move_element_comprehensive(
@@ -223,25 +233,7 @@ pub fn move_element(
         excluded_patterns,
     )?;
 
-    // Get list of newly modified files (sorted for deterministic output)
-    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .filter(|f| !modified_before.contains(f))
-        .cloned()
-        .collect();
-    modified_files.sort();
-
-    // Generate diffs for output
-    let diffs = generate_crud_diffs(
-        &model_manager.graph_registry,
-        &modified_files,
-        git_root,
-    )?;
-
-    // Flush changes if not dry-run
-    if !dry_run {
-        model_manager.graph_registry.flush_modified_files(git_root)?;
-    }
+    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
 
     // Create result structure
     Ok(CrudResult {
@@ -269,43 +261,24 @@ pub fn rename_element(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     // Get element info before rename
-    let element = model_manager.graph_registry.nodes.get(element_id)
-        .ok_or_else(|| ReqvireError::MissingElement(
-            format!("Element not found: {}", element_id)
-        ))?;
+    let element = model_manager
+        .graph_registry
+        .nodes
+        .get(element_id)
+        .ok_or_else(|| {
+            ReqvireError::MissingElement(format!("Element not found: {}", element_id))
+        })?;
     let old_name = element.element.name.clone();
 
     // Track which files were modified before the operation
-    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .cloned()
-        .collect();
+    let modified_before = snapshot_modified_files(model_manager);
 
     // Rename element using core business logic
-    let new_id = model_manager.graph_registry.rename_element(
-        element_id,
-        new_name,
-    )?;
+    let new_id = model_manager
+        .graph_registry
+        .rename_element(element_id, new_name)?;
 
-    // Get list of newly modified files (sorted for deterministic output)
-    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .filter(|f| !modified_before.contains(f))
-        .cloned()
-        .collect();
-    modified_files.sort();
-
-    // Generate diffs for output
-    let diffs = generate_crud_diffs(
-        &model_manager.graph_registry,
-        &modified_files,
-        git_root,
-    )?;
-
-    // Flush changes if not dry-run
-    if !dry_run {
-        model_manager.graph_registry.flush_modified_files(git_root)?;
-    }
+    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
 
     // Create result structure showing the rename
     Ok(CrudResult {
@@ -340,10 +313,7 @@ pub fn move_file(
         .to_string();
 
     // Track which files were modified before the operation
-    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .cloned()
-        .collect();
+    let modified_before = snapshot_modified_files(model_manager);
 
     // Move file using core business logic
     let identifier_mappings = model_manager.graph_registry.move_file(
@@ -352,36 +322,20 @@ pub fn move_file(
         squash,
     )?;
 
-    // Get list of newly modified files (sorted for deterministic output)
-    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .filter(|f| !modified_before.contains(f))
-        .cloned()
-        .collect();
-    modified_files.sort();
+    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
 
-    // Generate diffs for output
-    let diffs = generate_crud_diffs(
-        &model_manager.graph_registry,
-        &modified_files,
-        git_root,
-    )?;
-
-    // Flush changes if not dry-run
     if !dry_run {
-        model_manager.graph_registry.flush_modified_files(git_root)?;
-
         // Delete the source file from disk
         let source_path = git_root.join(&source_file_normalized);
         if source_path.exists() {
-            std::fs::remove_file(&source_path)
-                .map_err(ReqvireError::IoError)?;
+            std::fs::remove_file(&source_path).map_err(ReqvireError::IoError)?;
         }
     }
 
     // Create summary of moved elements
     let element_count = identifier_mappings.len();
-    let element_name = format!("{} element{} from {} → {}",
+    let element_name = format!(
+        "{} element{} from {} → {}",
         element_count,
         if element_count == 1 { "" } else { "s" },
         source_file,
@@ -416,35 +370,43 @@ pub fn attach(
     use std::path::PathBuf;
 
     // Find the element by name
-    let element = model_manager.graph_registry.get_element_by_name(element_name)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Element '{}' not found", element_name)
-        ))?;
+    let element = model_manager
+        .graph_registry
+        .get_element_by_name(element_name)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!("Element '{}' not found", element_name))
+        })?;
 
     let element_id = element.identifier.clone();
     let file_path = element.file_path.clone();
 
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
-    let content = fs::read_to_string(&absolute_file_path)
-        .map_err(ReqvireError::IoError)?;
+    let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
     // Check if attachment already exists - return error
-    if element.attachments.iter().any(|a| a.target.as_str() == attachment_path) {
-        return Err(ReqvireError::ElementError(
-            format!("Attachment '{}' already exists on '{}'", attachment_path, element_name)
-        ));
+    if element
+        .attachments
+        .iter()
+        .any(|a| a.target.as_str() == attachment_path)
+    {
+        return Err(ReqvireError::ElementError(format!(
+            "Attachment '{}' already exists on '{}'",
+            attachment_path, element_name
+        )));
     }
 
     // Check for cross-section duplicate: target already exists in Relations
-    let in_relations = element.relations.iter().any(|r| {
-        r.target.link.as_str() == attachment_path
-    });
+    let in_relations = element
+        .relations
+        .iter()
+        .any(|r| r.target.link.as_str() == attachment_path);
 
     if in_relations {
-        return Err(ReqvireError::CrossSectionDuplicate(
-            format!("Target '{}' already exists in Relations of '{}'. Cannot add to Attachments.", attachment_path, element_name)
-        ));
+        return Err(ReqvireError::CrossSectionDuplicate(format!(
+            "Target '{}' already exists in Relations of '{}'. Cannot add to Attachments.",
+            attachment_path, element_name
+        )));
     }
 
     // Calculate file-relative path for the attachment link in markdown
@@ -462,11 +424,13 @@ pub fn attach(
 
     // Write to file if not dry run
     if !dry_run {
-        fs::write(&absolute_file_path, &new_content)
-            .map_err(ReqvireError::IoError)?;
+        fs::write(&absolute_file_path, &new_content).map_err(ReqvireError::IoError)?;
 
         // Mark file as modified for re-parsing
-        model_manager.graph_registry.modified_files.insert(file_path.clone());
+        model_manager
+            .graph_registry
+            .modified_files
+            .insert(file_path.clone());
     }
 
     Ok(CrudResult {
@@ -490,18 +454,19 @@ pub fn detach(
     use std::path::PathBuf;
 
     // Find the element by name
-    let element = model_manager.graph_registry.get_element_by_name(element_name)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Element '{}' not found", element_name)
-        ))?;
+    let element = model_manager
+        .graph_registry
+        .get_element_by_name(element_name)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!("Element '{}' not found", element_name))
+        })?;
 
     let element_id = element.identifier.clone();
     let file_path = element.file_path.clone();
 
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
-    let content = fs::read_to_string(&absolute_file_path)
-        .map_err(ReqvireError::IoError)?;
+    let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
     // Calculate file-relative path for finding the attachment link in markdown
     let file_dir = crate::utils::get_parent_dir(&file_path);
@@ -511,18 +476,21 @@ pub fn detach(
     let relative_attachment_str = relative_attachment_path.to_string_lossy();
 
     // Remove attachment from element
-    let new_content = remove_attachment_from_element(&content, element_name, &relative_attachment_str)?;
+    let new_content =
+        remove_attachment_from_element(&content, element_name, &relative_attachment_str)?;
 
     // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
 
     // Write to file if not dry run
     if !dry_run {
-        fs::write(&absolute_file_path, &new_content)
-            .map_err(ReqvireError::IoError)?;
+        fs::write(&absolute_file_path, &new_content).map_err(ReqvireError::IoError)?;
 
         // Mark file as modified for re-parsing
-        model_manager.graph_registry.modified_files.insert(file_path.clone());
+        model_manager
+            .graph_registry
+            .modified_files
+            .insert(file_path.clone());
     }
 
     Ok(CrudResult {
@@ -552,10 +520,12 @@ pub fn attach_element(
     use std::fs;
 
     // Find the target element by name (the element to attach TO)
-    let target_element = model_manager.graph_registry.get_element_by_name(element_name)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Element '{}' not found", element_name)
-        ))?;
+    let target_element = model_manager
+        .graph_registry
+        .get_element_by_name(element_name)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!("Element '{}' not found", element_name))
+        })?;
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
@@ -576,16 +546,24 @@ pub fn attach_element(
     let attachment_identifier = attachment_element.identifier.clone();
 
     // Check 1: Satisfied Refinement Constraint - refinement must have a refine relation
-    if !model_manager.graph_registry.refinement_has_refine_relation(&attachment_identifier) {
+    if !model_manager
+        .graph_registry
+        .refinement_has_refine_relation(&attachment_identifier)
+    {
         return Err(ReqvireError::InvalidAttachmentTarget(
             format!("'{}' has no refine relation. Refinements must refine a requirement before they can be attached.", attachment_element.name)
         ));
     }
 
     // Check 2: Hierarchical Independence Constraint - target element must not be in defining hierarchy
-    let defining_reqs = model_manager.graph_registry.get_defining_requirements(&attachment_identifier);
+    let defining_reqs = model_manager
+        .graph_registry
+        .get_defining_requirements(&attachment_identifier);
     for defining_req_id in defining_reqs {
-        if model_manager.graph_registry.is_in_hierarchy(&element_id, &defining_req_id) {
+        if model_manager
+            .graph_registry
+            .is_in_hierarchy(&element_id, &defining_req_id)
+        {
             return Err(ReqvireError::InvalidAttachmentScope(
                 format!("'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the refinedBy chain.", attachment_element.name, element_name)
             ));
@@ -594,27 +572,33 @@ pub fn attach_element(
     let attachment_display_name = attachment_element.name.clone();
 
     // Check if already attached - return error
-    if target_element.attachments.iter().any(|a| a.target.as_str() == attachment_identifier) {
-        return Err(ReqvireError::ElementError(
-            format!("Attachment '{}' already exists on '{}'", attachment_element_name, element_name)
-        ));
+    if target_element
+        .attachments
+        .iter()
+        .any(|a| a.target.as_str() == attachment_identifier)
+    {
+        return Err(ReqvireError::ElementError(format!(
+            "Attachment '{}' already exists on '{}'",
+            attachment_element_name, element_name
+        )));
     }
 
     // Check for cross-section duplicate: target already exists in Relations
-    let in_relations = target_element.relations.iter().any(|r| {
-        r.target.link.as_str() == attachment_identifier
-    });
+    let in_relations = target_element
+        .relations
+        .iter()
+        .any(|r| r.target.link.as_str() == attachment_identifier);
 
     if in_relations {
-        return Err(ReqvireError::CrossSectionDuplicate(
-            format!("Target '{}' already exists in Relations of '{}'. Cannot add to Attachments.", attachment_element_name, element_name)
-        ));
+        return Err(ReqvireError::CrossSectionDuplicate(format!(
+            "Target '{}' already exists in Relations of '{}'. Cannot add to Attachments.",
+            attachment_element_name, element_name
+        )));
     }
 
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
-    let content = fs::read_to_string(&absolute_file_path)
-        .map_err(ReqvireError::IoError)?;
+    let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
     // Calculate relative identifier from target element's file to attachment element
     // If both elements are in the same file, use just #fragment format
@@ -627,36 +611,44 @@ pub fn attach_element(
     } else {
         // Different files - calculate relative path
         let target_file_path_buf = std::path::PathBuf::from(&file_path);
-        let target_folder = target_file_path_buf.parent()
+        let target_folder = target_file_path_buf
+            .parent()
             .unwrap_or_else(|| std::path::Path::new("."))
             .to_path_buf();
 
-        crate::utils::to_relative_identifier(
-            &attachment_identifier,
-            &target_folder,
-            true
-        ).unwrap_or_else(|_| attachment_identifier.clone())
+        crate::utils::to_relative_identifier(&attachment_identifier, &target_folder, true)
+            .unwrap_or_else(|_| attachment_identifier.clone())
     };
 
     // Add element attachment to file
-    let new_content = add_element_attachment_to_element(&content, element_name, &attachment_display_name, &relative_identifier)?;
+    let new_content = add_element_attachment_to_element(
+        &content,
+        element_name,
+        &attachment_display_name,
+        &relative_identifier,
+    )?;
 
     // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
 
     // Write to file if not dry run
     if !dry_run {
-        fs::write(&absolute_file_path, &new_content)
-            .map_err(ReqvireError::IoError)?;
+        fs::write(&absolute_file_path, &new_content).map_err(ReqvireError::IoError)?;
 
         // Mark file as modified for re-parsing
-        model_manager.graph_registry.modified_files.insert(file_path.clone());
+        model_manager
+            .graph_registry
+            .modified_files
+            .insert(file_path.clone());
     }
 
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id,
-        element_name: format!("Attached element {} to {}", attachment_element_name, element_name),
+        element_name: format!(
+            "Attached element {} to {}",
+            attachment_element_name, element_name
+        ),
         diffs: vec![diff],
         dry_run,
     })
@@ -680,10 +672,12 @@ pub fn detach_element(
     use std::fs;
 
     // Find the target element by name
-    let target_element = model_manager.graph_registry.get_element_by_name(element_name)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Element '{}' not found", element_name)
-        ))?;
+    let target_element = model_manager
+        .graph_registry
+        .get_element_by_name(element_name)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!("Element '{}' not found", element_name))
+        })?;
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
@@ -699,40 +693,48 @@ pub fn detach_element(
 
     // Read current file content
     let absolute_file_path = git_root.join(&file_path);
-    let content = fs::read_to_string(&absolute_file_path)
-        .map_err(ReqvireError::IoError)?;
+    let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
     // Calculate relative identifier from target element's file to attachment element
     let target_file_path = std::path::PathBuf::from(&file_path);
-    let target_folder = target_file_path.parent()
+    let target_folder = target_file_path
+        .parent()
         .unwrap_or_else(|| std::path::Path::new("."))
         .to_path_buf();
 
-    let relative_identifier = crate::utils::to_relative_identifier(
-        &attachment_identifier,
-        &target_folder,
-        true
-    ).unwrap_or_else(|_| attachment_identifier.clone());
+    let relative_identifier =
+        crate::utils::to_relative_identifier(&attachment_identifier, &target_folder, true)
+            .unwrap_or_else(|_| attachment_identifier.clone());
 
     // Remove element attachment from file
-    let new_content = remove_element_attachment_from_element(&content, element_name, &attachment_display_name, &relative_identifier)?;
+    let new_content = remove_element_attachment_from_element(
+        &content,
+        element_name,
+        &attachment_display_name,
+        &relative_identifier,
+    )?;
 
     // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
 
     // Write to file if not dry run
     if !dry_run {
-        fs::write(&absolute_file_path, &new_content)
-            .map_err(ReqvireError::IoError)?;
+        fs::write(&absolute_file_path, &new_content).map_err(ReqvireError::IoError)?;
 
         // Mark file as modified for re-parsing
-        model_manager.graph_registry.modified_files.insert(file_path.clone());
+        model_manager
+            .graph_registry
+            .modified_files
+            .insert(file_path.clone());
     }
 
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id,
-        element_name: format!("Detached element {} from {}", attachment_element_name, element_name),
+        element_name: format!(
+            "Detached element {} from {}",
+            attachment_element_name, element_name
+        ),
         diffs: vec![diff],
         dry_run,
     })
@@ -746,8 +748,8 @@ pub fn mv_asset(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
     use crate::relation::LinkType;
+    use std::fs;
     use std::path::PathBuf;
 
     let old_path_buf = PathBuf::from(old_path);
@@ -780,9 +782,10 @@ pub fn mv_asset(
     }
 
     if affected_files.is_empty() {
-        return Err(ReqvireError::MissingAttachmentTarget(
-            format!("No elements reference file '{}'", old_path)
-        ));
+        return Err(ReqvireError::MissingAttachmentTarget(format!(
+            "No elements reference file '{}'",
+            old_path
+        )));
     }
 
     let mut all_diffs = vec![];
@@ -790,8 +793,7 @@ pub fn mv_asset(
     // Update references in each affected file
     for file_path in &affected_files {
         let absolute_file_path = git_root.join(file_path);
-        let content = fs::read_to_string(&absolute_file_path)
-            .map_err(ReqvireError::IoError)?;
+        let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
         let mut new_content = content.clone();
 
@@ -800,10 +802,10 @@ pub fn mv_asset(
         let file_dir = crate::utils::get_parent_dir(file_path);
 
         // Calculate old and new file-relative paths
-        let old_relative = pathdiff::diff_paths(&old_path_buf, &file_dir)
-            .unwrap_or_else(|| old_path_buf.clone());
-        let new_relative = pathdiff::diff_paths(new_path, &file_dir)
-            .unwrap_or_else(|| PathBuf::from(new_path));
+        let old_relative =
+            pathdiff::diff_paths(&old_path_buf, &file_dir).unwrap_or_else(|| old_path_buf.clone());
+        let new_relative =
+            pathdiff::diff_paths(new_path, &file_dir).unwrap_or_else(|| PathBuf::from(new_path));
 
         let old_relative_str = old_relative.to_string_lossy();
         let new_relative_str = new_relative.to_string_lossy();
@@ -824,10 +826,12 @@ pub fn mv_asset(
             all_diffs.push(diff);
 
             if !dry_run {
-                fs::write(&absolute_file_path, &new_content)
-                    .map_err(ReqvireError::IoError)?;
+                fs::write(&absolute_file_path, &new_content).map_err(ReqvireError::IoError)?;
 
-                model_manager.graph_registry.modified_files.insert(file_path.clone());
+                model_manager
+                    .graph_registry
+                    .modified_files
+                    .insert(file_path.clone());
             }
         }
     }
@@ -848,8 +852,14 @@ pub fn mv_asset(
     Ok(CrudResult {
         operation: CrudOperation::Move,
         element_id: old_path.to_string(),
-        element_name: format!("Moved {} → {} ({} attachment(s), {} relation(s) in {} file(s))",
-            old_path, new_path, attachment_count, relation_count, affected_files.len()),
+        element_name: format!(
+            "Moved {} → {} ({} attachment(s), {} relation(s) in {} file(s))",
+            old_path,
+            new_path,
+            attachment_count,
+            relation_count,
+            affected_files.len()
+        ),
         diffs: all_diffs,
         dry_run,
     })
@@ -862,8 +872,8 @@ pub fn rm_asset(
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
-    use std::fs;
     use crate::relation::LinkType;
+    use std::fs;
     use std::path::PathBuf;
 
     // Find all elements with this file as attachment OR as InternalPath relation target
@@ -899,8 +909,7 @@ pub fn rm_asset(
     // Remove references from each affected file
     for spec_file_path in &affected_files {
         let absolute_file_path = git_root.join(spec_file_path);
-        let content = fs::read_to_string(&absolute_file_path)
-            .map_err(ReqvireError::IoError)?;
+        let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
         // Paths in markdown are file-relative, calculate the relative path from this file
         let file_dir = crate::utils::get_parent_dir(spec_file_path);
@@ -919,10 +928,12 @@ pub fn rm_asset(
             all_diffs.push(diff);
 
             if !dry_run {
-                fs::write(&absolute_file_path, &new_content)
-                    .map_err(ReqvireError::IoError)?;
+                fs::write(&absolute_file_path, &new_content).map_err(ReqvireError::IoError)?;
 
-                model_manager.graph_registry.modified_files.insert(spec_file_path.clone());
+                model_manager
+                    .graph_registry
+                    .modified_files
+                    .insert(spec_file_path.clone());
             }
         }
     }
@@ -938,8 +949,13 @@ pub fn rm_asset(
     Ok(CrudResult {
         operation: CrudOperation::Remove,
         element_id: file_path_arg.to_string(),
-        element_name: format!("Removed {} ({} attachment(s), {} relation(s) from {} file(s))",
-            file_path_arg, attachment_count, relation_count, affected_files.len()),
+        element_name: format!(
+            "Removed {} ({} attachment(s), {} relation(s) from {} file(s))",
+            file_path_arg,
+            attachment_count,
+            relation_count,
+            affected_files.len()
+        ),
         diffs: all_diffs,
         dry_run,
     })
@@ -961,45 +977,50 @@ pub fn merge_elements(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     // Resolve target element by name
-    let target_element = model_manager.graph_registry.get_element_by_name(target_name)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Target element '{}' not found", target_name)
-        ))?;
+    let target_element = model_manager
+        .graph_registry
+        .get_element_by_name(target_name)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!("Target element '{}' not found", target_name))
+        })?;
     let target_id = target_element.identifier.clone();
 
     // Resolve all source elements (validation is done in graph_registry.merge_elements)
     let mut source_ids = Vec::new();
     for source_name in source_names {
-        let source_element = model_manager.graph_registry.get_element_by_name(source_name)
-            .ok_or_else(|| ReqvireError::ElementNotFound(
-                format!("Source element '{}' not found", source_name)
-            ))?;
+        let source_element = model_manager
+            .graph_registry
+            .get_element_by_name(source_name)
+            .ok_or_else(|| {
+                ReqvireError::ElementNotFound(format!("Source element '{}' not found", source_name))
+            })?;
 
         source_ids.push(source_element.identifier.clone());
     }
 
     // Track which files were modified before the operation
-    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .cloned()
-        .collect();
+    let modified_before = snapshot_modified_files(model_manager);
 
     // Capture BEFORE state: Get current in-memory content for files that will be modified
     // We need to do this BEFORE the merge to show proper diffs
     let target_file = target_element.file_path.clone();
-    let source_files: Vec<String> = source_ids.iter()
+    let source_files: Vec<String> = source_ids
+        .iter()
         .filter_map(|id| model_manager.graph_registry.get_element(id))
         .map(|el| el.file_path.clone())
         .collect();
 
-    let mut before_content: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+    let mut before_content: std::collections::HashMap<String, String> =
+        std::collections::HashMap::new();
     let grouped_before = model_manager.graph_registry.group_elements_by_location();
 
     // Capture content for target file
     if let Some(sections) = grouped_before.get(&target_file) {
         before_content.insert(
             target_file.clone(),
-            model_manager.graph_registry.generate_file_markdown(&target_file, sections, false)
+            model_manager
+                .graph_registry
+                .generate_file_markdown(&target_file, sections, false),
         );
     }
 
@@ -1009,32 +1030,37 @@ pub fn merge_elements(
             if let Some(sections) = grouped_before.get(source_file.as_str()) {
                 before_content.insert(
                     source_file.clone(),
-                    model_manager.graph_registry.generate_file_markdown(source_file, sections, false)
+                    model_manager.graph_registry.generate_file_markdown(
+                        source_file,
+                        sections,
+                        false,
+                    ),
                 );
             }
         }
     }
 
     // Perform the merge in graph_registry
-    model_manager.graph_registry.merge_elements(&target_id, &source_ids)?;
+    model_manager
+        .graph_registry
+        .merge_elements(&target_id, &source_ids)?;
 
-    // Get list of newly modified files (sorted for deterministic output)
-    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .filter(|f| !modified_before.contains(f))
-        .cloned()
-        .collect();
-    modified_files.sort();
+    let modified_files = collect_new_modified_files(model_manager, &modified_before);
 
     // Generate diffs for output using BEFORE vs AFTER in-memory state
     let mut diffs = Vec::new();
     let grouped_after = model_manager.graph_registry.group_elements_by_location();
 
     for file_path in &modified_files {
-        let before = before_content.get(file_path).map(|s| s.as_str()).unwrap_or("");
+        let before = before_content
+            .get(file_path)
+            .map(|s| s.as_str())
+            .unwrap_or("");
 
         let after = if let Some(sections) = grouped_after.get(file_path) {
-            model_manager.graph_registry.generate_file_markdown(file_path, sections, false)
+            model_manager
+                .graph_registry
+                .generate_file_markdown(file_path, sections, false)
         } else {
             String::new()
         };
@@ -1047,14 +1073,20 @@ pub fn merge_elements(
 
     // Flush changes if not dry-run
     if !dry_run {
-        model_manager.graph_registry.flush_modified_files(git_root)?;
+        model_manager
+            .graph_registry
+            .flush_modified_files(git_root)?;
     }
 
     // Create result structure
     Ok(CrudResult {
         operation: CrudOperation::Merge,
         element_id: target_id,
-        element_name: format!("Merged {} element(s) into '{}'", source_names.len(), target_name),
+        element_name: format!(
+            "Merged {} element(s) into '{}'",
+            source_names.len(),
+            target_name
+        ),
         diffs,
         dry_run,
     })
@@ -1116,7 +1148,11 @@ fn remove_relation_with_path(content: &str, path: &str) -> Result<String, Reqvir
 }
 
 // Helper function to add attachment to element in markdown content
-fn add_attachment_to_element(content: &str, element_name: &str, attachment_path: &str) -> Result<String, ReqvireError> {
+fn add_attachment_to_element(
+    content: &str,
+    element_name: &str,
+    attachment_path: &str,
+) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut inserted = false;
@@ -1141,7 +1177,10 @@ fn add_attachment_to_element(content: &str, element_name: &str, attachment_path:
             // Add the new attachment after existing ones
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
-                if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") || next_trimmed.is_empty() {
+                if next_trimmed.starts_with("* ")
+                    || next_trimmed.starts_with("- ")
+                    || next_trimmed.is_empty()
+                {
                     result.push_str(lines_iter.next().unwrap());
                     result.push('\n');
                 } else {
@@ -1170,16 +1209,21 @@ fn add_attachment_to_element(content: &str, element_name: &str, attachment_path:
     }
 
     if !inserted {
-        return Err(ReqvireError::ElementNotFound(
-            format!("Could not find element '{}' to add attachment", element_name)
-        ));
+        return Err(ReqvireError::ElementNotFound(format!(
+            "Could not find element '{}' to add attachment",
+            element_name
+        )));
     }
 
     Ok(result)
 }
 
 // Helper function to remove attachment from element in markdown content
-fn remove_attachment_from_element(content: &str, element_name: &str, attachment_path: &str) -> Result<String, ReqvireError> {
+fn remove_attachment_from_element(
+    content: &str,
+    element_name: &str,
+    attachment_path: &str,
+) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut in_attachments_section = false;
@@ -1210,13 +1254,17 @@ fn remove_attachment_from_element(content: &str, element_name: &str, attachment_
         }
 
         // Check for end of Attachments section (another h4 header or element separator)
-        if in_attachments_section && ((trimmed.starts_with("####") && trimmed != "#### Attachments") || trimmed == "---") {
+        if in_attachments_section
+            && ((trimmed.starts_with("####") && trimmed != "#### Attachments") || trimmed == "---")
+        {
             in_attachments_section = false;
         }
 
         // Skip the attachment line we want to remove
         if in_target_element && in_attachments_section {
-            if (trimmed.starts_with("* ") || trimmed.starts_with("- ")) && trimmed.contains(&attachment_link) {
+            if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
+                && trimmed.contains(&attachment_link)
+            {
                 removed = true;
                 continue; // Skip this line
             }
@@ -1238,7 +1286,12 @@ fn remove_attachment_from_element(content: &str, element_name: &str, attachment_
 }
 
 // Helper function to add element attachment (with display name) to element in markdown content
-fn add_element_attachment_to_element(content: &str, element_name: &str, display_name: &str, identifier: &str) -> Result<String, ReqvireError> {
+fn add_element_attachment_to_element(
+    content: &str,
+    element_name: &str,
+    display_name: &str,
+    identifier: &str,
+) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut inserted = false;
@@ -1264,7 +1317,10 @@ fn add_element_attachment_to_element(content: &str, element_name: &str, display_
             // Add the new attachment after existing ones
             while let Some(next_line) = lines_iter.peek() {
                 let next_trimmed = next_line.trim();
-                if next_trimmed.starts_with("* ") || next_trimmed.starts_with("- ") || next_trimmed.is_empty() {
+                if next_trimmed.starts_with("* ")
+                    || next_trimmed.starts_with("- ")
+                    || next_trimmed.is_empty()
+                {
                     result.push_str(lines_iter.next().unwrap());
                     result.push('\n');
                 } else {
@@ -1293,16 +1349,22 @@ fn add_element_attachment_to_element(content: &str, element_name: &str, display_
     }
 
     if !inserted {
-        return Err(ReqvireError::ElementNotFound(
-            format!("Could not find element '{}' to add attachment", element_name)
-        ));
+        return Err(ReqvireError::ElementNotFound(format!(
+            "Could not find element '{}' to add attachment",
+            element_name
+        )));
     }
 
     Ok(result)
 }
 
 // Helper function to remove element attachment from element in markdown content
-fn remove_element_attachment_from_element(content: &str, element_name: &str, display_name: &str, identifier: &str) -> Result<String, ReqvireError> {
+fn remove_element_attachment_from_element(
+    content: &str,
+    element_name: &str,
+    display_name: &str,
+    identifier: &str,
+) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let mut in_target_element = false;
     let mut in_attachments_section = false;
@@ -1333,14 +1395,18 @@ fn remove_element_attachment_from_element(content: &str, element_name: &str, dis
         }
 
         // Check for end of Attachments section
-        if in_attachments_section && ((trimmed.starts_with("####") && trimmed != "#### Attachments") || trimmed == "---") {
+        if in_attachments_section
+            && ((trimmed.starts_with("####") && trimmed != "#### Attachments") || trimmed == "---")
+        {
             in_attachments_section = false;
         }
 
         // Skip the attachment line we want to remove
         if in_target_element && in_attachments_section {
-            if (trimmed.starts_with("* ") || trimmed.starts_with("- ")) &&
-               (trimmed.contains(&attachment_link_by_id) || trimmed.contains(&attachment_link_full)) {
+            if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
+                && (trimmed.contains(&attachment_link_by_id)
+                    || trimmed.contains(&attachment_link_full))
+            {
                 removed = true;
                 continue; // Skip this line
             }
@@ -1362,7 +1428,10 @@ fn remove_element_attachment_from_element(content: &str, element_name: &str, dis
 }
 
 // Helper function to remove attachment from all elements in a file
-fn remove_attachment_from_file(content: &str, attachment_path: &str) -> Result<String, ReqvireError> {
+fn remove_attachment_from_file(
+    content: &str,
+    attachment_path: &str,
+) -> Result<String, ReqvireError> {
     let mut result = String::new();
     let attachment_link = format!("[{}]({})", attachment_path, attachment_path);
 
@@ -1370,7 +1439,9 @@ fn remove_attachment_from_file(content: &str, attachment_path: &str) -> Result<S
         let trimmed = line.trim();
 
         // Skip attachment lines matching our path
-        if (trimmed.starts_with("* ") || trimmed.starts_with("- ")) && trimmed.contains(&attachment_link) {
+        if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
+            && trimmed.contains(&attachment_link)
+        {
             continue; // Skip this line
         }
 
@@ -1501,44 +1572,29 @@ pub fn link(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     // Resolve source element by name
-    let source_element = model_manager.graph_registry.get_element_by_name(source)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Source element '{}' not found", source)
-        ))?;
+    let source_element = model_manager
+        .graph_registry
+        .get_element_by_name(source)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
+        })?;
 
     let source_id = source_element.identifier.clone();
     let source_name = source_element.name.clone();
 
     // Track which files were modified before the operation
-    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .cloned()
-        .collect();
+    let modified_before = snapshot_modified_files(model_manager);
 
     // Delegate to graph_registry (includes all validation and target resolution)
     // NOTE: This will mutate the in-memory graph even in dry-run mode
-    let _modified_file = model_manager.graph_registry
-        .add_element_relation_full(&source_id, target, relation_type, git_root)?;
-
-    // Get list of newly modified files (sorted for deterministic output)
-    let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
-        .iter()
-        .filter(|f| !modified_before.contains(f))
-        .cloned()
-        .collect();
-    modified_files.sort();
-
-    // Generate diffs for output
-    let diffs = generate_crud_diffs(
-        &model_manager.graph_registry,
-        &modified_files,
+    let _modified_file = model_manager.graph_registry.add_element_relation_full(
+        &source_id,
+        target,
+        relation_type,
         git_root,
     )?;
 
-    // Flush changes if not dry-run
-    if !dry_run {
-        model_manager.graph_registry.flush_modified_files(git_root)?;
-    }
+    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
 
     Ok(CrudResult {
         operation: CrudOperation::Update,
@@ -1567,40 +1623,38 @@ pub fn unlink(
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     // Resolve source element by name
-    let source_element = model_manager.graph_registry.get_element_by_name(source)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Source element '{}' not found", source)
-        ))?;
+    let source_element = model_manager
+        .graph_registry
+        .get_element_by_name(source)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
+        })?;
 
     let source_id = source_element.identifier.clone();
     let source_name = source_element.name.clone();
 
     // Track modified files before
-    let modified_before: Vec<String> = model_manager.graph_registry.modified_files
-        .iter().cloned().collect();
+    let modified_before = snapshot_modified_files(model_manager);
 
     // Try to remove relation via graph_registry
     // This handles element-to-element relations (NOT attachments)
-    match model_manager.graph_registry.remove_element_relation_full(&source_id, target)? {
+    match model_manager
+        .graph_registry
+        .remove_element_relation_full(&source_id, target)?
+    {
         Some((_modified_file, relation_type, target_display)) => {
             // Relation was found and removed
             // Get newly modified files
-            let mut modified_files: Vec<String> = model_manager.graph_registry.modified_files
-                .iter().filter(|f| !modified_before.contains(f)).cloned().collect();
-            modified_files.sort();
-
-            // Generate diffs
-            let diffs = generate_crud_diffs(&model_manager.graph_registry, &modified_files, git_root)?;
-
-            // Flush if not dry-run
-            if !dry_run {
-                model_manager.graph_registry.flush_modified_files(git_root)?;
-            }
+            let diffs =
+                finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
 
             Ok(CrudResult {
                 operation: CrudOperation::Update,
                 element_id: source_id,
-                element_name: format!("Unlinked {} {} {}", source_name, relation_type, target_display),
+                element_name: format!(
+                    "Unlinked {} {} {}",
+                    source_name, relation_type, target_display
+                ),
                 diffs,
                 dry_run,
             })
@@ -1608,17 +1662,20 @@ pub fn unlink(
         None => {
             // No relation found - check if it's an attachment instead
             // Get fresh source element (in case graph was modified)
-            let source_element = model_manager.graph_registry.get_element_by_name(source)
-                .ok_or_else(|| ReqvireError::ElementNotFound(
-                    format!("Source element '{}' not found", source)
-                ))?;
+            let source_element = model_manager
+                .graph_registry
+                .get_element_by_name(source)
+                .ok_or_else(|| {
+                    ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
+                })?;
 
             // Check if target is an element attachment
             if let Some(target_element) = model_manager.graph_registry.get_element_by_name(target) {
                 let target_id = &target_element.identifier;
-                let attachment_match = source_element.attachments.iter().find(|a| {
-                    a.target.as_str() == target_id.as_str()
-                });
+                let attachment_match = source_element
+                    .attachments
+                    .iter()
+                    .find(|a| a.target.as_str() == target_id.as_str());
 
                 if attachment_match.is_some() {
                     return detach_element(model_manager, source, target, git_root, dry_run);
@@ -1635,18 +1692,20 @@ pub fn unlink(
             }
 
             // Check attachments by path string (even if file doesn't exist anymore)
-            let attachment_by_path = source_element.attachments.iter().find(|a| {
-                a.target.as_str() == target || a.target.as_str().ends_with(target)
-            });
+            let attachment_by_path = source_element
+                .attachments
+                .iter()
+                .find(|a| a.target.as_str() == target || a.target.as_str().ends_with(target));
 
             if attachment_by_path.is_some() {
                 return detach(model_manager, source, target, git_root, dry_run);
             }
 
             // Nothing found
-            Err(ReqvireError::RelationError(
-                format!("No relation or attachment found from '{}' to '{}'", source, target)
-            ))
+            Err(ReqvireError::RelationError(format!(
+                "No relation or attachment found from '{}' to '{}'",
+                source, target
+            )))
         }
     }
 }

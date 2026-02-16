@@ -35,7 +35,10 @@ globset = { workspace = true }
 ignore = "0.4"
 
 # HTTP server
-tiny_http = { workspace = true }
+tokio = { workspace = true }
+axum = { workspace = true }
+tower-http = { workspace = true }
+percent-encoding = { workspace = true }
 
 [dev-dependencies]
 assert_fs = { workspace = true }

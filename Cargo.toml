@@ -37,6 +37,10 @@ rustc-hash = "2.1"
 difference = "2.0"
 reqvire = { path = "core" }
 tiny_http = "0.12"
+tokio = { version = "1.48", features = ["macros", "rt-multi-thread", "signal", "net", "fs", "sync"] }
+axum = "0.8.4"
+tower-http = { version = "0.6.6", features = ["fs"] }
+percent-encoding = "2.3"
 
 
 # dev dependencies
@@ -44,4 +48,3 @@ assert_fs   = "1.0"
 predicates  = "3.0"
 tempfile    = "3.8"
 serial_test = "3.2"
-

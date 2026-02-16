@@ -1,23 +1,23 @@
-use std::collections::{HashMap, BTreeSet, HashSet, BTreeMap};
+use log::{debug, warn};
+use serde::Serialize;
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
-use log::{debug, warn};
-use serde::Serialize;
 
-use crate::Relation;
-use crate::relation::{self, LinkType, get_hierarchical_relation_types, IMPACT_PROPAGATION_RELATIONS, SATISFACTION_RELATIONS, REFINEMENT_RELATIONS};
 use crate::element::{Element, ElementType, RequirementType};
 use crate::error::ReqvireError;
 use crate::git_commands;
+use crate::relation::{
+    self, get_hierarchical_relation_types, LinkType, IMPACT_PROPAGATION_RELATIONS,
+    REFINEMENT_RELATIONS, SATISFACTION_RELATIONS,
+};
+use crate::Relation;
 use globset::GlobSet;
 use regex::Regex;
 
 /// Cached regex for matching .md file references in relation targets
-static MD_FILE_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"\.md(?:#|$)").unwrap()
-});
-
+static MD_FILE_RE: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"\.md(?:#|$)").unwrap());
 
 #[derive(Debug, Clone, Serialize)]
 pub struct Page {
@@ -31,7 +31,6 @@ impl Page {
         }
     }
 }
-
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RelationNode {
@@ -74,22 +73,32 @@ impl GraphRegistry {
     }
 
     /// Registers an element with local validation
-    pub fn register_element(&mut self, element: Element, _file_path: &str) -> Result<(), ReqvireError> {
+    pub fn register_element(
+        &mut self,
+        element: Element,
+        _file_path: &str,
+    ) -> Result<(), ReqvireError> {
         let element_id = element.identifier.clone();
 
         // Note: Duplicate checking is now done at global level in ModelManager::pass1_collect_elements
         // to properly report all duplicate locations
 
-        self.nodes.insert(element_id, ElementNode {
-            element,
-            relations: Vec::new(),
-        });
+        self.nodes.insert(
+            element_id,
+            ElementNode {
+                element,
+                relations: Vec::new(),
+            },
+        );
 
         Ok(())
     }
 
     /// Build relations and validate graph structure
-    pub fn build_relations(&mut self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqvireError>, ReqvireError> {
+    pub fn build_relations(
+        &mut self,
+        excluded_filename_patterns: &GlobSet,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("GraphRegistry: Building relations and validating graph structure");
 
         // First build the relation graph
@@ -137,7 +146,9 @@ impl GraphRegistry {
             let element = &node.element;
 
             // Collect all relation targets (normalized identifiers)
-            let relation_targets: std::collections::HashSet<String> = element.relations.iter()
+            let relation_targets: std::collections::HashSet<String> = element
+                .relations
+                .iter()
                 .filter(|r| r.user_created)
                 .map(|r| r.target.link.as_str().to_string())
                 .collect();
@@ -169,7 +180,9 @@ impl GraphRegistry {
                 for relation in &source_node.element.relations {
                     if let LinkType::Identifier(ref target_id) = relation.target.link {
                         // Only handle relations that propagate impact
-                        if relation::IMPACT_PROPAGATION_RELATIONS.contains(&relation.relation_type.name) {
+                        if relation::IMPACT_PROPAGATION_RELATIONS
+                            .contains(&relation.relation_type.name)
+                        {
                             if let Some(target_node) = self.nodes.get(target_id) {
                                 relation_nodes.push(RelationNode {
                                     relation_trigger: relation.relation_type.name.to_string(),
@@ -195,8 +208,12 @@ impl GraphRegistry {
         for source_id in &element_ids {
             if let Some(source_node) = self.nodes.get(source_id) {
                 for relation in &source_node.element.relations {
-                    if let crate::relation::LinkType::Identifier(ref target_id) = relation.target.link {
-                        if !MD_FILE_RE.is_match(target_id) || excluded_filename_patterns.is_match(target_id) {
+                    if let crate::relation::LinkType::Identifier(ref target_id) =
+                        relation.target.link
+                    {
+                        if !MD_FILE_RE.is_match(target_id)
+                            || excluded_filename_patterns.is_match(target_id)
+                        {
                             continue;
                         }
 
@@ -208,9 +225,11 @@ impl GraphRegistry {
                                 });
 
                                 if !already_present {
-                                    if let Some(opposite_relation) =
-                                        relation.to_opposite(&source_node.element.name, &source_node.element.identifier, &source_node.element.id)
-                                    {
+                                    if let Some(opposite_relation) = relation.to_opposite(
+                                        &source_node.element.name,
+                                        &source_node.element.identifier,
+                                        &source_node.element.id,
+                                    ) {
                                         to_add.push((target_id.clone(), opposite_relation));
                                     }
                                 }
@@ -268,7 +287,9 @@ impl GraphRegistry {
         }
 
         // Create opposite relation using existing to_opposite() method
-        if let Some(opposite_relation) = relation.to_opposite(source_name, source_id, source_element_id) {
+        if let Some(opposite_relation) =
+            relation.to_opposite(source_name, source_id, source_element_id)
+        {
             // Add opposite to target element
             if let Some(target_node) = self.nodes.get_mut(target_id) {
                 target_node.element.relations.push(opposite_relation);
@@ -298,9 +319,9 @@ impl GraphRegistry {
         if let Some(target_node) = self.nodes.get(target_id) {
             // Check if target has user_created opposite (written to file)
             let had_user_created_opposite = target_node.element.relations.iter().any(|r| {
-                r.user_created &&
-                r.relation_type.name == opposite_type_name &&
-                r.target.link.as_str() == source_id
+                r.user_created
+                    && r.relation_type.name == opposite_type_name
+                    && r.target.link.as_str() == source_id
             });
 
             let target_file_path = target_node.element.file_path.clone();
@@ -308,8 +329,7 @@ impl GraphRegistry {
             // Remove opposite relation (both user_created and auto-generated)
             let target_node = self.nodes.get_mut(target_id).unwrap();
             target_node.element.relations.retain(|r| {
-                !(r.relation_type.name == opposite_type_name &&
-                  r.target.link.as_str() == source_id)
+                !(r.relation_type.name == opposite_type_name && r.target.link.as_str() == source_id)
             });
 
             // Mark file as modified only if opposite was user_created
@@ -327,24 +347,24 @@ impl GraphRegistry {
     /// # Arguments
     /// * `old_id` - Old full identifier of the moved element
     /// * `new_id` - New full identifier of the moved element
-    fn recreate_opposites_after_move(
-        &mut self,
-        old_id: &str,
-        new_id: &str,
-    ) {
+    fn recreate_opposites_after_move(&mut self, old_id: &str, new_id: &str) {
         // Get moved element info
-        let (moved_name, moved_element_id, relations_to_process) = if let Some(moved_node) = self.nodes.get(new_id) {
-            let name = moved_node.element.name.clone();
-            let element_id = moved_node.element.id.clone();
-            // Only process user_created relations (these have opposites that need updating)
-            let relations: Vec<_> = moved_node.element.relations.iter()
-                .filter(|r| r.user_created)
-                .cloned()
-                .collect();
-            (name, element_id, relations)
-        } else {
-            return; // Moved element not found
-        };
+        let (moved_name, moved_element_id, relations_to_process) =
+            if let Some(moved_node) = self.nodes.get(new_id) {
+                let name = moved_node.element.name.clone();
+                let element_id = moved_node.element.id.clone();
+                // Only process user_created relations (these have opposites that need updating)
+                let relations: Vec<_> = moved_node
+                    .element
+                    .relations
+                    .iter()
+                    .filter(|r| r.user_created)
+                    .cloned()
+                    .collect();
+                (name, element_id, relations)
+            } else {
+                return; // Moved element not found
+            };
 
         // For each user_created relation in moved element, update its opposite
         for relation in relations_to_process {
@@ -366,7 +386,9 @@ impl GraphRegistry {
         log::debug!("Populating element_id for all relations...");
 
         // First pass: collect mapping of identifier -> element_id
-        let id_map: std::collections::HashMap<String, String> = self.nodes.iter()
+        let id_map: std::collections::HashMap<String, String> = self
+            .nodes
+            .iter()
             .map(|(identifier, node)| (identifier.clone(), node.element.id.clone()))
             .collect();
 
@@ -384,7 +406,10 @@ impl GraphRegistry {
     }
 
     /// Validates relations for target existence and element type compatibility.
-    fn validate_relations(&self, excluded_filename_patterns: &GlobSet) -> Result<Vec<ReqvireError>, ReqvireError> {
+    fn validate_relations(
+        &self,
+        excluded_filename_patterns: &GlobSet,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
         log::debug!("Running relation validation...");
         let mut errors = Vec::new();
         let element_ids: Vec<String> = self.nodes.keys().cloned().collect();
@@ -406,9 +431,10 @@ impl GraphRegistry {
 
                             match self.get_element(target_id) {
                                 None => {
-                                    errors.push(ReqvireError::MissingRelationTarget(
-                                        format!("Element '{}' references missing target '{}'", source_node.element.identifier, target_id),
-                                    ));
+                                    errors.push(ReqvireError::MissingRelationTarget(format!(
+                                        "Element '{}' references missing target '{}'",
+                                        source_node.element.identifier, target_id
+                                    )));
                                 }
                                 Some(target_element) => {
                                     if let Some(error) = self.validate_element_types(
@@ -426,15 +452,17 @@ impl GraphRegistry {
                             // InternalPath contains normalized paths from normalize_identifier which are git-root-relative
                             let git_root = match crate::git_commands::get_git_root_dir() {
                                 Ok(root) => root,
-                                Err(_) => std::env::current_dir().unwrap_or_else(|_| PathBuf::from(".")),
+                                Err(_) => {
+                                    std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
+                                }
                             };
                             let absolute_path = git_root.join(file_path);
                             if !absolute_path.exists() {
-                                errors.push(ReqvireError::MissingRelationTarget(
-                                    format!("Element '{}' references missing target '{}'",
-                                        source_node.element.identifier,
-                                        file_path.to_string_lossy()),
-                                ));
+                                errors.push(ReqvireError::MissingRelationTarget(format!(
+                                    "Element '{}' references missing target '{}'",
+                                    source_node.element.identifier,
+                                    file_path.to_string_lossy()
+                                )));
                             }
                         }
                         crate::relation::LinkType::ExternalUrl(_) => {
@@ -454,15 +482,17 @@ impl GraphRegistry {
         &self,
         relation_type: &str,
         source_element: &Element,
-        target_element: &Element
+        target_element: &Element,
     ) -> Option<ReqvireError> {
         // Only validate relation types with element type restrictions
-        if let Some(expected_types) = crate::relation::get_relation_element_type_description(relation_type) {
+        if let Some(expected_types) =
+            crate::relation::get_relation_element_type_description(relation_type)
+        {
             // Check if the element types are compatible
             let is_valid = crate::relation::validate_relation_element_types(
                 relation_type,
                 &source_element.element_type,
-                &target_element.element_type
+                &target_element.element_type,
             );
 
             if !is_valid {
@@ -484,7 +514,9 @@ impl GraphRegistry {
 
     /// Validates that only test-verification elements can have satisfiedBy relations
     /// Returns a list of validation errors for non-test-verification elements with satisfiedBy
-    fn validate_non_test_verification_satisfied_by(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+    fn validate_non_test_verification_satisfied_by(
+        &self,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
         log::debug!("Validating non-test-verification satisfiedBy relations...");
         let mut errors = Vec::new();
 
@@ -502,9 +534,9 @@ impl GraphRegistry {
                     crate::element::ElementType::Verification(verification_type) => {
                         // Allow only test-verification (Default and Test types) to have satisfiedBy
                         match verification_type {
-                            crate::element::VerificationType::Analysis |
-                            crate::element::VerificationType::Inspection |
-                            crate::element::VerificationType::Demonstration => {
+                            crate::element::VerificationType::Analysis
+                            | crate::element::VerificationType::Inspection
+                            | crate::element::VerificationType::Demonstration => {
                                 errors.push(ReqvireError::IncompatibleElementTypes(
                                     format!("Non-test-verification element with satisfiedBy relation: '{}' (type: {:?}) cannot have satisfiedBy relations. Only test-verification elements may use satisfiedBy.",
                                         element.identifier,
@@ -512,8 +544,8 @@ impl GraphRegistry {
                                     )
                                 ));
                             }
-                            crate::element::VerificationType::Default |
-                            crate::element::VerificationType::Test => {
+                            crate::element::VerificationType::Default
+                            | crate::element::VerificationType::Test => {
                                 // These are valid - test verifications can have satisfiedBy
                             }
                         }
@@ -538,7 +570,12 @@ impl GraphRegistry {
         // Check for circular dependencies - but be less strict about what constitutes a cycle
         for element_node in self.nodes.values() {
             let mut path = Vec::new();
-            self.check_circular_dependencies(&element_node.element, &mut visited, &mut path, &mut errors);
+            self.check_circular_dependencies(
+                &element_node.element,
+                &mut visited,
+                &mut path,
+                &mut errors,
+            );
         }
 
         // Check for missing hierarchical parent relations
@@ -552,7 +589,9 @@ impl GraphRegistry {
                 match req_type {
                     RequirementType::User => continue,
                     RequirementType::System => {
-                        let has_hierarchical_parent = element.relations.iter()
+                        let has_hierarchical_parent = element
+                            .relations
+                            .iter()
                             .any(|r| valid_hierarchical_relations.contains(&r.relation_type.name));
 
                         if !has_hierarchical_parent {
@@ -593,14 +632,12 @@ impl GraphRegistry {
                         let full_path = git_root.join(file_path);
 
                         if !full_path.exists() {
-                            errors.push(ReqvireError::MissingAttachmentFile(
-                                format!(
-                                    "File {}: Element '{}' references missing attachment file: {}",
-                                    element.file_path,
-                                    element.name,
-                                    file_path.display()
-                                ),
-                            ));
+                            errors.push(ReqvireError::MissingAttachmentFile(format!(
+                                "File {}: Element '{}' references missing attachment file: {}",
+                                element.file_path,
+                                element.name,
+                                file_path.display()
+                            )));
                             continue;
                         }
 
@@ -608,7 +645,9 @@ impl GraphRegistry {
                         let file_owners = self.get_file_owners(file_path);
                         for owner_id in &file_owners {
                             if self.is_in_hierarchy(&element.identifier, owner_id) {
-                                let owner_name = self.nodes.get(owner_id)
+                                let owner_name = self
+                                    .nodes
+                                    .get(owner_id)
                                     .map(|n| n.element.name.as_str())
                                     .unwrap_or(owner_id);
                                 errors.push(ReqvireError::InvalidAttachmentScope(
@@ -626,8 +665,15 @@ impl GraphRegistry {
                         }
 
                         // Check upstream propagation constraint
-                        if let Some((direction, other_id)) = self.find_duplicate_attachment_in_hierarchy(&element.identifier, &attachment.target) {
-                            let other_name = self.nodes.get(&other_id)
+                        if let Some((direction, other_id)) = self
+                            .find_duplicate_attachment_in_hierarchy(
+                                &element.identifier,
+                                &attachment.target,
+                            )
+                        {
+                            let other_name = self
+                                .nodes
+                                .get(&other_id)
                                 .map(|n| n.element.name.as_str())
                                 .unwrap_or(&other_id);
                             let msg = if direction == "ancestor" {
@@ -701,8 +747,15 @@ impl GraphRegistry {
 
                             // Check 3: Upstream propagation constraint (only if no hierarchy violation)
                             if !hierarchy_violation {
-                                if let Some((direction, other_id)) = self.find_duplicate_attachment_in_hierarchy(&element.identifier, &attachment.target) {
-                                    let other_name = self.nodes.get(&other_id)
+                                if let Some((direction, other_id)) = self
+                                    .find_duplicate_attachment_in_hierarchy(
+                                        &element.identifier,
+                                        &attachment.target,
+                                    )
+                                {
+                                    let other_name = self
+                                        .nodes
+                                        .get(&other_id)
                                         .map(|n| n.element.name.as_str())
                                         .unwrap_or(&other_id);
                                     let msg = if direction == "ancestor" {
@@ -727,14 +780,10 @@ impl GraphRegistry {
                                 }
                             }
                         } else {
-                            errors.push(ReqvireError::MissingAttachmentTarget(
-                                format!(
-                                    "File {}: Element '{}' references missing attachment element: {}",
-                                    element.file_path,
-                                    element.name,
-                                    identifier
-                                ),
-                            ));
+                            errors.push(ReqvireError::MissingAttachmentTarget(format!(
+                                "File {}: Element '{}' references missing attachment element: {}",
+                                element.file_path, element.name, identifier
+                            )));
                         }
                     }
                 }
@@ -761,7 +810,8 @@ impl GraphRegistry {
             for relation in &element_node.element.relations {
                 // Use REFINEMENT_RELATIONS - refinedBy is the forward refinement relation from requirement
                 if relation::is_refinement_relation(relation.relation_type)
-                    && relation.relation_type.name == REFINEMENT_RELATIONS[1] // refinedBy
+                    && relation.relation_type.name == REFINEMENT_RELATIONS[1]
+                // refinedBy
                 {
                     if let LinkType::Identifier(target_id) = &relation.target.link {
                         if target_id == refinement_id {
@@ -779,10 +829,14 @@ impl GraphRegistry {
     /// Returns true if the refinement has a refine relation, false otherwise.
     pub fn refinement_has_refine_relation(&self, refinement_id: &str) -> bool {
         if let Some(node) = self.nodes.get(refinement_id) {
-            node.element.relations.iter()
+            node.element
+                .relations
+                .iter()
                 // Use REFINEMENT_RELATIONS - refine is the backward refinement relation from refinement
-                .any(|r| relation::is_refinement_relation(r.relation_type)
-                    && r.relation_type.name == REFINEMENT_RELATIONS[0]) // refine
+                .any(|r| {
+                    relation::is_refinement_relation(r.relation_type)
+                        && r.relation_type.name == REFINEMENT_RELATIONS[0]
+                }) // refine
         } else {
             false
         }
@@ -814,7 +868,12 @@ impl GraphRegistry {
     fn is_ancestor_of(&self, potential_ancestor: &str, element_id: &str) -> bool {
         let hierarchical_types = get_hierarchical_relation_types();
         let mut visited = HashSet::new();
-        self.is_ancestor_of_recursive(potential_ancestor, element_id, &hierarchical_types, &mut visited)
+        self.is_ancestor_of_recursive(
+            potential_ancestor,
+            element_id,
+            &hierarchical_types,
+            &mut visited,
+        )
     }
 
     fn is_ancestor_of_recursive(
@@ -836,7 +895,12 @@ impl GraphRegistry {
                         if parent_id == potential_ancestor {
                             return true;
                         }
-                        if self.is_ancestor_of_recursive(potential_ancestor, parent_id, hierarchical_types, visited) {
+                        if self.is_ancestor_of_recursive(
+                            potential_ancestor,
+                            parent_id,
+                            hierarchical_types,
+                            visited,
+                        ) {
                             return true;
                         }
                     }
@@ -901,7 +965,12 @@ impl GraphRegistry {
     ) -> Option<String> {
         let hierarchical_types = get_hierarchical_relation_types();
         let mut visited = HashSet::new();
-        self.find_attachment_in_ancestors_recursive(element_id, attachment, &hierarchical_types, &mut visited)
+        self.find_attachment_in_ancestors_recursive(
+            element_id,
+            attachment,
+            &hierarchical_types,
+            &mut visited,
+        )
     }
 
     fn find_attachment_in_ancestors_recursive(
@@ -922,12 +991,22 @@ impl GraphRegistry {
                     if let LinkType::Identifier(parent_id) = &relation.target.link {
                         if let Some(parent_node) = self.nodes.get(parent_id) {
                             // Check if parent has this attachment
-                            if parent_node.element.attachments.iter().any(|a| self.attachments_equal(&a.target, attachment)) {
+                            if parent_node
+                                .element
+                                .attachments
+                                .iter()
+                                .any(|a| self.attachments_equal(&a.target, attachment))
+                            {
                                 return Some(parent_id.clone());
                             }
                         }
                         // Check ancestors recursively
-                        if let Some(found) = self.find_attachment_in_ancestors_recursive(parent_id, attachment, hierarchical_types, visited) {
+                        if let Some(found) = self.find_attachment_in_ancestors_recursive(
+                            parent_id,
+                            attachment,
+                            hierarchical_types,
+                            visited,
+                        ) {
                             return Some(found);
                         }
                     }
@@ -966,11 +1045,18 @@ impl GraphRegistry {
 
             if is_child {
                 // Check if child has this attachment
-                if child_node.element.attachments.iter().any(|a| self.attachments_equal(&a.target, attachment)) {
+                if child_node
+                    .element
+                    .attachments
+                    .iter()
+                    .any(|a| self.attachments_equal(&a.target, attachment))
+                {
                     return Some(child_id.clone());
                 }
                 // Check descendants recursively
-                if let Some(found) = self.find_attachment_in_descendants_recursive(child_id, attachment, visited) {
+                if let Some(found) =
+                    self.find_attachment_in_descendants_recursive(child_id, attachment, visited)
+                {
                     return Some(found);
                 }
             }
@@ -978,10 +1064,20 @@ impl GraphRegistry {
         None
     }
 
-    fn attachments_equal(&self, a: &crate::element::AttachmentTarget, b: &crate::element::AttachmentTarget) -> bool {
+    fn attachments_equal(
+        &self,
+        a: &crate::element::AttachmentTarget,
+        b: &crate::element::AttachmentTarget,
+    ) -> bool {
         match (a, b) {
-            (crate::element::AttachmentTarget::FilePath(p1), crate::element::AttachmentTarget::FilePath(p2)) => p1 == p2,
-            (crate::element::AttachmentTarget::ElementIdentifier(id1), crate::element::AttachmentTarget::ElementIdentifier(id2)) => id1 == id2,
+            (
+                crate::element::AttachmentTarget::FilePath(p1),
+                crate::element::AttachmentTarget::FilePath(p2),
+            ) => p1 == p2,
+            (
+                crate::element::AttachmentTarget::ElementIdentifier(id1),
+                crate::element::AttachmentTarget::ElementIdentifier(id2),
+            ) => id1 == id2,
             _ => false,
         }
     }
@@ -999,13 +1095,16 @@ impl GraphRegistry {
             // Check if this is a Refinement element type
             if element.element_type.is_refinement() {
                 // Refinement elements can only have refine relations
-                let invalid_relations: Vec<_> = element.relations.iter()
+                let invalid_relations: Vec<_> = element
+                    .relations
+                    .iter()
                     .filter(|r| r.user_created)
                     .filter(|r| r.relation_type.name.to_lowercase() != "refine")
                     .collect();
 
                 if !invalid_relations.is_empty() {
-                    let invalid_types: Vec<_> = invalid_relations.iter()
+                    let invalid_types: Vec<_> = invalid_relations
+                        .iter()
                         .map(|r| &r.relation_type.name)
                         .collect();
                     errors.push(ReqvireError::InvalidMarkdownStructure(
@@ -1036,7 +1135,10 @@ impl GraphRegistry {
         if errors.is_empty() {
             debug!("No Refinement element validation errors found.");
         } else {
-            debug!("{} Refinement element validation errors found.", errors.len());
+            debug!(
+                "{} Refinement element validation errors found.",
+                errors.len()
+            );
         }
 
         Ok(errors)
@@ -1048,17 +1150,21 @@ impl GraphRegistry {
         debug!("Validating refinement ownership uniqueness...");
         let mut errors = Vec::new();
         // Map from refinement target (identifier or file path) to owning requirement identifier
-        let mut ownership_map: std::collections::HashMap<String, String> = std::collections::HashMap::new();
+        let mut ownership_map: std::collections::HashMap<String, String> =
+            std::collections::HashMap::new();
 
         for (element_id, element_node) in &self.nodes {
             for relation in &element_node.element.relations {
                 if relation::is_refinement_relation(relation.relation_type)
-                    && relation.relation_type.name == REFINEMENT_RELATIONS[1] // refinedBy
+                    && relation.relation_type.name == REFINEMENT_RELATIONS[1]
+                // refinedBy
                 {
                     let target_key = relation.target.link.as_str().to_string();
                     if let Some(existing_owner) = ownership_map.get(&target_key) {
                         let target_name = &relation.target.text;
-                        let owner_name = self.nodes.get(existing_owner)
+                        let owner_name = self
+                            .nodes
+                            .get(existing_owner)
                             .map(|n| n.element.name.as_str())
                             .unwrap_or(existing_owner);
                         let current_name = element_node.element.name.as_str();
@@ -1085,7 +1191,10 @@ impl GraphRegistry {
         if errors.is_empty() {
             debug!("No refinement ownership uniqueness violations found.");
         } else {
-            debug!("{} refinement ownership uniqueness violations found.", errors.len());
+            debug!(
+                "{} refinement ownership uniqueness violations found.",
+                errors.len()
+            );
         }
 
         Ok(errors)
@@ -1104,7 +1213,9 @@ impl GraphRegistry {
             if let crate::element::ElementType::Other(type_str) = &element.element_type {
                 if type_str == "other" {
                     // 'other' type can only use trace relations
-                    let non_trace_relations: Vec<_> = element.relations.iter()
+                    let non_trace_relations: Vec<_> = element
+                        .relations
+                        .iter()
                         .filter(|r| r.user_created && r.relation_type.name != "trace")
                         .collect();
 
@@ -1125,7 +1236,10 @@ impl GraphRegistry {
         if errors.is_empty() {
             debug!("No 'other' element type relation errors found.");
         } else {
-            debug!("{} 'other' element type relation errors found.", errors.len());
+            debug!(
+                "{} 'other' element type relation errors found.",
+                errors.len()
+            );
         }
 
         Ok(errors)
@@ -1150,9 +1264,10 @@ impl GraphRegistry {
         if let Some(pos) = path.iter().position(|id| id == &element_id) {
             let cycle = path[pos..].join(" -> ");
             let full_cycle = format!("{} -> {}", cycle, element_id);
-            errors.push(ReqvireError::CircularDependencyError(
-                format!("Circular dependency error: {}", full_cycle),
-            ));
+            errors.push(ReqvireError::CircularDependencyError(format!(
+                "Circular dependency error: {}",
+                full_cycle
+            )));
             return;
         }
 
@@ -1241,31 +1356,39 @@ impl GraphRegistry {
         let search_name = element_name.trim();
 
         // Find all elements with matching name
-        let matching: Vec<&String> = self.nodes
+        let matching: Vec<&String> = self
+            .nodes
             .iter()
             .filter(|(_, node)| node.element.name == search_name)
             .map(|(id, _)| id)
             .collect();
 
         if matching.is_empty() {
-            return Err(ReqvireError::MissingElement(
-                format!("Element not found: {}", element_name)
-            ));
+            return Err(ReqvireError::MissingElement(format!(
+                "Element not found: {}",
+                element_name
+            )));
         } else if matching.len() > 1 {
-            return Err(ReqvireError::ProcessError(
-                format!("Multiple elements found with name '{}': {:?}", element_name, matching)
-            ));
+            return Err(ReqvireError::ProcessError(format!(
+                "Multiple elements found with name '{}': {:?}",
+                element_name, matching
+            )));
         }
 
         Ok(matching[0].clone())
     }
 
     /// Moves an element to an existing file in the graph
-    pub fn move_element_to_location(&mut self, element_id: &str, new_file_path: &str) -> Result<(), ReqvireError> {
+    pub fn move_element_to_location(
+        &mut self,
+        element_id: &str,
+        new_file_path: &str,
+    ) -> Result<(), ReqvireError> {
         // Verify the target file exists in the graph (either has elements or is registered as a page)
-        let target_has_elements = self.nodes.values().any(|node| {
-            node.element.file_path == new_file_path
-        });
+        let target_has_elements = self
+            .nodes
+            .values()
+            .any(|node| node.element.file_path == new_file_path);
         let target_is_page = self.pages.contains_key(new_file_path);
 
         if !target_has_elements && !target_is_page {
@@ -1291,22 +1414,33 @@ impl GraphRegistry {
 
             log::debug!(
                 "Moved element '{}' from '{}' to '{}'",
-                element_id, old_file_path, new_file_path
+                element_id,
+                old_file_path,
+                new_file_path
             );
 
             Ok(())
         } else {
-            Err(ReqvireError::MissingElement(format!("Element '{}' not found in graph", element_id)))
+            Err(ReqvireError::MissingElement(format!(
+                "Element '{}' not found in graph",
+                element_id
+            )))
         }
     }
 
     /// Adds a new file location to the graph (virtual - no filesystem changes)
     pub fn add_file_location(&mut self, new_file_path: &str) -> Result<(), ReqvireError> {
         // Check if the file already exists
-        let file_exists = self.nodes.values().any(|node| node.element.file_path == new_file_path);
+        let file_exists = self
+            .nodes
+            .values()
+            .any(|node| node.element.file_path == new_file_path);
 
         if file_exists {
-            return Err(ReqvireError::LocationAlreadyExists(format!("File '{}' already exists in the graph", new_file_path)));
+            return Err(ReqvireError::LocationAlreadyExists(format!(
+                "File '{}' already exists in the graph",
+                new_file_path
+            )));
         }
 
         // Create a virtual placeholder element to track this file location
@@ -1319,19 +1453,29 @@ impl GraphRegistry {
             None,
         );
 
-        self.nodes.insert(virtual_id, ElementNode {
-            element: virtual_element,
-            relations: Vec::new(),
-        });
+        self.nodes.insert(
+            virtual_id,
+            ElementNode {
+                element: virtual_element,
+                relations: Vec::new(),
+            },
+        );
 
         log::debug!("Added virtual file location '{}'", new_file_path);
         Ok(())
     }
 
     /// Moves element to a new file location (creates file location if needed)
-    pub fn move_element_to_new_file(&mut self, element_id: &str, new_file_path: &str) -> Result<(), ReqvireError> {
+    pub fn move_element_to_new_file(
+        &mut self,
+        element_id: &str,
+        new_file_path: &str,
+    ) -> Result<(), ReqvireError> {
         // Check if file exists, if not, create it virtually
-        let file_exists = self.nodes.values().any(|node| node.element.file_path == new_file_path);
+        let file_exists = self
+            .nodes
+            .values()
+            .any(|node| node.element.file_path == new_file_path);
 
         if !file_exists {
             self.add_file_location(new_file_path)?;
@@ -1356,12 +1500,17 @@ impl GraphRegistry {
 
             log::debug!(
                 "Moved element '{}' from '{}' to new file '{}'",
-                element_id, old_file_path, new_file_path
+                element_id,
+                old_file_path,
+                new_file_path
             );
 
             Ok(())
         } else {
-            Err(ReqvireError::MissingElement(format!("Element '{}' not found in graph", element_id)))
+            Err(ReqvireError::MissingElement(format!(
+                "Element '{}' not found in graph",
+                element_id
+            )))
         }
     }
 
@@ -1405,7 +1554,11 @@ impl GraphRegistry {
         self.build_impact_tree_recursive(root_id, &mut visited)
     }
 
-    fn build_impact_tree_recursive(&self, current_id: &str, visited: &mut BTreeSet<String>) -> ElementNode {
+    fn build_impact_tree_recursive(
+        &self,
+        current_id: &str,
+        visited: &mut BTreeSet<String>,
+    ) -> ElementNode {
         if !visited.insert(current_id.to_string()) {
             // Already visited, stop recursion to prevent cycles
             let current_node = self.nodes.get(current_id).unwrap();
@@ -1450,7 +1603,9 @@ impl GraphRegistry {
     pub fn find_root_requirements(&self) -> Vec<String> {
         let hierarchical_relations = relation::get_hierarchical_relation_types();
 
-        let mut roots: Vec<String> = self.nodes.values()
+        let mut roots: Vec<String> = self
+            .nodes
+            .values()
             .map(|node| &node.element)
             .filter(|element| {
                 // Only consider requirements
@@ -1459,7 +1614,9 @@ impl GraphRegistry {
                 }
 
                 // Check if has any hierarchical parent relation
-                let has_parent = element.relations.iter()
+                let has_parent = element
+                    .relations
+                    .iter()
                     .any(|r| hierarchical_relations.contains(&r.relation_type.name));
 
                 !has_parent
@@ -1478,7 +1635,9 @@ impl GraphRegistry {
     /// 2. Have no outgoing forward relations to other elements - nothing derives from them
     ///    Optionally filter by element types
     pub fn find_leaf_elements(&self, type_filter: Option<&[&str]>) -> Vec<String> {
-        let mut leaves: Vec<String> = self.nodes.values()
+        let mut leaves: Vec<String> = self
+            .nodes
+            .values()
             .map(|node| &node.element)
             .filter(|element| {
                 // Apply type filter if provided
@@ -1490,22 +1649,20 @@ impl GraphRegistry {
                 }
 
                 // Must have at least one backward relation (to trace upward)
-                let has_backward_relations = element.relations.iter()
-                    .any(|r| {
-                        relation::BACKWARD_RELATIONS.contains(&r.relation_type.name) &&
-                        matches!(r.target.link, relation::LinkType::Identifier(_))
-                    });
+                let has_backward_relations = element.relations.iter().any(|r| {
+                    relation::BACKWARD_RELATIONS.contains(&r.relation_type.name)
+                        && matches!(r.target.link, relation::LinkType::Identifier(_))
+                });
 
                 if !has_backward_relations {
                     return false;
                 }
 
                 // Must NOT have outgoing forward relations to elements (nothing derives from it)
-                let has_forward_children = element.relations.iter()
-                    .any(|r| {
-                        relation::DIAGRAM_RELATIONS.contains(&r.relation_type.name) &&
-                        matches!(r.target.link, relation::LinkType::Identifier(_))
-                    });
+                let has_forward_children = element.relations.iter().any(|r| {
+                    relation::DIAGRAM_RELATIONS.contains(&r.relation_type.name)
+                        && matches!(r.target.link, relation::LinkType::Identifier(_))
+                });
 
                 !has_forward_children
             })
@@ -1519,7 +1676,9 @@ impl GraphRegistry {
 
     /// Find starting elements filtered by type (for both forward and reverse traversal)
     pub fn find_elements_by_type(&self, type_filter: &[&str]) -> Vec<String> {
-        let mut elements: Vec<String> = self.nodes.values()
+        let mut elements: Vec<String> = self
+            .nodes
+            .values()
             .map(|node| &node.element)
             .filter(|element| {
                 let element_type_str = element.element_type.as_str();
@@ -1546,11 +1705,13 @@ impl GraphRegistry {
         let all_elements = self.get_all_elements();
 
         // Find root elements (elements without parent relations)
-        let root_elements: Vec<&Element> = all_elements.iter()
+        let root_elements: Vec<&Element> = all_elements
+            .iter()
             .filter(|element| {
-                !element.relations.iter().any(|rel| {
-                    parent_relation_types.contains(&rel.relation_type.name)
-                })
+                !element
+                    .relations
+                    .iter()
+                    .any(|rel| parent_relation_types.contains(&rel.relation_type.name))
             })
             .copied()
             .collect();
@@ -1581,7 +1742,11 @@ impl GraphRegistry {
     }
 
     /// Recursively collect all descendants of the elements already in descendants
-    fn collect_descendants<'a>(&self, all_elements: &[&'a Element], descendants: &mut Vec<&'a Element>) {
+    fn collect_descendants<'a>(
+        &self,
+        all_elements: &[&'a Element],
+        descendants: &mut Vec<&'a Element>,
+    ) {
         let mut found_new = true;
 
         while found_new {
@@ -1590,7 +1755,10 @@ impl GraphRegistry {
 
             for element in all_elements {
                 // Skip if already collected
-                if descendants.iter().any(|d| d.identifier == element.identifier) {
+                if descendants
+                    .iter()
+                    .any(|d| d.identifier == element.identifier)
+                {
                     continue;
                 }
 
@@ -1615,15 +1783,23 @@ impl GraphRegistry {
     }
 
     /// Change impact analysis with relation information
-    pub fn change_impact_with_relation(&self, element: &Element) -> Vec<(String, Vec<crate::relation::Relation>)> {
+    pub fn change_impact_with_relation(
+        &self,
+        element: &Element,
+    ) -> Vec<(String, Vec<crate::relation::Relation>)> {
         if let Some(node) = self.nodes.get(&element.identifier) {
             // Group original relations by target ID using BTreeMap for deterministic ordering
-            let mut relations_by_target: std::collections::BTreeMap<String, Vec<crate::relation::Relation>> = std::collections::BTreeMap::new();
+            let mut relations_by_target: std::collections::BTreeMap<
+                String,
+                Vec<crate::relation::Relation>,
+            > = std::collections::BTreeMap::new();
 
             for relation in &node.element.relations {
                 let target_id = match &relation.target.link {
                     crate::relation::LinkType::Identifier(ref target_id) => target_id.clone(),
-                    crate::relation::LinkType::InternalPath(ref path) => path.to_string_lossy().to_string(),
+                    crate::relation::LinkType::InternalPath(ref path) => {
+                        path.to_string_lossy().to_string()
+                    }
                     crate::relation::LinkType::ExternalUrl(_) => continue, // Skip external URLs for change impact
                 };
 
@@ -1646,7 +1822,8 @@ impl GraphRegistry {
 
     /// Gets an element by its display name
     pub fn get_element_by_name(&self, name: &str) -> Option<&Element> {
-        self.nodes.values()
+        self.nodes
+            .values()
             .map(|node| &node.element)
             .find(|elem| elem.name == name)
     }
@@ -1671,8 +1848,12 @@ impl GraphRegistry {
         internal_paths
     }
 
-
-    fn element_to_markdown_with_context(&self, element: &Element, _current_file: &str, with_full_relations: bool) -> String {
+    fn element_to_markdown_with_context(
+        &self,
+        element: &Element,
+        _current_file: &str,
+        with_full_relations: bool,
+    ) -> String {
         let mut markdown = String::new();
 
         // Add the element header
@@ -1686,7 +1867,9 @@ impl GraphRegistry {
 
         // Add metadata subsection
         // Always include metadata to preserve structure during CRUD operations
-        let mut custom_metadata: Vec<_> = element.metadata.iter()
+        let mut custom_metadata: Vec<_> = element
+            .metadata
+            .iter()
             .filter(|(key, _)| *key != "type") // type is handled separately
             .collect();
         custom_metadata.sort_by_key(|(key, _)| *key);
@@ -1704,8 +1887,11 @@ impl GraphRegistry {
 
         // Add attachments subsection if there are attachments
         // Deduplicate attachments by target, keeping first occurrence
-        let mut seen_attachments: std::collections::HashSet<String> = std::collections::HashSet::new();
-        let unique_attachments: Vec<_> = element.attachments.iter()
+        let mut seen_attachments: std::collections::HashSet<String> =
+            std::collections::HashSet::new();
+        let unique_attachments: Vec<_> = element
+            .attachments
+            .iter()
             .filter(|a| seen_attachments.insert(a.target.as_str()))
             .collect();
 
@@ -1719,7 +1905,8 @@ impl GraphRegistry {
 
                         // Make the path relative to the current file's directory (same as relations)
                         let current_file_path = std::path::PathBuf::from(_current_file);
-                        let current_folder = current_file_path.parent()
+                        let current_folder = current_file_path
+                            .parent()
                             .unwrap_or_else(|| std::path::Path::new("."))
                             .to_path_buf();
 
@@ -1729,8 +1916,9 @@ impl GraphRegistry {
                         let relative_path = crate::utils::to_relative_identifier(
                             &absolute_path,
                             &current_folder,
-                            false
-                        ).unwrap_or_else(|_| attachment_path.clone());
+                            false,
+                        )
+                        .unwrap_or_else(|_| attachment_path.clone());
 
                         // Use filename as display text for cleaner markdown
                         let display_name = file_path
@@ -1743,23 +1931,27 @@ impl GraphRegistry {
                     crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
                         // Element identifier attachments - format as markdown link
                         let current_file_path = std::path::PathBuf::from(_current_file);
-                        let current_folder = current_file_path.parent()
+                        let current_folder = current_file_path
+                            .parent()
                             .unwrap_or_else(|| std::path::Path::new("."))
                             .to_path_buf();
 
                         // Use to_relative_identifier to make identifier relative to current file
-                        let relative_id = crate::utils::to_relative_identifier(
-                            identifier,
-                            &current_folder,
-                            true
-                        ).unwrap_or_else(|_| identifier.clone());
+                        let relative_id =
+                            crate::utils::to_relative_identifier(identifier, &current_folder, true)
+                                .unwrap_or_else(|_| identifier.clone());
 
                         // Look up actual element name from registry for human-readable display
-                        let display_name = self.get_element(identifier)
+                        let display_name = self
+                            .get_element(identifier)
                             .map(|e| e.name.clone())
                             .unwrap_or_else(|| {
                                 // Fallback to identifier fragment if element not found
-                                identifier.split('#').next_back().unwrap_or(identifier).to_string()
+                                identifier
+                                    .split('#')
+                                    .next_back()
+                                    .unwrap_or(identifier)
+                                    .to_string()
                             });
                         markdown.push_str(&format!("  * [{}]({})\n", display_name, relative_id));
                     }
@@ -1774,7 +1966,11 @@ impl GraphRegistry {
         let mut relations_to_include: Vec<_> = if with_full_relations {
             element.relations.iter().collect()
         } else {
-            element.relations.iter().filter(|r| r.user_created).collect()
+            element
+                .relations
+                .iter()
+                .filter(|r| r.user_created)
+                .collect()
         };
         // Sort relations for deterministic output: by relation type name, then by target link
         relations_to_include.sort_by(|a, b| {
@@ -1783,7 +1979,8 @@ impl GraphRegistry {
         });
         // Remove duplicate relations (same relation_type + same target), keeping first occurrence
         relations_to_include.dedup_by(|a, b| {
-            a.relation_type.name == b.relation_type.name && a.target.link.as_str() == b.target.link.as_str()
+            a.relation_type.name == b.relation_type.name
+                && a.target.link.as_str() == b.target.link.as_str()
         });
         if !relations_to_include.is_empty() {
             markdown.push_str("#### Relations\n");
@@ -1794,7 +1991,7 @@ impl GraphRegistry {
                     LinkType::ExternalUrl(url) => {
                         // For external URLs, preserve the original markdown link format
                         format!("[{}]({})", relation.target.text, url)
-                    },
+                    }
                     LinkType::Identifier(target_id) => {
                         // Extract fragment to look up the target element
                         let fragment = if let Some(fragment_pos) = target_id.find('#') {
@@ -1811,13 +2008,17 @@ impl GraphRegistry {
                             target_node.element.name.clone()
                         } else {
                             // Fallback: convert fragment to title case
-                            fragment.replace('-', " ")
+                            fragment
+                                .replace('-', " ")
                                 .split_whitespace()
                                 .map(|word| {
                                     let mut chars = word.chars();
                                     match chars.next() {
                                         None => String::new(),
-                                        Some(first) => first.to_uppercase().collect::<String>() + chars.as_str(),
+                                        Some(first) => {
+                                            first.to_uppercase().collect::<String>()
+                                                + chars.as_str()
+                                        }
                                     }
                                 })
                                 .collect::<Vec<String>>()
@@ -1836,24 +2037,28 @@ impl GraphRegistry {
                         let current_file_str = _current_file;
 
                         // If target is in the same file, use just the fragment
-                        if target_file.is_empty() || target_file == current_file_str ||
-                           target_id.starts_with('#') {
+                        if target_file.is_empty()
+                            || target_file == current_file_str
+                            || target_id.starts_with('#')
+                        {
                             format!("[{}](#{})", display_name, fragment)
                         } else {
                             // Make the link relative using just the folder of the current file
-                            let current_folder = current_file_path.parent()
+                            let current_folder = current_file_path
+                                .parent()
                                 .unwrap_or_else(|| std::path::Path::new("."))
                                 .to_path_buf();
 
                             let relative_link = crate::utils::to_relative_identifier(
                                 relation.target.link.as_str(),
                                 &current_folder,
-                                false
-                            ).unwrap_or_else(|_| relation.target.link.as_str().to_string());
+                                false,
+                            )
+                            .unwrap_or_else(|_| relation.target.link.as_str().to_string());
 
                             format!("[{}]({})", display_name, relative_link)
                         }
-                    },
+                    }
                     LinkType::InternalPath(path) => {
                         // For InternalPath, use the filename as display text and full relative path as link
                         let path_str = path.to_str().unwrap_or("invalid_path");
@@ -1864,23 +2069,25 @@ impl GraphRegistry {
 
                         // Make the path relative using just the folder of the current file
                         let current_file_path = std::path::PathBuf::from(_current_file);
-                        let current_folder = current_file_path.parent()
+                        let current_folder = current_file_path
+                            .parent()
                             .unwrap_or_else(|| std::path::Path::new("."))
                             .to_path_buf();
 
                         let relative_link = crate::utils::to_relative_identifier(
                             relation.target.link.as_str(),
                             &current_folder,
-                            false
-                        ).unwrap_or_else(|_| relation.target.link.as_str().to_string());
+                            false,
+                        )
+                        .unwrap_or_else(|_| relation.target.link.as_str().to_string());
 
                         format!("[{}]({})", display_name, relative_link)
                     }
                 };
 
-                markdown.push_str(&format!("  * {}: {}\n",
-                    relation.relation_type.name,
-                    target_text
+                markdown.push_str(&format!(
+                    "  * {}: {}\n",
+                    relation.relation_type.name, target_text
                 ));
             }
             markdown.push('\n');
@@ -1918,7 +2125,9 @@ impl GraphRegistry {
             // Skip blank lines immediately after #### headers
             if !in_details && line.trim().is_empty() {
                 // Check if the previous line was a #### header
-                let prev_line_is_header = result.lines().last()
+                let prev_line_is_header = result
+                    .lines()
+                    .last()
                     .is_some_and(|l| l.trim_start().starts_with("####"));
                 if prev_line_is_header {
                     continue;
@@ -1984,7 +2193,12 @@ impl GraphRegistry {
             .iter()
             .enumerate()
             .map(|(i, e)| {
-                let fragment = e.identifier.split('#').next_back().unwrap_or(&e.identifier).to_string();
+                let fragment = e
+                    .identifier
+                    .split('#')
+                    .next_back()
+                    .unwrap_or(&e.identifier)
+                    .to_string();
                 (fragment, i)
             })
             .collect();
@@ -2004,10 +2218,7 @@ impl GraphRegistry {
                         // Check if this target exists in the same file
                         if let Some(&parent_idx) = fragment_to_idx.get(target_id) {
                             // This element has a file-local parent
-                            children_map
-                                .entry(parent_idx)
-                                .or_default()
-                                .push(idx);
+                            children_map.entry(parent_idx).or_default().push(idx);
                             has_parent.insert(idx);
                         }
                     }
@@ -2064,7 +2275,12 @@ impl GraphRegistry {
 
     /// Generates markdown content for a file
     /// When with_full_relations is true, includes all relations (user-created and auto-generated)
-    pub fn generate_file_markdown(&self, file_path: &str, elements: &[&Element], with_full_relations: bool) -> String {
+    pub fn generate_file_markdown(
+        &self,
+        file_path: &str,
+        elements: &[&Element],
+        with_full_relations: bool,
+    ) -> String {
         let mut markdown = String::new();
 
         // All specification files must have "# Elements" as the page header
@@ -2087,7 +2303,11 @@ impl GraphRegistry {
             if i > 0 {
                 markdown.push_str("---\n\n");
             }
-            markdown.push_str(&self.element_to_markdown_with_context(element, file_path, with_full_relations));
+            markdown.push_str(&self.element_to_markdown_with_context(
+                element,
+                file_path,
+                with_full_relations,
+            ));
         }
 
         // Add final separator after the last element (if there were any elements)
@@ -2099,13 +2319,18 @@ impl GraphRegistry {
     }
 
     /// Copies InternalPath files to the output directory
-    fn copy_internal_path_files(&self, internal_paths: &HashSet<PathBuf>, output_dir: &Path) -> Result<usize, ReqvireError> {
+    fn copy_internal_path_files(
+        &self,
+        internal_paths: &HashSet<PathBuf>,
+        output_dir: &Path,
+    ) -> Result<usize, ReqvireError> {
         let base_dir = match git_commands::get_git_root_dir() {
             Ok(git_root) => git_root,
             Err(_) => {
                 // If Git repository root can't be found, use the current working directory
-                std::env::current_dir()
-                    .map_err(|e| ReqvireError::PathError(format!("Failed to get current directory: {}", e)))?
+                std::env::current_dir().map_err(|e| {
+                    ReqvireError::PathError(format!("Failed to get current directory: {}", e))
+                })?
             }
         };
 
@@ -2130,14 +2355,16 @@ impl GraphRegistry {
 
             // Skip if source and destination are the same (in-place operations)
             if src_path == dst_path {
-                debug!("Skipping InternalPath file (same source and destination): {:?}", src_path);
+                debug!(
+                    "Skipping InternalPath file (same source and destination): {:?}",
+                    src_path
+                );
                 continue;
             }
 
             // Create parent directories if needed
             if let Some(parent_dir) = dst_path.parent() {
-                fs::create_dir_all(parent_dir)
-                    .map_err(ReqvireError::IoError)?;
+                fs::create_dir_all(parent_dir).map_err(ReqvireError::IoError)?;
             }
 
             // Copy the file
@@ -2169,10 +2396,9 @@ impl GraphRegistry {
         new_name: &str,
     ) -> Result<String, ReqvireError> {
         // Validate element exists
-        let node = self.nodes.get(element_id)
-            .ok_or_else(|| ReqvireError::MissingElement(
-                format!("Element '{}' not found", element_id)
-            ))?;
+        let node = self.nodes.get(element_id).ok_or_else(|| {
+            ReqvireError::MissingElement(format!("Element '{}' not found", element_id))
+        })?;
 
         let file_path = node.element.file_path.clone();
         let _old_name = node.element.name.clone();
@@ -2183,17 +2409,18 @@ impl GraphRegistry {
 
         // Check if new identifier already exists (globally unique check)
         if self.nodes.contains_key(&new_identifier) {
-            return Err(ReqvireError::DuplicateElement(
-                format!("An element with name '{}' already exists (identifier: {})", new_name, new_identifier)
-            ));
+            return Err(ReqvireError::DuplicateElement(format!(
+                "An element with name '{}' already exists (identifier: {})",
+                new_name, new_identifier
+            )));
         }
 
         // Find all files with relations to this element
         let mut modified_files = vec![file_path.clone()];
         for node in self.nodes.values() {
-            let has_relation = node.element.relations.iter().any(|rel| {
-                matches!(&rel.target.link, LinkType::Identifier(id) if id == element_id)
-            });
+            let has_relation = node.element.relations.iter().any(
+                |rel| matches!(&rel.target.link, LinkType::Identifier(id) if id == element_id),
+            );
 
             if has_relation {
                 let file = node.element.file_path.clone();
@@ -2256,25 +2483,31 @@ impl GraphRegistry {
         squash: bool,
     ) -> Result<Vec<(String, String)>, ReqvireError> {
         // Validate source file exists in the model
-        let elements_in_source: Vec<String> = self.nodes.values()
+        let elements_in_source: Vec<String> = self
+            .nodes
+            .values()
             .filter(|node| node.element.file_path == source_file)
             .map(|node| node.element.identifier.clone())
             .collect();
 
         if elements_in_source.is_empty() {
-            return Err(ReqvireError::LocationNotFound(
-                format!("Source file '{}' not found or contains no elements", source_file)
-            ));
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Source file '{}' not found or contains no elements",
+                source_file
+            )));
         }
 
         // Validate target file doesn't exist (unless squash mode)
-        let target_exists = self.nodes.values()
+        let target_exists = self
+            .nodes
+            .values()
             .any(|node| node.element.file_path == target_file);
 
         if target_exists && !squash {
-            return Err(ReqvireError::DuplicateElement(
-                format!("Target file '{}' already exists", target_file)
-            ));
+            return Err(ReqvireError::DuplicateElement(format!(
+                "Target file '{}' already exists",
+                target_file
+            )));
         }
 
         // Track old -> new identifier mappings
@@ -2286,7 +2519,7 @@ impl GraphRegistry {
             // Move each element to target file
             for old_id in &elements_in_source {
                 let slug = if let Some(pos) = old_id.rfind('#') {
-                    &old_id[pos+1..]
+                    &old_id[pos + 1..]
                 } else {
                     continue;
                 };
@@ -2304,7 +2537,7 @@ impl GraphRegistry {
             // Normal mode: move entire file (keep sections as-is)
             for old_id in &elements_in_source {
                 let slug = if let Some(pos) = old_id.rfind('#') {
-                    &old_id[pos+1..]
+                    &old_id[pos + 1..]
                 } else {
                     continue;
                 };
@@ -2383,11 +2616,14 @@ impl GraphRegistry {
 
     /// Flushes all elements to markdown files and copies InternalPath files to the specified directory
     /// When with_full_relations is true, includes all relations (user-created and auto-generated inverse relations)
-    pub fn flush_to_directory(&self, output_dir: &Path, with_full_relations: bool) -> Result<(usize, usize), ReqvireError> {
+    pub fn flush_to_directory(
+        &self,
+        output_dir: &Path,
+        with_full_relations: bool,
+    ) -> Result<(usize, usize), ReqvireError> {
         // Create output directory if it doesn't exist
         if !output_dir.exists() {
-            fs::create_dir_all(output_dir)
-                .map_err(ReqvireError::IoError)?;
+            fs::create_dir_all(output_dir).map_err(ReqvireError::IoError)?;
         }
 
         // Generate and write markdown files
@@ -2396,22 +2632,22 @@ impl GraphRegistry {
 
         for (file_path, elements) in grouped_elements {
             // Generate the markdown content for this file
-            let markdown_content = self.generate_file_markdown(&file_path, &elements, with_full_relations);
+            let markdown_content =
+                self.generate_file_markdown(&file_path, &elements, with_full_relations);
 
             // Determine the output file path
             let output_file_path = output_dir.join(&file_path);
 
             // Create parent directories if needed
             if let Some(parent_dir) = output_file_path.parent() {
-                fs::create_dir_all(parent_dir)
-                    .map_err(ReqvireError::IoError)?;
+                fs::create_dir_all(parent_dir).map_err(ReqvireError::IoError)?;
             }
 
             // Write the markdown file
-            fs::write(&output_file_path, markdown_content)
-                .map_err(ReqvireError::IoError)?;
+            fs::write(&output_file_path, markdown_content).map_err(ReqvireError::IoError)?;
 
-            debug!("Flushed {} elements to {}",
+            debug!(
+                "Flushed {} elements to {}",
                 elements.len(),
                 output_file_path.display()
             );
@@ -2423,19 +2659,27 @@ impl GraphRegistry {
         let internal_paths = self.collect_internal_path_targets();
         let internal_files_copied = self.copy_internal_path_files(&internal_paths, output_dir)?;
 
-        log::info!("Successfully flushed {} markdown files and copied {} internal files to {}",
-                   markdown_files_written, internal_files_copied, output_dir.display());
+        log::info!(
+            "Successfully flushed {} markdown files and copied {} internal files to {}",
+            markdown_files_written,
+            internal_files_copied,
+            output_dir.display()
+        );
 
         Ok((markdown_files_written, internal_files_copied))
     }
 
     /// Flushes elements from specific files to markdown files and copies related InternalPath files
     /// When with_full_relations is true, includes all relations (user-created and auto-generated inverse relations)
-    pub fn flush_files_to_directory(&self, file_paths: &[String], output_dir: &Path, with_full_relations: bool) -> Result<(usize, usize), ReqvireError> {
+    pub fn flush_files_to_directory(
+        &self,
+        file_paths: &[String],
+        output_dir: &Path,
+        with_full_relations: bool,
+    ) -> Result<(usize, usize), ReqvireError> {
         // Create output directory if it doesn't exist
         if !output_dir.exists() {
-            fs::create_dir_all(output_dir)
-                .map_err(ReqvireError::IoError)?;
+            fs::create_dir_all(output_dir).map_err(ReqvireError::IoError)?;
         }
 
         let grouped_elements = self.group_elements_by_location();
@@ -2445,20 +2689,19 @@ impl GraphRegistry {
         for file_path in file_paths {
             if let Some(elements) = grouped_elements.get(file_path) {
                 // Generate the markdown content for this file
-                let markdown_content = self.generate_file_markdown(file_path, elements, with_full_relations);
+                let markdown_content =
+                    self.generate_file_markdown(file_path, elements, with_full_relations);
 
                 // Determine the output file path
                 let output_file_path = output_dir.join(file_path);
 
                 // Create parent directories if needed
                 if let Some(parent_dir) = output_file_path.parent() {
-                    fs::create_dir_all(parent_dir)
-                        .map_err(ReqvireError::IoError)?;
+                    fs::create_dir_all(parent_dir).map_err(ReqvireError::IoError)?;
                 }
 
                 // Write the markdown file
-                fs::write(&output_file_path, markdown_content)
-                    .map_err(ReqvireError::IoError)?;
+                fs::write(&output_file_path, markdown_content).map_err(ReqvireError::IoError)?;
 
                 // Collect InternalPath relations from elements in this file
                 for element in elements {
@@ -2469,7 +2712,8 @@ impl GraphRegistry {
                     }
                 }
 
-                debug!("Flushed {} elements to {}",
+                debug!(
+                    "Flushed {} elements to {}",
                     elements.len(),
                     output_file_path.display()
                 );
@@ -2479,21 +2723,33 @@ impl GraphRegistry {
         }
 
         // Copy related InternalPath files
-        let internal_files_copied = self.copy_internal_path_files(&related_internal_paths, output_dir)?;
+        let internal_files_copied =
+            self.copy_internal_path_files(&related_internal_paths, output_dir)?;
 
-        log::info!("Successfully flushed {} markdown files and copied {} internal files to {}",
-                   markdown_files_written, internal_files_copied, output_dir.display());
+        log::info!(
+            "Successfully flushed {} markdown files and copied {} internal files to {}",
+            markdown_files_written,
+            internal_files_copied,
+            output_dir.display()
+        );
 
         Ok((markdown_files_written, internal_files_copied))
     }
 
-
     // Dynamic graph manipulation methods
 
     /// Updates relation identifiers when elements move between files
-    fn update_relation_identifiers(&mut self, moved_element_id: &str, _old_file_path: &str, new_file_path: &str) {
+    fn update_relation_identifiers(
+        &mut self,
+        moved_element_id: &str,
+        _old_file_path: &str,
+        new_file_path: &str,
+    ) {
         // Extract just the fragment (element name) from the moved element's identifier
-        let moved_fragment = moved_element_id.split('#').next_back().unwrap_or(moved_element_id);
+        let moved_fragment = moved_element_id
+            .split('#')
+            .next_back()
+            .unwrap_or(moved_element_id);
 
         // 1. Update relations FROM other elements TO the moved element
         for (_id, node) in self.nodes.iter_mut() {
@@ -2504,7 +2760,9 @@ impl GraphRegistry {
 
             // Update relations in the Element object (for markdown generation)
             for relation in &mut node.element.relations {
-                if let crate::relation::LinkType::Identifier(ref mut target_id) = relation.target.link {
+                if let crate::relation::LinkType::Identifier(ref mut target_id) =
+                    relation.target.link
+                {
                     if target_id == moved_element_id {
                         if node.element.file_path != new_file_path {
                             // Cross-file reference needed
@@ -2523,8 +2781,10 @@ impl GraphRegistry {
         // 2. Update relations FROM the moved element TO other elements
         // Build lookup maps: full identifier -> file_path, and fragment -> (full_id, file_path)
         // This allows resolving both full identifiers and bare fragments
-        let mut id_to_file: std::collections::HashMap<String, String> = std::collections::HashMap::new();
-        let mut fragment_to_id_file: std::collections::HashMap<String, (String, String)> = std::collections::HashMap::new();
+        let mut id_to_file: std::collections::HashMap<String, String> =
+            std::collections::HashMap::new();
+        let mut fragment_to_id_file: std::collections::HashMap<String, (String, String)> =
+            std::collections::HashMap::new();
         for node in self.nodes.values() {
             let id = node.element.identifier.clone();
             let file = node.element.file_path.clone();
@@ -2536,21 +2796,32 @@ impl GraphRegistry {
 
         if let Some(moved_node) = self.nodes.get_mut(moved_element_id) {
             for relation in &mut moved_node.element.relations {
-                if let crate::relation::LinkType::Identifier(ref mut target_id) = relation.target.link {
+                if let crate::relation::LinkType::Identifier(ref mut target_id) =
+                    relation.target.link
+                {
                     // Extract the bare fragment (element name) from the target
-                    let fragment = target_id.split('#').next_back().unwrap_or(target_id).to_string();
+                    let fragment = target_id
+                        .split('#')
+                        .next_back()
+                        .unwrap_or(target_id)
+                        .to_string();
 
                     // Resolve target's file path: try full target_id first, then bare fragment
-                    let resolved = id_to_file.get(target_id.as_str())
+                    let resolved = id_to_file
+                        .get(target_id.as_str())
                         .map(|file| (fragment.clone(), file.clone()))
-                        .or_else(|| fragment_to_id_file.get(&fragment)
-                            .map(|(_full_id, file)| (fragment.clone(), file.clone())));
+                        .or_else(|| {
+                            fragment_to_id_file
+                                .get(&fragment)
+                                .map(|(_full_id, file)| (fragment.clone(), file.clone()))
+                        });
 
                     if let Some((target_fragment, target_file_path)) = resolved {
                         if new_file_path != target_file_path {
                             // Cross-file reference needed
                             *target_id = format!("{}#{}", target_file_path, target_fragment);
-                            relation.target.text = format!("{}#{}", target_file_path, target_fragment);
+                            relation.target.text =
+                                format!("{}#{}", target_file_path, target_fragment);
                         } else {
                             // Same file, use simple fragment reference
                             *target_id = target_fragment.clone();
@@ -2568,7 +2839,9 @@ impl GraphRegistry {
         // Find and update all attachment identifiers pointing to the old identifier
         for node in self.nodes.values_mut() {
             for attachment in &mut node.element.attachments {
-                if let crate::element::AttachmentTarget::ElementIdentifier(ref mut id) = attachment.target {
+                if let crate::element::AttachmentTarget::ElementIdentifier(ref mut id) =
+                    attachment.target
+                {
                     if id == old_identifier {
                         *id = new_identifier.to_string();
                     }
@@ -2599,13 +2872,19 @@ impl GraphRegistry {
         let element_id = element.identifier.clone();
 
         if self.nodes.contains_key(&element_id) {
-            return Err(ReqvireError::ElementMoveError(format!("Element '{}' already exists in the graph", element_id)));
+            return Err(ReqvireError::ElementMoveError(format!(
+                "Element '{}' already exists in the graph",
+                element_id
+            )));
         }
 
-        self.nodes.insert(element_id, ElementNode {
-            element,
-            relations: Vec::new(),
-        });
+        self.nodes.insert(
+            element_id,
+            ElementNode {
+                element,
+                relations: Vec::new(),
+            },
+        );
 
         Ok(())
     }
@@ -2613,7 +2892,10 @@ impl GraphRegistry {
     /// Removes an element from the graph and all relations pointing to it
     pub fn remove_element(&mut self, element_id: &str) -> Result<(), ReqvireError> {
         if !self.nodes.contains_key(element_id) {
-            return Err(ReqvireError::LocationNotFound(format!("Element '{}' not found in the graph", element_id)));
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Element '{}' not found in the graph",
+                element_id
+            )));
         }
 
         // Remove the element itself
@@ -2621,7 +2903,8 @@ impl GraphRegistry {
 
         // Remove all relations pointing to this element from graph structure
         for node in self.nodes.values_mut() {
-            node.relations.retain(|rel| rel.element_node.element.identifier != element_id);
+            node.relations
+                .retain(|rel| rel.element_node.element.identifier != element_id);
         }
 
         // Remove all relations pointing to this element from element's own relations list
@@ -2631,7 +2914,7 @@ impl GraphRegistry {
                     crate::relation::LinkType::Identifier(target) => {
                         // Remove if it points to the deleted element (handle both forms)
                         target != element_id && !target.ends_with(&format!("#{}", element_id))
-                    },
+                    }
                     _ => true, // Keep external links
                 }
             });
@@ -2641,18 +2924,32 @@ impl GraphRegistry {
     }
 
     /// Adds a relation between two elements in the graph
-    pub fn add_relation(&mut self, source_id: &str, target_id: &str, relation_type: &str) -> Result<(), ReqvireError> {
+    pub fn add_relation(
+        &mut self,
+        source_id: &str,
+        target_id: &str,
+        relation_type: &str,
+    ) -> Result<(), ReqvireError> {
         // Validate both elements exist
         if !self.nodes.contains_key(source_id) {
-            return Err(ReqvireError::LocationNotFound(format!("Source element '{}' not found", source_id)));
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Source element '{}' not found",
+                source_id
+            )));
         }
         if !self.nodes.contains_key(target_id) {
-            return Err(ReqvireError::LocationNotFound(format!("Target element '{}' not found", target_id)));
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Target element '{}' not found",
+                target_id
+            )));
         }
 
         // Check if relation type is valid for impact propagation
         if !relation::IMPACT_PROPAGATION_RELATIONS.contains(&relation_type) {
-            return Err(ReqvireError::ProcessError(format!("Relation type '{}' is not valid for impact propagation", relation_type)));
+            return Err(ReqvireError::ProcessError(format!(
+                "Relation type '{}' is not valid for impact propagation",
+                relation_type
+            )));
         }
 
         // Get the target node to create the relation
@@ -2662,12 +2959,16 @@ impl GraphRegistry {
         let source_node = self.nodes.get_mut(source_id).unwrap();
 
         // Check if relation already exists
-        let relation_exists = source_node.relations.iter().any(|rel|
-            rel.element_node.element.identifier == target_id && rel.relation_trigger == relation_type
-        );
+        let relation_exists = source_node.relations.iter().any(|rel| {
+            rel.element_node.element.identifier == target_id
+                && rel.relation_trigger == relation_type
+        });
 
         if relation_exists {
-            return Err(ReqvireError::ProcessError(format!("Relation '{}' from '{}' to '{}' already exists", relation_type, source_id, target_id)));
+            return Err(ReqvireError::ProcessError(format!(
+                "Relation '{}' from '{}' to '{}' already exists",
+                relation_type, source_id, target_id
+            )));
         }
 
         source_node.relations.push(RelationNode {
@@ -2679,20 +2980,32 @@ impl GraphRegistry {
     }
 
     /// Removes a specific relation between two elements (graph structure only)
-    pub fn remove_relation(&mut self, source_id: &str, target_id: &str, relation_type: &str) -> Result<(), ReqvireError> {
+    pub fn remove_relation(
+        &mut self,
+        source_id: &str,
+        target_id: &str,
+        relation_type: &str,
+    ) -> Result<(), ReqvireError> {
         if !self.nodes.contains_key(source_id) {
-            return Err(ReqvireError::LocationNotFound(format!("Source element '{}' not found", source_id)));
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Source element '{}' not found",
+                source_id
+            )));
         }
 
         let source_node = self.nodes.get_mut(source_id).unwrap();
         let initial_count = source_node.relations.len();
 
-        source_node.relations.retain(|rel|
-            !(rel.element_node.element.identifier == target_id && rel.relation_trigger == relation_type)
-        );
+        source_node.relations.retain(|rel| {
+            !(rel.element_node.element.identifier == target_id
+                && rel.relation_trigger == relation_type)
+        });
 
         if source_node.relations.len() == initial_count {
-            return Err(ReqvireError::ProcessError(format!("Relation '{}' from '{}' to '{}' not found", relation_type, source_id, target_id)));
+            return Err(ReqvireError::ProcessError(format!(
+                "Relation '{}' from '{}' to '{}' not found",
+                relation_type, source_id, target_id
+            )));
         }
 
         Ok(())
@@ -2701,15 +3014,26 @@ impl GraphRegistry {
     /// Removes a relation from an element's relations array with bidirectional handling
     /// This removes the relation from element.relations (which gets written to markdown)
     /// and also removes the opposite relation if one exists
-    pub fn remove_element_relation(&mut self, element_id: &str, target_id: &str, relation_type: &str) -> Result<(), ReqvireError> {
+    pub fn remove_element_relation(
+        &mut self,
+        element_id: &str,
+        target_id: &str,
+        relation_type: &str,
+    ) -> Result<(), ReqvireError> {
         // Check if source element exists
         if !self.nodes.contains_key(element_id) {
-            return Err(ReqvireError::LocationNotFound(format!("Element '{}' not found", element_id)));
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Element '{}' not found",
+                element_id
+            )));
         }
 
         // Check if target element exists
         if !self.nodes.contains_key(target_id) {
-            return Err(ReqvireError::LocationNotFound(format!("Target element '{}' not found", target_id)));
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Target element '{}' not found",
+                target_id
+            )));
         }
 
         // Remove the relation from source element's relations array
@@ -2722,9 +3046,10 @@ impl GraphRegistry {
         });
 
         if source_node.element.relations.len() == initial_count {
-            return Err(ReqvireError::ProcessError(
-                format!("Relation '{}' from '{}' to '{}' not found", relation_type, element_id, target_id)
-            ));
+            return Err(ReqvireError::ProcessError(format!(
+                "Relation '{}' from '{}' to '{}' not found",
+                relation_type, element_id, target_id
+            )));
         }
 
         // Check if this relation type has an opposite (bidirectional)
@@ -2743,35 +3068,49 @@ impl GraphRegistry {
     }
 
     /// Remove an attachment from an element
-    pub fn remove_element_attachment(&mut self, element_id: &str, attachment: &str) -> Result<(), ReqvireError> {
+    pub fn remove_element_attachment(
+        &mut self,
+        element_id: &str,
+        attachment: &str,
+    ) -> Result<(), ReqvireError> {
         if let Some(node) = self.nodes.get_mut(element_id) {
             let original_len = node.element.attachments.len();
-            node.element.attachments.retain(|a| {
-                a.target.as_str() != attachment
-            });
+            node.element
+                .attachments
+                .retain(|a| a.target.as_str() != attachment);
 
             if node.element.attachments.len() < original_len {
                 self.modified_files.insert(node.element.file_path.clone());
                 Ok(())
             } else {
                 Err(ReqvireError::ProcessError(format!(
-                    "Attachment '{}' not found on element '{}'", attachment, element_id
+                    "Attachment '{}' not found on element '{}'",
+                    attachment, element_id
                 )))
             }
         } else {
             Err(ReqvireError::ProcessError(format!(
-                "Element '{}' not found", element_id
+                "Element '{}' not found",
+                element_id
             )))
         }
     }
 
     /// Lists all relations for a given element
     pub fn list_relations(&self, element_id: &str) -> Result<Vec<(String, String)>, ReqvireError> {
-        let node = self.nodes.get(element_id)
-            .ok_or_else(|| ReqvireError::LocationNotFound(format!("Element '{}' not found", element_id)))?;
+        let node = self.nodes.get(element_id).ok_or_else(|| {
+            ReqvireError::LocationNotFound(format!("Element '{}' not found", element_id))
+        })?;
 
-        let relations = node.relations.iter()
-            .map(|rel| (rel.relation_trigger.clone(), rel.element_node.element.identifier.clone()))
+        let relations = node
+            .relations
+            .iter()
+            .map(|rel| {
+                (
+                    rel.relation_trigger.clone(),
+                    rel.element_node.element.identifier.clone(),
+                )
+            })
             .collect();
 
         Ok(relations)
@@ -2795,22 +3134,24 @@ impl GraphRegistry {
         relation_type: &str,
         git_root: &std::path::Path,
     ) -> Result<String, ReqvireError> {
-        use crate::relation::{RELATION_TYPES, Relation, RelationTarget, LinkType};
+        use crate::relation::{LinkType, Relation, RelationTarget, RELATION_TYPES};
         use std::path::PathBuf;
 
         // Validate source element exists
         if !self.nodes.contains_key(source_id) {
-            return Err(ReqvireError::ElementNotFound(
-                format!("Source element '{}' not found", source_id)
-            ));
+            return Err(ReqvireError::ElementNotFound(format!(
+                "Source element '{}' not found",
+                source_id
+            )));
         }
 
         // Validate relation type
         if !RELATION_TYPES.contains_key(relation_type) {
-            return Err(ReqvireError::UnsupportedRelationType(
-                format!("Invalid relation type '{}'. Valid types: {}",
-                    relation_type, crate::relation::supported_relation_types_list())
-            ));
+            return Err(ReqvireError::UnsupportedRelationType(format!(
+                "Invalid relation type '{}'. Valid types: {}",
+                relation_type,
+                crate::relation::supported_relation_types_list()
+            )));
         }
 
         // Get source element info
@@ -2821,17 +3162,19 @@ impl GraphRegistry {
 
         // Determine target type: element name, external URL, or internal path
         let is_external_url = crate::utils::is_external_url(target);
-        let is_internal_path = !is_external_url && (
-            target.ends_with(".md") ||
-            target.contains('/') ||
-            git_root.join(target).exists()
-        );
+        let is_internal_path = !is_external_url
+            && (target.ends_with(".md") || target.contains('/') || git_root.join(target).exists());
 
         // Resolve target and create relation components
         let (target_display_name, relation_target_link, target_id_for_check, element_id_opt) =
             if is_external_url {
                 // External URL - use as-is
-                (target.to_string(), LinkType::ExternalUrl(target.to_string()), target.to_string(), None)
+                (
+                    target.to_string(),
+                    LinkType::ExternalUrl(target.to_string()),
+                    target.to_string(),
+                    None,
+                )
             } else if is_internal_path {
                 // Internal file path
                 let source_folder = crate::utils::get_parent_dir(&source_file_path);
@@ -2842,17 +3185,22 @@ impl GraphRegistry {
                     .unwrap_or_else(|| target_path.clone());
 
                 // Extract filename for display name
-                let display = target_path.file_name()
+                let display = target_path
+                    .file_name()
                     .map(|n| n.to_string_lossy().to_string())
                     .unwrap_or_else(|| target.to_string());
 
-                (display, LinkType::InternalPath(relative_path), target.to_string(), None)
+                (
+                    display,
+                    LinkType::InternalPath(relative_path),
+                    target.to_string(),
+                    None,
+                )
             } else {
                 // Element name - resolve to get identifier
-                let target_element = self.get_element_by_name(target)
-                    .ok_or_else(|| ReqvireError::ElementNotFound(
-                        format!("Target element '{}' not found", target)
-                    ))?;
+                let target_element = self.get_element_by_name(target).ok_or_else(|| {
+                    ReqvireError::ElementNotFound(format!("Target element '{}' not found", target))
+                })?;
 
                 let target_id = target_element.identifier.clone();
                 let target_display_name = target_element.name.clone();
@@ -2882,11 +3230,9 @@ impl GraphRegistry {
                     LinkType::Identifier(format!("#{}", fragment))
                 } else {
                     // Different files - calculate relative path
-                    let relative_id = crate::utils::to_relative_identifier(
-                        &target_id,
-                        &source_folder,
-                        true
-                    ).unwrap_or_else(|_| target_id.clone());
+                    let relative_id =
+                        crate::utils::to_relative_identifier(&target_id, &source_folder, true)
+                            .unwrap_or_else(|_| target_id.clone());
                     LinkType::Identifier(relative_id)
                 };
 
@@ -2902,28 +3248,30 @@ impl GraphRegistry {
 
         // Validate: Check if relation already exists (idempotent)
         let relation_exists = source_node.element.relations.iter().any(|r| {
-            r.user_created &&
-            r.relation_type.name == relation_type &&
-            r.target.link.as_str() == target_id_for_check
+            r.user_created
+                && r.relation_type.name == relation_type
+                && r.target.link.as_str() == target_id_for_check
         });
 
         if relation_exists {
-            return Err(ReqvireError::RelationError(
-                format!("Relation '{}' from '{}' to '{}' already exists",
-                    relation_type, source_name, target)
-            ));
+            return Err(ReqvireError::RelationError(format!(
+                "Relation '{}' from '{}' to '{}' already exists",
+                relation_type, source_name, target
+            )));
         }
 
         // Validate: Check for cross-section duplicate (target in Attachments)
-        let in_attachments = source_node.element.attachments.iter().any(|a| {
-            a.target.as_str() == target_id_for_check
-        });
+        let in_attachments = source_node
+            .element
+            .attachments
+            .iter()
+            .any(|a| a.target.as_str() == target_id_for_check);
 
         if in_attachments {
-            return Err(ReqvireError::CrossSectionDuplicate(
-                format!("Target '{}' already exists in Attachments of '{}'. Cannot add to Relations.",
-                    target, source_name)
-            ));
+            return Err(ReqvireError::CrossSectionDuplicate(format!(
+                "Target '{}' already exists in Attachments of '{}'. Cannot add to Relations.",
+                target, source_name
+            )));
         }
 
         // Create the relation
@@ -2953,12 +3301,7 @@ impl GraphRegistry {
 
         // CRITICAL: Maintain bidirectional consistency for in-memory model
         // Use helper to add opposite relation to target element (if applicable)
-        self.add_opposite_to_target(
-            &relation,
-            source_id,
-            &source_name,
-            &source_element_id,
-        );
+        self.add_opposite_to_target(&relation, source_id, &source_name, &source_element_id);
 
         Ok(file_path)
     }
@@ -2979,9 +3322,10 @@ impl GraphRegistry {
     ) -> Result<Option<(String, String, String)>, ReqvireError> {
         // Validate source element exists
         if !self.nodes.contains_key(source_id) {
-            return Err(ReqvireError::ElementNotFound(
-                format!("Source element '{}' not found", source_id)
-            ));
+            return Err(ReqvireError::ElementNotFound(format!(
+                "Source element '{}' not found",
+                source_id
+            )));
         }
 
         let source_node = self.nodes.get(source_id).unwrap();
@@ -2997,23 +3341,26 @@ impl GraphRegistry {
 
         // Find matching relation (check both user_created and auto-generated)
         // This allows unlinking from either side of a bidirectional relation
-        let relation_match = source_node.element.relations.iter()
-            .find(|r| {
-                r.target.link.as_str() == target_id_to_find
-            })
+        let relation_match = source_node
+            .element
+            .relations
+            .iter()
+            .find(|r| r.target.link.as_str() == target_id_to_find)
             .cloned(); // Clone to avoid borrow issues
 
         if let Some(relation) = relation_match {
             let relation_type = relation.relation_type.name.to_string();
             let target_display_name = relation.target.text.clone();
-            let relation_type_info = crate::relation::RELATION_TYPES.get(relation_type.as_str()).unwrap();
+            let relation_type_info = crate::relation::RELATION_TYPES
+                .get(relation_type.as_str())
+                .unwrap();
             let source_relation_was_user_created = relation.user_created;
 
             // Remove the relation (both user_created and auto-generated)
             let source_node = self.nodes.get_mut(source_id).unwrap();
             source_node.element.relations.retain(|r| {
-                !(r.relation_type.name == relation_type &&
-                  r.target.link.as_str() == target_id_to_find)
+                !(r.relation_type.name == relation_type
+                    && r.target.link.as_str() == target_id_to_find)
             });
 
             // Mark source file as modified only if relation was user_created (written to file)
@@ -3037,9 +3384,7 @@ impl GraphRegistry {
     /// Gets statistics about the graph
     pub fn get_graph_stats(&self) -> (usize, usize) {
         let element_count = self.nodes.len();
-        let relation_count = self.nodes.values()
-            .map(|node| node.relations.len())
-            .sum();
+        let relation_count = self.nodes.values().map(|node| node.relations.len()).sum();
 
         (element_count, relation_count)
     }
@@ -3061,7 +3406,9 @@ impl GraphRegistry {
 
         if !validation.is_valid {
             return Err(ReqvireError::InvalidPath(
-                validation.error_message.unwrap_or_else(|| "Invalid target path".to_string())
+                validation
+                    .error_message
+                    .unwrap_or_else(|| "Invalid target path".to_string()),
             ));
         }
 
@@ -3070,9 +3417,10 @@ impl GraphRegistry {
 
         // Check for duplicate element name (global uniqueness)
         if self.nodes.contains_key(&element.identifier) {
-            return Err(ReqvireError::DuplicateElement(
-                format!("Element '{}' already exists in the model", element.name)
-            ));
+            return Err(ReqvireError::DuplicateElement(format!(
+                "Element '{}' already exists in the model",
+                element.name
+            )));
         }
 
         // Validate that all relation targets exist in the model
@@ -3080,7 +3428,8 @@ impl GraphRegistry {
         for relation in &element.relations {
             if let crate::relation::LinkType::Identifier(target_id) = &relation.target.link {
                 // Check if this is an external link using the predefined list
-                let is_external = crate::utils::EXTERNAL_SCHEMES.iter()
+                let is_external = crate::utils::EXTERNAL_SCHEMES
+                    .iter()
                     .any(|scheme| target_id.starts_with(scheme));
 
                 // If not external, validate that the target exists
@@ -3111,7 +3460,9 @@ impl GraphRegistry {
 
         // Set file_order_index: append to end of file
         let mut new_element = element.clone();
-        let max_index = self.nodes.values()
+        let max_index = self
+            .nodes
+            .values()
             .filter(|node| node.element.file_path == target_file)
             .map(|node| node.element.file_order_index)
             .max()
@@ -3130,7 +3481,9 @@ impl GraphRegistry {
         let new_element_id = new_element.identifier.clone();
         let new_element_name = new_element.name.clone();
         let new_element_fragment_id = new_element.id.clone();
-        let relations_to_process: Vec<_> = self.nodes.get(&new_element_id)
+        let relations_to_process: Vec<_> = self
+            .nodes
+            .get(&new_element_id)
             .unwrap()
             .element
             .relations
@@ -3187,11 +3540,15 @@ impl GraphRegistry {
     }
 
     /// Enhanced remove element that tracks modifications and performs cleanup
-    pub fn remove_element_with_cleanup(&mut self, element_id: &str) -> Result<Vec<String>, ReqvireError> {
+    pub fn remove_element_with_cleanup(
+        &mut self,
+        element_id: &str,
+    ) -> Result<Vec<String>, ReqvireError> {
         if !self.nodes.contains_key(element_id) {
-            return Err(ReqvireError::LocationNotFound(
-                format!("Element '{}' not found in the graph", element_id)
-            ));
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Element '{}' not found in the graph",
+                element_id
+            )));
         }
 
         // Get element info before removal
@@ -3221,9 +3578,9 @@ impl GraphRegistry {
         // Find all elements with relations pointing to this element
         for (other_id, node) in self.nodes.iter() {
             if other_id != element_id {
-                let has_relation_to_target = node.element.relations.iter().any(|rel| {
-                    matches!(&rel.target.link, LinkType::Identifier(id) if id == element_id)
-                });
+                let has_relation_to_target = node.element.relations.iter().any(
+                    |rel| matches!(&rel.target.link, LinkType::Identifier(id) if id == element_id),
+                );
 
                 if has_relation_to_target {
                     let other_file = node.element.file_path.clone();
@@ -3247,7 +3604,10 @@ impl GraphRegistry {
 
     /// Checks if a file has no elements remaining
     pub fn is_file_empty(&self, file_path: &str) -> bool {
-        !self.nodes.values().any(|node| node.element.file_path == file_path)
+        !self
+            .nodes
+            .values()
+            .any(|node| node.element.file_path == file_path)
     }
 
     /// Comprehensive move operation with full relation updates and file tracking
@@ -3259,20 +3619,29 @@ impl GraphRegistry {
     ) -> Result<(String, Vec<String>), ReqvireError> {
         // Validate element exists
         if !self.nodes.contains_key(element_id) {
-            return Err(ReqvireError::LocationNotFound(
-                format!("Element '{}' not found", element_id)
-            ));
+            return Err(ReqvireError::LocationNotFound(format!(
+                "Element '{}' not found",
+                element_id
+            )));
         }
 
         // Get source file before move
-        let source_file = self.nodes.get(element_id).unwrap().element.file_path.clone();
+        let source_file = self
+            .nodes
+            .get(element_id)
+            .unwrap()
+            .element
+            .file_path
+            .clone();
 
         // Validate target path
         let validation = crate::utils::validate_target_path(target_file, None, excluded_patterns)?;
 
         if !validation.is_valid {
             return Err(ReqvireError::InvalidPath(
-                validation.error_message.unwrap_or_else(|| "Invalid target path".to_string())
+                validation
+                    .error_message
+                    .unwrap_or_else(|| "Invalid target path".to_string()),
             ));
         }
 
@@ -3298,9 +3667,9 @@ impl GraphRegistry {
         }
 
         for node in self.nodes.values() {
-            let has_relation = node.element.relations.iter().any(|rel| {
-                matches!(&rel.target.link, LinkType::Identifier(id) if id == &old_identifier)
-            });
+            let has_relation = node.element.relations.iter().any(
+                |rel| matches!(&rel.target.link, LinkType::Identifier(id) if id == &old_identifier),
+            );
 
             if has_relation {
                 let file = node.element.file_path.clone();
@@ -3367,9 +3736,10 @@ impl GraphRegistry {
     ) -> Result<(), ReqvireError> {
         // Validate target exists
         if !self.nodes.contains_key(target_id) {
-            return Err(ReqvireError::ElementNotFound(
-                format!("Target element '{}' not found", target_id)
-            ));
+            return Err(ReqvireError::ElementNotFound(format!(
+                "Target element '{}' not found",
+                target_id
+            )));
         }
 
         // Get target element data first (needed for validation)
@@ -3379,19 +3749,24 @@ impl GraphRegistry {
 
         // Validate all sources exist and collect their data
         #[allow(clippy::type_complexity)]
-        let mut source_data: Vec<(String, String, String, Vec<crate::relation::Relation>, Vec<crate::element::Attachment>)> = Vec::new();
+        let mut source_data: Vec<(
+            String,
+            String,
+            String,
+            Vec<crate::relation::Relation>,
+            Vec<crate::element::Attachment>,
+        )> = Vec::new();
         for source_id in source_ids {
-            let source_node = self.nodes.get(source_id)
-                .ok_or_else(|| ReqvireError::ElementNotFound(
-                    format!("Source element '{}' not found", source_id)
-                ))?;
+            let source_node = self.nodes.get(source_id).ok_or_else(|| {
+                ReqvireError::ElementNotFound(format!("Source element '{}' not found", source_id))
+            })?;
 
             let source_element = &source_node.element;
 
             // Validate: Check if source would merge into itself
             if source_id == target_id {
                 return Err(ReqvireError::InvalidOperation(
-                    "Cannot merge element into itself".to_string()
+                    "Cannot merge element into itself".to_string(),
                 ));
             }
 
@@ -3409,7 +3784,9 @@ impl GraphRegistry {
                 source_id.clone(),
                 source_element.name.clone(),
                 source_element.content.clone(),
-                source_element.relations.iter()
+                source_element
+                    .relations
+                    .iter()
                     .filter(|r| r.user_created)
                     .cloned()
                     .collect(),
@@ -3421,14 +3798,20 @@ impl GraphRegistry {
         let target_node = self.nodes.get(target_id).unwrap();
         let target_file_path = target_node.element.file_path.clone();
         let mut merged_content = String::new();
-        let mut merged_relations: Vec<crate::relation::Relation> = target_node.element.relations.iter()
+        let mut merged_relations: Vec<crate::relation::Relation> = target_node
+            .element
+            .relations
+            .iter()
             .filter(|r| r.user_created)
             .cloned()
             .collect();
-        let mut merged_attachments: Vec<crate::element::Attachment> = target_node.element.attachments.clone();
+        let mut merged_attachments: Vec<crate::element::Attachment> =
+            target_node.element.attachments.clone();
 
         // Process each source element
-        for (source_id, source_name, source_content, source_relations, source_attachments) in &source_data {
+        for (source_id, source_name, source_content, source_relations, source_attachments) in
+            &source_data
+        {
             // Extract main content and details from source
             let (main_content, details_content) = extract_content_parts(source_content);
 
@@ -3441,7 +3824,8 @@ impl GraphRegistry {
             if !details_content.trim().is_empty() {
                 merged_content.push_str(&format!(
                     "\n#### Merged Details ({})\n{}\n",
-                    source_name, details_content.trim()
+                    source_name,
+                    details_content.trim()
                 ));
             }
 
@@ -3463,7 +3847,10 @@ impl GraphRegistry {
         // Deduplicate relations by (relation_type, target)
         let mut seen_relations: HashSet<(String, String)> = HashSet::new();
         merged_relations.retain(|r| {
-            let key = (r.relation_type.name.to_string(), r.target.link.as_str().to_string());
+            let key = (
+                r.relation_type.name.to_string(),
+                r.target.link.as_str().to_string(),
+            );
             if seen_relations.contains(&key) {
                 false
             } else {
@@ -3486,10 +3873,14 @@ impl GraphRegistry {
 
         // Validate attachment scope constraints for target element
         for attachment in &merged_attachments {
-            if let crate::element::AttachmentTarget::ElementIdentifier(ref att_id) = attachment.target {
+            if let crate::element::AttachmentTarget::ElementIdentifier(ref att_id) =
+                attachment.target
+            {
                 // Check orphan refinement constraint
                 if !self.refinement_has_refine_relation(att_id) {
-                    let att_name = self.nodes.get(att_id)
+                    let att_name = self
+                        .nodes
+                        .get(att_id)
                         .map(|n| n.element.name.as_str())
                         .unwrap_or(att_id);
                     return Err(ReqvireError::InvalidAttachmentTarget(
@@ -3504,7 +3895,9 @@ impl GraphRegistry {
                 let defining_reqs = self.get_defining_requirements(att_id);
                 for defining_req_id in defining_reqs {
                     if self.is_in_hierarchy(target_id, &defining_req_id) {
-                        let att_name = self.nodes.get(att_id)
+                        let att_name = self
+                            .nodes
+                            .get(att_id)
                             .map(|n| n.element.name.as_str())
                             .unwrap_or(att_id);
                         return Err(ReqvireError::InvalidAttachmentScope(
@@ -3520,7 +3913,8 @@ impl GraphRegistry {
         }
 
         // Check for cross-section duplicates
-        let relation_targets: HashSet<String> = merged_relations.iter()
+        let relation_targets: HashSet<String> = merged_relations
+            .iter()
             .map(|r| r.target.link.as_str().to_string())
             .collect();
 
@@ -3541,7 +3935,8 @@ impl GraphRegistry {
 
             // Merge content into target's Details section
             if !merged_content.trim().is_empty() {
-                target_element.content = merge_content_into_details(&target_element.content, &merged_content);
+                target_element.content =
+                    merge_content_into_details(&target_element.content, &merged_content);
             }
 
             target_element.relations = merged_relations;
@@ -3579,12 +3974,21 @@ impl GraphRegistry {
                 for relation in relations_to_source {
                     if let Some(opposite_type_name) = relation.relation_type.opposite {
                         // Remove old opposite pointing to source
-                        self.remove_opposite_from_target(source_id, &referrer_id, opposite_type_name);
+                        self.remove_opposite_from_target(
+                            source_id,
+                            &referrer_id,
+                            opposite_type_name,
+                        );
 
                         // Create new opposite pointing to target (will be added to target after merge)
                         // Note: The referrer's relation will be redirected by redirect_relations_to_target(),
                         // so we create opposite on target now
-                        self.add_opposite_to_target(&relation, target_id, &target_name, &target_element_id);
+                        self.add_opposite_to_target(
+                            &relation,
+                            target_id,
+                            &target_name,
+                            &target_element_id,
+                        );
                     }
                 }
             }
@@ -3610,17 +4014,18 @@ impl GraphRegistry {
         target_id: &str,
     ) -> Result<(), ReqvireError> {
         // Find all nodes with relations pointing to source_id
-        let nodes_to_update: Vec<String> = self.nodes.iter()
+        let nodes_to_update: Vec<String> = self
+            .nodes
+            .iter()
             .filter(|(id, node)| {
-                *id != source_id && *id != target_id &&
-                node.element.relations.iter().any(|r| {
-                    match &r.target.link {
+                *id != source_id
+                    && *id != target_id
+                    && node.element.relations.iter().any(|r| match &r.target.link {
                         LinkType::Identifier(ref id) => {
                             id == source_id || id.ends_with(&format!("#{}", source_id))
-                        },
+                        }
                         _ => false,
-                    }
-                })
+                    })
             })
             .map(|(id, _)| id.clone())
             .collect();
@@ -3646,8 +4051,12 @@ impl GraphRegistry {
 
         // CRITICAL: Also redirect opposite relations (auto-generated, user_created=false)
         // Get target element info for creating correct opposite targets
-        let (target_name, target_element_id) = if let Some(target_node) = self.nodes.get(target_id) {
-            (target_node.element.name.clone(), target_node.element.id.clone())
+        let (target_name, target_element_id) = if let Some(target_node) = self.nodes.get(target_id)
+        {
+            (
+                target_node.element.name.clone(),
+                target_node.element.id.clone(),
+            )
         } else {
             return Ok(()); // Target doesn't exist
         };
@@ -3660,7 +4069,8 @@ impl GraphRegistry {
 
             // Update auto-generated opposite relations pointing to source
             for relation in &mut node.element.relations {
-                if !relation.user_created { // Only auto-generated opposites
+                if !relation.user_created {
+                    // Only auto-generated opposites
                     if let LinkType::Identifier(ref id) = relation.target.link {
                         if id == source_id || id.ends_with(&format!("#{}", source_id)) {
                             // Update opposite to point to target
@@ -3680,7 +4090,7 @@ impl GraphRegistry {
     }
 
     /// Flushes only modified files to directory (optimization)
-    pub fn flush_modified_files(&self, directory: &Path) -> Result<(), ReqvireError> {
+    pub fn flush_modified_files(&mut self, directory: &Path) -> Result<(), ReqvireError> {
         if self.modified_files.is_empty() {
             return Ok(());
         }
@@ -3695,13 +4105,13 @@ impl GraphRegistry {
                 // This file has no elements, delete it
                 let file_full_path = directory.join(file_path);
                 if file_full_path.exists() {
-                    fs::remove_file(&file_full_path)
-                        .map_err(ReqvireError::IoError)?;
+                    fs::remove_file(&file_full_path).map_err(ReqvireError::IoError)?;
                     log::info!("Deleted empty file: {}", file_path);
                 }
             }
         }
 
+        self.modified_files.clear();
         Ok(())
     }
 
@@ -3724,8 +4134,7 @@ fn extract_content_parts(content: &str) -> (String, String) {
         let rest = &content[after_marker..];
 
         // Find end of details (next #### or end)
-        let details_end = rest.find("\n#### ")
-            .unwrap_or(rest.len());
+        let details_end = rest.find("\n#### ").unwrap_or(rest.len());
 
         (main, rest[..details_end].to_string())
     } else {
@@ -3744,7 +4153,8 @@ fn merge_content_into_details(target_content: &str, additional: &str) -> String 
         // Find end of existing details
         let after_marker = pos + details_marker.len();
         let rest = &target_content[after_marker..];
-        let details_end = rest.find("\n#### ")
+        let details_end = rest
+            .find("\n#### ")
             .map(|p| after_marker + p)
             .unwrap_or(target_content.len());
 
@@ -3755,7 +4165,11 @@ fn merge_content_into_details(target_content: &str, additional: &str) -> String 
         result
     } else {
         // No Details section - create one
-        format!("{}\n#### Details\n{}", target_content.trim_end(), additional)
+        format!(
+            "{}\n#### Details\n{}",
+            target_content.trim_end(),
+            additional
+        )
     }
 }
 
@@ -3763,7 +4177,7 @@ fn merge_content_into_details(target_content: &str, additional: &str) -> String 
 mod tests {
     use super::*;
     use crate::element::{Element, ElementType, RequirementType};
-    use crate::relation::{Relation, RelationTarget, LinkType, RELATION_TYPES};
+    use crate::relation::{LinkType, Relation, RelationTarget, RELATION_TYPES};
 
     fn make_element(id: &str, name: &str) -> Element {
         let mut element = Element::new(
@@ -3781,7 +4195,9 @@ mod tests {
     fn add_relation(from: &mut Element, relation_type: &'static str, to_id: &str) {
         let relation_info = RELATION_TYPES.get(relation_type).unwrap();
         // Extract element_id from identifier (fragment after #)
-        let element_id = crate::utils::extract_path_and_fragment(to_id).1.map(|f| f.to_string());
+        let element_id = crate::utils::extract_path_and_fragment(to_id)
+            .1
+            .map(|f| f.to_string());
         from.relations.push(Relation {
             relation_type: relation_info,
             target: RelationTarget {
@@ -3928,7 +4344,10 @@ mod tests {
         // Try to move to non-existent file
         let result = graph.move_element_to_location("A", "nonexistent.md");
         assert!(result.is_err());
-        assert!(result.unwrap_err().to_string().contains("does not exist in the graph"));
+        assert!(result
+            .unwrap_err()
+            .to_string()
+            .contains("does not exist in the graph"));
     }
 
     #[test]
@@ -4064,17 +4483,32 @@ mod tests {
         let c_relations_after = graph.list_relations("C").unwrap();
 
         // These should still exist and point to the moved element
-        assert_eq!(b_relations_after.len(), 1, "B should still have 1 relation after A is moved");
-        assert_eq!(c_relations_after.len(), 1, "C should still have 1 relation after A is moved");
+        assert_eq!(
+            b_relations_after.len(),
+            1,
+            "B should still have 1 relation after A is moved"
+        );
+        assert_eq!(
+            c_relations_after.len(),
+            1,
+            "C should still have 1 relation after A is moved"
+        );
 
         // The target should still be "A" (or updated identifier if it changed)
         let b_target = &b_relations_after[0].1;
         let c_target = &c_relations_after[0].1;
 
         // Verify the targets still exist in the graph
-        assert!(graph.get_element(b_target).is_some(), "B's relation target '{}' should exist in graph", b_target);
-        assert!(graph.get_element(c_target).is_some(), "C's relation target '{}' should exist in graph", c_target);
-
+        assert!(
+            graph.get_element(b_target).is_some(),
+            "B's relation target '{}' should exist in graph",
+            b_target
+        );
+        assert!(
+            graph.get_element(c_target).is_some(),
+            "C's relation target '{}' should exist in graph",
+            c_target
+        );
     }
 
     #[test]
@@ -4115,14 +4549,17 @@ mod tests {
 
         // Let's check what the markdown would look like:
         let b_element = graph.nodes.get("B").unwrap().element.clone();
-        let b_markdown = graph.element_to_markdown_with_context(&b_element, "file1.md",true);
+        let b_markdown = graph.element_to_markdown_with_context(&b_element, "file1.md", true);
         println!("B's markdown after A is moved:");
         println!("{}", b_markdown);
 
         // The relation should be "file2.md#A" since A is now in a different file
         // but it's probably still "A" which would be incorrect
-        assert!(b_markdown.contains("file2.md#A") || b_markdown.contains("[A](file2.md#A)"),
-                "B's relation should reference A in its new location: {}", b_markdown);
+        assert!(
+            b_markdown.contains("file2.md#A") || b_markdown.contains("[A](file2.md#A)"),
+            "B's relation should reference A in its new location: {}",
+            b_markdown
+        );
     }
 
     #[test]
@@ -4134,10 +4571,10 @@ mod tests {
         a.file_path = "file1.md".to_string();
 
         let mut b = make_element("B", "Element B");
-        b.file_path = "file2.md".to_string();  // B is in different file
+        b.file_path = "file2.md".to_string(); // B is in different file
 
         let mut c = make_element("C", "Element C");
-        c.file_path = "file1.md".to_string();  // C is in same file as A initially
+        c.file_path = "file1.md".to_string(); // C is in same file as A initially
 
         // A has relations to both B (cross-file) and C (same-file)
         add_relation(&mut a, "derivedFrom", "B");
@@ -4151,7 +4588,8 @@ mod tests {
 
         // Check A's initial relations in markdown
         let a_element_initial = graph.nodes.get("A").unwrap().element.clone();
-        let a_markdown_initial = graph.element_to_markdown_with_context(&a_element_initial, "file1.md",true);
+        let a_markdown_initial =
+            graph.element_to_markdown_with_context(&a_element_initial, "file1.md", true);
         println!("A's initial markdown (in file1.md):");
         println!("{}", a_markdown_initial);
 
@@ -4164,7 +4602,8 @@ mod tests {
 
         // Check A's relations after the move
         let a_element_moved = graph.nodes.get("A").unwrap().element.clone();
-        let a_markdown_moved = graph.element_to_markdown_with_context(&a_element_moved, "file3.md",true);
+        let a_markdown_moved =
+            graph.element_to_markdown_with_context(&a_element_moved, "file3.md", true);
         println!("A's markdown after move to file3.md:");
         println!("{}", a_markdown_moved);
 
@@ -4175,22 +4614,32 @@ mod tests {
 
         println!("A's relations after move:");
         for relation in &a_element_moved.relations {
-            println!("  {} -> {}", relation.relation_type.name,
-                    match &relation.target.link {
-                        crate::relation::LinkType::Identifier(id) => id.clone(),
-                        crate::relation::LinkType::InternalPath(path) => path.to_string_lossy().to_string(),
-                        crate::relation::LinkType::ExternalUrl(url) => url.clone(),
-                    });
+            println!(
+                "  {} -> {}",
+                relation.relation_type.name,
+                match &relation.target.link {
+                    crate::relation::LinkType::Identifier(id) => id.clone(),
+                    crate::relation::LinkType::InternalPath(path) =>
+                        path.to_string_lossy().to_string(),
+                    crate::relation::LinkType::ExternalUrl(url) => url.clone(),
+                }
+            );
         }
 
         // PROBLEM: A's relations likely still point to "B" and "C"
         // but should now point to "file2.md#B" and "file1.md#C" respectively
         // since A is now in a different file than both of them
 
-        assert!(a_markdown_moved.contains("file2.md#B") || a_markdown_moved.contains("[B](file2.md#B)"),
-                "A should reference B with file path since they're in different files: {}", a_markdown_moved);
-        assert!(a_markdown_moved.contains("file1.md#C") || a_markdown_moved.contains("[C](file1.md#C)"),
-                "A should reference C with file path since they're in different files: {}", a_markdown_moved);
+        assert!(
+            a_markdown_moved.contains("file2.md#B") || a_markdown_moved.contains("[B](file2.md#B)"),
+            "A should reference B with file path since they're in different files: {}",
+            a_markdown_moved
+        );
+        assert!(
+            a_markdown_moved.contains("file1.md#C") || a_markdown_moved.contains("[C](file1.md#C)"),
+            "A should reference C with file path since they're in different files: {}",
+            a_markdown_moved
+        );
     }
 
     #[test]
@@ -4233,7 +4682,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path,true);
+        let result = graph.flush_to_directory(output_path, true);
         assert!(result.is_ok());
 
         // List what files were actually created
@@ -4267,14 +4716,20 @@ mod tests {
 
         // Verify ElementA's relations in file1.md
         // A -> B should be cross-file reference with proper display name and fragment anchor
-        assert!(file1_content.contains("[Element B Description](file3.md#ElementB)"),
-                "ElementA should reference ElementB with proper display name: {}", file1_content);
+        assert!(
+            file1_content.contains("[Element B Description](file3.md#ElementB)"),
+            "ElementA should reference ElementB with proper display name: {}",
+            file1_content
+        );
 
         // A -> C should be same-file reference (no file prefix needed)
-        assert!(file1_content.contains("[ElementC](ElementC)") ||
-                file1_content.contains("[ElementC](#ElementC)") ||
-                file1_content.contains("ElementC"),
-                "ElementA should reference ElementC in same file: {}", file1_content);
+        assert!(
+            file1_content.contains("[ElementC](ElementC)")
+                || file1_content.contains("[ElementC](#ElementC)")
+                || file1_content.contains("ElementC"),
+            "ElementA should reference ElementC in same file: {}",
+            file1_content
+        );
 
         // Verify file3.md content (contains ElementB)
         assert!(file3_content.contains("### Element B Description"));
@@ -4283,8 +4738,11 @@ mod tests {
 
         // Verify ElementB's relations in file3.md
         // B -> A should be cross-file reference with proper display name and fragment anchor
-        assert!(file3_content.contains("[Element A Description](file1.md#ElementA)"),
-                "ElementB should reference ElementA with proper display name: {}", file3_content);
+        assert!(
+            file3_content.contains("[Element A Description](file1.md#ElementA)"),
+            "ElementB should reference ElementA with proper display name: {}",
+            file3_content
+        );
 
         // Verify no virtual placeholder content appears in any file
         assert!(!file1_content.contains("Virtual placeholder"));
@@ -4307,10 +4765,13 @@ mod tests {
         let mut a = make_element("ElementA", "Element A Description");
         a.file_path = "test_file.md".to_string();
 
-        registry.register_element(a.clone(), "test_file.md").unwrap();
+        registry
+            .register_element(a.clone(), "test_file.md")
+            .unwrap();
 
         // Add page content
-        let page = Page::new("This is page frontmatter content.\n\nMore page content here.".to_string());
+        let page =
+            Page::new("This is page frontmatter content.\n\nMore page content here.".to_string());
         registry.pages.insert("test_file.md".to_string(), page);
 
         let graph = registry;
@@ -4320,7 +4781,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path,true);
+        let result = graph.flush_to_directory(output_path, true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
@@ -4341,7 +4802,9 @@ mod tests {
 
         // Verify order: header, page content, element
         let header_pos = file_content.find("# Elements").unwrap();
-        let page_content_pos = file_content.find("This is page frontmatter content.").unwrap();
+        let page_content_pos = file_content
+            .find("This is page frontmatter content.")
+            .unwrap();
         let element_pos = file_content.find("### Element A Description").unwrap();
 
         assert!(header_pos < page_content_pos);
@@ -4364,8 +4827,12 @@ mod tests {
         b.file_path = "test_file.md".to_string();
         b.file_order_index = 2;
 
-        registry.register_element(a.clone(), "test_file.md").unwrap();
-        registry.register_element(b.clone(), "test_file.md").unwrap();
+        registry
+            .register_element(a.clone(), "test_file.md")
+            .unwrap();
+        registry
+            .register_element(b.clone(), "test_file.md")
+            .unwrap();
 
         // Add page content
         let page = Page::new("Page frontmatter content.".to_string());
@@ -4378,7 +4845,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path,true);
+        let result = graph.flush_to_directory(output_path, true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
@@ -4404,7 +4871,9 @@ mod tests {
         let mut a = make_element("ElementA", "Element A Description");
         a.file_path = "test_file.md".to_string();
 
-        registry.register_element(a.clone(), "test_file.md").unwrap();
+        registry
+            .register_element(a.clone(), "test_file.md")
+            .unwrap();
 
         // Add empty page content (should be skipped)
         let page = Page::new("   \n\t  \n  ".to_string()); // only whitespace
@@ -4417,7 +4886,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path,true);
+        let result = graph.flush_to_directory(output_path, true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
@@ -4454,7 +4923,7 @@ mod tests {
         let output_path = temp_dir.path();
 
         // Flush the graph to markdown files
-        let result = graph.flush_to_directory(output_path,true);
+        let result = graph.flush_to_directory(output_path, true);
         assert!(result.is_ok());
 
         // Read the generated markdown file
