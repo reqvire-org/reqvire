@@ -171,6 +171,178 @@ The collect command supports two directions:
 - **UPSTREAM** (default): Traverses `derivedFrom` relations upward — ancestors, specs, attachments
 - **DOWNSTREAM**: Traverses `derive` relations downward — all children to leaf elements
 
+## Task Pattern: Attachment-Boundary Submodel Refactor
+
+### Do It When
+
+- The model must be split into several independent submodels.
+- Cross-submodel links must be attachments only (no direct cross-submodel relations).
+- `collect` must provide all external specs needed by a consuming submodel.
+- `change-impact` must detect propagation through attached contracts/artifacts.
+
+### Mandatory Human Boundary Check
+
+Before applying refactor operations:
+
+- Confirm submodel boundaries and ownership with the user.
+- Confirm which relation types are forbidden across boundaries (`derive`, `derivedFrom`, `refinedBy`, `verifiedBy`, etc.).
+- Confirm where shared contracts live (files, refinement elements, or both).
+
+Do not run bulk unlink/move operations before this confirmation.
+
+### Refactor Workflow
+
+1. Audit cross-submodel relations and hotspots.
+2. Move misplaced elements into owning submodels where feasible.
+3. Replace remaining cross-submodel relations with attachment contracts.
+4. Verify `collect` includes all required attached external specification context.
+5. Verify `change-impact` reports consumers when attached contracts change.
+6. Run `reqvire validate`, `reqvire lint`, `reqvire coverage`.
+
+### Circle-Back Checkpoint (Human Confirmation)
+
+Before applying refactor edits, explicitly confirm:
+
+- Submodel ownership map (who owns which folders/elements).
+- Which cross-submodel dependencies are allowed as attachments.
+- Which relation types are forbidden across submodels (`derive`, `refinedBy`, `verifiedBy`, etc.).
+- Whether shared contracts live as files, refinement elements, or both.
+
+Do not proceed with bulk unlink/move operations until this is confirmed.
+
+### Correct vs Incorrect Patterns
+
+Correct (attachment boundary):
+
+- `Submodel A` requirement keeps internal `derive/refinedBy/verifiedBy` only within `Submodel A`.
+- `Submodel A` requirement attaches `Submodel B` contract/spec:
+  - `reqvire link "A Requirement" attaching "requirements/Contracts/B/InterfaceSpec.md#api-contract"`
+- `collect` for `A Requirement` includes the attached external contract content.
+
+Incorrect (cross-submodel relation leakage):
+
+- `Submodel A` requirement directly uses:
+  - `derivedFrom` to `Submodel B` requirement
+  - `refinedBy` to `Submodel B` specification
+  - `verifiedBy` to `Submodel B` verification
+- This breaks independence and creates hidden coupling that attachment boundaries are meant to prevent.
+
+### Report Expectations
+
+`collect` expectation (after refactor):
+
+- Running `reqvire collect "<A Requirement>" --json` should include:
+  - local ancestry from `Submodel A`
+  - attached external contracts/specifications from `Submodel B`
+  - enough content to implement/review `A Requirement` without cross-submodel relations
+
+`change-impact` expectation (after refactor):
+
+- If an attached contract changes (content, move, rename), then
+  `reqvire change-impact --git-commit="<base>"` should list impacted elements in consuming submodels.
+- If impact report does not include known consumers, attachment boundary coverage is incomplete.
+
+### How Not To Do It
+
+- Do not remove cross-submodel relations without replacing them by required attachments.
+- Do not assume attachment coverage is complete without checking `collect` output.
+- Do not rely on inferred boundaries; always confirm with the human user first.
+- Do not run mass refactors in one pass; refactor by boundary slice and validate each slice.
+
+## Task Pattern: Requirement-to-Refinement Content Extraction
+
+### Do It When
+
+- Requirement body/`#### Details` contains embedded specifications, constraints, or behaviors.
+- Requirements need to stay intent-level, while technical details must be explicit and attachable.
+- You are preparing model content for stronger cross-submodel attachment contracts.
+
+### Goal
+
+Extract technical content from requirements into dedicated refinement elements and keep requirements focused on EARS intent statements.
+
+### Mandatory Boundary Clarification (Human Checkpoint)
+
+Before extraction, confirm with the user:
+
+- Which requirement groups are in scope.
+- Exact split policy: what text remains in requirement vs moves to refinements.
+- Naming convention for refinement elements.
+- Reuse policy for existing refinements vs creating new ones.
+
+Do not start bulk extraction before this confirmation.
+
+### Workflow
+
+1. Identify requirement text segments that are technical details (not intent statements).
+2. Classify each segment as `specification`, `constraint`, or `behavior`.
+3. Create/reuse refinement elements and link via `refinedBy`.
+4. Transfer extracted content into refinement `#### Details`.
+5. Replace requirement details with concise pointer text preserving requirement intent.
+6. Run and review:
+   - `reqvire validate`
+   - `reqvire lint`
+   - `reqvire coverage --json`
+   - `reqvire collect "<requirement>" --json`
+
+### Example Report Expectations
+
+After correct extraction:
+
+- `validate` passes with no structural/type errors.
+- `lint` does not introduce new model hygiene regressions.
+- `coverage` keeps verification linkage stable (no accidental orphaning from content migration).
+- `collect` output still provides implementation/review-ready context through linked refinements.
+
+### How Not To Do It
+
+- Do not create empty "Refinement Specification" elements.
+- Do not remove details from requirements unless moved into linked refinements.
+- Do not alter requirement intent semantics during extraction.
+- Do not place verification criteria content into refinement elements.
+- Do not perform a repository-wide rewrite without iterative validation checkpoints.
+
+## Task Pattern: Design-Document Ownership Normalization
+
+### Do It When
+
+- `DesignDocuments/*.md` files are referenced via attachments but lack explicit owner requirement.
+- The model still contains legacy attachment-only refinement contracts.
+- You need one owning requirement per design/refinement document.
+
+### Goal
+
+Normalize design document ownership so each design/refinement document is owned by exactly one requirement via `refinedBy`, while other requirements consume it through attachments.
+
+### Mandatory Boundary Clarification (Human Checkpoint)
+
+Confirm before bulk edits:
+
+- Scope (entire model or selected submodels).
+- Tie-break rule when multiple candidate owners exist.
+- Exceptions that should stay attachment-only.
+
+### Workflow
+
+1. Enumerate all references to `DesignDocuments/*.md`.
+2. Select a single owner requirement for each document by semantic/derivation fit.
+3. Convert owner requirement link to `refinedBy` file relation.
+4. Keep all non-owner references as attachments.
+5. Verify no design document has multiple owner requirements.
+6. Run `reqvire validate`, `reqvire lint`, `reqvire coverage --json`.
+
+### Example Report Expectations
+
+- `validate` passes with no relation/type errors.
+- `collect` on owner requirement includes the design document as part of refinement context.
+- `change-impact` captures downstream impact via owner+attachment chain when the design doc changes.
+
+### How Not To Do It
+
+- Do not blindly replace every attachment with `refinedBy`.
+- Do not assign multiple owners to one design document.
+- Do not choose owners without checking requirement intent and derivation context.
+
 ## Command Reference
 
 This section consolidates the most common reqvire commands. For detailed options and advanced usage, see reference files.
@@ -593,8 +765,4 @@ reqvire format --fix      # Apply formatting
 - `reqvire traces` - Verify verification traceability
 - `reqvire model` - Confirm hierarchy structure
 - `reqvire containment` - Check physical organization
-
-
-
-
 

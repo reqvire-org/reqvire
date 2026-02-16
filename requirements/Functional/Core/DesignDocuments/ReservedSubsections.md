@@ -1,3 +1,13 @@
+# Documents
+
+## Metadata
+  * type: specification
+
+## Relations
+  * refine: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
+
+## ReservedSubsections
+
 # Reserved Subsections Specification
 
 ## Relations Subsection
@@ -23,13 +33,14 @@ The Relations subsection defines relationships between elements using markdown b
 
 Must be defined with a level 4 header: `#### Details`.
 
-The Details subsection provides additional information directly related to the main requirement text.
+The Details subsection provides supporting requirement context and intent-level clarification.
 
 **Parsing Rules:**
 - When parsing `#### Details` subsections, any markdown headers or elements within `<details>...</details>` tags are skipped
-- Content within the Details subsection is considered an **extension of the requirement text**
-- It serves the same purpose as refinement relation in other MBSE tools and SysML
-- Any statements in the Details subsection hold the same validity as the main requirement text
+- Content within the Details subsection is part of the requirement narrative context
+- Details subsection does **not** replace refinement relations
+- Technical specifications, constraints, and behaviors that define implementation contracts should be captured in explicit refinement elements linked via `refinedBy`
+- Any normative statements in the Details subsection are interpreted as requirement-level statements unless moved to dedicated refinement elements
 
 **Examples:**
 ```markdown
@@ -38,10 +49,10 @@ The Details subsection provides additional information directly related to the m
 The system shall perform action X.
 
 #### Details
+Implementation details shall follow associated refinement specifications.
 Additional context about action X:
-- Constraint 1
-- Constraint 2
-- Performance requirement
+- Operational assumption 1
+- Clarification 2
 ```
 
 ## Metadata Subsection

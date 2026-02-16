@@ -18,34 +18,14 @@ The system shall provide mobile-friendly HTML documentation accessible on smartp
 The system shall use component-based architecture for HTML generation to eliminate duplication and improve maintainability.
 
 #### Details
-The HTML generation system shall be organized into reusable components:
-
-**Shared components:**
-- Navigation menu (with mobile/desktop variants)
-- Page header with metadata
-- Footer
-- Mobile menu toggle
-
-**Reusable layouts:**
-- Base layout for standard pages
-- Diagram layout for full-height visualizations
-
-**Page-specific modules:**
-- Index/Containment page
-- Model view page
-- Traces page
-- TraceFlow page
-- Coverage page
-- Resources page
-- Individual specification pages
-
-Each component shall be defined once and reused across all generated pages to eliminate code duplication.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
+  * refinedBy: [Component Based Html Architecture Refinement Specification](Specifications.md#component-based-html-architecture-refinement-specification)
   * verifiedBy: [Component Reuse Verification](Verifications/HTMLGenerationVerifications.md#component-reuse-verification)
 ---
 
@@ -123,3 +103,4 @@ This ensures HTML validity errors are caught during compilation rather than at r
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
   * verifiedBy: [HTML Validity Verification](Verifications/HTMLGenerationVerifications.md#html-validity-verification)
 ---
+

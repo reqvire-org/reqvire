@@ -81,6 +81,16 @@ Rules for normalizing document hierarchical structure during formatting.
   * type: specification
 ---
 
+### Element Manipulation File Persistence Refinement Specification
+Specification extracted from requirement "Element Manipulation File Persistence".
+
+#### Details
+The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
+
+#### Metadata
+  * type: specification
+---
+
 ### Format Consistency Specification
 
 Rules for detecting and fixing formatting inconsistencies in requirements documents.
@@ -107,6 +117,20 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
 **Output Formatting:**
 - Display changes with sequential line numbering that reflects final file positions
 - Provide context lines with proper line number continuity
+
+#### Metadata
+  * type: specification
+---
+
+### Full Relations Insertion Refinement Specification
+Specification extracted from requirement "Full Relations Insertion".
+
+#### Details
+Auto-generated relations are inverse relations created by the parser during model loading but not persisted to files by default. See Relation Types Specification for opposite relation pairs.
+
+When --with-full-relations is active:
+- All relations from the model registry are written to the Relations subsection
+- Relations are sorted according to the Relation Ordering Normalization requirement
 
 #### Metadata
   * type: specification
@@ -161,6 +185,14 @@ The system shall reject the operation with a clear error message if:
 - Source and target element types are incompatible per Merge Type Compatibility Constraint
 - Merged result would have cross-section duplicates per Merge Content Transformation Behavior
 
+For `# Documents` targets:
+- The merged result shall remain serialized as `# Documents` with a single implicit element.
+- Merged content shall remain inside the `## <Actual Element Name>` body of that element.
+
+For document-to-elements merge direction:
+- If any source element is in a `# Documents` file and the target element is in a `# Elements` file, the merge shall be rejected with a clear error.
+- The error shall state that this conversion must be done manually to avoid breaking `# Elements` parsing rules.
+
 #### Metadata
   * type: specification
 ---
@@ -183,6 +215,9 @@ When moving an element, the system shall:
 - Ensure the element name is globally unique in the model
 - Provide updates report following Diff Output Format Specification
 
+Document format rule:
+- If the target file is an existing `# Documents` file, moving an element from a different file into it shall be rejected with a clear error, because `# Documents` files contain exactly one element.
+
 **Empty Source File Cleanup:**
 - After moving the element, check if the source file contains any remaining elements
 - If no elements remain (only page content, headers, or whitespace), remove the source file from the filesystem
@@ -195,6 +230,38 @@ When moving an element, the system shall:
 **Identifier Update:**
 - The element's identifier changes from `<old-file>#<element-name>` to `<new-file>#<element-name>`
 - All references to the old identifier shall be updated to the new identifier
+
+#### Metadata
+  * type: specification
+---
+
+### Move File Operation Refinement Specification
+Specification extracted from requirement "Move File Operation".
+
+#### Details
+When moving a file, the system shall:
+- Accept source file path (relative to git repository root)
+- Accept target file path (relative to git repository root)
+- Accept optional squashing flag
+- Validate both source and target paths
+- Move the physical file from source to target location
+- Update all element identifiers within the file to reflect the new file path
+- Update all relation references (both forward and backward) throughout the model that point to any element in the moved file
+- Preserve all file content, structure, and formatting
+- Provide updates report following Diff Output Format Specification
+
+The system shall reject the operation with a clear error message if:
+- The source file does not exist
+- The target file already exists (unless --squash flag is provided)
+- The source or target paths fail validation
+- `--squash` is used with a target that is an existing `# Documents` file
+
+**Squash Mode Behavior:**
+When the --squash flag is provided and the target file already exists, the system shall:
+- Move all elements from the source file to the target end of file
+- Remove the source file after all elements have been successfully moved
+- Preserve element ordering from the source file when inserting into target section
+- Reject squash if target is `# Documents` format (single-element document file)
 
 #### Metadata
   * type: specification
@@ -397,6 +464,27 @@ Rules for validating and normalizing relation targets during element creation an
 - Validate that each relation target element exists in the model
 - Reject the operation if any relation target does not exist
 - Provide clear error messages indicating which relation target was not found
+
+#### Metadata
+  * type: specification
+---
+
+### Rename Element Operation Refinement Specification
+Specification extracted from requirement "Rename Element Operation".
+
+#### Details
+When renaming an element, the system shall:
+- Accept the current element name and the new element name
+- Validate that the current element exists in the model registry
+- Validate that the new name is globally unique in the model registry
+- Update the element's heading text in the markdown file
+- Update all relation references (both forward and backward) to use the new element identifier
+- Update the element identifier in the registry
+- Provide updates report following Diff Output Format Specification
+
+The system shall reject the operation with a clear error message if:
+- The element does not exist
+- The new name conflicts with an existing element
 
 #### Metadata
   * type: specification

@@ -2,23 +2,25 @@
 
 ### Specification File Identification
 
-The system shall only parse markdown files that are identified as specification files. A markdown file is considered a specification file if and only if its first level-1 heading (`#`) is exactly `# Elements`. Files not meeting this criterion shall be ignored during model parsing, even if they have a `.md` extension.
+The system shall identify supported markdown model document types by the first level-1 heading (`#`) and apply type-specific processing rules.
 
 #### Details
-- The `# Elements` heading must be the first H1 header in the file
-- Leading whitespace, blank lines, or frontmatter before the heading are allowed
-- Files without `# Elements` as first H1 are silently skipped (no error)
-- This rule applies in addition to `.gitignore` and `.reqvireignore` exclusions
-- The page title is not stored or tracked by the system
+Supported model document types:
+- `# Elements`: parsed as element collections.
+- `# Documents`: parsed as a single-element document format with `## Metadata`, optional `## Relations`, and a dynamic `## <Actual Element Name>` section (the section heading itself is the element name) whose body may contain any markdown headers.
+
+Unsupported first H1 headings shall be ignored by element parsing.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
+  * refinedBy: [Specification File Identification Refinement Specification](Specifications.md#specification-file-identification-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Specification File Identification Test](Verifications/ParsingVerifications.md#specification-file-identification-test)
+  * verifiedBy: [Document Refinement Validation Test](Verifications/ValidationVerifications.md#document-refinement-validation-test)
 ---
 
 ### Structure and Addressing in Markdown Documents
@@ -28,13 +30,12 @@ The system shall implement semi-structured markdown format specifications that d
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [MarkdownStructure.md](DesignDocuments/MarkdownStructure.md)
-
 #### Relations
   * derive: [Element Identity Model](#element-identity-model)
   * derive: [Reserved Subsections Support](#reserved-subsections-support)
   * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
+  * refinedBy: [MarkdownStructure](DesignDocuments/MarkdownStructure.md#markdownstructure)
+  * refinedBy: [Structure And Addressing In Markdown Documents Refinement Specification](Specifications.md#structure-and-addressing-in-markdown-documents-refinement-specification)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
@@ -51,14 +52,12 @@ The system shall distinguish between element identity (ID) and element addressin
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [ElementIdentity.md](DesignDocuments/ElementIdentity.md)
-
 #### Relations
   * derive: [Identifiers and Relations](#identifiers-and-relations)
   * derive: [Internal Consistency Validator](Validation.md#internal-consistency-validator)
   * derive: [Change Impact Detection](../Processing/ChangeImpact.md#change-impact-detection)
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
+  * refinedBy: [ElementIdentity](DesignDocuments/ElementIdentity.md#elementidentity)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Fragment Normalization Test](Verifications/ParsingVerifications.md#fragment-normalization-test)
@@ -71,12 +70,11 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [IdentifiersAndRelations.md](DesignDocuments/IdentifiersAndRelations.md)
-
 #### Relations
   * derive: [Relation Types and behaviors](ModelManagement.md#relation-types-and-behaviors)
   * derivedFrom: [Element Identity Model](#element-identity-model)
+  * refinedBy: [IdentifiersAndRelations](DesignDocuments/IdentifiersAndRelations.md#identifiersandrelations)
+  * refinedBy: [Identifiers and Relations Refinement Specification](Specifications.md#identifiers-and-relations-refinement-specification)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
 ---
 
@@ -98,15 +96,13 @@ Each reserved subsection has specific parsing rules, validation requirements, an
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [ReservedSubsections.md](DesignDocuments/ReservedSubsections.md)
-
 #### Relations
   * derive: [Verification Type Categories](ModelManagement.md#verification-type-categories)
   * derive: [Attachment Target Validation](Validation.md#attachment-target-validation)
   * derive: [Create Element Operation](../Operations/ElementManipulation.md#create-element-operation)
   * derive: [Attachment Commands](../../Interfaces/CLI/Commands.md#attachment-commands)
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
+  * refinedBy: [ReservedSubsections](DesignDocuments/ReservedSubsections.md#reservedsubsections)
   * refinedBy: [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)

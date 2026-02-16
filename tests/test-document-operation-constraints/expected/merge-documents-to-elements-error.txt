@@ -1,0 +1,1 @@
+Invalid operation: Cannot merge 'Document Source Requirement' into 'Target Requirement': source is in a '# Documents' file and target is in a '# Elements' file. This conversion can break '# Elements' parsing rules and must be performed manually.

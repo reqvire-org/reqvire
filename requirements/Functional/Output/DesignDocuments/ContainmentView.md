@@ -1,3 +1,13 @@
+# Documents
+
+## Metadata
+  * type: specification
+
+## Relations
+  * refine: [Containment View Report](../Reporting.md#containment-view-report)
+
+## ContainmentView
+
 # Containment View Specification
 
 ## Overview

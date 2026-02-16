@@ -5,32 +5,7 @@
 The system shall automatically assign the **default type `requirement`** to all elements if not explicitly specified in their `metadata` subsection.
 
 #### Details
-<details>
-<summary>Type Assignment Rules</summary>
-
-When an element does not have a `#### Metadata` subsection with a `type` property, the system assigns the default type `requirement`.
-
-**This behavior is location-independent:** All elements default to type `requirement` regardless of their folder location within the Git repository.
-
-**To use other element types**, users must explicitly specify the type in the element's Metadata subsection:
-```markdown
-#### Metadata
-  * type: user-requirement
-```
-
-**Supported element types:**
-- `requirement` (default)
-- `user-requirement`
-- `verification` / `test-verification`
-- `analysis-verification`
-- `inspection-verification`
-- `demonstration-verification`
-- `constraint` (refinement type)
-- `behavior` (refinement type)
-- `specification` (refinement type)
-- `other`
-
-</details>
+Type assignment behavior shall follow the associated refinement specifications.
 
 #### Metadata
   * type: user-requirement
@@ -40,6 +15,7 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
 
 #### Relations
   * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
+  * refinedBy: [Default Requirement Type Assignment Refinement Specification](Specifications.md#default-requirement-type-assignment-refinement-specification)
   * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
   * verifiedBy: [Default Element Type Assignment Test](Verifications/ValidationVerifications.md#default-element-type-assignment-test)
 ---
@@ -143,7 +119,6 @@ The system shall implement relations following clearly defined specifications fo
   * type: requirement
 
 #### Attachments
-  * [RelationTypes.md](DesignDocuments/RelationTypes.md)
   * [Relation Semantics Specification](../../Refinements.md#relation-semantics-specification)
 
 #### Relations
@@ -152,6 +127,8 @@ The system shall implement relations following clearly defined specifications fo
   * derive: [Validate Relation Types](Validation.md#validate-relation-types)
   * derive: [Trace Relation Non-Directional Behavior](../Output/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
+  * refinedBy: [RelationTypes](DesignDocuments/RelationTypes.md#relationtypes)
+  * refinedBy: [Relation Types And Behaviors Refinement Specification](Specifications.md#relation-types-and-behaviors-refinement-specification)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
 ---
@@ -181,13 +158,7 @@ The system shall define element type relation compatibility constraints.
 The system shall restrict Refinement elements (constraint, behavior, specification) to only allow `refine` relations.
 
 #### Details
-Refinement elements serve as detailed documentation that augments requirements and drives implementation. Their relation usage is restricted because:
-- They represent atomic pieces of information focused on documenting requirements
-- They are primarily referenced through the Attachments subsection of other elements
-- Their `refine` relation links back to the requirement they refine, establishing ownership
-- Each refinement can only be owned by one requirement (uniqueness constraint)
-
-When a Refinement element contains relations other than `refine`, the validator shall report an error indicating that only `refine` relations are allowed for refinement types.
+Refinement relation usage shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -197,6 +168,7 @@ When a Refinement element contains relations other than `refine`, the validator 
 
 #### Relations
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
+  * refinedBy: [Refinement Element Structure Constraints Refinement Specification](Specifications.md#refinement-element-structure-constraints-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Refinement Relations Rejection Test](Verifications/ParsingVerifications.md#refinement-relations-rejection-test)
 ---

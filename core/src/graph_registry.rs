@@ -58,6 +58,18 @@ impl Default for GraphRegistry {
 }
 
 impl GraphRegistry {
+    fn is_documents_format_file(&self, file_path: &str) -> bool {
+        self.nodes.values().any(|node| {
+            node.element.file_path == file_path
+                && node
+                    .element
+                    .metadata
+                    .get("_document_format")
+                    .map(|v| v == "documents")
+                    .unwrap_or(false)
+        })
+    }
+
     /// Creates a new empty GraphRegistry
     pub fn new() -> Self {
         Self {
@@ -461,6 +473,14 @@ impl GraphRegistry {
                                 errors.push(ReqvireError::MissingRelationTarget(format!(
                                     "Element '{}' references missing target '{}'",
                                     source_node.element.identifier,
+                                    file_path.to_string_lossy()
+                                )));
+                                continue;
+                            }
+
+                            if relation.relation_type.name == "refinedBy" {
+                                errors.push(ReqvireError::IncompatibleElementTypes(format!(
+                                    "refinedBy target '{}' is invalid. 'refinedBy' must point to a refinement element identifier, not a file path.",
                                     file_path.to_string_lossy()
                                 )));
                             }
@@ -1398,6 +1418,22 @@ impl GraphRegistry {
             )));
         }
 
+        // '# Documents' files represent exactly one implicit element.
+        // Disallow moving additional elements into an existing documents-format file.
+        if target_has_elements && self.is_documents_format_file(new_file_path) {
+            let source_file_path = self
+                .nodes
+                .get(element_id)
+                .map(|n| n.element.file_path.clone())
+                .unwrap_or_default();
+            if source_file_path != new_file_path {
+                return Err(ReqvireError::InvalidOperation(format!(
+                    "Cannot move element '{}' into '{}': target is a '# Documents' file and can contain only one element.",
+                    element_id, new_file_path
+                )));
+            }
+        }
+
         if let Some(node) = self.nodes.get_mut(element_id) {
             let old_file_path = node.element.file_path.clone();
 
@@ -1870,7 +1906,7 @@ impl GraphRegistry {
         let mut custom_metadata: Vec<_> = element
             .metadata
             .iter()
-            .filter(|(key, _)| *key != "type") // type is handled separately
+            .filter(|(key, _)| *key != "type" && *key != "_document_format") // type is handled separately
             .collect();
         custom_metadata.sort_by_key(|(key, _)| *key);
 
@@ -2273,6 +2309,117 @@ impl GraphRegistry {
         }
     }
 
+    fn document_file_markdown(
+        &self,
+        file_path: &str,
+        element: &Element,
+        with_full_relations: bool,
+    ) -> String {
+        let mut markdown = String::new();
+        markdown.push_str("# Documents\n\n");
+
+        markdown.push_str("## Metadata\n");
+        markdown.push_str(&format!("  * type: {}\n", element.element_type.as_str()));
+        let mut custom_metadata: Vec<_> = element
+            .metadata
+            .iter()
+            .filter(|(k, _)| *k != "type" && *k != "_document_format")
+            .collect();
+        custom_metadata.sort_by_key(|(k, _)| *k);
+        for (k, v) in custom_metadata {
+            markdown.push_str(&format!("  * {}: {}\n", k, v));
+        }
+        markdown.push('\n');
+
+        let mut relations_to_include: Vec<_> = if with_full_relations {
+            element.relations.iter().collect()
+        } else {
+            element.relations.iter().filter(|r| r.user_created).collect()
+        };
+        relations_to_include.sort_by(|a, b| {
+            (&a.relation_type.name, a.target.link.as_str())
+                .cmp(&(&b.relation_type.name, b.target.link.as_str()))
+        });
+        relations_to_include.dedup_by(|a, b| {
+            a.relation_type.name == b.relation_type.name
+                && a.target.link.as_str() == b.target.link.as_str()
+        });
+        if !relations_to_include.is_empty() {
+            markdown.push_str("## Relations\n");
+            for relation in relations_to_include {
+                let target_text = match &relation.target.link {
+                    LinkType::ExternalUrl(url) => format!("[{}]({})", relation.target.text, url),
+                    LinkType::Identifier(target_id) => {
+                        let current_file_path = PathBuf::from(file_path);
+                        let current_folder = current_file_path
+                            .parent()
+                            .unwrap_or_else(|| Path::new("."))
+                            .to_path_buf();
+                        let relative_id =
+                            crate::utils::to_relative_identifier(target_id, &current_folder, true)
+                                .unwrap_or_else(|_| target_id.clone());
+                        let display_name = self
+                            .get_element(target_id)
+                            .map(|e| e.name.clone())
+                            .unwrap_or_else(|| relation.target.text.clone());
+                        format!("[{}]({})", display_name, relative_id)
+                    }
+                    LinkType::InternalPath(path) => {
+                        let current_file_path = PathBuf::from(file_path);
+                        let current_folder = current_file_path
+                            .parent()
+                            .unwrap_or_else(|| Path::new("."))
+                            .to_path_buf();
+                        let path_str = path.to_string_lossy().to_string();
+                        let absolute_path = format!("/{}", path_str);
+                        let relative_path =
+                            crate::utils::to_relative_identifier(&absolute_path, &current_folder, false)
+                                .unwrap_or(path_str.clone());
+                        let display_name = path
+                            .file_name()
+                            .and_then(|n| n.to_str())
+                            .unwrap_or(&path_str);
+                        format!("[{}]({})", display_name, relative_path)
+                    }
+                };
+
+                markdown.push_str(&format!(
+                    "  * {}: {}\n",
+                    relation.relation_type.name, target_text
+                ));
+            }
+            markdown.push('\n');
+        }
+
+        if !element.attachments.is_empty() {
+            markdown.push_str("## Attachments\n");
+            for attachment in &element.attachments {
+                match &attachment.target {
+                    crate::element::AttachmentTarget::FilePath(path) => {
+                        let path_str = path.to_string_lossy().to_string();
+                        markdown.push_str(&format!("  * [{}]({})\n", path_str, path_str));
+                    }
+                    crate::element::AttachmentTarget::ElementIdentifier(id) => {
+                        let display = self
+                            .get_element(id)
+                            .map(|e| e.name.clone())
+                            .unwrap_or_else(|| id.clone());
+                        markdown.push_str(&format!("  * [{}]({})\n", display, id));
+                    }
+                }
+            }
+            markdown.push('\n');
+        }
+
+        markdown.push_str(&format!("## {}\n\n", element.name));
+        if !element.content.trim().is_empty() {
+            markdown.push_str(element.content.trim_end());
+            markdown.push('\n');
+        }
+
+        markdown
+    }
+
     /// Generates markdown content for a file
     /// When with_full_relations is true, includes all relations (user-created and auto-generated)
     pub fn generate_file_markdown(
@@ -2281,6 +2428,16 @@ impl GraphRegistry {
         elements: &[&Element],
         with_full_relations: bool,
     ) -> String {
+        if elements.len() == 1
+            && elements[0]
+                .metadata
+                .get("_document_format")
+                .map(|v| v == "documents")
+                .unwrap_or(false)
+        {
+            return self.document_file_markdown(file_path, elements[0], with_full_relations);
+        }
+
         let mut markdown = String::new();
 
         // All specification files must have "# Elements" as the page header
@@ -2506,6 +2663,15 @@ impl GraphRegistry {
         if target_exists && !squash {
             return Err(ReqvireError::DuplicateElement(format!(
                 "Target file '{}' already exists",
+                target_file
+            )));
+        }
+
+        // '# Documents' files represent one implicit element.
+        // Squashing multiple elements into such file would violate the format.
+        if squash && target_exists && self.is_documents_format_file(target_file) {
+            return Err(ReqvireError::InvalidOperation(format!(
+                "Cannot use --squash into '{}': target is a '# Documents' file and can contain only one element.",
                 target_file
             )));
         }
@@ -3746,6 +3912,8 @@ impl GraphRegistry {
         let target_node = self.nodes.get(target_id).unwrap();
         let target_name = target_node.element.name.clone();
         let target_type = target_node.element.element_type.clone();
+        let target_file_path = target_node.element.file_path.clone();
+        let target_is_documents = self.is_documents_format_file(&target_file_path);
 
         // Validate all sources exist and collect their data
         #[allow(clippy::type_complexity)]
@@ -3762,12 +3930,23 @@ impl GraphRegistry {
             })?;
 
             let source_element = &source_node.element;
+            let source_file_path = source_element.file_path.clone();
+            let source_is_documents = self.is_documents_format_file(&source_file_path);
 
             // Validate: Check if source would merge into itself
             if source_id == target_id {
                 return Err(ReqvireError::InvalidOperation(
                     "Cannot merge element into itself".to_string(),
                 ));
+            }
+
+            // Merging document-format source content into # Elements target is disallowed.
+            // '# Documents' bodies permit headers that violate # Elements parsing constraints.
+            if source_is_documents && !target_is_documents {
+                return Err(ReqvireError::InvalidOperation(format!(
+                    "Cannot merge '{}' into '{}': source is in a '# Documents' file and target is in a '# Elements' file. This conversion can break '# Elements' parsing rules and must be performed manually.",
+                    source_element.name, target_name
+                )));
             }
 
             // Validate: Check type compatibility
@@ -3796,7 +3975,6 @@ impl GraphRegistry {
 
         // Re-get target element data (needed after validation)
         let target_node = self.nodes.get(target_id).unwrap();
-        let target_file_path = target_node.element.file_path.clone();
         let mut merged_content = String::new();
         let mut merged_relations: Vec<crate::relation::Relation> = target_node
             .element

@@ -70,7 +70,6 @@ Each collected content block followed by source citation and separator:
 |-------------|-----------------|
 | Element | `— Source: [Element Name](file.md#element-id)` |
 | Refinement Element (via refinedBy) | `— Source: [Refinement Name](file.md#refinement-id) refining [Element Name](file.md#element-id)` |
-| Refinement File (via refinedBy) | `— Source: [filename.md](path/to/file.md) refining [Element Name](file.md#element-id)` |
 | Attachment File | `— Source: [filename.md](path/to/file.md) attached to [Element Name](file.md#element-id)` |
 | Attachment Element | `— Source: [Refinement Name](file.md#refinement-id) attached to [Element Name](file.md#element-id)` |
 
@@ -111,7 +110,6 @@ Each collected content block followed by source citation and separator:
 **Source Type Values:**
 - `element` - Content from model element
 - `refined_by_element` - Content from refinement element (via refinedBy relation)
-- `refined_by_file` - Content from refinement file (via refinedBy relation)
 - `attachment_file` - Content from attached file
 - `attachment_element` - Content from attached refinement element
 
@@ -176,6 +174,28 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 | refinement | #FF9800 | 🔧 |
 | design-document | #8D6E63 | 📝 |
 | attachment-file | #607D8B | 📎 |
+
+#### Metadata
+  * type: specification
+---
+
+### Containment View Report Refinement Specification
+Specification extracted from requirement "Containment View Report".
+
+#### Details
+The containment view shows the physical organization of the model:
+- Root folder → Subfolders → Files → Elements
+- Sections skipped (elements shown directly under files)
+
+The system shall generate reports in multiple formats:
+- Mermaid diagrams for visualization
+- JSON for programmatic access
+- HTML export integration
+
+The system shall include design documents:
+- Files in DesignDocuments folders displayed alongside specifications
+- Design documents visually distinguished from specification elements
+- Clickable navigation to document files
 
 #### Metadata
   * type: specification
@@ -301,6 +321,48 @@ Structure for error and warning messages.
 **Grouping:**
 - Group errors by file
 - Sort by line number within file
+
+#### Metadata
+  * type: specification
+---
+
+### Flexible Search Type Filtering Refinement Specification
+Specification extracted from requirement "Flexible Search Type Filtering".
+
+#### Details
+Users shall be able to specify multiple element types in a single search operation using comma-separated values (e.g., `requirement,test-verification,behavior`).
+
+This capability enables:
+- Searching across related type categories (all requirement types, all verification types)
+- Building complex queries without multiple search invocations
+- Improved workflow efficiency for model analysis and reporting
+
+#### Metadata
+  * type: specification
+---
+
+### Interactive Mermaid Diagram Node Behavior Refinement Specification
+Specification extracted from requirement "Interactive Mermaid Diagram Node Behavior".
+
+#### Details
+Clickable mermaid diagrams links by default must use relative links to the git repository.
+
+CLI flag options must be provided that can change default behavior to use stable github repository links:
+* diagrams click links are not working on Github if not using stable github repository links
+* from another side that pollutes PR diffs thus choice must be given to the user
+* Commands that generate diagrams (`generate-diagrams`, `export`, `serve`) must expose `--links-with-blobs` CLI flag for that purpose
+* The flag defaults to `false` (use relative paths)
+
+When generating diagram node links and when `--links-with-blobs` flag is set to `true`, the system shall:
+- Use stable git repository links (`{repository-url}/blob/{commit-hash}/{file-path}`) when git repository information is available
+- Fallback to relative markdown links when git repository information is not available
+- Use the current commit hash to ensure links remain stable even as the repository evolves
+- Match the same link format used in traceability matrices and change impact reports
+- Preserve interactive behavior across all generated diagrams
+
+The `traces` command shall always use relative paths (hardcoded to `false`, no flag needed).
+
+The `change-impact` command shall continue to use GitHub blob URLs by default (unchanged behavior).
 
 #### Metadata
   * type: specification
@@ -600,6 +662,38 @@ Default text output (when neither `--json` nor other format flags specified):
 - Deterministic ordering (alphabetical by identifier)
 - Consistent spacing and alignment
 - No trailing whitespace
+
+#### Metadata
+  * type: specification
+---
+
+### Trace Relation Non-Directional Behavior Refinement Specification
+Specification extracted from requirement "Trace Relation Non-Directional Behavior".
+
+#### Details
+The trace relation behavior shall include:
+
+1. **Circular Dependency Exclusion**:
+- Trace relations shall not be traversed during circular dependency detection
+- The cycle detection algorithm shall skip trace relations to prevent false positive cycles
+- Trace relations exist solely for traceability and documentation purposes
+
+2. **Non-Propagation Behavior**:
+- Changes shall not propagate through trace relations
+- Trace relations shall not be included in change impact analysis
+- Impact trees shall not traverse trace relation connections
+
+3. **Bidirectional Traceability**:
+- Trace relations shall provide bidirectional navigational capability
+- Users can navigate from source to target and target to source
+- Both directions are semantically equivalent for traceability purposes
+
+4. **Validation Behavior**:
+- Trace relations shall be validated for target existence
+- Trace relations shall not require type compatibility validation
+- Trace relations can connect any element type to any other element type
+
+This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.
 
 #### Metadata
   * type: specification

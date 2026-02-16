@@ -751,12 +751,14 @@ Test cases:
 8. **Dry-run mode**: `--dry-run` does not modify files.
 9. **Relation deduplication**: duplicate merged relation appears once.
 10. **Regression scenario**: multi-source merge keeps target element present and model validates.
+11. **Document-to-elements rejection**: merging a source from `# Documents` into a target in `# Elements` fails with explicit manual-migration guidance.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-merge-elements/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-document-operation-constraints/test.sh)
   * verify: [Merge Element Operation](../ElementManipulation.md#merge-element-operation)
 ---
 
@@ -819,6 +821,7 @@ The test shall verify that existing model elements can be moved to different loc
 - Move last element from file (triggers source file deletion)
 - Move element leaving other elements (source file preserved)
 - Verify element ordering after move (parent before children)
+- Reject move into existing `# Documents` target that would create multiple elements
 
 #### Metadata
   * type: test-verification
@@ -826,6 +829,7 @@ The test shall verify that existing model elements can be moved to different loc
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-empty-file-cleanup/test.sh)
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-document-operation-constraints/test.sh)
   * verify: [Move Element Operation](../ElementManipulation.md#move-element-operation)
 ---
 
@@ -895,12 +899,14 @@ The test shall verify that the `mv-file --squash` command moves all elements fro
 - Dry run mode with --squash
 - JSON output mode with --squash
 - Error: target file exists without --squash flag
+- Error: `mv-file --squash` target is existing `# Documents` file
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-mv-file-squash/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-document-operation-constraints/test.sh)
   * verify: [Move File Operation](../ElementManipulation.md#move-file-operation)
 ---
 
@@ -1073,4 +1079,3 @@ The test shall verify that the `unlink` command removes relations from elements 
   * verify: [Relation Management Operations](../../Core/ModelManagement.md#relation-management-operations)
   * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
 ---
-

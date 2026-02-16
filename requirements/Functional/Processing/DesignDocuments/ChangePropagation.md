@@ -1,3 +1,13 @@
+# Documents
+
+## Metadata
+  * type: specification
+
+## Relations
+  * refine: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
+
+## ChangePropagation
+
 # Change Propagation Specification
 
 ## Change Impact Propagation in Requirements

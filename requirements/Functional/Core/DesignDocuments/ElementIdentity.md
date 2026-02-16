@@ -1,3 +1,13 @@
+# Documents
+
+## Metadata
+  * type: specification
+
+## Relations
+  * refine: [Element Identity Model](../StructureAndParsing.md#element-identity-model)
+
+## ElementIdentity
+
 # Element Identity Specification
 
 ## Element ID vs Identifier

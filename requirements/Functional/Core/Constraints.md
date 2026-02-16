@@ -10,12 +10,6 @@ A refinement element can only be attached to a requirement if that requirement h
 - Cannot attach to any parent (ancestor) of that requirement via derivedFrom chain
 - Cannot attach to any child (descendant) of that requirement via derive chain
 
-**For file attachments (assets):**
-When a file is referenced via `refinedBy` from a requirement (establishing ownership), the same hierarchical independence rules apply:
-- Cannot attach to the requirement that owns the file via `refinedBy`
-- Cannot attach to any parent (ancestor) of the owner via derivedFrom chain
-- Cannot attach to any child (descendant) of the owner via derive chain
-
 **Upstream attachment propagation:**
 If an attachment (refinement or file) is already attached to an ancestor requirement in the derivation hierarchy, descendants cannot attach the same target:
 - Attachments propagate downstream through the derivedFrom chain

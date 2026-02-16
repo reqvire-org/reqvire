@@ -1,3 +1,13 @@
+# Documents
+
+## Metadata
+  * type: specification
+
+## Relations
+  * refine: [Identifiers and Relations](../StructureAndParsing.md#identifiers-and-relations)
+
+## IdentifiersAndRelations
+
 # Identifiers and Relations Specification
 
 ## Identifiers in Markdown Documents

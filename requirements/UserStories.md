@@ -43,6 +43,7 @@ As a **Developer**, I want to align code with System models, so that implementat
 
 #### Relations
   * derive: [Code Traceability](Functional/Integration/CodeAlignment.md#code-traceability)
+  * refinedBy: [Aligning Design with Code Refinement Specification](Refinements.md#aligning-design-with-code-refinement-specification)
 ---
 
 ### Defining Model Structure
@@ -50,14 +51,13 @@ As a **Developer**, I want to align code with System models, so that implementat
 As a **System Engineer**, I want a well-defined model structure and file identification mechanism, so that I can organize system specifications in a consistent and predictable manner.
 
 #### Details
-This user story covers the foundational aspects of how System models are structured:
-- Identification of specification files within the repository
-- Structure and addressing rules for markdown documents
-- Coexistence of structured and unstructured documents
-- Git repository as the project root for path resolution
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * refinedBy: [Defining Model Structure Refinement Specification](Refinements.md#defining-model-structure-refinement-specification)
 ---
 
 ### Formatting Model Documents
@@ -66,6 +66,9 @@ As a **System Engineer**, I want to automatically format model documents to ensu
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * refinedBy: [Formatting Model Documents Refinement Specification](Refinements.md#formatting-model-documents-refinement-specification)
 ---
 
 ### Fostering Community Contributions
@@ -197,3 +200,4 @@ As a **V&V Engineer**, I want to trace verification coverage through the require
 #### Relations
   * derive: [Verification Upward Traceability](Functional/Processing/VerificationTraces.md#verification-upward-traceability)
 ---
+

@@ -56,7 +56,7 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> = L
     m.insert("refinedBy", RelationTypeInfo {
         name: "refinedBy",
         opposite: Some("refine"),
-        description: "A requirement being refined by a refinement element or specification file.",
+        description: "A requirement being refined by a refinement element.",
         arrow: "-->",
         label: "refinedBy",
     });
@@ -373,7 +373,7 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// - verify: Source must be verification, target must be requirement
 /// - satisfiedBy: Source must be requirement or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
-/// - refinedBy: Source must be requirement, target must be refinement element or file
+/// - refinedBy: Source must be requirement, target must be refinement element
 /// - refine: Source must be refinement element, target must be requirement
 /// - trace: Any non-refinement element type can use trace
 /// - Refinement types (constraint, behavior, specification): Can only have refine relations
@@ -448,9 +448,9 @@ pub fn validate_relation_element_types(
         },
         "refinedBy" => {
             // Source must be a requirement type
-            // Target can be a refinement element or file (specification documents, design docs)
+            // Target must be a refinement element
             matches!(source_type, ElementType::Requirement(_)) &&
-            matches!(target_type, ElementType::File | ElementType::Other(_) | ElementType::Refinement(_))
+            matches!(target_type, ElementType::Refinement(_))
         },
         "refine" => {
             // Source must be a refinement element, target must be a requirement
@@ -477,10 +477,9 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "verify" => Some("'verify' should connect a verification element to a requirement".to_string()),
         "satisfiedBy" => Some("'satisfiedBy' should connect a requirement or test-verification to an implementation file".to_string()),
         "satisfy" => Some("'satisfy' should connect an implementation file to a requirement or test-verification".to_string()),
-        "refinedBy" => Some("'refinedBy' should connect a requirement to a refinement element (constraint, behavior, specification) or specification file".to_string()),
+        "refinedBy" => Some("'refinedBy' should connect a requirement to a refinement element (constraint, behavior, specification)".to_string()),
         "refine" => Some("'refine' should connect a refinement element to a requirement".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }
 }
-

@@ -153,26 +153,14 @@ The system shall check the internal consistency of the system model, ensuring th
 The system shall validate attachment targets and reject invalid attachment references during model validation.
 
 #### Details
-Attachment targets support two types of references:
-
-**File Paths:**
-- Normalized to git-root-relative paths
-- Validated for file existence during model validation
-- Standard markdown link format where link text equals href
-
-**Element Identifiers:**
-- Must point to Refinement element types only (constraint, behavior, specification)
-- Normalized like relation targets (resolved to full identifier path)
-- Validation shall reject identifiers pointing to non-Refinement elements
-- Provides clear error message indicating the expected element type
-
-This validation ensures that attachments either reference existing files or valid Refinement elements that provide supplementary documentation.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * refinedBy: [Attachment Target Validation Refinement Specification](Specifications.md#attachment-target-validation-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Attachments Subsection Parsing Verification](Verifications/AttachmentsVerifications.md#attachments-subsection-parsing-verification)
@@ -184,7 +172,7 @@ This validation ensures that attachments either reference existing files or vali
 The system shall validate attachment scope constraints and report validation errors for violations.
 
 #### Details
-When validating attachments (both refinement elements and file assets), the system shall enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -195,6 +183,7 @@ When validating attachments (both refinement elements and file assets), the syst
 
 #### Relations
   * derivedFrom: [Attachment Target Validation](#attachment-target-validation)
+  * refinedBy: [Attachment Scope Validation Refinement Specification](Specifications.md#attachment-scope-validation-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Attachment Scope Constraints Test](Verifications/AttachmentsVerifications.md#attachment-scope-constraints-test)
 ---
@@ -263,22 +252,14 @@ Commands in the first group shall automatically run the two-pass validation and 
 The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, inconsistent relationship patterns, and element name uniqueness, with detailed error reporting.
 
 #### Details
-The consistency validator shall verify:
-- **Global Element Name Uniqueness**: Element names are globally unique across all files in the model
-- **Duplicate Detection**: Detect and report when multiple elements in different files share the same name
-- **Location Reporting**: Report both file locations where duplicate element names occur
-- **Clear Error Messages**: Error messages clearly indicate that element names must be globally unique
-- **Circular Dependencies**: Detect and report circular dependency chains in requirements
-- **Orphaned Elements**: Identify elements without proper traceability connections
-- **Inconsistent Patterns**: Detect relationship patterns that violate model constraints
-
-Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * refinedBy: [Internal Consistency Validator Refinement Specification](Specifications.md#internal-consistency-validator-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
@@ -365,28 +346,18 @@ The system shall validate relation types and allow only supported types.
 The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type, following the Element Type Relation Compatibility matrix.
 
 #### Details
-The validator enforces the constraints defined in the [Element Type Relation Compatibility](DesignDocuments/RelationTypes.md#element-type-relation-compatibility) specification:
-
-- For `derivedFrom`/`derive` relations, validate that both source and target are requirement types (`requirement` or `user-requirement`)
-- For `verifiedBy`/`verify` relations, validate that one endpoint is a requirement element and the other is a verification element
-- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a requirement or test-verification element and the other is an implementation element
-- For verification elements with `satisfiedBy` relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)
-- `trace` relations are always allowed for any non-refinement element type
-- Refinement types (`constraint`, `behavior`, `specification`) can only have `satisfy` relations and cannot have Attachments subsections
-- Warnings should be issued when relation endpoints have incompatible element types
-
-This validation occurs:
-- During model parsing and validation (model.rs, parser.rs)
-- During link operations at CRUD time (graph_registry.rs)
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Validate Relation Types](#validate-relation-types)
+  * refinedBy: [Relation Element Type Validator Refinement Specification](Specifications.md#relation-element-type-validator-refinement-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
   * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
+  * verifiedBy: [Document Refinement Validation Test](Verifications/ValidationVerifications.md#document-refinement-validation-test)
 ---

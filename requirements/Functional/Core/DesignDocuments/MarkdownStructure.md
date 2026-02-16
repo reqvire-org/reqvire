@@ -1,3 +1,13 @@
+# Documents
+
+## Metadata
+  * type: specification
+
+## Relations
+  * refine: [Structure and Addressing in Markdown Documents](../StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
+
+## MarkdownStructure
+
 # Markdown Structure Specification
 
 ## Elements in Markdown Documents

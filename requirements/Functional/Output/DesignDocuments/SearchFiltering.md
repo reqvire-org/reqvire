@@ -1,3 +1,13 @@
+# Documents
+
+## Metadata
+  * type: specification
+
+## Relations
+  * refine: [Search Report Generator](../Reporting.md#search-report-generator)
+
+## SearchFiltering
+
 # Search Filtering Specification
 
 ## Summary

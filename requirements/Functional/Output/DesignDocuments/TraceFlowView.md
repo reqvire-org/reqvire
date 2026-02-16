@@ -1,3 +1,13 @@
+# Documents
+
+## Metadata
+  * type: specification
+
+## Relations
+  * refine: [TraceFlow View Report Generation](../Reporting.md#traceflow-view-report-generation)
+
+## TraceFlowView
+
 # TraceFlow View Specification
 
 ## Overview

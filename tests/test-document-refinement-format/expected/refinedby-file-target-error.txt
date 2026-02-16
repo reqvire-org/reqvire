@@ -1,0 +1,1 @@
+1. Incompatible element types for relation: refinedBy target 'specifications/DesignDocuments/ChangePropagation.md' is invalid. 'refinedBy' must point to a refinement element identifier, not a file path.

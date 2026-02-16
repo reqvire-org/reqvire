@@ -166,11 +166,7 @@ The system shall display formatting change suggestions in a git-style diff forma
 When the --with-full-relations flag is provided, the system shall insert all registered relations into elements, including both user-created and auto-generated relations.
 
 #### Details
-Auto-generated relations are inverse relations created by the parser during model loading but not persisted to files by default. See Relation Types Specification for opposite relation pairs.
-
-When --with-full-relations is active:
-- All relations from the model registry are written to the Relations subsection
-- Relations are sorted according to the Relation Ordering Normalization requirement
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -180,6 +176,7 @@ When --with-full-relations is active:
 
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)
+  * refinedBy: [Full Relations Insertion Refinement Specification](Specifications.md#full-relations-insertion-refinement-specification)
   * verifiedBy: [Full Relations Insertion Verification](Verifications/FormattingVerifications.md#full-relations-insertion-verification)
 ---
 
@@ -194,3 +191,4 @@ The system shall replace absolute links with relative links, where applicable an
   * derivedFrom: [Model Formatting](#model-formatting)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
 ---
+

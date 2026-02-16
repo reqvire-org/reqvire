@@ -1,5 +1,15 @@
 # Elements
 
+### Aligning Design with Code Refinement Specification
+Specification extracted from requirement "Aligning Design with Code".
+
+#### Details
+As a **Developer**, I want to align code with System models, so that implementation remains consistent with design specifications.
+
+#### Metadata
+  * type: specification
+---
+
 ### Containment Specification
 
 Reqvire implements containment hierarchy through filesystem structure.
@@ -24,21 +34,45 @@ Reqvire implements containment hierarchy through filesystem structure.
   * type: specification
 ---
 
+### Defining Model Structure Refinement Specification
+Specification extracted from requirement "Defining Model Structure".
+
+#### Details
+This user story covers the foundational aspects of how System models are structured:
+- Identification of specification files within the repository
+- Structure and addressing rules for markdown documents
+- Coexistence of structured and unstructured documents
+- Git repository as the project root for path resolution
+
+#### Metadata
+  * type: specification
+---
+
+### Formatting Model Documents Refinement Specification
+Specification extracted from requirement "Formatting Model Documents".
+
+#### Details
+As a **System Engineer**, I want to automatically format model documents to ensure consistent structure and style across all specification files.
+
+#### Metadata
+  * type: specification
+---
+
 ### Refinement Specification
 
-Reqvire implements requirement refinement through the Details subsection.
+Reqvire implements requirement refinement through explicit refinement elements linked to requirements.
 
 #### Details
 **SysML Refine Stereotype:**
-- `#### Details` subsection provides textual refinement
-- One level of refinement per element
-- Elaborates requirement without creating separate child element
+- Refinement content is captured in dedicated elements (`specification`, `constraint`, `behavior`)
+- Requirement owns refinement via `refinedBy`; refinement points back via `refine`
+- Refinement elements can be attached by external requirements when ownership constraints allow
 
 **Usage:**
-- Acceptance criteria
-- Implementation notes
-- Clarifying information
-- Rationale and context
+- Acceptance criteria and technical details reside in refinement elements
+- Requirement text stays intent-focused (EARS-style), with concise detail pointers
+- Clarifying information and rationale are captured in linked refinements
+- Refinements provide attachment-ready specification contracts across submodels
 
 #### Metadata
   * type: specification

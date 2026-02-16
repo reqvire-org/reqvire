@@ -37,11 +37,9 @@ When a requirement is changed, the system shall propagate the change through rel
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [ChangePropagation.md](DesignDocuments/ChangePropagation.md)
-
 #### Relations
   * derivedFrom: [Change Impact Detection](#change-impact-detection)
+  * refinedBy: [ChangePropagation](DesignDocuments/ChangePropagation.md#changepropagation)
   * satisfiedBy: [change_impact.rs](../../../core/src/change_impact.rs)
   * verifiedBy: [Change Impact Detection Test](Verifications/ChangeImpactVerifications.md#change-impact-detection-test)
   * verifiedBy: [Change Impact Relations Test](Verifications/ChangeImpactVerifications.md#change-impact-relations-test)

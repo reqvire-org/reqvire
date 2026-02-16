@@ -1,5 +1,36 @@
 # Elements
 
+### Component-Based HTML Architecture Refinement Specification
+Specification extracted from requirement "Component-Based HTML Architecture".
+
+#### Details
+The HTML generation system shall be organized into reusable components:
+
+**Shared components:**
+- Navigation menu (with mobile/desktop variants)
+- Page header with metadata
+- Footer
+- Mobile menu toggle
+
+**Reusable layouts:**
+- Base layout for standard pages
+- Diagram layout for full-height visualizations
+
+**Page-specific modules:**
+- Index/Containment page
+- Model view page
+- Traces page
+- TraceFlow page
+- Coverage page
+- Resources page
+- Individual specification pages
+
+Each component shall be defined once and reused across all generated pages to eliminate code duplication.
+
+#### Metadata
+  * type: specification
+---
+
 ### D3.js Containment Tree Specification
 
 Specification for the D3.js interactive containment tree visualization.
@@ -107,6 +138,35 @@ The navigation bar must be:
   * type: specification
 ---
 
+### Web Interface Refinement Specification
+Specification extracted from requirement "Web Interface".
+
+#### Details
+The browse interface allows users to:
+- View HTML-rendered specifications and requirements
+- Navigate through diagrams and visualizations
+- Access verification traces and coverage reports
+- Explore the complete model structure through an integrated web interface
+
+This capability enables both human users (via browser) and AI agents (via MCP server) to efficiently explore and understand the System model without manually navigating file structures.
+
+All generated HTML content shall produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.
+
+The system shall ensure deterministic HTML output by:
+- Sorting elements by identifier before rendering
+- Sorting relations by type and target identifier
+- Maintaining consistent navigation and page ordering
+- Generating stable diagram node and relation ordering
+
+This determinism ensures that:
+- Running HTML generation multiple times produces byte-identical output
+- Version control diffs reflect actual content changes
+- Continuous integration pipelines produce reproducible results
+
+#### Metadata
+  * type: specification
+---
+
 ### Web Interface Style Specification
 
 Styling conventions for HTML export web interface.
@@ -158,3 +218,4 @@ The web interface uses a monochrome grayscale theme for consistent, professional
 #### Metadata
   * type: specification
 ---
+

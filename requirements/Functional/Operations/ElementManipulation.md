@@ -58,6 +58,7 @@ The system shall persist all element manipulation operations to the source files
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * refinedBy: [Element Manipulation File Persistence Refinement Specification](Specifications.md#element-manipulation-file-persistence-refinement-specification)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [File Persistence Test](Verifications/ElementManipulationVerifications.md#file-persistence-test)
@@ -67,6 +68,10 @@ The system shall persist all element manipulation operations to the source files
 ### Merge Element Operation
 
 The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and attachments while enforcing type compatibility and removing source elements after successful merge.
+
+#### Details
+When the merge target is a `# Documents` model file element, the operation shall preserve the `# Documents` file format and keep the result as a single-element document file.
+The operation shall reject merges where a source element is in a `# Documents` file and the target element is in a `# Elements` file. That conversion can violate `# Elements` parsing constraints and shall be performed manually.
 
 #### Metadata
   * type: requirement
@@ -90,6 +95,9 @@ The system shall provide the capability to merge multiple source elements into a
 
 The system shall provide the capability to move existing model elements to different file locations while automatically updating all relations that reference the moved element, creating target files if needed, and removing empty source files when no elements remain.
 
+#### Details
+The operation shall reject moves into an existing `# Documents` file when that move would introduce an additional element. `# Documents` files are single-element model files.
+
 #### Metadata
   * type: requirement
 
@@ -112,27 +120,7 @@ The system shall provide the capability to move existing model elements to diffe
 The system shall provide the capability to move entire specification files with all their elements to a new location in the repository while updating all relation references throughout the model.
 
 #### Details
-When moving a file, the system shall:
-- Accept source file path (relative to git repository root)
-- Accept target file path (relative to git repository root)
-- Accept optional squashing flag
-- Validate both source and target paths
-- Move the physical file from source to target location
-- Update all element identifiers within the file to reflect the new file path
-- Update all relation references (both forward and backward) throughout the model that point to any element in the moved file
-- Preserve all file content, structure, and formatting
-- Provide updates report following Diff Output Format Specification
-
-The system shall reject the operation with a clear error message if:
-- The source file does not exist
-- The target file already exists (unless --squash flag is provided)
-- The source or target paths fail validation
-
-**Squash Mode Behavior:**
-When the --squash flag is provided and the target file already exists, the system shall:
-- Move all elements from the source file to the target end of file
-- Remove the source file after all elements have been successfully moved
-- Preserve element ordering from the source file when inserting into target section
+When `--squash` is requested, the operation shall reject squashing into an existing `# Documents` target file. `# Documents` files are single-element model files and cannot accept squashed multi-element content.
 
 #### Metadata
   * type: requirement
@@ -142,6 +130,7 @@ When the --squash flag is provided and the target file already exists, the syste
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * refinedBy: [Move File Operation Refinement Specification](Specifications.md#move-file-operation-refinement-specification)
   * verifiedBy: [Move File Squash Test](Verifications/ElementManipulationVerifications.md#move-file-squash-test)
 ---
 
@@ -176,24 +165,14 @@ When manipulating elements, the system shall ensure:
 The system shall provide the capability to rename existing model elements by changing their heading text while updating all relation references and the registry.
 
 #### Details
-When renaming an element, the system shall:
-- Accept the current element name and the new element name
-- Validate that the current element exists in the model registry
-- Validate that the new name is globally unique in the model registry
-- Update the element's heading text in the markdown file
-- Update all relation references (both forward and backward) to use the new element identifier
-- Update the element identifier in the registry
-- Provide updates report following Diff Output Format Specification
-
-The system shall reject the operation with a clear error message if:
-- The element does not exist
-- The new name conflicts with an existing element
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * refinedBy: [Rename Element Operation Refinement Specification](Specifications.md#rename-element-operation-refinement-specification)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)

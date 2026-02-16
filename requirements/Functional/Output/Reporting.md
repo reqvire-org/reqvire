@@ -28,7 +28,7 @@ When requested the system shall provide human readable and machine readable Syst
 
 ### Collect Content from Requirement Chain
 
-The system shall collect and consolidate all content from a requirement element and its related requirements via derivedFrom relations (upstream to ancestors) or derive relations (downstream to descendants), including refinedBy targets (refinement elements and specification files) and attachment contents, and output with source citations in text or JSON format.
+The system shall collect and consolidate all content from a requirement element and its related requirements via derivedFrom relations (upstream to ancestors) or derive relations (downstream to descendants), including refinedBy targets (refinement elements) and attachment contents, and output with source citations in text or JSON format.
 
 #### Details
 The system shall define:
@@ -65,31 +65,20 @@ When requested the system shall generate reports summarizing the structure and r
 The system shall generate containment view reports showing the physical hierarchical structure of the model.
 
 #### Details
-The containment view shows the physical organization of the model:
-- Root folder → Subfolders → Files → Elements
-- Sections skipped (elements shown directly under files)
-
-The system shall generate reports in multiple formats:
-- Mermaid diagrams for visualization
-- JSON for programmatic access
-- HTML export integration
-
-The system shall include design documents:
-- Files in DesignDocuments folders displayed alongside specifications
-- Design documents visually distinguished from specification elements
-- Clickable navigation to document files
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: user-requirement
 
 #### Attachments
-  * [ContainmentView.md](DesignDocuments/ContainmentView.md)
   * [Containment Specification](../../Refinements.md#containment-specification)
   * [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+  * refinedBy: [ContainmentView](DesignDocuments/ContainmentView.md#containmentview)
+  * refinedBy: [Containment View Report Refinement Specification](Specifications.md#containment-view-report-refinement-specification)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
   * verifiedBy: [Containment View Design Documents Test](Verifications/ReportingVerifications.md#containment-view-design-documents-test)
 ---
@@ -191,12 +180,12 @@ The system shall define custom element type tracking:
   * type: requirement
 
 #### Attachments
-  * [SearchFiltering.md](DesignDocuments/SearchFiltering.md)
   * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+  * refinedBy: [SearchFiltering](DesignDocuments/SearchFiltering.md#searchfiltering)
   * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
   * verifiedBy: [Search Command Tests](Verifications/ReportingVerifications.md#search-command-tests)
@@ -207,18 +196,14 @@ The system shall define custom element type tracking:
 The system shall support filtering search results by multiple element types simultaneously to enable flexible querying across type categories.
 
 #### Details
-Users shall be able to specify multiple element types in a single search operation using comma-separated values (e.g., `requirement,test-verification,behavior`).
-
-This capability enables:
-- Searching across related type categories (all requirement types, all verification types)
-- Building complex queries without multiple search invocations
-- Improved workflow efficiency for model analysis and reporting
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: user-requirement
 
 #### Relations
   * derivedFrom: [Search Report Generator](#search-report-generator)
+  * refinedBy: [Flexible Search Type Filtering Refinement Specification](Specifications.md#flexible-search-type-filtering-refinement-specification)
 ---
 
 ### Comma-Separated Type Filter Parsing
@@ -328,11 +313,11 @@ The system shall generate a TraceFlow view page showing the verification traceab
   * type: requirement
 
 #### Attachments
-  * [TraceFlowView.md](DesignDocuments/TraceFlowView.md)
   * [Verification Trace Tree Construction](../Processing/Specifications.md#verification-trace-tree-construction)
 
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
+  * refinedBy: [TraceFlowView](DesignDocuments/TraceFlowView.md#traceflowview)
   * refinedBy: [Verification Trace Diagram Specification](Specifications.md#verification-trace-diagram-specification)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * verifiedBy: [TraceFlow View Test](Verifications/ReportingVerifications.md#traceflow-view-test)

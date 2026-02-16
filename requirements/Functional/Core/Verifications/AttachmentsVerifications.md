@@ -93,12 +93,6 @@ Verify that attachment scope constraints (hierarchical independence, refine requ
 - Error when attaching requirement is child/grandchild of the defining requirement
 - Accept attachment when attaching requirement is in a separate branch
 
-**Test cases for file attachment hierarchical independence:**
-- Error when attaching file that is owned via `refinedBy` by the same requirement
-- Error when attaching file owned by parent requirement in hierarchy
-- Error when attaching file owned by child requirement in hierarchy
-- Accept file attachment when attaching requirement is in a separate branch from owner
-
 **Test cases for upstream attachment propagation:**
 - Error when ancestor requirement already has the same attachment (refinement or file)
 - Error when descendant requirement already has the same attachment (suggest move)
@@ -107,7 +101,6 @@ Verify that attachment scope constraints (hierarchical independence, refine requ
 
 **Error message formats:**
 - Refinement hierarchy: `'<refinement>' cannot be attached to '<element>' because it is within the refinement's defining hierarchy`
-- File ownership: `'<file>' cannot be attached to '<element>' because it is within the file owner's hierarchy (owned by '<owner>')`
 - Ancestor propagation: `'<attachment>' is already attached at '<ancestor>' which is an ancestor. Attachments propagate downstream.`
 - Descendant conflict: `'<attachment>' is already attached at '<descendant>' which is a descendant. Move attachment to '<element>' if you want it at higher level.`
 
@@ -327,4 +320,3 @@ Test cases for filesystem and reporting:
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
   * verify: [CLI Remove Asset Command](../../../Interfaces/CLI/Commands.md#cli-remove-asset-command)
 ---
-

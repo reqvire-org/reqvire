@@ -141,6 +141,39 @@ This test verifies that the system correctly validates relation types based on e
   * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
 ---
 
+### Document Refinement Validation Test
+
+This test verifies that `# Documents` files are parsed as single-element model documents and that `refinedBy` targets must resolve to refinement elements (including those defined in `# Documents` files).
+
+#### Details
+
+##### Acceptance Criteria
+- System shall parse `# Documents` files as model files with one element.
+- The document element shall use metadata type from `## Metadata`.
+- Content under `## <Actual Element Name>` shall allow arbitrary markdown headers, and the heading text shall define the element name.
+- `refinedBy` targets shall be identifier links that resolve to refinement elements.
+- `refinedBy` plain file-path targets shall be rejected.
+- `refinedBy` identifier targets into `# Documents` files shall satisfy existing relation type compatibility rules based on target element type.
+
+##### Test Criteria
+1. Create valid `# Documents` refinement file with:
+   - `## Metadata` type `specification`
+   - `## Relations` containing `refine` relation
+   - `## <Actual Element Name>` body containing nested markdown headers
+2. Create requirement with `refinedBy` pointing to the document element identifier (`file.md#fragment`); run `reqvire validate`; assert success.
+3. Change document metadata type to `requirement`; run `reqvire validate`; assert failure with incompatible type message.
+4. Point `refinedBy` to plain file path (no fragment), including a `# Documents` file path; run `reqvire validate`; assert failure.
+5. Create `# Documents` file where `## <Actual Element Name>` body contains multiple markdown headers (including `###`); run `reqvire validate`; assert success.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-document-refinement-format/test.sh)
+  * verify: [Specification File Identification](../StructureAndParsing.md#specification-file-identification)
+  * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
+---
+
 ### File Exclusion Test
 
 This test verifies that Reqvire correctly reads and applies exclusion patterns from the repository root .gitignore file, .reqvireignore file, and reserved filenames.

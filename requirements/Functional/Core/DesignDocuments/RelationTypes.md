@@ -1,3 +1,13 @@
+# Documents
+
+## Metadata
+  * type: specification
+
+## Relations
+  * refine: [Relation Types and behaviors](../ModelManagement.md#relation-types-and-behaviors)
+
+## RelationTypes
+
 # Relation Types Specification
 
 ## Relation Type Definition
@@ -41,7 +51,7 @@ Relations are categorized by their usage in different system functions:
 | **derive** | derivedFrom | Yes | No | Yes | Links a parent element to child elements derived from it |
 | **satisfiedBy** | satisfy | Yes | No | Yes | Links a requirement to implementation elements that satisfy it |
 | **satisfy** | satisfiedBy | No | Yes | No | Links an implementation to the requirement it satisfies |
-| **refinedBy** | refine | Yes | No | Yes | Links a requirement to refinement elements or specification files that refine it |
+| **refinedBy** | refine | Yes | No | Yes | Links a requirement to refinement elements |
 | **refine** | refinedBy | No | Yes | No | Links a refinement element to the requirement it refines |
 | **verifiedBy** | verify | Yes | No | Yes | Links a requirement to verification artifacts |
 | **verify** | verifiedBy | No | Yes | No | Links a verification artifact to the requirement it verifies |
@@ -66,7 +76,7 @@ These relations connect requirements to implementations:
 
 These relations establish ownership of refinement artifacts by requirements:
 
-- **refinedBy/refine**: Links requirements to refinement elements (specification, constraint, behavior) and specification files that augment the requirement definition. Each refinement can only be owned by one requirement (uniqueness constraint). Together with the requirement, these artifacts drive implementation.
+- **refinedBy/refine**: Links requirements to refinement elements (specification, constraint, behavior) that augment the requirement definition. Each refinement can only be owned by one requirement (uniqueness constraint). Together with the requirement, these artifacts drive implementation.
 
 ### 4. Verification Relations
 
@@ -121,7 +131,7 @@ This section defines which element types can use which relation types as source 
 | **derive** | requirement, user-requirement | requirement, user-requirement | Inverse of derivedFrom |
 | **satisfiedBy** | requirement, user-requirement, test-verification | InternalPath (files) | Requirements/tests link to implementations |
 | **satisfy** | InternalPath (files) | requirement, user-requirement, test-verification | Inverse of satisfiedBy (auto-generated) |
-| **refinedBy** | requirement, user-requirement | refinement types, InternalPath (files) | Requirements link to refinement elements or specification files |
+| **refinedBy** | requirement, user-requirement | refinement types | Requirements link to refinement elements (including elements defined in `# Documents` files via identifier links) |
 | **refine** | refinement types | requirement, user-requirement | Inverse of refinedBy (auto-generated) |
 | **verifiedBy** | requirement, user-requirement | All verification types | Requirements link to verifications |
 | **verify** | All verification types | requirement, user-requirement | Verifications link to requirements |
