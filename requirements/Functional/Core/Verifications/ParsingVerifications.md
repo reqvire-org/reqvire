@@ -206,49 +206,32 @@ This test verifies that non-reserved subsections (subsections other than Relatio
 
 ### Refinement Element Type Parsing Test
 
-This test verifies that the system correctly parses Refinement element types (constraint, behavior, specification) from metadata and handles their structural constraints.
+This test verifies that the system parses Refinement element types (constraint, behavior, specification) from metadata and that type-based search filters return the expected elements.
 
 #### Details
 
 ##### Acceptance Criteria
-**Type Parsing:**
-- System shall parse `type: constraint` as Refinement type Constraint
-- System shall parse `type: behavior` as Refinement type Behavior
-- System shall parse `type: specification` as Refinement type Specification
-- Refinement types shall be stored distinctly from other element types
-- Refinement types shall display as `"constraint"`, `"behavior"`, `"specification"` in output
-
-**Search and Filtering:**
-- System shall support filtering by `--filter-type="constraint"`
-- System shall support filtering by `--filter-type="behavior"`
-- System shall support filtering by `--filter-type="specification"`
+- With only valid fixtures present, `reqvire validate` succeeds.
+- `reqvire search --json` reports:
+  - `Test Constraint Element` with type `constraint`
+  - `Test Behavior Element` with type `behavior`
+  - `Test Specification Element` with type `specification`
+- `reqvire search --filter-type=constraint --json` returns exactly 1 element.
+- `reqvire search --filter-type=behavior --json` returns exactly 1 element.
+- `reqvire search --filter-type=specification --json` returns exactly 1 element.
 
 ##### Test Criteria
-1. **Constraint type parsing:**
-   - Create element with `type: constraint` metadata
-   - Query model via JSON output
-   - Verify `element_type` field is `"constraint"`
-
-2. **Behavior type parsing:**
-   - Create element with `type: behavior` metadata
-   - Query model via JSON output
-   - Verify `element_type` field is `"behavior"`
-
-3. **Specification type parsing:**
-   - Create element with `type: specification` metadata
-   - Query model via JSON output
-   - Verify `element_type` field is `"specification"`
-
-4. **Search filtering:**
-   - Create elements of all three Refinement types
-   - Test `--filter-type="constraint"` returns only constraint elements
-   - Test `--filter-type="behavior"` returns only behavior elements
-   - Test `--filter-type="specification"` returns only specification elements
+1. Remove invalid refinement fixture and run `reqvire validate`; assert exit code is 0.
+2. Run `reqvire search --json`; assert the three refinement elements have exact types `constraint`, `behavior`, `specification`.
+3. Run `reqvire search --filter-type=constraint --json`; assert element count is 1.
+4. Run `reqvire search --filter-type=behavior --json`; assert element count is 1.
+5. Run `reqvire search --filter-type=specification --json`; assert element count is 1.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-refinement-elements/test.sh)
   * verify: [Refinement Element Structure Constraints](../ModelManagement.md#refinement-element-structure-constraints)
 ---
 
@@ -259,42 +242,22 @@ This test verifies that the system rejects Refinement elements that include a Re
 #### Details
 
 ##### Acceptance Criteria
-**Validation Rejection:**
-- System shall report validation error when Refinement element has Relations subsection
-- Error message shall indicate that Refinement elements cannot have relations
-- Error shall include element name and file location
-- Validation shall fail (non-zero exit code) when this error is detected
-
-**Valid Refinement Elements:**
-- Refinement elements without Relations subsection shall pass validation
-- Refinement elements with Metadata and Details subsections shall pass validation
-- Refinement elements with Attachments subsection shall pass validation
+- When an invalid `constraint` element includes a Relations subsection, `reqvire validate` fails (non-zero exit code).
+- When an invalid `behavior` element includes a Relations subsection, `reqvire validate` fails (non-zero exit code).
+- When an invalid `specification` element includes a Relations subsection, `reqvire validate` fails (non-zero exit code).
+- Validation output contains at least one of: `constraint`, `refinement`, or `relations`.
 
 ##### Test Criteria
-1. **Relations rejection for constraint:**
-   - Create constraint element with Relations subsection
-   - Run reqvire validate
-   - Verify validation fails with appropriate error message
-
-2. **Relations rejection for behavior:**
-   - Create behavior element with Relations subsection
-   - Run reqvire validate
-   - Verify validation fails with appropriate error message
-
-3. **Relations rejection for specification:**
-   - Create specification element with Relations subsection
-   - Run reqvire validate
-   - Verify validation fails with appropriate error message
-
-4. **Valid Refinement elements:**
-   - Create Refinement elements without Relations (only Metadata, Details, Attachments)
-   - Run reqvire validate
-   - Verify validation passes
+1. Write an invalid `constraint` element containing a Relations subsection, run `reqvire validate`, and assert non-zero exit.
+2. Write an invalid `behavior` element containing a Relations subsection, run `reqvire validate`, and assert non-zero exit.
+3. Write an invalid `specification` element containing a Relations subsection, run `reqvire validate`, and assert non-zero exit.
+4. Assert validation output mentions refinement/type/relations context.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-refinement-elements/test.sh)
   * verify: [Refinement Element Structure Constraints](../ModelManagement.md#refinement-element-structure-constraints)
 ---
 
@@ -356,3 +319,4 @@ This test verifies that the system only parses markdown files where the first H1
   * satisfiedBy: [test.sh](../../../../tests/test-gitignore-integration/test.sh)
   * verify: [Specification File Identification](../StructureAndParsing.md#specification-file-identification)
 ---
+

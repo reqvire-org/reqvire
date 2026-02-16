@@ -51,6 +51,20 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/change-impact-report.txt" <(echo "$SAN
   exit 1
 fi
 
+# Verify Impact Scope section ordering in text output
+CHANGED_LINE=$(echo "$SANITIZED_OUTPUT" | grep -n "^### Changed Elements" | cut -d: -f1 | head -n1)
+SCOPE_LINE=$(echo "$SANITIZED_OUTPUT" | grep -n "^### Impact Scope" | cut -d: -f1 | head -n1)
+
+if [ -z "${CHANGED_LINE:-}" ] || [ -z "${SCOPE_LINE:-}" ]; then
+  echo "FAILED: Expected Changed Elements and Impact Scope sections to exist in text output"
+  exit 1
+fi
+
+if [ "$SCOPE_LINE" -le "$CHANGED_LINE" ]; then
+  echo "FAILED: Impact Scope section should appear after Changed Elements section"
+  exit 1
+fi
+
 # Test 2: Run change impact detection (JSON output)
 set +e
 JSON_RAW=$(cd "${TEST_DIR}" && "${REQVIRE_BIN}" change-impact --json 2>&1)

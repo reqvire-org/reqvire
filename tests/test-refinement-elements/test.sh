@@ -177,39 +177,53 @@ fi
 # ==================================
 echo "Test 7: Validation rejects Refinement with Relations..."
 
-# Restore invalid file
-cat > "$TEST_DIR/specifications/InvalidRefinement.md" <<'EOF'
+# Helper to assert refinement-with-relations is rejected for a given refinement type
+assert_invalid_refinement_relations_rejected() {
+  local refinement_type="$1"
+  local element_name="$2"
+
+  cat > "$TEST_DIR/specifications/InvalidRefinement.md" <<EOF
 # Elements
 
-### Invalid Constraint With Relations
+### ${element_name}
 
-This constraint element has relations which is not allowed.
+This ${refinement_type} element has relations which is not allowed.
 
 #### Metadata
-  * type: constraint
+  * type: ${refinement_type}
 
 #### Relations
   * derivedFrom: [Parent Requirement](Requirements.md#parent-requirement)
 ---
 EOF
 
-# Validation should fail
-set +e
-VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
-VALIDATION_EXIT=$?
-set -e
+  # Validation should fail
+  set +e
+  VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+  VALIDATION_EXIT=$?
+  set -e
 
-if [ $VALIDATION_EXIT -eq 0 ]; then
-  echo "FAILED: Validation should have failed for Refinement with Relations"
-  exit 1
-fi
+  if [ $VALIDATION_EXIT -eq 0 ]; then
+    echo "FAILED: Validation should have failed for ${refinement_type} with Relations"
+    exit 1
+  fi
 
-# Verify error message mentions Refinement or constraint
-if ! echo "$VALIDATION_OUTPUT" | grep -qi "constraint\|refinement\|relations"; then
-  echo "FAILED: Error message should mention constraint/refinement/relations issue"
-  echo "Output: $VALIDATION_OUTPUT"
-  exit 1
-fi
+  # Verify error message mentions refinement/type/relations context
+  if ! echo "$VALIDATION_OUTPUT" | grep -qi "constraint\|behavior\|specification\|refinement\|relations"; then
+    echo "FAILED: Error message should mention refinement/relations issue for type ${refinement_type}"
+    echo "Output: $VALIDATION_OUTPUT"
+    exit 1
+  fi
+}
+
+# Constraint with relations -> rejected
+assert_invalid_refinement_relations_rejected "constraint" "Invalid Constraint With Relations"
+
+# Behavior with relations -> rejected
+assert_invalid_refinement_relations_rejected "behavior" "Invalid Behavior With Relations"
+
+# Specification with relations -> rejected
+assert_invalid_refinement_relations_rejected "specification" "Invalid Specification With Relations"
 
 # ==================================
 # Test 8: Attachment Identifier to Refinement Element
@@ -218,6 +232,25 @@ echo "Test 8: Attachment identifier to Refinement element..."
 
 # Remove invalid file for this test
 rm -f "$TEST_DIR/specifications/InvalidRefinement.md"
+
+# Create a second cross-file attachment reference to validate multi-file CRUD update behavior
+cat > "$TEST_DIR/specifications/AdditionalRequirements.md" <<'EOF'
+# Elements
+
+### Additional Requirement With Refinement Attachment
+
+This additional requirement references the same refinement from a separate file.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Test Constraint Element](Requirements.md#test-constraint-element)
+
+#### Relations
+  * derivedFrom: [Separate Branch Requirement](Requirements.md#separate-branch-requirement)
+---
+EOF
 
 # Verify attachment parsing
 set +e
@@ -261,6 +294,15 @@ if ! echo "$FILE_CONTENT" | grep -q "#renamed-constraint"; then
   echo "FAILED: Attachment identifier not updated after rename"
   echo "File content:"
   echo "$FILE_CONTENT"
+  exit 1
+fi
+
+# Verify all referencing files were updated (cross-file attachment target update)
+ADDITIONAL_FILE_CONTENT=$(cat "$TEST_DIR/specifications/AdditionalRequirements.md")
+if ! echo "$ADDITIONAL_FILE_CONTENT" | grep -q "Requirements.md#renamed-constraint"; then
+  echo "FAILED: Cross-file attachment identifier not updated after rename"
+  echo "AdditionalRequirements.md content:"
+  echo "$ADDITIONAL_FILE_CONTENT"
   exit 1
 fi
 
@@ -317,6 +359,14 @@ if ! echo "$FILE_CONTENT" | grep -q "Refinements.md#test-constraint-element"; th
   echo "FAILED: Attachment identifier not updated after move"
   echo "File content:"
   echo "$FILE_CONTENT"
+  exit 1
+fi
+
+ADDITIONAL_FILE_CONTENT=$(cat "$TEST_DIR/specifications/AdditionalRequirements.md")
+if ! echo "$ADDITIONAL_FILE_CONTENT" | grep -q "Refinements.md#test-constraint-element"; then
+  echo "FAILED: Cross-file attachment identifier not updated after move"
+  echo "AdditionalRequirements.md content:"
+  echo "$ADDITIONAL_FILE_CONTENT"
   exit 1
 fi
 

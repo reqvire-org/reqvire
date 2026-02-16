@@ -34,25 +34,24 @@ Test cases for element attachments:
 Verify that moving or renaming Refinement elements updates attachment identifiers throughout the model.
 
 #### Details
-Test cases for move operations:
-- Moving a Refinement element updates all attachment identifiers referencing it
-- All files with referencing attachments are modified
-- Attachment format remains valid after move
-
 Test cases for rename operations:
-- Renaming a Refinement element updates all attachment identifiers referencing it
-- All files with referencing attachments are modified
-- Attachment format remains valid after rename
+- Renaming `Test Constraint Element` to `Renamed Constraint` updates attachment links in `specifications/Requirements.md` to `#renamed-constraint`
+- Renaming `Test Constraint Element` updates attachment links in all referencing files used by the fixture (including `specifications/AdditionalRequirements.md`)
+- Model validation succeeds after rename
+
+Test cases for move operations:
+- Moving `Test Constraint Element` to `specifications/Refinements.md` updates attachment links in `specifications/Requirements.md` to `Refinements.md#test-constraint-element`
+- Moving `Test Constraint Element` updates attachment links in all referencing files used by the fixture (including `specifications/AdditionalRequirements.md`)
+- Model validation succeeds after move
 
 Test cases for consistency:
-- Behavior matches relation target updates (same update logic)
-- Validation passes after CRUD operations
-- No orphaned or broken attachment references
+- Attachment identifiers remain resolvable after rename/move operations exercised by the test script
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-refinement-elements/test.sh)
   * verify: [Attachment Identifier Updates](../ModelManagement.md#attachment-identifier-updates)
 ---
 
@@ -328,3 +327,4 @@ Test cases for filesystem and reporting:
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
   * verify: [CLI Remove Asset Command](../../../Interfaces/CLI/Commands.md#cli-remove-asset-command)
 ---
+

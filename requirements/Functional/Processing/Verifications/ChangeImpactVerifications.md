@@ -177,22 +177,29 @@ This test verifies that the change impact report correctly computes and displays
 #### Details
 
 ##### Acceptance Criteria
-- System computes per-branch lowest common ancestors for changed+added requirements
-- Deleted requirements' parents (if still in current model) are included in scope
-- Siblings under the same parent are merged into the parent
-- Single impacted elements without siblings remain as-is
-- Scope roots are listed between Changed Elements and Invalidated Verifications
+- After changing sibling requirements under Branch A, impact scope includes `Branch A`.
+- After deleting `Leaf B1`, impact scope includes `Branch B`.
+- After changing standalone requirement, impact scope includes `Standalone Req`.
+- Text output matches expected report fixture.
+- In text output, the `Impact Scope` section appears after `Changed Elements`.
+- JSON output includes `impact_scope` with exactly 3 entries and expected names.
 
 ##### Test Criteria
-- When two sibling requirements change, their parent appears as scope root
-- When a requirement is deleted, its parent (if still in model) appears in scope
-- Elements in different branches produce separate scope roots
-- Both text and JSON outputs include impact scope data
+- Modify `Leaf A1`, `Leaf A2`, and `Standalone Req`, and delete `Leaf B1` in test fixture model.
+- Run `reqvire change-impact`; assert exit code 0 and compare sanitized text output to `expected/change-impact-report.txt`.
+- Assert text output section order places `### Impact Scope` after `### Changed Elements`.
+- Run `reqvire change-impact --json`; assert valid JSON and presence of `.impact_scope`.
+- Assert `.impact_scope | length == 3`.
+- Assert `.impact_scope[].name` equals:
+  - `Branch A`
+  - `Branch B`
+  - `Standalone Req`
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-change-impact-scope/test.sh)
   * verify: [Change Impact Detection](../ChangeImpact.md#change-impact-detection)
 ---
 
@@ -222,3 +229,4 @@ TODO: write test procedure
   * satisfiedBy: [test.sh](../../../../tests/test-change-impact-detection/test.sh)
   * verify: [Tracing Structural Changes](../../Output/Reporting.md#tracing-structural-changes)
 ---
+

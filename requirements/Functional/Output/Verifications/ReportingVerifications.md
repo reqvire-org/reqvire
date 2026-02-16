@@ -1,51 +1,5 @@
 # Elements
 
-### CLI JSON File Output Test
-
-This test verifies that the `--output` flag writes JSON output to a file when used with `--json` across CLI commands.
-
-#### Details
-
-##### Acceptance Criteria
-- `--output <FILE>` writes JSON to file when combined with `--json`
-- Confirmation message printed to stdout: `✅ Output saved to <filepath>`
-- File contains valid JSON identical to what `--json` alone would produce on stdout
-- `--output` without `--json` produces an error and non-zero exit code
-- File is created if it doesn't exist
-- File is overwritten if it exists
-
-##### Test Criteria
-1. **JSON file output with validate**
-   Command: `reqvire validate --json --output output.json`
-   - exits code **0**
-   - stdout contains `✅ Output saved to output.json`
-   - `output.json` exists and contains valid JSON
-   - JSON content matches `reqvire validate --json` stdout output
-
-2. **JSON file output with search**
-   Command: `reqvire search --json --output search.json`
-   - exits code **0**
-   - stdout contains `✅ Output saved to search.json`
-   - `search.json` exists and contains valid JSON
-
-3. **Error when --output used without --json**
-   Command: `reqvire validate --output output.json`
-   - exits non-zero
-   - stderr contains error message about requiring --json
-
-4. **File overwrite behavior**
-   - Create a file with existing content
-   - Run command with `--json --output <same-file>`
-   - Verify file is overwritten with new JSON content
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-json-file-output/test.sh)
-  * verify: [CLI JSON File Output Option](../../../Interfaces/CLI/Commands.md#cli-json-file-output-option)
----
-
 ### CLI Collect Command Test
 
 This test verifies that the collect command aggregates content from a requirement chain with proper source citations.
@@ -148,6 +102,52 @@ This test verifies that the collect command aggregates content from a requiremen
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-collect-command/test.sh)
   * verify: [CLI Collect Command](../../../Interfaces/CLI/Commands.md#cli-collect-command)
+---
+
+### CLI JSON File Output Test
+
+This test verifies that the `--output` flag writes JSON output to a file when used with `--json` across CLI commands.
+
+#### Details
+
+##### Acceptance Criteria
+- `--output <FILE>` writes JSON to file when combined with `--json`
+- Confirmation message printed to stdout: `✅ Output saved to <filepath>`
+- File contains valid JSON identical to what `--json` alone would produce on stdout
+- `--output` without `--json` produces an error and non-zero exit code
+- File is created if it doesn't exist
+- File is overwritten if it exists
+
+##### Test Criteria
+1. **JSON file output with validate**
+   Command: `reqvire validate --json --output output.json`
+   - exits code **0**
+   - stdout contains `✅ Output saved to output.json`
+   - `output.json` exists and contains valid JSON
+   - JSON content matches `reqvire validate --json` stdout output
+
+2. **JSON file output with search**
+   Command: `reqvire search --json --output search.json`
+   - exits code **0**
+   - stdout contains `✅ Output saved to search.json`
+   - `search.json` exists and contains valid JSON
+
+3. **Error when --output used without --json**
+   Command: `reqvire validate --output output.json`
+   - exits non-zero
+   - stderr contains error message about requiring --json
+
+4. **File overwrite behavior**
+   - Create a file with existing content
+   - Run command with `--json --output <same-file>`
+   - Verify file is overwritten with new JSON content
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-json-file-output/test.sh)
+  * verify: [CLI JSON File Output Option](../../../Interfaces/CLI/Commands.md#cli-json-file-output-option)
 ---
 
 ### Containment Hierarchy Extraction Test
@@ -743,15 +743,14 @@ This test verifies that the resources command correctly generates reports showin
 
 ### Reverse Model Traversal Test
 
-Test verifies reverse relation traversal functionality:
+Test verifies reverse traversal output against golden files for both JSON and Markdown modes.
 
-1. Create model with hierarchical structure (root -> mid -> leaf)
-2. Run model command with reverse mode enabled
-3. Verify output starts from leaf elements
-4. Verify relations shown are backward (derivedFrom, satisfy, verify)
-5. Verify tree structure builds upward to roots
-6. Run model command with reverse mode and specific starting element
-7. Verify traversal starts from specified element going upward
+#### Details
+Test cases:
+1. Run `reqvire model --reverse --json`; assert command success and valid JSON output.
+2. Compare JSON output to `expected/expected_reverse_output.json`.
+3. Run `reqvire model --reverse`; assert command success.
+4. Compare Markdown output to `expected/expected_reverse_output.md`.
 
 #### Metadata
   * type: test-verification
@@ -760,6 +759,7 @@ Test verifies reverse relation traversal functionality:
   * [Reverse Relation Traversal Behavior](../Behaviors.md#reverse-relation-traversal-behavior)
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
   * verify: [Reverse Relation Traversal](../Reporting.md#reverse-relation-traversal)
 ---
 
@@ -904,14 +904,15 @@ This test verifies that the system provides a unified `search` command functiona
 
 ### Start Type Filter Test
 
-Test verifies start element type filtering functionality:
+Test verifies model start-element type filtering using JSON/Markdown assertions and expected fixtures.
 
-1. Create model with mixed element types (requirements, verifications)
-2. Run model command with type filter for verification elements
-3. Verify only verification elements are used as roots
-4. Run model command with reverse mode and verification type filter
-5. Verify verifications are starting points for upward traversal
-6. Verify this produces traces-like output
+#### Details
+Test cases:
+1. Run `reqvire model --filter-type=test-verification --json`; assert success and valid JSON.
+2. Assert `metadata.type_filter` contains `test-verification`.
+3. Assert all top-level `.elements[].element_type` values are `test-verification`.
+4. Run `reqvire model --reverse --filter-type=test-verification --json`; assert success and compare with `expected/expected_reverse_filter_output.json`.
+5. Run `reqvire model --reverse --filter-type=test-verification`; assert success and compare with `expected/expected_reverse_filter_output.md`.
 
 #### Metadata
   * type: test-verification
@@ -920,6 +921,7 @@ Test verifies start element type filtering functionality:
   * [Start Element Type Filter Behavior](../Behaviors.md#start-element-type-filter-behavior)
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
   * verify: [Start Element Type Filtering](../Reporting.md#start-element-type-filtering)
 ---
 
@@ -1188,3 +1190,4 @@ This test verifies that the --from-folder option correctly generates relative li
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
   * verify: [CLI Traces Command](../../../Interfaces/CLI/Commands.md#cli-traces-command)
 ---
+

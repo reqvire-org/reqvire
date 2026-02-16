@@ -398,13 +398,20 @@ The test shall verify that the `rename` command renames elements, updates all re
 
 ### Create Element Override Test
 
-Test verifies that create element with override mode correctly replaces existing elements:
+Test verifies `add --override` behavior as asserted by the override E2E script.
 
-1. Create initial element "Test Element" in target file
-2. Run create element with override for "Test Element" with new content
-3. Verify old element content is replaced with new content
-4. Verify operation reports as "Update"
-5. Verify element relations are preserved from new content only
+#### Details
+Test cases:
+1. Override existing element content and assert command output contains `Updated`.
+2. Compare resulting file content to expected fixture after override.
+3. Verify model validation succeeds after successful override.
+4. Attempt duplicate add without `--override` and assert command fails.
+5. Run `--override` for a non-existent element and assert operation succeeds (acts as add).
+6. Attempt override that would orphan children and assert failure:
+   - error mentions orphaning
+   - error names `Feature B`
+   - error includes remediation guidance
+7. Override an element without children and assert success with `Updated` output.
 
 #### Metadata
   * type: test-verification
@@ -413,6 +420,7 @@ Test verifies that create element with override mode correctly replaces existing
   * [Create Element Override Behavior](../Behaviors.md#create-element-override-behavior)
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-crud-override/test.sh)
   * verify: [Create Element Operation](../ElementManipulation.md#create-element-operation)
 ---
 
@@ -733,21 +741,22 @@ Test verifies that the merge command correctly combines elements.
 
 #### Details
 Test cases:
-1. **Basic merge**: Merge two requirements, verify content consolidation
-2. **Multi-element merge**: Merge 3+ elements into target
-3. **Cross-file merge**: Merge elements from different files
-4. **Relation merging**: Verify relations are merged and deduplicated
-5. **Attachment merging**: Verify attachments are merged and deduplicated
-6. **Type compatibility**: Verify error when merging incompatible types
-7. **Cross-section duplicate**: Verify error when merged result has cross-section duplicate
-8. **Relation redirection**: Verify relations pointing to source are updated to target
-9. **Source deletion**: Verify source elements are removed after merge
-10. **Dry-run mode**: Verify no changes when --dry-run is used
+1. **Basic merge**: merge two requirements and compare resulting file with expected fixture.
+2. **Source deletion**: verify merged source element no longer appears in search results.
+3. **Relation redirection**: verify relations that pointed to source now point to target.
+4. **Multi-element merge**: merge multiple sources and compare resulting file with expected fixture.
+5. **Type compatibility error**: merging incompatible types fails with type-mismatch message.
+6. **Merge into self error**: merging an element into itself fails.
+7. **Non-existent source error**: merge with missing source fails.
+8. **Dry-run mode**: `--dry-run` does not modify files.
+9. **Relation deduplication**: duplicate merged relation appears once.
+10. **Regression scenario**: multi-source merge keeps target element present and model validates.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-merge-elements/test.sh)
   * verify: [Merge Element Operation](../ElementManipulation.md#merge-element-operation)
 ---
 
@@ -1064,3 +1073,4 @@ The test shall verify that the `unlink` command removes relations from elements 
   * verify: [Relation Management Operations](../../Core/ModelManagement.md#relation-management-operations)
   * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
 ---
+
