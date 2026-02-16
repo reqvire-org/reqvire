@@ -103,16 +103,16 @@ To read more about plugin usage see the [Claude Plugin](https://www.reqvire.org/
 
 ## Contributing
 
-We welcome contributions to **Reqvire**! Whether you're fixing bugs, adding features, improving documentation, or refining specifications, your input is highly valued.
+External pull request contributions are by invitation only.
 
 ### How to Contribute
 
-1. **Read the [Contributing Guide](./doc/README.md)** - Understand our MBSE-based development workflow
-2. **Fork and create a branch** - Work on your changes in a dedicated feature branch
-3. **Follow the discipline** - Requirements first, then verifications, tests, and code
-4. **Submit a PR** - Include clear description and link related issues
+1. **Read the [Contributing Guide](./doc/CONTRIBUTING.md)** - Understand contribution policy and invited workflow
+2. **Open or upvote an issue** - Propose features, behavior changes, and bug reports
+3. **Contribute analysis** - Share reproduction details and implementation ideas in issue threads
+4. **Submit a PR only if invited** - Uninvited PRs may be closed without review
 
-**Important**: Reqvire follows an MBSE workflow. All code changes must be accompanied by corresponding requirements and verifications. See our [Contributor Documentation](./doc/README.md) for details.
+**Important**: Reqvire follows an MBSE workflow. Invited code changes should include corresponding requirements, verifications, and tests. See [Contributor Documentation](./doc/README.md) for details.
 
 ### Quick Links
 

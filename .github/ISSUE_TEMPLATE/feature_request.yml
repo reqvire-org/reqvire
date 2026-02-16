@@ -7,7 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for suggesting a new feature! Please provide as much detail as possible to help us understand your request.
+        Thanks for suggesting a new feature.
+        External code contributions are invitation-only, so this issue is the primary place to discuss scope, design, and tradeoffs.
+        Maintainers may invite a PR after alignment.
 
   - type: textarea
     id: problem
@@ -48,10 +50,19 @@ body:
       description: Add any other context, screenshots, or references about the feature request.
       placeholder: Links to similar tools, research papers, standards, etc.
 
+  - type: textarea
+    id: impact
+    attributes:
+      label: 📈 Impact and Priority
+      description: Who is affected, how often, and why this should be prioritized now.
+      placeholder: Affected users, pain level, frequency, and expected outcome...
+
   - type: checkboxes
     id: terms
     attributes:
       label: 📋 Checklist
       options:
         - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I understand external code PRs are invitation-only and should not be opened unless invited by a maintainer
           required: true

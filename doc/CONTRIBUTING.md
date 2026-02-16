@@ -1,70 +1,56 @@
 # Contributing to Reqvire
 
-Thank you for your interest in contributing to Reqvire! We welcome contributions from the community and appreciate your efforts to make this project better. This document outlines the terms and guidelines for contributing to the project.
+## External Contributions Are By Invitation Only
 
----
+At this time, the Reqvire maintainers do not accept unsolicited pull requests.
 
-## Contribution Guidelines
+If you would like to propose a feature or behavior change, please open an issue (or upvote an existing one). If you find a bug, please open a bug report and include detailed analysis, reproduction steps, and root-cause hypotheses when possible.
 
-### 1. Code of Conduct
-By participating in this project, you agree to adhere to our [Code of Conduct](./code_of_conduct.md). Please ensure that your behavior fosters a positive and respectful environment.
+Pull requests that have not been explicitly invited by a maintainer may be closed without review.
 
-### 2. Licensing of Contributions
+## Why We Use This Model
 
-By contributing to Reqvire, you agree that your contributions will be licensed under the **Apache License 2.0**, in line with the project’s current license.
+Maintaining Reqvire requires architectural context, roadmap awareness, and prioritization across many requests. In practice, unsolicited PRs often increase review overhead and delay higher-priority work.
 
-Additionally, by accepting the **Contributor License Agreement (CLA)**, you grant the project maintainers the flexibility to relicense your contributions in the future if needed. This ensures consistency, legal clarity, and allows the project to grow and adapt over time.
+The most valuable external input is usually early problem analysis in issue discussions. We therefore focus community contributions on issue collaboration first, and invite implementation PRs selectively when the scope and approach are aligned.
 
+## If You Are Invited To Contribute Code
 
-### 3. Submitting Issues
-- Before submitting an issue, search the [issue tracker](https://github.com/ilijaljubicic/Reqvire/issues) to ensure it hasn’t been reported already.
-- If your issue is new, please provide as much detail as possible, including:
-  - Steps to reproduce (if applicable)
-  - Expected behavior
-  - Actual behavior
+### Development Workflow
 
-### 4. Proposing Changes
-- For major changes or new features, open an issue to discuss your proposal with the maintainers before starting work.
-- Once your idea is approved, fork the repository and work on your changes in a feature branch.
+1. Start with an issue and align on the approach before writing code.
+2. Apply MBSE principles first: begin with requirements/specifications/verifications updates in the system model.
+3. Create a focused topic branch from `main`.
+4. Keep changes scoped to one problem per PR.
+5. Add or update tests that fail before and pass after your change.
+6. Update relevant docs when behavior changes.
+7. Run project checks locally before opening the PR.
 
-### 5. Making a Pull Request (PR)
-- Ensure your code adheres to the project's coding standards.
-- Write clear and descriptive commit messages.
-- Include tests for your changes whenever possible.
-- Run all existing tests to confirm that your changes do not introduce regressions.
-- Submit your pull request to the `main` branch, ensuring it links to the related issue (if applicable).
-- Be prepared to engage in discussion and make revisions as needed.
+### Opening a Pull Request (By Invitation)
 
----
+1. Link the approved issue in your PR.
+2. Clearly describe what changed and why.
+3. Ensure all local checks pass.
+4. Mark the PR ready for review only when it is merge-ready.
 
-## Development Workflow
+### Review Process
 
-1. Fork the repository and clone your fork locally.
-2. Create a new branch for your feature or bugfix:
-3. Make your changes, and commit them with meaningful commit messages.
-4. Push your branch to your fork:
-  * git push origin my-feature-branch
-5. Open a pull request to the `main` branch of the original repository.
+1. A maintainer will review the invited PR.
+2. If scope diverges from the agreed issue plan, the PR may be closed.
+3. Revisions may be requested for correctness, consistency, or maintainability.
+4. Approved PRs are merged by maintainers.
 
----
+## Code of Conduct
 
-## Contributor Agreement
+By participating in this project, you agree to follow the [Code of Conduct](./code_of_conduct.md).
 
-All contributors are required to accept the **Contributor License Agreement (CLA)** before their pull requests can be merged. The CLA ensures that:
+## Contributor Agreement (CLA)
 
-- The contribution is your own original work or that you have the right to submit it.
-- You grant the project maintainers the right to use, modify, distribute, and relicense your contribution under any license, including open-source and proprietary licenses.
-
-The CLA process is **automated** through a GitHub pull request comment. When you open a PR, the CLA bot will prompt you to review and accept the agreement.
-
-For more details, see the [CLA.md](./CLA.md).
+All merged contributions require CLA acceptance. See [CLA.md](./CLA.md) for details.
 
 ## Getting Help
 
-If you need help with your contribution, feel free to:
-- Review the [user documentation](https://www.reqvire.org) to understand how Reqvire works
-- Review the [contributor documentation](./README.md) for development guidelines
-- Open an issue to request clarification or additional resources
-- Join our [GitHub Discussions](https://github.com/reqvire-org/reqvire/discussions)
-
-Thank you for helping to make Reqvire better!
+- Review the [user documentation](https://www.reqvire.org)
+- Review the [contributor documentation](./README.md)
+- Open an issue for bug reports or proposals
+- Use [GitHub Discussions](https://github.com/reqvire-org/reqvire/discussions) for questions

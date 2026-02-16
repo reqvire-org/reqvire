@@ -89,16 +89,16 @@ reqvire/
 ## Contribution Workflow
 
 1. **Read** the [Contributing Guide](./CONTRIBUTING.md)
-2. **Fork** the repository
-3. **Create** a feature branch
-4. **Follow MBSE workflow** (see [CLAUDE.md](../CLAUDE.md)):
+2. **Open or join** an issue discussion before code changes
+3. **Wait for maintainer invitation** before opening a PR
+4. **Follow MBSE workflow for invited PRs** (see [CLAUDE.md](../CLAUDE.md)):
    - Add requirements first
    - Define verifications
    - Implement tests
    - Write code
    - Link implementation to requirements
 5. **Test** your changes
-6. **Submit** a pull request
+6. **Submit** an invited pull request
 
 ## Need Help?
 

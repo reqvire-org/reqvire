@@ -7,7 +7,9 @@ body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to report a bug! Please fill out the following information to help us understand and fix the issue.
+        Thanks for taking the time to report a bug.
+        External code contributions are invitation-only, so please focus on detailed analysis here.
+        Maintainers may invite a PR after scope and approach are aligned in this issue.
 
   - type: textarea
     id: description
@@ -88,10 +90,19 @@ body:
       description: Add any other context about the problem here (screenshots, links, etc.)
       placeholder: Any additional information that might help...
 
+  - type: textarea
+    id: hypothesis
+    attributes:
+      label: 🧠 Root-Cause Hypothesis
+      description: If you have a hypothesis about why this happens, share it here.
+      placeholder: Potential root cause, impacted modules, or suspected regression source...
+
   - type: checkboxes
     id: terms
     attributes:
       label: 📋 Checklist
       options:
         - label: I have searched existing issues to avoid duplicates
+          required: true
+        - label: I understand external code PRs are invitation-only and should not be opened unless invited by a maintainer
           required: true
