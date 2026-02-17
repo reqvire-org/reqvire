@@ -5,11 +5,6 @@ use maud::{html, Markup, PreEscaped};
 /// # Arguments
 /// * `diagram_code` - Mermaid diagram code (without ```mermaid wrapper)
 ///
-/// # Example
-/// ```ignore
-/// let mermaid_code = "graph TD\n  A --> B";
-/// let diagram = mermaid::render(mermaid_code);
-/// ```
 pub fn render(diagram_code: &str) -> Markup {
     html! {
         div class="mermaid-container w-full h-full" {

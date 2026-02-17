@@ -2119,8 +2119,8 @@ mod tests {
         assert!(matches!(args.command, Some(Commands::Export { output: _ })));
     }
 
-    #[test]
-    fn test_handle_command() {
+    #[tokio::test]
+    async fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
             command: Some(Commands::Export {
@@ -2138,7 +2138,7 @@ mod tests {
         ];
 
         // Run the handle_command function
-        let result = handle_command(args, &build_glob_set(&excluded_filename_patterns));
+        let result = handle_command(args, &build_glob_set(&excluded_filename_patterns)).await;
 
         // Assert that it runs without error
         assert!(

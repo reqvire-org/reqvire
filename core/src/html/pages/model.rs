@@ -9,11 +9,6 @@ use maud::{html, Markup, PreEscaped};
 /// * `html_content` - Pre-converted HTML content from markdown model report (contains Mermaid diagrams)
 /// * `nav_prefix` - Relative path prefix for navigation links
 ///
-/// # Example
-/// ```ignore
-/// let model_html = markdown_to_html(&model_markdown);
-/// let page = model::render(&model_html, "");
-/// ```
 pub fn render(html_content: &str, nav_prefix: &str) -> Markup {
     let diagram = html! {
         div class="model-view w-full h-full p-4" {

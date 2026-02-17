@@ -155,18 +155,6 @@ fn calculate_nav_prefix(file_path: &Path, base_folder: &Path) -> String {
 /// * `content` - HTML content markup to display in the page
 /// * `nav_prefix` - Relative path prefix for navigation links (e.g., "../" for nested pages)
 ///
-/// # Example
-/// ```ignore
-/// use reqvire_core::html;
-/// use maud::html;
-///
-/// let content = html! {
-///     h1 { "Welcome" }
-///     p { "This is a test page" }
-/// };
-///
-/// let page = html::generate_page("Test Page", content, "");
-/// ```
 pub fn generate_page(title: &str, content: Markup, nav_prefix: &str) -> String {
     layouts::base(title, content, nav_prefix).into_string()
 }

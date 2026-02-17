@@ -9,11 +9,6 @@ use maud::{html, Markup, PreEscaped};
 /// * `html_content` - Pre-converted HTML content with D3 visualizations and toggle
 /// * `nav_prefix` - Relative path prefix for navigation links
 ///
-/// # Example
-/// ```ignore
-/// let containment_html = markdown_to_html(&containment_markdown);
-/// let page = index::render(&containment_html, "");
-/// ```
 pub fn render(html_content: &str, nav_prefix: &str) -> Markup {
     let diagram = html! {
         div class="containment-page w-full h-full p-4" {
