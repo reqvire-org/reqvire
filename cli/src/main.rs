@@ -6,6 +6,7 @@ use crate::cli::handle_command;
 use crate::cli::Args;
 use crate::config::get_excluded_filename_patterns_glob_set;
 use log::error;
+use reqvire::error::ReqvireError;
 
 #[tokio::main]
 async fn main() {
@@ -35,7 +36,17 @@ async fn main() {
     let exit_code = handle_command(args, &get_excluded_filename_patterns_glob_set())
         .await
         .unwrap_or_else(|e| {
-            error!("{}", e);
+            match e {
+                ReqvireError::ValidationError(errors) => {
+                    let mut messages: Vec<String> = errors.iter().map(|err| err.to_string()).collect();
+                    messages.sort();
+                    eprintln!("Validation failed with {} error(s):", messages.len());
+                    for (idx, msg) in messages.iter().enumerate() {
+                        eprintln!("{}. {}", idx + 1, msg);
+                    }
+                }
+                other => error!("{}", other),
+            }
             1 // Return exit code 1 in case of an error
         });
 

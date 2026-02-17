@@ -151,32 +151,26 @@ MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" relink "Child" derivedFrom "
 MULTIROOT_EXIT=$?
 set -e
 
-if [ $MULTIROOT_EXIT -ne 0 ]; then
-  if ! echo "$MULTIROOT_OUTPUT" | grep -qi "exactly one top root user-requirement\|single root\|multi-root"; then
-    echo "FAILED: relink multi-root error message is missing"
-    echo "$MULTIROOT_OUTPUT"
-    exit 1
-  fi
-
-  assert_file_matches \
-    "$BEFORE_MULTIROOT" \
-    "$TEST_DIR/specifications/Requirements.md" \
-    "Failed relink must not modify file"
-else
-  set +e
-  VALIDATE_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate --json 2>&1)
-  VALIDATE_MULTIROOT_EXIT=$?
-  set -e
-  if [ $VALIDATE_MULTIROOT_EXIT -eq 0 ]; then
-    echo "FAILED: relink must be rejected or produce model flagged by single-root validation"
-    exit 1
-  fi
-  if ! echo "$VALIDATE_MULTIROOT_OUTPUT" | grep -qi "exactly one top root user-requirement\|single root\|multi-root"; then
-    echo "FAILED: validation output should mention single-root ownership violation"
-    echo "$VALIDATE_MULTIROOT_OUTPUT"
-    exit 1
-  fi
+if [ $MULTIROOT_EXIT -eq 0 ]; then
+  echo "FAILED: relink should fail deterministically with single-root ownership violation"
+  exit 1
 fi
+
+printf "%s\n" "$MULTIROOT_OUTPUT" \
+  | sed 's/\x1b\[[0-9;]*m//g' \
+  | sed -E 's/^\[[^]]+\][[:space:]]*//' \
+  | grep -E "Single-root hierarchy ownership violation" \
+  > "$TEST_DIR/output/04-relink-multiroot-error.actual.txt"
+
+assert_output_matches \
+  "$TEST_SCRIPT_DIR/expected/04-relink-multiroot-error.txt" \
+  "$TEST_DIR/output/04-relink-multiroot-error.actual.txt" \
+  "Deterministic single-root error output mismatch for relink"
+
+assert_file_matches \
+  "$BEFORE_MULTIROOT" \
+  "$TEST_DIR/specifications/Requirements.md" \
+  "Failed relink must not modify file"
 
 rm -f "$BEFORE_MULTIROOT"
 

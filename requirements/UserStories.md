@@ -10,6 +10,14 @@
 | **Manager** | Oversees project progress, tracks metrics, and ensures alignment with organizational objectives |
 | **Contributor** | Open-source contributor who collaborates on the Reqvire project |
 
+### Reqvire System Vision
+
+Top-level user requirement that acts as the single hierarchy root for Reqvire user stories.
+
+#### Metadata
+  * type: user-requirement
+---
+
 ### AI-Assisted System Model Management
 
 As a **Systems Engineer**, I want to efficiently manage System models using AI-powered tools and LLM-based assistants.
@@ -18,6 +26,7 @@ As a **Systems Engineer**, I want to efficiently manage System models using AI-p
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [AI Assistant Skill-Guided Reqvire Modeling](Functional/Integration/AISkills.md#ai-assistant-skill-guided-reqvire-modeling)
 ---
 
@@ -29,6 +38,7 @@ As an **AI Assistant**, I want explicit instruction and skills hints for Reqvire
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [AI Assistant Skill-Guided Reqvire Modeling](Functional/Integration/AISkills.md#ai-assistant-skill-guided-reqvire-modeling)
 ---
 
@@ -40,6 +50,7 @@ As a **System Engineer**, I want to work with a system that adheres to widely re
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * refinedBy: [Containment Specification](Refinements.md#containment-specification)
   * refinedBy: [Refinement Specification](Refinements.md#refinement-specification)
   * refinedBy: [Relation Semantics Specification](Refinements.md#relation-semantics-specification)
@@ -56,6 +67,7 @@ As a **Developer**, I want to align code with System models, so that implementat
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [Code Traceability](Functional/Integration/CodeAlignment.md#code-traceability)
 ---
 
@@ -67,6 +79,7 @@ As a **System Engineer**, I want a well-defined model structure and file identif
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [Specification File Identification](Functional/Core/StructureAndParsing.md#specification-file-identification)
   * derive: [Structure and Addressing in Markdown Documents](Functional/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * derive: [Coexistence of Structured and Unstructured Documents](Functional/Core/Configuration.md#coexistence-of-structured-and-unstructured-documents)
@@ -81,6 +94,9 @@ As a **System Engineer**, I want to automatically format model documents to ensu
 #### Metadata
   * type: user-requirement
 
+#### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
+
 ---
 
 ### Fostering Community Contributions
@@ -89,6 +105,9 @@ As a **Contributor**, I want Reqvire tools to be intuitive and well-documented, 
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
 ---
 
 ### Generate Diagrams
@@ -99,6 +118,7 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [Interactive Mermaid Diagrams](Functional/Output/DiagramGeneration.md#interactive-mermaid-diagrams)
 ---
 
@@ -108,6 +128,9 @@ As a **System Engineer**, I want to lint model documents to detect and fix quali
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
 ---
 
 ### Operating on Model Elements
@@ -123,6 +146,9 @@ This user story covers all operations that modify model elements:
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
 ---
 
 ### Promote Automation and Efficiency
@@ -133,6 +159,7 @@ As as **System Engineer**, I would like to reduce manual effort in managing requ
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [Efficient Processing](Functional/Core/ModelManagement.md#efficient-processing)
   * derive: [Integrate with GitHub Workflows](#integrate-with-github-workflows)
 ---
@@ -145,6 +172,7 @@ As a **Contributor**, I want Reqvire to integrate seamlessly with GitHub workflo
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [Automate Documentation Export](Functional/Integration/GitHubIntegration.md#automate-documentation-export)
   * derive: [Automate Pull Request Validations](Functional/Integration/GitHubIntegration.md#automate-pull-request-validations)
   * derive: [Generate Change Logs for Pull Requests](Functional/Integration/GitHubIntegration.md#generate-change-logs-for-pull-requests)
@@ -159,6 +187,7 @@ As a **Manager**, I want to generate structured reports based on the System mode
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [Model Reports](Functional/Output/Reporting.md#model-reports)
 ---
 
@@ -173,6 +202,9 @@ This user story covers the different ways to access and manage system models:
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
 ---
 
 ### Trace Changes in System Model
@@ -183,6 +215,7 @@ As a **System Engineer**, I want to trace changes in the System model to identif
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [Tracing Structural Changes](Functional/Output/Reporting.md#tracing-structural-changes)
 ---
 
@@ -194,6 +227,7 @@ As an **System Engineer**, I want to validate the structure of System models, so
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [Validate Cross-Component Dependencies](Functional/Core/Validation.md#validate-cross-component-dependencies)
   * derive: [Validate Filesystem Structure](Functional/Core/Validation.md#validate-filesystem-structure)
   * derive: [Validate Internal Consistency](Functional/Core/Validation.md#validate-internal-consistency)
@@ -209,5 +243,6 @@ As a **V&V Engineer**, I want to trace verification coverage through the require
   * type: user-requirement
 
 #### Relations
+  * derivedFrom: [Reqvire System Vision](#reqvire-system-vision)
   * derive: [Verification Upward Traceability](Functional/Processing/VerificationTraces.md#verification-upward-traceability)
 ---

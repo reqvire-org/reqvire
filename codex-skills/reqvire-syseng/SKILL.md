@@ -35,6 +35,9 @@ Use this skill for any requirements, specifications, verifications, or system-mo
 7. Coverage interpretation:
    - Verification coverage is reported for leaf requirements (roll-up logic applies).
    - Implementation coverage scope includes `requirement` elements only.
+8. Hierarchy integrity:
+   - Requirement mutations must preserve single-root hierarchy ownership.
+   - If command behavior is not explicit, verify with `reqvire validate` after mutation.
 
 ## Quick Start: Common Workflows
 
@@ -132,6 +135,33 @@ Incorrect (cross-submodel relation leakage):
 - Do not assume attachment coverage is complete without checking `collect` output.
 - Do not rely on inferred boundaries; always confirm with the human user first.
 - Do not run mass refactors in one pass; refactor by boundary slice and validate each slice.
+
+## Task Pattern: Verification Criteria Alignment
+
+### Do It When
+
+- Verification text and e2e tests drift apart.
+- A new rule/behavior is added and existing tests only partially assert it.
+- User asks to align criteria with explicit assertions in tests.
+
+### Goal
+
+Keep verification criteria strictly aligned with what tests assert, and ensure every important claim is represented by deterministic test checks.
+
+### Workflow
+
+1. Identify owning verification element(s) for affected command/feature.
+2. Extract current explicit assertions from existing e2e tests.
+3. Update verification `#### Details` test criteria to match those assertions exactly.
+4. Extend existing tests (prefer existing suite over new suite) for missing critical cases.
+5. Use expected-output fixtures where possible and assert diff on mismatch.
+6. Run `./tests/run_tests.sh` and ensure full pass.
+
+### How Not To Do It
+
+- Do not claim behavior in verification criteria that tests do not assert.
+- Do not add broad “should work” criteria without deterministic checks.
+- Do not add new standalone tests when existing command suite should be extended.
 
 ## Task Pattern: Requirement-to-Refinement Content Extraction
 

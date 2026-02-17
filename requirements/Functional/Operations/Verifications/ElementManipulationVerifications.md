@@ -30,7 +30,7 @@ This test verifies atomic relation relink behavior, including hierarchical subgr
 - Candidate relink state is validated before persistence.
 - Relink rejects operations that would create circular dependencies.
 - Relink rejects operations that violate single-root ownership.
-- Relink operations that violate single-root ownership are either rejected by command or flagged by validation.
+- Relink rejects operations that violate single-root ownership with deterministic command error output.
 
 ##### Test Criteria
 1. **Successful relink:**
@@ -42,9 +42,9 @@ This test verifies atomic relation relink behavior, including hierarchical subgr
    - Attempt relink that introduces cycle.
    - Assert non-zero exit and no persisted changes.
 
-3. **Single-root ownership enforcement:**
+3. **Single-root rejection:**
    - Attempt hierarchical relink producing multi-root ownership.
-   - Assert either non-zero exit with no persisted changes, or successful command followed by validation error for single-root ownership.
+   - Assert non-zero exit, deterministic single-root ownership error output, and no persisted changes.
 
 4. **Dry-run behavior:**
    - Run `reqvire relink ... --dry-run`.
@@ -745,7 +745,7 @@ The test shall verify that the `link` command adds relations to elements followi
 7. Link from non-existent source
 8. Verify error is reported
 9. Link that introduces multi-root ownership in hierarchy
-10. Verify operation is either rejected with unchanged files, or results in validation error for single-root ownership
+10. Verify operation is rejected with deterministic single-root ownership error output and unchanged files
 
 **Test Steps - External URL Handling:**
 1. Link with relation type (e.g., trace) to external URL
@@ -766,7 +766,7 @@ The test shall verify that the `link` command adds relations to elements followi
 - Validates element type compatibility
 - Supports --dry-run preview
 - Reports errors for invalid inputs
-- Enforces single-root ownership: violating links are rejected or explicitly flagged by validation
+- Enforces single-root ownership: violating links are rejected with deterministic single-root ownership error output
 - External URLs allowed for relations (trace, satisfiedBy, etc.)
 - External URLs rejected for 'attaching' with helpful error message
 
@@ -796,7 +796,7 @@ Test cases:
 9. **Relation deduplication**: duplicate merged relation appears once.
 10. **Regression scenario**: multi-source merge keeps target element present and model validates.
 11. **Document-to-elements rejection**: merging a source from `# Documents` into a target in `# Elements` fails with explicit manual-migration guidance.
-12. **Single-root ownership enforcement**: merge that would create multi-root hierarchy ownership is rejected, or is explicitly flagged by validation.
+12. **Single-root rejection**: merge that would create multi-root hierarchy ownership fails with deterministic single-root ownership error output and persists no changes.
 
 #### Metadata
   * type: test-verification

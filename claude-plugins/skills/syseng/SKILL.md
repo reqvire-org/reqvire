@@ -148,6 +148,9 @@ Refinements are owned via `refinedBy` on the requirement (refinement gets auto-g
 5. When reading requirements, always check for **attachments** (documents, diagrams, images)
 6. Use `reqvire collect` to gather full context from requirement chains (ancestors or descendants + attachments)
 7. Implementation coverage (`reqvire coverage`) applies to `requirement` elements only (not `user-requirement`).
+8. Hierarchy integrity:
+   - Requirement mutations must preserve single-root hierarchy ownership.
+   - If mutation command behavior is unclear, verify post-change with `reqvire validate`.
 
 Use `reqvire collect` to gather complete context for a requirement:
 
@@ -304,6 +307,33 @@ After correct extraction:
 - Do not alter requirement intent semantics during extraction.
 - Do not place verification criteria content into refinement elements.
 - Do not perform a repository-wide rewrite without iterative validation checkpoints.
+
+## Task Pattern: Verification Criteria Alignment
+
+### Do It When
+
+- Verification criteria and e2e assertions diverge.
+- A new command/rule was implemented and criteria mention behavior not explicitly tested.
+- User asks to align verification claims to actual tests.
+
+### Goal
+
+Keep verification elements and test scripts synchronized so each critical claim has a concrete assertion.
+
+### Workflow
+
+1. Locate owning verification element for the command/feature.
+2. Inspect existing e2e assertions and expected fixtures.
+3. Rewrite verification criteria to match explicit assertions.
+4. Extend existing command test suite with missing critical negative/positive cases.
+5. Use expected output files and diff checks for deterministic failures.
+6. Run `./tests/run_tests.sh` and only finalize after full pass.
+
+### How Not To Do It
+
+- Do not keep unverifiable claims in verification criteria.
+- Do not add vague criteria without direct assertions.
+- Do not create a separate test if the existing feature suite should own the new criterion.
 
 ## Task Pattern: Design-Document Ownership Normalization
 

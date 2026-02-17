@@ -58,7 +58,18 @@ fn enforce_single_root_after_mutation(model_manager: &ModelManager) -> Result<()
     if ownership_errors.is_empty() {
         Ok(())
     } else {
-        Err(ReqvireError::ValidationError(ownership_errors))
+        let mut details: Vec<String> = ownership_errors
+            .iter()
+            .map(|e| e.to_string())
+            .collect();
+        details.sort();
+        let message = details.first().cloned().unwrap_or_else(|| {
+            "Single-root hierarchy ownership violation detected".to_string()
+        });
+        Err(ReqvireError::InvalidOperation(format!(
+            "Single-root hierarchy ownership violation: {}",
+            message
+        )))
     }
 }
 

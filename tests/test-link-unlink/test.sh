@@ -24,6 +24,19 @@ assert_file_matches() {
   fi
 }
 
+assert_output_matches() {
+  local expected="$1"
+  local actual="$2"
+  local description="$3"
+
+  if ! diff -u "$expected" "$actual"; then
+    echo "FAILED: $description"
+    echo ""
+    echo "If changes are intentional, update $expected"
+    exit 1
+  fi
+}
+
 echo "===================================="
 echo "Link/Unlink Commands Tests"
 echo "===================================="
@@ -356,6 +369,9 @@ echo ""
 # ==================================
 echo "Test 15: Link rejects multi-root hierarchy ownership violation..."
 
+# Keep fixture valid so this test asserts the command-level single-root rejection only.
+rm -f "$TEST_DIR/specifications/Verifications.md"
+
 cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 # Elements
 
@@ -407,28 +423,23 @@ LINK_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Child" "derivedFr
 LINK_MULTIROOT_EXIT=$?
 set -e
 
-if [ $LINK_MULTIROOT_EXIT -ne 0 ]; then
-  if ! echo "$LINK_MULTIROOT_OUTPUT" | grep -qi "exactly one top root user-requirement\|single root\|multi-root"; then
-    echo "FAILED: Error should mention single-root ownership violation"
-    echo "$LINK_MULTIROOT_OUTPUT"
-    exit 1
-  fi
-  assert_file_matches "$BEFORE_TEST15" "$TEST_DIR/specifications/Requirements.md" "Failed link must not modify file"
-else
-  set +e
-  VALIDATE_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate --json 2>&1)
-  VALIDATE_MULTIROOT_EXIT=$?
-  set -e
-  if [ $VALIDATE_MULTIROOT_EXIT -eq 0 ]; then
-    echo "FAILED: Link must be rejected or produce model flagged by single-root validation"
-    exit 1
-  fi
-  if ! echo "$VALIDATE_MULTIROOT_OUTPUT" | grep -qi "exactly one top root user-requirement\|single root\|multi-root"; then
-    echo "FAILED: Validation output should mention single-root ownership violation"
-    echo "$VALIDATE_MULTIROOT_OUTPUT"
-    exit 1
-  fi
+if [ $LINK_MULTIROOT_EXIT -eq 0 ]; then
+  echo "FAILED: Link should fail deterministically with single-root ownership violation"
+  exit 1
 fi
+
+printf "%s\n" "$LINK_MULTIROOT_OUTPUT" \
+  | sed 's/\x1b\[[0-9;]*m//g' \
+  | sed -E 's/^\[[^]]+\][[:space:]]*//' \
+  | grep -E "Single-root hierarchy ownership violation" \
+  > "$TEST_DIR/output/15-link-multiroot-error.actual.txt"
+
+assert_output_matches \
+  "${TEST_SCRIPT_DIR}/expected/15-link-multiroot-error.txt" \
+  "$TEST_DIR/output/15-link-multiroot-error.actual.txt" \
+  "Deterministic single-root error output mismatch for link"
+
+assert_file_matches "$BEFORE_TEST15" "$TEST_DIR/specifications/Requirements.md" "Failed link must not modify file"
 
 rm -f "$BEFORE_TEST15"
 
