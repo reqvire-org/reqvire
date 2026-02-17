@@ -18,6 +18,47 @@ Test cases:
   * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
 ---
 
+### Atomic Relation Relink Test
+
+This test verifies atomic relation relink behavior, including hierarchical subgraph relinks and rollback on validation failures.
+
+#### Details
+
+##### Acceptance Criteria
+- Relink rewires relation targets atomically with no partial persistence on failure.
+- Hierarchical relink supports subgraph boundary use cases.
+- Candidate relink state is validated before persistence.
+- Relink rejects operations that would create circular dependencies.
+- Relink rejects operations that violate single-root ownership.
+- Relink operations that violate single-root ownership are either rejected by command or flagged by validation.
+
+##### Test Criteria
+1. **Successful relink:**
+   - Command: `reqvire relink <source> <relation-type> <old-target> <new-target>`
+   - Relink an existing relation from old target to new target.
+   - Assert success exit code and deterministic diff output.
+
+2. **Circular dependency rejection:**
+   - Attempt relink that introduces cycle.
+   - Assert non-zero exit and no persisted changes.
+
+3. **Single-root ownership enforcement:**
+   - Attempt hierarchical relink producing multi-root ownership.
+   - Assert either non-zero exit with no persisted changes, or successful command followed by validation error for single-root ownership.
+
+4. **Dry-run behavior:**
+   - Run `reqvire relink ... --dry-run`.
+   - Assert reported changes with no file persistence.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-relink-command/test.sh)
+  * verify: [Atomic Relation Relink Operation](../ElementManipulation.md#atomic-relation-relink-operation)
+  * verify: [CLI Relink Command](../../../Interfaces/CLI/Commands.md#cli-relink-command)
+---
+
 ### Add Command Error Messages Test
 
 Test verifies that the add command provides contextual error messages with examples when format parsing fails.
@@ -63,7 +104,7 @@ Test verifies that the add command provides contextual error messages with examp
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-add-command-error-messages/test.sh)
-  * verify: [Enhanced Validation Error Reporting](../../Core/Validation.md#enhanced-validation-error-reporting)
+  * verify: [Validation Error Handling](../../Core/Validation.md#validation-error-handling)
   * verify: [Markdown Structure Validator](../../Core/Validation.md#markdown-structure-validator)
   * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
   * verify: [Detailed Error Handling and Logging](../../../Interfaces/CLI/Commands.md#detailed-error-handling-and-logging)
@@ -703,6 +744,8 @@ The test shall verify that the `link` command adds relations to elements followi
 6. Verify error is reported
 7. Link from non-existent source
 8. Verify error is reported
+9. Link that introduces multi-root ownership in hierarchy
+10. Verify operation is either rejected with unchanged files, or results in validation error for single-root ownership
 
 **Test Steps - External URL Handling:**
 1. Link with relation type (e.g., trace) to external URL
@@ -723,6 +766,7 @@ The test shall verify that the `link` command adds relations to elements followi
 - Validates element type compatibility
 - Supports --dry-run preview
 - Reports errors for invalid inputs
+- Enforces single-root ownership: violating links are rejected or explicitly flagged by validation
 - External URLs allowed for relations (trace, satisfiedBy, etc.)
 - External URLs rejected for 'attaching' with helpful error message
 
@@ -752,6 +796,7 @@ Test cases:
 9. **Relation deduplication**: duplicate merged relation appears once.
 10. **Regression scenario**: multi-source merge keeps target element present and model validates.
 11. **Document-to-elements rejection**: merging a source from `# Documents` into a target in `# Elements` fails with explicit manual-migration guidance.
+12. **Single-root ownership enforcement**: merge that would create multi-root hierarchy ownership is rejected, or is explicitly flagged by validation.
 
 #### Metadata
   * type: test-verification

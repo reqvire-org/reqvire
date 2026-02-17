@@ -16,4 +16,7 @@ Users SHALL be able to manage organization memberships and roles.
 #### Metadata
   * type: user-requirement
 
+#### Relations
+  * derivedFrom: [Authorization Specification](#authorization-specification)
+
 ---

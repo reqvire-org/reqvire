@@ -72,6 +72,22 @@ When start element type filtering is enabled:
   * type: behavior
 ---
 
+### Forward-Only Relation Traversal Behavior
+
+When filtering model output from a starting requirement:
+1. Follow only forward relations (`derive`, `satisfiedBy`, `verifiedBy`, `trace`).
+2. Start from the specified root element when `--from` is provided.
+3. Recursively traverse outgoing relations until leaf elements are reached.
+4. Do not traverse backward relations during forward traversal mode.
+5. When no `--from` filter is provided, include the complete model.
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * refine: [Forward-Only Relation Traversal](Reporting.md#forward-only-relation-traversal)
+---
+
 ### Verification Coverage Philosophy Behavior
 
 Coverage evaluation philosophy for verification reporting.

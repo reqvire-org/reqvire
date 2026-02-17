@@ -2,7 +2,7 @@
 
 ### Attachment Scope Validation Refinement Specification
 
-Specification extracted from requirement "Attachment Scope Validation".
+
 
 #### Details
 When validating attachments (both refinement elements and file assets), the system shall enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
@@ -13,7 +13,7 @@ When validating attachments (both refinement elements and file assets), the syst
 
 ### Attachment Target Validation Refinement Specification
 
-Specification extracted from requirement "Attachment Target Validation".
+
 
 #### Details
 Attachment targets support two types of references:
@@ -37,7 +37,7 @@ This validation ensures that attachments either reference existing files or vali
 
 ### Default Requirement Type Assignment Refinement Specification
 
-Specification extracted from requirement "Default Requirement Type Assignment".
+
 
 #### Details
 When an element does not have a `#### Metadata` subsection with a `type` property, the system assigns the default type `requirement`.
@@ -110,7 +110,7 @@ Path resolution and scope validation rules for Git repository-based project mana
 
 ### Identifiers and Relations Refinement Specification
 
-Specification extracted from requirement "Identifiers and Relations".
+
 
 #### Details
 The system shall implement **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
@@ -147,9 +147,97 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
   * type: specification
 ---
 
+### Ignoring Unstructured Documents Refinement Specification
+
+#### Details
+Unstructured document exclusion behavior:
+- Uses `.reqvireignore` at repository root with `.gitignore`-compatible syntax.
+- Supports glob patterns for structured-document processing exclusions.
+- Keeps excluded files in repository scope while excluding them from structured parsing flow.
+- Provides Reqvire-specific exclusions distinct from Git tracking behavior.
+
+Example `.reqvireignore` patterns:
+```.reqvireignore
+# Example patterns to exclude from structured documents processing
+**/Logical*.md
+**/Physical*.md
+**/draft-*.md
+examples/**
+```
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Ignoring Unstructured Documents](Configuration.md#ignoring-unstructured-documents)
+---
+
+### Requirements Processing Refinement Specification
+
+#### Details
+Requirements-processing scope behavior:
+- Applies `.gitignore` exclusions for files not in version-control processing scope.
+- Applies `.reqvireignore` exclusions for files excluded from requirements parsing.
+- Applies reserved repository filename exclusions (for example `README.md`, `LICENSE.md`).
+- Parses remaining in-scope files through the structured model pipeline.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Requirements Processing](Configuration.md#requirements-processing)
+---
+
+### Structured Markdown Files Search and Detection Refinement Specification
+
+#### Details
+Structured markdown detection behavior:
+1. Scans files in repository root and subfolders.
+2. Marks files matching configured exclusion patterns as non-structured targets.
+3. Marks non-`.md` files as non-structured targets.
+4. Retains only eligible markdown files for structured parsing passes.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Structured Markdown Files Search and Detection](Configuration.md#structured-markdown-files-search-and-detection)
+---
+
+### Excluded File Relation Validation Refinement Specification
+
+#### Details
+Excluded-file relation validation behavior:
+1. Registers files matching exclusion patterns in registry context for relation-target validation.
+2. Skips internal element parsing/validation for excluded files.
+3. Preserves ability to validate references that point to excluded file paths.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Excluded File Relation Validation](Validation.md#excluded-file-relation-validation)
+---
+
+### Integrated Validation Refinement Specification
+
+#### Details
+Integrated validation execution behavior:
+- Commands are split into model-dependent commands and raw-file commands.
+- Model-dependent commands invoke two-pass validation before execution and stop on validation failures.
+- Raw-file commands skip model validation when their behavior operates directly on file content.
+- Validation gating ensures commands needing graph consistency do not run with invalid model state.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Integrated Validation](Validation.md#integrated-validation)
+---
+
 ### Internal Consistency Validator Refinement Specification
 
-Specification extracted from requirement "Internal Consistency Validator".
+
 
 #### Details
 The consistency validator shall verify:
@@ -169,7 +257,7 @@ Rationale: Element names serve as stable IDs for element identity, independent o
 
 ### Refinement Element Structure Constraints Refinement Specification
 
-Specification extracted from requirement "Refinement Element Structure Constraints".
+
 
 #### Details
 Refinement elements serve as detailed documentation that augments requirements and drives implementation. Their relation usage is restricted because:
@@ -186,7 +274,7 @@ When a Refinement element contains relations other than `refine`, the validator 
 
 ### Relation Element Type Validator Refinement Specification
 
-Specification extracted from requirement "Relation Element Type Validator".
+
 
 #### Details
 The validator enforces the constraints defined in the [Element Type Relation Compatibility](DesignDocuments/RelationTypes.md#element-type-relation-compatibility) specification:
@@ -211,7 +299,7 @@ This validation occurs:
 
 ### Relation Types and behaviors Refinement Specification
 
-Specification extracted from requirement "Relation Types and behaviors".
+
 
 #### Details
 The system shall implement relations following clearly defined specifications for types and behaviors.
@@ -273,7 +361,7 @@ The following filenames are reserved for general repository documentation and ar
 
 ### Specification File Identification Refinement Specification
 
-Specification extracted from requirement "Specification File Identification".
+
 
 #### Details
 - Supported first H1 headings:
@@ -290,7 +378,7 @@ Specification extracted from requirement "Specification File Identification".
 
 ### Structure and Addressing in Markdown Documents Refinement Specification
 
-Specification extracted from requirement "Structure and Addressing in Markdown Documents".
+
 
 #### Details
 The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.

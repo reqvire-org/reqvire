@@ -112,7 +112,7 @@ Both visualizations use consistent colors matching Mermaid diagrams:
 | file | #B8860B | Dark goldenrod for files |
 | design-document | #607D8B | Blue-gray for design docs |
 | user-requirement | #7E57C2 | Purple for user requirements |
-| system-requirement | #673AB7 | Deep purple for system requirements |
+| requirement | #673AB7 | Deep purple for system requirements |
 | verification | #4CAF50 | Green for verifications |
 | test-verification | #4CAF50 | Green for test verifications |
 | refinement | #FF9800 | Orange for refinements |

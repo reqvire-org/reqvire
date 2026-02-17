@@ -83,7 +83,7 @@ Rules for normalizing document hierarchical structure during formatting.
 
 ### Element Manipulation File Persistence Refinement Specification
 
-Specification extracted from requirement "Element Manipulation File Persistence".
+
 
 #### Details
 The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
@@ -125,7 +125,7 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
 
 ### Full Relations Insertion Refinement Specification
 
-Specification extracted from requirement "Full Relations Insertion".
+
 
 #### Details
 Auto-generated relations are inverse relations created by the parser during model loading but not persisted to files by default. See Relation Types Specification for opposite relation pairs.
@@ -163,6 +163,65 @@ Specification for lint command output format and content structure.
 
 #### Metadata
   * type: specification
+---
+
+### Lint Auto-fix Capability Refinement Specification
+
+#### Details
+Auto-fix behavior:
+- Applies fixes only for issues categorized as auto-fixable.
+- Modifies affected markdown files directly.
+- Removes redundant verify relations from verification elements where safe.
+- Preserves unrelated content and formatting.
+- Reports all applied changes (files modified, relations removed).
+- Skips issues categorized as needing manual review.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Lint Auto-fix Capability](Linting.md#lint-auto-fix-capability)
+---
+
+### Redundant Verify Relations Detection Refinement Specification
+
+#### Details
+Redundant verify relation detection behavior:
+- Detects cases where a verification directly verifies both a leaf requirement and its ancestor.
+- Uses verification trace tree analysis to determine ancestor reachability.
+- Treats leaf verification as sufficient when hierarchy roll-up already covers ancestors.
+- Reuses trace-tree logic from [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder).
+- Reports redundant direct verify relations as model noise.
+- Categorizes these findings as auto-fixable.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Redundant Verify Relations Detection](Linting.md#redundant-verify-relations-detection)
+---
+
+### Relation Consistency Maintenance Refinement Specification
+
+#### Details
+Relation consistency maintenance behavior during element manipulation:
+- Maintains opposite relation consistency for supported relation pairs.
+- If element `A` has `derivedFrom` to `B`, ensures inverse `derive` exists from `B` to `A`.
+- If element `A` is `verifiedBy` verification `V`, ensures inverse `verify` exists from `V` to `A`.
+- On delete operations, removes both incoming and outgoing relation references for deleted elements.
+- On move/rename operations, updates relation targets for both forward and backward references.
+- Preserves valid graph state after each manipulation step without dangling relation targets.
+
+Validation behavior:
+- Runs relation-consistency checks after manipulation operations.
+- Reports detected inconsistencies with actionable context.
+- Blocks manipulations that would leave the model in inconsistent relation state.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Relation Consistency Maintenance](ElementManipulation.md#relation-consistency-maintenance)
 ---
 
 ### Merge Element Workflow Specification
@@ -239,7 +298,7 @@ Document format rule:
 
 ### Move File Operation Refinement Specification
 
-Specification extracted from requirement "Move File Operation".
+
 
 #### Details
 When moving a file, the system shall:
@@ -268,6 +327,36 @@ When the --squash flag is provided and the target file already exists, the syste
 
 #### Metadata
   * type: specification
+---
+
+### Atomic Relation Relink Workflow Specification
+
+Detailed workflow for atomically relinking an existing relation target.
+
+#### Details
+When relinking a relation, the system shall:
+- Resolve source element and both targets (`old-target`, `new-target`) in the current model.
+- Verify that the source currently has the specified relation to `old-target`.
+- Build an in-memory transaction plan for relation rewiring.
+- Apply candidate rewiring in memory first, without persisting files.
+- Validate the candidate model after rewiring, including all existing validation rules.
+- Persist changes only when candidate validation succeeds.
+- Roll back and report errors when candidate validation fails.
+
+For hierarchical relinks (`derivedFrom`/`derive`):
+- Support subgraph boundary relinking semantics where the source can represent the root of a moved hierarchy boundary.
+- Reject relinks that introduce circular dependency, missing parent relation, or single-root hierarchy ownership violations.
+
+Output behavior:
+- Support dry-run diff preview without persistence.
+- Report affected elements/files deterministically.
+- Return non-zero status on any failed validation or unresolved target.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Atomic Relation Relink Operation](ElementManipulation.md#atomic-relation-relink-operation)
 ---
 
 ### Multi-Branch Convergence Detection Specification
@@ -474,7 +563,7 @@ Rules for validating and normalizing relation targets during element creation an
 
 ### Rename Element Operation Refinement Specification
 
-Specification extracted from requirement "Rename Element Operation".
+
 
 #### Details
 When renaming an element, the system shall:

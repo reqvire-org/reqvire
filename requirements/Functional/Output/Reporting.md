@@ -88,12 +88,7 @@ Implementation details shall follow the associated refinement specifications.
 System shall support markdown and JSON output formats.
 
 #### Details
-- Markdown format shall include embedded Mermaid diagram with model structure
-- Markdown shall show hierarchical structure using containment subgraphs (folders > files > elements)
-- Mermaid diagrams shall use folder and file subgraphs to visually group elements by their physical location
-- JSON format shall use structured data with folders, files, sections, elements, relations, and attachments
-- Both formats shall represent the same filtered or complete model data
-- Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -105,6 +100,7 @@ System shall support markdown and JSON output formats.
 #### Relations
   * derive: [Forward-Only Relation Traversal](#forward-only-relation-traversal)
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+  * refinedBy: [Model Diagram Output Formats Refinement Specification](Specifications.md#model-diagram-output-formats-refinement-specification)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
 ---
@@ -114,17 +110,14 @@ System shall support markdown and JSON output formats.
 When filtering by root element, system shall traverse only forward relations down to leaf elements.
 
 #### Details
-- Shall follow only forward relations (derive, satisfiedBy, verifiedBy, trace)
-- Shall start from specified root element (looked up by name)
-- Shall recursively traverse outgoing relations to leaf elements
-- Shall NOT traverse backward (no bidirectional traversal)
-- Unfiltered diagrams (no --from) shall show complete model with all elements
+Traversal behavior shall follow the associated behavior refinement.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Model Diagram Output Formats](#model-diagram-output-formats)
+  * refinedBy: [Forward-Only Relation Traversal Behavior](Behaviors.md#forward-only-relation-traversal-behavior)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * verifiedBy: [Model Command Verification](Verifications/ReportingVerifications.md#model-command-verification)
 ---
@@ -211,23 +204,14 @@ Implementation details shall follow the associated refinement specifications.
 The system shall parse comma-separated element type values in the `--filter-type` flag, validating each type and applying OR logic to match elements.
 
 #### Details
-When parsing the `--filter-type` argument:
-- Split input by comma delimiter
-- Trim whitespace from each type value
-- Convert to lowercase for case-insensitive matching
-- Validate each type against the valid element types list
-- Return clear error messages for invalid types
-
-When filtering elements:
-- Element matches if it matches ANY of the specified types (OR logic)
-- Support for custom types using `other-TYPENAME` syntax
-- Maintain backward compatibility with single-type queries
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Flexible Search Type Filtering](#flexible-search-type-filtering)
+  * refinedBy: [Comma-Separated Type Filter Parsing Refinement Specification](Specifications.md#comma-separated-type-filter-parsing-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
 ---

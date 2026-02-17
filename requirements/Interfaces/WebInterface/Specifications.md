@@ -2,7 +2,7 @@
 
 ### Component-Based HTML Architecture Refinement Specification
 
-Specification extracted from requirement "Component-Based HTML Architecture".
+
 
 #### Details
 The HTML generation system shall be organized into reusable components:
@@ -117,6 +117,177 @@ Execute all generation commands treating temporary directory as repository root:
   * type: specification
 ---
 
+### Serve Command Refinement Specification
+
+#### Details
+Serve command behavior:
+- Accept `--host <HOST>` option to specify the bind address (default: localhost)
+- Accept `--port <PORT>` option to specify the server port (default: 8080)
+- Use a random temporary directory for HTML export
+- Run HTML Export to generate complete documentation in the temporary directory
+- Start an HTTP server serving static files from the temporary directory
+- Display clickable server URL for user to open in browser
+- Display instructions to press Ctrl-C to stop server
+- Continue serving until terminated by the user (Ctrl-C)
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Serve Command](Features.md#serve-command)
+---
+
+### Attachment Export Refinement Specification
+
+#### Details
+Attachment export behavior during HTML export:
+- Collects attachment references from `element.attachments` across the model.
+- Copies each attachment file into the output directory while preserving relative paths.
+- Skips duplicate file copies when the same file is referenced by multiple elements.
+- Emits progress information for attachment copy operations.
+
+This keeps exported documentation complete for offline browsing with referenced files.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Attachment Export](Features.md#attachment-export)
+---
+
+### Containment View Attachment Links Refinement Specification
+
+#### Details
+Containment view attachment rendering behavior:
+- For each element with attachments, renders attachments as child nodes in the D3 tree.
+- Uses wrench icon (`🔧`) and type `attachment-element` for element attachments.
+- Uses paperclip icon (`📎`) and type `attachment-file` for file attachments.
+- Element-attachment nodes navigate to the referenced element.
+- File-attachment nodes display filename and path reference.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Containment View Attachment Links](Features.md#containment-view-attachment-links)
+---
+
+### Diagram Attachment Display Refinement Specification
+
+#### Details
+Diagram attachment rendering behavior in Mermaid output:
+- Renders attachment links under the element name inside node labels.
+- Prefixes each attachment with paperclip icon (`📎`).
+- Displays filename rather than full path for compact diagrams.
+- Produces clickable links to the referenced document.
+- Uses Mermaid multiline label formatting (`<br/>`).
+
+Example node:
+```
+elementId["Element Name<br/>📎 DesignDoc.md"]
+```
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Diagram Attachment Display](Features.md#diagram-attachment-display)
+---
+
+### Model-Centric View Generation Refinement Specification
+
+#### Details
+Model-centric view generation behavior:
+- Uses root requirements (no hierarchical parent) as top-level entries.
+- Expands relations recursively with full target element details.
+- Includes summary metadata for element and relation counts.
+- Generates Mermaid diagrams for nested relation structures.
+- Produces markdown output that is later rendered as `model.html`.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Model-Centric View Generation](Features.md#model-centric-view-generation)
+---
+
+### Model View Element Navigation Refinement Specification
+
+#### Details
+Model-view element navigation behavior:
+- Element-name headers render as hyperlinks.
+- Links target element source file plus fragment identifier.
+- Link format: `[Element Name](file_path#element-fragment)`.
+- Navigation enables direct jump from model view to definition.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Model View Element Navigation](Features.md#model-view-element-navigation)
+---
+
+### Responsive HTML Generation Refinement Specification
+
+#### Details
+Responsive HTML behavior:
+- Supports viewport widths from 320px (mobile) through 1920px+ (desktop).
+- Uses mobile-first CSS with progressive enhancement.
+- Provides hamburger navigation for viewports under 768px.
+- Scales typography and spacing by responsive breakpoints.
+
+Breakpoints:
+- `sm`: 640px and up.
+- `md`: 768px and up.
+- `lg`: 1024px and up.
+- `xl`: 1280px and up.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Responsive HTML Generation](HTMLGeneration.md#responsive-html-generation)
+---
+
+### CSS Framework Integration Refinement Specification
+
+#### Details
+CSS framework integration behavior:
+- Uses Tailwind CSS via CDN in current export flow.
+- Applies mobile-first utility classes for responsive layout behavior.
+- Uses responsive modifiers (`sm`, `md`, `lg`, `xl`) for adaptation.
+- Defines Reqvire theme colors including primary, requirement, and verification tones.
+
+Tailwind usage provides:
+- Utility-first styling for predictable page composition.
+- Built-in responsive modifiers (for example `md:hidden`, `lg:flex`).
+- Consistent spacing, color, and typography scales.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CSS Framework Integration](HTMLGeneration.md#css-framework-integration)
+---
+
+### Type-Safe HTML Generation Refinement Specification
+
+#### Details
+Type-safe HTML generation behavior:
+- Uses `maud` macros for compile-time HTML generation.
+- Relies on Rust type checks to validate structure during compilation.
+- Prevents malformed tags, unclosed nodes, and invalid nesting.
+- Produces well-formed HTML5 output for generated pages.
+
+This shifts most structural HTML errors to compile time instead of runtime.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Type-Safe HTML Generation](HTMLGeneration.md#type-safe-html-generation)
+---
+
 ### HTML Navigation Bar Specification
 
 Specification for the fixed navigation bar in HTML pages.
@@ -141,7 +312,7 @@ The navigation bar must be:
 
 ### Web Interface Refinement Specification
 
-Specification extracted from requirement "Web Interface".
+
 
 #### Details
 The browse interface allows users to:

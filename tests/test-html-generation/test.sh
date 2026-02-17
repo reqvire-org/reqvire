@@ -4,6 +4,40 @@
 
 set -e  # Exit on error
 
+REQVIRE_CMD="${REQVIRE_BIN:-}"
+if [ -z "$REQVIRE_CMD" ]; then
+  echo "REQVIRE_BIN is not set"
+  exit 1
+fi
+
+TEST_MODEL_DIR="$(mktemp -d /tmp/reqvire-html-model-XXXXXX)"
+OUTPUT_DIR="/tmp/reqvire-test-output"
+
+mkdir -p "$TEST_MODEL_DIR/requirements/System"
+git -C "$TEST_MODEL_DIR" init > /dev/null 2>&1
+cat > "$TEST_MODEL_DIR/requirements/Requirements.md" << 'EOF'
+# Elements
+
+### Root Requirement
+
+#### Metadata
+  * type: user-requirement
+---
+EOF
+
+cat > "$TEST_MODEL_DIR/requirements/System/Core.md" << 'EOF'
+# Elements
+
+### Core Requirement
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Root Requirement](../Requirements.md#root-requirement)
+---
+EOF
+
 echo "=== HTML Generation Tests ==="
 echo
 
@@ -13,26 +47,25 @@ echo
 echo "1. Running Integration Tests..."
 
 # Generate all pages
-cargo run -- export --output /tmp/reqvire-test-output
+cd "$TEST_MODEL_DIR" && "$REQVIRE_CMD" export --output "$OUTPUT_DIR"
 
 # Verify 7 core pages exist
 echo "  - Checking core pages exist..."
-test -f /tmp/reqvire-test-output/index.html
-test -f /tmp/reqvire-test-output/model.html
-test -f /tmp/reqvire-test-output/traces.html
-test -f /tmp/reqvire-test-output/traceflow.html
-test -f /tmp/reqvire-test-output/coverage.html
-test -f /tmp/reqvire-test-output/resources.html
+test -f "$OUTPUT_DIR/index.html"
+test -f "$OUTPUT_DIR/model.html"
+test -f "$OUTPUT_DIR/traces.html"
+test -f "$OUTPUT_DIR/traceflow.html"
+test -f "$OUTPUT_DIR/coverage.html"
+test -f "$OUTPUT_DIR/resources.html"
 
 # Test each page contains navigation
 echo "  - Checking navigation present..."
-grep -q "reqvire-nav" /tmp/reqvire-test-output/index.html
-grep -q "Containment" /tmp/reqvire-test-output/index.html
+grep -q "reqvire-nav" "$OUTPUT_DIR/index.html"
+grep -q "Containment" "$OUTPUT_DIR/index.html"
 
 # Test relative links from nested file
 echo "  - Testing relative links..."
-mkdir -p requirements/System
-cat > requirements/System/Test.md << 'EOF'
+cat > "$TEST_MODEL_DIR/requirements/System/Test.md" << 'EOF'
 # Elements
 
 ### Test Requirement
@@ -42,13 +75,13 @@ This is a test requirement for validating nested file exports.
 #### Metadata
   * type: user-requirement
 EOF
-cargo run -- export --output /tmp/reqvire-test-output 2>&1 | grep -q "Total Markdown files exported"
-grep -q 'href="../../index.html"' /tmp/reqvire-test-output/requirements/System/Test.html
+cd "$TEST_MODEL_DIR" && "$REQVIRE_CMD" export --output "$OUTPUT_DIR" 2>&1 | grep -q "Total Markdown files exported"
+grep -q 'href="../../index.html"' "$OUTPUT_DIR/requirements/System/Test.html"
 
 # Test visualizations present
 echo "  - Checking visualizations..."
-grep -q "mermaid" /tmp/reqvire-test-output/model.html
-grep -q "d3" /tmp/reqvire-test-output/index.html
+grep -q "mermaid" "$OUTPUT_DIR/model.html"
+grep -q "d3" "$OUTPUT_DIR/index.html"
 
 echo "  ✅ Integration tests passed"
 echo
@@ -60,21 +93,21 @@ echo "2. Running Responsive Design Tests..."
 
 # Verify Tailwind CSS included
 echo "  - Checking Tailwind CSS..."
-grep -q "tailwindcss" /tmp/reqvire-test-output/index.html
+grep -q "tailwindcss" "$OUTPUT_DIR/index.html"
 
 # Verify responsive classes present
 echo "  - Checking responsive classes..."
-grep -q "md:hidden" /tmp/reqvire-test-output/index.html  # Mobile menu
-grep -q "hidden md:flex" /tmp/reqvire-test-output/index.html  # Desktop nav
+grep -q "md:hidden" "$OUTPUT_DIR/index.html"  # Mobile menu
+grep -q "hidden md:flex" "$OUTPUT_DIR/index.html"  # Desktop nav
 
 # Verify viewport meta tag
 echo "  - Checking viewport meta tag..."
-grep -q 'name="viewport"' /tmp/reqvire-test-output/index.html
+grep -q 'name="viewport"' "$OUTPUT_DIR/index.html"
 
 # Verify mobile menu toggle present
 echo "  - Checking mobile menu components..."
-grep -q "mobile-menu-btn" /tmp/reqvire-test-output/index.html
-grep -q "mobile-menu" /tmp/reqvire-test-output/index.html
+grep -q "mobile-menu-btn" "$OUTPUT_DIR/index.html"
+grep -q "mobile-menu" "$OUTPUT_DIR/index.html"
 
 echo "  ✅ Responsive design tests passed"
 echo
@@ -85,7 +118,7 @@ echo
 echo "3. Running HTML Validity Tests..."
 
 # Basic HTML structure validation
-for file in /tmp/reqvire-test-output/*.html; do
+for file in "$OUTPUT_DIR"/*.html; do
     filename=$(basename "$file")
     echo "  - Validating $filename..."
 
@@ -139,8 +172,7 @@ echo
 # ========================================
 # CLEANUP
 # ========================================
-rm -rf /tmp/reqvire-test-output
-rm -f requirements/System/Test.md
-rmdir requirements/System 2>/dev/null || true
+rm -rf "$OUTPUT_DIR"
+rm -rf "$TEST_MODEL_DIR"
 
 echo "=== All HTML Generation Tests Passed ✅ ==="

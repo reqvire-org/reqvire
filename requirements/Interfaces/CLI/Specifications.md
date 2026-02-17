@@ -2,7 +2,7 @@
 
 ### CLI Add Element Command Refinement Specification
 
-Specification extracted from requirement "CLI Add Element Command".
+
 
 #### Details
 The `add` command shall:
@@ -27,7 +27,7 @@ The `add` command shall:
 
 ### CLI Collect Command Refinement Specification
 
-Specification extracted from requirement "CLI Collect Command".
+
 
 #### Details
 Command syntax: `reqvire collect <element-name> [--direction UPSTREAM|DOWNSTREAM] [--json]`
@@ -49,7 +49,7 @@ Command syntax: `reqvire collect <element-name> [--direction UPSTREAM|DOWNSTREAM
 
 ### CLI Interface Structure Refinement Specification
 
-Specification extracted from requirement "CLI Interface Structure".
+
 
 #### Details
 The CLI must display all commands and options and command's options flattened in the main help output which must also be a default command:
@@ -96,7 +96,7 @@ Each command has its own options displayed in a flattened section
 
 ### CLI Move Element Command Refinement Specification
 
-Specification extracted from requirement "CLI Move Element Command".
+
 
 #### Details
 The `mv` command shall:
@@ -121,7 +121,7 @@ The `mv` command shall:
 
 ### CLI Move File Command Refinement Specification
 
-Specification extracted from requirement "CLI Move File Command".
+
 
 #### Details
 The `mv-file` command shall:
@@ -137,9 +137,360 @@ The `mv-file` command shall:
   * type: specification
 ---
 
+### CLI Coverage Command Refinement Specification
+
+#### Details
+Coverage command behavior:
+- Be invoked as `reqvire coverage`
+- Support `--json` flag for JSON output format
+- Default to human-readable text output when JSON flag is not present
+- Generate reports focusing on leaf requirements (requirements without forward relations to other requirements)
+- Show the percentage and details of verified and unverified leaf requirements
+- Include breakdowns by file, section, and verification type
+- Show satisfaction status of test-verification elements (those with `satisfiedBy` relations)
+- Show orphaned verifications (verification elements without any `verify` relations to requirements)
+- Include requirement implementation coverage summary for `requirement` elements only (exclude `user-requirement`)
+- Classify covered requirements by implementation source (`direct_satisfied`, `refinement_contract_satisfied_via_attachment`, `refinement_contract_satisfied_via_child`)
+- Show implementation-uncovered requirements with identifiers and names
+- Emit all coverage percentages with at most 2 decimal places in text and JSON output
+- Uses [Verification Roll-up Strategy](../../Functional/Processing/VerificationTraces.md#verification-roll-up-strategy)
+- Treat test-verification elements as satisfied only when they have `satisfiedBy` relations
+- Treat analysis, inspection, and demonstration verification elements as satisfied by default
+- Exit with status code 0 on success
+- Exit with non-zero status code on errors
+
+Command output is written to stdout for easy redirection to files.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Coverage Command](Commands.md#cli-coverage-command)
+---
+
+### CLI JSON File Output Option Refinement Specification
+
+#### Details
+`--output` option behavior:
+- Be available on every command that has a `--json` flag.
+- Require `--json` to also be set; report an error when `--output` is used without `--json`.
+- Write JSON content to the specified file path.
+- Create the file if it does not exist, and overwrite it if it does.
+- Print a confirmation message to stdout: `✅ Output saved to <filepath>`.
+- Exit with code 0 on success and non-zero on file write error.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI JSON File Output Option](Commands.md#cli-json-file-output-option)
+---
+
+### CLI Lint Command Refinement Specification
+
+#### Details
+Lint command behavior:
+- Be invoked as `reqvire lint`.
+- Default to dry-run mode (report issues without applying fixes).
+- Support `--fixable` to show only auto-fixable issues.
+- Support `--auditable` to show only issues requiring manual review.
+- Support `--fix` to apply auto-fixable changes.
+- Support `--json` for structured output.
+- Default to showing all issues when no filter flags are provided.
+- Categorize output into:
+  - Auto-fixable issues.
+  - Needs manual review issues.
+- Exit with code 0 when no issues are found or when fixes are successfully applied.
+- Exit with non-zero status code on errors.
+
+Command output is written to stdout for easy redirection to files.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Lint Command](Commands.md#cli-lint-command)
+---
+
+### CLI Merge Element Command Refinement Specification
+
+#### Details
+Merge command behavior:
+- Accept target element name as the first required positional argument.
+- Accept one or more source element names as subsequent required arguments.
+- Support command syntax: `reqvire merge <target> <source1> [source2...]`.
+- Reject merge when a source is in `# Documents` format and target is in `# Elements` format; report that manual migration is required.
+- Apply changes immediately by default.
+- Support `--dry-run` to preview changes without applying.
+- Output git-style diff showing all affected files by default.
+- Support `--json` for structured output.
+- Exit with code 0 on success and non-zero on error.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Merge Element Command](Commands.md#cli-merge-element-command)
+---
+
+### CLI Move Asset Command Refinement Specification
+
+#### Details
+`mv-asset` command behavior:
+- Accept old file path as required positional argument.
+- Accept new file path as required positional argument.
+- Find all elements referencing the file as InternalPath.
+- Update all InternalPath references:
+  - In `Attachments` subsection (update both display text and href).
+  - In relations (`satisfiedBy`, `satisfy`, `trace` targets).
+- Physically move/rename the file on the filesystem.
+- Apply changes immediately by default.
+- Support `--dry-run` to preview changes without applying.
+- Output git-style diff showing all affected files.
+- Report all affected elements and relation updates.
+- Exit with code 0 on success and non-zero on error.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Move Asset Command](Commands.md#cli-move-asset-command)
+---
+
+### CLI Remove Asset Command Refinement Specification
+
+#### Details
+`rm-asset` command behavior:
+- Accept file path as required positional argument.
+- Find all elements referencing the file as InternalPath.
+- Remove all InternalPath references:
+  - From `Attachments` subsection (remove link entry and remove subsection if empty).
+  - From relations (remove entire relation line for `satisfiedBy`, `satisfy`, `trace`).
+- Delete the physical file from the filesystem.
+- Apply changes immediately by default.
+- Support `--dry-run` to preview changes without applying.
+- Output git-style diff showing all affected files.
+- Report all affected elements and removed relations.
+- Exit with code 0 on success and non-zero on error.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Remove Asset Command](Commands.md#cli-remove-asset-command)
+---
+
+### CLI Remove Element Command Refinement Specification
+
+#### Details
+`rm` command behavior:
+- Accept element name as required positional argument.
+- Support command syntax: `reqvire rm <element-name>`.
+- Delete the specified element from its file.
+- Remove all incoming relations from other elements.
+- Apply changes immediately by default.
+- Support `--dry-run` to preview changes without applying.
+- Output git-style diff showing file changes by default.
+- Support `--json` for structured output with affected relations.
+- Report error when the element does not exist.
+- Exit with code 0 on success and non-zero on error.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Remove Element Command](Commands.md#cli-remove-element-command)
+---
+
+### CLI Rename Element Command Refinement Specification
+
+#### Details
+`rename` command behavior:
+- Accept current element name (required).
+- Accept new element name (required).
+- Update all incoming relations system-wide with the new identifier.
+- Apply changes immediately by default.
+- Support `--dry-run` to preview changes without applying.
+- Output git-style diff showing all affected files by default.
+- Support `--json` for structured output with relation updates and identifier change.
+- Report identifier change (`old -> new`).
+- Report error if the element does not exist or the new name conflicts with an existing element.
+- Exit with code 0 on success and non-zero on error.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Rename Element Command](Commands.md#cli-rename-element-command)
+---
+
+### CLI Resources Command Refinement Specification
+
+#### Details
+Resources command behavior:
+- Be invoked as `reqvire resources`.
+- Support `--json` for JSON output format.
+- Default to human-readable text output when `--json` is not present.
+- Generate two sections: Relations and Attachments.
+- Show files from InternalPath relation targets (`satisfiedBy`, `trace`, and related path-based targets).
+- Show files from FilePath attachment targets.
+- List files alphabetically by path.
+- For each file, show referencing elements with links.
+- Sort references by relation type (for relations section), then by element identifier.
+- Exit with status code 0 on success and non-zero on errors.
+
+Command output is written to stdout for easy redirection to files.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Resources Command](Commands.md#cli-resources-command)
+---
+
+### CLI Model Diagram Command Refinement Specification
+
+#### Details
+Model command behavior:
+- Be named `model`.
+- Support `--from=<name>` for filtering from a specific element by name.
+- Use globally unique element names for name-based lookup.
+- Support `--json` for JSON output format.
+- Support `--reverse` for leaf-to-root traversal.
+- Support `--filter-type=<types>` with comma-separated element types to filter starting points.
+- Default to Markdown output with embedded Mermaid diagram.
+- Integrate with existing model diagram generation functionality.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Model Diagram Command](Commands.md#cli-model-diagram-command)
+---
+
+### Relation Commands Refinement Specification
+
+#### Details
+Relation command behavior:
+
+The `link` command:
+- Accepts syntax: `reqvire link <source> <relation-type-or-attaching> <target>`.
+- Uses existing element name for source.
+- Accepts relation type from `derivedFrom`, `derive`, `satisfiedBy`, `satisfy`, `verifiedBy`, `verify`, `trace`, or `attaching`.
+- Supports relation targets as element name, internal file path, or external URL (`http`/`https`).
+- Supports attachment targets as internal file path or refinement element name.
+- Rejects `attaching` with external URL and reports guidance to use `trace`.
+- Rejects duplicate relation/attachment pairs with clear error.
+- Supports `--dry-run` preview.
+
+The `unlink` command:
+- Accepts syntax: `reqvire unlink <source> <target>`.
+- Auto-detects target in relations first, then attachments.
+- Enforces single relation per source-target pair.
+- Uses existing element name for source.
+- Accepts element name or file path as target.
+- Supports `--dry-run` preview.
+
+Hierarchy ownership behavior:
+- Hierarchical `link`/`unlink` edits that would produce invalid hierarchy state shall fail.
+- Error messages shall guide users to atomic relink operation for hierarchy boundary rewiring.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Relation Commands](Commands.md#relation-commands)
+---
+
+### CLI Relink Command Refinement Specification
+
+#### Details
+`relink` command behavior:
+- Accept source element name as required positional argument.
+- Accept relation type as required positional argument.
+- Accept old target and new target as required positional arguments.
+- Support command syntax: `reqvire relink <source> <relation-type> <old-target> <new-target>`.
+- Invoke the functional atomic relation relink operation.
+- Validate candidate model state before persistence.
+- Support `--dry-run` preview and `--json` output.
+- Reject unresolved source/target references, missing source relation, and post-relink validation failures with non-zero exit status.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Relink Command](Commands.md#cli-relink-command)
+---
+
+### Mutating Command Hierarchy Safety Refinement Specification
+
+#### Details
+For mutating commands (`add`, `rm`, `mv`, `rename`, `merge`, `mv-file`, `link`, `unlink`, `relink`):
+- Commands shall validate candidate state before persistence.
+- Operations that would violate hierarchy invariants shall fail with non-zero status.
+- Failed operations shall not partially persist model changes.
+- Error output shall include clear hierarchy constraint context.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Relink Command](Commands.md#cli-relink-command)
+---
+
+### Validate Command Refinement Specification
+
+#### Details
+Validate command behavior:
+- Executes the two-pass validation strategy.
+- Pass 1 performs parsing, element collection, and local validation.
+- Pass 2 builds graph state and validates relations and cross-component consistency.
+- Prints all validation issues found in the model.
+- Prints `No validation issues found` when model validation succeeds.
+- Supports `--json` output for structured validation results.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Validate Command](Commands.md#validate-command)
+---
+
+### Verification Traces Element Navigation Refinement Specification
+
+#### Details
+Verification traces element navigation behavior:
+- Verification element names displayed as headers are rendered as hyperlinks.
+- Hyperlinks point to the verification source file with fragment identifier.
+- Link format is `[Verification Name](file_path#element-fragment)`.
+- Navigation allows direct jump from traces report to verification definition.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Verification Traces Element Navigation](Commands.md#verification-traces-element-navigation)
+---
+
+### Detailed Error Handling and Logging Refinement Specification
+
+#### Details
+CLI error handling and logging behavior:
+- Returns contextual error messages that help users identify command failure causes.
+- Preserves actionable feedback format so remediation steps are visible near errors.
+- Uses shared validation/error reporting behavior for consistent message quality across commands.
+- Emits non-zero exit codes for command failures.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Detailed Error Handling and Logging](Commands.md#detailed-error-handling-and-logging)
+---
+
 ### CLI Search Command Refinement Specification
 
-Specification extracted from requirement "CLI Search Command".
+
 
 #### Details
 Search command features:
@@ -149,7 +500,7 @@ Search command features:
 - Support comprehensive filter options (all combinable):
 - By file path glob: `--filter-file="src/**/*Reqs.md"`
 - By element name regex: `--filter-name=".*safety.*"`
-- By element type: `--filter-type="system-requirement"` (exact match)
+- By element type: `--filter-type="requirement"` (exact match)
 - By element content regex: `--filter-content="MUST"`
 - By page content regex: `--filter-page-content="architecture"`
 - By having relations: `--have-relations=verifiedBy,satisfiedBy` (comma-separated, must have ALL)
@@ -175,7 +526,7 @@ Default output:
 
 ### CLI Traces Command Refinement Specification
 
-Specification extracted from requirement "CLI Traces Command".
+
 
 #### Details
 The command shall:
@@ -229,7 +580,7 @@ reqvire traces --from-folder=docs/reports > docs/reports/traces.md
 
 ### Format Command Refinement Specification
 
-Specification extracted from requirement "Format Command".
+
 
 #### Details
 `format` command shall:

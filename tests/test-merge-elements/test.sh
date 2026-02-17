@@ -297,6 +297,77 @@ fi
 echo "Test 10 passed"
 echo ""
 
+# ==================================
+# Test 11: Merge rejects multi-root hierarchy ownership violation
+# ==================================
+echo "Test 11: Merge rejects multi-root hierarchy ownership violation..."
+
+# Reset
+cp "${TEST_SCRIPT_DIR}/specifications/Requirements.md" "$TEST_DIR/specifications/Requirements.md"
+cp "${TEST_SCRIPT_DIR}/specifications/Verifications.md" "$TEST_DIR/specifications/Verifications.md"
+
+cat >> "$TEST_DIR/specifications/Requirements.md" << 'EOF'
+
+### External Root
+
+External root branch for ownership violation scenario.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### External Source
+
+Source requirement under a different root.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [External Root](#external-root)
+---
+EOF
+
+BEFORE_TEST11="$(mktemp /tmp/reqvire-merge-before11-XXXXXX.md)"
+cp "$TEST_DIR/specifications/Requirements.md" "$BEFORE_TEST11"
+
+set +e
+MERGE_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Target Requirement" "External Source" 2>&1)
+MERGE_MULTIROOT_EXIT=$?
+set -e
+
+if [ $MERGE_MULTIROOT_EXIT -ne 0 ]; then
+  if ! echo "$MERGE_MULTIROOT_OUTPUT" | grep -qi "exactly one top root user-requirement\|single root\|multi-root"; then
+    echo "FAILED: Error should mention single-root ownership violation"
+    echo "$MERGE_MULTIROOT_OUTPUT"
+    exit 1
+  fi
+  if ! cmp -s "$TEST_DIR/specifications/Requirements.md" "$BEFORE_TEST11"; then
+    echo "FAILED: Failed merge must not modify files"
+    diff -u "$BEFORE_TEST11" "$TEST_DIR/specifications/Requirements.md"
+    exit 1
+  fi
+else
+  set +e
+  VALIDATE_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate --json 2>&1)
+  VALIDATE_MULTIROOT_EXIT=$?
+  set -e
+  if [ $VALIDATE_MULTIROOT_EXIT -eq 0 ]; then
+    echo "FAILED: Merge must be rejected or produce model flagged by single-root validation"
+    exit 1
+  fi
+  if ! echo "$VALIDATE_MULTIROOT_OUTPUT" | grep -qi "exactly one top root user-requirement\|single root\|multi-root"; then
+    echo "FAILED: Validation output should mention single-root ownership violation"
+    echo "$VALIDATE_MULTIROOT_OUTPUT"
+    exit 1
+  fi
+fi
+
+rm -f "$BEFORE_TEST11"
+
+echo "Test 11 passed"
+echo ""
+
 echo "===================================="
 echo "All Merge Elements tests passed"
 echo "===================================="

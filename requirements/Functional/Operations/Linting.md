@@ -32,13 +32,7 @@ When filtering lint results, the system shall allow focusing on specific categor
 The system shall provide automatic fixing capability for auto-fixable lint issues, applying changes directly to model files when the `--fix` flag is used.
 
 #### Details
-Auto-fix shall:
-- Only apply fixes for issues categorized as auto-fixable
-- Modify the affected markdown files directly
-- Remove redundant verify relations from verification elements
-- Preserve all other content and formatting in the files
-- Report all changes made (files modified, relations removed)
-- Skip issues categorized as needing manual review
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -48,6 +42,7 @@ Auto-fix shall:
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
+  * refinedBy: [Lint Auto-fix Capability Refinement Specification](Specifications.md#lint-auto-fix-capability-refinement-specification)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
@@ -91,16 +86,7 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
 The system shall detect redundant verify relations where a verification directly verifies both a child requirement and its ancestor, leveraging the existing verification trace tree logic from the Verification Trace Builder.
 
 #### Details
-A verify relation is redundant when:
-- A verification directly verifies both a leaf requirement AND its parent/ancestor in the hierarchy
-- The verification trace tree shows that an ancestor requirement is also directly verified
-- Since verification traces roll up automatically through derivedFrom relations, verifying the leaf is sufficient
-
-Detection shall:
-- Reuse the trace tree building logic from [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder)
-- Identify ancestor requirements in each verification's trace tree that are also directly verified
-- Report these as redundant relations that add noise to the model
-- Categorize as **auto-fixable** since removing them is safe and mechanical
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -110,6 +96,7 @@ Detection shall:
 
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
+  * refinedBy: [Redundant Verify Relations Detection Refinement Specification](Specifications.md#redundant-verify-relations-detection-refinement-specification)
   * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
   * satisfiedBy: [trace_tree_builder.rs](../../../core/src/trace_tree_builder.rs)
   * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)

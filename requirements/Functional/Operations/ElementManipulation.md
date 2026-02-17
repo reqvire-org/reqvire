@@ -138,28 +138,38 @@ When `--squash` is requested, the operation shall reject squashing into an exist
   * verifiedBy: [Move File Squash Test](Verifications/ElementManipulationVerifications.md#move-file-squash-test)
 ---
 
-### Relation Consistency Maintenance
+### Atomic Relation Relink Operation
 
-The system shall maintain bidirectional relation consistency when elements are manipulated, ensuring that forward and backward relations remain synchronized.
+The system shall provide an atomic relation relink operation that rewires an existing relation target to a new target while preserving model validity.
 
 #### Details
-When manipulating elements, the system shall ensure:
-- If element A derives from element B, then B must have a derive relation to A
-- If element A is verified by verification V, then V must have a verify relation to A
-- When an element is deleted, both forward and backward relations are removed
-- When an element is moved, both forward and backward relations are updated
-- After any manipulation operation, the model remains in a valid state with no dangling relations
-
-**Validation:**
-- The system shall validate relation consistency after each manipulation operation
-- The system shall report any inconsistencies detected during manipulation
-- The system shall prevent operations that would leave the model in an inconsistent state
+For hierarchical relinks (`derivedFrom`/`derive`), the operation shall support subgraph boundary relinking semantics, applying changes as one transaction and validating the resulting model state before persistence.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * refinedBy: [Atomic Relation Relink Workflow Specification](Specifications.md#atomic-relation-relink-workflow-specification)
+  * refinedBy: [Atomic Relink Validity Constraint](Constraints.md#atomic-relink-validity-constraint)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * verifiedBy: [Atomic Relation Relink Test](Verifications/ElementManipulationVerifications.md#atomic-relation-relink-test)
+---
+
+### Relation Consistency Maintenance
+
+The system shall maintain bidirectional relation consistency when elements are manipulated, ensuring that forward and backward relations remain synchronized.
+
+#### Details
+Implementation details shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * refinedBy: [Relation Consistency Maintenance Refinement Specification](Specifications.md#relation-consistency-maintenance-refinement-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [Relation Consistency Test](Verifications/ElementManipulationVerifications.md#relation-consistency-test)
 ---

@@ -19,6 +19,44 @@ Test cases:
   * verify: [Cross-Section Duplicate Validation](../Validation.md#cross-section-duplicate-validation)
 ---
 
+### Single Root Hierarchy Ownership Validation Test
+
+This test verifies that each hierarchy element resolves to exactly one top root user-requirement.
+
+#### Details
+
+##### Acceptance Criteria
+- Validation passes when all hierarchy elements resolve to exactly one top root user-requirement.
+- Validation fails when a hierarchy element resolves to more than one top root user-requirement.
+- Validation fails when a hierarchy element resolves to zero top root user-requirements.
+- Validation error identifies the violating element and the resolved root set/count.
+
+##### Test Criteria
+1. **Valid single-root hierarchy:**
+   - Create a hierarchy with one top root user-requirement and descendants.
+   - Run `reqvire validate`.
+   - Assert success exit code.
+
+2. **Invalid multi-root hierarchy ownership:**
+   - Create one descendant requirement with `derivedFrom` to two different top root user-requirements.
+   - Run `reqvire validate`.
+   - Assert non-zero exit code.
+   - Assert error contains "must resolve to exactly one top root user-requirement".
+
+3. **Invalid zero-root hierarchy ownership:**
+   - Create a descendant chain containing only `requirement` elements and no user-requirement top root.
+   - Run `reqvire validate`.
+   - Assert non-zero exit code.
+   - Assert error contains "must resolve to exactly one top root user-requirement".
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-single-root-hierarchy-validation/test.sh)
+  * verify: [Single Root Hierarchy Ownership](../Validation.md#single-root-hierarchy-ownership)
+---
+
 ### Default Element Type Assignment Test
 
 This test verifies that the system assigns the default type 'requirement' to all elements without explicit type metadata, regardless of their file location within the repository.

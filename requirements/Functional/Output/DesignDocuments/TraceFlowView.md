@@ -51,7 +51,7 @@ The visualization uses consistent colors matching other diagrams:
 | Type | Color | Description |
 |------|-------|-------------|
 | user-requirement | #7E57C2 | Purple for user requirements |
-| system-requirement | #673AB7 | Deep purple for system requirements |
+| requirement | #673AB7 | Deep purple for system requirements |
 | verification | #4CAF50 | Green for verifications |
 | test-verification | #4CAF50 | Green for test verifications |
 

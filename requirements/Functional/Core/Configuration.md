@@ -20,17 +20,7 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
 The system shall support configurable glob patterns to exclude specific files from requirement processing.
 
 #### Details
-Exclusion patterns are defined in `.reqvireignore` file at the repository root, using the same format as `.gitignore`:
-
-```.reqvireignore
-# Example patterns to exclude from structured documents processing
-**/Logical*.md
-**/Physical*.md
-**/draft-*.md
-examples/**
-```
-
-The `.reqvireignore` file provides Reqvire-specific exclusions for files that should remain in version control but not be processed as requirements.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -41,6 +31,7 @@ The `.reqvireignore` file provides Reqvire-specific exclusions for files that sh
   * derive: [Reserved Repository Files Exclusion](#reserved-repository-files-exclusion)
   * derive: [File Pattern Exclusion for Format](../Operations/Formatting.md#file-pattern-exclusion-for-format)
   * derivedFrom: [Coexistence of Structured and Unstructured Documents](#coexistence-of-structured-and-unstructured-documents)
+  * refinedBy: [Ignoring Unstructured Documents Refinement Specification](Specifications.md#ignoring-unstructured-documents-refinement-specification)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)
 ---
 
@@ -70,10 +61,7 @@ The system shall integrate with Git workflows by reading exclusion patterns from
 The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.
 
 #### Details
-File exclusion is handled through:
-- .gitignore patterns (files not in version control)
-- .reqvireignore patterns (files in version control but excluded from requirements processing)
-- Reserved repository files (README.md, LICENSE.md, etc.)
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -81,6 +69,7 @@ File exclusion is handled through:
 #### Relations
   * derive: [Structured Markdown Files Search and Detection](#structured-markdown-files-search-and-detection)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
+  * refinedBy: [Requirements Processing Refinement Specification](Specifications.md#requirements-processing-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Same-File Fragment Relations Test](Verifications/ValidationVerifications.md#same-file-fragment-relations-test)
@@ -92,16 +81,14 @@ File exclusion is handled through:
 The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.
 
 #### Details
-Identification Process:
-1. **File Selection**: The process scans all files in the the git repository root and all sub folders.
-2. **Excluded Patterns Check**: If a file matches any excluded patterns, it is marked as **not a structured document file**.
-3. **File Extension Check**: If the file does not have a `.md` extension, it is marked as **not a structured document file**.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Requirements Processing](#requirements-processing)
+  * refinedBy: [Structured Markdown Files Search and Detection Refinement Specification](Specifications.md#structured-markdown-files-search-and-detection-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---

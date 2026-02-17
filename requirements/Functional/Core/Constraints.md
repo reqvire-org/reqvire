@@ -80,3 +80,23 @@ Validation rules for element type and relation type combinations.
 #### Metadata
   * type: constraint
 ---
+
+### Single Root Hierarchy Ownership Constraint
+
+Rules for ensuring each hierarchy element belongs to exactly one top root user-requirement tree.
+
+#### Details
+- Hierarchical relations are defined by `derivedFrom`/`derive`.
+- A top root is an element of type `user-requirement` with no hierarchical parent relation (`derivedFrom`).
+- Every hierarchy element shall resolve to exactly one top root `user-requirement` when traversing parent hierarchy relations.
+- Resolution count `0` is invalid (orphaned hierarchy from top user-requirement ownership perspective).
+- Resolution count `>1` is invalid (ambiguous multi-root ownership).
+
+This rule is a structural model invariant and shall be enforced as validation, not lint.
+
+#### Metadata
+  * type: constraint
+
+#### Relations
+  * refine: [Single Root Hierarchy Ownership](Validation.md#single-root-hierarchy-ownership)
+---

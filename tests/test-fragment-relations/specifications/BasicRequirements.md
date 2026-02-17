@@ -19,6 +19,9 @@ Users should be able to receive notifications through multiple channels (email, 
 #### Metadata
 * type: user-requirement
 
+#### Relations
+* derivedFrom: [USER-REQ-001 Notification Preferences](#user-req-001-notification-preferences)
+
 ---
 
 ### USER-REQ-003 Notification Grouping
@@ -27,6 +30,9 @@ Users should be able to view notifications grouped by type and priority.
 
 #### Metadata
 * type: user-requirement
+
+#### Relations
+* derivedFrom: [USER-REQ-001 Notification Preferences](#user-req-001-notification-preferences)
 
 ---
 
@@ -37,5 +43,8 @@ Users should be able to interact with notifications through simple actions.
 
 #### Metadata
 * type: user-requirement
+
+#### Relations
+* derivedFrom: [USER-REQ-001 Notification Preferences](#user-req-001-notification-preferences)
 
 ---

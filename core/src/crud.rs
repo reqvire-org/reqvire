@@ -51,6 +51,17 @@ fn finalize_crud_operation(
     Ok(diffs)
 }
 
+fn enforce_single_root_after_mutation(model_manager: &ModelManager) -> Result<(), ReqvireError> {
+    let ownership_errors = model_manager
+        .graph_registry
+        .validate_single_root_hierarchy_ownership_in_memory()?;
+    if ownership_errors.is_empty() {
+        Ok(())
+    } else {
+        Err(ReqvireError::ValidationError(ownership_errors))
+    }
+}
+
 /// Add a new element to the model
 ///
 /// # Arguments
@@ -226,12 +237,19 @@ pub fn move_element(
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
 
+    let registry_snapshot = model_manager.graph_registry.clone();
+
     // Move element using core business logic
     let (new_id, _affected_files) = model_manager.graph_registry.move_element_comprehensive(
         element_id,
         &target_file_normalized,
         excluded_patterns,
     )?;
+
+    if let Err(err) = enforce_single_root_after_mutation(model_manager) {
+        model_manager.graph_registry = registry_snapshot;
+        return Err(err);
+    }
 
     let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
 
@@ -1040,10 +1058,17 @@ pub fn merge_elements(
         }
     }
 
+    let registry_snapshot = model_manager.graph_registry.clone();
+
     // Perform the merge in graph_registry
     model_manager
         .graph_registry
         .merge_elements(&target_id, &source_ids)?;
+
+    if let Err(err) = enforce_single_root_after_mutation(model_manager) {
+        model_manager.graph_registry = registry_snapshot;
+        return Err(err);
+    }
 
     let modified_files = collect_new_modified_files(model_manager, &modified_before);
 
@@ -1585,14 +1610,25 @@ pub fn link(
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
 
+    let registry_snapshot = model_manager.graph_registry.clone();
+
     // Delegate to graph_registry (includes all validation and target resolution)
     // NOTE: This will mutate the in-memory graph even in dry-run mode
-    let _modified_file = model_manager.graph_registry.add_element_relation_full(
+    let link_result = model_manager.graph_registry.add_element_relation_full(
         &source_id,
         target,
         relation_type,
         git_root,
-    )?;
+    );
+    if let Err(err) = link_result {
+        model_manager.graph_registry = registry_snapshot;
+        return Err(err);
+    }
+
+    if let Err(err) = enforce_single_root_after_mutation(model_manager) {
+        model_manager.graph_registry = registry_snapshot;
+        return Err(err);
+    }
 
     let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
 
@@ -1600,6 +1636,117 @@ pub fn link(
         operation: CrudOperation::Update,
         element_id: source_id,
         element_name: format!("Linked {} {} {}", source_name, relation_type, target),
+        diffs,
+        dry_run,
+    })
+}
+
+/// Atomically relink a relation: replace one target with another for the same relation type.
+///
+/// This operation is all-or-nothing from caller perspective. If add fails after remove,
+/// in-memory graph state is rolled back to the pre-operation snapshot.
+pub fn relink(
+    model_manager: &mut ModelManager,
+    source: &str,
+    relation_type: &str,
+    from_target: &str,
+    to_target: &str,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    // Resolve source element by name
+    let source_element = model_manager
+        .graph_registry
+        .get_element_by_name(source)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!("Source element '{}' not found", source))
+        })?;
+
+    let source_id = source_element.identifier.clone();
+    let source_name = source_element.name.clone();
+
+    if from_target == to_target {
+        return Err(ReqvireError::RelationError(
+            "Relink requires different source and target relation endpoints".to_string(),
+        ));
+    }
+
+    // Validate existing relation type before mutation.
+    let from_target_resolved = if let Some(element) = model_manager
+        .graph_registry
+        .get_element_by_name(from_target)
+    {
+        element.identifier.clone()
+    } else {
+        from_target.to_string()
+    };
+
+    let existing_relation = model_manager
+        .graph_registry
+        .nodes
+        .get(&source_id)
+        .and_then(|n| {
+            n.element
+                .relations
+                .iter()
+                .find(|r| r.target.link.as_str() == from_target_resolved)
+        })
+        .cloned()
+        .ok_or_else(|| {
+            ReqvireError::RelationError(format!(
+                "No relation found from '{}' to '{}'",
+                source, from_target
+            ))
+        })?;
+
+    if existing_relation.relation_type.name != relation_type {
+        return Err(ReqvireError::RelationError(format!(
+            "Relation mismatch: '{}' -> '{}' exists as '{}', not '{}'",
+            source,
+            from_target,
+            existing_relation.relation_type.name,
+            relation_type
+        )));
+    }
+
+    let modified_before = snapshot_modified_files(model_manager);
+    let registry_snapshot = model_manager.graph_registry.clone();
+
+    let mutation_result = (|| -> Result<(), ReqvireError> {
+        let removed = model_manager
+            .graph_registry
+            .remove_element_relation_full(&source_id, from_target)?;
+        if removed.is_none() {
+            return Err(ReqvireError::RelationError(format!(
+                "No relation found from '{}' to '{}'",
+                source, from_target
+            )));
+        }
+
+        model_manager.graph_registry.add_element_relation_full(
+            &source_id,
+            to_target,
+            relation_type,
+            git_root,
+        )?;
+        enforce_single_root_after_mutation(model_manager)?;
+        Ok(())
+    })();
+
+    if let Err(err) = mutation_result {
+        model_manager.graph_registry = registry_snapshot;
+        return Err(err);
+    }
+
+    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
+
+    Ok(CrudResult {
+        operation: CrudOperation::Update,
+        element_id: source_id,
+        element_name: format!(
+            "Relinked {} {} {} -> {}",
+            source_name, relation_type, from_target, to_target
+        ),
         diffs,
         dry_run,
     })

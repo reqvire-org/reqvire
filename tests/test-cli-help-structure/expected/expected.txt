@@ -21,6 +21,7 @@ Commands:
   mv-file           Move entire specification file with all its elements
   link              Add relation or attachment between elements
   unlink            Remove relation or attachment between elements (auto-detects type)
+  relink            Replace an existing relation target with a new target in one operation
   mv-asset          Move/rename asset file and update all references (Attachments and Relations)
   rm-asset          Remove asset file and remove all references (Attachments and Relations)
   containment       Generate containment view showing folder/file/element hierarchy
@@ -147,6 +148,13 @@ LINK OPTIONS:
 UNLINK OPTIONS:
        <SOURCE>                 Source element name
        <TARGET>                 Target element name OR file path
+      --dry-run                 Preview changes without applying
+
+RELINK OPTIONS:
+       <SOURCE>                 Source element name
+       <RELATION_TYPE>          Relation type to preserve
+       <FROM_TARGET>            Existing target to replace
+       <TO_TARGET>              New target
       --dry-run                 Preview changes without applying
 
 MV ASSET OPTIONS:

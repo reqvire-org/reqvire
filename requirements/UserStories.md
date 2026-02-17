@@ -16,6 +16,20 @@ As a **Systems Engineer**, I want to efficiently manage System models using AI-p
 
 #### Metadata
   * type: user-requirement
+
+#### Relations
+  * derive: [AI Assistant Skill-Guided Reqvire Modeling](Functional/Integration/AISkills.md#ai-assistant-skill-guided-reqvire-modeling)
+---
+
+### AI Assistant Skill Authoring for Reqvire
+
+As an **AI Assistant**, I want explicit instruction and skills hints for Reqvire workflows, so that I can produce consistent and traceable model changes.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derive: [AI Assistant Skill-Guided Reqvire Modeling](Functional/Integration/AISkills.md#ai-assistant-skill-guided-reqvire-modeling)
 ---
 
 ### Align with Industry Standards
@@ -57,6 +71,7 @@ As a **System Engineer**, I want a well-defined model structure and file identif
   * derive: [Structure and Addressing in Markdown Documents](Functional/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * derive: [Coexistence of Structured and Unstructured Documents](Functional/Core/Configuration.md#coexistence-of-structured-and-unstructured-documents)
   * derive: [Git Repository as Project Root](Functional/Core/ModelManagement.md#git-repository-as-project-root)
+  * derive: [Single Root Hierarchy Ownership](Functional/Core/Validation.md#single-root-hierarchy-ownership)
 ---
 
 ### Formatting Model Documents
@@ -179,7 +194,6 @@ As an **System Engineer**, I want to validate the structure of System models, so
   * type: user-requirement
 
 #### Relations
-  * derive: [Enhanced Validation Error Reporting](Functional/Core/Validation.md#enhanced-validation-error-reporting)
   * derive: [Validate Cross-Component Dependencies](Functional/Core/Validation.md#validate-cross-component-dependencies)
   * derive: [Validate Filesystem Structure](Functional/Core/Validation.md#validate-filesystem-structure)
   * derive: [Validate Internal Consistency](Functional/Core/Validation.md#validate-internal-consistency)

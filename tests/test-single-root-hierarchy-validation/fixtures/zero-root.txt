@@ -1,0 +1,23 @@
+# Elements
+
+### Requirement A
+
+Invalid: cycle of requirements without top user-requirement root.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Requirement B](#requirement-b)
+---
+
+### Requirement B
+
+Invalid: cycle of requirements without top user-requirement root.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Requirement A](#requirement-a)
+---

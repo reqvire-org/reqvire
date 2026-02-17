@@ -17,18 +17,7 @@ The system shall support code traceability by using structured comments to link 
 When parsing a source file for traceability, the system shall identify and extract all `[reqvire::...]` markers along with their associated requirement element identifiers.
 
 #### Details
-Syntax used for `[reqvire::...]` markers:
-
-```
-[reqvire::<relation_type>: <element identifier>] START [reqvire::<relation_type>: <element idetifier>] END
-
-```
-
-Where:
-- `<relation_type>` specifies the type of relation with only 2 types allowed:
-  * satisfies
-  * trace
-- `<element identifier>` is the identifier of the requirement being traced.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -37,6 +26,7 @@ Where:
   * derive: [Comment Style by File Extension](#comment-style-by-file-extension)
   * derive: [Validating Traceability Format](#validating-traceability-format)
   * derivedFrom: [Code Traceability](#code-traceability)
+  * refinedBy: [Traceability Format Refinement Specification](Specifications.md#traceability-format-refinement-specification)
 ---
 
 ### Comment Style by File Extension
@@ -86,17 +76,14 @@ REM [reqvire::satisfies: Req1] END
 When a source file has a `.css` or `.scss` extension, the system shall use `/* */` for comments.
 
 #### Details
-```
-/* [reqvire::satisfies: Req1] START */
-.button { background-color: blue; }
-/* [reqvire::satisfies: Req1] END */
-```
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
+  * refinedBy: [CSS Style Comment Refinement Specification](Specifications.md#css-style-comment-refinement-specification)
 ---
 
 ### Dash style comment
@@ -140,19 +127,14 @@ SELECT * FROM users;
 When a source file has a `.c`, `.cpp`, `.cs`, `.java`, `.js`, or `.ts` extension, the system shall use `//` for single-line comments.
 
 #### Details
-```
-// [reqvire::satisfies: Req1] START
-void processSensorData() {
-    // Implementation logic
-}
-// [reqvire::satisfies: Req1] END
-```
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
+  * refinedBy: [Slash Style Comment Refinement Specification](Specifications.md#slash-style-comment-refinement-specification)
 ---
 
 ### XML style comment
@@ -160,18 +142,14 @@ void processSensorData() {
 When a source file has a `.html`, `.xml`, or `.xsl` extension, the system shall use `<!-- -->` for comments.
 
 #### Details
-```
-<!-- [reqvire::satisfies: Req1] START -->
-<div> UI Component </div>
-<!-- [reqvire::satisfies: Req1] END -->
-
-```
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)
+  * refinedBy: [XML Style Comment Refinement Specification](Specifications.md#xml-style-comment-refinement-specification)
 ---
 
 ### Validating Traceability Format

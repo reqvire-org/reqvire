@@ -181,7 +181,7 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 
 ### Containment View Report Refinement Specification
 
-Specification extracted from requirement "Containment View Report".
+
 
 #### Details
 The containment view shows the physical organization of the model:
@@ -200,6 +200,67 @@ The system shall include design documents:
 
 #### Metadata
   * type: specification
+---
+
+### File Diagram Attachment Display Refinement Specification
+
+#### Details
+File-diagram attachment rendering behavior:
+- Renders attachments below the element name using `<br/>` separators.
+- Prefixes each attachment entry with `📎`.
+- Displays attachment filename rather than full path.
+- Emits clickable attachment links to file targets.
+- Renders each attachment on its own line.
+- For elements without attachments, renders only the element name.
+
+Label format example:
+`Element Name<br/>📎 attachment1.md<br/>📎 attachment2.md`
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [File Diagram Attachment Display](DiagramGeneration.md#file-diagram-attachment-display)
+---
+
+### Model Diagram Output Formats Refinement Specification
+
+#### Details
+Model output format rules:
+- Markdown format includes embedded Mermaid diagram with model structure.
+- Markdown shows hierarchical structure using containment subgraphs (folders > files > elements).
+- Mermaid diagrams use folder and file subgraphs to visually group elements by physical location.
+- JSON format uses structured data with folders, files, sections, elements, relations, and attachments.
+- Both formats represent the same filtered or complete model data.
+- Element attachments are included as an array of strings in both formats (file paths and element identifiers).
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Model Diagram Output Formats](Reporting.md#model-diagram-output-formats)
+---
+
+### Comma-Separated Type Filter Parsing Refinement Specification
+
+#### Details
+`--filter-type` parsing behavior:
+- Splits input by comma delimiter.
+- Trims whitespace around each token.
+- Normalizes type tokens to lowercase for case-insensitive matching.
+- Validates each parsed type against supported element types.
+- Reports clear errors for invalid type tokens.
+
+Filtering behavior:
+- Matches elements when any parsed type matches (OR semantics).
+- Supports custom type syntax using `other-TYPENAME`.
+- Preserves single-type query behavior as a compatible subset.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Comma-Separated Type Filter Parsing](Reporting.md#comma-separated-type-filter-parsing)
 ---
 
 ### Deterministic Output Specification
@@ -381,7 +442,7 @@ Structure for error and warning messages.
 
 ### Flexible Search Type Filtering Refinement Specification
 
-Specification extracted from requirement "Flexible Search Type Filtering".
+
 
 #### Details
 Users shall be able to specify multiple element types in a single search operation using comma-separated values (e.g., `requirement,test-verification,behavior`).
@@ -397,7 +458,7 @@ This capability enables:
 
 ### Interactive Mermaid Diagram Node Behavior Refinement Specification
 
-Specification extracted from requirement "Interactive Mermaid Diagram Node Behavior".
+
 
 #### Details
 Clickable mermaid diagrams links by default must use relative links to the git repository.
@@ -724,7 +785,7 @@ Default text output (when neither `--json` nor other format flags specified):
 
 ### Trace Relation Non-Directional Behavior Refinement Specification
 
-Specification extracted from requirement "Trace Relation Non-Directional Behavior".
+
 
 #### Details
 The trace relation behavior shall include:

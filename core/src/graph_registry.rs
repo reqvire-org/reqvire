@@ -44,7 +44,7 @@ pub struct ElementNode {
     pub relations: Vec<RelationNode>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct GraphRegistry {
     pub nodes: HashMap<String, ElementNode>,
     pub pages: HashMap<String, Page>,
@@ -588,7 +588,10 @@ impl GraphRegistry {
         let mut visited = HashSet::new();
 
         // Check for circular dependencies - but be less strict about what constitutes a cycle
-        for element_node in self.nodes.values() {
+        let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
+        sorted_nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
+
+        for element_node in &sorted_nodes {
             let mut path = Vec::new();
             self.check_circular_dependencies(
                 &element_node.element,
@@ -600,7 +603,7 @@ impl GraphRegistry {
 
         // Check for missing hierarchical parent relations
         let valid_hierarchical_relations = get_hierarchical_relation_types();
-        for element_node in self.nodes.values() {
+        for element_node in &sorted_nodes {
             let element = &element_node.element;
             let element_file = &element.file_path;
 
@@ -624,6 +627,9 @@ impl GraphRegistry {
             }
         }
 
+        // Enforce single top-root user-requirement ownership for hierarchy elements.
+        errors.extend(self.validate_single_root_hierarchy_ownership()?);
+
         if errors.is_empty() {
             debug!("No cross-component dependency validation errors found.");
         } else {
@@ -631,6 +637,175 @@ impl GraphRegistry {
         }
 
         Ok(errors)
+    }
+
+    fn validate_single_root_hierarchy_ownership(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let mut errors = Vec::new();
+        let mut memo: HashMap<String, BTreeSet<String>> = HashMap::new();
+        let mut visiting: HashSet<String> = HashSet::new();
+
+        let mut sorted_ids: Vec<&String> = self.nodes.keys().collect();
+        sorted_ids.sort();
+
+        for element_id in sorted_ids {
+            let Some(element_node) = self.nodes.get(element_id) else {
+                continue;
+            };
+            let element = &element_node.element;
+            let is_hierarchy_element = matches!(
+                element.element_type,
+                ElementType::Requirement(RequirementType::System)
+                    | ElementType::Requirement(RequirementType::User)
+            );
+            if !is_hierarchy_element {
+                continue;
+            }
+
+            // Preserve current behavior for requirements without parent relation:
+            // they are reported by MissingParentRelation. Skip duplicate ownership error in that case.
+            if matches!(element.element_type, ElementType::Requirement(RequirementType::System))
+                && !self.has_hierarchical_parent(element)
+            {
+                continue;
+            }
+
+            let roots = self.resolve_top_root_user_requirements(element_id, &mut memo, &mut visiting);
+            if roots.len() != 1 {
+                if roots.is_empty() {
+                    errors.push(ReqvireError::MixedHierarchicalRelations(format!(
+                        "Element '{}' ({}) must resolve to exactly one top root user-requirement via hierarchical relations, but resolved to 0 roots",
+                        element.name, element.identifier
+                    )));
+                } else {
+                    let roots_count = roots.len();
+                    let roots_list = roots.into_iter().collect::<Vec<_>>().join(", ");
+                    errors.push(ReqvireError::MixedHierarchicalRelations(format!(
+                        "Element '{}' ({}) must resolve to exactly one top root user-requirement via hierarchical relations, but resolved to {} roots: {}",
+                        element.name,
+                        element.identifier,
+                        roots_count,
+                        roots_list
+                    )));
+                }
+            }
+        }
+
+        Ok(errors)
+    }
+
+    /// Validates single-root hierarchy ownership on current in-memory graph state.
+    /// Used by mutating CRUD operations to reject invalid post-mutation ownership.
+    pub fn validate_single_root_hierarchy_ownership_in_memory(
+        &self,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        self.validate_single_root_hierarchy_ownership()
+    }
+
+    fn has_hierarchical_parent(&self, element: &Element) -> bool {
+        let hierarchical_relations = get_hierarchical_relation_types();
+        element.relations.iter().any(|relation| {
+            hierarchical_relations.contains(&relation.relation_type.name)
+                && matches!(relation.target.link, LinkType::Identifier(_))
+        })
+    }
+
+    fn resolve_top_root_user_requirements(
+        &self,
+        element_id: &str,
+        memo: &mut HashMap<String, BTreeSet<String>>,
+        visiting: &mut HashSet<String>,
+    ) -> BTreeSet<String> {
+        if let Some(cached) = memo.get(element_id) {
+            return cached.clone();
+        }
+
+        // Hierarchical cycles without a user root resolve to zero roots.
+        if visiting.contains(element_id) {
+            return BTreeSet::new();
+        }
+        visiting.insert(element_id.to_string());
+
+        let mut result = BTreeSet::new();
+        let Some(element) = self.get_element(element_id) else {
+            visiting.remove(element_id);
+            return result;
+        };
+
+        let parent_ids = self.get_hierarchical_parent_ids(element);
+
+        if parent_ids.is_empty() {
+            if matches!(element.element_type, ElementType::Requirement(RequirementType::User)) {
+                result.insert(element.identifier.clone());
+            }
+        } else {
+            for parent_id in parent_ids {
+                let parent_roots =
+                    self.resolve_top_root_user_requirements(&parent_id, memo, visiting);
+                for root in parent_roots {
+                    result.insert(root);
+                }
+            }
+        }
+
+        visiting.remove(element_id);
+        memo.insert(element_id.to_string(), result.clone());
+        result
+    }
+
+    fn get_hierarchical_parent_ids(&self, element: &Element) -> Vec<String> {
+        let hierarchical_relations = get_hierarchical_relation_types();
+        let mut parent_ids: BTreeSet<String> = BTreeSet::new();
+
+        for relation in &element.relations {
+            if !hierarchical_relations.contains(&relation.relation_type.name) {
+                continue;
+            }
+
+            if let LinkType::Identifier(ref target_id) = relation.target.link {
+                if let Some(parent_identifier) =
+                    self.resolve_relation_identifier(element, target_id)
+                {
+                    if let Some(parent) = self.get_element(&parent_identifier) {
+                        if matches!(
+                            parent.element_type,
+                            ElementType::Requirement(RequirementType::System)
+                                | ElementType::Requirement(RequirementType::User)
+                        ) {
+                            parent_ids.insert(parent.identifier.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        parent_ids.into_iter().collect()
+    }
+
+    fn resolve_relation_identifier(&self, source_element: &Element, target_id: &str) -> Option<String> {
+        if self.nodes.contains_key(target_id) {
+            return Some(target_id.to_string());
+        }
+
+        // Same-file fragment forms used during CRUD mutations ("#fragment" or "fragment")
+        let fragment = target_id.trim_start_matches('#');
+        if !fragment.is_empty() {
+            let same_file_identifier = format!("{}#{}", source_element.file_path, fragment);
+            if self.nodes.contains_key(&same_file_identifier) {
+                return Some(same_file_identifier);
+            }
+        }
+
+        // Relative path identifiers (e.g. ../X.md#y) can be normalized with source file context.
+        let base_path = std::path::Path::new(&source_element.file_path)
+            .parent()
+            .unwrap_or_else(|| std::path::Path::new("."));
+        if let Ok(normalized) = crate::utils::normalize_identifier(target_id, base_path) {
+            if self.nodes.contains_key(&normalized) {
+                return Some(normalized);
+            }
+        }
+
+        None
     }
 
     /// Validates that all attachment files referenced by elements exist.

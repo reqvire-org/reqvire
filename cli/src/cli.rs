@@ -469,6 +469,29 @@ pub enum Commands {
         dry_run: bool,
     },
 
+    /// Replace an existing relation target with a new target in one operation
+    #[clap(
+        name = "relink",
+        override_help = "Replace an existing relation target with a new target in one operation\n\nRELINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE>          Relation type to preserve\n       <FROM_TARGET>            Existing target to replace\n       <TO_TARGET>              New target\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire relink \"Child Requirement\" derivedFrom \"Old Parent\" \"New Parent\""
+    )]
+    Relink {
+        /// Source element name
+        source: String,
+
+        /// Relation type to preserve
+        relation_type: String,
+
+        /// Existing target to replace
+        from_target: String,
+
+        /// New target
+        to_target: String,
+
+        /// Preview changes without applying
+        #[clap(long, help_heading = "RELINK OPTIONS")]
+        dry_run: bool,
+    },
+
     /// Move/rename asset file and update all references (Attachments and Relations)
     #[clap(
         name = "mv-asset",
@@ -1488,6 +1511,26 @@ pub async fn handle_command(
             let git_root = git_commands::get_git_root_dir()?;
             let result =
                 reqvire::crud::unlink(&mut model_manager, &source, &target, &git_root, dry_run)?;
+            render_crud_result(&result);
+            Ok(0)
+        }
+        Some(Commands::Relink {
+            source,
+            relation_type,
+            from_target,
+            to_target,
+            dry_run,
+        }) => {
+            let git_root = git_commands::get_git_root_dir()?;
+            let result = reqvire::crud::relink(
+                &mut model_manager,
+                &source,
+                &relation_type,
+                &from_target,
+                &to_target,
+                &git_root,
+                dry_run,
+            )?;
             render_crud_result(&result);
             Ok(0)
         }

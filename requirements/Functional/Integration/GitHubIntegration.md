@@ -16,22 +16,14 @@ The system shall automate export of HTML documentation in the GitHub workflow on
 The system shall implement a GitHub workflow that automatically exports and commits updated HTML documentation when pull requests are merged to the main branch.
 
 #### Details
-The GitHub workflow shall:
-- Be triggered only when a pull request is merged to the main branch (not on PR creation or updates)
-- Check out the latest code from the main branch post-merge
-- Build the Reqvire tool from source
-- Run the HTML export process using `reqvire export --output docs`
-- Check if any documentation files have been added or modified
-- Commit any updated files with a standardized commit message
-- Push the updates back to the main branch
-
-This ensures that the HTML documentation in the `docs/` folder is always up-to-date after changes are merged to the main branch, providing accurate documentation for GitHub Pages without requiring manual intervention.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Automate Documentation Export](#automate-documentation-export)
+  * refinedBy: [Automated Documentation Export on PR Merge Refinement Specification](Specifications.md#automated-documentation-export-on-pr-merge-refinement-specification)
   * satisfiedBy: [update_docs.yml_disabled](../../../.github/workflows/update_docs.yml_disabled)
   * verifiedBy: [Automated Documentation Export on PR Merge Verification](../Output/Verifications/DiagramVerifications.md#automated-documentation-export-on-pr-merge-verification)
 ---

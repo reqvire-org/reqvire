@@ -1,0 +1,10 @@
+
+❌ 3 validation failed with error(s):
+
+  1. Circular dependency error: Circular dependency error: Requirements.md#requirement-a -> Requirements.md#requirement-b -> Requirements.md#requirement-a
+
+  2. Mixed hierarchical relations in chain: Element 'Requirement A' (Requirements.md#requirement-a) must resolve to exactly one top root user-requirement via hierarchical relations, but resolved to 0 roots
+
+  3. Mixed hierarchical relations in chain: Element 'Requirement B' (Requirements.md#requirement-b) must resolve to exactly one top root user-requirement via hierarchical relations, but resolved to 0 roots
+
+

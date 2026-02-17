@@ -66,6 +66,7 @@ Implementation details shall follow the associated refinement specifications.
   * derive: [CLI Move Asset Command](#cli-move-asset-command)
   * derive: [CLI Move Element Command](#cli-move-element-command)
   * derive: [CLI Move File Command](#cli-move-file-command)
+  * derive: [CLI Relink Command](#cli-relink-command)
   * derive: [CLI Remove Asset Command](#cli-remove-asset-command)
   * derive: [CLI Remove Element Command](#cli-remove-element-command)
   * derive: [CLI Rename Element Command](#cli-rename-element-command)
@@ -214,26 +215,7 @@ The markdown output shall include:
 The system shall provide a `coverage` command that generates both verification coverage and requirement implementation coverage reports.
 
 #### Details
-The command shall:
-- Be invoked as `reqvire coverage`
-- Support `--json` flag for JSON output format
-- Default to human-readable text output when JSON flag is not present
-- Generate reports focusing on leaf requirements (requirements without forward relations to other requirements)
-- Show the percentage and details of verified and unverified leaf requirements
-- Include breakdowns by file, section, and verification type
-- Show satisfaction status of test-verification elements (those with satisfiedBy relations)
-- Show orphaned verifications (verification elements without any verify relations to requirements)
-- Include requirement implementation coverage summary for `requirement` elements only (exclude `user-requirement`)
-- Classify covered requirements by implementation source (`direct_satisfied`, `refinement_contract_satisfied_via_attachment`, `refinement_contract_satisfied_via_child`)
-- Show implementation-uncovered requirements with identifiers and names
-- Emit all coverage percentages with at most 2 decimal places in text and JSON output
-- Follow [Verification Roll-up Strategy](../System/Processing/VerificationTraces.md#verification-roll-up-strategy)
-- Test-verification elements require satisfiedBy relations to be considered satisfied
-- Analysis, inspection, and demonstration verification elements are considered satisfied by default
-- Exit with status code 0 on success
-- Exit with non-zero status code on errors
-
-Command output shall be written to stdout for easy redirection to files.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -246,6 +228,7 @@ Command output shall be written to stdout for easy redirection to files.
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Coverage Command Refinement Specification](Specifications.md#cli-coverage-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Verification Coverage Report Test](../../Functional/Output/Verifications/ReportingVerifications.md#verification-coverage-report-test)
   * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
@@ -256,19 +239,14 @@ Command output shall be written to stdout for easy redirection to files.
 The system shall provide an `--output <FILE>` option on all commands that support `--json`, allowing JSON output to be written to a file instead of stdout.
 
 #### Details
-The `--output` option shall:
-- Be available on every command that has a `--json` flag
-- Require `--json` to also be set; report an error if `--output` is used without `--json`
-- Write JSON content to the specified file path
-- Create the file if it does not exist, overwrite if it does
-- Print a confirmation message to stdout: `✅ Output saved to <filepath>`
-- Exit with code 0 on success, non-zero on file write error
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI JSON File Output Option Refinement Specification](Specifications.md#cli-json-file-output-option-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI JSON File Output Test](../../Functional/Output/Verifications/ReportingVerifications.md#cli-json-file-output-test)
 ---
@@ -278,21 +256,7 @@ The `--output` option shall:
 The system shall implement a `lint` command that analyzes model quality and detects issues in requirements relations, providing categorized output that distinguishes between auto-fixable issues and those requiring manual review.
 
 #### Details
-The command shall:
-- Be invoked as `reqvire lint`
-- Default to dry-run mode (report issues without applying fixes)
-- Support `--fixable` flag to show only auto-fixable issues
-- Support `--auditable` flag to show only issues requiring manual review
-- Support `--fix` flag to automatically apply fixes for auto-fixable issues
-- Support `--json` flag for structured JSON output
-- Default to showing ALL issues when no filter flags are provided
-- Categorize output into two sections:
-  * **Auto-fixable Issues**: Issues that can be automatically corrected by the system
-  * **Needs Manual Review**: Issues that require human judgment to resolve
-- Exit with status code 0 when no issues are found or when fixes are successfully applied
-- Exit with non-zero status code on errors
-
-Command output shall be written to stdout for easy redirection to files.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -306,6 +270,7 @@ Command output shall be written to stdout for easy redirection to files.
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Lint Command Refinement Specification](Specifications.md#cli-lint-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -314,16 +279,7 @@ Command output shall be written to stdout for easy redirection to files.
 The system shall provide a `merge` command to combine multiple elements into a target element.
 
 #### Details
-The `merge` command shall:
-- Accept target element name as first required positional argument
-- Accept one or more source element names as subsequent required arguments
-- Support command syntax: `reqvire merge <target> <source1> [source2...]`
-- Reject merge when a source is in `# Documents` format and target is in `# Elements` format; report that manual migration is required
-- Apply changes immediately by default
-- Support `--dry-run` flag to preview changes without applying
-- Output git-style diff showing all affected files by default
-- Support `--json` flag for structured output
-- Exit with code 0 on success, non-zero on error
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -338,6 +294,7 @@ The `merge` command shall:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Merge Element Command Refinement Specification](Specifications.md#cli-merge-element-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
@@ -346,14 +303,7 @@ The `merge` command shall:
 System shall provide CLI command to generate model diagrams with optional filtering and output format selection.
 
 #### Details
-- Command shall be named `model`
-- Shall support `--from=<name>` flag for filtering from specific element by name
-- Element names are globally unique, allowing lookup by name alone
-- Shall support `--json` flag for JSON output format
-- Shall support `--reverse` flag for leaf-to-root traversal
-- Shall support `--filter-type=<types>` flag with comma-separated element types to filter starting points (consistent with search command)
-- Default output shall be markdown with embedded Mermaid diagram
-- Shall integrate with existing model diagram generation functionality
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -367,6 +317,7 @@ System shall provide CLI command to generate model diagrams with optional filter
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Model Diagram Command Refinement Specification](Specifications.md#cli-model-diagram-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
 ---
@@ -376,19 +327,7 @@ System shall provide CLI command to generate model diagrams with optional filter
 The system shall provide a `mv-asset` command to move or rename InternalPath files and automatically update all references across the model.
 
 #### Details
-The `mv-asset` command shall:
-- Accept old file path as required positional argument
-- Accept new file path as required positional argument
-- Find all elements referencing the file as InternalPath
-- Update all InternalPath references:
-  - In Attachments subsection (update both display text and href)
-  - In Relations (satisfiedBy, satisfy, trace targets)
-- Physically move/rename the file on filesystem
-- Apply changes immediately by default
-- Support `--dry-run` flag to preview changes without applying
-- Output git-style diff showing all affected files
-- Report all affected elements and relation updates
-- Exit with code 0 on success, non-zero on error
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -400,6 +339,7 @@ The `mv-asset` command shall:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Move Asset Command Refinement Specification](Specifications.md#cli-move-asset-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Move Asset Command Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#move-asset-command-verification)
 ---
@@ -456,23 +396,35 @@ The command shall reject `mv-file --squash` when the target file is an existing 
   * verifiedBy: [CLI Move File Test](../../Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-move-file-test)
 ---
 
+### CLI Relink Command
+
+The system shall provide a `relink` command that exposes the atomic relation relink operation.
+
+#### Details
+Implementation details shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Atomic Relation Relink Workflow Specification](../../Functional/Operations/Specifications.md#atomic-relation-relink-workflow-specification)
+  * [Atomic Relink Validity Constraint](../../Functional/Operations/Constraints.md#atomic-relink-validity-constraint)
+  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Relink Command Refinement Specification](Specifications.md#cli-relink-command-refinement-specification)
+  * refinedBy: [Mutating Command Hierarchy Safety Refinement Specification](Specifications.md#mutating-command-hierarchy-safety-refinement-specification)
+  * verifiedBy: [Atomic Relation Relink Test](../../Functional/Operations/Verifications/ElementManipulationVerifications.md#atomic-relation-relink-test)
+---
+
 ### CLI Remove Asset Command
 
 The system shall provide an `rm-asset` command to remove InternalPath files and automatically remove all references from the model.
 
 #### Details
-The `rm-asset` command shall:
-- Accept file path as required positional argument
-- Find all elements referencing the file as InternalPath
-- Remove all InternalPath references:
-  - From Attachments subsection (remove link entry, remove subsection if empty)
-  - From Relations (remove entire relation line for satisfiedBy, satisfy, trace)
-- Delete physical file from filesystem
-- Apply changes immediately by default
-- Support `--dry-run` flag to preview changes without applying
-- Output git-style diff showing all affected files
-- Report all affected elements and removed relations
-- Exit with code 0 on success, non-zero on error
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -484,6 +436,7 @@ The `rm-asset` command shall:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Remove Asset Command Refinement Specification](Specifications.md#cli-remove-asset-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Remove Asset Command Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#remove-asset-command-verification)
 ---
@@ -493,17 +446,7 @@ The `rm-asset` command shall:
 The system shall provide an `rm` command to delete existing model elements and automatically remove all relations referencing the deleted element.
 
 #### Details
-The `rm` command shall:
-- Accept element name as required positional argument
-- Support command syntax: `reqvire rm <element-name>`
-- Delete the specified element from its file
-- Remove all incoming relations from other elements
-- Apply changes immediately by default
-- Support `--dry-run` flag to preview changes without applying
-- Output git-style diff showing file changes by default
-- Support `--json` flag for structured output with affected relations
-- Report error if element does not exist
-- Exit with code 0 on success, non-zero on error
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -517,6 +460,7 @@ The `rm` command shall:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Remove Element Command Refinement Specification](Specifications.md#cli-remove-element-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Remove Element Test](../../Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-remove-element-test)
 ---
@@ -526,17 +470,7 @@ The `rm` command shall:
 The system shall provide a `rename` command to rename existing model elements while automatically updating all relations that reference the renamed element.
 
 #### Details
-The `rename` command shall:
-- Accept current element name (required)
-- Accept new element name (required)
-- Update all incoming relations system-wide with new identifier
-- Apply changes immediately by default
-- Support `--dry-run` flag to preview changes without applying
-- Output git-style diff showing all affected files by default
-- Support `--json` flag for structured output with relation updates and identifier change
-- Report identifier change (old → new)
-- Report error if element does not exist or new name conflicts with existing element
-- Exit with code 0 on success, non-zero on error
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -549,6 +483,7 @@ The `rename` command shall:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Rename Element Command Refinement Specification](Specifications.md#cli-rename-element-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI Rename Element Test](../../Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-rename-element-test)
 ---
@@ -558,26 +493,14 @@ The `rename` command shall:
 The system shall provide a `resources` command that generates a report showing all files referenced by the model through relations and attachments.
 
 #### Details
-The command shall:
-- Be invoked as `reqvire resources`
-- Support `--json` flag for JSON output format
-- Default to human-readable text output when JSON flag is not present
-- Generate two sections: Relations and Attachments
-- Show files from InternalPath relation targets (satisfiedBy, trace, etc.)
-- Show files from FilePath attachment targets
-- List files alphabetically by path
-- For each file, show referencing elements with links
-- Sort references by relation type (for relations section), then by element identifier
-- Exit with status code 0 on success
-- Exit with non-zero status code on errors
-
-Command output shall be written to stdout for easy redirection to files.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Resources Command Refinement Specification](Specifications.md#cli-resources-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Resources Report Verification](../../Functional/Output/Verifications/ReportingVerifications.md#resources-report-verification)
 ---
@@ -639,16 +562,14 @@ Implementation details shall follow the associated refinement specifications.
 The system shall make verification element names in the traces report clickable links that navigate to the element's definition in its source file.
 
 #### Details
-- Verification element names displayed as headers shall be hyperlinks
-- Links shall point to the verification's source file with fragment identifier
-- Format: `[Verification Name](file_path#element-fragment)`
-- Enables direct navigation from traces report to verification definition
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [CLI Traces Command](#cli-traces-command)
+  * refinedBy: [Verification Traces Element Navigation Refinement Specification](Specifications.md#verification-traces-element-navigation-refinement-specification)
   * satisfiedBy: [verification_trace.rs](../../../core/src/verification_trace.rs)
   * verifiedBy: [Verification Traces Element Navigation Test](Verifications/CLIVerifications.md#verification-traces-element-navigation-test)
 ---
@@ -656,6 +577,9 @@ The system shall make verification element names in the traces report clickable 
 ### Detailed Error Handling and Logging
 
 The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.
+
+#### Details
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -665,6 +589,7 @@ The system shall implement detailed error handling and logging throughout the ap
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [Detailed Error Handling and Logging Refinement Specification](Specifications.md#detailed-error-handling-and-logging-refinement-specification)
   * satisfiedBy: [error.rs](../../../core/src/error.rs)
 ---
 
@@ -698,23 +623,7 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide unified CLI commands for relation and attachment management: link and unlink.
 
 #### Details
-The `link` command shall:
-- Accept syntax: `reqvire link <source> <relation-type-or-attaching> <target>`
-- Source: existing element name
-- Relation-type: one of derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace, OR 'attaching'
-- Target types for relations: element name, internal file path, or external URL (http/https)
-- Target types for attaching: internal file path or Refinement element name (external URLs NOT allowed)
-- When 'attaching' is used with an external URL, reject with error suggesting to use 'trace' relation instead
-- When relation or attachment already exists, return error with clear message
-- Support `--dry-run` flag for preview
-
-The `unlink` command shall:
-- Accept syntax: `reqvire unlink <source> <target>`
-- Auto-detect: searches relations first, then attachments
-- Only one relation per source-target pair is allowed
-- Source: existing element name
-- Target: element name or file path
-- Support `--dry-run` flag for preview
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -727,6 +636,7 @@ The `unlink` command shall:
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [Relation Commands Refinement Specification](Specifications.md#relation-commands-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Link Command Verification](../../Functional/Operations/Verifications/ElementManipulationVerifications.md#link-command-verification)
   * verifiedBy: [Unlink Command Verification](../../Functional/Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification)
@@ -737,21 +647,7 @@ The `unlink` command shall:
 The system shall provide a validation command that executes model validation and reports any issues found.
 
 #### Details
-`validate` command shall:
-  - Execute two-pass validation strategy:
-    * **Pass 1: Element Collection and Local Validation**
-      - Parse all markdown files
-      - Extract elements with metadata
-      - Perform local validation (element uniqueness, identifier format, metadata syntax)
-      - Report errors if found
-    * **Pass 2: Graph Construction and Relation Validation**
-      - Build GraphRegistry from collected elements
-      - Validate all relations (target existence, type compatibility)
-      - Perform cross-component validation
-      - Report errors if found
-  - Print all validation issues found in the model
-  - Output a success message "No validation issues found" when the model is valid
-  - Support --json flag to output validation results in JSON format
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -766,6 +662,7 @@ The system shall provide a validation command that executes model validation and
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [Validate Command Refinement Specification](Specifications.md#validate-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Invalid Relations Test](../../Functional/Core/Verifications/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)

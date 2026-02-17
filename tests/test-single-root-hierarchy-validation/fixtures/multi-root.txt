@@ -1,0 +1,29 @@
+# Elements
+
+### Root One
+
+First top-level root.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Root Two
+
+Second top-level root.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Shared Child Requirement
+
+Invalid: resolves to two top roots.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Root One](#root-one)
+  * derivedFrom: [Root Two](#root-two)
+---

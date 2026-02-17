@@ -1,0 +1,20 @@
+# Elements
+
+### Root User Requirement
+
+Top-level root user-requirement.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Child Requirement
+
+Child requirement with exactly one root.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Root User Requirement](#root-user-requirement)
+---

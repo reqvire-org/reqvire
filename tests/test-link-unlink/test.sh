@@ -346,8 +346,93 @@ Parent.
 EOF
 
 assert_file_matches "$TEST_DIR/expected-test14.md" "$TEST_DIR/specifications/Requirements.md" "Unlink from opposite side should remove user-created relation"
+rm -f "$TEST_DIR/expected-test14.md"
 
 echo "Test 14 passed"
+echo ""
+
+# ==================================
+# Test 15: Link rejects multi-root hierarchy ownership violation
+# ==================================
+echo "Test 15: Link rejects multi-root hierarchy ownership violation..."
+
+cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
+# Elements
+
+### Root A
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Root B
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Parent A
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Root A](#root-a)
+---
+
+### Parent B
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Root B](#root-b)
+---
+
+### Child
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Parent A](#parent-a)
+---
+EOF
+
+BEFORE_TEST15="$(mktemp /tmp/reqvire-link-before15-XXXXXX.md)"
+cp "$TEST_DIR/specifications/Requirements.md" "$BEFORE_TEST15"
+
+set +e
+LINK_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Child" "derivedFrom" "Parent B" 2>&1)
+LINK_MULTIROOT_EXIT=$?
+set -e
+
+if [ $LINK_MULTIROOT_EXIT -ne 0 ]; then
+  if ! echo "$LINK_MULTIROOT_OUTPUT" | grep -qi "exactly one top root user-requirement\|single root\|multi-root"; then
+    echo "FAILED: Error should mention single-root ownership violation"
+    echo "$LINK_MULTIROOT_OUTPUT"
+    exit 1
+  fi
+  assert_file_matches "$BEFORE_TEST15" "$TEST_DIR/specifications/Requirements.md" "Failed link must not modify file"
+else
+  set +e
+  VALIDATE_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate --json 2>&1)
+  VALIDATE_MULTIROOT_EXIT=$?
+  set -e
+  if [ $VALIDATE_MULTIROOT_EXIT -eq 0 ]; then
+    echo "FAILED: Link must be rejected or produce model flagged by single-root validation"
+    exit 1
+  fi
+  if ! echo "$VALIDATE_MULTIROOT_OUTPUT" | grep -qi "exactly one top root user-requirement\|single root\|multi-root"; then
+    echo "FAILED: Validation output should mention single-root ownership violation"
+    echo "$VALIDATE_MULTIROOT_OUTPUT"
+    exit 1
+  fi
+fi
+
+rm -f "$BEFORE_TEST15"
+
+echo "Test 15 passed"
 echo ""
 
 echo "===================================="

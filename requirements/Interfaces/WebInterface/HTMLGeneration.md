@@ -35,17 +35,7 @@ Implementation details shall follow the associated refinement specifications.
 The system shall generate HTML documentation with responsive design supporting desktop, tablet, and mobile viewports.
 
 #### Details
-The system shall:
-- Support viewport widths from 320px (mobile) to 1920px+ (desktop)
-- Use mobile-first CSS approach with progressive enhancement
-- Provide hamburger navigation menu for screens < 768px
-- Scale typography and spacing based on viewport size using responsive breakpoints
-
-Responsive breakpoints:
-- sm: 640px and up (small tablets)
-- md: 768px and up (tablets)
-- lg: 1024px and up (desktops)
-- xl: 1280px and up (large desktops)
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
@@ -53,6 +43,7 @@ Responsive breakpoints:
 #### Relations
   * derive: [CSS Framework Integration](#css-framework-integration)
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
+  * refinedBy: [Responsive HTML Generation Refinement Specification](Specifications.md#responsive-html-generation-refinement-specification)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [styles.rs](../../../core/src/html/styles.rs)
   * verifiedBy: [Responsive Design Verification](Verifications/HTMLGenerationVerifications.md#responsive-design-verification)
@@ -63,26 +54,14 @@ Responsive breakpoints:
 The system shall integrate Tailwind CSS utility framework for consistent responsive styling.
 
 #### Details
-The system shall:
-- Include Tailwind CSS via CDN for development
-- Use mobile-first utility classes for responsive design
-- Apply responsive breakpoints (sm, md, lg, xl) for layout adaptation
-- Define custom theme colors for Reqvire branding:
-  - Primary: Indigo (#3F51B5)
-  - Requirement: Deep Purple (#673AB7)
-  - Verification: Emerald Green (#4CAF50)
-
-Tailwind provides:
-- Utility-first CSS for rapid development
-- Built-in responsive modifiers (e.g., `md:hidden`, `lg:flex`)
-- Consistent spacing, colors, and typography scale
-- Small bundle size with tree-shaking capability
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Responsive HTML Generation](#responsive-html-generation)
+  * refinedBy: [CSS Framework Integration Refinement Specification](Specifications.md#css-framework-integration-refinement-specification)
   * satisfiedBy: [styles.rs](../../../core/src/html/styles.rs)
   * verifiedBy: [Responsive Design Verification](Verifications/HTMLGenerationVerifications.md#responsive-design-verification)
 ---
@@ -92,19 +71,14 @@ Tailwind provides:
 The system shall generate HTML using type-safe Rust macros to prevent invalid HTML at compile time.
 
 #### Details
-The system shall:
-- Use Maud crate for compile-time HTML generation
-- Validate HTML structure at compile time through Rust's type system
-- Prevent malformed HTML tags, unclosed elements, and invalid nesting
-- Generate well-formed HTML5 output conforming to W3C standards
-
-This ensures HTML validity errors are caught during compilation rather than at runtime or by users.
+Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
+  * refinedBy: [Type-Safe HTML Generation Refinement Specification](Specifications.md#type-safe-html-generation-refinement-specification)
   * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
   * verifiedBy: [HTML Validity Verification](Verifications/HTMLGenerationVerifications.md#html-validity-verification)
 ---
