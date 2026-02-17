@@ -150,6 +150,9 @@ Refinements are owned via `refinedBy` on the requirement (refinement gets auto-g
 7. Implementation coverage (`reqvire coverage`) applies to `requirement` elements only (not `user-requirement`).
 8. Hierarchy integrity:
    - Requirement mutations must preserve single-root hierarchy ownership.
+   - Rationale: single-root ownership keeps requirement ownership unambiguous and keeps coverage/collect/change-impact outputs deterministic.
+   - Mutating commands (`link`, `merge`, `mv`, `relink`, etc.) should fail deterministically when they would violate single-root ownership.
+   - Expected failure output should explicitly include `Single-root hierarchy ownership violation`.
    - If mutation command behavior is unclear, verify post-change with `reqvire validate`.
 
 Use `reqvire collect` to gather complete context for a requirement:
@@ -423,6 +426,9 @@ reqvire link "Source" attaching "Specification Element"
 # Unlink elements
 reqvire unlink "Source" "Target"
 
+# Relink relation target in one atomic operation
+reqvire relink "Source" "derivedFrom" "Old Target" "New Target"
+
 # Move elements
 reqvire mv "Element" "target.md"
 reqvire mv "Element" "target.md" 0  # Move to specific position
@@ -501,6 +507,9 @@ reqvire link "Element" attaching "docs/spec.pdf" --dry-run
 
 # Preview unlink operation
 reqvire unlink "Element" "Parent" --dry-run
+
+# Preview relink operation
+reqvire relink "Element" "derivedFrom" "Old Parent" "New Parent" --dry-run
 ```
 
 **Best practice**: Always use `--dry-run` for destructive operations (rm, merge, mv-file) to verify changes before execution.

@@ -37,6 +37,9 @@ Use this skill for any requirements, specifications, verifications, or system-mo
    - Implementation coverage scope includes `requirement` elements only.
 8. Hierarchy integrity:
    - Requirement mutations must preserve single-root hierarchy ownership.
+   - Rationale: single-root ownership keeps requirement ownership unambiguous and keeps coverage/collect/change-impact outputs deterministic.
+   - Mutating commands (`link`, `merge`, `mv`, `relink`, etc.) must fail deterministically when they would violate single-root ownership.
+   - Expected failure output should explicitly include `Single-root hierarchy ownership violation`.
    - If command behavior is not explicit, verify with `reqvire validate` after mutation.
 
 ## Quick Start: Common Workflows
@@ -46,7 +49,7 @@ Use this skill for any requirements, specifications, verifications, or system-mo
 2. Explore current model:
    - `reqvire search --short --json | jq '.summary'`
    - `reqvire model`
-3. Apply change using reqvire commands (`add`, `link`, `unlink`, `mv`, `rename`, `rm`).
+3. Apply change using reqvire commands (`add`, `link`, `unlink`, `relink`, `mv`, `rename`, `rm`).
 4. Run validation and coverage.
 5. Summarize what changed and what still needs action.
 
