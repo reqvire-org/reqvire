@@ -12,10 +12,10 @@ The system shall provide the capability to create new model elements by acceptin
   * [Element Ordering Behavior](Behaviors.md#element-ordering-behavior)
   * [Attachment Hierarchical Independence Constraint](../Core/Constraints.md#attachment-hierarchical-independence-constraint)
   * [Attachment Satisfied Refinement Constraint](../Core/Constraints.md#attachment-satisfied-refinement-constraint)
+  * [Element Type Metadata Specification](../Core/Specifications.md#element-type-metadata-specification)
 
 #### Relations
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
-  * derivedFrom: [Reserved Subsections Support](../Core/StructureAndParsing.md#reserved-subsections-support)
   * refinedBy: [Create Element Override Behavior](Behaviors.md#create-element-override-behavior)
   * refinedBy: [Create Element Workflow Specification](Specifications.md#create-element-workflow-specification)
   * refinedBy: [Relation Validation Specification](Specifications.md#relation-validation-specification)
@@ -202,10 +202,12 @@ The system shall define target location validation constraints.
 #### Metadata
   * type: requirement
 
+#### Attachments
+  * [Ignore Files Specification](../Core/Specifications.md#ignore-files-specification)
+  * [Git Repository Scope Specification](../Core/Specifications.md#git-repository-scope-specification)
+
 #### Relations
-  * derivedFrom: [Ignore Files Integration](../Core/Configuration.md#ignore-files-integration)
   * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
-  * derivedFrom: [Git Repository as Project Root](../Core/ModelManagement.md#git-repository-as-project-root)
   * refinedBy: [Target Location Constraint](Constraints.md#target-location-constraint)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)

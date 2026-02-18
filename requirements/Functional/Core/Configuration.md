@@ -49,7 +49,6 @@ The system shall integrate with Git workflows by reading exclusion patterns from
   * type: requirement
 
 #### Relations
-  * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
   * refinedBy: [Ignore Files Specification](Specifications.md#ignore-files-specification)
   * satisfiedBy: [config.rs](../../../cli/src/config.rs)

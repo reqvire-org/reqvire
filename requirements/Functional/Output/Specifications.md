@@ -719,6 +719,34 @@ The resources report shall consist of two sections:
 Technical specification for submodels report structure and deterministic ordering.
 
 #### Details
+**Submodel Boundary Principle:**
+- Reqvire models are structured as independent hierarchical submodels, each with clear ownership, lifecycle, and stakeholder responsibility.
+- Hierarchical relations are used only for internal decomposition within a submodel.
+- Cross-submodel dependencies are expressed through explicit attachment contracts, not hierarchical coupling.
+- This preserves boundary clarity, supports independent evolution of submodels, and keeps collect, change-impact, and coverage outputs deterministic and auditable.
+
+**Refactor Rule:**
+When a relation crosses intended submodel boundaries, either:
+1. Move/reparent to restore hierarchical ownership, or
+2. Replace cross-boundary hierarchy links with attachment-based refinement contracts.
+
+**Refactor Procedure:**
+Apply boundary refactoring recursively, top-down:
+1. Start from each top root and inspect its first-level children.
+2. For each first-level child, inspect all direct children and relation edges.
+3. Continue recursively for each descendant branch until leaf requirements.
+4. At each level, enforce:
+   - hierarchical relations remain internal to that branch/submodel,
+   - cross-branch dependencies are attachment contracts.
+5. If a cross-boundary hierarchical relation is found, either:
+   - move/reparent to restore ownership, or
+   - replace with attachment-based refinement contract.
+6. Re-run validation and submodel analysis after each boundary slice before continuing recursion.
+
+**Internal Sub-Boundaries:**
+A submodel may contain internal sub-boundaries (nested domains) with separate ownership and lifecycle.
+Cross-internal-boundary dependencies should be modeled as explicit attachment contracts when they represent contractual dependency, not hierarchical ownership.
+
 **Submodel Resolution Rules:**
 - A submodel root is a requirement element with no hierarchical parent relation.
 - Submodel membership is resolved using hierarchical relations only, in downstream direction.

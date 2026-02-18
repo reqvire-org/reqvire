@@ -252,7 +252,6 @@ The system shall provide a resources report showing all files referenced by the 
   * type: user-requirement
 
 #### Relations
-  * derive: [CLI Resources Command](../../Interfaces/CLI/Commands.md#cli-resources-command)
   * derivedFrom: [Model Reports](#model-reports)
   * refinedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
   * verifiedBy: [Resources Report Verification](Verifications/ReportingVerifications.md#resources-report-verification)

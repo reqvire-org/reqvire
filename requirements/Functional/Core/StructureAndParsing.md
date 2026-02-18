@@ -99,7 +99,6 @@ Each reserved subsection has specific parsing rules, validation requirements, an
 #### Relations
   * derive: [Verification Type Categories](ModelManagement.md#verification-type-categories)
   * derive: [Attachment Target Validation](Validation.md#attachment-target-validation)
-  * derive: [Create Element Operation](../Operations/ElementManipulation.md#create-element-operation)
   * derive: [Attachment Commands](../../Interfaces/CLI/Commands.md#attachment-commands)
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * refinedBy: [ReservedSubsections](DesignDocuments/ReservedSubsections.md#reservedsubsections)

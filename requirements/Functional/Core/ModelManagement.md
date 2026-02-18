@@ -103,7 +103,6 @@ The system shall use the Git repository root as the project base for path resolu
   * [Containment Specification](../../Refinements.md#containment-specification)
 
 #### Relations
-  * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
   * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
   * refinedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
   * refinedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
