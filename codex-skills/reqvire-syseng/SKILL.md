@@ -29,13 +29,16 @@ Use this skill for any requirements, specifications, verifications, or system-mo
    - `reqvire lint`
    - `reqvire coverage`
 5. Use `reqvire collect` when implementing or reviewing requirements with trace dependencies.
-6. Relation/type guardrails:
+6. Use `reqvire submodels` to analyze independent requirement subgraphs and cross-submodel couplings before refactors.
+   - `reqvire submodels --from "<ROOT_NAME>"` means selected root is scope boundary (excluded from reported submodels).
+   - Scoped submodels are the first branch roots under the selected root.
+7. Relation/type guardrails:
    - `satisfiedBy`/`satisfy` are allowed on `requirement` and `test-verification`.
    - `user-requirement` must not use `satisfiedBy`/`satisfy`.
-7. Coverage interpretation:
+8. Coverage interpretation:
    - Verification coverage is reported for leaf requirements (roll-up logic applies).
    - Implementation coverage scope includes `requirement` elements only.
-8. Hierarchy integrity:
+9. Hierarchy integrity:
    - Requirement mutations must preserve single-root hierarchy ownership.
    - Rationale: single-root ownership keeps requirement ownership unambiguous and keeps coverage/collect/change-impact outputs deterministic.
    - Mutating commands (`link`, `merge`, `mv`, `relink`, etc.) must fail deterministically when they would violate single-root ownership.

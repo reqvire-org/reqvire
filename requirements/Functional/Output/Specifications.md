@@ -714,6 +714,55 @@ The resources report shall consist of two sections:
   * type: specification
 ---
 
+### Requirement Submodels Report Specification
+
+Technical specification for submodels report structure and deterministic ordering.
+
+#### Details
+**Submodel Resolution Rules:**
+- A submodel root is a requirement element with no hierarchical parent relation.
+- Submodel membership is resolved using hierarchical relations only, in downstream direction.
+- Each requirement shall be assigned to one resolved top root for report grouping.
+- For root-scoped report generation, the selected root defines report scope; it is not itself reported as a submodel entry.
+
+**Report Content:**
+- List all discovered submodels with:
+  - root identifier and display name
+  - root element type
+  - requirement count in that submodel
+- List cross-submodel requirement couplings:
+  - source requirement
+  - relation type
+  - target requirement
+  - source and target root context
+
+**Cross-Submodel Coupling Scope:**
+- Include requirement-to-requirement relations where source and target belong to different top roots.
+- Use explicit relation targets only (no inferred transitive links).
+- For root-scoped report generation, include only couplings relevant to submodels inside the selected root scope.
+
+**Output Formats:**
+*Text/Markdown Format:*
+- Human-readable sectioned report with deterministic ordering
+- Markdown links for source/target/root identifiers
+- Summary section with totals
+- When filtered by root scope:
+  - output submodels discovered within selected root scope
+  - do not output selected root as a submodel entry
+  - summary counts are computed from filtered output only
+
+*JSON Format:*
+- Structured arrays for `submodels` and `cross_submodel_couplings`
+- Summary object with deterministic count fields
+- Stable sort order for reproducible automation output
+- When filtered by root scope:
+  - JSON includes only filtered-scope submodel data and relevant couplings
+  - selected root is excluded from `submodels` array
+
+#### Metadata
+  * type: specification
+---
+
 ### SysML Rendering Specification
 
 SysML notation standards for relationship rendering in diagrams.

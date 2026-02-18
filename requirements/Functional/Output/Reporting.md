@@ -57,6 +57,7 @@ When requested the system shall generate reports summarizing the structure and r
 #### Relations
   * derive: [Containment View Report](#containment-view-report)
   * derive: [Model Diagram Output Formats](#model-diagram-output-formats)
+  * derive: [Requirement Submodels Report](#requirement-submodels-report)
   * derive: [Search Report Generator](#search-report-generator)
   * derivedFrom: [Model Reports](#model-reports)
 ---
@@ -255,6 +256,31 @@ The system shall provide a resources report showing all files referenced by the 
   * derivedFrom: [Model Reports](#model-reports)
   * refinedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
   * verifiedBy: [Resources Report Verification](Verifications/ReportingVerifications.md#resources-report-verification)
+---
+
+### Requirement Submodels Report
+
+The system shall provide a submodels report that identifies independent requirement hierarchies (by top roots) and cross-submodel requirement couplings.
+
+#### Details
+The report shall support:
+- Full model view listing all discovered submodels and cross-submodel couplings
+- Filtered view scoped to one root submodel by root identifier input
+- In filtered view, the selected root is a scope boundary and SHALL NOT be counted as a reported submodel entry
+
+Implementation details shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [RelationTypes](../Core/DesignDocuments/RelationTypes.md#relationtypes)
+
+#### Relations
+  * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+  * refinedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
+  * satisfiedBy: [report_submodels.rs](../../../core/src/report_submodels.rs)
+  * verifiedBy: [Submodels Report Verification](Verifications/ReportingVerifications.md#submodels-report-verification)
 ---
 
 ### Verification Coverage Report

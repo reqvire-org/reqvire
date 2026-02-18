@@ -26,6 +26,7 @@ Commands:
   rm-asset          Remove asset file and remove all references (Attachments and Relations)
   containment       Generate containment view showing folder/file/element hierarchy
   resources         Generate resources report showing files referenced by the model
+  submodels         Analyze independent requirement submodels and cross-submodel couplings
   collect           Collect content from requirement chain
   help               Print this message or the help of the given subcommand(s)
 
@@ -172,6 +173,11 @@ CONTAINMENT OPTIONS:
       --short                   Show only root elements (without hierarchical parents in same file)
 
 RESOURCES OPTIONS:
+      --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
+
+SUBMODELS OPTIONS:
+      --from <ROOT_NAME>        Filter report to a specific submodel root by name
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 

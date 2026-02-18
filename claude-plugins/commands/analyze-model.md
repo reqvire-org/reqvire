@@ -39,13 +39,19 @@ Perform comprehensive analysis of the current Reqvire model.
    reqvire lint --json --output /tmp/lint.json
    ```
 
-5. **Analyze the results:**
+5. **Analyze submodel boundaries:**
+   ```bash
+   reqvire submodels --json --output /tmp/submodels.json
+   ```
+
+6. **Analyze the results:**
    - Review validation errors and warnings
    - Identify unverified requirements from coverage report
    - Check for model quality issues from lint report
+   - Review cross-submodel couplings and boundary hotspots
    - Calculate coverage percentages and statistics
 
-6. **Provide recommendations:**
+7. **Provide recommendations:**
    - List specific issues found with file locations
    - Suggest improvements prioritized by impact
    - Recommend commands to fix issues (e.g., `reqvire lint --fix`)

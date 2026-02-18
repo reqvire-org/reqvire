@@ -741,6 +741,74 @@ This test verifies that the resources command correctly generates reports showin
   * verify: [CLI Resources Command](../../../Interfaces/CLI/Commands.md#cli-resources-command)
 ---
 
+### Submodels Report Verification
+
+This test verifies that the `submodels` command reports independent requirement hierarchies and cross-submodel requirement couplings with deterministic output.
+
+#### Details
+
+##### Acceptance Criteria
+- System shall provide CLI command `submodels`
+- Command shall support `--from <ROOT_NAME>` to filter report to one submodel root
+- Command shall support `--json` flag for JSON output format
+- Text output shall include:
+  - discovered submodels grouped by top root
+  - per-submodel requirement counts
+  - cross-submodel requirement coupling list
+  - summary totals
+- JSON output shall include `submodels`, `cross_submodel_couplings`, and `summary`
+- Output ordering shall be deterministic across runs
+
+##### Test Criteria
+1. **Basic text output**
+   Command: `reqvire submodels`
+   - exits code **0**
+   - output contains `## Submodels`
+   - output contains `## Cross-Submodel Couplings`
+   - output contains `## Summary`
+   - output matches expected fixture
+
+2. **JSON output structure**
+   Command: `reqvire submodels --json`
+   - exits code **0**
+   - output parses under `jq`
+   - contains `submodels` array with root metadata and requirement counts
+   - contains `cross_submodel_couplings` array with source/target and relation type fields
+   - contains `summary` with total counts
+   - output matches expected fixture
+
+3. **Root filter output**
+   Command: `reqvire submodels --from "Root One"`
+   - exits code **0**
+   - selected root is not listed as a submodel entry
+   - when selected root has multiple first-level child branches, each branch root is listed as a scoped submodel entry
+   - output contains only submodels discovered within selected root scope
+   - summary `Submodels` count matches filtered-scope submodels only
+   - output matches expected filtered fixture
+
+4. **Root filter JSON output**
+   Command: `reqvire submodels --from "Root One" --json`
+   - exits code **0**
+   - output parses under `jq`
+   - selected root does not appear in `submodels` array
+   - `submodels` includes one entry per first-level scoped branch root under the selected root
+   - `submodels` contains only filtered-scope submodels
+   - output matches expected filtered JSON fixture
+
+5. **Root filter missing root error**
+   Command: `reqvire submodels --from "Missing Root"`
+   - exits non-zero
+   - error message indicates submodel root not found
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-submodels-command/test.sh)
+  * verify: [Requirement Submodels Report](../Reporting.md#requirement-submodels-report)
+  * verify: [CLI Submodels Command](../../../Interfaces/CLI/Commands.md#cli-submodels-command)
+---
+
 ### Reverse Model Traversal Test
 
 Test verifies reverse traversal output against golden files for both JSON and Markdown modes.

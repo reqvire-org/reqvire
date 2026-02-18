@@ -27,6 +27,7 @@ pub mod lint;
 pub mod containment;
 pub mod report_collect;
 pub mod report_resources;
+pub mod report_submodels;
 
 // Re-export commonly used modules
 pub use crate::model::ModelManager;

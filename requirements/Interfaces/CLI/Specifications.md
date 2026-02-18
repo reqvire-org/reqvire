@@ -348,6 +348,31 @@ Command output is written to stdout for easy redirection to files.
   * refine: [CLI Resources Command](Commands.md#cli-resources-command)
 ---
 
+### CLI Submodels Command Refinement Specification
+
+#### Details
+Submodels command behavior:
+- Be invoked as `reqvire submodels`.
+- Support `--from <ROOT_NAME>` to filter report to one submodel root.
+- Support `--json` for JSON output format.
+- Default to human-readable text output when `--json` is not present.
+- Report independent requirement submodels using hierarchical (`derivedFrom`) relations.
+- Report cross-submodel requirement couplings using explicit requirement-to-requirement relations.
+- In `--from` mode, treat selected root as scope boundary and exclude it from reported `submodels` entries.
+- Provide deterministic ordering for submodels and couplings.
+- Include summary totals for submodels, requirements, and cross-submodel couplings.
+- Return a clear error when `--from` root name does not match any discovered submodel root.
+- Exit with status code 0 on success and non-zero on errors.
+
+Command output is written to stdout for easy redirection to files.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CLI Submodels Command](Commands.md#cli-submodels-command)
+---
+
 ### CLI Model Diagram Command Refinement Specification
 
 #### Details

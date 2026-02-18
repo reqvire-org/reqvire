@@ -1,0 +1,45 @@
+{
+  "submodels": [
+    {
+      "root_id": "specifications/Requirements.md#root-one",
+      "root_name": "Root One",
+      "root_type": "user-requirement",
+      "requirement_count": 5
+    },
+    {
+      "root_id": "specifications/Requirements.md#root-two",
+      "root_name": "Root Two",
+      "root_type": "user-requirement",
+      "requirement_count": 3
+    }
+  ],
+  "cross_submodel_couplings": [
+    {
+      "source_id": "specifications/Requirements.md#invoice-requirement",
+      "source_name": "Invoice Requirement",
+      "source_root_id": "specifications/Requirements.md#root-one",
+      "source_root_name": "Root One",
+      "relation_type": "trace",
+      "target_id": "specifications/Requirements.md#identity-requirement",
+      "target_name": "Identity Requirement",
+      "target_root_id": "specifications/Requirements.md#root-two",
+      "target_root_name": "Root Two"
+    },
+    {
+      "source_id": "specifications/Requirements.md#session-requirement",
+      "source_name": "Session Requirement",
+      "source_root_id": "specifications/Requirements.md#root-two",
+      "source_root_name": "Root Two",
+      "relation_type": "trace",
+      "target_id": "specifications/Requirements.md#payments-requirement",
+      "target_name": "Payments Requirement",
+      "target_root_id": "specifications/Requirements.md#root-one",
+      "target_root_name": "Root One"
+    }
+  ],
+  "summary": {
+    "total_submodels": 2,
+    "total_requirements": 8,
+    "total_cross_submodel_couplings": 2
+  }
+}

@@ -71,6 +71,7 @@ Implementation details shall follow the associated refinement specifications.
   * derive: [CLI Remove Element Command](#cli-remove-element-command)
   * derive: [CLI Rename Element Command](#cli-rename-element-command)
   * derive: [CLI Resources Command](#cli-resources-command)
+  * derive: [CLI Submodels Command](#cli-submodels-command)
   * derive: [CLI Search Command](#cli-search-command)
   * derive: [CLI Traces Command](#cli-traces-command)
   * derive: [Format Command](#format-command)
@@ -503,6 +504,33 @@ Implementation details shall follow the associated refinement specifications.
   * refinedBy: [CLI Resources Command Refinement Specification](Specifications.md#cli-resources-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Resources Report Verification](../../Functional/Output/Verifications/ReportingVerifications.md#resources-report-verification)
+---
+
+### CLI Submodels Command
+
+The system shall provide a `submodels` command that reports independent requirement hierarchies and cross-submodel requirement couplings.
+
+#### Details
+The command shall support:
+- `--from <ROOT_NAME>` to scope report output to one discovered submodel root by name
+- `--json` and `--output <FILE>` for machine-readable output
+- In `--from` mode, selected root is a scope boundary and is not listed as a submodel entry
+
+Implementation details shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
+  * [Requirement Submodels Report Specification](../../Functional/Output/Specifications.md#requirement-submodels-report-specification)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Submodels Command Refinement Specification](Specifications.md#cli-submodels-command-refinement-specification)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * verifiedBy: [Submodels Report Verification](../../Functional/Output/Verifications/ReportingVerifications.md#submodels-report-verification)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
 ---
 
 ### CLI Search Command

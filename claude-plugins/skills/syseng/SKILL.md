@@ -147,8 +147,11 @@ Refinements are owned via `refinedBy` on the requirement (refinement gets auto-g
 4. Validate after each significant change
 5. When reading requirements, always check for **attachments** (documents, diagrams, images)
 6. Use `reqvire collect` to gather full context from requirement chains (ancestors or descendants + attachments)
-7. Implementation coverage (`reqvire coverage`) applies to `requirement` elements only (not `user-requirement`).
-8. Hierarchy integrity:
+7. Use `reqvire submodels` to inspect independent requirement subgraphs and cross-submodel couplings before boundary refactors.
+   - `reqvire submodels --from "<ROOT_NAME>"`: selected root defines scope and is excluded from reported submodels.
+   - Scoped submodels are the first branch roots under that selected root.
+8. Implementation coverage (`reqvire coverage`) applies to `requirement` elements only (not `user-requirement`).
+9. Hierarchy integrity:
    - Requirement mutations must preserve single-root hierarchy ownership.
    - Rationale: single-root ownership keeps requirement ownership unambiguous and keeps coverage/collect/change-impact outputs deterministic.
    - Mutating commands (`link`, `merge`, `mv`, `relink`, etc.) should fail deterministically when they would violate single-root ownership.

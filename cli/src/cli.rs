@@ -18,6 +18,7 @@ use reqvire::report_collect;
 use reqvire::report_coverage;
 use reqvire::report_model;
 use reqvire::report_resources;
+use reqvire::report_submodels;
 use reqvire::verification_trace;
 use reqvire::GraphRegistry;
 use reqvire::ModelManager;
@@ -555,6 +556,24 @@ pub enum Commands {
         output: Option<String>,
     },
 
+    /// Analyze independent requirement submodels and cross-submodel couplings
+    #[clap(
+        override_help = "Analyze independent requirement submodels and cross-submodel couplings\n\nSUBMODELS OPTIONS:\n      --from <ROOT_NAME>  Filter report to a specific submodel root by name\n      --json              Output results in JSON format\n      --output <FILE>     Save JSON output to file (requires --json)"
+    )]
+    Submodels {
+        /// Filter report to a specific submodel root by name
+        #[clap(long, value_name = "ROOT_NAME", help_heading = "SUBMODELS OPTIONS")]
+        from: Option<String>,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "SUBMODELS OPTIONS")]
+        json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "SUBMODELS OPTIONS")]
+        output: Option<String>,
+    },
+
     /// Collect content from requirement chain
     #[clap(
         override_help = "Collect content from requirement chain\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the requirement element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)"
@@ -808,6 +827,7 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Coverage { json, .. }) => *json,
         Some(Commands::Model { json, .. }) => *json,
         Some(Commands::Lint { json, .. }) => *json,
+        Some(Commands::Submodels { json, .. }) => *json,
         _ => false,
     }
 }
@@ -871,6 +891,7 @@ pub async fn handle_command(
             Commands::MvFile { output, json, .. } => (output.is_some(), *json),
             Commands::Containment { output, json, .. } => (output.is_some(), *json),
             Commands::Resources { output, json, .. } => (output.is_some(), *json),
+            Commands::Submodels { output, json, .. } => (output.is_some(), *json),
             Commands::Collect { output, json, .. } => (output.is_some(), *json),
             _ => (false, false),
         };
@@ -1593,6 +1614,16 @@ pub async fn handle_command(
                 let report =
                     report_resources::generate_resources_report(&model_manager.graph_registry);
                 report.print(false);
+            }
+            Ok(0)
+        }
+        Some(Commands::Submodels { from, json, output }) => {
+            let report =
+                report_submodels::generate_submodels_report(&model_manager.graph_registry, from.as_deref())?;
+            if json {
+                handle_json_output(&report.to_json_string(), &output)?;
+            } else {
+                println!("{}", report.format_text());
             }
             Ok(0)
         }
