@@ -177,7 +177,7 @@ RESOURCES OPTIONS:
       --output <FILE>           Save JSON output to file (requires --json)
 
 SUBMODELS OPTIONS:
-      --from <ROOT_NAME>        Filter report to a specific submodel root by name
+      --from <NAME>             Scope report to a specific requirement subtree by name
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 

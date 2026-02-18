@@ -512,9 +512,9 @@ The system shall provide a `submodels` command that reports independent requirem
 
 #### Details
 The command shall support:
-- `--from <ROOT_NAME>` to scope report output to one discovered submodel root by name
+- `--from <NAME>` to scope report output to one requirement subtree by name
 - `--json` and `--output <FILE>` for machine-readable output
-- In `--from` mode, selected root is a scope boundary and is not listed as a submodel entry
+- In `--from` mode, selected requirement is a scope boundary and is not listed as a submodel entry
 
 Implementation details shall follow the associated refinement specifications.
 

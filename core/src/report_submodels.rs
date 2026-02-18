@@ -186,7 +186,7 @@ fn resolve_top_roots(
 
 pub fn generate_submodels_report(
     registry: &GraphRegistry,
-    from_root_name: Option<&str>,
+    from_name: Option<&str>,
 ) -> Result<SubmodelsReport, ReqvireError> {
     let hierarchical_relations = get_hierarchical_relation_types();
 
@@ -325,15 +325,29 @@ pub fn generate_submodels_report(
         cross_submodel_couplings: couplings,
     };
 
-    if let Some(root_name) = from_root_name {
-        let Some(root) = report.submodels.iter().find(|s| s.root_name == root_name) else {
-            return Err(ReqvireError::ElementNotFound(format!(
-                "Submodel root '{}' not found",
-                root_name
-            )));
+    if let Some(from_name) = from_name {
+        let from_id = match registry.find_element_by_name(from_name) {
+            Ok(id) => id,
+            Err(ReqvireError::MissingElement(_)) | Err(ReqvireError::ElementNotFound(_)) => {
+                return Err(ReqvireError::ElementNotFound(format!(
+                    "Submodel root '{}' not found",
+                    from_name
+                )));
+            }
+            Err(other) => return Err(other),
         };
+        let from_element = registry
+            .get_element(&from_id)
+            .ok_or_else(|| ReqvireError::ElementNotFound(from_id.clone()))?;
 
-        let root_id = root.root_id.clone();
+        if !matches!(from_element.element_type, ElementType::Requirement(_)) {
+            return Err(ReqvireError::InvalidOperation(format!(
+                "Submodel scope source '{}' must be a requirement",
+                from_name
+            )));
+        }
+
+        let root_id = from_id;
         let mut child_map: HashMap<String, Vec<String>> = HashMap::new();
         for (child_id, parent_ids) in &parent_map {
             for parent_id in parent_ids {
@@ -357,7 +371,7 @@ pub fn generate_submodels_report(
             }
         }
 
-        // The selected root defines scope boundary, but is not a reported submodel entry.
+        // The selected requirement defines scope boundary, but is not a reported submodel entry.
         scoped_nodes.remove(&root_id);
 
         let mut scoped_parent_map: HashMap<String, Vec<String>> = HashMap::new();

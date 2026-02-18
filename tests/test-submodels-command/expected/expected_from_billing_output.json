@@ -1,0 +1,16 @@
+{
+  "submodels": [
+    {
+      "root_id": "specifications/Requirements.md#receipt-requirement",
+      "root_name": "Receipt Requirement",
+      "root_type": "requirement",
+      "requirement_count": 1
+    }
+  ],
+  "cross_submodel_couplings": [],
+  "summary": {
+    "total_submodels": 1,
+    "total_requirements": 1,
+    "total_cross_submodel_couplings": 0
+  }
+}

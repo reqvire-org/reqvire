@@ -123,7 +123,87 @@ if ! diff -u \
   exit 1
 fi
 
-# Test 6: --from missing root should fail
+# Test 6: --from branch output should report only branch submodels
+set +e
+BRANCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Billing Requirement" 2>&1)
+BRANCH_EXIT=$?
+set -e
+
+if [ $BRANCH_EXIT -ne 0 ]; then
+  echo "FAILED: submodels --from Billing Requirement exited with code $BRANCH_EXIT"
+  echo "$BRANCH_OUTPUT"
+  exit 1
+fi
+
+printf "%s\n" "$BRANCH_OUTPUT" > "$TEST_DIR/output/submodels.from-billing.actual.md"
+assert_file_matches \
+  "$TEST_SCRIPT_DIR/expected/expected_from_billing_output.md" \
+  "$TEST_DIR/output/submodels.from-billing.actual.md" \
+  "Submodels --from Billing Requirement text output mismatch"
+
+# Test 7: --from branch JSON output should report branch subtree summary
+set +e
+BRANCH_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Billing Requirement" --json 2>&1)
+BRANCH_JSON_EXIT=$?
+set -e
+
+if [ $BRANCH_JSON_EXIT -ne 0 ]; then
+  echo "FAILED: submodels --from Billing Requirement --json exited with code $BRANCH_JSON_EXIT"
+  echo "$BRANCH_JSON_OUTPUT"
+  exit 1
+fi
+
+printf "%s\n" "$BRANCH_JSON_OUTPUT" > "$TEST_DIR/output/submodels.from-billing.actual.json"
+if ! diff -u \
+  <(jq -S . "$TEST_SCRIPT_DIR/expected/expected_from_billing_output.json") \
+  <(jq -S . "$TEST_DIR/output/submodels.from-billing.actual.json"); then
+  echo "FAILED: Submodels --from Billing Requirement JSON output mismatch"
+  echo ""
+  echo "If changes are intentional, update $TEST_SCRIPT_DIR/expected/expected_from_billing_output.json"
+  exit 1
+fi
+
+# Test 8: --from leaf requirement should produce empty scoped result
+set +e
+LEAF_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Invoice Requirement" 2>&1)
+LEAF_EXIT=$?
+set -e
+
+if [ $LEAF_EXIT -ne 0 ]; then
+  echo "FAILED: submodels --from Invoice Requirement exited with code $LEAF_EXIT"
+  echo "$LEAF_OUTPUT"
+  exit 1
+fi
+
+printf "%s\n" "$LEAF_OUTPUT" > "$TEST_DIR/output/submodels.from-invoice.actual.md"
+assert_file_matches \
+  "$TEST_SCRIPT_DIR/expected/expected_from_invoice_output.md" \
+  "$TEST_DIR/output/submodels.from-invoice.actual.md" \
+  "Submodels --from Invoice Requirement text output mismatch"
+
+# Test 9: --from leaf requirement JSON output should be empty result
+set +e
+LEAF_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Invoice Requirement" --json 2>&1)
+LEAF_JSON_EXIT=$?
+set -e
+
+if [ $LEAF_JSON_EXIT -ne 0 ]; then
+  echo "FAILED: submodels --from Invoice Requirement --json exited with code $LEAF_JSON_EXIT"
+  echo "$LEAF_JSON_OUTPUT"
+  exit 1
+fi
+
+printf "%s\n" "$LEAF_JSON_OUTPUT" > "$TEST_DIR/output/submodels.from-invoice.actual.json"
+if ! diff -u \
+  <(jq -S . "$TEST_SCRIPT_DIR/expected/expected_from_invoice_output.json") \
+  <(jq -S . "$TEST_DIR/output/submodels.from-invoice.actual.json"); then
+  echo "FAILED: Submodels --from Invoice Requirement JSON output mismatch"
+  echo ""
+  echo "If changes are intentional, update $TEST_SCRIPT_DIR/expected/expected_from_invoice_output.json"
+  exit 1
+fi
+
+# Test 10: --from missing root should fail
 set +e
 MISSING_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Missing Root" 2>&1)
 MISSING_EXIT=$?

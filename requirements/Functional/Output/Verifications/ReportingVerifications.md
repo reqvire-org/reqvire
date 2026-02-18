@@ -749,7 +749,7 @@ This test verifies that the `submodels` command reports independent requirement 
 
 ##### Acceptance Criteria
 - System shall provide CLI command `submodels`
-- Command shall support `--from <ROOT_NAME>` to filter report to one submodel root
+- Command shall support `--from <NAME>` to scope report to one requirement subtree
 - Command shall support `--json` flag for JSON output format
 - Text output shall include:
   - discovered submodels grouped by top root
@@ -780,9 +780,9 @@ This test verifies that the `submodels` command reports independent requirement 
 3. **Root filter output**
    Command: `reqvire submodels --from "Root One"`
    - exits code **0**
-   - selected root is not listed as a submodel entry
-   - when selected root has multiple first-level child branches, each branch root is listed as a scoped submodel entry
-   - output contains only submodels discovered within selected root scope
+   - selected scope is not listed as a submodel entry
+   - when selected scope has multiple first-level child branches, each branch root is listed as a scoped submodel entry
+   - output contains only submodels discovered within selected scope
    - summary `Submodels` count matches filtered-scope submodels only
    - output matches expected filtered fixture
 
@@ -790,15 +790,15 @@ This test verifies that the `submodels` command reports independent requirement 
    Command: `reqvire submodels --from "Root One" --json`
    - exits code **0**
    - output parses under `jq`
-   - selected root does not appear in `submodels` array
-   - `submodels` includes one entry per first-level scoped branch root under the selected root
+   - selected scope does not appear in `submodels` array
+   - `submodels` includes one entry per first-level scoped branch root under the selected scope
    - `submodels` contains only filtered-scope submodels
    - output matches expected filtered JSON fixture
 
 5. **Root filter missing root error**
    Command: `reqvire submodels --from "Missing Root"`
    - exits non-zero
-   - error message indicates submodel root not found
+   - error message indicates selected scope was not found
 
 #### Metadata
   * type: test-verification

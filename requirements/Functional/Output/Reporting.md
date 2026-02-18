@@ -264,8 +264,8 @@ The system shall provide a submodels report that identifies independent requirem
 #### Details
 The report shall support:
 - Full model view listing all discovered submodels and cross-submodel couplings
-- Filtered view scoped to one root submodel by root identifier input
-- In filtered view, the selected root is a scope boundary and SHALL NOT be counted as a reported submodel entry
+- Filtered view scoped to one requirement subtree by requirement name
+- In filtered view, the selected requirement is a scope boundary and SHALL NOT be counted as a reported submodel entry
 
 Implementation details shall follow the associated refinement specifications.
 

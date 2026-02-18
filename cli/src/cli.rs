@@ -558,11 +558,11 @@ pub enum Commands {
 
     /// Analyze independent requirement submodels and cross-submodel couplings
     #[clap(
-        override_help = "Analyze independent requirement submodels and cross-submodel couplings\n\nSUBMODELS OPTIONS:\n      --from <ROOT_NAME>  Filter report to a specific submodel root by name\n      --json              Output results in JSON format\n      --output <FILE>     Save JSON output to file (requires --json)"
+        override_help = "Analyze independent requirement submodels and cross-submodel couplings\n\nSUBMODELS OPTIONS:\n      --from <NAME>      Scope report to a specific requirement subtree by name\n      --json              Output results in JSON output format\n      --output <FILE>     Save JSON output to file (requires --json)"
     )]
     Submodels {
-        /// Filter report to a specific submodel root by name
-        #[clap(long, value_name = "ROOT_NAME", help_heading = "SUBMODELS OPTIONS")]
+        /// Scope report to a specific requirement subtree by name
+        #[clap(long, value_name = "NAME", help_heading = "SUBMODELS OPTIONS")]
         from: Option<String>,
 
         /// Output results in JSON format

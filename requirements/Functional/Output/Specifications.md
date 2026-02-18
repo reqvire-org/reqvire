@@ -751,7 +751,7 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
 - A submodel root is a requirement element with no hierarchical parent relation.
 - Submodel membership is resolved using hierarchical relations only, in downstream direction.
 - Each requirement shall be assigned to one resolved top root for report grouping.
-- For root-scoped report generation, the selected root defines report scope; it is not itself reported as a submodel entry.
+- For scope-scoped report generation, the selected requirement defines report scope; it is not itself reported as a submodel entry.
 
 **Report Content:**
 - List all discovered submodels with:
@@ -767,25 +767,25 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
 **Cross-Submodel Coupling Scope:**
 - Include requirement-to-requirement relations where source and target belong to different top roots.
 - Use explicit relation targets only (no inferred transitive links).
-- For root-scoped report generation, include only couplings relevant to submodels inside the selected root scope.
+- For scope-scoped report generation, include only couplings relevant to submodels inside the selected scope.
 
 **Output Formats:**
 *Text/Markdown Format:*
 - Human-readable sectioned report with deterministic ordering
 - Markdown links for source/target/root identifiers
 - Summary section with totals
-- When filtered by root scope:
-  - output submodels discovered within selected root scope
-  - do not output selected root as a submodel entry
+- When filtered by scope:
+  - output submodels discovered within selected scope
+  - do not output selected scope boundary as a submodel entry
   - summary counts are computed from filtered output only
 
 *JSON Format:*
 - Structured arrays for `submodels` and `cross_submodel_couplings`
 - Summary object with deterministic count fields
 - Stable sort order for reproducible automation output
-- When filtered by root scope:
+- When filtered by scope:
   - JSON includes only filtered-scope submodel data and relevant couplings
-  - selected root is excluded from `submodels` array
+  - selected scope boundary is excluded from `submodels` array
 
 #### Metadata
   * type: specification
