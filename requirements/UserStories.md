@@ -10,7 +10,6 @@
 | **Manager** | Oversees project progress, tracks metrics, and ensures alignment with organizational objectives |
 | **Contributor** | Open-source contributor who collaborates on the Reqvire project |
 
-
 ### AI-Assisted System Model Management
 
 As a **Systems Engineer**, I want to efficiently manage System models using AI-powered tools and LLM-based assistants.
@@ -69,124 +68,11 @@ As a **System Engineer**, I want a well-defined model structure and file identif
   * type: user-requirement
 
 #### Relations
-  * derive: [Specification File Identification](Functional/Core/StructureAndParsing.md#specification-file-identification)
-  * derive: [Structure and Addressing in Markdown Documents](Functional/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * derive: [Coexistence of Structured and Unstructured Documents](Functional/Core/Configuration.md#coexistence-of-structured-and-unstructured-documents)
   * derive: [Git Repository as Project Root](Functional/Core/ModelManagement.md#git-repository-as-project-root)
+  * derive: [Specification File Identification](Functional/Core/StructureAndParsing.md#specification-file-identification)
+  * derive: [Structure and Addressing in Markdown Documents](Functional/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
   * derive: [Single Root Hierarchy Ownership](Functional/Core/Validation.md#single-root-hierarchy-ownership)
----
-
-### Formatting Model Documents
-
-As a **System Engineer**, I want to automatically format model documents to ensure consistent structure and style across all specification files.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-
----
-
-### Fostering Community Contributions
-
-As a **Contributor**, I want Reqvire tools to be intuitive and well-documented, so that I can contribute effectively to the open-source project.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
----
-
-### Generate Diagrams
-
-As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derive: [Interactive Mermaid Diagrams](Functional/Output/DiagramGeneration.md#interactive-mermaid-diagrams)
-  * derivedFrom: [Provide Reports](#provide-reports)
----
-
-### Linting Model Quality
-
-As a **System Engineer**, I want to lint model documents to detect and fix quality issues such as missing relations, orphaned elements, and inconsistencies.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
----
-
-### Operating on Model Elements
-
-As a **System Engineer**, I want to create, modify, move, and delete model elements programmatically, so that I can efficiently maintain and evolve the system model over time.
-
-#### Details
-This user story covers all operations that modify model elements:
-- Element manipulation operations (add, remove, move, rename, merge)
-- Default type assignment for new elements
-- Efficient processing of model changes
-- Template-based model bootstrapping
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [Promote Automation and Efficiency](#promote-automation-and-efficiency)
----
-
-### Promote Automation and Efficiency
-
-As as **System Engineer**, I would like to reduce manual effort in managing requirements, models, and traceability by automating routine tasks.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derive: [Efficient Processing](Functional/Core/ModelManagement.md#efficient-processing)
-  * derive: [Integrate with GitHub Workflows](#integrate-with-github-workflows)
----
-
-### Integrate with GitHub Workflows
-
-As a **Contributor**, I want Reqvire to integrate seamlessly with GitHub workflows, so that I can collaborate on updates and manage contributions effectively.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derive: [Automate Documentation Export](Functional/Integration/GitHubIntegration.md#automate-documentation-export)
-  * derive: [Automate Pull Request Validations](Functional/Integration/GitHubIntegration.md#automate-pull-request-validations)
-  * derive: [Generate Change Logs for Pull Requests](Functional/Integration/GitHubIntegration.md#generate-change-logs-for-pull-requests)
-  * derivedFrom: [Promote Automation and Efficiency](#promote-automation-and-efficiency)
----
-
-### Provide Reports
-
-As a **Manager**, I want to generate structured reports based on the System model, so that I can track progress and ensure alignment with organizational objectives.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derive: [Model Reports](Functional/Output/Reporting.md#model-reports)
----
-
-### System Model Interfaces
-
-As a **System Engineer**, I want to interact with the system model through multiple interfaces, so that I can choose the most appropriate tool for my workflow.
-
-#### Details
-This user story covers the different ways to access and manage system models:
-- Command-line interface for automation and scripting
-- Web interface for browsing and visualization
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
 ---
 
 ### Trace Changes in System Model
@@ -217,6 +103,102 @@ As an **System Engineer**, I want to validate the structure of System models, so
   * derivedFrom: [Defining Model Structure](#defining-model-structure)
 ---
 
+### Formatting Model Documents
+
+As a **System Engineer**, I want to automatically format model documents to ensure consistent structure and style across all specification files.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Linting Model Quality
+
+As a **System Engineer**, I want to lint model documents to detect and fix quality issues such as missing relations, orphaned elements, and inconsistencies.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Promote Automation and Efficiency
+
+As as **System Engineer**, I would like to reduce manual effort in managing requirements, models, and traceability by automating routine tasks.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derive: [Efficient Processing](Functional/Core/ModelManagement.md#efficient-processing)
+  * derive: [Integrate with GitHub Workflows](#integrate-with-github-workflows)
+---
+
+### Integrate with GitHub Workflows
+
+As a **Contributor**, I want Reqvire to integrate seamlessly with GitHub workflows, so that I can collaborate on updates and manage contributions effectively.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derive: [Automate Documentation Export](Functional/Integration/GitHubIntegration.md#automate-documentation-export)
+  * derive: [Automate Pull Request Validations](Functional/Integration/GitHubIntegration.md#automate-pull-request-validations)
+  * derive: [Generate Change Logs for Pull Requests](Functional/Integration/GitHubIntegration.md#generate-change-logs-for-pull-requests)
+  * derivedFrom: [Promote Automation and Efficiency](#promote-automation-and-efficiency)
+---
+
+### Operating on Model Elements
+
+As a **System Engineer**, I want to create, modify, move, and delete model elements programmatically, so that I can efficiently maintain and evolve the system model over time.
+
+#### Details
+This user story covers all operations that modify model elements:
+- Element manipulation operations (add, remove, move, rename, merge)
+- Default type assignment for new elements
+- Efficient processing of model changes
+- Template-based model bootstrapping
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derivedFrom: [Promote Automation and Efficiency](#promote-automation-and-efficiency)
+---
+
+### Provide Reports
+
+As a **Manager**, I want to generate structured reports based on the System model, so that I can track progress and ensure alignment with organizational objectives.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derive: [Model Reports](Functional/Output/Reporting.md#model-reports)
+---
+
+### Generate Diagrams
+
+As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * derive: [Interactive Mermaid Diagrams](Functional/Output/DiagramGeneration.md#interactive-mermaid-diagrams)
+  * derivedFrom: [Provide Reports](#provide-reports)
+---
+
+### System Model Interfaces
+
+As a **System Engineer**, I want to interact with the system model through multiple interfaces, so that I can choose the most appropriate tool for my workflow.
+
+#### Details
+This user story covers the different ways to access and manage system models:
+- Command-line interface for automation and scripting
+- Web interface for browsing and visualization
+
+#### Metadata
+  * type: user-requirement
+---
+
 ### Verification Traceability
 
 As a **V&V Engineer**, I want to trace verification coverage through the requirement hierarchy, so that I can ensure all requirements are properly verified and identify gaps in verification.
@@ -227,3 +209,4 @@ As a **V&V Engineer**, I want to trace verification coverage through the require
 #### Relations
   * derive: [Verification Upward Traceability](Functional/Processing/VerificationTraces.md#verification-upward-traceability)
 ---
+

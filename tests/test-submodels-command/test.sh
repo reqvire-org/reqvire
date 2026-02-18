@@ -16,6 +16,77 @@ assert_file_matches() {
   fi
 }
 
+assert_summary_counts() {
+  local output_file="$1"
+  local expected_submodels="$2"
+  local expected_requirements="$3"
+  local expected_couplings="$4"
+  local description="$5"
+
+  local actual_submodels actual_requirements actual_couplings
+  actual_submodels=$(grep -F -- "- **Submodels:** " "$output_file" | awk '{print $3}' | head -n 1)
+  actual_requirements=$(grep -F -- "- **Requirements:** " "$output_file" | awk '{print $3}' | head -n 1)
+  actual_couplings=$(grep -F -- "- **Cross-Submodel Couplings:** " "$output_file" | awk '{print $3}' | head -n 1)
+
+  if [ -z "$actual_submodels" ] || [ -z "$actual_requirements" ] || [ -z "$actual_couplings" ]; then
+    echo "FAILED: $description"
+    echo "Summary lines missing in $output_file"
+    exit 1
+  fi
+
+  if [ "$actual_submodels" -ne "$expected_submodels" ]; then
+    echo "FAILED: $description"
+    echo "Expected summary submodels=$expected_submodels, got=$actual_submodels"
+    exit 1
+  fi
+
+  if [ "$actual_requirements" -ne "$expected_requirements" ]; then
+    echo "FAILED: $description"
+    echo "Expected summary requirements=$expected_requirements, got=$actual_requirements"
+    exit 1
+  fi
+
+  if [ "$actual_couplings" -ne "$expected_couplings" ]; then
+    echo "FAILED: $description"
+    echo "Expected summary cross-submodel couplings=$expected_couplings, got=$actual_couplings"
+    exit 1
+  fi
+}
+
+assert_json_summary_counts() {
+  local json_file="$1"
+  local expected_submodels="$2"
+  local expected_requirements="$3"
+  local expected_couplings="$4"
+  local description="$5"
+
+  local actual_submodels
+  local actual_requirements
+  local actual_couplings
+
+  actual_submodels=$(jq -r '.summary.total_submodels' "$json_file")
+  actual_requirements=$(jq -r '.summary.total_requirements' "$json_file")
+  actual_couplings=$(jq -r '.summary.total_cross_submodel_couplings' "$json_file")
+
+  if [ "$actual_submodels" != "$expected_submodels" ]; then
+    echo "FAILED: $description"
+    echo "Expected summary.total_submodels=$expected_submodels, got=$actual_submodels"
+    exit 1
+  fi
+
+  if [ "$actual_requirements" != "$expected_requirements" ]; then
+    echo "FAILED: $description"
+    echo "Expected summary.total_requirements=$expected_requirements, got=$actual_requirements"
+    exit 1
+  fi
+
+  if [ "$actual_couplings" != "$expected_couplings" ]; then
+    echo "FAILED: $description"
+    echo "Expected summary.total_cross_submodel_couplings=$expected_couplings, got=$actual_couplings"
+    exit 1
+  fi
+}
+
 # Test 1: text output
 set +e
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels 2>&1)
@@ -33,6 +104,10 @@ assert_file_matches \
   "$TEST_SCRIPT_DIR/expected/expected_output.md" \
   "$TEST_DIR/output/submodels.actual.md" \
   "Submodels text output mismatch"
+assert_summary_counts \
+  "$TEST_DIR/output/submodels.actual.md" \
+  2 8 2 \
+  "Submodels text summary counts mismatch"
 
 # Test 2: JSON stdout
 set +e
@@ -55,6 +130,10 @@ if ! diff -u \
   echo "If changes are intentional, update $TEST_SCRIPT_DIR/expected/expected_output.json"
   exit 1
 fi
+assert_json_summary_counts \
+  "$TEST_DIR/output/submodels.actual.json" \
+  2 8 2 \
+  "Submodels JSON summary counts mismatch"
 
 # Test 3: JSON file output
 set +e
@@ -100,6 +179,10 @@ assert_file_matches \
   "$TEST_SCRIPT_DIR/expected/expected_from_root_one_output.md" \
   "$TEST_DIR/output/submodels.from-root-one.actual.md" \
   "Submodels --from text output mismatch"
+assert_summary_counts \
+  "$TEST_DIR/output/submodels.from-root-one.actual.md" \
+  2 4 2 \
+  "Submodels --from summary counts mismatch"
 
 # Test 5: --from JSON output
 set +e
@@ -122,6 +205,10 @@ if ! diff -u \
   echo "If changes are intentional, update $TEST_SCRIPT_DIR/expected/expected_from_root_one_output.json"
   exit 1
 fi
+assert_json_summary_counts \
+  "$TEST_DIR/output/submodels.from-root-one.actual.json" \
+  2 4 2 \
+  "Submodels --from JSON summary counts mismatch"
 
 # Test 6: --from branch output should report only branch submodels
 set +e
@@ -140,6 +227,10 @@ assert_file_matches \
   "$TEST_SCRIPT_DIR/expected/expected_from_billing_output.md" \
   "$TEST_DIR/output/submodels.from-billing.actual.md" \
   "Submodels --from Billing Requirement text output mismatch"
+assert_summary_counts \
+  "$TEST_DIR/output/submodels.from-billing.actual.md" \
+  1 1 0 \
+  "Submodels --from Billing Requirement summary counts mismatch"
 
 # Test 7: --from branch JSON output should report branch subtree summary
 set +e
@@ -162,6 +253,10 @@ if ! diff -u \
   echo "If changes are intentional, update $TEST_SCRIPT_DIR/expected/expected_from_billing_output.json"
   exit 1
 fi
+assert_json_summary_counts \
+  "$TEST_DIR/output/submodels.from-billing.actual.json" \
+  1 1 0 \
+  "Submodels --from Billing Requirement JSON summary counts mismatch"
 
 # Test 8: --from leaf requirement should produce empty scoped result
 set +e
@@ -180,6 +275,10 @@ assert_file_matches \
   "$TEST_SCRIPT_DIR/expected/expected_from_invoice_output.md" \
   "$TEST_DIR/output/submodels.from-invoice.actual.md" \
   "Submodels --from Invoice Requirement text output mismatch"
+assert_summary_counts \
+  "$TEST_DIR/output/submodels.from-invoice.actual.md" \
+  0 0 0 \
+  "Submodels --from Invoice Requirement summary counts mismatch"
 
 # Test 9: --from leaf requirement JSON output should be empty result
 set +e
@@ -202,6 +301,10 @@ if ! diff -u \
   echo "If changes are intentional, update $TEST_SCRIPT_DIR/expected/expected_from_invoice_output.json"
   exit 1
 fi
+assert_json_summary_counts \
+  "$TEST_DIR/output/submodels.from-invoice.actual.json" \
+  0 0 0 \
+  "Submodels --from Invoice Requirement JSON summary counts mismatch"
 
 # Test 10: --from missing root should fail
 set +e

@@ -265,7 +265,11 @@ The system shall provide a submodels report that identifies independent requirem
 The report shall support:
 - Full model view listing all discovered submodels and cross-submodel couplings
 - Filtered view scoped to one requirement subtree by requirement name
-- In filtered view, the selected requirement is a scope boundary and SHALL NOT be counted as a reported submodel entry
+- Scope filtering follows transitive descendants via hierarchical edges in downstream direction, so the selected requirement defines a boundary subtree.
+- When a selected subtree has no child sub-requirements, the filtered report contains zero scoped submodels.
+- In filtered view, the selected requirement is a scope boundary and is not counted as a reported submodel entry
+- The report summary includes deterministic counts for total submodels, total requirements represented in scope, and total cross-submodel couplings; in scoped mode, counts are computed from the scoped submodels and couplings only.
+- Summary content follows the report paragraph: `Submodels`, `Requirements`, and `Cross-Submodel Couplings`.
 
 Implementation details shall follow the associated refinement specifications.
 

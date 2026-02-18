@@ -766,6 +766,8 @@ This test verifies that the `submodels` command reports independent requirement 
    - output contains `## Submodels`
    - output contains `## Cross-Submodel Couplings`
    - output contains `## Summary`
+   - summary block includes `**Submodels:**`, `**Requirements:**`, and `**Cross-Submodel Couplings:**`
+   - summary counts match fixture totals
    - output matches expected fixture
 
 2. **JSON output structure**
@@ -774,7 +776,10 @@ This test verifies that the `submodels` command reports independent requirement 
    - output parses under `jq`
    - contains `submodels` array with root metadata and requirement counts
    - contains `cross_submodel_couplings` array with source/target and relation type fields
-   - contains `summary` with total counts
+   - summary fields match fixture totals:
+     - `summary.total_submodels`
+     - `summary.total_requirements`
+     - `summary.total_cross_submodel_couplings`
    - output matches expected fixture
 
 3. **Root filter output**
@@ -784,6 +789,7 @@ This test verifies that the `submodels` command reports independent requirement 
    - when selected scope has multiple first-level child branches, each branch root is listed as a scoped submodel entry
    - output contains only submodels discovered within selected scope
    - summary `Submodels` count matches filtered-scope submodels only
+   - summary `Requirements` and `Cross-Submodel Couplings` counts reflect selected scope only
    - output matches expected filtered fixture
 
 4. **Root filter JSON output**
@@ -793,6 +799,7 @@ This test verifies that the `submodels` command reports independent requirement 
    - selected scope does not appear in `submodels` array
    - `submodels` includes one entry per first-level scoped branch root under the selected scope
    - `submodels` contains only filtered-scope submodels
+   - `summary.total_requirements` and `summary.total_cross_submodel_couplings` are derived from selected-scope couplings
    - output matches expected filtered JSON fixture
 
 5. **Root filter missing root error**

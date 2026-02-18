@@ -769,6 +769,11 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
 - Use explicit relation targets only (no inferred transitive links).
 - For scope-scoped report generation, include only couplings relevant to submodels inside the selected scope.
 
+**Scope Resolution Rules:**
+- In scope mode, select a requirement by name and compute the induced downstream subtree via hierarchical relations.
+- Submodel roots for scope mode are first-level roots of this induced subtree where no parent in the induced subtree exists.
+- If the selected boundary has no children in the induced subtree, `submodels` output is empty.
+
 **Output Formats:**
 *Text/Markdown Format:*
 - Human-readable sectioned report with deterministic ordering
@@ -786,6 +791,13 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
 - When filtered by scope:
   - JSON includes only filtered-scope submodel data and relevant couplings
   - selected scope boundary is excluded from `submodels` array
+
+**Summary Section Semantics:**
+- Summary reports:
+  - `Submodels`: number of scoped top-level submodel roots returned
+  - `Requirements`: number of requirements counted across returned scoped submodels
+  - `Cross-Submodel Couplings`: number of qualifying couplings for the active scope
+- In scoped mode, all summary fields are derived from scoped submodel and coupling sets only.
 
 #### Metadata
   * type: specification
