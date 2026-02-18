@@ -16,9 +16,6 @@ As a **Systems Engineer**, I want to efficiently manage System models using AI-p
 
 #### Metadata
   * type: user-requirement
-
-#### Relations
-  * derive: [AI Assistant Skill-Guided Reqvire Modeling](Functional/Integration/AISkills.md#ai-assistant-skill-guided-reqvire-modeling)
 ---
 
 ### AI Assistant Skill Authoring for Reqvire
@@ -72,7 +69,6 @@ As a **System Engineer**, I want a well-defined model structure and file identif
   * derive: [Git Repository as Project Root](Functional/Core/ModelManagement.md#git-repository-as-project-root)
   * derive: [Specification File Identification](Functional/Core/StructureAndParsing.md#specification-file-identification)
   * derive: [Structure and Addressing in Markdown Documents](Functional/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents)
-  * derive: [Single Root Hierarchy Ownership](Functional/Core/Validation.md#single-root-hierarchy-ownership)
 ---
 
 ### Trace Changes in System Model
@@ -127,7 +123,6 @@ As as **System Engineer**, I would like to reduce manual effort in managing requ
   * type: user-requirement
 
 #### Relations
-  * derive: [Efficient Processing](Functional/Core/ModelManagement.md#efficient-processing)
   * derive: [Integrate with GitHub Workflows](#integrate-with-github-workflows)
 ---
 
@@ -209,4 +204,3 @@ As a **V&V Engineer**, I want to trace verification coverage through the require
 #### Relations
   * derive: [Verification Upward Traceability](Functional/Processing/VerificationTraces.md#verification-upward-traceability)
 ---
-

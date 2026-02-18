@@ -1,69 +1,5 @@
 # Elements
 
-### Relation Type Validation
-
-The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
-  * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
-  * verifiedBy: [Same-File Fragment Relations Test](Verifications/ValidationVerifications.md#same-file-fragment-relations-test)
----
-
-### Type Validation Error Requirement
-
-The system shall display all valid type options when type validation fails.
-
-#### Details
-- Invalid element types shall show list of valid element types including custom type pattern
-- Invalid relation types shall show list of valid relation types
-- Element type list format: "type1, type2, ... For custom types use: other-TYPENAME"
-- Relation type list format: "type1, type2, ..." (alphabetically sorted)
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Type Validation Error Behavior](Behaviors.md#type-validation-error-behavior)
-  * satisfiedBy: [element.rs](../../../core/src/element.rs)
-  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
-  * verifiedBy: [Type Validation Errors Test](Verifications/ValidationVerifications.md#type-validation-errors-test)
----
-
-### Validation Error Handling
-
-The system shall maintain consistent error handling across both validation passes, collecting all errors within each pass before reporting.
-
-#### Details
-Error handling shall follow these principles:
-
-1. **Complete pass execution**: Each pass runs to completion, collecting all errors found
-2. **Aggregated reporting**: All errors from a pass are reported together
-3. **Early termination**: Process exits after reporting errors from either pass
-4. **Existing error format**: Error messages maintain the current format and structure
-5. **Exit codes**: Non-zero exit codes indicate validation failures
-
-This ensures users see all relevant errors at once rather than fixing issues one at a time.
-
-#### Metadata
-  * type: requirement
-
-#### Attachments
-  * [Error Message Format Specification](../Output/Specifications.md#error-message-format-specification)
-
-#### Relations
-  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
-  * satisfiedBy: [error.rs](../../../core/src/error.rs)
-  * satisfiedBy: [model.rs](../../../core/src/model.rs)
-  * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
----
-
 ### Excluded File Relation Validation
 
 The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and formatting operations.
@@ -129,23 +65,6 @@ The system shall check the internal consistency of the system model, ensuring th
   * derive: [Internal Consistency Validator](#internal-consistency-validator)
   * derive: [Two-Pass Validation Strategy](#two-pass-validation-strategy)
   * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
----
-
-### Single Root Hierarchy Ownership
-
-The system shall enforce that each hierarchy element resolves to exactly one top root `user-requirement` through hierarchical relations.
-
-#### Details
-Validation details shall follow the associated hierarchy ownership constraint.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
-  * refinedBy: [Single Root Hierarchy Ownership Constraint](Constraints.md#single-root-hierarchy-ownership-constraint)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * verifiedBy: [Single Root Hierarchy Ownership Validation Test](Verifications/ValidationVerifications.md#single-root-hierarchy-ownership-validation-test)
 ---
 
 ### Attachment Target Validation
@@ -273,6 +192,37 @@ Within-section duplicates (same entry repeated within Relations OR within Attach
   * verifiedBy: [Cross-Section Duplicate Validation Test](Verifications/ValidationVerifications.md#cross-section-duplicate-validation-test)
 ---
 
+### Relation Type Validation
+
+The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
+  * verifiedBy: [Same-File Fragment Relations Test](Verifications/ValidationVerifications.md#same-file-fragment-relations-test)
+---
+
+### Single Root Hierarchy Ownership
+
+The system shall enforce that each hierarchy element resolves to exactly one top root `user-requirement` through hierarchical relations.
+
+#### Details
+Validation details shall follow the associated hierarchy ownership constraint.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * refinedBy: [Single Root Hierarchy Ownership Constraint](Constraints.md#single-root-hierarchy-ownership-constraint)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * verifiedBy: [Single Root Hierarchy Ownership Validation Test](Verifications/ValidationVerifications.md#single-root-hierarchy-ownership-validation-test)
+---
+
 ### Two-Pass Validation Strategy
 
 The system shall execute model validation in two phases: element collection and graph validation.
@@ -287,6 +237,56 @@ The system shall define two-pass validation behavior.
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
   * refinedBy: [Two-Pass Validation Behavior](Behaviors.md#two-pass-validation-behavior)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+---
+
+### Type Validation Error Requirement
+
+The system shall display all valid type options when type validation fails.
+
+#### Details
+- Invalid element types shall show list of valid element types including custom type pattern
+- Invalid relation types shall show list of valid relation types
+- Element type list format: "type1, type2, ... For custom types use: other-TYPENAME"
+- Relation type list format: "type1, type2, ..." (alphabetically sorted)
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * refinedBy: [Type Validation Error Behavior](Behaviors.md#type-validation-error-behavior)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
+  * verifiedBy: [Type Validation Errors Test](Verifications/ValidationVerifications.md#type-validation-errors-test)
+---
+
+### Validation Error Handling
+
+The system shall maintain consistent error handling across both validation passes, collecting all errors within each pass before reporting.
+
+#### Details
+Error handling shall follow these principles:
+
+1. **Complete pass execution**: Each pass runs to completion, collecting all errors found
+2. **Aggregated reporting**: All errors from a pass are reported together
+3. **Early termination**: Process exits after reporting errors from either pass
+4. **Existing error format**: Error messages maintain the current format and structure
+5. **Exit codes**: Non-zero exit codes indicate validation failures
+
+This ensures users see all relevant errors at once rather than fixing issues one at a time.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Error Message Format Specification](../Output/Specifications.md#error-message-format-specification)
+
+#### Relations
+  * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)
+  * refinedBy: [Validation Error Reporting Behavior](Behaviors.md#validation-error-reporting-behavior)
+  * satisfiedBy: [error.rs](../../../core/src/error.rs)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
 ---
 
 ### Validate Markdown Structure

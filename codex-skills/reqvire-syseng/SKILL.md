@@ -251,6 +251,35 @@ Expected after extraction:
 - Do not move verification intent into refinements; only specification/constraint/behavior details belong there.
 - Do not run one-shot global rewrite without validating each requirement slice.
 
+## Task Pattern: Specification Language Cleanup
+
+### Do It When
+
+- A `specification`, `constraint`, or `behavior` element contains normative wording that belongs in a requirement.
+- Requirement text is mixed with mechanism details that should move to refinements.
+- You are running a model cleanup pass and need consistent, traceable language ownership boundaries.
+
+### Goal
+
+Keep normative capability text in requirement intent, and keep refinements descriptive of mechanism, constraints, and behavior details in non-normative form where possible.
+
+### Workflow
+
+1. Use `reqvire search` to identify candidates containing `shall`, `must`, or `must not`.
+2. For each candidate:
+   - confirm parent ownership via `refinedBy` / `refine`;
+   - choose `move` (normative intent goes to parent requirement `#### Details`) or `rephrase` (keep detail in refinement).
+3. Apply updates with small batches and user-verified scope decisions.
+4. Validate after each batch:
+   - `reqvire validate`
+   - `reqvire lint`
+   - `reqvire coverage --json`
+
+### How To Execute
+
+- Use [`SpecificationLanguageCleanup.md`](references/SpecificationLanguageCleanup.md) as the execution reference for this task.
+- Do not perform bulk edits without confirming ownership boundaries.
+
 ## Task Pattern: Design-Document Ownership Normalization
 
 ### Do It When
@@ -331,3 +360,4 @@ Load only the reference file needed for the current task:
 - `references/ConsolidateRequirements.md` - model refactoring and cleanup
 - `references/CreatingTasks.md` - generate implementation tasks from requirement changes
 - `references/SpecificationsExtractionLogic.md` - extract technical specs from requirements
+- `references/SpecificationLanguageCleanup.md` - normalize specification language boundaries before traceability-sensitive refactors

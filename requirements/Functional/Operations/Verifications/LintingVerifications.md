@@ -34,6 +34,13 @@ This test verifies that the lint command analyzes model quality, detects issues 
 - System shall show affected elements with their derivedFrom relations
 - System shall not suggest which relations to remove
 
+**Cross-Submodel Hierarchical Relation Detection:**
+- System shall detect hierarchical relations where source and target resolve to different hierarchical roots
+- System shall report those as needs manual review items
+- Manual-review output shall include source/target identifiers and source/target owning roots
+- Cross-submodel findings shall appear in `--auditable` and `--auditable --json`
+- Cross-submodel findings shall not be included in `--fixable` output and shall not be auto-removed by `--fix`
+
 **Output Formatting:**
 - System shall categorize output into "Auto-fixable Issues" and "Needs Manual Review" sections
 - Each issue shall include element identifier, file path, specific relations, and rationale
@@ -62,6 +69,7 @@ This test verifies that the lint command analyzes model quality, detects issues 
    - --auditable --json shows only needs_manual_review items (auto_fixable is empty array)
    - --json without filters shows both auto_fixable and needs_manual_review items
    - JSON output correctly filters based on flags before serialization
+   - --auditable --json for cross-submodel fixture case returns exactly one `cross_submodel_hierarchical_relation` item and no auto-fixable items
 
 3. **Redundant verify detection**
    - Correctly identifies redundant verify relations using trace tree logic
@@ -87,11 +95,18 @@ This test verifies that the lint command analyzes model quality, detects issues 
    - Reports changes accurately
    - Does not modify manual review issues
 
+7. **Cross-submodel hierarchy boundary detection**
+   - Default lint output includes cross-submodel hierarchical violations
+   - --fixable output excludes cross-submodel manual-review items
+   - --auditable output contains cross-submodel violations with explicit source/target roots
+   - --fix does not remove or alter cross-submodel hierarchical relations
+
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-lint-command/test.sh)
+  * verify: [Cross-Submodel Hierarchical Relation Detection](../Linting.md#cross-submodel-hierarchical-relation-detection)
   * verify: [Lint Auto-fix Capability](../Linting.md#lint-auto-fix-capability)
   * verify: [Multi-Branch Convergence Detection](../Linting.md#multi-branch-convergence-detection)
   * verify: [Redundant Hierarchical Relations Detection and Auto-Removal](../Linting.md#redundant-hierarchical-relations-detection-and-auto-removal)

@@ -741,81 +741,6 @@ This test verifies that the resources command correctly generates reports showin
   * verify: [CLI Resources Command](../../../Interfaces/CLI/Commands.md#cli-resources-command)
 ---
 
-### Submodels Report Verification
-
-This test verifies that the `submodels` command reports independent requirement hierarchies and cross-submodel requirement couplings with deterministic output.
-
-#### Details
-
-##### Acceptance Criteria
-- System shall provide CLI command `submodels`
-- Command shall support `--from <NAME>` to scope report to one requirement subtree
-- Command shall support `--json` flag for JSON output format
-- Text output shall include:
-  - discovered submodels grouped by top root
-  - per-submodel requirement counts
-  - cross-submodel requirement coupling list
-  - summary totals
-- JSON output shall include `submodels`, `cross_submodel_couplings`, and `summary`
-- Output ordering shall be deterministic across runs
-
-##### Test Criteria
-1. **Basic text output**
-   Command: `reqvire submodels`
-   - exits code **0**
-   - output contains `## Submodels`
-   - output contains `## Cross-Submodel Couplings`
-   - output contains `## Summary`
-   - summary block includes `**Submodels:**`, `**Requirements:**`, and `**Cross-Submodel Couplings:**`
-   - summary counts match fixture totals
-   - output matches expected fixture
-
-2. **JSON output structure**
-   Command: `reqvire submodels --json`
-   - exits code **0**
-   - output parses under `jq`
-   - contains `submodels` array with root metadata and requirement counts
-   - contains `cross_submodel_couplings` array with source/target and relation type fields
-   - summary fields match fixture totals:
-     - `summary.total_submodels`
-     - `summary.total_requirements`
-     - `summary.total_cross_submodel_couplings`
-   - output matches expected fixture
-
-3. **Root filter output**
-   Command: `reqvire submodels --from "Root One"`
-   - exits code **0**
-   - selected scope is not listed as a submodel entry
-   - when selected scope has multiple first-level child branches, each branch root is listed as a scoped submodel entry
-   - output contains only submodels discovered within selected scope
-   - summary `Submodels` count matches filtered-scope submodels only
-   - summary `Requirements` and `Cross-Submodel Couplings` counts reflect selected scope only
-   - output matches expected filtered fixture
-
-4. **Root filter JSON output**
-   Command: `reqvire submodels --from "Root One" --json`
-   - exits code **0**
-   - output parses under `jq`
-   - selected scope does not appear in `submodels` array
-   - `submodels` includes one entry per first-level scoped branch root under the selected scope
-   - `submodels` contains only filtered-scope submodels
-   - `summary.total_requirements` and `summary.total_cross_submodel_couplings` are derived from selected-scope couplings
-   - output matches expected filtered JSON fixture
-
-5. **Root filter missing root error**
-   Command: `reqvire submodels --from "Missing Root"`
-   - exits non-zero
-   - error message indicates selected scope was not found
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-submodels-command/test.sh)
-  * verify: [Requirement Submodels Report](../Reporting.md#requirement-submodels-report)
-  * verify: [CLI Submodels Command](../../../Interfaces/CLI/Commands.md#cli-submodels-command)
----
-
 ### Reverse Model Traversal Test
 
 Test verifies reverse traversal output against golden files for both JSON and Markdown modes.
@@ -998,6 +923,81 @@ Test cases:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
   * verify: [Start Element Type Filtering](../Reporting.md#start-element-type-filtering)
+---
+
+### Submodels Report Verification
+
+This test verifies that the `submodels` command reports independent requirement hierarchies and cross-submodel requirement couplings with deterministic output.
+
+#### Details
+
+##### Acceptance Criteria
+- System shall provide CLI command `submodels`
+- Command shall support `--from <NAME>` to scope report to one requirement subtree
+- Command shall support `--json` flag for JSON output format
+- Text output shall include:
+  - discovered submodels grouped by top root
+  - per-submodel requirement counts
+  - cross-submodel requirement coupling list
+  - summary totals
+- JSON output shall include `submodels`, `cross_submodel_couplings`, and `summary`
+- Output ordering shall be deterministic across runs
+
+##### Test Criteria
+1. **Basic text output**
+   Command: `reqvire submodels`
+   - exits code **0**
+   - output contains `## Submodels`
+   - output contains `## Cross-Submodel Couplings`
+   - output contains `## Summary`
+   - summary block includes `**Submodels:**`, `**Requirements:**`, and `**Cross-Submodel Couplings:**`
+   - summary counts match fixture totals
+   - output matches expected fixture
+
+2. **JSON output structure**
+   Command: `reqvire submodels --json`
+   - exits code **0**
+   - output parses under `jq`
+   - contains `submodels` array with root metadata and requirement counts
+   - contains `cross_submodel_couplings` array with source/target and relation type fields
+   - summary fields match fixture totals:
+     - `summary.total_submodels`
+     - `summary.total_requirements`
+     - `summary.total_cross_submodel_couplings`
+   - output matches expected fixture
+
+3. **Root filter output**
+   Command: `reqvire submodels --from "Root One"`
+   - exits code **0**
+   - selected scope is not listed as a submodel entry
+   - when selected scope has multiple first-level child branches, each branch root is listed as a scoped submodel entry
+   - output contains only submodels discovered within selected scope
+   - summary `Submodels` count matches filtered-scope submodels only
+   - summary `Requirements` and `Cross-Submodel Couplings` counts reflect selected scope only
+   - output matches expected filtered fixture
+
+4. **Root filter JSON output**
+   Command: `reqvire submodels --from "Root One" --json`
+   - exits code **0**
+   - output parses under `jq`
+   - selected scope does not appear in `submodels` array
+   - `submodels` includes one entry per first-level scoped branch root under the selected scope
+   - `submodels` contains only filtered-scope submodels
+   - `summary.total_requirements` and `summary.total_cross_submodel_couplings` are derived from selected-scope couplings
+   - output matches expected filtered JSON fixture
+
+5. **Root filter missing root error**
+   Command: `reqvire submodels --from "Missing Root"`
+   - exits non-zero
+   - error message indicates selected scope was not found
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-submodels-command/test.sh)
+  * verify: [Requirement Submodels Report](../Reporting.md#requirement-submodels-report)
+  * verify: [CLI Submodels Command](../../../Interfaces/CLI/Commands.md#cli-submodels-command)
 ---
 
 ### TraceFlow View Test

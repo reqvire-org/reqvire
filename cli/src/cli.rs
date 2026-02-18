@@ -905,7 +905,12 @@ pub async fn handle_command(
     let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
 
     let mut model_manager = ModelManager::new();
-    let parse_result = model_manager.parse_and_validate(None, excluded_filename_patterns);
+    let is_lint_command = matches!(args.command, Some(Commands::Lint { .. }));
+    let parse_result = if is_lint_command {
+        model_manager.parse_and_validate_with_mode(None, excluded_filename_patterns, true)
+    } else {
+        model_manager.parse_and_validate(None, excluded_filename_patterns)
+    };
 
     let json_output = wants_json(&args);
 

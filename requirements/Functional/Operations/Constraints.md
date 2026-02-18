@@ -1,5 +1,25 @@
 # Elements
 
+### Atomic Relink Validity Constraint
+
+Validation rules for atomic relation relink operations.
+
+#### Details
+- Relink operations shall be atomic: no partial persistence is allowed on failure.
+- Candidate relink state shall satisfy all model validation rules before commit.
+- For hierarchical relations (`derivedFrom`/`derive`), relink shall be rejected when it would:
+  - create circular dependencies,
+  - orphan system requirements without required parent hierarchy,
+  - violate single-root hierarchy ownership.
+- Error output shall identify the failing validation constraints and impacted elements.
+
+#### Metadata
+  * type: constraint
+
+#### Relations
+  * refine: [Atomic Relation Relink Operation](ElementManipulation.md#atomic-relation-relink-operation)
+---
+
 ### Merge Type Compatibility Constraint
 
 Type compatibility rules for merging elements.
@@ -40,24 +60,4 @@ Validation rules for target paths in element operations.
 
 #### Metadata
   * type: constraint
----
-
-### Atomic Relink Validity Constraint
-
-Validation rules for atomic relation relink operations.
-
-#### Details
-- Relink operations shall be atomic: no partial persistence is allowed on failure.
-- Candidate relink state shall satisfy all model validation rules before commit.
-- For hierarchical relations (`derivedFrom`/`derive`), relink shall be rejected when it would:
-  - create circular dependencies,
-  - orphan system requirements without required parent hierarchy,
-  - violate single-root hierarchy ownership.
-- Error output shall identify the failing validation constraints and impacted elements.
-
-#### Metadata
-  * type: constraint
-
-#### Relations
-  * refine: [Atomic Relation Relink Operation](ElementManipulation.md#atomic-relation-relink-operation)
 ---

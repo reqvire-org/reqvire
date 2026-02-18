@@ -42,6 +42,18 @@ This is a parent requirement derived from root.
   * derivedFrom: [Root Requirement](#root-requirement)
 ---
 
+### Cross-Submodel Linked Requirement
+
+This requirement should only be modeled via attachment, not by hierarchical relation.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Parent Requirement](#parent-requirement)
+  * derivedFrom: [Standalone Child](#standalone-child)
+---
+
 ### Leaf Requirement
 
 This is a leaf requirement derived from parent.
@@ -63,4 +75,23 @@ This requirement has derivedFrom to both parent and root through a SINGLE chain 
 
 #### Relations
   * derivedFrom: [Parent Requirement](#parent-requirement)
+---
+
+### Standalone Submodel Root
+
+This is an independent root for cross-submodel boundary checks.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Standalone Child
+
+This requirement is owned by `Standalone Submodel Root`.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Standalone Submodel Root](#standalone-submodel-root)
 ---

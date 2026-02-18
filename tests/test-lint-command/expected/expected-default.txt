@@ -47,3 +47,18 @@ Redundant verify relations (these can be automatically removed):
 Reason: This verification verifies leaf requirements which derive from parent requirements also directly verified. Verification traces automatically roll up through derivedFrom relations, so verifying the leaf requirements is sufficient.
 
 ---
+
+## Needs Manual Review
+
+### Cross-Submodel Hierarchical Relation
+**Source: Cross-Submodel Linked Requirement**
+Source root: Root Requirement (specifications/Requirements.md#root-requirement)
+Target: Standalone Child (specifications/Requirements.md#standalone-child)
+Target root: Standalone Submodel Root (specifications/Requirements.md#standalone-submodel-root)
+Relation: derivedFrom -> [specifications/Requirements.md#standalone-child](specifications/Requirements.md#standalone-child)
+File: [specifications/Requirements.md#cross-submodel-linked-requirement](specifications/Requirements.md#cross-submodel-linked-requirement)
+
+Reason: Hierarchical relation 'derivedFrom' from 'specifications/Requirements.md#cross-submodel-linked-requirement' crosses from submodel 'specifications/Requirements.md#root-requirement' to 'specifications/Requirements.md#standalone-submodel-root'. Hierarchical structure should remain internal to a single ownership boundary. Replace this relation with an explicit attachment contract.
+
+
+---

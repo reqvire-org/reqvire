@@ -663,6 +663,7 @@ Use this decision table to determine which reference file to load based on your 
 | **Add features** | - Adding new functionality?<br>- Creating requirements hierarchy?<br>- Building from scratch?<br>- MBSE workflow needed? | [AddFeature.md](reference/AddFeature.md) | Complete workflow:<br>requirements → verifications |
 | **Refactor model** | - Model is cluttered/duplicated?<br>- Reorganizing without changing intent?<br>- Fixing relations/ownership?<br>- Converting attachments? | [ConsolidateRequirements.md](reference/ConsolidateRequirements.md) | Merge, move files,<br>fix relations |
 | **Extract specs** | - Requirements have embedded details?<br>- Need to separate EARS from specs?<br>- Making requirements reusable?<br>- Requirements too long (>15 lines)? | [SpecificationsExtractionLogic.md](reference/SpecificationsExtractionLogic.md) | Extraction methodology,<br>refactoring patterns |
+| **Clean normative wording** | - Requirement intent mixed with implementation detail?<br>- `shall`/`must` left in refinements?<br>- Language ownership is ambiguous? | [SpecificationLanguageCleanup.md](reference/SpecificationLanguageCleanup.md) | Review language ownership,<br>move/rephrase cleanly |
 | **Generate tasks** | - Creating implementation plan?<br>- Analyzing requirement changes?<br>- Working on feature branch?<br>- Need task breakdown? | [CreatingTasks.md](reference/CreatingTasks.md) | Change-impact analysis,<br>task generation |
 
 ### Quick Tasks (No Reference Needed)
@@ -779,6 +780,8 @@ reqvire mv-file "old-path.md" "new-path.md" --dry-run
 
 **Extract specifications:**
 - Load [SpecificationsExtractionLogic.md](reference/SpecificationsExtractionLogic.md) for methodology
+- **Clean requirement/spec wording:**
+- Load [SpecificationLanguageCleanup.md](reference/SpecificationLanguageCleanup.md) for move/rephrase logic and validation checkpoints.
 
 **Full refactoring workflow:**
 - Load [ConsolidateRequirements.md](reference/ConsolidateRequirements.md) for comprehensive guidance

@@ -29,7 +29,6 @@ The system shall process structured documents and relations to extract model-rel
 
 #### Relations
   * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
-  * derivedFrom: [Promote Automation and Efficiency](../../UserStories.md#promote-automation-and-efficiency)
 ---
 
 ### Element Manipulation Operations

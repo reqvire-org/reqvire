@@ -19,12 +19,31 @@ When filtering lint results, the system shall allow focusing on specific categor
   * type: user-requirement
 
 #### Relations
+  * derive: [Cross-Submodel Hierarchical Relation Detection](#cross-submodel-hierarchical-relation-detection)
   * derive: [Lint Auto-fix Capability](#lint-auto-fix-capability)
   * derive: [Multi-Branch Convergence Detection](#multi-branch-convergence-detection)
   * derive: [Redundant Hierarchical Relations Detection and Auto-Removal](#redundant-hierarchical-relations-detection-and-auto-removal)
   * derive: [Redundant Verify Relations Detection](#redundant-verify-relations-detection)
   * derivedFrom: [Linting Model Quality](../../UserStories.md#linting-model-quality)
   * refinedBy: [Lint Output Specification](Specifications.md#lint-output-specification)
+---
+
+### Cross-Submodel Hierarchical Relation Detection
+
+Cross-submodel ownership validation for hierarchical relations during linting.
+
+#### Details
+When a user-created hierarchical relation target belongs to a different hierarchical root than its source, linting shall surface this as a cross-submodel violation that must be reviewed as an ownership-boundary issue.
+The system shall use this detection during lint analysis to identify and report boundary crossings as manual-review findings.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Model Linting](#model-linting)
+  * refinedBy: [Cross-Submodel Hierarchical Relation Detection Specification](Specifications.md#cross-submodel-hierarchical-relation-detection-specification)
+  * satisfiedBy: [lint.rs](../../../core/src/lint.rs)
+  * verifiedBy: [Lint Command Verification](Verifications/LintingVerifications.md#lint-command-verification)
 ---
 
 ### Lint Auto-fix Capability

@@ -1,5 +1,43 @@
 # Elements
 
+### Forward-Only Relation Traversal Behavior
+
+When filtering model output from a starting requirement:
+1. Follow only forward relations (`derive`, `satisfiedBy`, `verifiedBy`, `trace`).
+2. Start from the specified root element when `--from` is provided.
+3. Recursively traverse outgoing relations until leaf elements are reached.
+4. Do not traverse backward relations during forward traversal mode.
+5. When no `--from` filter is provided, include the complete model.
+
+#### Metadata
+  * type: behavior
+
+#### Relations
+  * refine: [Forward-Only Relation Traversal](Reporting.md#forward-only-relation-traversal)
+---
+
+### Implementation Coverage Behavior
+
+Coverage behavior for requirement implementation reporting.
+
+#### Details
+Implementation coverage classification shall follow:
+
+- **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
+- **Refinement-contract via attachment**: requirement owns refinement elements via `refinedBy`, and at least one owned refinement is attached by a requirement that is directly satisfied.
+- **Refinement-contract via child**: requirement owns refinement elements via `refinedBy`, and at least one derived descendant requirement has `satisfiedBy`.
+- **Uncovered**: requirement has no coverage evidence from the above sources.
+
+Rules:
+- Scope includes only `requirement` elements (excludes `user-requirement`).
+- Refinement-contract attachment propagation uses only refinement element identifiers as contracts.
+- Generic derivation roll-up is not used for implementation coverage.
+- Coverage source and evidence identifiers shall be reported in text and JSON outputs.
+
+#### Metadata
+  * type: behavior
+---
+
 ### Mermaid Diagram Interaction Behavior
 
 Interactive behavior for Mermaid diagrams in HTML export.
@@ -72,22 +110,6 @@ When start element type filtering is enabled:
   * type: behavior
 ---
 
-### Forward-Only Relation Traversal Behavior
-
-When filtering model output from a starting requirement:
-1. Follow only forward relations (`derive`, `satisfiedBy`, `verifiedBy`, `trace`).
-2. Start from the specified root element when `--from` is provided.
-3. Recursively traverse outgoing relations until leaf elements are reached.
-4. Do not traverse backward relations during forward traversal mode.
-5. When no `--from` filter is provided, include the complete model.
-
-#### Metadata
-  * type: behavior
-
-#### Relations
-  * refine: [Forward-Only Relation Traversal](Reporting.md#forward-only-relation-traversal)
----
-
 ### Verification Coverage Philosophy Behavior
 
 Coverage evaluation philosophy for verification reporting.
@@ -112,28 +134,6 @@ Coverage evaluation philosophy for verification reporting.
 - Leaf requirement verification provides coverage for parent requirements
 - Parent verification is redundant if all derived leaves are verified
 - Coverage percentages focus on leaf requirement verification status
-
-#### Metadata
-  * type: behavior
----
-
-### Implementation Coverage Behavior
-
-Coverage behavior for requirement implementation reporting.
-
-#### Details
-Implementation coverage classification shall follow:
-
-- **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
-- **Refinement-contract via attachment**: requirement owns refinement elements via `refinedBy`, and at least one owned refinement is attached by a requirement that is directly satisfied.
-- **Refinement-contract via child**: requirement owns refinement elements via `refinedBy`, and at least one derived descendant requirement has `satisfiedBy`.
-- **Uncovered**: requirement has no coverage evidence from the above sources.
-
-Rules:
-- Scope includes only `requirement` elements (excludes `user-requirement`).
-- Refinement-contract attachment propagation uses only refinement element identifiers as contracts.
-- Generic derivation roll-up is not used for implementation coverage.
-- Coverage source and evidence identifiers shall be reported in text and JSON outputs.
 
 #### Metadata
   * type: behavior

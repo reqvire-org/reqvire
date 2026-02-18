@@ -1,11 +1,41 @@
 # Elements
 
+### Atomic Relation Relink Workflow Specification
+
+Detailed workflow for atomically relinking an existing relation target.
+
+#### Details
+When relinking a relation, the system is expected to:
+- Resolve source element and both targets (`old-target`, `new-target`) in the current model.
+- Verify that the source currently has the specified relation to `old-target`.
+- Build an in-memory transaction plan for relation rewiring.
+- Apply candidate rewiring in memory first, without persisting files.
+- Validate the candidate model after rewiring, including all existing validation rules.
+- Persist changes only when candidate validation succeeds.
+- Roll back and report errors when candidate validation fails.
+
+For hierarchical relinks (`derivedFrom`/`derive`):
+- Support subgraph boundary relinking semantics where the source can represent the root of a moved hierarchy boundary.
+- Reject relinks that introduce circular dependency, missing parent relation, or single-root hierarchy ownership violations.
+
+Output behavior:
+- Support dry-run diff preview without persistence.
+- Report affected elements/files deterministically.
+- Return non-zero status on any failed validation or unresolved target.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Atomic Relation Relink Operation](ElementManipulation.md#atomic-relation-relink-operation)
+---
+
 ### Create Element Workflow Specification
 
 Detailed workflow for creating new model elements.
 
 #### Details
-When creating a new element, the system shall:
+When creating a new element, the system is expected to:
 - Accept a string containing the full element definition in Markdown format
 - Accept target location: file path
 - Validate the target location using path validation rules
@@ -16,10 +46,33 @@ When creating a new element, the system shall:
 - Insert the element into the target file following Element Ordering Behavior
 - Reject the operation and report validation errors if validation fails
 - Provide updates report following Diff Output Format Specification
-- The system shall support override mode to replace existing element with same name following rules defined in Create Element Override Behavior
+- The system is expected to support override mode to replace existing element with same name following rules defined in Create Element Override Behavior
 
 #### Metadata
-  * type: specification
+ * type: specification
+---
+
+### Cross-Submodel Hierarchical Relation Detection Specification
+
+- Determine ownership roots from hierarchical relations using only hierarchy edges (for example `derivedFrom` and `derive`).
+- For each user-created hierarchical relation where source root differs from target root, create a manual-review lint item.
+- Include in that item:
+ - `source`, `target`, and `relation_type`
+ - owning source root
+ - owning target root
+ - rationale that states why the relation breaks submodel ownership and should be converted to attachment-based coupling.
+- Report such findings in:
+ - default text output under **Needs Manual Review**
+ - `--auditable` output
+ - `needs_manual_review` JSON array
+- Do not include cross-submodel hierarchical items in auto-fix output (`--fixable`).
+- Never auto-remove cross-submodel hierarchical relations; they require explicit model refactoring.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Cross-Submodel Hierarchical Relation Detection](Linting.md#cross-submodel-hierarchical-relation-detection)
 ---
 
 ### Delete Element Workflow Specification
@@ -27,7 +80,7 @@ When creating a new element, the system shall:
 Detailed workflow for deleting existing model elements.
 
 #### Details
-When deleting an element, the system shall:
+When deleting an element, the system is expected to:
 - Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
 - Reject the operation if any child would become orphaned
 - Provide clear error message listing orphaned children with resolution guidance
@@ -46,14 +99,14 @@ When deleting an element, the system shall:
 - If the file is removed, report the file deletion in the operation output
 
 **Relation Handling:**
-- All `derivedFrom` relations pointing to the deleted element shall be removed
-- All `verifiedBy` relations pointing to the deleted element shall be removed
-- All `verify` relations pointing to the deleted element shall be removed
-- All `satisfiedBy` relations pointing to the deleted element shall be removed
+- All `derivedFrom` relations pointing to the deleted element is expected to be removed
+- All `verifiedBy` relations pointing to the deleted element is expected to be removed
+- All `verify` relations pointing to the deleted element is expected to be removed
+- All `satisfiedBy` relations pointing to the deleted element is expected to be removed
 - Relations from the deleted element are automatically removed with the element
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Document Structure Specification
@@ -78,18 +131,16 @@ Rules for normalizing document hierarchical structure during formatting.
 2. If document has `# Elements` and `##`: No header additions needed
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Element Manipulation File Persistence Refinement Specification
 
-
-
 #### Details
-The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
+The system is expected to persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Format Consistency Specification
@@ -120,12 +171,10 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
 - Provide context lines with proper line number continuity
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Full Relations Insertion Refinement Specification
-
-
 
 #### Details
 Auto-generated relations are inverse relations created by the parser during model loading but not persisted to files by default. See Relation Types Specification for opposite relation pairs.
@@ -135,34 +184,7 @@ When --with-full-relations is active:
 - Relations are sorted according to the Relation Ordering Normalization requirement
 
 #### Metadata
-  * type: specification
----
-
-### Lint Output Specification
-
-Specification for lint command output format and content structure.
-
-#### Details
-**Text Output Structure:**
-- Section headers: "Auto-fixable Issues" and "Needs Manual Review" (when applicable)
-- For each issue category:
-  * Issue type heading (e.g., "Safe Redundant Hierarchical Relations", "Redundant Verify Relations")
-  * List of affected elements with file paths and identifiers
-  * Specific relations flagged as redundant
-  * Brief explanation of why the relation is redundant, including which intermediate paths provide alternate routes
-- For auto-fixable issues: indicate these can be fixed with `--fix` flag
-- For manual review issues: explain why human judgment is required
-
-**JSON Output Structure:**
-- Issue categorization (auto_fixable vs. needs_manual_review)
-- Issue type classification
-- Affected element identifiers
-- Specific relation details (type, target)
-- Rationale text explaining the redundancy
-- Intermediate paths that make the direct relation redundant
-
-#### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Lint Auto-fix Capability Refinement Specification
@@ -177,51 +199,37 @@ Auto-fix behavior:
 - Skips issues categorized as needing manual review.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Lint Auto-fix Capability](Linting.md#lint-auto-fix-capability)
+ * refine: [Lint Auto-fix Capability](Linting.md#lint-auto-fix-capability)
 ---
 
-### Redundant Verify Relations Detection Refinement Specification
+### Lint Output Specification
+
+Specification for lint command output format and content structure.
 
 #### Details
-Redundant verify relation detection behavior:
-- Detects cases where a verification directly verifies both a leaf requirement and its ancestor.
-- Uses verification trace tree analysis to determine ancestor reachability.
-- Treats leaf verification as sufficient when hierarchy roll-up already covers ancestors.
-- Reuses trace-tree logic from [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder).
-- Reports redundant direct verify relations as model noise.
-- Categorizes these findings as auto-fixable.
+**Text Output Structure:**
+- Section headers: "Auto-fixable Issues" and "Needs Manual Review" (when applicable)
+- For each issue category:
+ * Issue type heading (e.g., "Safe Redundant Hierarchical Relations", "Redundant Verify Relations")
+ * List of affected elements with file paths and identifiers
+ * Specific relations flagged as redundant
+ * Brief explanation of why the relation is redundant, including which intermediate paths provide alternate routes
+- For auto-fixable issues: indicate these can be fixed with `--fix` flag
+- For manual review issues: explain why human judgment is required
+
+**JSON Output Structure:**
+- Issue categorization (auto_fixable vs. needs_manual_review)
+- Issue type classification
+- Affected element identifiers
+- Specific relation details (type, target)
+- Rationale text explaining the redundancy
+- Intermediate paths that make the direct relation redundant
 
 #### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Redundant Verify Relations Detection](Linting.md#redundant-verify-relations-detection)
----
-
-### Relation Consistency Maintenance Refinement Specification
-
-#### Details
-Relation consistency maintenance behavior during element manipulation:
-- Maintains opposite relation consistency for supported relation pairs.
-- If element `A` has `derivedFrom` to `B`, ensures inverse `derive` exists from `B` to `A`.
-- If element `A` is `verifiedBy` verification `V`, ensures inverse `verify` exists from `V` to `A`.
-- On delete operations, removes both incoming and outgoing relation references for deleted elements.
-- On move/rename operations, updates relation targets for both forward and backward references.
-- Preserves valid graph state after each manipulation step without dangling relation targets.
-
-Validation behavior:
-- Runs relation-consistency checks after manipulation operations.
-- Reports detected inconsistencies with actionable context.
-- Blocks manipulations that would leave the model in inconsistent relation state.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Relation Consistency Maintenance](ElementManipulation.md#relation-consistency-maintenance)
+ * type: specification
 ---
 
 ### Merge Element Workflow Specification
@@ -229,7 +237,7 @@ Validation behavior:
 Detailed workflow for merging multiple source elements into a target element.
 
 #### Details
-When merging elements, the system shall:
+When merging elements, the system is expected to:
 - Accept target element name (must exist in the model)
 - Accept one or more source element names (must exist in the model)
 - Validate type compatibility following clearly defined rules in Merge Type Compatibility Constraint
@@ -240,22 +248,22 @@ When merging elements, the system shall:
 - Remove empty source files when no elements remain
 - Provide updates report following Diff Output Format Specification
 
-The system shall reject the operation with a clear error message if:
+The system is expected to reject the operation with a clear error message if:
 - The target element does not exist
 - Any source element does not exist
 - Source and target element types are incompatible per Merge Type Compatibility Constraint
 - Merged result would have cross-section duplicates per Merge Content Transformation Behavior
 
 For `# Documents` targets:
-- The merged result shall remain serialized as `# Documents` with a single implicit element.
-- Merged content shall remain inside the `## <Actual Element Name>` body of that element.
+- The merged result is expected to remain serialized as `# Documents` with a single implicit element.
+- Merged content is expected to remain inside the `## <Actual Element Name>` body of that element.
 
 For document-to-elements merge direction:
-- If any source element is in a `# Documents` file and the target element is in a `# Elements` file, the merge shall be rejected with a clear error.
-- The error shall state that this conversion must be done manually to avoid breaking `# Elements` parsing rules.
+- If any source element is in a `# Documents` file and the target element is in a `# Elements` file, the merge is expected to be rejected with a clear error.
+- The error is expected to state that this conversion must be done manually to avoid breaking `# Elements` parsing rules.
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Move Element Workflow Specification
@@ -263,7 +271,7 @@ For document-to-elements merge direction:
 Detailed workflow for moving existing model elements to different file locations.
 
 #### Details
-When moving an element, the system shall:
+When moving an element, the system is expected to:
 - Validate the target location using path validation rules
 - Create target file if it does not exist (subject to validation constraints)
 - Remove the element from the source file
@@ -277,7 +285,7 @@ When moving an element, the system shall:
 - Provide updates report following Diff Output Format Specification
 
 Document format rule:
-- If the target file is an existing `# Documents` file, moving an element from a different file into it shall be rejected with a clear error, because `# Documents` files contain exactly one element.
+- If the target file is an existing `# Documents` file, moving an element from a different file into it is expected to be rejected with a clear error, because `# Documents` files contain exactly one element.
 
 **Empty Source File Cleanup:**
 - After moving the element, check if the source file contains any remaining elements
@@ -285,23 +293,21 @@ Document format rule:
 - If the file is removed, report the file deletion in the operation output
 
 **Relation Update Requirements:**
-- All relations (both forward and backward) pointing to the moved element shall be updated to the new identifier
-- Relations within the moved element (outgoing relations) shall be preserved unchanged
+- All relations (both forward and backward) pointing to the moved element is expected to be updated to the new identifier
+- Relations within the moved element (outgoing relations) is expected to be preserved unchanged
 
 **Identifier Update:**
 - The element's identifier changes from `<old-file>#<element-name>` to `<new-file>#<element-name>`
-- All references to the old identifier shall be updated to the new identifier
+- All references to the old identifier is expected to be updated to the new identifier
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Move File Operation Refinement Specification
 
-
-
 #### Details
-When moving a file, the system shall:
+When moving a file, the system is expected to:
 - Accept source file path (relative to git repository root)
 - Accept target file path (relative to git repository root)
 - Accept optional squashing flag
@@ -312,51 +318,21 @@ When moving a file, the system shall:
 - Preserve all file content, structure, and formatting
 - Provide updates report following Diff Output Format Specification
 
-The system shall reject the operation with a clear error message if:
+The system is expected to reject the operation with a clear error message if:
 - The source file does not exist
 - The target file already exists (unless --squash flag is provided)
 - The source or target paths fail validation
 - `--squash` is used with a target that is an existing `# Documents` file
 
 **Squash Mode Behavior:**
-When the --squash flag is provided and the target file already exists, the system shall:
+When the --squash flag is provided and the target file already exists, the system is expected to:
 - Move all elements from the source file to the target end of file
 - Remove the source file after all elements have been successfully moved
 - Preserve element ordering from the source file when inserting into target section
 - Reject squash if target is `# Documents` format (single-element document file)
 
 #### Metadata
-  * type: specification
----
-
-### Atomic Relation Relink Workflow Specification
-
-Detailed workflow for atomically relinking an existing relation target.
-
-#### Details
-When relinking a relation, the system shall:
-- Resolve source element and both targets (`old-target`, `new-target`) in the current model.
-- Verify that the source currently has the specified relation to `old-target`.
-- Build an in-memory transaction plan for relation rewiring.
-- Apply candidate rewiring in memory first, without persisting files.
-- Validate the candidate model after rewiring, including all existing validation rules.
-- Persist changes only when candidate validation succeeds.
-- Roll back and report errors when candidate validation fails.
-
-For hierarchical relinks (`derivedFrom`/`derive`):
-- Support subgraph boundary relinking semantics where the source can represent the root of a moved hierarchy boundary.
-- Reject relinks that introduce circular dependency, missing parent relation, or single-root hierarchy ownership violations.
-
-Output behavior:
-- Support dry-run diff preview without persistence.
-- Report affected elements/files deterministically.
-- Return non-zero status on any failed validation or unresolved target.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Atomic Relation Relink Operation](ElementManipulation.md#atomic-relation-relink-operation)
+ * type: specification
 ---
 
 ### Multi-Branch Convergence Detection Specification
@@ -377,14 +353,14 @@ A multi-branch convergence occurs when:
 **Example:**
 ```
 Authorization (root)
-  → Management API
-    → API Specification
-  → Public API
-    → API Specification
+ → Management API
+ → API Specification
+ → Public API
+ → API Specification
 ```
 API Specification reaches Authorization through two branches (Management API and Public API). Both branches might be semantically valid (spec derives from auth in context of both APIs), OR one might be a modeling error that should be removed.
 
-Detection shall:
+Detection is expected to:
 - Use the trace tree building logic to identify elements that reach common ancestors through multiple distinct branch paths
 - Exclude cases where a direct relation exists (those are handled by Redundant Hierarchical Relations Detection)
 - Report the element, the common ancestor, and all distinct branch paths
@@ -397,12 +373,12 @@ This enables the model author to review and decide:
 - Should there be a direct relation instead? (restructure the model)
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Orphaned Children Error Message Specification
 
-The error message for orphaned children prevention shall include:
+The error message for orphaned children prevention is expected to include:
 - Statement that deletion cannot proceed due to orphaned children
 - Element name being deleted
 - Count of child elements that would be orphaned
@@ -410,7 +386,7 @@ The error message for orphaned children prevention shall include:
 - Resolution guidance: "Delete the child elements first, or update the child elements to link to a different parent element"
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Redundant Hierarchical Relations Specification
@@ -433,7 +409,7 @@ This applies to:
 
 **Detection Logic:**
 
-The system shall use verification trace tree logic for detection:
+The system is expected to use verification trace tree logic for detection:
 - Create a virtual/dummy verification element
 - Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations
 - Apply the same trace tree building logic used for verification upward traceability
@@ -444,7 +420,7 @@ This approach reuses the proven trace tree logic for redundancy detection, ensur
 
 **Safe Auto-Removal Criteria:**
 
-A redundant hierarchical derivation relation shall be considered safe to auto-remove when ALL of the following conditions are met:
+A redundant hierarchical derivation relation is expected to be considered safe to auto-remove when ALL of the following conditions are met:
 1. **Direct relation exists**: Element A has a direct derivedFrom relation to element C
 2. **Alternate path exists**: There exists at least one path from A to C through intermediate elements (single or multiple convergent paths)
 3. **Transitive redundancy**: The direct A → C relation is redundant because C is reachable through other derivedFrom relations
@@ -454,8 +430,8 @@ A redundant hierarchical derivation relation shall be considered safe to auto-re
 *Single-chain redundancy (auto-removable):*
 ```
 User Requirement A
-  → System Requirement B
-    → Implementation C
+ → System Requirement B
+ → Implementation C
 
 Redundant: A → C (can be safely auto-removed)
 Reason: C is reachable via A → B → C
@@ -464,8 +440,8 @@ Reason: C is reachable via A → B → C
 *Multi-path/branching redundancy (auto-removable):*
 ```
 Authorization A
-  → Public API B → API Specification D
-  → Management API C → API Specification D
+ → Public API B → API Specification D
+ → Management API C → API Specification D
 
 Redundant: A → D (can be safely auto-removed)
 Reason: D is reachable via A → B → D and A → C → D
@@ -473,7 +449,7 @@ Reason: D is reachable via A → B → D and A → C → D
 
 **Auto-Removal Behavior:**
 
-When auto-fix mode is activated, the system shall:
+When auto-fix mode is activated, the system is expected to:
 - Remove ALL redundant derivedFrom relations where alternate paths exist
 - Preserve traceability through intermediate elements
 - Maintain model coherence by ensuring all elements remain reachable through non-redundant paths
@@ -484,7 +460,48 @@ When auto-fix mode is activated, the system shall:
 **Implementation Note**: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.
 
 #### Metadata
-  * type: specification
+ * type: specification
+---
+
+### Redundant Verify Relations Detection Refinement Specification
+
+#### Details
+Redundant verify relation detection behavior:
+- Detects cases where a verification directly verifies both a leaf requirement and its ancestor.
+- Uses verification trace tree analysis to determine ancestor reachability.
+- Treats leaf verification as sufficient when hierarchy roll-up already covers ancestors.
+- Reuses trace-tree logic from [Verification Trace Builder](../Processing/VerificationTraces.md#verification-trace-builder).
+- Reports redundant direct verify relations as model noise.
+- Categorizes these findings as auto-fixable.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Redundant Verify Relations Detection](Linting.md#redundant-verify-relations-detection)
+---
+
+### Relation Consistency Maintenance Refinement Specification
+
+#### Details
+Relation consistency maintenance behavior during element manipulation:
+- Maintains opposite relation consistency for supported relation pairs.
+- If element `A` has `derivedFrom` to `B`, ensures inverse `derive` exists from `B` to `A`.
+- If element `A` is `verifiedBy` verification `V`, ensures inverse `verify` exists from `V` to `A`.
+- On delete operations, removes both incoming and outgoing relation references for deleted elements.
+- On move/rename operations, updates relation targets for both forward and backward references.
+- Preserves valid graph state after each manipulation step without dangling relation targets.
+
+Validation behavior:
+- Runs relation-consistency checks after manipulation operations.
+- Reports detected inconsistencies with actionable context.
+- Blocks manipulations that would leave the model in inconsistent relation state.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Relation Consistency Maintenance](ElementManipulation.md#relation-consistency-maintenance)
 ---
 
 ### Relation Operations Specification
@@ -514,7 +531,7 @@ Technical specification for relation link and unlink operations.
 - Report error if relation doesn't exist
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Relation Ordering Specification
@@ -532,7 +549,7 @@ Rules for sorting relations within elements for deterministic output.
 - Easier diff comparison between file versions
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Relation Validation Specification
@@ -558,15 +575,13 @@ Rules for validating and normalizing relation targets during element creation an
 - Provide clear error messages indicating which relation target was not found
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Rename Element Operation Refinement Specification
 
-
-
 #### Details
-When renaming an element, the system shall:
+When renaming an element, the system is expected to:
 - Accept the current element name and the new element name
 - Validate that the current element exists in the model registry
 - Validate that the new name is globally unique in the model registry
@@ -575,10 +590,10 @@ When renaming an element, the system shall:
 - Update the element identifier in the registry
 - Provide updates report following Diff Output Format Specification
 
-The system shall reject the operation with a clear error message if:
+The system is expected to reject the operation with a clear error message if:
 - The element does not exist
 - The new name conflicts with an existing element
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---

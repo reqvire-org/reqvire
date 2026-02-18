@@ -71,8 +71,8 @@ Implementation details shall follow the associated refinement specifications.
   * derive: [CLI Remove Element Command](#cli-remove-element-command)
   * derive: [CLI Rename Element Command](#cli-rename-element-command)
   * derive: [CLI Resources Command](#cli-resources-command)
-  * derive: [CLI Submodels Command](#cli-submodels-command)
   * derive: [CLI Search Command](#cli-search-command)
+  * derive: [CLI Submodels Command](#cli-submodels-command)
   * derive: [CLI Traces Command](#cli-traces-command)
   * derive: [Format Command](#format-command)
   * derive: [Validate Command](#validate-command)
@@ -266,6 +266,7 @@ Implementation details shall follow the associated refinement specifications.
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Lint Output Specification](../../Functional/Operations/Specifications.md#lint-output-specification)
+  * [Cross-Submodel Hierarchical Relation Detection Specification](../../Functional/Operations/Specifications.md#cross-submodel-hierarchical-relation-detection-specification)
   * [Text Output Formatting](../../Functional/Output/Specifications.md#text-output-formatting)
   * [Multi-Branch Convergence Detection Specification](../../Functional/Operations/Specifications.md#multi-branch-convergence-detection-specification)
 
@@ -506,6 +507,32 @@ Implementation details shall follow the associated refinement specifications.
   * verifiedBy: [Resources Report Verification](../../Functional/Output/Verifications/ReportingVerifications.md#resources-report-verification)
 ---
 
+### CLI Search Command
+
+The system shall provide a unified search function, activated by the `search` root command, which shall search and report on model elements with comprehensive filtering capabilities.
+
+#### Details
+Implementation details shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
+  * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
+  * [Short Mode Behavior](../../Functional/Output/Behaviors.md#short-mode-behavior)
+  * [Text Output Formatting](../../Functional/Output/Specifications.md#text-output-formatting)
+  * [Type Validation Error Behavior](../../Functional/Core/Behaviors.md#type-validation-error-behavior)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Search Command Refinement Specification](Specifications.md#cli-search-command-refinement-specification)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * verifiedBy: [Attachment Search Filters Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification)
+  * verifiedBy: [Search Command Tests](../../Functional/Output/Verifications/ReportingVerifications.md#search-command-tests)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
+---
+
 ### CLI Submodels Command
 
 The system shall provide a `submodels` command that reports independent requirement hierarchies and cross-submodel requirement couplings.
@@ -530,32 +557,6 @@ Implementation details shall follow the associated refinement specifications.
   * refinedBy: [CLI Submodels Command Refinement Specification](Specifications.md#cli-submodels-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Submodels Report Verification](../../Functional/Output/Verifications/ReportingVerifications.md#submodels-report-verification)
-  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
----
-
-### CLI Search Command
-
-The system shall provide a unified search function, activated by the `search` root command, which shall search and report on model elements with comprehensive filtering capabilities.
-
-#### Details
-Implementation details shall follow the associated refinement specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Attachments
-  * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
-  * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
-  * [Short Mode Behavior](../../Functional/Output/Behaviors.md#short-mode-behavior)
-  * [Text Output Formatting](../../Functional/Output/Specifications.md#text-output-formatting)
-  * [Type Validation Error Behavior](../../Functional/Core/Behaviors.md#type-validation-error-behavior)
-
-#### Relations
-  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
-  * refinedBy: [CLI Search Command Refinement Specification](Specifications.md#cli-search-command-refinement-specification)
-  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * verifiedBy: [Attachment Search Filters Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification)
-  * verifiedBy: [Search Command Tests](../../Functional/Output/Verifications/ReportingVerifications.md#search-command-tests)
   * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
 ---
 

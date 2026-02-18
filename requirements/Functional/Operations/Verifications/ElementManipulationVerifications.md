@@ -18,47 +18,6 @@ Test cases:
   * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
 ---
 
-### Atomic Relation Relink Test
-
-This test verifies atomic relation relink behavior, including hierarchical subgraph relinks and rollback on validation failures.
-
-#### Details
-
-##### Acceptance Criteria
-- Relink rewires relation targets atomically with no partial persistence on failure.
-- Hierarchical relink supports subgraph boundary use cases.
-- Candidate relink state is validated before persistence.
-- Relink rejects operations that would create circular dependencies.
-- Relink rejects operations that violate single-root ownership.
-- Relink rejects operations that violate single-root ownership with deterministic command error output.
-
-##### Test Criteria
-1. **Successful relink:**
-   - Command: `reqvire relink <source> <relation-type> <old-target> <new-target>`
-   - Relink an existing relation from old target to new target.
-   - Assert success exit code and deterministic diff output.
-
-2. **Circular dependency rejection:**
-   - Attempt relink that introduces cycle.
-   - Assert non-zero exit and no persisted changes.
-
-3. **Single-root rejection:**
-   - Attempt hierarchical relink producing multi-root ownership.
-   - Assert non-zero exit, deterministic single-root ownership error output, and no persisted changes.
-
-4. **Dry-run behavior:**
-   - Run `reqvire relink ... --dry-run`.
-   - Assert reported changes with no file persistence.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-relink-command/test.sh)
-  * verify: [Atomic Relation Relink Operation](../ElementManipulation.md#atomic-relation-relink-operation)
-  * verify: [CLI Relink Command](../../../Interfaces/CLI/Commands.md#cli-relink-command)
----
-
 ### Add Command Error Messages Test
 
 Test verifies that the add command provides contextual error messages with examples when format parsing fails.
@@ -104,10 +63,51 @@ Test verifies that the add command provides contextual error messages with examp
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-add-command-error-messages/test.sh)
-  * verify: [Validation Error Handling](../../Core/Validation.md#validation-error-handling)
   * verify: [Markdown Structure Validator](../../Core/Validation.md#markdown-structure-validator)
+  * verify: [Validation Error Handling](../../Core/Validation.md#validation-error-handling)
   * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
   * verify: [Detailed Error Handling and Logging](../../../Interfaces/CLI/Commands.md#detailed-error-handling-and-logging)
+---
+
+### Atomic Relation Relink Test
+
+This test verifies atomic relation relink behavior, including hierarchical subgraph relinks and rollback on validation failures.
+
+#### Details
+
+##### Acceptance Criteria
+- Relink rewires relation targets atomically with no partial persistence on failure.
+- Hierarchical relink supports subgraph boundary use cases.
+- Candidate relink state is validated before persistence.
+- Relink rejects operations that would create circular dependencies.
+- Relink rejects operations that violate single-root ownership.
+- Relink rejects operations that violate single-root ownership with deterministic command error output.
+
+##### Test Criteria
+1. **Successful relink:**
+   - Command: `reqvire relink <source> <relation-type> <old-target> <new-target>`
+   - Relink an existing relation from old target to new target.
+   - Assert success exit code and deterministic diff output.
+
+2. **Circular dependency rejection:**
+   - Attempt relink that introduces cycle.
+   - Assert non-zero exit and no persisted changes.
+
+3. **Single-root rejection:**
+   - Attempt hierarchical relink producing multi-root ownership.
+   - Assert non-zero exit, deterministic single-root ownership error output, and no persisted changes.
+
+4. **Dry-run behavior:**
+   - Run `reqvire relink ... --dry-run`.
+   - Assert reported changes with no file persistence.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-relink-command/test.sh)
+  * verify: [Atomic Relation Relink Operation](../ElementManipulation.md#atomic-relation-relink-operation)
+  * verify: [CLI Relink Command](../../../Interfaces/CLI/Commands.md#cli-relink-command)
 ---
 
 ### CLI Add Element Test

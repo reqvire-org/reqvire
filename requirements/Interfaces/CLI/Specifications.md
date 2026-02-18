@@ -2,10 +2,8 @@
 
 ### CLI Add Element Command Refinement Specification
 
-
-
 #### Details
-The `add` command shall:
+The `add` command is expected to:
 - Accept element definition input from standard input (stdin) by default
 - Support `--content <string>` option as alternative to stdin input
 - When `--content` is provided, use its value instead of reading stdin
@@ -22,12 +20,10 @@ The `add` command shall:
 - Exit with code 0 on success, non-zero on error
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### CLI Collect Command Refinement Specification
-
-
 
 #### Details
 Command syntax: `reqvire collect <element-name> [--direction UPSTREAM|DOWNSTREAM] [--json]`
@@ -44,97 +40,7 @@ Command syntax: `reqvire collect <element-name> [--direction UPSTREAM|DOWNSTREAM
 - Non-zero on error (element not found, invalid type, invalid direction, etc.)
 
 #### Metadata
-  * type: specification
----
-
-### CLI Interface Structure Refinement Specification
-
-
-
-#### Details
-The CLI must display all commands and options and command's options flattened in the main help output which must also be a default command:
-Reqvire requirements & traceability management tool
-
-Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
-
-Commands:
-export            Export model to browsable HTML documentation
-serve             Serve model as browsable HTML documentation via HTTP server
-format            Format and normalize requirements files
-validate          Validate model
-search            Search and filter model elements
-change-impact     Analyze change impact and provide report
-traces            Generate verification traces
-coverage          Generate verification and implementation coverage report
-model             Generate model-centric structure diagram
-lint              Analyze model quality and detect issues
-add               Add new element to model
-rm                Remove element from model
-mv                Move element to different location
-rename            Rename element
-merge             Merge multiple elements into target element
-mv-file           Move entire specification file
-link              Add relation or attachment between elements
-unlink            Remove relation or attachment (auto-detects)
-mv-asset          Move/rename asset file and update references
-rm-asset          Remove asset file and remove references
-containment       Generate containment view
-resources         Generate resources report
-help              Print help for commands
-
-Options:
--h, --help               Print help
--V, --version            Print version
-
-<COMMAND OPTIONS>:
-Each command has its own options displayed in a flattened section
-(e.g., FORMAT OPTIONS, VALIDATE OPTIONS, etc.)
-
-#### Metadata
-  * type: specification
----
-
-### CLI Move Element Command Refinement Specification
-
-
-
-#### Details
-The `mv` command shall:
-- Accept element name as required positional argument
-- Accept target file path as required positional argument (resolved relative to Git repository root)
-- Support command syntax: `reqvire mv <element-name> <file>`
-- Move element to target file following Element Ordering Behavior
-- Update all incoming relations system-wide with new identifier
-- Preserve element content, metadata, and outgoing relations
-- Apply changes immediately by default
-- Support `--dry-run` flag to preview changes without applying
-- Output git-style diff showing all affected files by default
-- Support `--json` flag for structured output with relation updates and identifier change
-- Report identifier change (old → new)
-- Report error if element does not exist or target location is invalid
-- Reject moves into existing `# Documents` files when the move would create multiple elements in that file
-- Exit with code 0 on success, non-zero on error
-
-#### Metadata
-  * type: specification
----
-
-### CLI Move File Command Refinement Specification
-
-
-
-#### Details
-The `mv-file` command shall:
-- Accept source file path (required, relative to current working directory)
-- Accept target file path (required, relative to current working directory)
-- Support `--dry-run` flag to preview changes without applying
-- Support `--json` flag for structured output
-- Exit with code 0 on success, non-zero on error
-- Command syntax: `reqvire mv-file <source-file> <target-file>`
-- When `--squash` is used, reject if target is an existing `# Documents` file
-
-#### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### CLI Coverage Command Refinement Specification
@@ -162,10 +68,55 @@ Coverage command behavior:
 Command output is written to stdout for easy redirection to files.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI Coverage Command](Commands.md#cli-coverage-command)
+ * refine: [CLI Coverage Command](Commands.md#cli-coverage-command)
+---
+
+### CLI Interface Structure Refinement Specification
+
+#### Details
+The CLI must display all commands and options and command's options flattened in the main help output which must also be a default command:
+Reqvire requirements & traceability management tool
+
+Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
+
+Commands:
+export Export model to browsable HTML documentation
+serve Serve model as browsable HTML documentation via HTTP server
+format Format and normalize requirements files
+validate Validate model
+search Search and filter model elements
+change-impact Analyze change impact and provide report
+traces Generate verification traces
+coverage Generate verification and implementation coverage report
+model Generate model-centric structure diagram
+lint Analyze model quality and detect issues
+add Add new element to model
+rm Remove element from model
+mv Move element to different location
+rename Rename element
+merge Merge multiple elements into target element
+mv-file Move entire specification file
+link Add relation or attachment between elements
+unlink Remove relation or attachment (auto-detects)
+mv-asset Move/rename asset file and update references
+rm-asset Remove asset file and remove references
+containment Generate containment view
+resources Generate resources report
+help Print help for commands
+
+Options:
+-h, --help Print help
+-V, --version Print version
+
+<COMMAND OPTIONS>:
+Each command has its own options displayed in a flattened section
+(e.g., FORMAT OPTIONS, VALIDATE OPTIONS, etc.)
+
+#### Metadata
+ * type: specification
 ---
 
 ### CLI JSON File Output Option Refinement Specification
@@ -180,10 +131,10 @@ Command output is written to stdout for easy redirection to files.
 - Exit with code 0 on success and non-zero on file write error.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI JSON File Output Option](Commands.md#cli-json-file-output-option)
+ * refine: [CLI JSON File Output Option](Commands.md#cli-json-file-output-option)
 ---
 
 ### CLI Lint Command Refinement Specification
@@ -198,18 +149,18 @@ Lint command behavior:
 - Support `--json` for structured output.
 - Default to showing all issues when no filter flags are provided.
 - Categorize output into:
-  - Auto-fixable issues.
-  - Needs manual review issues.
+ - Auto-fixable issues.
+ - Needs manual review issues.
 - Exit with code 0 when no issues are found or when fixes are successfully applied.
 - Exit with non-zero status code on errors.
 
 Command output is written to stdout for easy redirection to files.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI Lint Command](Commands.md#cli-lint-command)
+ * refine: [CLI Lint Command](Commands.md#cli-lint-command)
 ---
 
 ### CLI Merge Element Command Refinement Specification
@@ -227,10 +178,30 @@ Merge command behavior:
 - Exit with code 0 on success and non-zero on error.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI Merge Element Command](Commands.md#cli-merge-element-command)
+ * refine: [CLI Merge Element Command](Commands.md#cli-merge-element-command)
+---
+
+### CLI Model Diagram Command Refinement Specification
+
+#### Details
+Model command behavior:
+- Be named `model`.
+- Support `--from=<name>` for filtering from a specific element by name.
+- Use globally unique element names for name-based lookup.
+- Support `--json` for JSON output format.
+- Support `--reverse` for leaf-to-root traversal.
+- Support `--filter-type=<types>` with comma-separated element types to filter starting points.
+- Default to Markdown output with embedded Mermaid diagram.
+- Integrate with existing model diagram generation functionality.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [CLI Model Diagram Command](Commands.md#cli-model-diagram-command)
 ---
 
 ### CLI Move Asset Command Refinement Specification
@@ -241,8 +212,8 @@ Merge command behavior:
 - Accept new file path as required positional argument.
 - Find all elements referencing the file as InternalPath.
 - Update all InternalPath references:
-  - In `Attachments` subsection (update both display text and href).
-  - In relations (`satisfiedBy`, `satisfy`, `trace` targets).
+ - In `Attachments` subsection (update both display text and href).
+ - In relations (`satisfiedBy`, `satisfy`, `trace` targets).
 - Physically move/rename the file on the filesystem.
 - Apply changes immediately by default.
 - Support `--dry-run` to preview changes without applying.
@@ -251,10 +222,69 @@ Merge command behavior:
 - Exit with code 0 on success and non-zero on error.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI Move Asset Command](Commands.md#cli-move-asset-command)
+ * refine: [CLI Move Asset Command](Commands.md#cli-move-asset-command)
+---
+
+### CLI Move Element Command Refinement Specification
+
+#### Details
+The `mv` command is expected to:
+- Accept element name as required positional argument
+- Accept target file path as required positional argument (resolved relative to Git repository root)
+- Support command syntax: `reqvire mv <element-name> <file>`
+- Move element to target file following Element Ordering Behavior
+- Update all incoming relations system-wide with new identifier
+- Preserve element content, metadata, and outgoing relations
+- Apply changes immediately by default
+- Support `--dry-run` flag to preview changes without applying
+- Output git-style diff showing all affected files by default
+- Support `--json` flag for structured output with relation updates and identifier change
+- Report identifier change (old → new)
+- Report error if element does not exist or target location is invalid
+- Reject moves into existing `# Documents` files when the move would create multiple elements in that file
+- Exit with code 0 on success, non-zero on error
+
+#### Metadata
+ * type: specification
+---
+
+### CLI Move File Command Refinement Specification
+
+#### Details
+The `mv-file` command is expected to:
+- Accept source file path (required, relative to current working directory)
+- Accept target file path (required, relative to current working directory)
+- Support `--dry-run` flag to preview changes without applying
+- Support `--json` flag for structured output
+- Exit with code 0 on success, non-zero on error
+- Command syntax: `reqvire mv-file <source-file> <target-file>`
+- When `--squash` is used, reject if target is an existing `# Documents` file
+
+#### Metadata
+ * type: specification
+---
+
+### CLI Relink Command Refinement Specification
+
+#### Details
+`relink` command behavior:
+- Accept source element name as required positional argument.
+- Accept relation type as required positional argument.
+- Accept old target and new target as required positional arguments.
+- Support command syntax: `reqvire relink <source> <relation-type> <old-target> <new-target>`.
+- Invoke the functional atomic relation relink operation.
+- Validate candidate model state before persistence.
+- Support `--dry-run` preview and `--json` output.
+- Reject unresolved source/target references, missing source relation, and post-relink validation failures with non-zero exit status.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [CLI Relink Command](Commands.md#cli-relink-command)
 ---
 
 ### CLI Remove Asset Command Refinement Specification
@@ -264,8 +294,8 @@ Merge command behavior:
 - Accept file path as required positional argument.
 - Find all elements referencing the file as InternalPath.
 - Remove all InternalPath references:
-  - From `Attachments` subsection (remove link entry and remove subsection if empty).
-  - From relations (remove entire relation line for `satisfiedBy`, `satisfy`, `trace`).
+ - From `Attachments` subsection (remove link entry and remove subsection if empty).
+ - From relations (remove entire relation line for `satisfiedBy`, `satisfy`, `trace`).
 - Delete the physical file from the filesystem.
 - Apply changes immediately by default.
 - Support `--dry-run` to preview changes without applying.
@@ -274,10 +304,10 @@ Merge command behavior:
 - Exit with code 0 on success and non-zero on error.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI Remove Asset Command](Commands.md#cli-remove-asset-command)
+ * refine: [CLI Remove Asset Command](Commands.md#cli-remove-asset-command)
 ---
 
 ### CLI Remove Element Command Refinement Specification
@@ -296,10 +326,10 @@ Merge command behavior:
 - Exit with code 0 on success and non-zero on error.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI Remove Element Command](Commands.md#cli-remove-element-command)
+ * refine: [CLI Remove Element Command](Commands.md#cli-remove-element-command)
 ---
 
 ### CLI Rename Element Command Refinement Specification
@@ -318,10 +348,10 @@ Merge command behavior:
 - Exit with code 0 on success and non-zero on error.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI Rename Element Command](Commands.md#cli-rename-element-command)
+ * refine: [CLI Rename Element Command](Commands.md#cli-rename-element-command)
 ---
 
 ### CLI Resources Command Refinement Specification
@@ -342,10 +372,44 @@ Resources command behavior:
 Command output is written to stdout for easy redirection to files.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI Resources Command](Commands.md#cli-resources-command)
+ * refine: [CLI Resources Command](Commands.md#cli-resources-command)
+---
+
+### CLI Search Command Refinement Specification
+
+#### Details
+Search command features:
+- `search`: Search model elements and output results to stdout
+- Support `--json` flag for structured JSON output
+- Support `--short` flag for abbreviated output (both text and JSON)
+- Support comprehensive filter options (all combinable):
+- By file path glob: `--filter-file="src/**/*Reqs.md"`
+- By element name regex: `--filter-name=".*safety.*"`
+- By element type: `--filter-type="requirement"` (exact match)
+- By element content regex: `--filter-content="MUST"`
+- By page content regex: `--filter-page-content="architecture"`
+- By having relations: `--have-relations=verifiedBy,satisfiedBy` (comma-separated, must have ALL)
+- By not having relations: `--not-have-relations=verifiedBy` (comma-separated, must NOT have ALL)
+- By having attachments: `--has-attachments` (filter elements with Attachments subsection)
+- By attachment path pattern: `--filter-attachment <glob>` (supports glob patterns like `*.pdf`, `docs/*`)
+
+Short mode behavior:
+- Text output: Display abbreviated one-line format per element
+- JSON output: Omit fields: `content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_elements`, `global_counters`
+
+Error handling:
+- Invalid regex patterns is expected to return clear error message showing the faulty pattern and exit
+- Invalid relation type names is expected to return error with list of valid relation types
+
+Default output:
+- Human-readable text format when neither `--json` nor `--short` is specified
+- Full detail mode showing all element metadata and relations
+
+#### Metadata
+ * type: specification
 ---
 
 ### CLI Submodels Command Refinement Specification
@@ -367,30 +431,116 @@ Submodels command behavior:
 Command output is written to stdout for easy redirection to files.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CLI Submodels Command](Commands.md#cli-submodels-command)
+ * refine: [CLI Submodels Command](Commands.md#cli-submodels-command)
 ---
 
-### CLI Model Diagram Command Refinement Specification
+### CLI Traces Command Refinement Specification
 
 #### Details
-Model command behavior:
-- Be named `model`.
-- Support `--from=<name>` for filtering from a specific element by name.
-- Use globally unique element names for name-based lookup.
-- Support `--json` for JSON output format.
-- Support `--reverse` for leaf-to-root traversal.
-- Support `--filter-type=<types>` with comma-separated element types to filter starting points.
-- Default to Markdown output with embedded Mermaid diagram.
-- Integrate with existing model diagram generation functionality.
+The command is expected to:
+- Be invoked as `reqvire traces`
+- Generate output in Markdown format with embedded Mermaid diagrams by default
+- Support `--json` flag for structured JSON output without diagrams
+- Show verification elements as roots with arrows following relation semantics
+- Include clickable links on all nodes (verifications and requirements) in Mermaid diagrams
+- Highlight directly verified requirements using CSS classes in diagrams
+- Traverse all upward parent relations to reach root requirements
+- Merge multiple verification paths into a single tree per verification
+- Exit with status code 0 on success
+- Exit with non-zero status code on errors
+
+The Mermaid diagrams generated for verification traces is expected to include clickable links on diagram nodes that navigate to the referenced element using relative paths (the `traces` command always uses relative paths and does not support the `--links-with-blobs` flag).
+
+Command output is expected to be written to stdout for easy redirection to files.
+
+**Filter Options:**
+The system is expected to support filtering verification traces by verification ID, name pattern, and verification type to allow users to generate traces for specific subsets of verifications.
+
+The following filter options is expected to be supported:
+- `--filter-id=<id>`: Generate trace for a specific verification element by its full identifier
+- `--filter-name=<regex>`: Filter verifications by name using regular expression matching
+- `--filter-type=<type>`: Filter by verification type (test-verification, analysis-verification, inspection-verification, demonstration-verification)
+
+Filters is expected to be combinable, and when multiple filters are specified, only verifications matching ALL filter criteria is expected to be included in the output.
+
+**From-Folder Option:**
+The system is expected to support a `--from-folder` option for the `traces` command that specifies the relative path from where Reqvire runs to the folder where generated output files will be saved, enabling generation of relative links in Mermaid diagrams and other outputs that are portable when the output is saved in different locations.
+
+The `--from-folder` option is expected to:
+- Accept a relative path string as parameter (e.g., `--from-folder=docs/verification-reports`)
+- Default to empty/current directory when not specified (maintaining existing behavior)
+- Support special case `/` to indicate the reqvire root (git root), keeping identifiers as git-root-relative paths
+- Adjust all clickable links in Mermaid diagrams to be relative to the specified folder path
+- Adjust all file path references in output to be relative to the specified folder path
+- Work with both Markdown output (with Mermaid diagrams) and JSON output
+- Ensure generated links work correctly when the output file is saved in the specified folder
+- Use the standard path resolution logic to calculate relative paths from the from-folder to git root
+
+**Example usage:**
+# Generate traces with links relative to docs/reports/ folder
+reqvire traces --from-folder=docs/reports > docs/reports/traces.md
+
+# Links in the output will be relative to docs/reports/ (e.g., ../../specifications/file.md)
 
 #### Metadata
-  * type: specification
+ * type: specification
+---
+
+### Detailed Error Handling and Logging Refinement Specification
+
+#### Details
+CLI error handling and logging behavior:
+- Returns contextual error messages that help users identify command failure causes.
+- Preserves actionable feedback format so remediation steps are visible near errors.
+- Uses shared validation/error reporting behavior for consistent message quality across commands.
+- Emits non-zero exit codes for command failures.
+
+#### Metadata
+ * type: specification
 
 #### Relations
-  * refine: [CLI Model Diagram Command](Commands.md#cli-model-diagram-command)
+ * refine: [Detailed Error Handling and Logging](Commands.md#detailed-error-handling-and-logging)
+---
+
+### Format Command Refinement Specification
+
+#### Details
+`format` command is expected to:
+- Default to dry-run mode (show suggested changes without applying them)
+- Require --fix flag to actually apply formatting changes to files
+- Display a diff-style summary of changes that would be or have been made
+- Support --json flag for structured output of formatting results
+- Show git diff style output with line numbers and colors for both preview and actual formatting
+- Support --with-full-relations flag to include all registered relations (user-created and auto-generated)
+
+Additional behavior:
+- By default (no --fix flag), preview changes without applying them
+- --fix flag applies the formatting changes to files
+- --json flag outputs formatting results in JSON format including file changes and diff information
+- When formatting is applied, show a summary of changed files with diff details
+- --with-full-relations flag inserts all relations from the model registry into elements, including auto-generated inverse relations (e.g., satisfiedBy from satisfy, derive from derivedFrom)
+
+#### Metadata
+ * type: specification
+---
+
+### Mutating Command Hierarchy Safety Refinement Specification
+
+#### Details
+For mutating commands (`add`, `rm`, `mv`, `rename`, `merge`, `mv-file`, `link`, `unlink`, `relink`):
+- Commands is expected to validate candidate state before persistence.
+- Operations that would violate hierarchy invariants is expected to fail with non-zero status.
+- Failed operations is expected to not partially persist model changes.
+- Error output is expected to include clear hierarchy constraint context.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [CLI Relink Command](Commands.md#cli-relink-command)
 ---
 
 ### Relation Commands Refinement Specification
@@ -417,50 +567,14 @@ The `unlink` command:
 - Supports `--dry-run` preview.
 
 Hierarchy ownership behavior:
-- Hierarchical `link`/`unlink` edits that would produce invalid hierarchy state shall fail.
-- Error messages shall guide users to atomic relink operation for hierarchy boundary rewiring.
+- Hierarchical `link`/`unlink` edits that would produce invalid hierarchy state is expected to fail.
+- Error messages is expected to guide users to atomic relink operation for hierarchy boundary rewiring.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Relation Commands](Commands.md#relation-commands)
----
-
-### CLI Relink Command Refinement Specification
-
-#### Details
-`relink` command behavior:
-- Accept source element name as required positional argument.
-- Accept relation type as required positional argument.
-- Accept old target and new target as required positional arguments.
-- Support command syntax: `reqvire relink <source> <relation-type> <old-target> <new-target>`.
-- Invoke the functional atomic relation relink operation.
-- Validate candidate model state before persistence.
-- Support `--dry-run` preview and `--json` output.
-- Reject unresolved source/target references, missing source relation, and post-relink validation failures with non-zero exit status.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [CLI Relink Command](Commands.md#cli-relink-command)
----
-
-### Mutating Command Hierarchy Safety Refinement Specification
-
-#### Details
-For mutating commands (`add`, `rm`, `mv`, `rename`, `merge`, `mv-file`, `link`, `unlink`, `relink`):
-- Commands shall validate candidate state before persistence.
-- Operations that would violate hierarchy invariants shall fail with non-zero status.
-- Failed operations shall not partially persist model changes.
-- Error output shall include clear hierarchy constraint context.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [CLI Relink Command](Commands.md#cli-relink-command)
+ * refine: [Relation Commands](Commands.md#relation-commands)
 ---
 
 ### Validate Command Refinement Specification
@@ -475,10 +589,10 @@ Validate command behavior:
 - Supports `--json` output for structured validation results.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Validate Command](Commands.md#validate-command)
+ * refine: [Validate Command](Commands.md#validate-command)
 ---
 
 ### Verification Traces Element Navigation Refinement Specification
@@ -491,138 +605,8 @@ Verification traces element navigation behavior:
 - Navigation allows direct jump from traces report to verification definition.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Verification Traces Element Navigation](Commands.md#verification-traces-element-navigation)
----
-
-### Detailed Error Handling and Logging Refinement Specification
-
-#### Details
-CLI error handling and logging behavior:
-- Returns contextual error messages that help users identify command failure causes.
-- Preserves actionable feedback format so remediation steps are visible near errors.
-- Uses shared validation/error reporting behavior for consistent message quality across commands.
-- Emits non-zero exit codes for command failures.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Detailed Error Handling and Logging](Commands.md#detailed-error-handling-and-logging)
----
-
-### CLI Search Command Refinement Specification
-
-
-
-#### Details
-Search command features:
-- `search`: Search model elements and output results to stdout
-- Support `--json` flag for structured JSON output
-- Support `--short` flag for abbreviated output (both text and JSON)
-- Support comprehensive filter options (all combinable):
-- By file path glob: `--filter-file="src/**/*Reqs.md"`
-- By element name regex: `--filter-name=".*safety.*"`
-- By element type: `--filter-type="requirement"` (exact match)
-- By element content regex: `--filter-content="MUST"`
-- By page content regex: `--filter-page-content="architecture"`
-- By having relations: `--have-relations=verifiedBy,satisfiedBy` (comma-separated, must have ALL)
-- By not having relations: `--not-have-relations=verifiedBy` (comma-separated, must NOT have ALL)
-- By having attachments: `--has-attachments` (filter elements with Attachments subsection)
-- By attachment path pattern: `--filter-attachment <glob>` (supports glob patterns like `*.pdf`, `docs/*`)
-
-Short mode behavior:
-- Text output: Display abbreviated one-line format per element
-- JSON output: Omit fields: `content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_elements`, `global_counters`
-
-Error handling:
-- Invalid regex patterns shall return clear error message showing the faulty pattern and exit
-- Invalid relation type names shall return error with list of valid relation types
-
-Default output:
-- Human-readable text format when neither `--json` nor `--short` is specified
-- Full detail mode showing all element metadata and relations
-
-#### Metadata
-  * type: specification
----
-
-### CLI Traces Command Refinement Specification
-
-
-
-#### Details
-The command shall:
-- Be invoked as `reqvire traces`
-- Generate output in Markdown format with embedded Mermaid diagrams by default
-- Support `--json` flag for structured JSON output without diagrams
-- Show verification elements as roots with arrows following relation semantics
-- Include clickable links on all nodes (verifications and requirements) in Mermaid diagrams
-- Highlight directly verified requirements using CSS classes in diagrams
-- Traverse all upward parent relations to reach root requirements
-- Merge multiple verification paths into a single tree per verification
-- Exit with status code 0 on success
-- Exit with non-zero status code on errors
-
-The Mermaid diagrams generated for verification traces shall include clickable links on diagram nodes that navigate to the referenced element using relative paths (the `traces` command always uses relative paths and does not support the `--links-with-blobs` flag).
-
-Command output shall be written to stdout for easy redirection to files.
-
-**Filter Options:**
-The system shall support filtering verification traces by verification ID, name pattern, and verification type to allow users to generate traces for specific subsets of verifications.
-
-The following filter options shall be supported:
-- `--filter-id=<id>`: Generate trace for a specific verification element by its full identifier
-- `--filter-name=<regex>`: Filter verifications by name using regular expression matching
-- `--filter-type=<type>`: Filter by verification type (test-verification, analysis-verification, inspection-verification, demonstration-verification)
-
-Filters shall be combinable, and when multiple filters are specified, only verifications matching ALL filter criteria shall be included in the output.
-
-**From-Folder Option:**
-The system shall support a `--from-folder` option for the `traces` command that specifies the relative path from where Reqvire runs to the folder where generated output files will be saved, enabling generation of relative links in Mermaid diagrams and other outputs that are portable when the output is saved in different locations.
-
-The `--from-folder` option shall:
-- Accept a relative path string as parameter (e.g., `--from-folder=docs/verification-reports`)
-- Default to empty/current directory when not specified (maintaining existing behavior)
-- Support special case `/` to indicate the reqvire root (git root), keeping identifiers as git-root-relative paths
-- Adjust all clickable links in Mermaid diagrams to be relative to the specified folder path
-- Adjust all file path references in output to be relative to the specified folder path
-- Work with both Markdown output (with Mermaid diagrams) and JSON output
-- Ensure generated links work correctly when the output file is saved in the specified folder
-- Use the standard path resolution logic to calculate relative paths from the from-folder to git root
-
-**Example usage:**
-# Generate traces with links relative to docs/reports/ folder
-reqvire traces --from-folder=docs/reports > docs/reports/traces.md
-
-# Links in the output will be relative to docs/reports/ (e.g., ../../specifications/file.md)
-
-#### Metadata
-  * type: specification
----
-
-### Format Command Refinement Specification
-
-
-
-#### Details
-`format` command shall:
-- Default to dry-run mode (show suggested changes without applying them)
-- Require --fix flag to actually apply formatting changes to files
-- Display a diff-style summary of changes that would be or have been made
-- Support --json flag for structured output of formatting results
-- Show git diff style output with line numbers and colors for both preview and actual formatting
-- Support --with-full-relations flag to include all registered relations (user-created and auto-generated)
-
-Additional behavior:
-- By default (no --fix flag), preview changes without applying them
-- --fix flag applies the formatting changes to files
-- --json flag outputs formatting results in JSON format including file changes and diff information
-- When formatting is applied, show a summary of changed files with diff details
-- --with-full-relations flag inserts all relations from the model registry into elements, including auto-generated inverse relations (e.g., satisfiedBy from satisfy, derive from derivedFrom)
-
-#### Metadata
-  * type: specification
+ * refine: [Verification Traces Element Navigation](Commands.md#verification-traces-element-navigation)
 ---

@@ -1,11 +1,48 @@
 # Elements
 
-### Component-Based HTML Architecture Refinement Specification
-
-
+### Attachment Export Refinement Specification
 
 #### Details
-The HTML generation system shall be organized into reusable components:
+Attachment export behavior during HTML export:
+- Collects attachment references from `element.attachments` across the model.
+- Copies each attachment file into the output directory while preserving relative paths.
+- Skips duplicate file copies when the same file is referenced by multiple elements.
+- Emits progress information for attachment copy operations.
+
+This keeps exported documentation complete for offline browsing with referenced files.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Attachment Export](Features.md#attachment-export)
+---
+
+### CSS Framework Integration Refinement Specification
+
+#### Details
+CSS framework integration behavior:
+- Uses Tailwind CSS via CDN in current export flow.
+- Applies mobile-first utility classes for responsive layout behavior.
+- Uses responsive modifiers (`sm`, `md`, `lg`, `xl`) for adaptation.
+- Defines Reqvire theme colors including primary, requirement, and verification tones.
+
+Tailwind usage provides:
+- Utility-first styling for predictable page composition.
+- Built-in responsive modifiers (for example `md:hidden`, `lg:flex`).
+- Consistent spacing, color, and typography scales.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [CSS Framework Integration](HTMLGeneration.md#css-framework-integration)
+---
+
+### Component-Based HTML Architecture Refinement Specification
+
+#### Details
+The HTML generation system is expected to be organized into reusable components:
 
 **Shared components:**
 - Navigation menu (with mobile/desktop variants)
@@ -26,10 +63,27 @@ The HTML generation system shall be organized into reusable components:
 - Resources page
 - Individual specification pages
 
-Each component shall be defined once and reused across all generated pages to eliminate code duplication.
+Each component is expected to be defined once and reused across all generated pages to eliminate code duplication.
 
 #### Metadata
-  * type: specification
+ * type: specification
+---
+
+### Containment View Attachment Links Refinement Specification
+
+#### Details
+Containment view attachment rendering behavior:
+- For each element with attachments, renders attachments as child nodes in the D3 tree.
+- Uses wrench icon (`🔧`) and type `attachment-element` for element attachments.
+- Uses paperclip icon (`📎`) and type `attachment-file` for file attachments.
+- Element-attachment nodes navigate to the referenced element.
+- File-attachment nodes display filename and path reference.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Containment View Attachment Links](Features.md#containment-view-attachment-links)
 ---
 
 ### D3.js Containment Tree Specification
@@ -37,7 +91,7 @@ Each component shall be defined once and reused across all generated pages to el
 Specification for the D3.js interactive containment tree visualization.
 
 #### Details
-The containment page (containment.html) shall display an interactive D3.js collapsible tree showing the containment hierarchy:
+The containment page (containment.html) is expected to display an interactive D3.js collapsible tree showing the containment hierarchy:
 1. Root node representing the model root
 2. Folder nodes that can be expanded/collapsed
 3. File nodes containing element children
@@ -49,7 +103,29 @@ The containment page (containment.html) shall display an interactive D3.js colla
 The containment view serves as the primary entry point for HTML documentation, providing an interactive visual overview of the model structure.
 
 #### Metadata
-  * type: specification
+ * type: specification
+---
+
+### Diagram Attachment Display Refinement Specification
+
+#### Details
+Diagram attachment rendering behavior in Mermaid output:
+- Renders attachment links under the element name inside node labels.
+- Prefixes each attachment with paperclip icon (`📎`).
+- Displays filename rather than full path for compact diagrams.
+- Produces clickable links to the referenced document.
+- Uses Mermaid multiline label formatting (`<br/>`).
+
+Example node:
+```
+elementId["Element Name<br/>📎 DesignDoc.md"]
+```
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Diagram Attachment Display](Features.md#diagram-attachment-display)
 ---
 
 ### HTML Branding Specification
@@ -58,16 +134,16 @@ Specification for Reqvire branding elements in HTML export.
 
 #### Details
 **Logo and Branding:**
-- The navigation bar shall display the Reqvire logo on the left side before the navigation links
-- A favicon shall be included for browser tab identification
-- Apple touch icons shall be included for mobile device support
-- All brand assets shall be exported to an assets folder during HTML export
+- The navigation bar is expected to display the Reqvire logo on the left side before the navigation links
+- A favicon is expected to be included for browser tab identification
+- Apple touch icons is expected to be included for mobile device support
+- All brand assets is expected to be exported to an assets folder during HTML export
 
 **HTML Design:**
-The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.
+The system is expected to design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### HTML Export Pipeline Specification
@@ -107,91 +183,52 @@ Execute all generation commands treating temporary directory as repository root:
 - All generation happens in isolated temporary directory
 
 **Git Directory Exclusion:**
-- The .git directory shall never be exported to the output folder
+- The .git directory is expected to never be exported to the output folder
 - This prevents internal git metadata from polluting the exported documentation
 
 **Export Related System Elements:**
 - Ensure that any related system elements are also copied into output folder to ensure consistency of exported model
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
-### Serve Command Refinement Specification
+### HTML Navigation Bar Specification
+
+Specification for the fixed navigation bar in HTML pages.
 
 #### Details
-Serve command behavior:
-- Accept `--host <HOST>` option to specify the bind address (default: localhost)
-- Accept `--port <PORT>` option to specify the server port (default: 8080)
-- Use a random temporary directory for HTML export
-- Run HTML Export to generate complete documentation in the temporary directory
-- Start an HTTP server serving static files from the temporary directory
-- Display clickable server URL for user to open in browser
-- Display instructions to press Ctrl-C to stop server
-- Continue serving until terminated by the user (Ctrl-C)
+The system is expected to provide a fixed navigation bar in all HTML pages with links to key model artifacts for easy access.
+
+The navigation bar must include (left to right):
+- Containment: Link to containment.html (interactive D3.js tree - main entry point)
+- Model: Link to model.html (model-centric view with nested relations)
+- Traces: Link to traces.html (verification upward traceability report)
+- Coverage: Link to coverage.html (verification coverage report)
+
+The navigation bar must be:
+- Always visible (fixed position) while scrolling
+- Consistent across all HTML pages
+- Clearly visible and accessible
 
 #### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Serve Command](Features.md#serve-command)
+ * type: specification
 ---
 
-### Attachment Export Refinement Specification
+### Model View Element Navigation Refinement Specification
 
 #### Details
-Attachment export behavior during HTML export:
-- Collects attachment references from `element.attachments` across the model.
-- Copies each attachment file into the output directory while preserving relative paths.
-- Skips duplicate file copies when the same file is referenced by multiple elements.
-- Emits progress information for attachment copy operations.
-
-This keeps exported documentation complete for offline browsing with referenced files.
+Model-view element navigation behavior:
+- Element-name headers render as hyperlinks.
+- Links target element source file plus fragment identifier.
+- Link format: `[Element Name](file_path#element-fragment)`.
+- Navigation enables direct jump from model view to definition.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Attachment Export](Features.md#attachment-export)
----
-
-### Containment View Attachment Links Refinement Specification
-
-#### Details
-Containment view attachment rendering behavior:
-- For each element with attachments, renders attachments as child nodes in the D3 tree.
-- Uses wrench icon (`🔧`) and type `attachment-element` for element attachments.
-- Uses paperclip icon (`📎`) and type `attachment-file` for file attachments.
-- Element-attachment nodes navigate to the referenced element.
-- File-attachment nodes display filename and path reference.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Containment View Attachment Links](Features.md#containment-view-attachment-links)
----
-
-### Diagram Attachment Display Refinement Specification
-
-#### Details
-Diagram attachment rendering behavior in Mermaid output:
-- Renders attachment links under the element name inside node labels.
-- Prefixes each attachment with paperclip icon (`📎`).
-- Displays filename rather than full path for compact diagrams.
-- Produces clickable links to the referenced document.
-- Uses Mermaid multiline label formatting (`<br/>`).
-
-Example node:
-```
-elementId["Element Name<br/>📎 DesignDoc.md"]
-```
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Diagram Attachment Display](Features.md#diagram-attachment-display)
+ * refine: [Model View Element Navigation](Features.md#model-view-element-navigation)
 ---
 
 ### Model-Centric View Generation Refinement Specification
@@ -205,26 +242,10 @@ Model-centric view generation behavior:
 - Produces markdown output that is later rendered as `model.html`.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Model-Centric View Generation](Features.md#model-centric-view-generation)
----
-
-### Model View Element Navigation Refinement Specification
-
-#### Details
-Model-view element navigation behavior:
-- Element-name headers render as hyperlinks.
-- Links target element source file plus fragment identifier.
-- Link format: `[Element Name](file_path#element-fragment)`.
-- Navigation enables direct jump from model view to definition.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Model View Element Navigation](Features.md#model-view-element-navigation)
+ * refine: [Model-Centric View Generation](Features.md#model-centric-view-generation)
 ---
 
 ### Responsive HTML Generation Refinement Specification
@@ -243,31 +264,30 @@ Breakpoints:
 - `xl`: 1280px and up.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Responsive HTML Generation](HTMLGeneration.md#responsive-html-generation)
+ * refine: [Responsive HTML Generation](HTMLGeneration.md#responsive-html-generation)
 ---
 
-### CSS Framework Integration Refinement Specification
+### Serve Command Refinement Specification
 
 #### Details
-CSS framework integration behavior:
-- Uses Tailwind CSS via CDN in current export flow.
-- Applies mobile-first utility classes for responsive layout behavior.
-- Uses responsive modifiers (`sm`, `md`, `lg`, `xl`) for adaptation.
-- Defines Reqvire theme colors including primary, requirement, and verification tones.
-
-Tailwind usage provides:
-- Utility-first styling for predictable page composition.
-- Built-in responsive modifiers (for example `md:hidden`, `lg:flex`).
-- Consistent spacing, color, and typography scales.
+Serve command behavior:
+- Accept `--host <HOST>` option to specify the bind address (default: localhost)
+- Accept `--port <PORT>` option to specify the server port (default: 8080)
+- Use a random temporary directory for HTML export
+- Run HTML Export to generate complete documentation in the temporary directory
+- Start an HTTP server serving static files from the temporary directory
+- Display clickable server URL for user to open in browser
+- Display instructions to press Ctrl-C to stop server
+- Continue serving until terminated by the user (Ctrl-C)
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [CSS Framework Integration](HTMLGeneration.md#css-framework-integration)
+ * refine: [Serve Command](Features.md#serve-command)
 ---
 
 ### Type-Safe HTML Generation Refinement Specification
@@ -282,37 +302,13 @@ Type-safe HTML generation behavior:
 This shifts most structural HTML errors to compile time instead of runtime.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Type-Safe HTML Generation](HTMLGeneration.md#type-safe-html-generation)
----
-
-### HTML Navigation Bar Specification
-
-Specification for the fixed navigation bar in HTML pages.
-
-#### Details
-The system shall provide a fixed navigation bar in all HTML pages with links to key model artifacts for easy access.
-
-The navigation bar must include (left to right):
-- Containment: Link to containment.html (interactive D3.js tree - main entry point)
-- Model: Link to model.html (model-centric view with nested relations)
-- Traces: Link to traces.html (verification upward traceability report)
-- Coverage: Link to coverage.html (verification coverage report)
-
-The navigation bar must be:
-- Always visible (fixed position) while scrolling
-- Consistent across all HTML pages
-- Clearly visible and accessible
-
-#### Metadata
-  * type: specification
+ * refine: [Type-Safe HTML Generation](HTMLGeneration.md#type-safe-html-generation)
 ---
 
 ### Web Interface Refinement Specification
-
-
 
 #### Details
 The browse interface allows users to:
@@ -323,9 +319,9 @@ The browse interface allows users to:
 
 This capability enables both human users (via browser) and AI agents (via MCP server) to efficiently explore and understand the System model without manually navigating file structures.
 
-All generated HTML content shall produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.
+All generated HTML content is expected to produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.
 
-The system shall ensure deterministic HTML output by:
+The system is expected to ensure deterministic HTML output by:
 - Sorting elements by identifier before rendering
 - Sorting relations by type and target identifier
 - Maintaining consistent navigation and page ordering
@@ -337,7 +333,7 @@ This determinism ensures that:
 - Continuous integration pipelines produce reproducible results
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Web Interface Style Specification
@@ -389,5 +385,5 @@ The web interface uses a monochrome grayscale theme for consistent, professional
 - Collapsible sections for long content
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---

@@ -126,10 +126,17 @@ if [ "$AUTO_FIXABLE_COUNT_AUDIT" -ne 0 ]; then
   exit 1
 fi
 
-# Verify needs_manual_review is empty (before fix, there are no manual review items)
+# Verify exactly one manual review item and it is cross-submodel
 MANUAL_REVIEW_COUNT_AUDIT=$(echo "$AUDITABLE_JSON_OUTPUT" | jq '.needs_manual_review | length')
-if [ "$MANUAL_REVIEW_COUNT_AUDIT" -ne 0 ]; then
-  echo "❌ FAILED: --auditable --json should have empty needs_manual_review before fix (found $MANUAL_REVIEW_COUNT_AUDIT)"
+if [ "$MANUAL_REVIEW_COUNT_AUDIT" -ne 1 ]; then
+  echo "❌ FAILED: --auditable --json should have exactly 1 manual review item (found $MANUAL_REVIEW_COUNT_AUDIT)"
+  echo "$AUDITABLE_JSON_OUTPUT" | jq '.needs_manual_review'
+  exit 1
+fi
+
+MANUAL_REVIEW_TYPES=$(echo "$AUDITABLE_JSON_OUTPUT" | jq -r '.needs_manual_review[].type' | sort -u)
+if [ "$MANUAL_REVIEW_TYPES" != "cross_submodel_hierarchical_relation" ]; then
+  echo "❌ FAILED: --auditable --json should report cross_submodel_hierarchical_relation (found: $MANUAL_REVIEW_TYPES)"
   echo "$AUDITABLE_JSON_OUTPUT" | jq '.needs_manual_review'
   exit 1
 fi

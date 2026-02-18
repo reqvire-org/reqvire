@@ -72,3 +72,35 @@ This requirement reaches root through MULTIPLE convergent paths (via parent-requ
   * derivedFrom: #root-requirement
 
 ---
+
+### Standalone Submodel Root
+
+This is an independent root for cross-submodel boundary checks.
+
+#### Metadata
+  * type: user-requirement
+
+---
+
+### Standalone Child
+
+This requirement is owned by `Standalone Submodel Root`.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: #standalone-submodel-root
+
+---
+
+### Cross-Submodel Linked Requirement
+
+This requirement should only be modeled via attachment, not by hierarchical relation.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: #parent-requirement
+  * derivedFrom: #standalone-child

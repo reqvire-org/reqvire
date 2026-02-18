@@ -6,10 +6,13 @@
 use crate::element::ElementType;
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
-use crate::relation::{VERIFY_RELATION, VERIFICATION_TRACES_RELATIONS};
+use crate::relation::{
+    get_hierarchical_relation_types, LinkType, VERIFY_RELATION, VERIFICATION_TRACES_RELATIONS,
+};
+use crate::utils;
 use crate::trace_tree_builder;
 use serde::Serialize;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 #[derive(Debug, Serialize, Clone)]
 pub struct LintReport {
@@ -41,6 +44,17 @@ pub enum ManualReviewIssue {
     MaybeRedundantHierarchicalRelations {
         element: ElementInfo,
         potentially_redundant_relations: Vec<RelationInfo>,
+        rationale: String,
+    },
+    #[serde(rename = "cross_submodel_hierarchical_relation")]
+    CrossSubmodelHierarchicalRelation {
+        source: ElementInfo,
+        target: ElementInfo,
+        relation_type: String,
+        source_root: String,
+        source_root_name: String,
+        target_root: String,
+        target_root_name: String,
         rationale: String,
     },
     #[serde(rename = "multi_branch_convergence")]
@@ -166,6 +180,27 @@ impl LintReport {
                         println!("\nReason: {}\n", rationale);
                         println!("---\n");
                     }
+                    ManualReviewIssue::CrossSubmodelHierarchicalRelation {
+                        source,
+                        target,
+                        relation_type,
+                        source_root,
+                        source_root_name,
+                        target_root,
+                        target_root_name,
+                        rationale,
+                    } => {
+                        println!("### Cross-Submodel Hierarchical Relation");
+                        println!("**Source: {}**", source.name);
+                        println!("Source root: {} ({})", source_root_name, source_root);
+                        println!("Target: {} ({})", target.name, target.identifier);
+                        println!("Target root: {} ({})", target_root_name, target_root);
+                        println!("Relation: {} -> [{}]({})", relation_type, target.identifier, target.identifier);
+                        println!("File: [{}]({})\n", source.identifier, source.identifier);
+                        println!("Reason: {}", rationale);
+                        println!("\n");
+                        println!("---\n");
+                    }
                     ManualReviewIssue::MultiBranchConvergence {
                         element,
                         common_ancestor,
@@ -268,6 +303,9 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
     auto_fixable.extend(safe_issues);
     needs_manual_review.extend(unsafe_issues);
 
+    // Detect cross-submodel hierarchical relations (manual review only)
+    needs_manual_review.extend(detect_cross_submodel_hierarchical_relations(registry));
+
     // Detect multi-branch convergence (needs manual review)
     needs_manual_review.extend(detect_multi_branch_convergence(registry));
 
@@ -287,10 +325,12 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
     needs_manual_review.sort_by(|a, b| {
         let id_a = match a {
             ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+            ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => &source.identifier,
             ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
         };
         let id_b = match b {
             ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+            ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => &source.identifier,
             ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
         };
         id_a.cmp(id_b)
@@ -300,6 +340,225 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
         auto_fixable,
         needs_manual_review,
     }
+}
+
+fn detect_cross_submodel_hierarchical_relations(
+    registry: &GraphRegistry,
+) -> Vec<ManualReviewIssue> {
+    let mut issues = Vec::new();
+    let hierarchical_relation_types = get_hierarchical_relation_types();
+    let (root_assignment, requirement_ids) =
+        build_requirement_root_assignment(registry, &hierarchical_relation_types);
+    let mut seen = HashSet::new();
+
+    for source_id in requirement_ids {
+        let Some(source_root_id) = root_assignment.get(&source_id) else {
+            continue;
+        };
+
+        let Some(source_root) = registry.get_element(source_root_id) else {
+            continue;
+        };
+
+        let Some(source_elem) = registry.get_element(&source_id) else {
+            continue;
+        };
+
+        for relation in &source_elem.relations {
+            if !hierarchical_relation_types.contains(&relation.relation_type.name) {
+                continue;
+            }
+
+            if !relation.user_created {
+                continue;
+            }
+
+            let LinkType::Identifier(target_identifier) = &relation.target.link else {
+                continue;
+            };
+
+            let Some(target_id) =
+                resolve_lint_target_identifier(registry, &source_elem.file_path, target_identifier)
+            else {
+                continue;
+            };
+
+            let Some(target_root_id) = root_assignment.get(&target_id) else {
+                continue;
+            };
+
+            if target_root_id == source_root_id {
+                continue;
+            }
+
+            let Some(target_elem) = registry.get_element(&target_id) else {
+                continue;
+            };
+
+            let Some(target_root) = registry.get_element(target_root_id) else {
+                continue;
+            };
+
+            let key = (
+                source_elem.identifier.clone(),
+                relation.relation_type.name,
+                target_id.clone(),
+            );
+            if !seen.insert(key) {
+                continue;
+            }
+
+            issues.push(ManualReviewIssue::CrossSubmodelHierarchicalRelation {
+                source: ElementInfo {
+                    identifier: source_elem.identifier.clone(),
+                    name: source_elem.name.clone(),
+                    file: source_elem.file_path.clone(),
+                },
+                target: ElementInfo {
+                    identifier: target_id.clone(),
+                    name: target_elem.name.clone(),
+                    file: target_elem.file_path.clone(),
+                },
+                relation_type: relation.relation_type.name.to_string(),
+                source_root: source_root_id.clone(),
+                source_root_name: source_root.name.clone(),
+                target_root: target_root_id.clone(),
+                target_root_name: target_root.name.clone(),
+                rationale: format!(
+                    "Hierarchical relation '{}' from '{}' crosses from submodel '{}' to '{}'. \
+                    Hierarchical structure should remain internal to a single ownership boundary. \
+                    Replace this relation with an explicit attachment contract.",
+                    relation.relation_type.name,
+                    source_elem.identifier,
+                    source_root_id,
+                    target_root_id
+                ),
+            });
+        }
+    }
+
+    issues
+}
+
+fn build_requirement_root_assignment(
+    registry: &GraphRegistry,
+    hierarchical_relation_types: &[&str],
+) -> (HashMap<String, String>, Vec<String>) {
+    let mut requirement_ids: Vec<String> = registry
+        .get_all_elements()
+        .into_iter()
+        .filter_map(|e| {
+            if matches!(e.element_type, crate::element::ElementType::Requirement(_)) {
+                Some(e.identifier.clone())
+            } else {
+                None
+            }
+        })
+        .collect();
+    requirement_ids.sort();
+
+    let requirement_set: HashSet<String> = requirement_ids.iter().cloned().collect();
+    let mut parent_map: HashMap<String, Vec<String>> = HashMap::new();
+
+    for requirement_id in &requirement_ids {
+        let mut parents = HashSet::new();
+        let Some(source_elem) = registry.get_element(requirement_id) else {
+            continue;
+        };
+
+        for relation in &source_elem.relations {
+            if !hierarchical_relation_types.contains(&relation.relation_type.name) {
+                continue;
+            }
+
+            let LinkType::Identifier(target_identifier) = &relation.target.link else {
+                continue;
+            };
+
+            let Some(parent_id) =
+                resolve_lint_target_identifier(registry, &source_elem.file_path, target_identifier)
+            else {
+                continue;
+            };
+
+            if requirement_set.contains(&parent_id) {
+                parents.insert(parent_id);
+            }
+        }
+
+        parent_map.insert(requirement_id.clone(), parents.into_iter().collect());
+    }
+
+    let mut memo = HashMap::new();
+    let mut root_assignment = HashMap::new();
+
+    for requirement_id in &requirement_ids {
+        let roots = resolve_root_candidates(requirement_id, &parent_map, &mut memo, &mut HashSet::new());
+        if let Some(root_id) = roots.first().cloned() {
+            root_assignment.insert(requirement_id.clone(), root_id);
+        }
+    }
+
+    (root_assignment, requirement_ids)
+}
+
+fn resolve_root_candidates(
+    requirement_id: &str,
+    parent_map: &HashMap<String, Vec<String>>,
+    memo: &mut HashMap<String, BTreeSet<String>>,
+    visiting: &mut HashSet<String>,
+) -> BTreeSet<String> {
+    if let Some(cached) = memo.get(requirement_id) {
+        return cached.clone();
+    }
+
+    if visiting.contains(requirement_id) {
+        return BTreeSet::new();
+    }
+    visiting.insert(requirement_id.to_string());
+
+    let mut roots = BTreeSet::new();
+    let parents = parent_map.get(requirement_id).cloned().unwrap_or_default();
+
+    if parents.is_empty() {
+        roots.insert(requirement_id.to_string());
+    } else {
+        for parent_id in parents {
+            for root in resolve_root_candidates(&parent_id, parent_map, memo, visiting) {
+                roots.insert(root);
+            }
+        }
+    }
+
+    visiting.remove(requirement_id);
+    memo.insert(requirement_id.to_string(), roots.clone());
+    roots
+}
+
+fn resolve_lint_target_identifier(
+    registry: &GraphRegistry,
+    source_file_path: &str,
+    target_identifier: &str,
+) -> Option<String> {
+    if registry.get_element(target_identifier).is_some() {
+        return Some(target_identifier.to_string());
+    }
+
+    if target_identifier.starts_with('#') {
+        let full_identifier = format!("{}{}", source_file_path, target_identifier);
+        if registry.get_element(&full_identifier).is_some() {
+            return Some(full_identifier);
+        }
+    }
+
+    let (_, fragment) = utils::extract_path_and_fragment(target_identifier);
+    if let Some(fragment) = fragment {
+        if registry.get_element(fragment).is_some() {
+            return Some(fragment.to_string());
+        }
+    }
+
+    None
 }
 
 /// Detect redundant verify relations in verifications

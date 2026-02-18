@@ -15,8 +15,8 @@ When requested the system shall provide human readable and machine readable Syst
   * derive: [Collect Content from Requirement Chain](#collect-content-from-requirement-chain)
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
   * derive: [Provide Validation Reports](#provide-validation-reports)
-  * derive: [Resources Report](#resources-report)
   * derive: [Requirement Implementation Coverage Report](#requirement-implementation-coverage-report)
+  * derive: [Resources Report](#resources-report)
   * derive: [Verification Coverage Report](#verification-coverage-report)
   * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
   * refinedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
@@ -151,6 +151,35 @@ The system shall support filtering starting elements by type for model traversal
   * verifiedBy: [Start Type Filter Test](Verifications/ReportingVerifications.md#start-type-filter-test)
 ---
 
+### Requirement Submodels Report
+
+The system shall provide a submodels report that identifies independent requirement hierarchies (by top roots) and cross-submodel requirement couplings.
+
+#### Details
+The report shall support:
+- Full model view listing all discovered submodels and cross-submodel couplings
+- Filtered view scoped to one requirement subtree by requirement name
+- Scope filtering follows transitive descendants via hierarchical edges in downstream direction, so the selected requirement defines a boundary subtree.
+- When a selected subtree has no child sub-requirements, the filtered report contains zero scoped submodels.
+- In filtered view, the selected requirement is a scope boundary and is not counted as a reported submodel entry
+- The report summary includes deterministic counts for total submodels, total requirements represented in scope, and total cross-submodel couplings; in scoped mode, counts are computed from the scoped submodels and couplings only.
+- Summary content follows the report paragraph: `Submodels`, `Requirements`, and `Cross-Submodel Couplings`.
+
+Implementation details shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [RelationTypes](../Core/DesignDocuments/RelationTypes.md#relationtypes)
+
+#### Relations
+  * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+  * refinedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
+  * satisfiedBy: [report_submodels.rs](../../../core/src/report_submodels.rs)
+  * verifiedBy: [Submodels Report Verification](Verifications/ReportingVerifications.md#submodels-report-verification)
+---
+
 ### Search Report Generator
 
 The system shall implement a search report generator with comprehensive filtering and element type tracking.
@@ -244,6 +273,34 @@ The system shall implement a validation report generator that compiles and forma
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
+### Requirement Implementation Coverage Report
+
+The system shall generate requirement implementation coverage reports that identify which requirements are implemented using direct `satisfiedBy` evidence and refinement-contract consumption evidence.
+
+#### Details
+The implementation coverage report shall provide:
+- Total count of requirements in scope (`requirement` only; excludes `user-requirement`)
+- Count and percentage of implementation-covered requirements
+- Count and percentage of implementation-uncovered requirements
+- Coverage source classification for covered requirements:
+  - direct `satisfiedBy` on the requirement
+  - refinement-contract coverage through owned refinement elements attached by directly satisfied requirements
+  - refinement-contract coverage when a requirement that owns refinement has directly satisfied derived descendants
+- Detailed lists grouped by file and section, including coverage source and evidence references
+- Output in both human-readable text and machine-readable JSON formats
+- Coverage percentages shall be reported with at most 2 decimal places
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Model Reports](#model-reports)
+  * refinedBy: [Implementation Coverage Behavior](Behaviors.md#implementation-coverage-behavior)
+  * refinedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
+  * refinedBy: [Requirement Implementation Coverage Logic Specification](Specifications.md#requirement-implementation-coverage-logic-specification)
+  * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
+---
+
 ### Resources Report
 
 The system shall provide a resources report showing all files referenced by the model through relations and attachments in text, JSON, and HTML formats.
@@ -255,35 +312,6 @@ The system shall provide a resources report showing all files referenced by the 
   * derivedFrom: [Model Reports](#model-reports)
   * refinedBy: [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
   * verifiedBy: [Resources Report Verification](Verifications/ReportingVerifications.md#resources-report-verification)
----
-
-### Requirement Submodels Report
-
-The system shall provide a submodels report that identifies independent requirement hierarchies (by top roots) and cross-submodel requirement couplings.
-
-#### Details
-The report shall support:
-- Full model view listing all discovered submodels and cross-submodel couplings
-- Filtered view scoped to one requirement subtree by requirement name
-- Scope filtering follows transitive descendants via hierarchical edges in downstream direction, so the selected requirement defines a boundary subtree.
-- When a selected subtree has no child sub-requirements, the filtered report contains zero scoped submodels.
-- In filtered view, the selected requirement is a scope boundary and is not counted as a reported submodel entry
-- The report summary includes deterministic counts for total submodels, total requirements represented in scope, and total cross-submodel couplings; in scoped mode, counts are computed from the scoped submodels and couplings only.
-- Summary content follows the report paragraph: `Submodels`, `Requirements`, and `Cross-Submodel Couplings`.
-
-Implementation details shall follow the associated refinement specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Attachments
-  * [RelationTypes](../Core/DesignDocuments/RelationTypes.md#relationtypes)
-
-#### Relations
-  * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * refinedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
-  * satisfiedBy: [report_submodels.rs](../../../core/src/report_submodels.rs)
-  * verifiedBy: [Submodels Report Verification](Verifications/ReportingVerifications.md#submodels-report-verification)
 ---
 
 ### Verification Coverage Report
@@ -314,36 +342,6 @@ The report helps track verification completeness and identify gaps in requiremen
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
   * refinedBy: [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
----
-
-### Requirement Implementation Coverage Report
-
-The system shall generate requirement implementation coverage reports that identify which requirements are implemented using direct `satisfiedBy` evidence and refinement-contract consumption evidence.
-
-#### Details
-The implementation coverage report shall provide:
-- Total count of requirements in scope (`requirement` only; excludes `user-requirement`)
-- Count and percentage of implementation-covered requirements
-- Count and percentage of implementation-uncovered requirements
-- Coverage source classification for covered requirements:
-  - direct `satisfiedBy` on the requirement
-  - refinement-contract coverage through owned refinement elements attached by directly satisfied requirements
-  - refinement-contract coverage when a requirement that owns refinement has directly satisfied derived descendants
-- Detailed lists grouped by file and section, including coverage source and evidence references
-- Output in both human-readable text and machine-readable JSON formats
-- Coverage percentages shall be reported with at most 2 decimal places
-
-#### Metadata
-  * type: requirement
-
-#### Attachments
-
-#### Relations
-  * derivedFrom: [Model Reports](#model-reports)
-  * refinedBy: [Requirement Implementation Coverage Logic Specification](Specifications.md#requirement-implementation-coverage-logic-specification)
-  * refinedBy: [Implementation Coverage Output Structure Specification](Specifications.md#implementation-coverage-output-structure-specification)
-  * refinedBy: [Implementation Coverage Behavior](Behaviors.md#implementation-coverage-behavior)
-  * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
 ---
 
 ### TraceFlow View Report Generation

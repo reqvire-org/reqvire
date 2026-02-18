@@ -2,18 +2,14 @@
 
 ### Attachment Scope Validation Refinement Specification
 
-
-
 #### Details
-When validating attachments (both refinement elements and file assets), the system shall enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
+When validating attachments (both refinement elements and file assets), the system is expected to enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Attachment Target Validation Refinement Specification
-
-
 
 #### Details
 Attachment targets support two types of references:
@@ -26,18 +22,16 @@ Attachment targets support two types of references:
 **Element Identifiers:**
 - Must point to Refinement element types only (constraint, behavior, specification)
 - Normalized like relation targets (resolved to full identifier path)
-- Validation shall reject identifiers pointing to non-Refinement elements
+- Validation is expected to reject identifiers pointing to non-Refinement elements
 - Provides clear error message indicating the expected element type
 
 This validation ensures that attachments either reference existing files or valid Refinement elements that provide supplementary documentation.
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Default Requirement Type Assignment Refinement Specification
-
-
 
 #### Details
 When an element does not have a `#### Metadata` subsection with a `type` property, the system assigns the default type `requirement`.
@@ -59,7 +53,7 @@ Supported element types:
 - `other`
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Element Type Metadata Specification
@@ -70,14 +64,29 @@ Specification for declaring element types in markdown documents through the Meta
 Element types are identified through a reserved `type` metadata property in the Metadata subsection.
 
 **Declaration Format:**
-`  * type: <element-type>` within the Metadata subsection.
+` * type: <element-type>` within the Metadata subsection.
 
 **Default Type Assignment:**
 - When no `type` property is specified, elements default to type `requirement`
 - This behavior is location-independent (applies regardless of file location)
 
 #### Metadata
-  * type: specification
+ * type: specification
+---
+
+### Excluded File Relation Validation Refinement Specification
+
+#### Details
+Excluded-file relation validation behavior:
+1. Registers files matching exclusion patterns in registry context for relation-target validation.
+2. Skips internal element parsing/validation for excluded files.
+3. Preserves ability to validate references that point to excluded file paths.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Excluded File Relation Validation](Validation.md#excluded-file-relation-validation)
 ---
 
 ### Git Repository Scope Specification
@@ -105,18 +114,16 @@ Path resolution and scope validation rules for Git repository-based project mana
 - Missing relation target errors clearly identify the unreachable reference due to subdirectory scope limitations
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Identifiers and Relations Refinement Specification
 
-
-
 #### Details
-The system shall implement **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
+The system is expected to implement **Identifiers** and **Relations** following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Ignore Files Specification
@@ -129,11 +136,11 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
 - `.reqvireignore` - Reqvire-specific exclusions (files tracked by Git but excluded from requirements processing)
 
 **Processing Rules:**
-- ONLY the root .gitignore file shall be used (not nested .gitignore files in subdirectories)
-- ONLY the root .reqvireignore file shall be used (not nested .reqvireignore files in subdirectories)
-- .reqvireignore shall use the same format and syntax as .gitignore
-- Patterns from .gitignore and .reqvireignore shall be combined
-- Files matching ANY exclusion pattern shall be excluded from parsing as requirements
+- ONLY the root .gitignore file is expected to be used (not nested .gitignore files in subdirectories)
+- ONLY the root .reqvireignore file is expected to be used (not nested .reqvireignore files in subdirectories)
+- .reqvireignore is expected to use the same format and syntax as .gitignore
+- Patterns from .gitignore and .reqvireignore is expected to be combined
+- Files matching ANY exclusion pattern is expected to be excluded from parsing as requirements
 
 **Exclusion Behavior Differences:**
 - Files excluded by `.gitignore`: completely excluded - cannot be parsed as structured markdown AND cannot be referenced in file relations
@@ -144,7 +151,7 @@ Rules for processing .gitignore and .reqvireignore exclusion patterns.
 - If .gitignore does not exist, process normally using only .reqvireignore patterns
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Ignoring Unstructured Documents Refinement Specification
@@ -166,57 +173,10 @@ examples/**
 ```
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Ignoring Unstructured Documents](Configuration.md#ignoring-unstructured-documents)
----
-
-### Requirements Processing Refinement Specification
-
-#### Details
-Requirements-processing scope behavior:
-- Applies `.gitignore` exclusions for files not in version-control processing scope.
-- Applies `.reqvireignore` exclusions for files excluded from requirements parsing.
-- Applies reserved repository filename exclusions (for example `README.md`, `LICENSE.md`).
-- Parses remaining in-scope files through the structured model pipeline.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Requirements Processing](Configuration.md#requirements-processing)
----
-
-### Structured Markdown Files Search and Detection Refinement Specification
-
-#### Details
-Structured markdown detection behavior:
-1. Scans files in repository root and subfolders.
-2. Marks files matching configured exclusion patterns as non-structured targets.
-3. Marks non-`.md` files as non-structured targets.
-4. Retains only eligible markdown files for structured parsing passes.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Structured Markdown Files Search and Detection](Configuration.md#structured-markdown-files-search-and-detection)
----
-
-### Excluded File Relation Validation Refinement Specification
-
-#### Details
-Excluded-file relation validation behavior:
-1. Registers files matching exclusion patterns in registry context for relation-target validation.
-2. Skips internal element parsing/validation for excluded files.
-3. Preserves ability to validate references that point to excluded file paths.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Excluded File Relation Validation](Validation.md#excluded-file-relation-validation)
+ * refine: [Ignoring Unstructured Documents](Configuration.md#ignoring-unstructured-documents)
 ---
 
 ### Integrated Validation Refinement Specification
@@ -229,18 +189,16 @@ Integrated validation execution behavior:
 - Validation gating ensures commands needing graph consistency do not run with invalid model state.
 
 #### Metadata
-  * type: specification
+ * type: specification
 
 #### Relations
-  * refine: [Integrated Validation](Validation.md#integrated-validation)
+ * refine: [Integrated Validation](Validation.md#integrated-validation)
 ---
 
 ### Internal Consistency Validator Refinement Specification
 
-
-
 #### Details
-The consistency validator shall verify:
+The consistency validator is expected to verify:
 - **Global Element Name Uniqueness**: Element names are globally unique across all files in the model
 - **Duplicate Detection**: Detect and report when multiple elements in different files share the same name
 - **Location Reporting**: Report both file locations where duplicate element names occur
@@ -252,12 +210,10 @@ The consistency validator shall verify:
 Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Refinement Element Structure Constraints Refinement Specification
-
-
 
 #### Details
 Refinement elements serve as detailed documentation that augments requirements and drives implementation. Their relation usage is restricted because:
@@ -266,22 +222,20 @@ Refinement elements serve as detailed documentation that augments requirements a
 - Their `refine` relation links back to the requirement they refine, establishing ownership
 - Each refinement can only be owned by one requirement (uniqueness constraint)
 
-When a Refinement element contains relations other than `refine`, the validator shall report an error indicating that only `refine` relations are allowed for refinement types.
+When a Refinement element contains relations other than `refine`, the validator is expected to report an error indicating that only `refine` relations are allowed for refinement types.
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Relation Element Type Validator Refinement Specification
-
-
 
 #### Details
 The validator enforces the constraints defined in the [Element Type Relation Compatibility](DesignDocuments/RelationTypes.md#element-type-relation-compatibility) specification:
 
 - For `derivedFrom`/`derive` relations, validate that both source and target are requirement types (`requirement` or `user-requirement`)
 - For `verifiedBy`/`verify` relations, validate that one endpoint is a requirement element and the other is a verification element
-- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a system requirement (`requirement`) or test-verification element and the other is an implementation element; `user-requirement` shall not use `satisfiedBy`/`satisfy`
+- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a system requirement (`requirement`) or test-verification element and the other is an implementation element; `user-requirement` is expected to not use `satisfiedBy`/`satisfy`
 - For `refinedBy`, require identifier targets that resolve to refinement elements (constraint, behavior, specification)
 - For `refinedBy`, reject plain file-path targets (InternalPath), including `# Documents` file links without element fragments
 - For verification elements with `satisfiedBy` relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)
@@ -294,18 +248,32 @@ This validation occurs:
 - During link operations at CRUD time (graph_registry.rs)
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Relation Types and behaviors Refinement Specification
 
-
-
 #### Details
-The system shall implement relations following clearly defined specifications for types and behaviors.
+The system is expected to implement relations following clearly defined specifications for types and behaviors.
 
 #### Metadata
-  * type: specification
+ * type: specification
+---
+
+### Requirements Processing Refinement Specification
+
+#### Details
+Requirements-processing scope behavior:
+- Applies `.gitignore` exclusions for files not in version-control processing scope.
+- Applies `.reqvireignore` exclusions for files excluded from requirements parsing.
+- Applies reserved repository filename exclusions (for example `README.md`, `LICENSE.md`).
+- Parses remaining in-scope files through the structured model pipeline.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Requirements Processing](Configuration.md#requirements-processing)
 ---
 
 ### Requirements Processing Specification
@@ -324,7 +292,7 @@ Specification for how requirements files are discovered and processed.
 - GraphRegistry built from ElementRegistry after Pass 1
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Reserved Files Specification
@@ -356,35 +324,47 @@ The following filenames are reserved for general repository documentation and ar
 - Takes precedence before ignore pattern evaluation
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Specification File Identification Refinement Specification
 
-
-
 #### Details
 - Supported first H1 headings:
-  - `# Elements`: parse as multi-element model file
-  - `# Documents`: parse as single-element model file with `## Metadata`, `## Relations` (optional), and `## <Actual Element Name>` body section where the section heading text defines the element name
+ - `# Elements`: parse as multi-element model file
+ - `# Documents`: parse as single-element model file with `## Metadata`, `## Relations` (optional), and `## <Actual Element Name>` body section where the section heading text defines the element name
 - Leading whitespace, blank lines, or frontmatter before the heading are allowed
 - Files without a supported first H1 are silently skipped (no error)
 - This rule applies in addition to `.gitignore` and `.reqvireignore` exclusions
 - The page title is not stored or tracked by the system
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---
 
 ### Structure and Addressing in Markdown Documents Refinement Specification
 
-
-
 #### Details
-The system shall implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
+The system is expected to implement semi-structured markdown format specifications that defines the structure, rules, and usage of **Elements**, **Subsections**, **Relations**, and **Identifiers** in Markdown (`.md`) documents following clearly defined specifications.
 
 #### Metadata
-  * type: specification
+ * type: specification
+---
+
+### Structured Markdown Files Search and Detection Refinement Specification
+
+#### Details
+Structured markdown detection behavior:
+1. Scans files in repository root and subfolders.
+2. Marks files matching configured exclusion patterns as non-structured targets.
+3. Marks non-`.md` files as non-structured targets.
+4. Retains only eligible markdown files for structured parsing passes.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Structured Markdown Files Search and Detection](Configuration.md#structured-markdown-files-search-and-detection)
 ---
 
 ### Verification Type Selection Guidelines
@@ -402,5 +382,5 @@ Usage guidelines for selecting appropriate verification types.
 - **Demonstration-verification**: User-facing features, workflow requirements, integration scenarios
 
 #### Metadata
-  * type: specification
+ * type: specification
 ---

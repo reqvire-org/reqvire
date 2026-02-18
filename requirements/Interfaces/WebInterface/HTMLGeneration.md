@@ -44,8 +44,8 @@ Implementation details shall follow the associated refinement specifications.
   * derive: [CSS Framework Integration](#css-framework-integration)
   * derivedFrom: [Mobile-Friendly Documentation](#mobile-friendly-documentation)
   * refinedBy: [Responsive HTML Generation Refinement Specification](Specifications.md#responsive-html-generation-refinement-specification)
-  * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [styles.rs](../../../core/src/html/styles.rs)
+  * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * verifiedBy: [Responsive Design Verification](Verifications/HTMLGenerationVerifications.md#responsive-design-verification)
 ---
 
