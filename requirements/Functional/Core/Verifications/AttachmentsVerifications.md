@@ -5,21 +5,18 @@
 Verify attach command creates Attachments subsection and adds links.
 
 #### Details
-Test cases for file attachments:
+Test cases for identifier attachments:
 - Create Attachments subsection if missing
-- Add link with format `[filename](path)`
+- Add link with format `[Name](file.md#id)` or `[Name](#id)` for same-file references
 - Idempotent: duplicate attach doesn't create duplicate entry
-- Many-to-many: same file attaches to multiple elements
+- Many-to-many: same refinement identifier attaches to multiple elements
 - Dry-run mode makes no changes
-- Validation passes after attach
-
-Test cases for element attachments:
-- Attach Refinement element by display name
-- Auto-detect: file path takes priority over element name when file exists
-- Element identifier format: `[Name](#id)` for same-file, `[Name](file.md#id)` for cross-file
+- Attach Refinement element by identifier target
 - Only Refinement types allowed (constraint, behavior, specification)
 - Error when attaching non-Refinement element (requirement, verification, etc.)
-- Error when neither file nor element found
+- Error when identifier target is unresolved
+- Error when target is not a valid refinement identifier
+- Error when target is a file path (identifier-only attachments)
 
 #### Metadata
   * type: test-verification
@@ -60,30 +57,26 @@ Test cases for consistency:
 Verify attachments render correctly in all output formats.
 
 #### Details
-Test cases for file paths:
+Test cases for identifier attachments:
 - Markdown output preserves format
 - HTML export renders clickable links
 - JSON includes attachments array
-- JSON file_path field contains git-root-relative path
-- Consistent indentation in markdown
-
-Test cases for element identifiers:
 - JSON includes element identifiers in attachments array as strings
 - Element identifier format: `"file.md#element-name"`
-- HTML export renders clickable links to Refinement elements
-- Mixed file path and element identifier attachments display correctly
+- Consistent indentation in markdown
+- Mixed same-file and cross-file identifier attachments display correctly
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
   * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
 ---
 
 ### Attachment Scope Constraints Test
 
-Verify that attachment scope constraints (hierarchical independence, refine requirement, and upstream propagation) are enforced for both refinement elements and file assets.
+Verify that attachment scope constraints (hierarchical independence, refine requirement, and upstream propagation) are enforced for refinement-element identifier attachments.
 
 #### Details
 **Test cases for refinement hierarchical independence:**
@@ -94,7 +87,7 @@ Verify that attachment scope constraints (hierarchical independence, refine requ
 - Accept attachment when attaching requirement is in a separate branch
 
 **Test cases for upstream attachment propagation:**
-- Error when ancestor requirement already has the same attachment (refinement or file)
+- Error when ancestor requirement already has the same refinement identifier attachment
 - Error when descendant requirement already has the same attachment (suggest move)
 - Attachments propagate downstream - descendants cannot re-attach
 - Accept attachment when no ancestor or descendant has the same attachment
@@ -112,7 +105,7 @@ Verify that attachment scope constraints (hierarchical independence, refine requ
 **Test cases for attach command:**
 - `link REQ attaching REFINEMENT` fails when REQ is in same hierarchy
 - `link REQ attaching ORPHAN-REFINEMENT` fails when refinement has no refine
-- `link REQ attaching FILE` fails when FILE is owned by requirement in same hierarchy
+- `link REQ attaching TARGET` fails when TARGET is not a valid refinement identifier
 - Error messages are consistent with validate error format
 
 **Test cases for merge command:**
@@ -136,9 +129,6 @@ Verify search filters correctly find elements by attachments.
 #### Details
 Test cases:
 - `--has-attachments` finds only elements with attachments
-- `--filter-attachment` with glob pattern matches correctly
-- Pattern `*.pdf` matches PDF files only
-- Pattern `docs/*` matches all files in docs directory
 - No false positives or false negatives
 
 #### Metadata
@@ -176,22 +166,16 @@ Test cases for Refinement element rm operations:
 
 ### Attachments Subsection Parsing Verification
 
-Verify the system correctly parses Attachments subsections including both file paths and element identifiers.
+Verify the system correctly parses Attachments subsections using refinement element identifiers.
 
 #### Details
-Test cases for file paths:
-- Parse markdown links in Attachments subsection
-- Extract paths where link text equals href
-- Normalize paths to git-root-relative
-- Handle multiple attachments in single element
-- Reject links where text ≠ href (for file paths)
-
 Test cases for element identifiers:
 - Parse markdown links to Refinement elements (constraint, behavior, specification)
 - Normalize element identifiers like relation targets
 - Support full identifier format `file.md#element-name`
 - Support same-file format `#element-name`
-- Handle mixed file path and element identifier attachments
+- Handle multiple identifier attachments in single element
+- Reject file-path attachment syntax
 
 #### Metadata
   * type: test-verification
@@ -204,20 +188,16 @@ Test cases for element identifiers:
 
 ### Attachments Validation Verification
 
-Verify the system validates attachment targets including file existence and element identifier validity.
+Verify the system validates attachment targets as refinement element identifiers.
 
 #### Details
-Test cases for file paths:
-- Validation passes when attachment files exist
-- Validation fails for missing attachment files
-- Error message includes element identifier and missing path
-- Validation occurs in Pass 2
-
 Test cases for element identifiers:
 - Accept Refinement element identifiers (constraint, behavior, specification)
 - Reject non-Refinement element identifiers (requirement, user-requirement, verification)
+- Reject file-path attachment syntax
 - Error message indicates expected Refinement type
 - Validation fails for non-existent element identifiers
+- Validation occurs in Pass 2
 
 #### Metadata
   * type: test-verification
@@ -230,22 +210,16 @@ Test cases for element identifiers:
 
 ### Detach Command Verification
 
-Verify detach command removes links and cleans up empty subsections.
+Verify detach command removes identifier links and cleans up empty subsections.
 
 #### Details
-CRITICAL: Must verify detach triggers change impact.
-
-Test cases for file attachments:
+Test cases for identifier attachments:
 - Remove link from Attachments subsection
 - Remove subsection when no attachments remain
 - Detach from one element doesn't affect others
 - Dry-run mode makes no changes
-- Change impact analysis shows element as changed
-
-Test cases for element attachments:
-- Detach Refinement element by display name
-- Auto-detect: match element name against existing attachments
-- Works for both same-file and cross-file element attachments
+- Detach Refinement element by identifier target
+- Works for both same-file and cross-file refinement identifiers
 
 #### Metadata
   * type: test-verification
@@ -257,14 +231,12 @@ Test cases for element attachments:
 
 ### Move Asset Command Verification
 
-Verify mv-asset moves InternalPath files and updates all references across the model.
+Verify mv-asset moves InternalPath files and updates path-based relations while leaving refinement-identifier attachments unchanged.
 
 #### Details
-Test cases for Attachments subsection updates:
-- Find all elements with InternalPath attachment matching old path
-- Update link text to new path
-- Update link href to new path
-- Handle relative path resolution from element's file location
+Test cases for attachment behavior:
+- Existing refinement-identifier attachments remain unchanged after mv-asset
+- No attachment entries are rewritten due to path moves
 
 Test cases for Relations updates:
 - Find all satisfiedBy relations with InternalPath matching old path
@@ -275,7 +247,6 @@ Test cases for Relations updates:
 
 Test cases for filesystem and reporting:
 - Move/rename physical file on filesystem
-- Report count of affected Attachments
 - Report count of affected Relations
 - Report list of modified specification files
 - Dry-run mode: show changes without applying (file not moved)
@@ -291,13 +262,12 @@ Test cases for filesystem and reporting:
 
 ### Remove Asset Command Verification
 
-Verify rm-asset deletes InternalPath files and removes all references from the model.
+Verify rm-asset deletes InternalPath files and removes path-based relations while leaving refinement-identifier attachments unchanged.
 
 #### Details
-Test cases for Attachments subsection updates:
-- Find all elements with InternalPath attachment matching path
-- Remove attachment link from Attachments subsection
-- Remove empty Attachments subsection if no attachments remain
+Test cases for attachment behavior:
+- Existing refinement-identifier attachments remain unchanged after rm-asset
+- No attachment entries are removed by rm-asset
 
 Test cases for Relations updates:
 - Find all satisfiedBy relations with InternalPath matching path
@@ -307,7 +277,6 @@ Test cases for Relations updates:
 
 Test cases for filesystem and reporting:
 - Delete physical file from filesystem
-- Report count of removed Attachments
 - Report count of removed Relations
 - Report list of modified specification files
 - Dry-run mode: show changes without applying (file not deleted)

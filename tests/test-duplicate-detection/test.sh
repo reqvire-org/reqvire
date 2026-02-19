@@ -196,7 +196,7 @@ fi
 
 # Add an attachment to Base Requirement
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" attaching "Refinement Element" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" attaching "#refinement-element" 2>&1)
 EXIT_CODE=$?
 set -e
 

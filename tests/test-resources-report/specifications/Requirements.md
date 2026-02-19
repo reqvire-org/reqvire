@@ -41,7 +41,7 @@ The system shall provide a user-friendly interface.
   * type: requirement
 
 #### Attachments
-  * [ui-mockup.png](../docs/ui-mockup.png)
+  * [UI Mockup Spec](#ui-mockup-spec)
 
 #### Relations
   * derivedFrom: [Root User Requirement](#root-user-requirement)
@@ -55,9 +55,37 @@ The system shall provide a RESTful API.
   * type: requirement
 
 #### Attachments
-  * [api-spec.md](../docs/api-spec.md)
+  * [API Contract Spec](#api-contract-spec)
 
 #### Relations
   * derivedFrom: [Root User Requirement](#root-user-requirement)
   * satisfiedBy: [api.rs](../core/src/api.rs)
+---
+
+### Documentation Contract Owner
+
+Owner requirement for documentation refinement contracts.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * refinedBy: [UI Mockup Spec](#ui-mockup-spec)
+  * refinedBy: [API Contract Spec](#api-contract-spec)
+---
+
+### UI Mockup Spec
+
+Refinement contract describing UI mockup expectations.
+
+#### Metadata
+  * type: specification
+---
+
+### API Contract Spec
+
+Refinement contract describing API specification constraints.
+
+#### Metadata
+  * type: specification
 ---

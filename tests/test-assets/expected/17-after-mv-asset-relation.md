@@ -22,4 +22,3 @@ This requirement is satisfied by a script.
   * derivedFrom: [Relations Test System](#relations-test-system)
   * satisfiedBy: [test_script.sh](../src/test_script.sh)
 ---
-

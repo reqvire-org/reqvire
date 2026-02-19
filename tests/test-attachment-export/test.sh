@@ -67,9 +67,9 @@ if ! grep -q "📎" "${TEST_DIR}/output/index.html"; then
   exit 1
 fi
 
-# Check that attachment filename appears in index (may be converted to .html)
-if ! grep -q "DesignSpec" "${TEST_DIR}/output/index.html"; then
-  echo "❌ FAILED: Index does not contain attachment filename 'DesignSpec'"
+# Check that attached refinement display name appears in index
+if ! grep -q "Design Spec Contract" "${TEST_DIR}/output/index.html"; then
+  echo "❌ FAILED: Index does not contain attached refinement name 'Design Spec Contract'"
   exit 1
 fi
 
@@ -102,8 +102,8 @@ if ! grep -qF "$EXPECTED_PATTERN" "$SPEC_HTML"; then
 fi
 
 # Verify paperclip icon is in the diagram context
-if ! grep -q '📎.*DesignSpec' "$SPEC_HTML"; then
-  echo "❌ FAILED: Diagram does not show 📎 icon with attachment filename"
+if ! grep -q '📎.*docs/DesignSpec.md#design-spec-contract' "$SPEC_HTML"; then
+  echo "❌ FAILED: Diagram does not show 📎 icon with attached refinement identifier"
   exit 1
 fi
 

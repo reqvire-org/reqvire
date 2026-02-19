@@ -23,15 +23,9 @@ Files referenced via relations (satisfiedBy, trace, etc.):
 
 Files referenced via attachments:
 
-### docs/api-spec.md
-  * [API Requirements](specifications/Requirements.md#api-requirements)
----
-
-### docs/ui-mockup.png
-  * [User Interface](specifications/Requirements.md#user-interface)
----
+*No files referenced via attachments.*
 
 ## Summary
 
 - **Relation Files:** 4 (5 references)
-- **Attachment Files:** 2 (2 references)
+- **Attachment Files:** 0 (0 references)

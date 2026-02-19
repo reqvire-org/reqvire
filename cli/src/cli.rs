@@ -434,7 +434,7 @@ pub enum Commands {
     /// Add relation or attachment between elements
     #[clap(
         name = "link",
-        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n\nRELATION TYPES:\n    derivedFrom  - Source is derived from target (parent traceability)\n    derive       - Source derives target (child traceability)\n    satisfiedBy  - Source requirement is satisfied by target implementation\n    satisfy      - Source implementation satisfies target requirement\n    verifiedBy   - Source requirement is verified by target verification\n    verify       - Source verification verifies target requirement\n    trace        - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach file or Refinement element to source\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: internal file path or Refinement element name\n\nUSAGE:\n    reqvire link \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire link \"Test Verification\" verify \"Feature Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"System Requirement\" attaching docs/SLO.pdf\n    reqvire link \"System Requirement\" attaching \"My Constraint Element\""
+        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n\nRELATION TYPES:\n    derivedFrom  - Source is derived from target (parent traceability)\n    derive       - Source derives target (child traceability)\n    satisfiedBy  - Source requirement is satisfied by target implementation\n    satisfy      - Source implementation satisfies target requirement\n    verifiedBy   - Source requirement is verified by target verification\n    verify       - Source verification verifies target requirement\n    trace        - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach a refinement element identifier to source\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: refinement element identifier (file.md#element-id or #element-id)\n\nUSAGE:\n    reqvire link \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire link \"Test Verification\" verify \"Feature Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\"\n    reqvire link \"System Requirement\" attaching \"#my-constraint-element\""
     )]
     Link {
         /// Source element name
@@ -442,10 +442,10 @@ pub enum Commands {
 
         /// Relation type OR 'attaching'.
         /// Relations: derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace.
-        /// Use 'attaching' to attach files or refinement elements (constraint, behavior, specification)
+        /// Use 'attaching' to attach refinement element identifiers (constraint, behavior, specification)
         relation_type: String,
 
-        /// Target: element name, internal path, or external URL (for relations); file path or element name (for attaching)
+        /// Target: element name, internal path, or external URL (for relations); refinement element identifier for attaching
         target: String,
 
         /// Preview changes without applying
@@ -1489,32 +1489,14 @@ pub async fn handle_command(
                     )));
                 }
 
-                // Auto-detect: check if target is a file or element name
-                let cwd = std::env::current_dir().unwrap_or_default();
-                let file_exists_cwd = cwd.join(&target).exists();
-                let file_exists_git_root = git_root.join(&target).exists();
-
-                if file_exists_cwd || file_exists_git_root {
-                    // It's a file path - use file attachment logic
-                    let result = reqvire::crud::attach(
-                        &mut model_manager,
-                        &source,
-                        &target,
-                        &git_root,
-                        dry_run,
-                    )?;
-                    render_crud_result(&result);
-                } else {
-                    // Not a file - try to resolve as element name
-                    let result = reqvire::crud::attach_element(
-                        &mut model_manager,
-                        &source,
-                        &target,
-                        &git_root,
-                        dry_run,
-                    )?;
-                    render_crud_result(&result);
-                }
+                let result = reqvire::crud::attach_element_identifier(
+                    &mut model_manager,
+                    &source,
+                    &target,
+                    &git_root,
+                    dry_run,
+                )?;
+                render_crud_result(&result);
             } else {
                 // Regular relation link
                 let result = reqvire::crud::link(

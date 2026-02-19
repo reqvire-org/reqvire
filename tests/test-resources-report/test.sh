@@ -12,7 +12,7 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # - Command shall support `--json` flag for JSON output format
 # - Resources report shall have two sections: Relations and Attachments
 # - Relations section lists files from InternalPath relations (satisfiedBy, trace, etc.)
-# - Attachments section lists files from FilePath attachments
+# - Attachments section reports file targets from attachments (empty when only identifier attachments are used)
 # - Files shall be sorted alphabetically by path
 # - References within each file shall be sorted by relation type, then by element identifier
 # - Text output shall include markdown links to referencing elements
@@ -116,8 +116,8 @@ fi
 
 # Test 4: Verify attachments count
 ATTACHMENT_FILES=$(echo "$OUTPUT" | jq '.summary.total_attachment_files')
-if [ "$ATTACHMENT_FILES" -ne 2 ]; then
-    echo "FAILED: Expected 2 attachment files, got $ATTACHMENT_FILES"
+if [ "$ATTACHMENT_FILES" -ne 0 ]; then
+    echo "FAILED: Expected 0 attachment files, got $ATTACHMENT_FILES"
     exit 1
 fi
 
@@ -148,10 +148,10 @@ if ! echo "$OUTPUT" | jq '.relations[0].references[0] | has("element_name")' | g
     exit 1
 fi
 
-# Test 7: Verify attachment reference does NOT have relation_type
-ATTACHMENT_REL_TYPE=$(echo "$OUTPUT" | jq '.attachments[0].references[0].relation_type')
-if [ "$ATTACHMENT_REL_TYPE" != "null" ]; then
-    echo "FAILED: Attachment reference should not have 'relation_type' field, got: $ATTACHMENT_REL_TYPE"
+# Test 7: Verify attachments list is empty for identifier-only attachment fixtures
+ATTACHMENT_LIST_SIZE=$(echo "$OUTPUT" | jq '.attachments | length')
+if [ "$ATTACHMENT_LIST_SIZE" -ne 0 ]; then
+    echo "FAILED: Expected empty attachments list, got size: $ATTACHMENT_LIST_SIZE"
     exit 1
 fi
 

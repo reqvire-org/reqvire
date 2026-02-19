@@ -11,12 +11,12 @@ A refinement element can only be attached to a requirement if that requirement h
 - Cannot attach to any child (descendant) of that requirement via derive chain
 
 **Upstream attachment propagation:**
-If an attachment (refinement or file) is already attached to an ancestor requirement in the derivation hierarchy, descendants cannot attach the same target:
+If an attachment (refinement identifier) is already attached to an ancestor requirement in the derivation hierarchy, descendants cannot attach the same target:
 - Attachments propagate downstream through the derivedFrom chain
 - Re-attaching at a descendant level is redundant
 - Only the highest-level requirement in a hierarchy branch should attach
 
-Only requirements in a separate branch of the hierarchy (no derivedFrom chain connecting them to the owner or existing attacher) may attach the refinement or file.
+Only requirements in a separate branch of the hierarchy (no derivedFrom chain connecting them to the owner or existing attacher) may attach the refinement.
 
 **Rationale**: Attachments enable cross-submodel traceability while maintaining stakeholder separation. Attachments within the same hierarchy are redundant since traceability already flows through the refinedBy relationship and propagates to derived requirements.
 
@@ -43,7 +43,7 @@ A refinement element can only be attached to requirements if:
 Rules for detecting duplicate link targets across subsections.
 
 **Cross-section duplicates** (same target in BOTH Relations AND Attachments):
-- Applies to all target types: element identifiers AND file paths
+- Applies to identifier targets
 - Treated as semantic errors requiring user resolution
 - The validate command fails with error
 - The format command does not auto-fix (user must decide which section to keep)

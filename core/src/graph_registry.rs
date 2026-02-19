@@ -808,14 +808,10 @@ impl GraphRegistry {
         None
     }
 
-    /// Validates that all attachment files referenced by elements exist.
+    /// Validates attachment targets and scope rules.
     fn validate_attachments(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
-        debug!("Validating attachment file existence...");
+        debug!("Validating attachment targets...");
         let mut errors = Vec::new();
-
-        // Get git root for resolving attachment paths
-        let git_root = crate::git_commands::get_git_root_dir()
-            .unwrap_or_else(|_| std::env::current_dir().unwrap_or_default());
 
         for element_node in self.nodes.values() {
             let element = &element_node.element;
@@ -823,74 +819,13 @@ impl GraphRegistry {
             for attachment in &element.attachments {
                 match &attachment.target {
                     crate::element::AttachmentTarget::FilePath(file_path) => {
-                        // Resolve attachment path relative to git root
-                        let full_path = git_root.join(file_path);
-
-                        if !full_path.exists() {
-                            errors.push(ReqvireError::MissingAttachmentFile(format!(
-                                "File {}: Element '{}' references missing attachment file: {}",
-                                element.file_path,
-                                element.name,
-                                file_path.display()
-                            )));
-                            continue;
-                        }
-
-                        // Check file ownership hierarchy constraint
-                        let file_owners = self.get_file_owners(file_path);
-                        for owner_id in &file_owners {
-                            if self.is_in_hierarchy(&element.identifier, owner_id) {
-                                let owner_name = self
-                                    .nodes
-                                    .get(owner_id)
-                                    .map(|n| n.element.name.as_str())
-                                    .unwrap_or(owner_id);
-                                errors.push(ReqvireError::InvalidAttachmentScope(
-                                    format!(
-                                        "'{}' cannot be attached to '{}' because it is within the file owner's hierarchy (owned by '{}'). (file: {}, element: {})",
-                                        file_path.display(),
-                                        element.name,
-                                        owner_name,
-                                        element.file_path,
-                                        element.name
-                                    ),
-                                ));
-                                break;
-                            }
-                        }
-
-                        // Check upstream propagation constraint
-                        if let Some((direction, other_id)) = self
-                            .find_duplicate_attachment_in_hierarchy(
-                                &element.identifier,
-                                &attachment.target,
-                            )
-                        {
-                            let other_name = self
-                                .nodes
-                                .get(&other_id)
-                                .map(|n| n.element.name.as_str())
-                                .unwrap_or(&other_id);
-                            let msg = if direction == "ancestor" {
-                                format!(
-                                    "'{}' is already attached at '{}' which is an ancestor. Attachments propagate downstream. (file: {}, element: {})",
-                                    file_path.display(),
-                                    other_name,
-                                    element.file_path,
-                                    element.name
-                                )
-                            } else {
-                                format!(
-                                    "'{}' is already attached at '{}' which is a descendant. Move attachment to '{}' if you want it at higher level. (file: {}, element: {})",
-                                    file_path.display(),
-                                    other_name,
-                                    element.name,
-                                    element.file_path,
-                                    element.name
-                                )
-                            };
-                            errors.push(ReqvireError::InvalidAttachmentScope(msg));
-                        }
+                        errors.push(ReqvireError::InvalidAttachmentTarget(format!(
+                            "File {}: Element '{}' has attachment '{}' which is a file path. Attachments must target refinement element identifiers (file.md#element-id).",
+                            element.file_path,
+                            element.name,
+                            file_path.display()
+                        )));
+                        continue;
                     }
                     crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
                         // Validate that the identifier points to an existing Refinement element

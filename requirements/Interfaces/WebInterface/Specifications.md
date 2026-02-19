@@ -5,11 +5,11 @@
 #### Details
 Attachment export behavior during HTML export:
 - Collects attachment references from `element.attachments` across the model.
-- Copies each attachment file into the output directory while preserving relative paths.
-- Skips duplicate file copies when the same file is referenced by multiple elements.
-- Emits progress information for attachment copy operations.
+- Resolves each attachment as a refinement element identifier target.
+- Skips duplicate identifier processing when the same refinement is referenced by multiple elements.
+- Emits progress information for attachment-link processing operations.
 
-This keeps exported documentation complete for offline browsing with referenced files.
+This keeps exported documentation complete with navigable refinement attachment links.
 
 #### Metadata
  * type: specification
@@ -75,9 +75,7 @@ Each component is expected to be defined once and reused across all generated pa
 Containment view attachment rendering behavior:
 - For each element with attachments, renders attachments as child nodes in the D3 tree.
 - Uses wrench icon (`🔧`) and type `attachment-element` for element attachments.
-- Uses paperclip icon (`📎`) and type `attachment-file` for file attachments.
 - Element-attachment nodes navigate to the referenced element.
-- File-attachment nodes display filename and path reference.
 
 #### Metadata
  * type: specification
@@ -96,7 +94,7 @@ The containment page (containment.html) is expected to display an interactive D3
 2. Folder nodes that can be expanded/collapsed
 3. File nodes containing element children
 4. Element nodes with type-specific icons and colors
-5. Attachment nodes as children of elements (element and file attachments)
+5. Attachment nodes as children of elements (refinement element attachments)
 6. Clickable elements that navigate to their definitions
 7. Expand All / Collapse All buttons for tree control
 
@@ -112,13 +110,13 @@ The containment view serves as the primary entry point for HTML documentation, p
 Diagram attachment rendering behavior in Mermaid output:
 - Renders attachment links under the element name inside node labels.
 - Prefixes each attachment with paperclip icon (`📎`).
-- Displays filename rather than full path for compact diagrams.
-- Produces clickable links to the referenced document.
+- Displays referenced refinement element names.
+- Produces clickable links to the referenced refinement element.
 - Uses Mermaid multiline label formatting (`<br/>`).
 
 Example node:
 ```
-elementId["Element Name<br/>📎 DesignDoc.md"]
+elementId["Element Name<br/>📎 Deterministic Output Specification"]
 ```
 
 #### Metadata
@@ -155,7 +153,7 @@ Technical specification for HTML export generation pipeline.
 - Create temporary working directory (e.g., in /tmp)
 - Generate markdown files from registry with full relations (user-created and auto-generated inverse relations)
 - Copy all related system elements (following satisfiedBy and other relations)
-- Copy all attachment files to temporary directory preserving structure
+- Resolve and preserve attachment identifier links to refinement elements
 
 **Generation Pipeline (in temporary directory):**
 Execute all generation commands treating temporary directory as repository root:

@@ -70,7 +70,6 @@ Each collected content block followed by source citation and separator:
 |-------------|-----------------|
 | Element | `— Source: [Element Name](file.md#element-id)` |
 | Refinement Element (via refinedBy) | `— Source: [Refinement Name](file.md#refinement-id) refining [Element Name](file.md#element-id)` |
-| Attachment File | `— Source: [filename.md](path/to/file.md) attached to [Element Name](file.md#element-id)` |
 | Attachment Element | `— Source: [Refinement Name](file.md#refinement-id) attached to [Element Name](file.md#element-id)` |
 
 **JSON Format:**
@@ -88,21 +87,21 @@ Each collected content block followed by source citation and separator:
  "source_type": "element"
  },
  {
- "name": "Attached File",
- "identifier": "path/to/attachment.md",
- "file_path": "path/to/attachment.md",
- "element_type": "attachment",
- "content": "Content from attachment file...",
+ "name": "Attached Refinement",
+ "identifier": "Refinements.md#deterministic-output-specification",
+ "file_path": "Refinements.md",
+ "element_type": "specification",
+ "content": "Technical refinement details...",
  "depth": 0,
- "source_type": "attachment_file",
+ "source_type": "attachment_element",
  "attached_to": "file.md#element-id"
  }
  ],
  "metadata": {
  "element_count": 5,
  "refinement_count": 3,
- "attachment_count": 2,
- "total_items": 10
+ "attachment_count": 1,
+ "total_items": 9
  }
 }
 ```
@@ -110,7 +109,6 @@ Each collected content block followed by source citation and separator:
 **Source Type Values:**
 - `element` - Content from model element
 - `refined_by_element` - Content from refinement element (via refinedBy relation)
-- `attachment_file` - Content from attached file
 - `attachment_element` - Content from attached refinement element
 
 #### Metadata
@@ -173,7 +171,7 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 | verification | #4CAF50 | ✅ |
 | refinement | #FF9800 | 🔧 |
 | design-document | #8D6E63 | 📝 |
-| attachment-file | #607D8B | 📎 |
+| attachment-element | #607D8B | 📎 |
 
 #### Metadata
  * type: specification
@@ -353,13 +351,13 @@ Structure for error and warning messages.
 File-diagram attachment rendering behavior:
 - Renders attachments below the element name using `<br/>` separators.
 - Prefixes each attachment entry with `📎`.
-- Displays attachment filename rather than full path.
-- Emits clickable attachment links to file targets.
+- Displays attached refinement element names.
+- Emits clickable attachment links to refinement identifier targets.
 - Renders each attachment on its own line.
 - For elements without attachments, renders only the element name.
 
 Label format example:
-`Element Name<br/>📎 attachment1.md<br/>📎 attachment2.md`
+`Element Name<br/>📎 Deterministic Output Specification<br/>📎 Rate Limits`
 
 #### Metadata
  * type: specification
@@ -459,7 +457,7 @@ JSON output conventions:
 - `type`: Element type string
 - `file_path`: Relative path from git root
 - `relations`: Array of relation objects with `type` and `target` fields
-- `attachments`: Array of attachment strings (file paths or element identifiers)
+- `attachments`: Array of refinement element identifier strings
 
 **Error Handling:**
 - Error responses include `error` field with message
@@ -633,7 +631,7 @@ Model output format rules:
 - Mermaid diagrams use folder and file subgraphs to visually group elements by physical location.
 - JSON format uses structured data with folders, files, sections, elements, relations, and attachments.
 - Both formats represent the same filtered or complete model data.
-- Element attachments are included as an array of strings in both formats (file paths and element identifiers).
+- Element attachments are included as an array of refinement element identifier strings in both formats.
 
 #### Metadata
  * type: specification
@@ -768,16 +766,16 @@ The resources report is expected to consist of two sections:
 - Each file lists all elements that reference it with their relation types
 
 **Attachments Section:**
-- Files from FilePath attachment targets
+- Refinement element identifiers from attachment targets
 - Shows source element for each reference
 - Sorted by element identifier
-- Each file lists all elements that attach it
+- Each refinement identifier lists all elements that attach it
 
 **Output Formats:**
 
 *Text/Markdown Format:*
 - Human-readable with markdown links
-- Files listed alphabetically by path
+- Entries listed alphabetically by path (relations) and identifier (attachments)
 - Element references shown as clickable markdown links
 - Clear section headers separating Relations and Attachments
 
@@ -850,7 +848,7 @@ Default text output (when neither `--json` nor other format flags specified):
 - Full element name and identifier
 - Element type in brackets: `[requirement]`, `[test-verification]`
 - Relations listed with target identifiers
-- Attachments listed as file paths or element names
+- Attachments listed as refinement element identifiers
 
 **Formatting:**
 - Color output when terminal supports it (errors in red, warnings in yellow)

@@ -89,20 +89,20 @@ This test verifies that the system correctly filters relations in diagram genera
 
 ### File Diagram Attachment Test
 
-This test verifies that element attachments are displayed within file-based diagram node boxes with clickable links.
+This test verifies that element attachments are displayed within file-based diagram node boxes as refinement-identifier links.
 
 #### Test Steps
 1. Create a model with elements that have attachments
 2. Run export or generate-diagrams command
-3. Verify element nodes show attachment filenames with 📎 prefix
+3. Verify element nodes show attached refinement element names with 📎 prefix
 4. Verify attachments appear below element name using `<br/>` separator
 5. Verify attachment links are clickable (click handlers present)
 
 #### Expected Results
-- Elements with attachments show `Element Name<br/>📎 filename.md` format
+- Elements with attachments show `Element Name<br/>📎 Refinement Name` format
 - Multiple attachments are each on separate lines
 - Elements without attachments show only their name
-- Click handlers navigate to attachment files
+- Click handlers navigate to referenced refinement elements
 
 #### Metadata
   * type: test-verification

@@ -13,11 +13,22 @@ The system shall provide core functionality.
 The system shall implement the feature as specified in the attached design document.
 
 #### Attachments
-  * [docs/DesignSpec.md](docs/DesignSpec.md)
+  * [Design Spec Contract](../docs/DesignSpec.md#design-spec-contract)
 
 #### Relations
   * derivedFrom: [Root Requirement](#root-requirement)
   * verifiedBy: [Feature Test](#feature-test)
+---
+
+### Design Spec Owner
+
+Owner requirement for the design specification contract.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * refinedBy: [Design Spec Contract](../docs/DesignSpec.md#design-spec-contract)
 ---
 
 ### Feature Test

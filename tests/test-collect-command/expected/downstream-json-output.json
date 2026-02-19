@@ -30,13 +30,13 @@
       "source_type": "element"
     },
     {
-      "name": "DesignDoc.md",
-      "identifier": "specifications/DesignDoc.md",
+      "name": "Design Doc Specification",
+      "identifier": "specifications/DesignDoc.md#design-doc-specification",
       "file_path": "specifications/DesignDoc.md",
-      "element_type": "attachment",
-      "content": "# Design Document\n\nThis is attached design documentation content.\n\n## Purpose\n\nThis document provides additional context for the leaf requirement.\n",
+      "element_type": "specification",
+      "content": "This is attached design documentation content.\n\n\n#### Details\nThis document provides additional context for the leaf requirement.",
       "depth": 2,
-      "source_type": "attachment_file",
+      "source_type": "attachment_element",
       "attached_to": "specifications/Requirements.md#leaf-requirement"
     }
   ],

@@ -73,7 +73,7 @@ reqvire link "API Authorization Specification" "refinedBy" "Authorization System
 - Requirement references but doesn't define the specification
 - Specification is defined by a different requirement
 - The attaching requirement is OUTSIDE the owner's derivation hierarchy
-- The attachment is a design document or external file (not an element)
+- The attachment target is a refinement element identifier owned by another requirement
 
 **Attachment constraints:**
 - Refinements must have a `refine` relation (established via requirement's `refinedBy`)
@@ -159,6 +159,19 @@ The merge command:
 - **Merge**: Elements express the same capability (duplicates)
 - **Link (derivedFrom)**: Elements have hierarchical relationship (parent/child)
 - **Link (trace)**: Elements are related but represent distinct capabilities
+
+### Merge vs Link: Acceptability Criteria
+
+When merge is **not** acceptable:
+- `derivedFrom` becomes one upstream source instead of two.
+- Impact analysis gets weaker: downstream behaviors cannot be attributed to either a billing-type concern or a usage-period concern.
+- Verification mapping becomes blurrier: tests/evidence are attached to a combined requirement rather than the specific concern.
+- Change churn increases: edits to either concern now touch the same merged requirement.
+
+When merge is acceptable:
+- They always change together.
+- They share owner, lifecycle, and acceptance criteria.
+- Separate compliance/audit evidence is unnecessary because the concerns are inseparable in practice.
 
 **Post-merge cleanup**: If the merged result needs content restructuring (removing "Merged Details" artifacts), use `/reqvire:consolidate` to read, fix, and override with clean content.
 

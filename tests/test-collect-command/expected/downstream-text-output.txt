@@ -28,16 +28,13 @@ This is the leaf requirement that derives from the mid-level.
 
 ---
 
-# Design Document
-
 This is attached design documentation content.
 
-## Purpose
 
+#### Details
 This document provides additional context for the leaf requirement.
 
-
-— Source: [DesignDoc.md](specifications/DesignDoc.md) attached to [Leaf Requirement](specifications/Requirements.md#leaf-requirement)
+— Source: [Design Doc Specification](specifications/DesignDoc.md#design-doc-specification) attached to [Leaf Requirement](specifications/Requirements.md#leaf-requirement)
 
 ---
 

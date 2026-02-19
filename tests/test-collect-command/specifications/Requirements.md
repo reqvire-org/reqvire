@@ -33,13 +33,24 @@ The leaf requirement at the bottom of the hierarchy.
 This is the leaf requirement that derives from the mid-level.
 
 #### Attachments
-  * [DesignDoc.md](DesignDoc.md)
+  * [Design Doc Specification](DesignDoc.md#design-doc-specification)
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Mid-Level Requirement](#mid-level-requirement)
+---
+
+### Design Owner Requirement
+
+Owner requirement for design refinement specification.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * refinedBy: [Design Doc Specification](DesignDoc.md#design-doc-specification)
 ---
 
 ### Test Verification

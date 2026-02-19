@@ -178,7 +178,7 @@ The system shall detect when the same target appears in both the Relations and A
 #### Details
 A constraint defines the detailed rules for cross-section duplicate detection.
 
-This applies to all target types: element identifiers and file paths.
+This applies to identifier targets.
 
 Within-section duplicates (same entry repeated within Relations OR within Attachments) are formatting issues handled by the format operation, not validation errors.
 

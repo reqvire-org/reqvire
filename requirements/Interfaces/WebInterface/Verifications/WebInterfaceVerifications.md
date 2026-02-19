@@ -2,21 +2,20 @@
 
 ### Attachment Export Verification
 
-This test verifies that HTML export copies all attachment files to the output directory.
+This test verifies that HTML export preserves attachment identifier links to referenced refinement elements.
 
 #### Details
 
 ##### Acceptance Criteria:
-- System shall copy all attachment files referenced by elements
-- Attachment files shall preserve their relative paths in output
-- Duplicate attachments (same file referenced multiple times) shall be copied only once
-- All attachment file types shall be supported (md, pdf, txt, etc.)
+- System shall preserve all refinement-identifier attachments referenced by elements
+- Attachment identifier links shall resolve to referenced refinement elements in exported HTML
+- Duplicate attachments (same refinement referenced multiple times) shall be processed consistently
 
 ##### Test Criteria:
 - Create model with elements having attachments
 - Run HTML export command
-- Verify attachment files exist in output directory at correct relative paths
-- Verify attachment files content matches original
+- Verify attachment links in exported HTML resolve to refinement element anchors
+- Verify identifier targets are navigable from rendered pages
 
 #### Metadata
   * type: test-verification
@@ -35,16 +34,13 @@ This test verifies that the D3.js containment tree view displays attachments as 
 ##### Acceptance Criteria:
 - Elements with attachments shall show attachments as child nodes in D3.js tree
 - Element attachments (refinements) shall use wrench icon (🔧) with type `attachment-element`
-- File attachments shall use paperclip icon (📎) with type `attachment-file`
 - Element attachments shall be clickable and navigate to the referenced element
-- File attachments shall show filename and path for reference
 
 ##### Test Criteria:
 - Create model with element having attachments
 - Run HTML export command
 - Verify containment.html contains d3-tree JSON data with attachment nodes
 - Verify attachment-element nodes have links to element definitions
-- Verify attachment-file nodes show file paths
 
 #### Metadata
   * type: test-verification
@@ -61,7 +57,7 @@ This test verifies that diagrams display attachment links within element boxes.
 #### Details
 
 ##### Acceptance Criteria:
-- Element boxes in diagrams shall include attachment filenames
+- Element boxes in diagrams shall include attached refinement element names
 - Attachments shall be prefixed with paperclip icon (📎)
 - Attachments shall appear below element name using line breaks
 - Attachment display shall not break diagram rendering
@@ -70,7 +66,7 @@ This test verifies that diagrams display attachment links within element boxes.
 - Create model with element having attachments
 - Generate diagram (format or model command)
 - Verify Mermaid output contains multiline labels with attachments
-- Verify attachment filenames appear with 📎 prefix
+- Verify attached refinement element names appear with 📎 prefix
 - Verify diagram renders correctly with attachment labels
 
 #### Metadata

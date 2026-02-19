@@ -38,7 +38,7 @@ When requested, the system shall automatically generate diagrams with relation f
 
 ### File Diagram Attachment Display
 
-The system shall display element attachments in file-based mermaid diagrams as clickable links below the element name within the node box.
+The system shall display element attachments in file-based mermaid diagrams as clickable links to referenced refinement elements below the element name within the node box.
 
 #### Details
 Implementation details shall follow the associated refinement specifications.

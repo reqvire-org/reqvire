@@ -276,7 +276,7 @@ rm -f "$TEST_DIR/specifications/TestAncestorAttachment.md"
 # ==================================
 
 set +e
-LINK_ORPHAN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "User Req X" attaching "Orphan-Spec" 2>&1)
+LINK_ORPHAN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "User Req X" attaching "Refinements.md#orphan-spec" 2>&1)
 LINK_ORPHAN_EXIT=$?
 set -e
 
@@ -296,7 +296,7 @@ assert_output_matches "${TEST_SCRIPT_DIR}/expected/link-orphan-error.txt" \
 # ==================================
 
 set +e
-LINK_HIERARCHY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Req B" attaching "Spec-1" 2>&1)
+LINK_HIERARCHY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Req B" attaching "Refinements.md#spec-1" 2>&1)
 LINK_HIERARCHY_EXIT=$?
 set -e
 

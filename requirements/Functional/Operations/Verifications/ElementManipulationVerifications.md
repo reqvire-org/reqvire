@@ -752,7 +752,7 @@ The test shall verify that the `link` command adds relations to elements followi
 2. Verify relation is added with URL as target
 3. Attempt to attach external URL using 'attaching' keyword
 4. Verify operation fails with clear error message
-5. Verify error message mentions "external URL" and suggests using 'trace' relation
+5. Verify error message states that `attaching` requires a refinement element identifier target
 
 **Success Criteria:**
 - Adds relation to source element's Relations subsection (written to file)
@@ -768,7 +768,7 @@ The test shall verify that the `link` command adds relations to elements followi
 - Reports errors for invalid inputs
 - Enforces single-root ownership: violating links are rejected with deterministic single-root ownership error output
 - External URLs allowed for relations (trace, satisfiedBy, etc.)
-- External URLs rejected for 'attaching' with helpful error message
+- Non-identifier targets rejected for 'attaching' with clear identifier-target error message
 
 #### Metadata
   * type: test-verification

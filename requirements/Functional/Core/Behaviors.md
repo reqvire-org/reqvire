@@ -22,24 +22,15 @@ This behavior mirrors the existing relation target update behavior used when mov
 
 ### Attachment Input Auto-Detection Behavior
 
-When attaching or detaching via CLI commands, the system shall auto-detect whether the input refers to a file path or a Refinement element name.
+When attaching or detaching via CLI commands, the system shall resolve attachment targets as refinement-element identifiers.
 
 #### Details
-The detection follows this priority order:
+The resolution follows this order:
 
-1. **File Path Check (Priority)**: Check if the input exists as a file on the filesystem
-   - Check relative to current working directory
-   - Check relative to git root directory
-   - If file exists, treat as file path attachment
-
-2. **Element Name Lookup (Fallback)**: If no file exists, attempt to resolve as element name
-   - Search for element by display name in the model
-   - Element must be a Refinement type (constraint, behavior, specification)
-   - Convert element name to identifier format for storage
-
-3. **Error Handling**: If neither file nor element found, report clear error message indicating what was attempted
-
-This behavior ensures backward compatibility (existing file attachments work unchanged) while enabling element attachments without requiring explicit flags.
+1. **Identifier Parse**: Parse target input as an element identifier (for example `file.md#refinement-id`).
+2. **Identifier Normalization**: Resolve and normalize identifier to full internal identifier format.
+3. **Type Validation**: Confirm target element type is a Refinement type (`constraint`, `behavior`, `specification`).
+4. **Error Handling**: If parsing or resolution fails, report a clear error message indicating that a refinement identifier target is required.
 
 #### Metadata
   * type: behavior

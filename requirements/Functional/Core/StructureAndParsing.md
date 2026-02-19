@@ -87,9 +87,8 @@ The system shall support following reserved subsections:
  * **Relations**: Define relationships between elements
  * **Details**: Extend requirement text with additional information
  * **Metadata**: Define element type and classification
- * **Attachments**: Link external documents and Refinement elements
-   - Can contain file paths (markdown links where text equals href)
-   - Can contain element identifiers (markdown links to Refinement elements ONLY)
+ * **Attachments**: Link Refinement elements
+   - Can contain element identifiers only (markdown links to Refinement elements ONLY)
 
 Each reserved subsection has specific parsing rules, validation requirements, and behaviors.
 

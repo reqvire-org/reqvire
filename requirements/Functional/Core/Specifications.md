@@ -3,7 +3,7 @@
 ### Attachment Scope Validation Refinement Specification
 
 #### Details
-When validating attachments (both refinement elements and file assets), the system is expected to enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
+When validating attachments, the system is expected to enforce attachment scope constraints for refinement-element identifier targets and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
 
 #### Metadata
  * type: specification
@@ -12,20 +12,16 @@ When validating attachments (both refinement elements and file assets), the syst
 ### Attachment Target Validation Refinement Specification
 
 #### Details
-Attachment targets support two types of references:
+Attachment targets support refinement-element identifier references only.
 
-**File Paths:**
-- Normalized to git-root-relative paths
-- Validated for file existence during model validation
-- Standard markdown link format where link text equals href
-
-**Element Identifiers:**
+**Identifier Targets:**
 - Must point to Refinement element types only (constraint, behavior, specification)
 - Normalized like relation targets (resolved to full identifier path)
 - Validation is expected to reject identifiers pointing to non-Refinement elements
+- Validation is expected to reject unresolved identifiers
 - Provides clear error message indicating the expected element type
 
-This validation ensures that attachments either reference existing files or valid Refinement elements that provide supplementary documentation.
+This validation ensures that attachments reference valid Refinement elements that provide supplementary documentation.
 
 #### Metadata
  * type: specification

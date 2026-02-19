@@ -8,5 +8,24 @@ A constraint element with an attachment (not allowed).
   * type: constraint
 
 #### Attachments
-  * [Some File](docs/file.md)
+  * [Attachment Spec](#attachment-spec)
+---
+
+### Attachment Owner Requirement
+
+Owner requirement for Attachment Spec.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * refinedBy: [Attachment Spec](#attachment-spec)
+---
+
+### Attachment Spec
+
+Specification element used as attachment target.
+
+#### Metadata
+  * type: specification
 ---

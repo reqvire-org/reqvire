@@ -4,7 +4,7 @@
 
 * [Independent Requirement With Same Attachment](specifications/Requirements.md#independent-requirement-with-same-attachment) ⚠️
     * 📎 [Data Format Spec](specifications/Requirements.md#data-format-spec)
-    * 📎 [specifications/docs/export-spec.md](specifications/docs/export-spec.md) ⚠️
+    * 📎 [Export Format Spec](specifications/Requirements.md#export-format-spec) ⚠️
     * verifiedBy -> [Export Test](specifications/Verifications.md#export-test)
     * derive -> [Export Implementation](specifications/Requirements.md#export-implementation)
 

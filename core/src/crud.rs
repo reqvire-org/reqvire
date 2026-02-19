@@ -531,24 +531,47 @@ pub fn detach(
     })
 }
 
-/// Attach a Refinement element to another element by adding its identifier to the Attachments subsection
-///
-/// # Arguments
-/// * `model_manager` - The model manager
-/// * `element_name` - Name of the element to attach to
-/// * `attachment_element_name` - Name of the Refinement element to attach
-/// * `git_root` - Git root directory
-/// * `dry_run` - If true, don't write changes to disk
-pub fn attach_element(
+fn resolve_attachment_identifier_for_element(
+    model_manager: &ModelManager,
+    target_element_file_path: &str,
+    attachment_target: &str,
+) -> Result<String, ReqvireError> {
+    if !attachment_target.contains('#') {
+        return Err(ReqvireError::InvalidAttachmentTarget(format!(
+            "Invalid attachment target '{}'. Attachments must use refinement element identifiers in the form 'file.md#element-id' or '#element-id'.",
+            attachment_target
+        )));
+    }
+
+    if attachment_target.starts_with('#') {
+        return Ok(format!("{}{}", target_element_file_path, attachment_target));
+    }
+
+    if model_manager.graph_registry.get_element(attachment_target).is_some() {
+        return Ok(attachment_target.to_string());
+    }
+
+    let base_path = std::path::Path::new(target_element_file_path)
+        .parent()
+        .unwrap_or_else(|| std::path::Path::new("."));
+    crate::utils::normalize_identifier(attachment_target, base_path).map_err(|e| {
+        ReqvireError::InvalidAttachmentTarget(format!(
+            "Invalid attachment target '{}': {}. Attachments must use refinement element identifiers in the form 'file.md#element-id' or '#element-id'.",
+            attachment_target, e
+        ))
+    })
+}
+
+/// Attach a Refinement element identifier to an element.
+pub fn attach_element_identifier(
     model_manager: &mut ModelManager,
     element_name: &str,
-    attachment_element_name: &str,
+    attachment_target: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
     use std::fs;
 
-    // Find the target element by name (the element to attach TO)
     let target_element = model_manager
         .graph_registry
         .get_element_by_name(element_name)
@@ -558,33 +581,40 @@ pub fn attach_element(
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
+    let attachment_identifier =
+        resolve_attachment_identifier_for_element(model_manager, &file_path, attachment_target)?;
 
-    // Find the attachment element by name (the Refinement element to attach)
-    let attachment_element = model_manager.graph_registry.get_element_by_name(attachment_element_name)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Attachment '{}' not found as file or element. Neither file exists nor element with this name was found in the model.", attachment_element_name)
-        ))?;
+    let attachment_element = model_manager
+        .graph_registry
+        .get_element(&attachment_identifier)
+        .ok_or_else(|| {
+            ReqvireError::MissingAttachmentTarget(format!(
+                "Attachment target '{}' could not be resolved to an existing element identifier.",
+                attachment_target
+            ))
+        })?;
 
-    // Verify the attachment element is a Refinement type (constraint, behavior, specification)
     if !attachment_element.element_type.is_refinement() {
         return Err(ReqvireError::InvalidAttachmentTarget(
-            format!("Element '{}' is not a Refinement type (constraint, behavior, specification). Only Refinement elements can be attached.", attachment_element_name)
+            format!(
+                "Element '{}' is not a Refinement type (constraint, behavior, specification). Only Refinement elements can be attached.",
+                attachment_element.name
+            )
         ));
     }
 
-    let attachment_identifier = attachment_element.identifier.clone();
-
-    // Check 1: Satisfied Refinement Constraint - refinement must have a refine relation
     if !model_manager
         .graph_registry
         .refinement_has_refine_relation(&attachment_identifier)
     {
         return Err(ReqvireError::InvalidAttachmentTarget(
-            format!("'{}' has no refine relation. Refinements must refine a requirement before they can be attached.", attachment_element.name)
+            format!(
+                "'{}' has no refine relation. Refinements must refine a requirement before they can be attached.",
+                attachment_element.name
+            )
         ));
     }
 
-    // Check 2: Hierarchical Independence Constraint - target element must not be in defining hierarchy
     let defining_reqs = model_manager
         .graph_registry
         .get_defining_requirements(&attachment_identifier);
@@ -594,13 +624,14 @@ pub fn attach_element(
             .is_in_hierarchy(&element_id, &defining_req_id)
         {
             return Err(ReqvireError::InvalidAttachmentScope(
-                format!("'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the refinedBy chain.", attachment_element.name, element_name)
+                format!(
+                    "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the refinedBy chain.",
+                    attachment_element.name, element_name
+                )
             ));
         }
     }
-    let attachment_display_name = attachment_element.name.clone();
 
-    // Check if already attached - return error
     if target_element
         .attachments
         .iter()
@@ -608,63 +639,50 @@ pub fn attach_element(
     {
         return Err(ReqvireError::ElementError(format!(
             "Attachment '{}' already exists on '{}'",
-            attachment_element_name, element_name
+            attachment_target, element_name
         )));
     }
 
-    // Check for cross-section duplicate: target already exists in Relations
     let in_relations = target_element
         .relations
         .iter()
         .any(|r| r.target.link.as_str() == attachment_identifier);
-
     if in_relations {
         return Err(ReqvireError::CrossSectionDuplicate(format!(
             "Target '{}' already exists in Relations of '{}'. Cannot add to Attachments.",
-            attachment_element_name, element_name
+            attachment_target, element_name
         )));
     }
 
-    // Read current file content
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
-
-    // Calculate relative identifier from target element's file to attachment element
-    // If both elements are in the same file, use just #fragment format
+    let attachment_display_name = attachment_element.name.clone();
     let attachment_file_path = attachment_element.file_path.clone();
+
     let relative_identifier = if file_path == attachment_file_path {
-        // Same file - use just the fragment (like relations do)
         let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&attachment_identifier);
         let fragment = fragment_opt.unwrap_or(&attachment_identifier);
         format!("#{}", fragment)
     } else {
-        // Different files - calculate relative path
         let target_file_path_buf = std::path::PathBuf::from(&file_path);
         let target_folder = target_file_path_buf
             .parent()
             .unwrap_or_else(|| std::path::Path::new("."))
             .to_path_buf();
-
         crate::utils::to_relative_identifier(&attachment_identifier, &target_folder, true)
             .unwrap_or_else(|_| attachment_identifier.clone())
     };
 
-    // Add element attachment to file
     let new_content = add_element_attachment_to_element(
         &content,
         element_name,
         &attachment_display_name,
         &relative_identifier,
     )?;
-
-    // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
 
-    // Write to file if not dry run
     if !dry_run {
         fs::write(&absolute_file_path, &new_content).map_err(ReqvireError::IoError)?;
-
-        // Mark file as modified for re-parsing
         model_manager
             .graph_registry
             .modified_files
@@ -676,31 +694,51 @@ pub fn attach_element(
         element_id,
         element_name: format!(
             "Attached element {} to {}",
-            attachment_element_name, element_name
+            attachment_target, element_name
         ),
         diffs: vec![diff],
         dry_run,
     })
 }
 
-/// Detach a Refinement element from another element by removing its identifier from the Attachments subsection
-///
-/// # Arguments
-/// * `model_manager` - The model manager
-/// * `element_name` - Name of the element to detach from
-/// * `attachment_element_name` - Name of the Refinement element to detach
-/// * `git_root` - Git root directory
-/// * `dry_run` - If true, don't write changes to disk
-pub fn detach_element(
+/// Attach a Refinement element by name to another element.
+pub fn attach_element(
     model_manager: &mut ModelManager,
     element_name: &str,
     attachment_element_name: &str,
     git_root: &Path,
     dry_run: bool,
 ) -> Result<CrudResult, ReqvireError> {
+    let attachment_identifier = model_manager
+        .graph_registry
+        .get_element_by_name(attachment_element_name)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!(
+                "Attachment '{}' not found",
+                attachment_element_name
+            ))
+        })?
+        .identifier
+        .clone();
+    attach_element_identifier(
+        model_manager,
+        element_name,
+        &attachment_identifier,
+        git_root,
+        dry_run,
+    )
+}
+
+/// Detach a Refinement element identifier from an element.
+pub fn detach_element_identifier(
+    model_manager: &mut ModelManager,
+    element_name: &str,
+    attachment_target: &str,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
     use std::fs;
 
-    // Find the target element by name
     let target_element = model_manager
         .graph_registry
         .get_element_by_name(element_name)
@@ -710,47 +748,44 @@ pub fn detach_element(
 
     let element_id = target_element.identifier.clone();
     let file_path = target_element.file_path.clone();
+    let attachment_identifier =
+        resolve_attachment_identifier_for_element(model_manager, &file_path, attachment_target)?;
 
-    // Find the attachment element by name to get its identifier
-    let attachment_element = model_manager.graph_registry.get_element_by_name(attachment_element_name)
-        .ok_or_else(|| ReqvireError::ElementNotFound(
-            format!("Attachment '{}' not found as file or element. Neither file exists nor element with this name was found in the model.", attachment_element_name)
-        ))?;
+    let attachment_display_name = model_manager
+        .graph_registry
+        .get_element(&attachment_identifier)
+        .map(|e| e.name.clone())
+        .unwrap_or_else(|| attachment_identifier.clone());
 
-    let attachment_identifier = attachment_element.identifier.clone();
-    let attachment_display_name = attachment_element.name.clone();
-
-    // Read current file content
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
 
-    // Calculate relative identifier from target element's file to attachment element
     let target_file_path = std::path::PathBuf::from(&file_path);
     let target_folder = target_file_path
         .parent()
         .unwrap_or_else(|| std::path::Path::new("."))
         .to_path_buf();
+    let relative_identifier = {
+        let (identifier_path, fragment_opt) =
+            crate::utils::extract_path_and_fragment(&attachment_identifier);
+        if identifier_path == file_path {
+            format!("#{}", fragment_opt.unwrap_or(&attachment_identifier))
+        } else {
+            crate::utils::to_relative_identifier(&attachment_identifier, &target_folder, true)
+                .unwrap_or_else(|_| attachment_identifier.clone())
+        }
+    };
 
-    let relative_identifier =
-        crate::utils::to_relative_identifier(&attachment_identifier, &target_folder, true)
-            .unwrap_or_else(|_| attachment_identifier.clone());
-
-    // Remove element attachment from file
     let new_content = remove_element_attachment_from_element(
         &content,
         element_name,
         &attachment_display_name,
         &relative_identifier,
     )?;
-
-    // Generate diff
     let diff = generate_file_diff(&file_path, &content, &new_content);
 
-    // Write to file if not dry run
     if !dry_run {
         fs::write(&absolute_file_path, &new_content).map_err(ReqvireError::IoError)?;
-
-        // Mark file as modified for re-parsing
         model_manager
             .graph_registry
             .modified_files
@@ -762,11 +797,39 @@ pub fn detach_element(
         element_id,
         element_name: format!(
             "Detached element {} from {}",
-            attachment_element_name, element_name
+            attachment_target, element_name
         ),
         diffs: vec![diff],
         dry_run,
     })
+}
+
+/// Detach a Refinement element by name from another element.
+pub fn detach_element(
+    model_manager: &mut ModelManager,
+    element_name: &str,
+    attachment_element_name: &str,
+    git_root: &Path,
+    dry_run: bool,
+) -> Result<CrudResult, ReqvireError> {
+    let attachment_identifier = model_manager
+        .graph_registry
+        .get_element_by_name(attachment_element_name)
+        .ok_or_else(|| {
+            ReqvireError::ElementNotFound(format!(
+                "Attachment '{}' not found",
+                attachment_element_name
+            ))
+        })?
+        .identifier
+        .clone();
+    detach_element_identifier(
+        model_manager,
+        element_name,
+        &attachment_identifier,
+        git_root,
+        dry_run,
+    )
 }
 
 /// Move an asset file and update all references across elements (Attachments and Relations)
@@ -1410,6 +1473,7 @@ fn remove_element_attachment_from_element(
     // Match by either identifier or display name in the link
     let attachment_link_by_id = format!("]({})", identifier);
     let attachment_link_full = format!("[{}]({})", display_name, identifier);
+    let attachment_link_by_name = format!("[{}](", display_name);
 
     for line in content.lines() {
         let trimmed = line.trim();
@@ -1441,7 +1505,8 @@ fn remove_element_attachment_from_element(
         if in_target_element && in_attachments_section {
             if (trimmed.starts_with("* ") || trimmed.starts_with("- "))
                 && (trimmed.contains(&attachment_link_by_id)
-                    || trimmed.contains(&attachment_link_full))
+                    || trimmed.contains(&attachment_link_full)
+                    || trimmed.contains(&attachment_link_by_name))
             {
                 removed = true;
                 continue; // Skip this line

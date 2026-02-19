@@ -2,18 +2,16 @@
 
 ### Attachment Commands
 
-**DEPRECATED**: Attachment functionality has been unified into the `link` and `unlink` commands. Use `reqvire link <element> attaching <target>` and `reqvire unlink <element> <target>` instead.
-
 The system shall provide attachment management through the unified link/unlink commands using the 'attaching' keyword.
 
 #### Details
-Attachment management has been consolidated into the Relation Commands. The attach/detach commands are superseded by:
+Attachment management behavior:
 
 **Attach (via link):**
 - Syntax: `reqvire link <element-name> attaching <target> [--dry-run]`
-- Target: internal file path OR Refinement element name (auto-detected)
+- Target: Refinement element identifier
 - Create Attachments subsection if doesn't exist
-- Add link to subsection with format `* [display-name](path)`
+- Add link to subsection with format `* [display-name](file.md#refinement-id)`
 - Skip if already attached (idempotent)
 - Support many-to-many (same attachment to multiple elements)
 - Support dry-run mode for preview
@@ -200,7 +198,7 @@ The markdown output shall include:
 #### Attachments
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
-  * [ContainmentView.md](../../Functional/Output/DesignDocuments/ContainmentView.md)
+  * [ContainmentView.md](../../Functional/Output/DesignDocuments/ContainmentView.md#containmentview)
   * [D3.js Containment Tree Specification](../WebInterface/Specifications.md#d3js-containment-tree-specification)
 
 #### Relations
@@ -659,7 +657,7 @@ Implementation details shall follow the associated refinement specifications.
 
 #### Attachments
   * [Relation Operations Specification](../../Functional/Operations/Specifications.md#relation-operations-specification)
-  * [RelationTypes.md](../../Functional/Core/DesignDocuments/RelationTypes.md)
+  * [RelationTypes.md](../../Functional/Core/DesignDocuments/RelationTypes.md#relationtypes)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
 

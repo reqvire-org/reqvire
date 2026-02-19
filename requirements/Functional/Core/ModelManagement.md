@@ -173,7 +173,7 @@ Refinement relation usage shall follow the associated refinement specifications.
 
 ### Attachment Scope Constraints
 
-The system shall enforce scope constraints on attachments (both refinement elements and file assets) to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.
+The system shall enforce scope constraints on refinement-element attachments to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.
 
 #### Metadata
   * type: requirement

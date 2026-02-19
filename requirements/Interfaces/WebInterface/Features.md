@@ -32,7 +32,7 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
 
 ### Attachment Export
 
-The system shall copy all attachment files referenced by elements during HTML export to preserve document completeness and enable navigation.
+The system shall preserve attachment identifier links to referenced refinement elements during HTML export to preserve document completeness and enable navigation.
 
 #### Details
 Implementation details shall follow the associated refinement specifications.

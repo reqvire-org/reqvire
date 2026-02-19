@@ -42,9 +42,7 @@ This test verifies that the collect command aggregates content from a requiremen
    - Same-level elements sorted alphabetically
 
 4. **Attachment Content Collection**
-   - .md file attachments: content read and included
-   - other file types: included as markdown link
-   - element identifier attachments: referenced element content included
+- element identifier attachments: referenced element content included
 
 5. **Error Handling - Element Not Found**
    Command: `reqvire collect non-existent-element`
@@ -605,7 +603,7 @@ Comprehensive test verifying model command generates model-centric nested output
    - Element targets are nested recursively with same structure
    - File targets have: `path`, `type: "file"`
    - External targets have: `url`, `type: "external"`
-   - Attachments is an array of file path strings (empty array if no attachments)
+   - Attachments is an array of refinement element identifier strings (empty array if no attachments)
    - Metadata has: `total_elements`, `total_relations`, `filtered_from`
 
 5. **Forward-Only Traversal Verification**
@@ -662,15 +660,16 @@ This test verifies that the search command correctly filters by multiple element
 
 ### Resources Report Verification
 
-This test verifies that the resources command correctly generates reports showing all files referenced by the model through relations and attachments.
+This test verifies that the resources command correctly generates reports showing file-based relations and identifier-based attachments.
 
 #### Details
 
 ##### Acceptance Criteria
 **Report Structure:**
 - Report shall have two main sections: Relations and Attachments
-- Each section lists files alphabetically by path
-- Each file shows referencing elements with markdown links
+- Relations section lists files alphabetically by path
+- Attachments section lists refinement identifiers alphabetically
+- Each entry shows referencing elements with markdown links
 
 **Relations Section:**
 - Includes files from InternalPath relation targets (satisfiedBy, trace, etc.)
@@ -678,7 +677,7 @@ This test verifies that the resources command correctly generates reports showin
 - References sorted by relation type, then by element identifier
 
 **Attachments Section:**
-- Includes files from FilePath attachment targets
+- Includes refinement identifiers from attachment targets
 - Each reference shows source element
 - References sorted by element identifier
 
@@ -704,7 +703,7 @@ This test verifies that the resources command correctly generates reports showin
    - exits code **0**
    - output parses under `jq`
    - contains `relations` array with file_path and references
-   - contains `attachments` array with file_path and references
+   - contains `attachments` array with identifier and references
    - contains `summary` with totals
 
 3. **Relations section content**
@@ -713,13 +712,13 @@ This test verifies that the resources command correctly generates reports showin
    - each reference includes relation_type, element_id, element_name
 
 4. **Attachments section content**
-   - FilePath attachments appear in Attachments section
-   - ElementIdentifier attachments do NOT appear (they reference model elements, not files)
+   - refinement identifier attachments appear in Attachments section
    - each reference includes element_id, element_name
 
 5. **Sorting verification**
-   - Files sorted alphabetically by path
-   - Within each file, references sorted by relation_type then element_id
+   - Relation files sorted alphabetically by path
+   - Attachment identifiers sorted alphabetically by identifier
+   - Within each entry, references sorted by relation_type then element_id
    - Consistent ordering across multiple runs
 
 6. **HTML export integration**
@@ -730,7 +729,7 @@ This test verifies that the resources command correctly generates reports showin
 
 7. **Empty sections handling**
    - If no InternalPath relations exist, Relations section shows appropriate message
-   - If no FilePath attachments exist, Attachments section shows appropriate message
+   - If no attachment identifiers exist, Attachments section shows appropriate message
 
 #### Metadata
   * type: test-verification
@@ -882,11 +881,10 @@ This test verifies that the system provides a unified `search` command functiona
 16. **Attachments in search output (full mode)**
     Command: `reqvire search --json`
     - JSON output must include `attachments` field for each element
-    - Attachments is an array of strings (file paths and element identifiers)
-    - File path attachments displayed as relative paths (e.g., `"path/to/file.pdf"`)
+    - Attachments is an array of refinement element identifier strings
     - Element identifier attachments displayed as full identifiers (e.g., `"specifications/File.md#refinement-element"`)
     - Elements without attachments have empty array `[]`
-    - Attachment paths are relative to git root
+    - Attachment identifiers are normalized to git-root-relative identifier format
 
 17. **Attachments omitted in short mode**
     Command: `reqvire search --short --json`

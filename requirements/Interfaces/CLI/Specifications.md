@@ -363,9 +363,9 @@ Resources command behavior:
 - Default to human-readable text output when `--json` is not present.
 - Generate two sections: Relations and Attachments.
 - Show files from InternalPath relation targets (`satisfiedBy`, `trace`, and related path-based targets).
-- Show files from FilePath attachment targets.
-- List files alphabetically by path.
-- For each file, show referencing elements with links.
+- Show referenced refinement identifiers from attachment targets.
+- List relation file entries and attachment identifier entries alphabetically.
+- For each entry, show referencing elements with links.
 - Sort references by relation type (for relations section), then by element identifier.
 - Exit with status code 0 on success and non-zero on errors.
 
@@ -394,7 +394,7 @@ Search command features:
 - By having relations: `--have-relations=verifiedBy,satisfiedBy` (comma-separated, must have ALL)
 - By not having relations: `--not-have-relations=verifiedBy` (comma-separated, must NOT have ALL)
 - By having attachments: `--has-attachments` (filter elements with Attachments subsection)
-- By attachment path pattern: `--filter-attachment <glob>` (supports glob patterns like `*.pdf`, `docs/*`)
+- By attachment identifier pattern: `--filter-attachment <glob>` (supports glob patterns over identifier strings)
 
 Short mode behavior:
 - Text output: Display abbreviated one-line format per element
@@ -553,8 +553,8 @@ The `link` command:
 - Uses existing element name for source.
 - Accepts relation type from `derivedFrom`, `derive`, `satisfiedBy`, `satisfy`, `verifiedBy`, `verify`, `trace`, or `attaching`.
 - Supports relation targets as element name, internal file path, or external URL (`http`/`https`).
-- Supports attachment targets as internal file path or refinement element name.
-- Rejects `attaching` with external URL and reports guidance to use `trace`.
+- Supports attachment targets as refinement element identifiers.
+- Rejects `attaching` targets that are not refinement element identifiers.
 - Rejects duplicate relation/attachment pairs with clear error.
 - Supports `--dry-run` preview.
 
@@ -563,7 +563,7 @@ The `unlink` command:
 - Auto-detects target in relations first, then attachments.
 - Enforces single relation per source-target pair.
 - Uses existing element name for source.
-- Accepts element name or file path as target.
+- Accepts element name, element identifier, or file path as target.
 - Supports `--dry-run` preview.
 
 Hierarchy ownership behavior:

@@ -172,7 +172,7 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Attachments
-  * [RelationTypes.md](../Core/DesignDocuments/RelationTypes.md)
+  * [RelationTypes.md](../Core/DesignDocuments/RelationTypes.md#relationtypes)
 
 #### Relations
   * derivedFrom: [Model Formatting](#model-formatting)

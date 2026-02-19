@@ -1,7 +1,12 @@
-# Design Document
+# Elements
+
+### Design Doc Specification
 
 This is attached design documentation content.
 
-## Purpose
-
+#### Details
 This document provides additional context for the leaf requirement.
+
+#### Metadata
+  * type: specification
+---

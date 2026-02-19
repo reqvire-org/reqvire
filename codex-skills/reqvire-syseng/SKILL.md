@@ -67,7 +67,7 @@ Use this skill for any requirements, specifications, verifications, or system-mo
 
 ### Goal
 
-Refactor relations so each submodel is internally connected, while any dependency on another submodel is represented as an attachment contract (file or refinement element), not a direct relation.
+Refactor relations so each submodel is internally connected, while any dependency on another submodel is represented as an attachment contract (refinement element identifier), not a direct relation.
 
 ### Submodel Boundary Principle
 
@@ -107,6 +107,7 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
 1. Identify cross-submodel relations:
    - `reqvire search --short --json`
    - Group by source/target folders and relation types.
+   - Run `reqvire lint --json` and prioritize `needs_manual_review` entries with `type: cross_submodel_hierarchical_relation`.
 2. Define submodel boundaries:
    - Keep derivation/refinement/verification relations inside each submodel.
    - Define allowed cross-boundary artifacts as attachments.
@@ -116,6 +117,7 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
 4. Validate semantic completeness:
    - `reqvire collect "<requirement>" --json` must include required attached specs for implementation/review.
    - `reqvire change-impact --git-commit="<base>"` must report impacts when attached contracts change.
+   - Repeat `reqvire lint --json`; the target state should show fewer or no `cross_submodel_hierarchical_relation` findings.
 5. Run quality checks:
    - `reqvire validate`
    - `reqvire lint`
@@ -128,7 +130,7 @@ Before applying refactor edits, explicitly confirm:
 - Submodel ownership map (who owns which folders/elements).
 - Which cross-submodel dependencies are allowed as attachments.
 - Which relation types are forbidden across submodels (`derive`, `refinedBy`, `verifiedBy`, etc.).
-- Whether shared contracts live as files, refinement elements, or both.
+- Whether shared contracts live as refinement elements (and which requirement owns each one).
 
 Do not proceed with bulk unlink/move operations until this is confirmed.
 

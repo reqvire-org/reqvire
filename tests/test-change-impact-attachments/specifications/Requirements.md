@@ -84,7 +84,7 @@ The system shall export data in the specified format.
 
 #### Attachments
   * [Data Format Spec](#data-format-spec)
-  * [docs/export-spec.md](docs/export-spec.md)
+  * [Export Format Spec](#export-format-spec)
 
 #### Metadata
   * type: user-requirement
@@ -92,6 +92,25 @@ The system shall export data in the specified format.
 #### Relations
   * derive: [Export Implementation](#export-implementation)
   * verifiedBy: [Export Test](Verifications.md#export-test)
+---
+
+### Export Format Owner Requirement
+
+Owner requirement for export format refinement.
+
+#### Metadata
+  * type: user-requirement
+
+#### Relations
+  * refinedBy: [Export Format Spec](#export-format-spec)
+---
+
+### Export Format Spec
+
+Specifies export filename format as export_YYYYMMDD.json.
+
+#### Metadata
+  * type: specification
 ---
 
 ### Export Implementation

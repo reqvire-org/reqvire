@@ -94,7 +94,7 @@ Refinement Elements      Code Implementation   Verification Element
 **File Header**:
 - Supported model files begin with either `# Elements` (multi-element) or `# Documents` (single-element)
 - In `# Documents`, the first non-reserved `## <Element Name>` section defines the element identifier fragment
-- Files without a supported first heading can still be used as attachment documents
+- Files without a supported first heading are ignored by the model parser and cannot be attachment targets
 
 **Elements** (`###` headers):
 - Must have unique names within each file
@@ -104,7 +104,7 @@ Refinement Elements      Code Implementation   Verification Element
 - **Metadata**: Element type and custom properties
 - **Relations**: Relationships between elements
 - **Details**: Additional details (use for EARS statements)
-- **Attachments**: References to files or Refinement elements (NOT for Refinement types)
+- **Attachments**: References to Refinement element identifiers (NOT for Refinement types)
 
 **Other Subsections** (`####`):
 - Any non-reserved subsection becomes part of element content
@@ -114,7 +114,7 @@ Refinement Elements      Code Implementation   Verification Element
 ```markdown
 #### Attachments
   * [Drop Down Constraints](path.md#drop-down-constraints)
-  * [Design Documents](../relative/path/to/DesignDocument.md)
+  * [Design Documents](../relative/path/to/DesignDocument.md#design-documents)
 ```
 
 **Relations syntax** (two-space indentation):
@@ -198,7 +198,7 @@ Before applying refactor operations:
 
 - Confirm submodel boundaries and ownership with the user.
 - Confirm which relation types are forbidden across boundaries (`derive`, `derivedFrom`, `refinedBy`, `verifiedBy`, etc.).
-- Confirm where shared contracts live (files, refinement elements, or both).
+- Confirm where shared contracts live (refinement elements and their owner requirements).
 
 Do not run bulk unlink/move operations before this confirmation.
 
@@ -234,11 +234,13 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
 ### Refactor Workflow
 
 1. Audit cross-submodel relations and hotspots.
+   - Run `reqvire lint --json` and prioritize `needs_manual_review` entries with `type: cross_submodel_hierarchical_relation`.
 2. Move misplaced elements into owning submodels where feasible.
 3. Replace remaining cross-submodel relations with attachment contracts.
 4. Verify `collect` includes all required attached external specification context.
 5. Verify `change-impact` reports consumers when attached contracts change.
-6. Run `reqvire validate`, `reqvire lint`, `reqvire coverage`.
+6. Repeat `reqvire lint --json`; target state has fewer or no `cross_submodel_hierarchical_relation` findings.
+7. Run `reqvire validate`, `reqvire lint`, `reqvire coverage`.
 
 ### Circle-Back Checkpoint (Human Confirmation)
 
@@ -247,7 +249,7 @@ Before applying refactor edits, explicitly confirm:
 - Submodel ownership map (who owns which folders/elements).
 - Which cross-submodel dependencies are allowed as attachments.
 - Which relation types are forbidden across submodels (`derive`, `refinedBy`, `verifiedBy`, etc.).
-- Whether shared contracts live as files, refinement elements, or both.
+- Whether shared contracts live as refinement elements (and which requirement owns each one).
 
 Do not proceed with bulk unlink/move operations until this is confirmed.
 
@@ -452,8 +454,8 @@ reqvire collect "Requirement Name" --json
 # Link elements
 reqvire link "Source" "derivedFrom" "Target"
 reqvire link "Source" "verifiedBy" "Verification"
-reqvire link "Source" attaching "file.pdf"
-reqvire link "Source" attaching "Specification Element"
+reqvire link "Source" attaching "#specification-element"
+reqvire link "Source" attaching "requirements/Specs/FeatureSpec.md#specification-element"
 
 # Unlink elements
 reqvire unlink "Source" "Target"
@@ -535,7 +537,7 @@ reqvire merge "Target" "Source" --dry-run
 
 # Preview link creation
 reqvire link "Element" "derivedFrom" "Parent" --dry-run
-reqvire link "Element" attaching "docs/spec.pdf" --dry-run
+reqvire link "Element" attaching "#specification-element" --dry-run
 
 # Preview unlink operation
 reqvire unlink "Element" "Parent" --dry-run
