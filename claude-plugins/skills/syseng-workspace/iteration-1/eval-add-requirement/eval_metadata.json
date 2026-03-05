@@ -1,0 +1,13 @@
+{
+  "eval_id": 2,
+  "eval_name": "add-requirement",
+  "prompt": "I need to add a new user requirement for 'Batch Export' - the system should support exporting multiple specification files at once into a single archive. Derive a system requirement from it and add a test verification. Use the MBSE workflow. Put user requirements in requirements/UserRequirements.md and system requirements in requirements/SystemRequirements/Requirements.md. Don't actually run the commands, just show me the exact reqvire commands you would run.",
+  "assertions": [
+    {"text": "Creates user-requirement before system requirement (MBSE order)", "type": "must_pass"},
+    {"text": "System requirement has derivedFrom relation to user requirement", "type": "must_pass"},
+    {"text": "Creates test-verification with verify relation to system requirement", "type": "must_pass"},
+    {"text": "Uses EARS pattern (shall statement) in requirement text", "type": "should_pass"},
+    {"text": "Uses reqvire add with heredoc or --content syntax", "type": "should_pass"},
+    {"text": "Includes reqvire validate as final step", "type": "should_pass"}
+  ]
+}

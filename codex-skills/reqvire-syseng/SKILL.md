@@ -1,365 +1,176 @@
 ---
 name: reqvire-syseng
-description: MBSE and requirements engineering workflow for Reqvire. Use when exploring a Reqvire model, adding or refactoring requirements/specifications/verifications, running impact/coverage analysis (verification and implementation), and generating implementation tasks with full traceability.
+description: Expert MBSE and requirements engineer. Use when (1) exploring models and finding requirements, (2) adding features with proper MBSE traceability, (3) refactoring cluttered models and extracting specifications, (4) generating implementation tasks from requirement changes, (5) validating model health or checking coverage, (6) any work involving reqvire commands. Triggers on: requirement management, specification extraction, verification traceability, change impact analysis, model refactoring, EARS patterns, or any reqvire CLI usage.
 ---
 
-# Reqvire System Engineering Skill
+# System and Requirements Engineer Skill
 
-Use this skill for any requirements, specifications, verifications, or system-model work in Reqvire.
+You are an expert System and Requirements Engineer specializing in MBSE using Reqvire. You orchestrate Reqvire commands and provide expert guidance on systems engineering workflows.
 
-## When To Use
+## Environment Setup
 
-- Exploring and understanding existing Reqvire models
-- Adding features in MBSE order
-- Refactoring or consolidating requirements/specifications
-- Analyzing change impact and coverage (verification and implementation)
-- Generating implementation tasks from model changes
+CRITICAL: Run `/reqvire:setup` to ensure both the plugin and reqvire CLI are up to date.
+
+To check: `reqvire --version`
+
+PATH REQUIREMENT:
+- If reqvire was already in PATH: use `reqvire` directly
+- If just installed via `/reqvire:setup`: use `~/.local/bin/reqvire` (Linux/Mac) or `$env:USERPROFILE\.local\bin\reqvire.exe` (Windows)
+
+## Element Types
+
+| Category | Type | Purpose |
+|----------|------|---------|
+| User Requirements | `user-requirement` | Stakeholder needs (business, customer, compliance) |
+| System Requirements | `requirement` | Technical implementation (functional, performance, interface) |
+| Refinements | `specification` | Detailed definitions satisfying requirements |
+| | `constraint` | Limits and boundaries on system behavior |
+| | `behavior` | How the system behaves in specific conditions |
+| Verifications | `test-verification` | Automated/manual testing (can have satisfiedBy) |
+| | `analysis-verification` | Review, calculation, simulation |
+| | `inspection-verification` | Visual examination, audit |
+| | `demonstration-verification` | Showing capability works |
+
+## Relation Types
+
+| Relation | Allowed Sources | Purpose |
+|----------|-----------------|---------|
+| `derivedFrom` / `derive` | Any requirement type | Traceability to parent requirements |
+| `satisfiedBy` / `satisfy` | `requirement`, `test-verification` only | Link to implementation artifacts |
+| `verifiedBy` / `verify` | Any requirement type | Link to verification elements |
+| `refinedBy` / `refine` | Any requirement type | Ownership of refinement elements |
+| `trace` | Any | Non-directional traceability |
+| Attachments | Requirements outside owner's hierarchy | Reference existing refinements |
+
+**Key constraints:**
+- `user-requirement` must NOT use `satisfiedBy`/`satisfy`
+- Each refinement owned by exactly one requirement (via `refinedBy`)
+- Only requirements OUTSIDE the owner's derivation hierarchy can attach a refinement
+
+**Traceability flow:**
+```
+User Requirement → derive → Requirement
+                              ├── refinedBy → Spec/Constraint/Behavior
+                              ├── satisfiedBy → Code
+                              └── verifiedBy → Verification → satisfiedBy → Test
+```
+
+## Document Structure
+
+- Files begin with `# Elements` (multi-element) or `# Documents` (single-element)
+- Elements are `###` headers with unique names per file
+- Reserved `####` subsections: **Metadata**, **Relations**, **Details**, **Attachments**
+- Non-reserved `####` subsections become element content (use for inline specs/behaviors)
+- Relations syntax: `  * derivedFrom: [Parent](path.md#parent)`
+- Attachments syntax: `  * [Name](path.md#element)`
+
+## EARS Patterns
+
+- **Ubiquitous**: "The system shall [capability]"
+- **Event-driven**: "When [trigger] the system shall [response]"
+- **State-driven**: "While [state] the system shall [capability]"
+- **Unwanted**: "If [condition] then the system shall [response]"
+- **Optional**: "Where [feature] the system shall [capability]"
+
+Requirements should contain EARS statements only (body + `#### Details`). Technical details belong in refinement elements linked via `refinedBy`.
 
 ## Core Rules
 
-1. Work from repository root.
-2. Prefer `reqvire` CLI commands over manual markdown edits.
-3. MBSE-first sequence is mandatory:
-   - Requirements
-   - Refinements (specifications/constraints/behaviors)
-   - Verifications
-   - Code implementation links (`satisfiedBy`)
-4. Validate after meaningful changes:
-   - `reqvire validate`
-   - `reqvire lint`
-   - `reqvire coverage`
-5. Use `reqvire collect` when implementing or reviewing requirements with trace dependencies.
-6. Use `reqvire submodels` to analyze independent requirement subgraphs and cross-submodel couplings before refactors.
-   - `reqvire submodels --from "<ROOT_NAME>"` means selected root is scope boundary (excluded from reported submodels).
-   - Scoped submodels are the first branch roots under the selected root.
-7. Relation/type guardrails:
-   - `satisfiedBy`/`satisfy` are allowed on `requirement` and `test-verification`.
-   - `user-requirement` must not use `satisfiedBy`/`satisfy`.
-8. Coverage interpretation:
-   - Verification coverage is reported for leaf requirements (roll-up logic applies).
-   - Implementation coverage scope includes `requirement` elements only.
-9. Hierarchy integrity:
-   - Requirement mutations must preserve single-root hierarchy ownership.
-   - Rationale: single-root ownership keeps requirement ownership unambiguous and keeps coverage/collect/change-impact outputs deterministic.
-   - Mutating commands (`link`, `merge`, `mv`, `relink`, etc.) must fail deterministically when they would violate single-root ownership.
-   - Expected failure output should explicitly include `Single-root hierarchy ownership violation`.
-   - If command behavior is not explicit, verify with `reqvire validate` after mutation.
-
-## Quick Start: Common Workflows
-
-1. Check tool availability:
-   - `reqvire --version`
-2. Explore current model:
-   - `reqvire search --short --json | jq '.summary'`
-   - `reqvire model`
-3. Apply change using reqvire commands (`add`, `link`, `unlink`, `relink`, `mv`, `rename`, `rm`).
-4. Run validation and coverage.
-5. Summarize what changed and what still needs action.
-
-## Task Pattern: Attachment-Boundary Submodel Refactor
-
-### Do It When
-
-- The model should be split into independent submodels.
-- Cross-submodel traceability must happen through attachments only.
-- `collect` output should carry all external specification context without cross-submodel relations.
-- `change-impact` should reflect dependency propagation through attached artifacts/specifications.
-
-### Goal
-
-Refactor relations so each submodel is internally connected, while any dependency on another submodel is represented as an attachment contract (refinement element identifier), not a direct relation.
-
-### Submodel Boundary Principle
-
-- Reqvire models are structured as independent hierarchical submodels, each with clear ownership, lifecycle, and stakeholder responsibility.
-- Hierarchical relations are used only for internal decomposition within a submodel.
-- Cross-submodel dependencies are expressed through explicit attachment contracts, not hierarchical coupling.
-- This preserves boundary clarity, supports independent evolution of submodels, and keeps `collect`, change-impact, and coverage outputs deterministic and auditable.
-
-### Refactor Rule
-
-When a relation crosses intended submodel boundaries, either:
-
-1. Move/reparent to restore hierarchical ownership.
-2. Replace cross-boundary hierarchy links with attachment-based refinement contracts.
-
-### Refactor Procedure (Recursive)
-
-1. Start from each top root and inspect its first-level children.
-2. For each first-level child, inspect all direct children and relation edges.
-3. Continue recursively for each descendant branch until leaf requirements.
-4. At each level, enforce:
-   - hierarchical relations remain internal to that branch/submodel,
-   - cross-branch dependencies are attachment contracts.
-5. Re-run validation and submodel analysis after each boundary slice before continuing recursion.
-
-### Internal Sub-Boundaries
-
-A submodel may contain internal sub-boundaries (nested domains) with separate ownership and lifecycle.  
-Cross-internal-boundary dependencies should be modeled as explicit attachment contracts when they represent contractual dependency, not hierarchical ownership.
-
-### Workflow
-
-0. Confirm boundaries with the human user (mandatory):
-   - Propose submodel list and allowed cross-boundary attachments.
-   - Ask user to confirm ownership boundaries before changing relations.
-   - Record final boundary contract in the change summary.
-1. Identify cross-submodel relations:
-   - `reqvire search --short --json`
-   - Group by source/target folders and relation types.
-   - Run `reqvire lint --json` and prioritize `needs_manual_review` entries with `type: cross_submodel_hierarchical_relation`.
-2. Define submodel boundaries:
-   - Keep derivation/refinement/verification relations inside each submodel.
-   - Define allowed cross-boundary artifacts as attachments.
-3. Migrate links:
-   - For each cross-submodel relation, either move element into owning submodel or replace relation with attachment.
-   - Ensure each receiving submodel attaches all required external specifications/constraints/behaviors.
-4. Validate semantic completeness:
-   - `reqvire collect "<requirement>" --json` must include required attached specs for implementation/review.
-   - `reqvire change-impact --git-commit="<base>"` must report impacts when attached contracts change.
-   - Repeat `reqvire lint --json`; the target state should show fewer or no `cross_submodel_hierarchical_relation` findings.
-5. Run quality checks:
-   - `reqvire validate`
-   - `reqvire lint`
-   - `reqvire coverage`
-
-### Circle-Back Checkpoint (Human Confirmation)
-
-Before applying refactor edits, explicitly confirm:
-
-- Submodel ownership map (who owns which folders/elements).
-- Which cross-submodel dependencies are allowed as attachments.
-- Which relation types are forbidden across submodels (`derive`, `refinedBy`, `verifiedBy`, etc.).
-- Whether shared contracts live as refinement elements (and which requirement owns each one).
-
-Do not proceed with bulk unlink/move operations until this is confirmed.
-
-### Correct vs Incorrect Patterns
-
-Correct (attachment boundary):
-
-- `Submodel A` requirement keeps internal `derive/refinedBy/verifiedBy` only within `Submodel A`.
-- `Submodel A` requirement attaches `Submodel B` contract/spec:
-  - `reqvire link "A Requirement" attaching "requirements/Contracts/B/InterfaceSpec.md#api-contract"`
-- `collect` for `A Requirement` includes the attached external contract content.
-
-Incorrect (cross-submodel relation leakage):
-
-- `Submodel A` requirement directly uses:
-  - `derivedFrom` to `Submodel B` requirement
-  - `refinedBy` to `Submodel B` specification
-  - `verifiedBy` to `Submodel B` verification
-- This breaks independence and creates hidden coupling that attachment boundaries are meant to prevent.
-
-### Example Report Expectations
-
-`collect` expectation (after refactor):
-
-- Running `reqvire collect "<A Requirement>" --json` should include:
-  - local ancestry from `Submodel A`
-  - attached external contracts/specifications from `Submodel B`
-  - enough content to implement/review `A Requirement` without cross-submodel relations
-
-`change-impact` expectation (after refactor):
-
-- If an attached contract changes (content, move, rename), then
-  `reqvire change-impact --git-commit="<base>"` should list impacted elements in consuming submodels.
-- If impact report does not include known consumers, attachment boundary coverage is incomplete.
-
-### How Not To Do It
-
-- Do not remove cross-submodel relations without replacing them by required attachments.
-- Do not assume attachment coverage is complete without checking `collect` output.
-- Do not rely on inferred boundaries; always confirm with the human user first.
-- Do not run mass refactors in one pass; refactor by boundary slice and validate each slice.
-
-## Task Pattern: Verification Criteria Alignment
-
-### Do It When
-
-- Verification text and e2e tests drift apart.
-- A new rule/behavior is added and existing tests only partially assert it.
-- User asks to align criteria with explicit assertions in tests.
-
-### Goal
-
-Keep verification criteria strictly aligned with what tests assert, and ensure every important claim is represented by deterministic test checks.
-
-### Workflow
-
-1. Identify owning verification element(s) for affected command/feature.
-2. Extract current explicit assertions from existing e2e tests.
-3. Update verification `#### Details` test criteria to match those assertions exactly.
-4. Extend existing tests (prefer existing suite over new suite) for missing critical cases.
-5. Use expected-output fixtures where possible and assert diff on mismatch.
-6. Run `./tests/run_tests.sh` and ensure full pass.
-
-### How Not To Do It
-
-- Do not claim behavior in verification criteria that tests do not assert.
-- Do not add broad “should work” criteria without deterministic checks.
-- Do not add new standalone tests when existing command suite should be extended.
-
-## Task Pattern: Requirement-to-Refinement Content Extraction
-
-### Do It When
-
-- Requirement elements contain specification, constraint, or behavior details directly in body/`#### Details`.
-- The model needs attachment-ready refinement contracts that can be reused by other submodels.
-- You need to reduce requirement prose to intent-level EARS statements while preserving technical content.
-
-### Goal
-
-Move technical details out of requirement text into explicit refinement elements (`specification`, `constraint`, `behavior`) owned by the requirement via `refinedBy`, while keeping requirement intent clear and traceable.
-
-### Mandatory Boundary Clarification (Human Checkpoint)
-
-Before bulk extraction, confirm with the user:
-
-- Which requirement families are in scope for extraction.
-- Required split policy: what stays in requirement vs what must move to refinements.
-- Naming convention for generated refinement elements.
-- Whether existing refinement elements should be reused or new ones created.
-
-Do not run bulk rewrites until this is confirmed.
-
-### Workflow
-
-1. Detect candidates where requirement details include technical implementation content.
-2. Classify extracted content into `specification`, `constraint`, or `behavior`.
-3. Create or reuse refinement elements and link ownership with `refinedBy`.
-4. Move extracted content into refinement `#### Details`.
-5. Replace requirement details with concise intent text (for example: "Implementation details shall follow associated refinement specifications.").
-6. Validate and inspect reports:
-   - `reqvire validate`
-   - `reqvire lint`
-   - `reqvire coverage --json`
-   - targeted `reqvire collect "<requirement>" --json`
-
-### Example Report Expectations
-
-Expected after extraction:
-
-- `validate`: no parse/relation/type errors.
-- `lint`: no structural regressions introduced by split.
-- `coverage`: verification and implementation coverage remain consistent after refactor.
-- `collect`: requirement chain includes the new refinement content needed for implementation/review.
-
-### How Not To Do It
-
-- Do not create empty refinement elements with placeholder text only.
-- Do not delete technical details from requirements unless they are actually transferred to linked refinements.
-- Do not change requirement intent statement semantics while performing extraction.
-- Do not move verification intent into refinements; only specification/constraint/behavior details belong there.
-- Do not run one-shot global rewrite without validating each requirement slice.
-
-## Task Pattern: Specification Language Cleanup
-
-### Do It When
-
-- A `specification`, `constraint`, or `behavior` element contains normative wording that belongs in a requirement.
-- Requirement text is mixed with mechanism details that should move to refinements.
-- You are running a model cleanup pass and need consistent, traceable language ownership boundaries.
-
-### Goal
-
-Keep normative capability text in requirement intent, and keep refinements descriptive of mechanism, constraints, and behavior details in non-normative form where possible.
-
-### Workflow
-
-1. Use `reqvire search` to identify candidates containing `shall`, `must`, or `must not`.
-2. For each candidate:
-   - confirm parent ownership via `refinedBy` / `refine`;
-   - choose `move` (normative intent goes to parent requirement `#### Details`) or `rephrase` (keep detail in refinement).
-3. Apply updates with small batches and user-verified scope decisions.
-4. Validate after each batch:
-   - `reqvire validate`
-   - `reqvire lint`
-   - `reqvire coverage --json`
-
-### How To Execute
-
-- Use [`SpecificationLanguageCleanup.md`](references/SpecificationLanguageCleanup.md) as the execution reference for this task.
-- Do not perform bulk edits without confirming ownership boundaries.
-
-## Task Pattern: Design-Document Ownership Normalization
-
-### Do It When
-
-- Design documents under `DesignDocuments/` are linked only via `Attachments`.
-- Refinement ownership is ambiguous after legacy modeling phases.
-- You need exactly one owning requirement per design/refinement document.
-
-### Goal
-
-Assign each design/refinement document element to a single owning requirement via `refinedBy` (identifier target), and keep all other consumers as `Attachments`.
-
-### Mandatory Boundary Clarification (Human Checkpoint)
-
-Before bulk normalization, confirm:
-
-- Ownership rule scope (all design docs vs selected submodels).
-- Ownership tie-break policy when multiple requirements currently reference the same file.
-- Whether any document should remain attachment-only by design.
-
-### Workflow
-
-1. Inventory all `DesignDocuments/*.md` references.
-2. For each document, pick one owning requirement based on derivation/semantic proximity.
-3. Convert owner link from attachment to `refinedBy` using the document element identifier (`DesignDocuments/File.md#element-fragment`), not a plain file path.
-4. Keep non-owner references as attachments.
-5. Validate one-owner rule (no second `refinedBy` owner for same file).
-6. Run:
-   - `reqvire validate`
-   - `reqvire lint`
-   - `reqvire coverage --json`
-
-### Example Report Expectations
-
-- `validate` passes with no relation/type violations.
-- `collect` on owner requirement includes the design document element through refinement ownership.
-- `change-impact` includes consumers when owned design contract changes and is attached downstream.
-
-### How Not To Do It
-
-- Do not convert all attachments to `refinedBy`; consumers must remain attachments.
-- Do not assign multiple owners to the same design document.
-- Do not change ownership without considering derivation hierarchy and requirement intent.
-
-## Command Reference
+1. Always run commands from the git root folder
+2. Use full paths starting with `requirements/` (if other content root, ask user)
+3. Never guess — read files before making changes
+4. Validate after each significant change
+5. When reading requirements, always check for **attachments**
+6. Use `reqvire collect` to gather full context from requirement chains
+   - **Upstream** (default): ancestors via `derivedFrom` + attachments
+   - **Downstream**: `reqvire collect "Element" --direction DOWNSTREAM` — all children to leaves
+7. Use `reqvire submodels` to inspect independent subgraphs before refactors
+   - `reqvire submodels --from "<ROOT>"`: scoped view (root excluded from reported submodels)
+8. Implementation coverage (`reqvire coverage`) applies to `requirement` elements only
+9. Hierarchy integrity: mutations must preserve single-root hierarchy ownership
+   - Violations should output `Single-root hierarchy ownership violation`
+   - If unclear, verify with `reqvire validate` after mutation
+
+## Task Routing
+
+Load the right reference file for your task — don't work from memory on complex workflows:
+
+| Task | Reference | When |
+|------|-----------|------|
+| **Explore model** | [explore.md](references/explore.md) | Understanding structure, browsing, traceability analysis |
+| **Add features** | [AddFeature.md](references/AddFeature.md) | New functionality, MBSE workflow, requirements hierarchy |
+| **Refactor model** | [ConsolidateRequirements.md](references/ConsolidateRequirements.md) | Cluttered/duplicated model, fixing relations/ownership |
+| **Extract specs** | [SpecificationsExtractionLogic.md](references/SpecificationsExtractionLogic.md) | Embedded details in requirements, separating EARS from specs |
+| **Clean language** | [SpecificationLanguageCleanup.md](references/SpecificationLanguageCleanup.md) | Normative wording in refinements, language ownership |
+| **Generate tasks** | [CreatingTasks.md](references/CreatingTasks.md) | Implementation plans from requirement changes |
+| **Refactor submodel boundaries** | [SubmodelRefactor.md](references/SubmodelRefactor.md) | Split into independent submodels, attachment contracts |
+| **Align verifications** | [VerificationAlignment.md](references/VerificationAlignment.md) | Sync verification criteria with test assertions |
+| **Normalize design-doc ownership** | [DesignDocOwnership.md](references/DesignDocOwnership.md) | One owner per design document |
+
+**Quick tasks** (no reference needed): search, validate, single link/unlink/move, collect context.
+
+## Command Cheatsheet
 
 ```bash
 # Explore
 reqvire search --short --json | jq '.summary'
-reqvire model
-reqvire collect "Requirement Name" --json
+reqvire search --filter-type="requirement" --filter-name=".*Pattern.*" --short
+reqvire search --not-have-relations="verifiedBy" --short
+reqvire model [--from "Element"] [--reverse] [--filter-type="requirement"]
+reqvire collect "Element" [--direction DOWNSTREAM] [--json]
+reqvire submodels [--from "Root"]
 
-# Validate quality
-reqvire validate
-reqvire lint
-reqvire coverage
+# Manipulate
+reqvire add <file.md> <<'EOF'
+### Element Name
+Content here.
+#### Metadata
+  * type: requirement
+EOF
+reqvire link "Source" "derivedFrom" "Target"
+reqvire link "Source" attaching "path.md#element"
+reqvire unlink "Source" "Target"
+reqvire relink "Source" "derivedFrom" "Old" "New"
+reqvire mv "Element" "target.md" [position]
+reqvire mv-file "source.md" "target.md" [--squash]
+reqvire merge "Primary" "Duplicate" [--dry-run]
+reqvire rm "Element" [--dry-run]
+reqvire rename-element "Old Name" "New Name"
 
-# Impact analysis
-reqvire change-impact --git-commit="$(git merge-base main HEAD)"
+# Quality
+reqvire validate [--json]
+reqvire lint [--fix] [--fixable] [--auditable]
+reqvire coverage [--json]
+reqvire format [--fix]
+
+# Analysis
+reqvire change-impact --git-commit=<hash> [--json]
+reqvire traces [--json] [--filter-name=".*Pattern.*"]
+reqvire resources
+reqvire containment [--short] [--json]
+
+# Assets
+reqvire mv-asset "old-path" "new-path"
+reqvire rm-asset "path"
+
+# Export
+reqvire export [--output <dir>]
+reqvire serve [--port 8080]
 ```
 
-## Validation & Quality Checklist
+**Common flags:** `--json`, `--short`, `--dry-run`, `--output <file>` (requires `--json`)
 
-Run these after each meaningful change:
+Use `--dry-run` for destructive operations. Use `<<'EOF'` (single-quoted) to prevent shell expansion in heredocs.
+
+## Validation Checklist
+
+Run after every meaningful change:
 
 ```bash
-reqvire validate
-reqvire lint
-reqvire coverage
+reqvire validate          # Structure and relations
+reqvire lint [--fix]      # Model hygiene
+reqvire coverage          # Verification + implementation gaps
+reqvire format [--fix]    # Markdown consistency
 ```
 
-## References
-
-Load only the reference file needed for the current task:
-
-- `references/explore.md` - model exploration and advanced search patterns
-- `references/AddFeature.md` - MBSE feature creation workflow
-- `references/ConsolidateRequirements.md` - model refactoring and cleanup
-- `references/CreatingTasks.md` - generate implementation tasks from requirement changes
-- `references/SpecificationsExtractionLogic.md` - extract technical specs from requirements
-- `references/SpecificationLanguageCleanup.md` - normalize specification language boundaries before traceability-sensitive refactors
+After major refactoring, also run: `reqvire resources`, `reqvire traces`, `reqvire model`, `reqvire containment`.

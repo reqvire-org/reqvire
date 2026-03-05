@@ -1,0 +1,32 @@
+{
+  "eval_id": 0,
+  "eval_name": "explore-model",
+  "configuration": "with_skill",
+  "expectations": [
+    {
+      "text": "Uses reqvire search or reqvire model command to explore",
+      "passed": true,
+      "evidence": "Ran 'reqvire search --short --json' successfully, found 444 elements across 56 files"
+    },
+    {
+      "text": "Uses reqvire validate to check model health",
+      "passed": true,
+      "evidence": "Ran 'reqvire validate' successfully, reported clean model with no issues"
+    },
+    {
+      "text": "Uses reqvire coverage to check gaps",
+      "passed": false,
+      "evidence": "Attempted to run 'reqvire coverage' but was blocked by Bash permission denial in the subagent sandbox"
+    },
+    {
+      "text": "Does NOT manually read specification markdown files as primary exploration method",
+      "passed": true,
+      "evidence": "Used reqvire commands (search, validate) as primary method; did NOT fall back to reading markdown files when commands were blocked"
+    },
+    {
+      "text": "Loads explore.md reference file for advanced exploration",
+      "passed": false,
+      "evidence": "Did not load explore.md reference file"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "eval_id": 0,
+  "eval_name": "explore-model",
+  "configuration": "old_skill",
+  "expectations": [
+    {
+      "text": "Uses reqvire search or reqvire model command to explore",
+      "passed": false,
+      "evidence": "All Bash commands were denied. Could not run any reqvire commands. Fell back entirely to file reading."
+    },
+    {
+      "text": "Uses reqvire validate to check model health",
+      "passed": false,
+      "evidence": "Could not run reqvire validate due to Bash permission denial. Performed manual inspection instead."
+    },
+    {
+      "text": "Uses reqvire coverage to check gaps",
+      "passed": false,
+      "evidence": "Could not run reqvire coverage due to Bash permission denial."
+    },
+    {
+      "text": "Does NOT manually read specification markdown files as primary exploration method",
+      "passed": false,
+      "evidence": "Read 41+ markdown files directly as the primary (and only) exploration method since Bash was denied."
+    },
+    {
+      "text": "Loads explore.md reference file for advanced exploration",
+      "passed": false,
+      "evidence": "Did not load explore.md reference file."
+    }
+  ]
+}

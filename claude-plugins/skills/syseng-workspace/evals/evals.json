@@ -1,0 +1,44 @@
+{
+  "skill_name": "syseng",
+  "evals": [
+    {
+      "id": 0,
+      "name": "explore-model",
+      "prompt": "I just cloned this repo and want to understand the requirements model. Show me the structure, any validation issues, and a quick health summary. Don't make any changes.",
+      "expected_output": "Should use reqvire commands (search, model, validate, coverage) to explore the model. Should load explore.md reference for advanced queries. Should NOT read spec files directly.",
+      "assertions": [
+        {"text": "Uses reqvire search or reqvire model command to explore", "type": "must_pass"},
+        {"text": "Uses reqvire validate to check model health", "type": "must_pass"},
+        {"text": "Uses reqvire coverage to check gaps", "type": "should_pass"},
+        {"text": "Does NOT manually read specification markdown files as primary exploration method", "type": "should_pass"},
+        {"text": "Loads explore.md reference file for advanced exploration", "type": "nice_to_have"}
+      ]
+    },
+    {
+      "id": 1,
+      "name": "coverage-gaps",
+      "prompt": "Find all requirements that don't have verifications yet. For each one, suggest what type of verification would be appropriate (test, analysis, inspection, or demonstration) and why.",
+      "expected_output": "Should use reqvire search with --not-have-relations='verifiedBy' filter. Should provide verification type recommendations based on requirement content. Should use reqvire commands, not file reading.",
+      "assertions": [
+        {"text": "Uses reqvire search with --not-have-relations='verifiedBy' filter", "type": "must_pass"},
+        {"text": "Recommends specific verification types (test/analysis/inspection/demonstration) for each gap", "type": "must_pass"},
+        {"text": "Uses reqvire commands rather than reading files directly", "type": "should_pass"},
+        {"text": "Explains reasoning for verification type choice", "type": "should_pass"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "add-requirement",
+      "prompt": "I need to add a new user requirement for 'Batch Export' - the system should support exporting multiple specification files at once into a single archive. Derive a system requirement from it and add a test verification. Use the MBSE workflow. Put user requirements in requirements/UserRequirements.md and system requirements in requirements/SystemRequirements/Requirements.md. Don't actually run the commands, just show me the exact reqvire commands you would run.",
+      "expected_output": "Should follow MBSE order: user-requirement first, then system requirement with derivedFrom, then test-verification with verify relation. Should use reqvire add with heredoc syntax. Should include proper EARS statements.",
+      "assertions": [
+        {"text": "Creates user-requirement before system requirement (MBSE order)", "type": "must_pass"},
+        {"text": "System requirement has derivedFrom relation to user requirement", "type": "must_pass"},
+        {"text": "Creates test-verification with verify relation to system requirement", "type": "must_pass"},
+        {"text": "Uses EARS pattern (shall statement) in requirement text", "type": "should_pass"},
+        {"text": "Uses reqvire add with heredoc or --content syntax", "type": "should_pass"},
+        {"text": "Includes reqvire validate as final step", "type": "should_pass"}
+      ]
+    }
+  ]
+}
