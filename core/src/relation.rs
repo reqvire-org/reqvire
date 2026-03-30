@@ -1,12 +1,12 @@
-use std::collections::HashMap;
-use std::sync::LazyLock;
 use crate::error::ReqvireError;
+use crate::utils::EXTERNAL_SCHEMES;
 use serde::Serialize;
 use std::cmp::Ordering;
+use std::collections::HashMap;
 use std::hash::Hash;
 use std::hash::Hasher;
-use crate::utils::EXTERNAL_SCHEMES;
 use std::path::PathBuf;
+use std::sync::LazyLock;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub struct RelationTypeInfo {
@@ -17,113 +17,140 @@ pub struct RelationTypeInfo {
     pub label: &'static str,
 }
 
-pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> = LazyLock::new(|| {
-    let mut m = HashMap::new();
+pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
+    LazyLock::new(|| {
+        let mut m = HashMap::new();
 
-    // Derive relations
-    m.insert("derivedFrom", RelationTypeInfo {
-        name: "derivedFrom",
-        opposite: Some("derive"),
-        description: "Element is derived from another element",
-        arrow: "-.->",
-        label: "derivedFrom",
-    });
-    m.insert("derive", RelationTypeInfo {
-        name: "derive",
-        opposite: Some("derivedFrom"),
-        description: "Element is source for a derived element",
-        arrow: "-.->",
-        label: "deriveReqT",
-    });
+        // Derive relations
+        m.insert(
+            "derivedFrom",
+            RelationTypeInfo {
+                name: "derivedFrom",
+                opposite: Some("derive"),
+                description: "Element is derived from another element",
+                arrow: "-.->",
+                label: "derivedFrom",
+            },
+        );
+        m.insert(
+            "derive",
+            RelationTypeInfo {
+                name: "derive",
+                opposite: Some("derivedFrom"),
+                description: "Element is source for a derived element",
+                arrow: "-.->",
+                label: "deriveReqT",
+            },
+        );
 
-    // Satisfy relations (implementations only)
-    m.insert("satisfiedBy", RelationTypeInfo {
-        name: "satisfiedBy",
-        opposite: Some("satisfy"),
-        description: "A requirement being satisfied by an implementation.",
-        arrow: "-->",
-        label: "satisfiedBy",
-    });
-    m.insert("satisfy", RelationTypeInfo {
-        name: "satisfy",
-        opposite: Some("satisfiedBy"),
-        description: "Implementation satisfies a requirement",
-        arrow: "-->",
-        label: "satisfies",
-    });
+        // Satisfy relations (implementations only)
+        m.insert(
+            "satisfiedBy",
+            RelationTypeInfo {
+                name: "satisfiedBy",
+                opposite: Some("satisfy"),
+                description: "A requirement being satisfied by an implementation.",
+                arrow: "-->",
+                label: "satisfiedBy",
+            },
+        );
+        m.insert(
+            "satisfy",
+            RelationTypeInfo {
+                name: "satisfy",
+                opposite: Some("satisfiedBy"),
+                description: "Implementation satisfies a requirement",
+                arrow: "-->",
+                label: "satisfies",
+            },
+        );
 
-    // Refine relations (refinement ownership)
-    m.insert("refinedBy", RelationTypeInfo {
-        name: "refinedBy",
-        opposite: Some("refine"),
-        description: "A requirement being refined by a refinement element.",
-        arrow: "-->",
-        label: "refinedBy",
-    });
-    m.insert("refine", RelationTypeInfo {
-        name: "refine",
-        opposite: Some("refinedBy"),
-        description: "Element refines a requirement",
-        arrow: "-->",
-        label: "refines",
-    });
+        // Refine relations (refinement ownership)
+        m.insert(
+            "refinedBy",
+            RelationTypeInfo {
+                name: "refinedBy",
+                opposite: Some("refine"),
+                description: "A requirement being refined by a refinement element.",
+                arrow: "-->",
+                label: "refinedBy",
+            },
+        );
+        m.insert(
+            "refine",
+            RelationTypeInfo {
+                name: "refine",
+                opposite: Some("refinedBy"),
+                description: "Element refines a requirement",
+                arrow: "-->",
+                label: "refines",
+            },
+        );
 
-    // Verify relations
-    m.insert("verifiedBy", RelationTypeInfo {
-        name: "verifiedBy",
-        opposite: Some("verify"),
-        description: "A source element being verified by other element.",
-        arrow: "-.->",
-        label: "verifiedBy",
-    });
-    m.insert("verify", RelationTypeInfo {
-        name: "verify",
-        opposite: Some("verifiedBy"),
-        description: "Element verifies another element",
-        arrow: "-.->",
-        label: "verifies",
-    });
+        // Verify relations
+        m.insert(
+            "verifiedBy",
+            RelationTypeInfo {
+                name: "verifiedBy",
+                opposite: Some("verify"),
+                description: "A source element being verified by other element.",
+                arrow: "-.->",
+                label: "verifiedBy",
+            },
+        );
+        m.insert(
+            "verify",
+            RelationTypeInfo {
+                name: "verify",
+                opposite: Some("verifiedBy"),
+                description: "Element verifies another element",
+                arrow: "-.->",
+                label: "verifies",
+            },
+        );
 
-    // Trace relations
-    m.insert("trace", RelationTypeInfo {
-        name: "trace",
-        opposite: None,
-        description: "Element is related to another element in a non-directional way",
-        arrow: "-.->",
-        label: "trace",
-    });
+        // Trace relations
+        m.insert(
+            "trace",
+            RelationTypeInfo {
+                name: "trace",
+                opposite: None,
+                description: "Element is related to another element in a non-directional way",
+                arrow: "-.->",
+                label: "trace",
+            },
+        );
 
-    m
-});
+        m
+    });
 
 /// Relations to show in diagrams (one from each pair to avoid duplicates)
 /// These are typically the "forward" relations from the old direction system
 pub const DIAGRAM_RELATIONS: &[&str] = &[
-    "derive",        // Not derivedFrom
-    "satisfiedBy",   // Not satisfy
-    "refinedBy",     // Not refine
-    "verifiedBy",    // Not verify
-    "trace"
+    "derive",      // Not derivedFrom
+    "satisfiedBy", // Not satisfy
+    "refinedBy",   // Not refine
+    "verifiedBy",  // Not verify
+    "trace",
 ];
 
 /// Relations that propagate changes in impact analysis
 /// When these relations exist, changes to the source affect the target
 pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
-    "derive",        // Source changes affect derived elements
-    "satisfiedBy",   // Requirement changes affect implementations
-    "refinedBy",     // Requirement changes affect refinements
-    "verifiedBy",    // Requirement changes invalidate verifications
+    "derive",      // Source changes affect derived elements
+    "satisfiedBy", // Requirement changes affect implementations
+    "refinedBy",   // Requirement changes affect refinements
+    "verifiedBy",  // Requirement changes invalidate verifications
 ];
 
 /// Backward relations for reverse model traversal (opposite of DIAGRAM_RELATIONS)
 /// These traverse from leaves upward to roots
 pub const BACKWARD_RELATIONS: &[&str] = &[
-    "derivedFrom",   // Opposite of derive
-    "satisfy",       // Opposite of satisfiedBy
-    "refine",        // Opposite of refinedBy
-    "verify",        // Opposite of verifiedBy
+    "derivedFrom", // Opposite of derive
+    "satisfy",     // Opposite of satisfiedBy
+    "refine",      // Opposite of refinedBy
+    "verify",      // Opposite of verifiedBy
 ];
-
 
 /// Relation type for verification
 pub const VERIFY_RELATION: &str = "verify";
@@ -131,21 +158,19 @@ pub const VERIFY_RELATION: &str = "verify";
 /// Relations for implementation satisfaction connections
 /// Used for linking requirements to code implementations
 pub const SATISFACTION_RELATIONS: &[&str] = &[
-    "satisfy",       // Implementation satisfies requirement (forward from implementation)
-    "satisfiedBy",   // Requirement satisfied by implementation (forward from requirement)
+    "satisfy",     // Implementation satisfies requirement (forward from implementation)
+    "satisfiedBy", // Requirement satisfied by implementation (forward from requirement)
 ];
 
 /// Relations for refinement ownership connections
 /// Used to determine if refinements are connected and find defining requirements
 pub const REFINEMENT_RELATIONS: &[&str] = &[
-    "refine",        // Refinement refines requirement (forward from refinement)
-    "refinedBy",     // Requirement refined by refinement (forward from requirement)
+    "refine",    // Refinement refines requirement (forward from refinement)
+    "refinedBy", // Requirement refined by refinement (forward from requirement)
 ];
 
 /// Relations that trace verification propagation in verification traces
-pub const VERIFICATION_TRACES_RELATIONS: &[&str] = &[
-    "derivedFrom",
-];
+pub const VERIFICATION_TRACES_RELATIONS: &[&str] = &["derivedFrom"];
 
 #[derive(Debug, Clone, Serialize)]
 pub struct RelationTarget {
@@ -182,12 +207,11 @@ impl Hash for RelationTarget {
     }
 }
 
-
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize)]
 pub enum LinkType {
-    Identifier(String), // Internal reference, e.g., "some-identifier"
-    ExternalUrl(String), // External URL, e.g., "https://example.com"
-    InternalPath(PathBuf), // Internal Path, e.g., "../core/src/digrams.rs"    
+    Identifier(String),    // Internal reference, e.g., "some-identifier"
+    ExternalUrl(String),   // External URL, e.g., "https://example.com"
+    InternalPath(PathBuf), // Internal Path, e.g., "../core/src/digrams.rs"
 }
 impl LinkType {
     /// Converts `LinkType` into a string representation.
@@ -202,13 +226,11 @@ impl LinkType {
     }
 }
 
-
-
 #[derive(Debug, Clone, Serialize)]
 pub struct Relation {
     pub relation_type: &'static RelationTypeInfo,
     pub target: RelationTarget,
-    pub user_created: bool
+    pub user_created: bool,
 }
 
 impl PartialEq for Relation {
@@ -218,7 +240,6 @@ impl PartialEq for Relation {
 }
 
 impl Eq for Relation {}
-
 
 impl Ord for Relation {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -249,54 +270,67 @@ impl Hash for Relation {
 }
 
 impl Relation {
-    pub fn new(relation_type: &str, text: String, normalized_target: &str, element_id: Option<String>) -> Result<Self, ReqvireError> {
-        let link=Self::parse_link_type(normalized_target);
+    pub fn new(
+        relation_type: &str,
+        text: String,
+        normalized_target: &str,
+        element_id: Option<String>,
+    ) -> Result<Self, ReqvireError> {
+        let link = Self::parse_link_type(normalized_target);
 
-        let relation_info = RELATION_TYPES.get(relation_type)
+        let relation_info = RELATION_TYPES
+            .get(relation_type)
             .ok_or_else(|| ReqvireError::UnsupportedRelationType(relation_type.to_string()))?;
         Ok(Self {
             relation_type: relation_info,
-            target: RelationTarget{text, link, element_id},
-            user_created: true,  // Relations created via parsing are user-created
+            target: RelationTarget {
+                text,
+                link,
+                element_id,
+            },
+            user_created: true, // Relations created via parsing are user-created
         })
     }
-    
+
     /// Determines if the link should be treated as an identifier, internal path or an external URL.
     fn parse_link_type(link: &str) -> LinkType {
-        if EXTERNAL_SCHEMES.iter().any(|scheme| link.starts_with(scheme)) {
+        if EXTERNAL_SCHEMES
+            .iter()
+            .any(|scheme| link.starts_with(scheme))
+        {
             LinkType::ExternalUrl(link.to_string())
         } else if link.contains('#') {
             LinkType::Identifier(link.to_string())
         } else {
             LinkType::InternalPath(PathBuf::from(link))
         }
-    }    
-
-    pub fn update_target_identifier_link_url(&mut self, url: &str)  {
-        if let LinkType::Identifier(_) = self.target.link { self.target.link=LinkType::Identifier(url.to_string()) };  
     }
 
+    pub fn update_target_identifier_link_url(&mut self, url: &str) {
+        if let LinkType::Identifier(_) = self.target.link {
+            self.target.link = LinkType::Identifier(url.to_string())
+        };
+    }
 
     /// Creates an opposite relation if possible for given target
     pub fn to_opposite(&self, name: &str, identifier: &str, element_id: &str) -> Option<Relation> {
         if let Some(opposite_name) = self.relation_type.opposite {
-            RELATION_TYPES.get(opposite_name).map(|opposite_info| Relation {
-                        relation_type: opposite_info,
-                        target: RelationTarget {
-                            text: name.to_string(),
-                            link: LinkType::Identifier(identifier.to_string()),
-                            element_id: Some(element_id.to_string()),
-                        },
-                        user_created: false,  // Auto-generated opposite relations are not user-created
-                    })
+            RELATION_TYPES
+                .get(opposite_name)
+                .map(|opposite_info| Relation {
+                    relation_type: opposite_info,
+                    target: RelationTarget {
+                        text: name.to_string(),
+                        link: LinkType::Identifier(identifier.to_string()),
+                        element_id: Some(element_id.to_string()),
+                    },
+                    user_created: false, // Auto-generated opposite relations are not user-created
+                })
         } else {
             None
         }
     }
-
 }
-
-
 
 /// Check if a relation type is supported according to the DSD
 pub fn is_supported_relation_type(relation_type: &str) -> bool {
@@ -361,9 +395,6 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
     matches!(rtype.name, "refinedBy" | "refine")
 }
 
-
-
-
 /// Validates if the element types are appropriate for a given relation type
 /// Returns true if the types are compatible, false otherwise
 ///
@@ -381,7 +412,7 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 pub fn validate_relation_element_types(
     relation_type: &str,
     source_type: &crate::element::ElementType,
-    target_type: &crate::element::ElementType
+    target_type: &crate::element::ElementType,
 ) -> bool {
     use crate::element::ElementType;
 
@@ -399,25 +430,25 @@ pub fn validate_relation_element_types(
         "derivedFrom" => {
             // Only requirement types can use derivedFrom
             // Source must be requirement, target must be requirement
-            matches!(source_type, ElementType::Requirement(_)) &&
-            matches!(target_type, ElementType::Requirement(_))
-        },
+            matches!(source_type, ElementType::Requirement(_))
+                && matches!(target_type, ElementType::Requirement(_))
+        }
         "derive" => {
             // Only requirement types can use derive
             // Source must be requirement, target must be requirement
-            matches!(source_type, ElementType::Requirement(_)) &&
-            matches!(target_type, ElementType::Requirement(_))
-        },
+            matches!(source_type, ElementType::Requirement(_))
+                && matches!(target_type, ElementType::Requirement(_))
+        }
         "verifiedBy" => {
             // Source must be a requirement and target must be a verification
-            matches!(source_type, ElementType::Requirement(_)) &&
-            matches!(target_type, ElementType::Verification(_))
-        },
+            matches!(source_type, ElementType::Requirement(_))
+                && matches!(target_type, ElementType::Verification(_))
+        }
         "verify" => {
             // Source must be a verification and target must be a requirement
-            matches!(source_type, ElementType::Verification(_)) &&
-            matches!(target_type, ElementType::Requirement(_))
-        },
+            matches!(source_type, ElementType::Verification(_))
+                && matches!(target_type, ElementType::Requirement(_))
+        }
         "satisfiedBy" => {
             // Source must be system requirement or test-verification
             // Target must be a file (implementation) - refinement types use refinedBy instead
@@ -425,14 +456,18 @@ pub fn validate_relation_element_types(
             let source_valid = match source_type {
                 ElementType::Requirement(crate::element::RequirementType::System) => true,
                 ElementType::Verification(vtype) => {
-                    matches!(vtype, crate::element::VerificationType::Default | crate::element::VerificationType::Test)
-                },
-                _ => false
+                    matches!(
+                        vtype,
+                        crate::element::VerificationType::Default
+                            | crate::element::VerificationType::Test
+                    )
+                }
+                _ => false,
             };
             // For target, we allow File type or Other (for implementation files) - NOT Refinement types
             let target_valid = matches!(target_type, ElementType::File | ElementType::Other(_));
             source_valid && target_valid
-        },
+        }
         "satisfy" => {
             // Source should be a file/implementation, target should be a system requirement or test-verification
             // Refinement elements use refine instead of satisfy
@@ -440,30 +475,34 @@ pub fn validate_relation_element_types(
             let target_valid = match target_type {
                 ElementType::Requirement(crate::element::RequirementType::System) => true,
                 ElementType::Verification(vtype) => {
-                    matches!(vtype, crate::element::VerificationType::Default | crate::element::VerificationType::Test)
-                },
-                _ => false
+                    matches!(
+                        vtype,
+                        crate::element::VerificationType::Default
+                            | crate::element::VerificationType::Test
+                    )
+                }
+                _ => false,
             };
             source_valid && target_valid
-        },
+        }
         "refinedBy" => {
             // Source must be a requirement type
             // Target must be a refinement element
-            matches!(source_type, ElementType::Requirement(_)) &&
-            matches!(target_type, ElementType::Refinement(_))
-        },
+            matches!(source_type, ElementType::Requirement(_))
+                && matches!(target_type, ElementType::Refinement(_))
+        }
         "refine" => {
             // Source must be a refinement element, target must be a requirement
-            matches!(source_type, ElementType::Refinement(_)) &&
-            matches!(target_type, ElementType::Requirement(_))
-        },
+            matches!(source_type, ElementType::Refinement(_))
+                && matches!(target_type, ElementType::Requirement(_))
+        }
         "trace" => {
             // Trace is allowed for any non-refinement element type
             // Refinement types cannot have relations at all (checked in parser)
             !matches!(source_type, ElementType::Refinement(_))
-        },
+        }
         // For other relation types, no specific element type validation
-        _ => true
+        _ => true,
     }
 }
 

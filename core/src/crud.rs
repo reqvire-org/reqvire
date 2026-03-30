@@ -58,14 +58,12 @@ fn enforce_single_root_after_mutation(model_manager: &ModelManager) -> Result<()
     if ownership_errors.is_empty() {
         Ok(())
     } else {
-        let mut details: Vec<String> = ownership_errors
-            .iter()
-            .map(|e| e.to_string())
-            .collect();
+        let mut details: Vec<String> = ownership_errors.iter().map(|e| e.to_string()).collect();
         details.sort();
-        let message = details.first().cloned().unwrap_or_else(|| {
-            "Single-root hierarchy ownership violation detected".to_string()
-        });
+        let message = details
+            .first()
+            .cloned()
+            .unwrap_or_else(|| "Single-root hierarchy ownership violation detected".to_string());
         Err(ReqvireError::InvalidOperation(format!(
             "Single-root hierarchy ownership violation: {}",
             message
@@ -547,7 +545,11 @@ fn resolve_attachment_identifier_for_element(
         return Ok(format!("{}{}", target_element_file_path, attachment_target));
     }
 
-    if model_manager.graph_registry.get_element(attachment_target).is_some() {
+    if model_manager
+        .graph_registry
+        .get_element(attachment_target)
+        .is_some()
+    {
         return Ok(attachment_target.to_string());
     }
 
@@ -692,10 +694,7 @@ pub fn attach_element_identifier(
     Ok(CrudResult {
         operation: CrudOperation::Update,
         element_id,
-        element_name: format!(
-            "Attached element {} to {}",
-            attachment_target, element_name
-        ),
+        element_name: format!("Attached element {} to {}", attachment_target, element_name),
         diffs: vec![diff],
         dry_run,
     })
@@ -1778,10 +1777,7 @@ pub fn relink(
     if existing_relation.relation_type.name != relation_type {
         return Err(ReqvireError::RelationError(format!(
             "Relation mismatch: '{}' -> '{}' exists as '{}', not '{}'",
-            source,
-            from_target,
-            existing_relation.relation_type.name,
-            relation_type
+            source, from_target, existing_relation.relation_type.name, relation_type
         )));
     }
 

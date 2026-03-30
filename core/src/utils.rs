@@ -1,16 +1,16 @@
-use anyhow::Result;
-use std::path::{Path, PathBuf};
-use std::sync::LazyLock;
-use pathdiff::diff_paths;
-use log::debug;
-use walkdir::WalkDir;
 use crate::error::ReqvireError;
+use crate::git_commands;
+use anyhow::Result;
 use globset::GlobSet;
+use log::debug;
+use pathdiff::diff_paths;
 use regex::Regex;
 use rustc_hash::FxHasher;
-use std::hash::{Hasher};
-use crate::git_commands;
 use std::cell::RefCell;
+use std::hash::Hasher;
+use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
+use walkdir::WalkDir;
 
 thread_local! {
     static QUIET_MODE: RefCell<bool> = const { RefCell::new(false) };
@@ -41,7 +41,6 @@ macro_rules! info_println {
     }};
 }
 
-
 /// Checks if a file should be ignored based on gitignore and reqvireignore patterns.
 /// Returns true if the file should be IGNORED (not processed).
 /// Note: This only checks ignore patterns. The `# Elements` header check
@@ -49,7 +48,6 @@ macro_rules! info_println {
 pub fn is_to_be_ignored(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
     is_excluded_by_patterns(path, excluded_filename_patterns)
 }
-
 
 /// Checks if a file is excluded based on configured patterns
 pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet) -> bool {
@@ -61,17 +59,30 @@ pub fn is_excluded_by_patterns(path: &Path, excluded_filename_patterns: &GlobSet
         Ok(rel_path) => rel_path,
         Err(_) => {
             // If we can't get relative path, fall back to original behavior
-            debug!("Failed to get relative path for '{}', falling back to absolute path matching", path.display());
-            if excluded_filename_patterns.is_match(path) || excluded_filename_patterns.is_match(filename) {
-                debug!("File '{}' is excluded due to matching a glob pattern.", filename);
+            debug!(
+                "Failed to get relative path for '{}', falling back to absolute path matching",
+                path.display()
+            );
+            if excluded_filename_patterns.is_match(path)
+                || excluded_filename_patterns.is_match(filename)
+            {
+                debug!(
+                    "File '{}' is excluded due to matching a glob pattern.",
+                    filename
+                );
                 return true;
             }
             return false;
         }
     };
 
-    if excluded_filename_patterns.is_match(&relative_path) || excluded_filename_patterns.is_match(filename) {
-        debug!("File '{}' is excluded due to matching a glob pattern.", filename);
+    if excluded_filename_patterns.is_match(&relative_path)
+        || excluded_filename_patterns.is_match(filename)
+    {
+        debug!(
+            "File '{}' is excluded due to matching a glob pattern.",
+            filename
+        );
         return true;
     }
 
@@ -170,32 +181,26 @@ pub fn validate_target_path(
     })
 }
 
-
 /// Scans the git root folder for markdown files, excluding files based on patterns.
 /// If the current working directory is a subfolder of the git root, only scans within that subfolder.
-/// 
+///
 /// # Arguments
-/// 
+///
 /// * `commit` - Optional commit ID to scan files from a specific commit
 /// * `excluded_filename_patterns` - Glob patterns for files to exclude
-/// 
+///
 /// # Returns
-/// 
+///
 /// A vector of paths to the markdown files found
 pub fn scan_markdown_files(
     commit: Option<&str>,
     excluded_filename_patterns: &GlobSet,
 ) -> Vec<PathBuf> {
     match commit {
-        Some(commit_id) => {
-            scan_markdown_files_from_commit(
-                commit_id,
-                excluded_filename_patterns
-            )
-        }
+        Some(commit_id) => scan_markdown_files_from_commit(commit_id, excluded_filename_patterns),
         None => {
             let mut files = Vec::new();
-            
+
             // Get git root directory
             let git_root = match git_commands::get_git_root_dir() {
                 Ok(dir) => dir,
@@ -204,10 +209,10 @@ pub fn scan_markdown_files(
                     std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
                 }
             };
-            
+
             // Get current working directory
             let current_dir = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-            
+
             // Determine scan directory - if current directory is within git root but not at git root,
             // scan only within the current directory subtree
             let scan_dir = if current_dir.starts_with(&git_root) && current_dir != git_root {
@@ -215,15 +220,17 @@ pub fn scan_markdown_files(
             } else {
                 git_root
             };
-            
+
             debug!("Scanning for markdown files in: {}", scan_dir.display());
-            
+
             // Scan all markdown files in the repository or specified subdirectory
             // Filter out files that are ignored by gitignore or reqvireignore
             for entry in WalkDir::new(&scan_dir)
                 .into_iter()
                 .filter_map(Result::ok)
-                .filter(|e| e.path().is_file() && e.path().extension().is_some_and(|ext| ext == "md"))
+                .filter(|e| {
+                    e.path().is_file() && e.path().extension().is_some_and(|ext| ext == "md")
+                })
                 .filter(|e| !is_to_be_ignored(e.path(), excluded_filename_patterns))
             {
                 files.push(entry.path().to_path_buf());
@@ -237,7 +244,7 @@ pub fn scan_markdown_files(
 
 /// Scans the given Git commit for markdown files,
 /// excluding files based on provided patterns.
-/// 
+///
 /// - `commit`: The Git commit (e.g. `"HEAD"`) where we want to look for files.
 /// - `excluded_filename_patterns`: Glob patterns for files to exclude
 pub fn scan_markdown_files_from_commit(
@@ -261,8 +268,8 @@ pub fn scan_markdown_files_from_commit(
         Err(e) => {
             eprintln!("Error listing files in commit: {}", e);
             Vec::new()
-        },       
-        Ok(v) => v
+        }
+        Ok(v) => v,
     };
 
     let matching_paths = documents_vec
@@ -277,7 +284,6 @@ pub fn scan_markdown_files_from_commit(
     files
 }
 
-
 /// Gets the relative path of a file from the git repository root
 pub fn get_relative_path(path: &Path) -> Result<PathBuf, ReqvireError> {
     let git_root = match git_commands::get_git_root_dir() {
@@ -287,29 +293,27 @@ pub fn get_relative_path(path: &Path) -> Result<PathBuf, ReqvireError> {
             std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."))
         }
     };
-    
+
     if let Ok(relative) = path.strip_prefix(&git_root) {
         return Ok(relative.to_path_buf());
     }
-    
+
     Err(ReqvireError::PathError(format!(
         "Failed to determine relative path: {}",
         path.display()
     )))
 }
 
-
-
 /// Splits an identifier into (file_part, Option(fragment)) following these rules:
-/// - If the identifier starts with '#' then it is treated as a fragment-only reference 
+/// - If the identifier starts with '#' then it is treated as a fragment-only reference
 ///   (file_part is empty, and the fragment is the whole identifier without the leading '#').
-/// - Otherwise, if the identifier contains a '/' or a '.' (indicating a file extension), 
-///   it is treated as a file reference. In that case, if a '#' is present, split at the first '#' 
+/// - Otherwise, if the identifier contains a '/' or a '.' (indicating a file extension),
+///   it is treated as a file reference. In that case, if a '#' is present, split at the first '#'
 ///   into file_part and fragment; otherwise, fragment is None.
 /// - Otherwise (if there is neither '/' nor '.'), treat the entire identifier as a fragment-only reference.
 pub fn extract_path_and_fragment(identifier: &str) -> (&str, Option<&str>) {
-    if identifier.is_empty(){
-        return ("",None);
+    if identifier.is_empty() {
+        return ("", None);
     }
     if let Some(frag) = identifier.strip_prefix('#') {
         return ("", Some(frag));
@@ -333,7 +337,8 @@ pub fn extract_path_and_fragment(identifier: &str) -> (&str, Option<&str>) {
 /// Returns the parent directory as a PathBuf, or an empty PathBuf if the path has no parent.
 /// This is commonly used when calculating file-relative paths in markdown.
 pub fn get_parent_dir(file_path: &str) -> PathBuf {
-    PathBuf::from(file_path).parent()
+    PathBuf::from(file_path)
+        .parent()
         .map(|p| p.to_path_buf())
         .unwrap_or_default()
 }
@@ -364,7 +369,6 @@ pub fn normalize_fragment(fragment: &str) -> String {
         .collect()
 }
 
-
 /// List of known external URL schemes
 pub const EXTERNAL_SCHEMES: &[&str] = &[
     "http://", "https://", "ftp://", "file://", "mailto:", "ssh://", "git://", "data:",
@@ -383,12 +387,16 @@ pub fn is_external_url(s: &str) -> bool {
 /// - External URLs are passed through unchanged
 fn resolve_path_to_absolute(path_part: &str, base_path: &Path) -> Result<PathBuf, ReqvireError> {
     // Check for external URLs first
-    if EXTERNAL_SCHEMES.iter().any(|scheme| path_part.starts_with(scheme)) {
-        return Err(ReqvireError::PathError("External URLs should not be resolved as paths".to_string()));
+    if EXTERNAL_SCHEMES
+        .iter()
+        .any(|scheme| path_part.starts_with(scheme))
+    {
+        return Err(ReqvireError::PathError(
+            "External URLs should not be resolved as paths".to_string(),
+        ));
     }
 
     let p = Path::new(path_part);
-
 
     if p.is_absolute() {
         // For paths starting with '/', treat them as relative to git root
@@ -427,15 +435,15 @@ fn resolve_path_to_absolute(path_part: &str, base_path: &Path) -> Result<PathBuf
     }
 }
 
-pub fn normalize_identifier(
-    identifier: &str,
-    base_path: &Path,
-) -> Result<String, ReqvireError> {
+pub fn normalize_identifier(identifier: &str, base_path: &Path) -> Result<String, ReqvireError> {
     // 0) Extract the path and any trailing fragment
     let (path_part, fragment_opt) = extract_path_and_fragment(identifier);
 
     // 1) Passthrough external URIs
-    if EXTERNAL_SCHEMES.iter().any(|scheme| path_part.starts_with(scheme)) {
+    if EXTERNAL_SCHEMES
+        .iter()
+        .any(|scheme| path_part.starts_with(scheme))
+    {
         return Ok(identifier.to_string());
     }
 
@@ -446,19 +454,18 @@ pub fn normalize_identifier(
     let git_root = crate::git_commands::get_git_root_dir()
         .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?
         .canonicalize()
-        .map_err(|e| ReqvireError::PathError(format!(
-            "Failed to canonicalize git root: {}",
-            e
-        )))?;
+        .map_err(|e| ReqvireError::PathError(format!("Failed to canonicalize git root: {}", e)))?;
 
     // 4) Strip the Git‐root prefix to get relative path
     let rel = full_path
         .strip_prefix(&git_root)
-        .map_err(|_| ReqvireError::PathError(format!(
-            "`{}` is not inside git root `{}`",
-            full_path.display(),
-            git_root.display()
-        )))?
+        .map_err(|_| {
+            ReqvireError::PathError(format!(
+                "`{}` is not inside git root `{}`",
+                full_path.display(),
+                git_root.display()
+            ))
+        })?
         .to_string_lossy()
         .into_owned();
 
@@ -474,7 +481,6 @@ pub fn normalize_identifier(
     Ok(final_result)
 }
 
-
 pub fn to_relative_identifier(
     identifier: &str,
     base_path: &PathBuf,
@@ -482,21 +488,18 @@ pub fn to_relative_identifier(
 ) -> Result<String, ReqvireError> {
     let (path, fragment_opt) = extract_path_and_fragment(identifier);
 
-    if EXTERNAL_SCHEMES.iter().any(|&scheme| identifier.starts_with(scheme)) {
+    if EXTERNAL_SCHEMES
+        .iter()
+        .any(|&scheme| identifier.starts_with(scheme))
+    {
         return Ok(identifier.to_string());
     }
-
 
     let git_root = crate::git_commands::get_git_root_dir()
         .map_err(|e| ReqvireError::PathError(format!("Failed to get git root: {}", e)))?;
 
-
     let is_absolute = path.starts_with('/');
-    let stripped = if is_absolute {
-        &path[1..]
-    } else {
-        path
-    };
+    let stripped = if is_absolute { &path[1..] } else { path };
 
     let resolved_path = if is_absolute {
         git_root.join(stripped)
@@ -509,7 +512,9 @@ pub fn to_relative_identifier(
     let canonical_path = resolved_path.canonicalize().ok();
     let canonical_base = base_path.canonicalize().ok();
 
-    let relative = if let (Some(ref normalized), Some(ref base)) = (&canonical_path, &canonical_base) {
+    let relative = if let (Some(ref normalized), Some(ref base)) =
+        (&canonical_path, &canonical_base)
+    {
         // Both exist - use canonical paths
         diff_paths(normalized, base).map(|p| p.to_string_lossy().into_owned())
     } else if let Some(ref base) = canonical_base {
@@ -538,7 +543,6 @@ pub fn to_relative_identifier(
     Ok(full)
 }
 
-
 /// Parses a metadata line and extracts a (key, value) pair if valid.
 /// Expected format: `* key: value` or `- key: value`
 pub fn parse_metadata_line(line: &str) -> Option<(String, String)> {
@@ -562,9 +566,6 @@ pub fn parse_metadata_line(line: &str) -> Option<(String, String)> {
     None
 }
 
-
-
-
 pub fn parse_relation_line(line: &str) -> Result<(String, (String, String)), ReqvireError> {
     let parts: Vec<&str> = line.splitn(2, ':').map(|s| s.trim()).collect();
     if parts.len() == 2 {
@@ -572,10 +573,12 @@ pub fn parse_relation_line(line: &str) -> Result<(String, (String, String)), Req
         let target = parse_target(parts[1]); // Parse target
         Ok((relation_type, target))
     } else {
-        Err(ReqvireError::InvalidRelationFormat(format!("Invalid relation format: '{}'", line)))
+        Err(ReqvireError::InvalidRelationFormat(format!(
+            "Invalid relation format: '{}'",
+            line
+        )))
     }
 }
-
 
 /// Parses a given string and creates a RelationTarget based on rules.
 /// Applies automatic normalization during parsing:
@@ -584,14 +587,13 @@ fn parse_target(input: &str) -> (String, String) {
     // 1. Check if the input is a Markdown-style link: `[text](link)`
     if let Some((text, link)) = extract_markdown_link(input) {
         // Path resolution happens later in normalize_identifier
-        return (text, link)
+        return (text, link);
     }
 
     // 2. Convert non-link identifier to proper markdown link
     let (display_text, normalized_link) = normalize_nonlink_identifier(input);
     (display_text, normalized_link)
 }
-
 
 /// Converts a non-link identifier to a proper markdown link with display text
 fn normalize_nonlink_identifier(input: &str) -> (String, String) {
@@ -628,9 +630,8 @@ fn normalize_nonlink_identifier(input: &str) -> (String, String) {
 }
 
 /// Cached regex for markdown link extraction
-static MARKDOWN_LINK_RE: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"^\[(.+?)\]\((.+?)\)$").unwrap()
-});
+static MARKDOWN_LINK_RE: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"^\[(.+?)\]\((.+?)\)$").unwrap());
 
 /// Extracts text and link from a Markdown-style link if present.
 fn extract_markdown_link(input: &str) -> Option<(String, String)> {
@@ -644,12 +645,11 @@ fn extract_markdown_link(input: &str) -> Option<(String, String)> {
     }
 }
 
-
 /// Generates a fast and lightweight hash ID
 pub fn hash_identifier(identifier: &str) -> String {
     let mut hasher = FxHasher::default();
     hasher.write(identifier.as_bytes());
-    format!("{:x}", hasher.finish()).to_string() 
+    format!("{:x}", hasher.finish()).to_string()
 }
 pub fn hash_content(content: &str) -> String {
     let mut hasher = FxHasher::default();
@@ -665,56 +665,58 @@ pub fn parse_attachment_line(line: &str) -> Result<String, ReqvireError> {
 
     // Must start with bullet point
     if !trimmed.starts_with("* ") && !trimmed.starts_with("- ") {
-        return Err(ReqvireError::InvalidAttachmentFormat(
-            format!("Attachment must start with '* ' or '- ': '{}'", line)
-        ));
+        return Err(ReqvireError::InvalidAttachmentFormat(format!(
+            "Attachment must start with '* ' or '- ': '{}'",
+            line
+        )));
     }
 
     // Extract the markdown link part (after bullet)
-    let link_part = trimmed.trim_start_matches("* ").trim_start_matches("- ").trim();
+    let link_part = trimmed
+        .trim_start_matches("* ")
+        .trim_start_matches("- ")
+        .trim();
 
     // Parse as markdown link - display text can be anything (filename or path)
     if let Some((_text, href)) = extract_markdown_link(link_part) {
         Ok(href)
     } else {
-        Err(ReqvireError::InvalidAttachmentFormat(
-            format!("Invalid attachment format, expected '[text](path)': '{}'", line)
-        ))
+        Err(ReqvireError::InvalidAttachmentFormat(format!(
+            "Invalid attachment format, expected '[text](path)': '{}'",
+            line
+        )))
     }
 }
-
 
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs;
-    use std::path::{ PathBuf};
-    use tempfile::TempDir;
-    use std::process::Command;
     use git_commands;
+    use std::fs;
+    use std::path::PathBuf;
+    use std::process::Command;
+    use tempfile::TempDir;
 
     // Mock Config structure for tests
     struct MockConfig {
         pub paths: MockPaths,
     }
-    
+
     struct MockPaths {
         pub user_requirements_root_folder: String,
         pub excluded_filename_patterns: Vec<String>,
     }
-    
+
     impl MockConfig {
         fn default() -> Self {
             Self {
                 paths: MockPaths {
                     user_requirements_root_folder: "specifications".to_string(),
                     excluded_filename_patterns: Vec::new(),
-                }
+                },
             }
         }
-        
 
-        
         fn get_excluded_filename_patterns_glob_set(&self) -> globset::GlobSet {
             let mut builder = globset::GlobSetBuilder::new();
             for pattern in &self.paths.excluded_filename_patterns {
@@ -725,7 +727,7 @@ mod tests {
             builder.build().expect("Failed to build glob set")
         }
     }
-    
+
     #[test]
     fn test_extract_path_and_fragment() {
         let test_cases = vec![
@@ -733,7 +735,7 @@ mod tests {
             ("/repo/path/to/file.md", "/repo/path/to/file.md", None),
             ("/user/repo#readme", "/user/repo", Some("readme")),
             ("/user/repo/", "/user/repo/", None),
-            ("File1.md", "File1.md", None),            
+            ("File1.md", "File1.md", None),
             ("onlyfragment", "", Some("onlyfragment")),
             ("#onlyfragment", "", Some("onlyfragment")),
             ("", "", None), // Empty input
@@ -745,7 +747,7 @@ mod tests {
             assert_eq!(fragment, expected_fragment, "Failed for input: {:?}", input);
         }
     }
-    
+
     #[test]
     fn test_all_git_operations_sequential() {
         // Disable git caching for tests to prevent interference
@@ -765,8 +767,7 @@ mod tests {
         let temp_dir = TempDir::new().expect("Failed to create temp dir");
         let temp_path = temp_dir.path();
 
-        std::env::set_current_dir(&temp_path)
-            .expect("Failed to set current directory");
+        std::env::set_current_dir(&temp_path).expect("Failed to set current directory");
 
         // Initialize Git repository
         Command::new("git")
@@ -785,60 +786,56 @@ mod tests {
 
         // Test cases: (identifier, base_path, expected result with GitHub-style fragment)
         let test_cases = vec![
-        // Relative path in base_path
-        (
-            "File1.md#Some Fragment",
-            &base_path,
-            "File1.md#some-fragment",
-        ),
-        // Absolute path at git root
-        (
-            "/File4.md#Title: Example",
-            &base_path,
-            "../../File4.md#title-example",
-        ),
-        // Absolute path nested
-        (
-            "/some/other/File4.md",
-            &base_path,
-            "../../some/other/File4.md",
-        ),
-        // Relative path with parentheses in fragment
-        (
-            "README.md#Installation (Windows)",
-            &base_path,
-            "README.md#installation-windows",
-        ),
-        // Relative path going deeper
-        (
-            "subdir/File.md#Section",
-            &base_path,
-            "subdir/File.md#section",
-        ),
-        // Fragment with special characters (C++) - punctuation removed
-        (
-            "API.md#C++ Reference",
-            &base_path,
-            "API.md#c-reference",
-        ),
-        // Fragment with underscores
-        (
-            "Code.md#my_variable_name",
-            &base_path,
-            "Code.md#my_variable_name",
-        ),
-        // Fragment with dots and numbers - dots (punctuation) removed
-        (
-            "Changelog.md#Version 1.2.3",
-            &base_path,
-            "Changelog.md#version-123",
-        ),
-        // Multiple consecutive spaces - each space becomes hyphen
-        (
-            "Doc.md#Multiple    Spaces",
-            &base_path,
-            "Doc.md#multiple----spaces",
-        ),
+            // Relative path in base_path
+            (
+                "File1.md#Some Fragment",
+                &base_path,
+                "File1.md#some-fragment",
+            ),
+            // Absolute path at git root
+            (
+                "/File4.md#Title: Example",
+                &base_path,
+                "../../File4.md#title-example",
+            ),
+            // Absolute path nested
+            (
+                "/some/other/File4.md",
+                &base_path,
+                "../../some/other/File4.md",
+            ),
+            // Relative path with parentheses in fragment
+            (
+                "README.md#Installation (Windows)",
+                &base_path,
+                "README.md#installation-windows",
+            ),
+            // Relative path going deeper
+            (
+                "subdir/File.md#Section",
+                &base_path,
+                "subdir/File.md#section",
+            ),
+            // Fragment with special characters (C++) - punctuation removed
+            ("API.md#C++ Reference", &base_path, "API.md#c-reference"),
+            // Fragment with underscores
+            (
+                "Code.md#my_variable_name",
+                &base_path,
+                "Code.md#my_variable_name",
+            ),
+            // Fragment with dots and numbers - dots (punctuation) removed
+            (
+                "Changelog.md#Version 1.2.3",
+                &base_path,
+                "Changelog.md#version-123",
+            ),
+            // Multiple consecutive spaces - each space becomes hyphen
+            (
+                "Doc.md#Multiple    Spaces",
+                &base_path,
+                "Doc.md#multiple----spaces",
+            ),
         ];
 
         for (identifier, base_path, expected_result) in test_cases {
@@ -856,12 +853,11 @@ mod tests {
 
             fs::write(&full_path, "test").unwrap();
 
-            let result = to_relative_identifier(identifier, base_path,true)
+            let result = to_relative_identifier(identifier, base_path, true)
                 .expect("Failed to to relative identifier");
 
             assert_eq!(
-                result,
-                expected_result,
+                result, expected_result,
                 "Expected GitHub-style normalized result for '{}'",
                 identifier
             );
@@ -874,7 +870,6 @@ mod tests {
 
     #[test]
     fn test_to_relative_identifier_external_links() {
-
         let dummy_path = std::env::temp_dir(); // Doesn't matter for external links
 
         let test_cases = vec![
@@ -886,7 +881,7 @@ mod tests {
         ];
 
         for identifier in test_cases {
-            let result = to_relative_identifier(identifier, &dummy_path,true)
+            let result = to_relative_identifier(identifier, &dummy_path, true)
                 .expect("Should return external URL unchanged");
             assert_eq!(
                 result, identifier,
@@ -894,21 +889,20 @@ mod tests {
                 identifier
             );
         }
-    }   
-    
+    }
+
     // Test the is_to_be_ignored function
     #[test]
     fn test_is_to_be_ignored() {
-
         // Configure excluded patterns for these tests
         let mut config_with_externals = MockConfig::default();
         config_with_externals.paths.user_requirements_root_folder = "specifications".to_string();
 
-        config_with_externals.paths.excluded_filename_patterns=vec![
+        config_with_externals.paths.excluded_filename_patterns = vec![
             "**/README*.md".to_string(),
             "**/Logical*.md".to_string(),
             "**/Physical*.md".to_string(),
-            "**/index.md".to_string()
+            "**/index.md".to_string(),
         ];
 
         // Test cases for files that should NOT be ignored (will be processed)
@@ -917,11 +911,9 @@ mod tests {
             "requirements/UserRequirements.md",
             "requirements/SystemRequirements.md",
             "requirements/MissionRequirements.md",
-
             // Requirements files in system requirements folder
             "requirements/SystemRequirements/Requirements.md",
             "requirements/SystemRequirements/Subsystem/Requirements.md",
-
             // Design specifications (not in ignore patterns)
             "requirements/DesignSpecifications/DSD_Diagram.md",
             "requirements/DSD_Architecture.md",
@@ -942,8 +934,14 @@ mod tests {
             if !path.exists() {
                 continue;
             }
-            assert!(!is_to_be_ignored(&path, &config_with_externals.get_excluded_filename_patterns_glob_set()),
-                    "Expected {} to NOT be ignored", path_str);
+            assert!(
+                !is_to_be_ignored(
+                    &path,
+                    &config_with_externals.get_excluded_filename_patterns_glob_set()
+                ),
+                "Expected {} to NOT be ignored",
+                path_str
+            );
         }
 
         // Test that ignored files are properly flagged
@@ -953,57 +951,57 @@ mod tests {
             if !path.exists() {
                 continue;
             }
-            assert!(is_to_be_ignored(&path, &config_with_externals.get_excluded_filename_patterns_glob_set()),
-                    "Expected {} to be ignored", path_str);
+            assert!(
+                is_to_be_ignored(
+                    &path,
+                    &config_with_externals.get_excluded_filename_patterns_glob_set()
+                ),
+                "Expected {} to be ignored",
+                path_str
+            );
         }
     }
-    
+
     // Test excluded_filename_patterns
     #[test]
     fn test_excluded_filename_patterns() {
-        //let _ = env_logger::builder().is_test(true).try_init();   
+        //let _ = env_logger::builder().is_test(true).try_init();
 
         // Configure external folders for these tests
         let mut config_with_externals = MockConfig::default();
         config_with_externals.paths.user_requirements_root_folder = "specifications".to_string();
-    
-        config_with_externals.paths.excluded_filename_patterns=vec![
+
+        config_with_externals.paths.excluded_filename_patterns = vec![
             "**/README*.md".to_string(),
             "**/Logical*.md".to_string(),
             "**/Physical*.md".to_string(),
-            "**/index.md".to_string()
+            "**/index.md".to_string(),
         ];
-                
-        
 
         let test_files = [
             // README* pattern test files
             ("requirements/README.md", true), // Should be excluded
             ("requirements/READMEtest.md", true), // Should be excluded
             ("requirements/readme.md", false), // Should NOT be excluded (case sensitive)
-            ("requirements/READ.md", false), // Should NOT be excluded
+            ("requirements/READ.md", false),  // Should NOT be excluded
             ("requirements/subfolder/README.md", true), // Should be excluded
             ("requirements/deep/nested/folder/README.md", true), // Should be excluded
-            
             // Logical* pattern test files (pattern still works for other files starting with Logical*)
             ("requirements/LOGICAL_view.md", false), // Should NOT be excluded (case sensitive)
             ("requirements/logical_design.md", false), // Should NOT be excluded (case sensitive)
-            ("requirements/Logicless.md", false), // Should NOT be excluded
+            ("requirements/Logicless.md", false),    // Should NOT be excluded
             ("requirements/subfolder/LogicalModel.md", true), // Should be excluded
             ("external_repo/specs/LogicalView.md", true), // Should be excluded
-
             // Physical* pattern test files (pattern still works for other files starting with Physical*)
             ("requirements/subfolder/PhysicalDiagram.md", true), // Should be excluded
-            ("requirements/NotPhysical.md", false), // Should NOT be excluded
-            ("requirements/Physicalsomething.md", true), // Should be excluded
-            
+            ("requirements/NotPhysical.md", false),              // Should NOT be excluded
+            ("requirements/Physicalsomething.md", true),         // Should be excluded
             // index.md pattern test files
             ("requirements/index.md", true), // Should be excluded
             ("requirements/subfolder/index.md", true), // Should be excluded
             ("requirements/INDEX.md", false), // Should NOT be excluded (case sensitive)
             ("requirements/indexing_guide.md", false), // Should NOT be excluded
             ("requirements/deep/nested/folder/index.md", true), // Should be excluded
-            
             // Standard requirement files - should never be excluded
             ("requirements/Requirements.md", false),
             ("requirements/SystemRequirements.md", false),
@@ -1011,66 +1009,91 @@ mod tests {
             ("requirements/subfolder/Requirements.md", false),
             ("external_repo/specs/Requirements.md", false),
         ];
-        
-        
+
         for (path, should_exclude) in &test_files {
             let test_path = PathBuf::from(path);
-            let matches_pattern = is_excluded_by_patterns(&test_path, &config_with_externals.get_excluded_filename_patterns_glob_set());                
+            let matches_pattern = is_excluded_by_patterns(
+                &test_path,
+                &config_with_externals.get_excluded_filename_patterns_glob_set(),
+            );
 
             if *should_exclude {
-                 assert!(
-                     matches_pattern,
-                     "❌ File '{}' should be EXCLUDED by pattern but is NOT",
-                      path
-                 );
+                assert!(
+                    matches_pattern,
+                    "❌ File '{}' should be EXCLUDED by pattern but is NOT",
+                    path
+                );
             } else {
-                   assert!(
-                      !matches_pattern,
-                      "❌ File '{}' should NOT be excluded by pattern but IS",
-                      path
-                   );
-           }
+                assert!(
+                    !matches_pattern,
+                    "❌ File '{}' should NOT be excluded by pattern but IS",
+                    path
+                );
+            }
         }
-        
     }
-    
 
     #[test]
     fn test_parse_target_cases() {
         let test_cases = vec![
             // Markdown External URL
-            ("[OpenAI](https://openai.com)", "OpenAI", "https://openai.com"),
-            
+            (
+                "[OpenAI](https://openai.com)",
+                "OpenAI",
+                "https://openai.com",
+            ),
             // Markdown Internal Identifier
             ("[Docs](some-identifier)", "Docs", "some-identifier"),
-
             // Plain External URL
-            ("https://github.com/user/repo", "https://github.com/user/repo", "https://github.com/user/repo"),
-
+            (
+                "https://github.com/user/repo",
+                "https://github.com/user/repo",
+                "https://github.com/user/repo",
+            ),
             // Plain Internal Identifier
             ("some-identifier", "some-identifier", "#some-identifier"),
-
             // File URL (External)
-            ("file:///usr/local/docs.txt", "file:///usr/local/docs.txt", "file:///usr/local/docs.txt"),
-
+            (
+                "file:///usr/local/docs.txt",
+                "file:///usr/local/docs.txt",
+                "file:///usr/local/docs.txt",
+            ),
             // FTP Link (External)
-            ("ftp://example.com/file.zip", "ftp://example.com/file.zip", "ftp://example.com/file.zip"),
-
+            (
+                "ftp://example.com/file.zip",
+                "ftp://example.com/file.zip",
+                "ftp://example.com/file.zip",
+            ),
             // Mailto Link (External)
-            ("mailto:user@example.com", "mailto:user@example.com", "mailto:user@example.com"),
-
+            (
+                "mailto:user@example.com",
+                "mailto:user@example.com",
+                "mailto:user@example.com",
+            ),
             // Git Repository Link (External)
-            ("git://github.com/user/repo.git", "git://github.com/user/repo.git", "git://github.com/user/repo.git"),
-
+            (
+                "git://github.com/user/repo.git",
+                "git://github.com/user/repo.git",
+                "git://github.com/user/repo.git",
+            ),
             // SSH Link (External)
-            ("ssh://192.168.1.1", "ssh://192.168.1.1", "ssh://192.168.1.1"),
-
+            (
+                "ssh://192.168.1.1",
+                "ssh://192.168.1.1",
+                "ssh://192.168.1.1",
+            ),
             // Data URI (External)
-            ("data:image/png;base64,XYZ", "data:image/png;base64,XYZ", "data:image/png;base64,XYZ"),
-
+            (
+                "data:image/png;base64,XYZ",
+                "data:image/png;base64,XYZ",
+                "data:image/png;base64,XYZ",
+            ),
             // Internal Path Reference
-            ("/docs/reference.md", "/docs/reference.md", "/docs/reference.md"),
-
+            (
+                "/docs/reference.md",
+                "/docs/reference.md",
+                "/docs/reference.md",
+            ),
             // Markdown Internal Path
             ("[Reference](/docs/ref.md)", "Reference", "/docs/ref.md"),
         ];
@@ -1082,7 +1105,6 @@ mod tests {
             assert_eq!(link, expected_link, "Failed on input: {}", input);
         }
     }
-    
 
     fn test_to_relative_identifier() {
         git_commands::clear_git_cache();
@@ -1129,17 +1151,15 @@ mod tests {
         let result = to_relative_identifier(&spec_identifier, &base_path, false)
             .expect("Should return relative path inside specifications folder");
         assert_eq!(
-            result,
-            "../../subfolder/file.yaml",
+            result, "../../subfolder/file.yaml",
             "Failed Git-root-based absolute path check"
         );
 
         // 3. Same-folder file path
         let spec_identifier = "/file.yaml";
-                
-        let result =
-            to_relative_identifier(&spec_identifier, &specifications_folder, false)
-                .expect("Should return relative path inside specifications folder");
+
+        let result = to_relative_identifier(&spec_identifier, &specifications_folder, false)
+            .expect("Should return relative path inside specifications folder");
         assert_eq!(result, "file.yaml", "Failed same-folder file check");
 
         // Restore original directory
@@ -1151,7 +1171,6 @@ mod tests {
 /// Diagram utility functions for consistent filtering across the codebase
 /// Constant marker used to identify auto-generated diagrams
 pub const REQVIRE_AUTOGENERATED_DIAGRAM_MARKER: &str = "REQVIRE-AUTOGENERATED-DIAGRAM";
-
 
 /// Removes only auto-generated mermaid diagrams from content
 /// Preserves user-created diagrams by checking for the auto-generation marker
@@ -1193,4 +1212,3 @@ pub fn remove_autogenerated_diagrams(content: &str) -> String {
 
     result
 }
-

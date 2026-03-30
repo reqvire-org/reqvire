@@ -11,6 +11,7 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * derive: [Attachment Export](#attachment-export)
   * derive: [Containment View Attachment Links](#containment-view-attachment-links)
   * derive: [Diagram Attachment Display](#diagram-attachment-display)
+  * derive: [Local Linked File Export](#local-linked-file-export)
   * derive: [Model-Centric View Generation](#model-centric-view-generation)
   * derive: [Web Interface Color Scheme](#web-interface-color-scheme)
   * derivedFrom: [Web Interface](../Interfaces.md#web-interface)
@@ -28,6 +29,24 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
   * verifiedBy: [CLI Help Structure Verification](../CLI/Verifications/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [HTML Export Verification](Verifications/WebInterfaceVerifications.md#html-export-verification)
+---
+
+### Local Linked File Export
+
+The system shall preserve local file references in exported markdown content so linked local assets remain usable in exported HTML pages.
+
+#### Details
+Implementation details shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * refinedBy: [Local Linked File Export Refinement Specification](Specifications.md#local-linked-file-export-refinement-specification)
+  * satisfiedBy: [export.rs](../../../core/src/export.rs)
+  * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
+  * verifiedBy: [HTML Export Local Linked Files Verification](Verifications/WebInterfaceVerifications.md#html-export-local-linked-files-verification)
 ---
 
 ### Attachment Export

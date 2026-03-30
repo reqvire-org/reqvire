@@ -74,7 +74,8 @@ impl ResourcesReport {
             for file_ref in &self.relations {
                 output.push_str(&format!("### {}\n", file_ref.file_path));
                 for reference in &file_ref.references {
-                    let link = format_identifier_link(&reference.element_id, &reference.element_name);
+                    let link =
+                        format_identifier_link(&reference.element_id, &reference.element_name);
                     if let Some(rel_type) = &reference.relation_type {
                         output.push_str(&format!("  * {} (via {})\n", link, rel_type));
                     } else {
@@ -95,7 +96,8 @@ impl ResourcesReport {
             for file_ref in &self.attachments {
                 output.push_str(&format!("### {}\n", file_ref.file_path));
                 for reference in &file_ref.references {
-                    let link = format_identifier_link(&reference.element_id, &reference.element_name);
+                    let link =
+                        format_identifier_link(&reference.element_id, &reference.element_name);
                     output.push_str(&format!("  * {}\n", link));
                 }
                 output.push_str("---\n\n");
@@ -104,12 +106,14 @@ impl ResourcesReport {
 
         // Summary
         output.push_str("## Summary\n\n");
-        output.push_str(&format!("- **Relation Files:** {} ({} references)\n",
-            self.summary.total_relation_files,
-            self.summary.total_relation_references));
-        output.push_str(&format!("- **Attachment Files:** {} ({} references)\n",
-            self.summary.total_attachment_files,
-            self.summary.total_attachment_references));
+        output.push_str(&format!(
+            "- **Relation Files:** {} ({} references)\n",
+            self.summary.total_relation_files, self.summary.total_relation_references
+        ));
+        output.push_str(&format!(
+            "- **Attachment Files:** {} ({} references)\n",
+            self.summary.total_attachment_files, self.summary.total_attachment_references
+        ));
 
         output
     }
@@ -132,10 +136,11 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
         for relation in &element.relations {
             if let LinkType::InternalPath(path) = &relation.target.link {
                 let rel_type = relation.relation_type.name.to_string();
-                relation_map
-                    .entry(path.clone())
-                    .or_default()
-                    .push((rel_type, element_id.clone(), element_name.clone()));
+                relation_map.entry(path.clone()).or_default().push((
+                    rel_type,
+                    element_id.clone(),
+                    element_name.clone(),
+                ));
             }
         }
 
@@ -156,9 +161,7 @@ pub fn generate_resources_report(registry: &GraphRegistry) -> ResourcesReport {
         .into_iter()
         .map(|(path, mut refs)| {
             // Sort references: by relation_type, then by element_id
-            refs.sort_by(|a, b| {
-                (&a.0, &a.1).cmp(&(&b.0, &b.1))
-            });
+            refs.sort_by(|a, b| (&a.0, &a.1).cmp(&(&b.0, &b.1)));
 
             let references: Vec<Reference> = refs
                 .into_iter()

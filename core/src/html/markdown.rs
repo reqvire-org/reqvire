@@ -1,72 +1,68 @@
-use std::path::{Path, PathBuf};
-use pulldown_cmark::{html, Options, Parser};
-use std::sync::LazyLock;
-use regex::{Captures, Regex};
 use crate::error::ReqvireError;
+use pulldown_cmark::{html, Options, Parser};
+use regex::{Captures, Regex};
+use std::path::{Path, PathBuf};
+use std::sync::LazyLock;
 
 // --- Module-level lazy statics (moved from function bodies) ---
 
-static HEADER_REGEX: LazyLock<Regex> = LazyLock::new(|| Regex::new(r"<(h[1-3])>([^<]+)</h[1-3]>").unwrap());
+static HEADER_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"<(h[1-3])>([^<]+)</h[1-3]>").unwrap());
 
 /// Find each mermaid code-block in HTML output
-static MERMAID_HTML_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
-    r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#
-).unwrap());
+static MERMAID_HTML_BLOCK: LazyLock<Regex> = LazyLock::new(|| {
+    Regex::new(r#"<pre><code class="language-mermaid">([\s\S]*?)</code></pre>"#).unwrap()
+});
 
 /// Find all .md links in mermaid diagrams
-static MERMAID_MD_LINK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
-    r#"(click\s+\S+\s+")([^"]*?)\.md(#[^"]*)?(")"#
-).unwrap());
+static MERMAID_MD_LINK: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r#"(click\s+\S+\s+")([^"]*?)\.md(#[^"]*)?(")"#).unwrap());
 
-static MERMAID_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
-    r"(?s)(?P<full>```mermaid\s+(?P<code>.*?)```)"
-).unwrap());
+static MERMAID_BLOCK: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?s)(?P<full>```mermaid\s+(?P<code>.*?)```)").unwrap());
 
-static D3_TREE_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
-    r"(?s)```d3-tree\s*\n(?P<json>.*?)```"
-).unwrap());
+static D3_TREE_BLOCK: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?s)```d3-tree\s*\n(?P<json>.*?)```").unwrap());
 
-static D3_SANKEY_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
-    r"(?s)```d3-sankey\s*\n(?P<json>.*?)```"
-).unwrap());
+static D3_SANKEY_BLOCK: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?s)```d3-sankey\s*\n(?P<json>.*?)```").unwrap());
 
-static D3_SUNBURST_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
-    r"(?s)```d3-sunburst\s*\n(?P<json>.*?)```"
-).unwrap());
+static D3_SUNBURST_BLOCK: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?s)```d3-sunburst\s*\n(?P<json>.*?)```").unwrap());
 
-static D3_ICICLE_BLOCK: LazyLock<Regex> = LazyLock::new(|| Regex::new(
-    r"(?s)```d3-icicle\s*\n(?P<json>.*?)```"
-).unwrap());
+static D3_ICICLE_BLOCK: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(?s)```d3-icicle\s*\n(?P<json>.*?)```").unwrap());
 
 // [text](../path/to/file.md#fragment)
-static MD_LINK_WITH_HASH_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(#[^)]+)(\))").unwrap()
-});
+static MD_LINK_WITH_HASH_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(#[^)]+)(\))").unwrap());
 
 // [text](../path/to/file.md)
-static MD_LINK_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(\))").unwrap()
-});
+static MD_LINK_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"(\]\()((?:\.\./)*)([^#)]+)\.md(\))").unwrap());
 
 // bare link text [foo.md]
-static MD_LINK_TEXT_REGEX: LazyLock<Regex> = LazyLock::new(|| {
-    Regex::new(r"\[([^]]+)\.md\]").unwrap()
-});
+static MD_LINK_TEXT_REGEX: LazyLock<Regex> =
+    LazyLock::new(|| Regex::new(r"\[([^]]+)\.md\]").unwrap());
 
 pub fn markdown_to_html_content(
     file_path: &PathBuf,
     markdown_content: &str,
-    base_folder: &PathBuf
+    base_folder: &PathBuf,
 ) -> Result<String, ReqvireError> {
     // 1. Extract Mermaid, D3 tree, D3 Sankey, D3 Sunburst, and D3 Icicle blocks before link conversion
     let (markdown_without_mermaid, mermaid_blocks) = extract_mermaid_blocks(markdown_content);
     let (markdown_without_d3, d3_tree_blocks) = extract_d3_tree_blocks(&markdown_without_mermaid);
-    let (markdown_without_sankey, d3_sankey_blocks) = extract_d3_sankey_blocks(&markdown_without_d3);
-    let (markdown_without_sunburst, d3_sunburst_blocks) = extract_d3_sunburst_blocks(&markdown_without_sankey);
-    let (markdown_without_icicle, d3_icicle_blocks) = extract_d3_icicle_blocks(&markdown_without_sunburst);
+    let (markdown_without_sankey, d3_sankey_blocks) =
+        extract_d3_sankey_blocks(&markdown_without_d3);
+    let (markdown_without_sunburst, d3_sunburst_blocks) =
+        extract_d3_sunburst_blocks(&markdown_without_sankey);
+    let (markdown_without_icicle, d3_icicle_blocks) =
+        extract_d3_icicle_blocks(&markdown_without_sunburst);
 
     // 2. Convert .md links to .html — safely
-    let markdown_html_ready = convert_markdown_links_to_html(file_path, &markdown_without_icicle, base_folder);
+    let markdown_html_ready =
+        convert_markdown_links_to_html(file_path, &markdown_without_icicle, base_folder);
 
     // 3. Restore Mermaid blocks (untouched by md → html rewrite)
     let markdown_final = restore_mermaid_blocks(&markdown_html_ready, &mermaid_blocks);
@@ -111,8 +107,8 @@ fn add_anchor_ids(html_content: &str) -> String {
 /// into `<div class="mermaid">…</div>` and convert relative links from .md to .html
 /// GitHub blob links are preserved as-is (keeping the .md extension)
 pub fn process_mermaid_diagrams(
-    _file_path: &Path,     // Used to determine if we're in a specifications folder
-    html_content: &str,    // the rendered HTML
+    _file_path: &Path,  // Used to determine if we're in a specifications folder
+    html_content: &str, // the rendered HTML
 ) -> String {
     // Process mermaid blocks
     let mermaid_processed = MERMAID_HTML_BLOCK
@@ -127,10 +123,10 @@ pub fn process_mermaid_diagrams(
 
             // Handle .md links, but preserve GitHub blob links
             let fixed = MERMAID_MD_LINK.replace_all(&decoded, |c: &regex::Captures| {
-                let prefix = &c[1];          // click X "
-                let path = &c[2];            // path/to/file
+                let prefix = &c[1]; // click X "
+                let path = &c[2]; // path/to/file
                 let anchor = c.get(3).map_or("", |m| m.as_str());
-                let suffix = &c[4];          // "
+                let suffix = &c[4]; // "
 
                 // Check if this is a GitHub URL - if so, preserve the .md extension
                 if path.starts_with("https://github.com") {
@@ -145,11 +141,9 @@ pub fn process_mermaid_diagrams(
             format!(r#"<div class="mermaid">{}</div>"#, fixed)
         })
         .to_string();
-    
+
     mermaid_processed
 }
-
-
 
 use std::collections::HashMap;
 
@@ -197,7 +191,8 @@ fn restore_d3_tree_blocks(content: &str, blocks: &HashMap<String, String>) -> St
 fn generate_d3_tree_html(json_data: &str) -> String {
     let unique_id = format!("d3tree_{:x}", json_data.as_ptr() as usize);
 
-    format!(r##"
+    format!(
+        r##"
 <div class="d3-tree-container" id="{id}">
     <div class="d3-tree-controls">
         <button onclick="expandAll_{id}()">Expand All</button>
@@ -492,7 +487,10 @@ fn generate_d3_tree_html(json_data: &str) -> String {
     fill: #3F51B5;
 }}
 </style>
-"##, id = unique_id, json = json_data)
+"##,
+        id = unique_id,
+        json = json_data
+    )
 }
 
 /// Extracts D3 Sankey blocks and replaces them with placeholders
@@ -529,7 +527,8 @@ fn restore_d3_sankey_blocks(content: &str, blocks: &HashMap<String, String>) -> 
 fn generate_d3_sankey_html(json_data: &str) -> String {
     let unique_id = format!("d3sankey_{:x}", json_data.as_ptr() as usize);
 
-    format!(r##"
+    format!(
+        r##"
 <div class="d3-sankey-container" id="{id}">
     <svg class="d3-sankey-svg"></svg>
 </div>
@@ -655,7 +654,10 @@ fn generate_d3_sankey_html(json_data: &str) -> String {
     width: 100%;
 }}
 </style>
-"##, id = unique_id, json = json_data)
+"##,
+        id = unique_id,
+        json = json_data
+    )
 }
 
 /// Extracts D3 Sunburst blocks and replaces them with placeholders
@@ -688,7 +690,8 @@ fn restore_d3_sunburst_blocks(content: &str, blocks: &HashMap<String, String>) -
 fn generate_d3_sunburst_html(json_data: &str) -> String {
     let unique_id = format!("d3sunburst_{:x}", json_data.as_ptr() as usize);
 
-    format!(r##"
+    format!(
+        r##"
 <div class="d3-sunburst-container" id="{id}">
     <div class="d3-sunburst-breadcrumb"></div>
     <div class="d3-sunburst-wrapper">
@@ -991,7 +994,10 @@ fn generate_d3_sunburst_html(json_data: &str) -> String {
     margin: 0 2px;
 }}
 </style>
-"##, id = unique_id, json = json_data)
+"##,
+        id = unique_id,
+        json = json_data
+    )
 }
 
 /// Extracts D3 Icicle blocks and replaces them with placeholders
@@ -1023,7 +1029,8 @@ fn restore_d3_icicle_blocks(content: &str, blocks: &HashMap<String, String>) -> 
 fn generate_d3_icicle_html(json_data: &str) -> String {
     let unique_id = format!("d3icicle_{:x}", json_data.as_ptr() as usize);
 
-    format!(r##"
+    format!(
+        r##"
 <div class="d3-icicle-container" id="{id}">
     <div class="d3-icicle-breadcrumb"></div>
     <div class="d3-icicle-wrapper">
@@ -1276,7 +1283,10 @@ fn generate_d3_icicle_html(json_data: &str) -> String {
     margin: 0 2px;
 }}
 </style>
-"##, id = unique_id, json = json_data)
+"##,
+        id = unique_id,
+        json = json_data
+    )
 }
 
 /// Replaces placeholders back with the original Mermaid blocks
@@ -1288,22 +1298,21 @@ fn restore_mermaid_blocks(content: &str, blocks: &HashMap<String, String>) -> St
     result
 }
 
-
 /// Convert all markdown links from .md to .html for HTML output
-/// Pre-processes markdown content to convert all markdown links with .md extension to .html 
+/// Pre-processes markdown content to convert all markdown links with .md extension to .html
 /// This is used to ensure all links in the generated HTML point to HTML files
 fn convert_markdown_links_to_html(
     _file_path: &PathBuf,
     markdown_content: &str,
-    _base_folder: &PathBuf
+    _base_folder: &PathBuf,
 ) -> String {
     // 1) Links with a fragment
     let content = MD_LINK_WITH_HASH_REGEX.replace_all(markdown_content, |caps: &Captures| {
-        let before   = &caps[1]; // "]("
-        let parents  = &caps[2]; // e.g. "../../"
-        let path     = &caps[3]; // "path/to/file"
+        let before = &caps[1]; // "]("
+        let parents = &caps[2]; // e.g. "../../"
+        let path = &caps[3]; // "path/to/file"
         let fragment = &caps[4]; // "#section"
-        let close    = &caps[5]; // ")"
+        let close = &caps[5]; // ")"
 
         // apply your existing folder‑name rewrites only to the path portion
         format!("{}{}{}.html{}{}", before, parents, path, fragment, close)
@@ -1311,10 +1320,10 @@ fn convert_markdown_links_to_html(
 
     // 2) Links without a fragment
     let content = MD_LINK_REGEX.replace_all(&content, |caps: &Captures| {
-        let before  = &caps[1]; // "]("
+        let before = &caps[1]; // "]("
         let parents = &caps[2]; // "../"*
-        let path    = &caps[3]; // "foo/bar"
-        let close   = &caps[4]; // ")"
+        let path = &caps[3]; // "foo/bar"
+        let close = &caps[4]; // ")"
 
         format!("{}{}{}.html{}", before, parents, path, close)
     });
@@ -1353,16 +1362,16 @@ mod tests {
 
         let html = convert_markdown_links_to_html(file_path, markdown, base_folder);
         println!("Converted HTML: {}", html);
-        
+
         // Check that no link still contains ".md".
         assert!(!html.contains("file.md"));
         assert!(!html.contains("../parent.md"));
         assert!(!html.contains("../../grandparent.md"));
         assert!(!html.contains("../other.md#element"));
         assert!(!html.contains("../something.md#header"));
-        assert!(!html.contains("../something.md"));                    
+        assert!(!html.contains("../something.md"));
         assert!(!html.contains("DesignSpecifications/DirectMessages.md"));
-        
+
         // Check that links are converted to .html.
         assert!(html.contains("file.html"));
         assert!(html.contains("../parent.html"));
@@ -1370,11 +1379,11 @@ mod tests {
         assert!(html.contains("../other.html#element"));
         assert!(html.contains("../something.html#header"));
         assert!(html.contains("../something.html"));
-        assert!(html.contains("../something.rs"));         
+        assert!(html.contains("../something.rs"));
         // Specification folder links remain intact.
         assert!(html.contains("DesignSpecifications/DirectMessages.html"));
     }
-    
+
     #[test]
     fn test_mermaid_click_links_preserve_rs_files() {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
@@ -1391,7 +1400,7 @@ mod tests {
         // .rs links remain untouched
         assert!(processed.contains("https://github.com/user/repo/blob/main/src/main.rs"));
     }
-    
+
     #[test]
     fn test_direct_markdown_links_in_mermaid() {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
@@ -1410,7 +1419,7 @@ mod tests {
         // original .md link is gone
         assert!(!processed.contains("specs/Reqs.md#id1"));
     }
-    
+
     #[test]
     fn test_parent_directory_links_in_mermaid() {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">
@@ -1431,9 +1440,8 @@ mod tests {
         // Original .md links are gone
         assert!(!processed.contains("../parent/Reqs.md#id1"));
         assert!(!processed.contains("../../grandparent/Reqs.md#id1"));
-
     }
-    
+
     #[test]
     fn test_mermaid_links_without_fragments() {
         let html_with_mermaid = r#"<pre><code class="language-mermaid">

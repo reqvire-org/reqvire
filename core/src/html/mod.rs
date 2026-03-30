@@ -16,9 +16,9 @@
 /// - `visualizations`: Visualization components (to be implemented in Phase 2/3)
 mod components;
 mod layouts;
+pub mod markdown;
 mod scripts;
 mod styles;
-pub mod markdown;
 
 pub mod pages;
 pub mod visualizations;
@@ -28,7 +28,7 @@ pub use layouts::{base, diagram_layout};
 pub use maud::Markup;
 
 // Re-export page generators for external use
-pub use pages::{coverage, index, model, resources, traces, traceflow};
+pub use pages::{coverage, index, model, resources, traceflow, traces};
 
 use crate::error::ReqvireError;
 use std::path::{Path, PathBuf};
@@ -53,40 +53,24 @@ pub fn convert_to_html(
     base_folder: &PathBuf,
 ) -> Result<String, ReqvireError> {
     // Process markdown to HTML content
-    let html_content = markdown::markdown_to_html_content(
-        file_path,
-        markdown_content,
-        base_folder,
-    )?;
+    let html_content =
+        markdown::markdown_to_html_content(file_path, markdown_content, base_folder)?;
 
     // Calculate relative path prefix for navigation links
     let nav_prefix = calculate_nav_prefix(file_path, base_folder);
 
     // Determine which page template to use based on filename
-    let filename = file_path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("");
+    let filename = file_path.file_name().and_then(|n| n.to_str()).unwrap_or("");
 
     let html_document = match filename {
         "SpecificationIndex.md" | "index.md" => {
             pages::index::render(&html_content, &nav_prefix).into_string()
         }
-        "model.md" => {
-            pages::model::render(&html_content, &nav_prefix).into_string()
-        }
-        "traces.md" => {
-            pages::traces::render(&html_content, &nav_prefix).into_string()
-        }
-        "traceflow.md" => {
-            pages::traceflow::render(&html_content, &nav_prefix).into_string()
-        }
-        "coverage.md" => {
-            pages::coverage::render(&html_content, &nav_prefix).into_string()
-        }
-        "resources.md" => {
-            pages::resources::render(&html_content, &nav_prefix).into_string()
-        }
+        "model.md" => pages::model::render(&html_content, &nav_prefix).into_string(),
+        "traces.md" => pages::traces::render(&html_content, &nav_prefix).into_string(),
+        "traceflow.md" => pages::traceflow::render(&html_content, &nav_prefix).into_string(),
+        "coverage.md" => pages::coverage::render(&html_content, &nav_prefix).into_string(),
+        "resources.md" => pages::resources::render(&html_content, &nav_prefix).into_string(),
         _ => {
             // Default: standard page for specification files
             // Check if content contains diagrams and include appropriate scripts

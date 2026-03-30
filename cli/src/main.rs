@@ -38,7 +38,8 @@ async fn main() {
         .unwrap_or_else(|e| {
             match e {
                 ReqvireError::ValidationError(errors) => {
-                    let mut messages: Vec<String> = errors.iter().map(|err| err.to_string()).collect();
+                    let mut messages: Vec<String> =
+                        errors.iter().map(|err| err.to_string()).collect();
                     messages.sort();
                     eprintln!("Validation failed with {} error(s):", messages.len());
                     for (idx, msg) in messages.iter().enumerate() {

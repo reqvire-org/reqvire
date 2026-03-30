@@ -48,12 +48,15 @@ pub struct CrudResult {
 
 /// Generate a diff showing changes between current and new content
 pub fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff {
-    use difference::{Difference, Changeset};
+    use difference::{Changeset, Difference};
 
     let changeset = Changeset::new(current, new, "\n");
 
     // Check if there are any actual changes (additions or removals)
-    let has_changes = changeset.diffs.iter().any(|diff| !matches!(diff, Difference::Same(_)));
+    let has_changes = changeset
+        .diffs
+        .iter()
+        .any(|diff| !matches!(diff, Difference::Same(_)));
     if !has_changes {
         // No actual changes, return empty diff
         return FileDiff {
@@ -79,10 +82,17 @@ pub fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff
         match diff {
             Difference::Same(text) => {
                 let lines: Vec<&str> = text.split('\n').collect();
-                let line_count = if lines.last() == Some(&"") { lines.len() - 1 } else { lines.len() };
+                let line_count = if lines.last() == Some(&"") {
+                    lines.len() - 1
+                } else {
+                    lines.len()
+                };
 
                 // Determine if we should show context lines
-                let next_has_change = changeset.diffs.get(i + 1).is_some_and(|d| !matches!(d, Difference::Same(_)));
+                let next_has_change = changeset
+                    .diffs
+                    .get(i + 1)
+                    .is_some_and(|d| !matches!(d, Difference::Same(_)));
                 let show_context = previous_was_change || next_has_change;
 
                 // Special case: handle empty Same sections (blank lines)
@@ -120,7 +130,11 @@ pub fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff
                                 format!("    {}", lines[line_idx])
                             };
                             diff_lines.push(DiffLine {
-                                prefix: format!("{:0width$}", new_line_num + line_idx, width = width),
+                                prefix: format!(
+                                    "{:0width$}",
+                                    new_line_num + line_idx,
+                                    width = width
+                                ),
                                 content,
                                 color: "context".to_string(),
                             });
@@ -137,7 +151,9 @@ pub fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff
                     }
 
                     // Show trailing context (before a change)
-                    let next_is_removal = changeset.diffs.get(i + 1)
+                    let next_is_removal = changeset
+                        .diffs
+                        .get(i + 1)
                         .is_some_and(|d| matches!(d, Difference::Rem(_)));
                     let start_end_lines = line_count.saturating_sub(end_lines);
                     for line_idx in start_end_lines..line_count {
@@ -171,7 +187,7 @@ pub fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff
                     new_line_num += line_count;
                     previous_was_change = false;
                 }
-            },
+            }
             Difference::Add(text) => {
                 previous_was_change = true;
                 for line in text.split('\n') {
@@ -188,7 +204,7 @@ pub fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff
                     });
                     new_line_num += 1;
                 }
-            },
+            }
             Difference::Rem(text) => {
                 previous_was_change = true;
                 for line in text.split('\n') {
@@ -205,7 +221,7 @@ pub fn generate_file_diff(file_path: &str, current: &str, new: &str) -> FileDiff
                     });
                     // Don't increment new_line_num - removed lines don't exist in new file
                 }
-            },
+            }
         }
     }
 
@@ -227,21 +243,21 @@ pub fn render_file_diffs(diffs: &[FileDiff]) {
                     } else {
                         println!("  \x1b[32m{} {}\x1b[0m", line.prefix, line.content)
                     }
-                },
+                }
                 "red" => {
                     if line.content.is_empty() {
                         println!("  \x1b[31m{}\x1b[0m", line.prefix)
                     } else {
                         println!("  \x1b[31m{} {}\x1b[0m", line.prefix, line.content)
                     }
-                },
+                }
                 "context" => {
                     if line.content.is_empty() {
                         println!("  \x1b[37m{}\x1b[0m", line.prefix)
                     } else {
                         println!("  \x1b[37m{} {}\x1b[0m", line.prefix, line.content)
                     }
-                },
+                }
                 "separator" => println!(),
                 _ => {
                     if line.content.is_empty() {
@@ -249,7 +265,7 @@ pub fn render_file_diffs(diffs: &[FileDiff]) {
                     } else {
                         println!("  {} {}", line.prefix, line.content)
                     }
-                },
+                }
             }
         }
         println!();
@@ -311,10 +327,16 @@ pub fn render_crud_result(result: &CrudResult) {
     };
 
     if result.dry_run {
-        println!("{} element: {} ({})", operation_name, result.element_name, result.element_id);
+        println!(
+            "{} element: {} ({})",
+            operation_name, result.element_name, result.element_id
+        );
         println!("Dry run - no files modified\n");
     } else {
-        println!("{} element: {} ({})\n", operation_name, result.element_name, result.element_id);
+        println!(
+            "{} element: {} ({})\n",
+            operation_name, result.element_name, result.element_id
+        );
     }
 
     if !result.diffs.is_empty() {

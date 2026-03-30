@@ -1,8 +1,8 @@
-use std::collections::HashMap;
-use std::path::PathBuf;
 use crate::relation::Relation;
 use crate::utils;
 use serde::Serialize;
+use std::collections::HashMap;
+use std::path::PathBuf;
 
 /// All valid element types that can be used in --filter-type arguments.
 /// These values match what ElementType::as_str() returns for each variant.
@@ -11,24 +11,24 @@ use serde::Serialize;
 /// The values must match exactly what ElementType::as_str() returns.
 pub const ELEMENT_TYPES: &[&str] = &[
     // RequirementType variants (from ElementType::Requirement)
-    "user-requirement",          // RequirementType::User
-    "requirement",               // RequirementType::System
+    "user-requirement", // RequirementType::User
+    "requirement",      // RequirementType::System
     // VerificationType variants (from ElementType::Verification)
-    "test-verification",         // VerificationType::Test/Default
-    "analysis-verification",     // VerificationType::Analysis
-    "inspection-verification",   // VerificationType::Inspection
-    "demonstration-verification",// VerificationType::Demonstration
+    "test-verification",          // VerificationType::Test/Default
+    "analysis-verification",      // VerificationType::Analysis
+    "inspection-verification",    // VerificationType::Inspection
+    "demonstration-verification", // VerificationType::Demonstration
     // RefinementType variants (from ElementType::Refinement)
-    "constraint",                // RefinementType::Constraint
-    "behavior",                  // RefinementType::Behavior
-    "specification",             // RefinementType::Specification
+    "constraint",    // RefinementType::Constraint
+    "behavior",      // RefinementType::Behavior
+    "specification", // RefinementType::Specification
 ];
 
 /// Element type aliases that are also accepted (mapped to canonical types)
 /// These match the aliases in ElementType::from_metadata()
 pub const ELEMENT_TYPE_ALIASES: &[&str] = &[
-    "system-requirement",  // alias for "requirement"
-    "verification",        // alias for "test-verification"
+    "system-requirement", // alias for "requirement"
+    "verification",       // alias for "test-verification"
 ];
 
 /// Returns true if the given type string is a valid element type
@@ -56,9 +56,11 @@ pub fn element_types_list() -> String {
 
 /// Helper function to get element types help with custom type explanation
 pub fn element_types_help() -> String {
-    format!("{}. For custom types use: other-TYPENAME", ELEMENT_TYPES.join(", "))
+    format!(
+        "{}. For custom types use: other-TYPENAME",
+        ELEMENT_TYPES.join(", ")
+    )
 }
-
 
 /// Represents the target of an attachment - either a file path or an element identifier
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
@@ -133,10 +135,7 @@ impl SubSection {
     }
 }
 
-
-
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)] 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum RequirementType {
     System,
     User,
@@ -167,7 +166,6 @@ pub enum ElementType {
     Other(String),
 }
 
-
 impl ElementType {
     /// Returns the metadata key corresponding to this ElementType,
     /// e.g. "user_requirement", "analysis-verification", or the
@@ -175,19 +173,19 @@ impl ElementType {
     pub fn as_str(&self) -> &str {
         match self {
             ElementType::Requirement(req) => match req {
-                RequirementType::User   => "user-requirement",
+                RequirementType::User => "user-requirement",
                 RequirementType::System => "requirement",
             },
             ElementType::Verification(ver) => match ver {
-                VerificationType::Default       => "test-verification",
-                VerificationType::Test          => "test-verification",
-                VerificationType::Analysis      => "analysis-verification",
-                VerificationType::Inspection    => "inspection-verification",
+                VerificationType::Default => "test-verification",
+                VerificationType::Test => "test-verification",
+                VerificationType::Analysis => "analysis-verification",
+                VerificationType::Inspection => "inspection-verification",
                 VerificationType::Demonstration => "demonstration-verification",
             },
             ElementType::Refinement(ref_type) => match ref_type {
-                RefinementType::Constraint    => "constraint",
-                RefinementType::Behavior      => "behavior",
+                RefinementType::Constraint => "constraint",
+                RefinementType::Behavior => "behavior",
                 RefinementType::Specification => "specification",
             },
             ElementType::File => "file",
@@ -195,19 +193,22 @@ impl ElementType {
         }
     }
 
-    
     /// Parses a string into an ElementType
     pub fn from_metadata(value: &str) -> Self {
         match value.to_lowercase().as_str() {
             "user-requirement" => ElementType::Requirement(RequirementType::User),
-            "requirement" | "system-requirement" => ElementType::Requirement(RequirementType::System),
+            "requirement" | "system-requirement" => {
+                ElementType::Requirement(RequirementType::System)
+            }
 
             // Different verification types
             "verification" => ElementType::Verification(VerificationType::Test),
             "test-verification" => ElementType::Verification(VerificationType::Test),
             "analysis-verification" => ElementType::Verification(VerificationType::Analysis),
             "inspection-verification" => ElementType::Verification(VerificationType::Inspection),
-            "demonstration-verification" => ElementType::Verification(VerificationType::Demonstration),
+            "demonstration-verification" => {
+                ElementType::Verification(VerificationType::Demonstration)
+            }
 
             // Refinement types
             "constraint" => ElementType::Refinement(RefinementType::Constraint),
@@ -269,12 +270,17 @@ pub struct Element {
     pub attachments: Vec<Attachment>,
 }
 
-
-
 impl Element {
-    pub fn new(name: &str, identifier: &str, file_path: &str, line_number: usize, element_type: Option<ElementType>) -> Self {
+    pub fn new(
+        name: &str,
+        identifier: &str,
+        file_path: &str,
+        line_number: usize,
+        element_type: Option<ElementType>,
+    ) -> Self {
         // Extract stable ID (fragment) from identifier
-        let id = utils::extract_path_and_fragment(identifier).1
+        let id = utils::extract_path_and_fragment(identifier)
+            .1
             .unwrap_or(identifier)
             .to_string();
 
@@ -313,20 +319,17 @@ impl Element {
         self.content = trimmed.to_string();
         self.hash_impact_content = utils::hash_content(&normalized);
     }
-        
+
     pub fn set_type_from_metadata(&mut self) {
         if let Some(type_value) = self.metadata.get("type") {
             self.element_type = ElementType::from_metadata(type_value);
         }
-     }
-   
+    }
+
     pub fn extract_fragment(&self) -> String {
         match self.identifier.split_once('#') {
             Some((_, fragment)) => fragment.to_string(),
             None => "".to_string(),
         }
     }
-
-
-
 }

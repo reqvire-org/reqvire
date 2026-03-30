@@ -1,6 +1,8 @@
-use crate::element::{Element, SubSection, ElementType, RequirementType, Attachment, AttachmentTarget};
-use crate::relation::{self, Relation};
+use crate::element::{
+    Attachment, AttachmentTarget, Element, ElementType, RequirementType, SubSection,
+};
 use crate::error::ReqvireError;
+use crate::relation::{self, Relation};
 use crate::utils;
 use log::debug;
 use std::collections::HashSet;
@@ -87,10 +89,7 @@ You can use **markdown formatting**.
 /// Parses a single element from markdown string.
 /// Used for CRUD operations (add command) to parse element from stdin or inline argument.
 /// Returns the parsed Element or an error.
-pub fn parse_single_element(
-    content: &str,
-    file_path: &str,
-) -> Result<Element, ReqvireError> {
+pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, ReqvireError> {
     let mut current_element: Option<Element> = None;
     let mut current_subsection = SubSection::Other("".to_string());
     let mut seen_subsections = HashSet::new();
@@ -127,7 +126,11 @@ pub fn parse_single_element(
             found_header = true;
             current_subsection = SubSection::Requirement;
 
-            let element_name = trimmed.strip_prefix("### ").unwrap_or(trimmed).trim().to_string();
+            let element_name = trimmed
+                .strip_prefix("### ")
+                .unwrap_or(trimmed)
+                .trim()
+                .to_string();
 
             // file_path is already relative to git root, use it directly
             // Only normalize the fragment part (element name)
@@ -140,7 +143,7 @@ pub fn parse_single_element(
             let new_element = Element::new(
                 &element_name,
                 &normalized_id,
-                file_path,  // Already relative
+                file_path, // Already relative
                 line_num + 1,
                 Some(element_type),
             );
@@ -152,9 +155,10 @@ pub fn parse_single_element(
             let subsection = SubSection::parse(trimmed[5..].trim());
 
             if seen_subsections.contains(&subsection) {
-                return Err(ReqvireError::DuplicateSubsection(
-                    format!("Duplicate subsection '{}'", subsection.name())
-                ));
+                return Err(ReqvireError::DuplicateSubsection(format!(
+                    "Duplicate subsection '{}'",
+                    subsection.name()
+                )));
             }
             seen_subsections.insert(subsection.clone());
 
@@ -168,13 +172,19 @@ pub fn parse_single_element(
             current_subsection = subsection;
 
         // Handle level 5+ headers
-        } else if trimmed.starts_with("#####") && current_element.is_some() && current_subsection != SubSection::Details {
+        } else if trimmed.starts_with("#####")
+            && current_element.is_some()
+            && current_subsection != SubSection::Details
+        {
             return Err(ReqvireError::InvalidMarkdownStructure(
-                "Level 5+ headers (#####+) can only appear inside '#### Details' subsection".to_string()
+                "Level 5+ headers (#####+) can only appear inside '#### Details' subsection"
+                    .to_string(),
             ));
 
         // Parse content for Requirement or Details subsections
-        } else if current_subsection == SubSection::Requirement || current_subsection == SubSection::Details {
+        } else if current_subsection == SubSection::Requirement
+            || current_subsection == SubSection::Details
+        {
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("<details") {
                     in_details_block = true;
@@ -195,9 +205,11 @@ pub fn parse_single_element(
                         element.set_type_from_metadata();
                     }
                 } else {
-                    return Err(ReqvireError::InvalidMetadataFormat(
-                        format!("Invalid metadata format: '{}'. Expected format: '  * key: value'\n{}", trimmed, get_element_example())
-                    ));
+                    return Err(ReqvireError::InvalidMetadataFormat(format!(
+                        "Invalid metadata format: '{}'. Expected format: '  * key: value'\n{}",
+                        trimmed,
+                        get_element_example()
+                    )));
                 }
             }
 
@@ -220,11 +232,12 @@ pub fn parse_single_element(
                     } else {
                         // External file reference: normalize relative to the target file's directory
                         // Get the directory of the target file as base path for normalization
-                        let file_parent = Path::new(file_path)
-                            .parent()
-                            .ok_or_else(|| ReqvireError::PathError(
-                                format!("Cannot determine parent directory of '{}'", file_path)
-                            ))?;
+                        let file_parent = Path::new(file_path).parent().ok_or_else(|| {
+                            ReqvireError::PathError(format!(
+                                "Cannot determine parent directory of '{}'",
+                                file_path
+                            ))
+                        })?;
                         let base_path = git_root.join(file_parent);
 
                         utils::normalize_identifier(&link, &base_path)?
@@ -237,12 +250,12 @@ pub fn parse_single_element(
                         r.relation_type == relation.relation_type && r.target == relation.target
                     });
                     if is_duplicate {
-                        return Err(ReqvireError::DuplicateRelation(
-                            format!("Duplicate relation '{}' to '{}'", relation_type, normalized_target)
-                        ));
+                        return Err(ReqvireError::DuplicateRelation(format!(
+                            "Duplicate relation '{}' to '{}'",
+                            relation_type, normalized_target
+                        )));
                     }
                     element.add_relation(relation);
-
                 } else if !trimmed.is_empty() {
                     return Err(ReqvireError::InvalidRelationFormat(
                         format!("Invalid relations format: '{}'. Expected format: '  * relationType: [Text](link)'\n{}", trimmed, get_element_example())
@@ -272,11 +285,13 @@ pub fn parse_single_element(
                                 format!("{}{}", file_path, href)
                             } else {
                                 // Cross-file reference: normalize relative to file's directory
-                                let file_parent = Path::new(file_path)
-                                    .parent()
-                                    .ok_or_else(|| ReqvireError::PathError(
-                                        format!("Cannot determine parent directory of '{}'", file_path)
-                                    ))?;
+                                let file_parent =
+                                    Path::new(file_path).parent().ok_or_else(|| {
+                                        ReqvireError::PathError(format!(
+                                            "Cannot determine parent directory of '{}'",
+                                            file_path
+                                        ))
+                                    })?;
                                 let base_path = git_root.join(file_parent);
                                 utils::normalize_identifier(&href, &base_path)?
                             };
@@ -284,22 +299,31 @@ pub fn parse_single_element(
 
                             // Check for duplicate attachments
                             if element.attachments.iter().any(|a| a.target == target) {
-                                return Err(ReqvireError::DuplicateAttachment(
-                                    format!("Duplicate attachment '{}'", href)
-                                ));
+                                return Err(ReqvireError::DuplicateAttachment(format!(
+                                    "Duplicate attachment '{}'",
+                                    href
+                                )));
                             }
-                            element.attachments.push(Attachment { target, content_hash: None });
+                            element.attachments.push(Attachment {
+                                target,
+                                content_hash: None,
+                            });
                         }
                         Err(e) => {
-                            return Err(ReqvireError::InvalidAttachmentFormat(
-                                format!("Invalid attachment format '{}': {}.\n{}", trimmed, e, get_element_example())
-                            ));
+                            return Err(ReqvireError::InvalidAttachmentFormat(format!(
+                                "Invalid attachment format '{}': {}.\n{}",
+                                trimmed,
+                                e,
+                                get_element_example()
+                            )));
                         }
                     }
                 } else if !trimmed.is_empty() {
-                    return Err(ReqvireError::InvalidAttachmentFormat(
-                        format!("Invalid attachment format: '{}'. Expected format: '  * [Text](link)'\n{}", trimmed, get_element_example())
-                    ));
+                    return Err(ReqvireError::InvalidAttachmentFormat(format!(
+                        "Invalid attachment format: '{}'. Expected format: '  * [Text](link)'\n{}",
+                        trimmed,
+                        get_element_example()
+                    )));
                 }
             }
         }
@@ -308,16 +332,18 @@ pub fn parse_single_element(
     // Finalize element
     if let Some(mut element) = current_element {
         if !found_header {
-            return Err(ReqvireError::InvalidMarkdownStructure(
-                format!("Element must start with ### header.\n{}", get_element_example())
-            ));
+            return Err(ReqvireError::InvalidMarkdownStructure(format!(
+                "Element must start with ### header.\n{}",
+                get_element_example()
+            )));
         }
         element.freeze_content();
         Ok(element)
     } else {
-        Err(ReqvireError::InvalidMarkdownStructure(
-            format!("No element found in markdown string.\n{}", get_element_example())
-        ))
+        Err(ReqvireError::InvalidMarkdownStructure(format!(
+            "No element found in markdown string.\n{}",
+            get_element_example()
+        )))
     }
 }
 
@@ -339,7 +365,8 @@ pub fn detect_model_file_type(content: &str) -> ModelFileType {
         }
         // If we hit any other H1 or content that's not a heading, keep looking
         // (allow frontmatter, comments, etc. before the heading)
-        if !trimmed.starts_with('#') && !trimmed.starts_with("---") && !trimmed.starts_with("<!--") {
+        if !trimmed.starts_with('#') && !trimmed.starts_with("---") && !trimmed.starts_with("<!--")
+        {
             // Non-header, non-frontmatter content before H1 - skip but continue looking
             continue;
         }
@@ -643,8 +670,14 @@ fn parse_documents_file(
                             } else {
                                 href.clone()
                             };
-                            let file_dir = file_path.parent().unwrap_or_else(|| Path::new(".")).to_path_buf();
-                            let target = match utils::normalize_identifier(&href_to_normalize, &file_dir) {
+                            let file_dir = file_path
+                                .parent()
+                                .unwrap_or_else(|| Path::new("."))
+                                .to_path_buf();
+                            let target = match utils::normalize_identifier(
+                                &href_to_normalize,
+                                &file_dir,
+                            ) {
                                 Ok(normalized) => AttachmentTarget::ElementIdentifier(normalized),
                                 Err(e) => {
                                     errors.push(ReqvireError::InvalidAttachmentFormat(format!(
@@ -659,7 +692,10 @@ fn parse_documents_file(
                             let content_hash = None;
 
                             if !element_attachments.iter().any(|a| a.target == target) {
-                                element_attachments.push(Attachment { target, content_hash });
+                                element_attachments.push(Attachment {
+                                    target,
+                                    content_hash,
+                                });
                             } else {
                                 errors.push(ReqvireError::DuplicateAttachment(format!(
                                     "Duplicate attachment '{}' in document file '{}' (line {})",
@@ -706,8 +742,9 @@ fn parse_documents_file(
     let normalized_fragment = utils::normalize_fragment(&final_element_name);
     let raw_identifier = format!("{}#{}", file, normalized_fragment);
     let identifier = match file_path.parent() {
-        Some(file_folder) => utils::normalize_identifier(&raw_identifier, file_folder)
-            .unwrap_or(raw_identifier),
+        Some(file_folder) => {
+            utils::normalize_identifier(&raw_identifier, file_folder).unwrap_or(raw_identifier)
+        }
         None => raw_identifier,
     };
     let relative_file = match utils::get_relative_path(file_path) {
@@ -763,7 +800,6 @@ pub fn parse_elements(
     let mut seen_subsections = HashSet::new();
     let mut in_details_block = false;
 
-
     let mut current_subsection = SubSection::Other("".to_string());
 
     // Content tracking variables
@@ -775,23 +811,20 @@ pub fn parse_elements(
     for (line_num, line) in content.lines().enumerate() {
         let trimmed = line.trim();
 
-
         if in_details_block {
             if !skip_current_element {
                 if let Some(element) = &mut current_element {
                     element.add_content(&format!("{}\n", line));
                 }
             }
-        
+
             if trimmed.starts_with("</details>") {
                 in_details_block = false;
             }
-        
-            continue; // Skip any further processing while in <details>        
 
-        }else if trimmed == "---" {
+            continue; // Skip any further processing while in <details>
+        } else if trimmed == "---" {
             current_subsection = SubSection::Other("".to_string());
-
         } else if trimmed.starts_with("<details") {
             // Start of details block - set flag and add content if in element
             in_details_block = true;
@@ -801,7 +834,6 @@ pub fn parse_elements(
                 }
             }
             continue;
-
         } else if trimmed.starts_with("## ") {
             // Section headers (## ) are not allowed - report syntax error
             let section_name = trimmed.strip_prefix("## ").unwrap_or(trimmed).trim();
@@ -812,7 +844,6 @@ pub fn parse_elements(
                 file_path.display()
             )));
             continue;
-
         } else if trimmed.starts_with("### ") {
             current_subsection = SubSection::Requirement;
 
@@ -826,18 +857,18 @@ pub fn parse_elements(
             skip_current_element = false;
             seen_subsections.clear();
 
-            let element_name = trimmed.strip_prefix("### ").unwrap_or(trimmed).trim().to_string();
+            let element_name = trimmed
+                .strip_prefix("### ")
+                .unwrap_or(trimmed)
+                .trim()
+                .to_string();
 
             match file_path.parent() {
                 Some(file_folder) => {
                     let identifier = format!("{}#{}", file, element_name);
 
-                    match utils::normalize_identifier(
-                        &identifier,
-                        file_folder
-                    ) {
+                    match utils::normalize_identifier(&identifier, file_folder) {
                         Ok(identifier) => {
-                        
                             let relative_file = match utils::get_relative_path(file_path) {
                                 Ok(path) => path,
                                 Err(err) => {
@@ -895,8 +926,11 @@ pub fn parse_elements(
                     skip_current_element = true;
                 }
             }
-
-        } else if trimmed.starts_with("#####") && current_element.is_some() && current_subsection != SubSection::Details && !skip_current_element {
+        } else if trimmed.starts_with("#####")
+            && current_element.is_some()
+            && current_subsection != SubSection::Details
+            && !skip_current_element
+        {
             // Level 5+ headers are only allowed inside Details subsection
             let msg = format!(
                 "Invalid header level in element '{}': Level 5+ headers (#####+) can only appear inside '#### Details' subsection (file: {}, line {})",
@@ -906,7 +940,6 @@ pub fn parse_elements(
             );
             errors.push(ReqvireError::InvalidMarkdownStructure(msg.clone()));
             debug!("Error: {}", msg);
-
         } else if trimmed.starts_with("#### ") && current_element.is_some() {
             let subsection = SubSection::parse(trimmed[5..].trim());
 
@@ -929,14 +962,15 @@ pub fn parse_elements(
             // If transitioning to Details or non-reserved subsection, add the header to content
             if !skip_current_element {
                 if let Some(element) = &mut current_element {
-                    if subsection == SubSection::Details || matches!(subsection, SubSection::Other(_)) {
+                    if subsection == SubSection::Details
+                        || matches!(subsection, SubSection::Other(_))
+                    {
                         element.add_content(&format!("\n{}\n", line));
                     }
                 }
             }
 
             current_subsection = subsection;
-
         } else if (current_subsection == SubSection::Requirement
             || current_subsection == SubSection::Details
             || matches!(current_subsection, SubSection::Other(_)))
@@ -949,15 +983,12 @@ pub fn parse_elements(
                 }
 
                 element.add_content(&format!("{}\n", line));
-
             }
-
         } else if in_details_block && !skip_current_element {
             // Still inside <details> block under 'Details' subsection
             if let Some(element) = &mut current_element {
                 element.add_content(&format!("{}\n", line));
             }
-
         } else if current_subsection == SubSection::Metadata && !skip_current_element {
             if trimmed.is_empty() {
                 continue;
@@ -972,14 +1003,16 @@ pub fn parse_elements(
                 } else {
                     let msg = format!(
                         "Element '{}' has invalid metadata format: '{}' (file: {}, line {})",
-                        element.name, trimmed, file, line_num + 1
+                        element.name,
+                        trimmed,
+                        file,
+                        line_num + 1
                     );
                     errors.push(ReqvireError::InvalidMetadataFormat(msg.clone()));
                     debug!("Error: {}", msg);
                     current_subsection = SubSection::Other("".to_string());
                 }
             }
-
         } else if current_subsection == SubSection::Relations && !skip_current_element {
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("* ") {
@@ -993,24 +1026,33 @@ pub fn parse_elements(
 
                             match file_path.parent() {
                                 Some(file_folder) => {
-                                    match utils::normalize_identifier(
-                                        &final_link,
-                                        file_folder
-                                    ) {
+                                    match utils::normalize_identifier(&final_link, file_folder) {
                                         Ok(normalized_target) => {
                                             // element_id will be populated later by GraphRegistry after all elements are registered
-                                            match Relation::new(&relation_type, text, &normalized_target, None) {
+                                            match Relation::new(
+                                                &relation_type,
+                                                text,
+                                                &normalized_target,
+                                                None,
+                                            ) {
                                                 Ok(relation) => {
                                                     // Check for duplicate relations (same type and target)
-                                                    let is_duplicate = element.relations.iter().any(|r| {
-                                                        r.relation_type == relation.relation_type && r.target == relation.target
-                                                    });
+                                                    let is_duplicate =
+                                                        element.relations.iter().any(|r| {
+                                                            r.relation_type
+                                                                == relation.relation_type
+                                                                && r.target == relation.target
+                                                        });
                                                     if is_duplicate {
                                                         let msg = format!(
                                                             "Duplicate relation '{}' to '{}' in element '{}' (file: {}, line {})",
                                                             relation_type, normalized_target, element.name, file, line_num + 1
                                                         );
-                                                        errors.push(ReqvireError::DuplicateRelation(msg.clone()));
+                                                        errors.push(
+                                                            ReqvireError::DuplicateRelation(
+                                                                msg.clone(),
+                                                            ),
+                                                        );
                                                         debug!("Warning: {}", msg);
                                                     } else {
                                                         element.add_relation(relation);
@@ -1022,7 +1064,11 @@ pub fn parse_elements(
                                                         relation_type, element.name, file, line_num + 1,
                                                         relation::supported_relation_types_list()
                                                     );
-                                                    errors.push(ReqvireError::UnsupportedRelationType(msg.clone()));
+                                                    errors.push(
+                                                        ReqvireError::UnsupportedRelationType(
+                                                            msg.clone(),
+                                                        ),
+                                                    );
                                                     debug!("Error: {}", msg);
                                                 }
                                             }
@@ -1032,7 +1078,8 @@ pub fn parse_elements(
                                                 "Failed to normalize identifier for '{}': {} (file: {}, line {})",
                                                 element.name, e, file, line_num + 1
                                             );
-                                            errors.push(ReqvireError::InvalidIdentifier(msg.clone()));
+                                            errors
+                                                .push(ReqvireError::InvalidIdentifier(msg.clone()));
                                             debug!("Error: {}", msg);
                                         }
                                     }
@@ -1064,14 +1111,16 @@ pub fn parse_elements(
                 } else {
                     let msg = format!(
                         "Element '{}' has invalid relations format: '{}' (file: {}, line {})",
-                        element.name, trimmed, file, line_num + 1
+                        element.name,
+                        trimmed,
+                        file,
+                        line_num + 1
                     );
                     errors.push(ReqvireError::InvalidRelationFormat(msg.clone()));
                     debug!("Error: {}", msg);
                     current_subsection = SubSection::Other("".to_string());
                 }
             }
-
         } else if current_subsection == SubSection::Attachments && !skip_current_element {
             // Parse Attachments subsection
             // Format: * [text](identifier) where identifier is:
@@ -1122,9 +1171,13 @@ pub fn parse_elements(
 
                             // Check for duplicates
                             if !element.attachments.iter().any(|a| a.target == target) {
-                                element.attachments.push(Attachment { target, content_hash });
+                                element.attachments.push(Attachment {
+                                    target,
+                                    content_hash,
+                                });
                             } else {
-                                let msg = format!(
+                                let msg =
+                                    format!(
                                     "Duplicate attachment '{}' in element '{}' (file: {}, line {})",
                                     href, element.name, file, line_num + 1
                                 );
@@ -1135,7 +1188,10 @@ pub fn parse_elements(
                         Err(e) => {
                             let msg = format!(
                                 "Invalid attachment in element '{}': {} (file: {}, line {})",
-                                element.name, e, file, line_num + 1
+                                element.name,
+                                e,
+                                file,
+                                line_num + 1
                             );
                             errors.push(ReqvireError::InvalidAttachmentFormat(msg.clone()));
                             debug!("Error: {}", msg);
@@ -1147,7 +1203,6 @@ pub fn parse_elements(
                 }
                 // Empty lines are ignored within Attachments subsection
             }
-
         } else if matches!(current_subsection, SubSection::Other(_)) {
             // Accumulate page content: everything outside of elements, but skip the # Elements title
             if !trimmed.starts_with("# ") {

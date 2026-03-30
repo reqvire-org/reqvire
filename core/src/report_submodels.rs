@@ -50,7 +50,9 @@ impl SubmodelsReport {
         let mut output = String::new();
 
         output.push_str("## Submodels\n\n");
-        output.push_str("Independent requirement hierarchies resolved via `derivedFrom` relations.\n\n");
+        output.push_str(
+            "Independent requirement hierarchies resolved via `derivedFrom` relations.\n\n",
+        );
 
         if self.submodels.is_empty() {
             output.push_str("*No requirement submodels found.*\n\n");
@@ -61,7 +63,10 @@ impl SubmodelsReport {
                     format_identifier_link(&submodel.root_id, &submodel.root_name)
                 ));
                 output.push_str(&format!("  * Type: {}\n", submodel.root_type));
-                output.push_str(&format!("  * Requirements: {}\n", submodel.requirement_count));
+                output.push_str(&format!(
+                    "  * Requirements: {}\n",
+                    submodel.requirement_count
+                ));
                 output.push_str("---\n\n");
             }
         }
@@ -163,10 +168,7 @@ fn resolve_top_roots(
     visiting.insert(requirement_id.to_string());
 
     let mut result = BTreeSet::new();
-    let parent_ids = parent_map
-        .get(requirement_id)
-        .cloned()
-        .unwrap_or_default();
+    let parent_ids = parent_map.get(requirement_id).cloned().unwrap_or_default();
 
     if parent_ids.is_empty() {
         result.insert(requirement_id.to_string());
@@ -312,7 +314,11 @@ pub fn generate_submodels_report(
     }
 
     couplings.sort_by(|a, b| {
-        (&a.source_id, &a.relation_type, &a.target_id).cmp(&(&b.source_id, &b.relation_type, &b.target_id))
+        (&a.source_id, &a.relation_type, &a.target_id).cmp(&(
+            &b.source_id,
+            &b.relation_type,
+            &b.target_id,
+        ))
     });
 
     let mut report = SubmodelsReport {
@@ -403,12 +409,14 @@ pub fn generate_submodels_report(
         report.submodels = scoped_root_counts
             .iter()
             .filter_map(|(scoped_root_id, count)| {
-                registry.get_element(scoped_root_id).map(|elem| SubmodelSummary {
-                    root_id: scoped_root_id.clone(),
-                    root_name: elem.name.clone(),
-                    root_type: elem.element_type.as_str().to_string(),
-                    requirement_count: *count,
-                })
+                registry
+                    .get_element(scoped_root_id)
+                    .map(|elem| SubmodelSummary {
+                        root_id: scoped_root_id.clone(),
+                        root_name: elem.name.clone(),
+                        root_type: elem.element_type.as_str().to_string(),
+                        requirement_count: *count,
+                    })
             })
             .collect();
 
@@ -416,7 +424,8 @@ pub fn generate_submodels_report(
             scoped_nodes.contains(&coupling.source_id) || scoped_nodes.contains(&coupling.target_id)
         });
 
-        let filtered_requirements: usize = report.submodels.iter().map(|s| s.requirement_count).sum();
+        let filtered_requirements: usize =
+            report.submodels.iter().map(|s| s.requirement_count).sum();
         report.summary = SubmodelsSummary {
             total_submodels: report.submodels.len(),
             total_requirements: filtered_requirements,

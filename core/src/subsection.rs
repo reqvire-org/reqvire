@@ -20,10 +20,10 @@ impl Subsection {
     }
 
     pub fn parse_relations(content: &str) -> Vec<String> {
-        content.lines()
+        content
+            .lines()
             .filter(|line| line.trim().starts_with('*'))
             .map(|line| line.trim_start_matches("* ").to_string())
             .collect()
     }
 }
-

@@ -170,35 +170,64 @@ impl CoverageReport {
 
         // Leaf Requirements Summary
         output.push_str("### Leaf Requirements\n\n");
-        output.push_str(&format!("- **Total Leaf Requirements:** {}\n", self.summary.total_leaf_requirements));
-        output.push_str(&format!("- **Verified Leaf Requirements:** {} ({:.1}%)\n",
+        output.push_str(&format!(
+            "- **Total Leaf Requirements:** {}\n",
+            self.summary.total_leaf_requirements
+        ));
+        output.push_str(&format!(
+            "- **Verified Leaf Requirements:** {} ({:.1}%)\n",
             self.summary.verified_leaf_requirements,
             self.summary.leaf_requirements_coverage_percentage
         ));
-        output.push_str(&format!("- **Unverified Leaf Requirements:** {}\n\n", self.summary.unverified_leaf_requirements));
+        output.push_str(&format!(
+            "- **Unverified Leaf Requirements:** {}\n\n",
+            self.summary.unverified_leaf_requirements
+        ));
 
         // Test Verifications Summary
         output.push_str("### Test Verifications\n\n");
-        output.push_str(&format!("- **Total Test Verifications:** {}\n", self.summary.total_test_verifications));
-        output.push_str(&format!("- **Satisfied Test Verifications:** {} ({:.1}%)\n",
+        output.push_str(&format!(
+            "- **Total Test Verifications:** {}\n",
+            self.summary.total_test_verifications
+        ));
+        output.push_str(&format!(
+            "- **Satisfied Test Verifications:** {} ({:.1}%)\n",
             self.summary.satisfied_test_verifications,
             self.summary.test_verifications_satisfaction_percentage
         ));
-        output.push_str(&format!("- **Unsatisfied Test Verifications:** {}\n\n", self.summary.unsatisfied_test_verifications));
+        output.push_str(&format!(
+            "- **Unsatisfied Test Verifications:** {}\n\n",
+            self.summary.unsatisfied_test_verifications
+        ));
 
         // Orphaned Verifications Summary
         output.push_str("### Orphaned Verifications\n\n");
-        output.push_str(&format!("- **Total Verifications:** {}\n", self.summary.total_verifications));
-        output.push_str(&format!("- **Orphaned Verifications:** {} ({:.1}%)\n\n",
-            self.summary.orphaned_verifications,
-            self.summary.orphaned_verifications_percentage
+        output.push_str(&format!(
+            "- **Total Verifications:** {}\n",
+            self.summary.total_verifications
+        ));
+        output.push_str(&format!(
+            "- **Orphaned Verifications:** {} ({:.1}%)\n\n",
+            self.summary.orphaned_verifications, self.summary.orphaned_verifications_percentage
         ));
 
         output.push_str("### Verification Types\n\n");
-        output.push_str(&format!("- Test: {}\n", self.summary.verification_types.test));
-        output.push_str(&format!("- Analysis: {}\n", self.summary.verification_types.analysis));
-        output.push_str(&format!("- Inspection: {}\n", self.summary.verification_types.inspection));
-        output.push_str(&format!("- Demonstration: {}\n\n", self.summary.verification_types.demonstration));
+        output.push_str(&format!(
+            "- Test: {}\n",
+            self.summary.verification_types.test
+        ));
+        output.push_str(&format!(
+            "- Analysis: {}\n",
+            self.summary.verification_types.analysis
+        ));
+        output.push_str(&format!(
+            "- Inspection: {}\n",
+            self.summary.verification_types.inspection
+        ));
+        output.push_str(&format!(
+            "- Demonstration: {}\n\n",
+            self.summary.verification_types.demonstration
+        ));
 
         // Verified leaf requirements
         if !self.verified_leaf_requirements.files.is_empty() {
@@ -212,7 +241,10 @@ impl CoverageReport {
                 sorted_requirements.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for requirement in sorted_requirements {
-                    output.push_str(&format!("- ✅ **[{}]({})**\n", requirement.name, requirement.identifier));
+                    output.push_str(&format!(
+                        "- ✅ **[{}]({})**\n",
+                        requirement.name, requirement.identifier
+                    ));
                     if !requirement.verified_by.is_empty() {
                         output.push_str("  - Verified by:\n");
                         for id in &requirement.verified_by {
@@ -236,7 +268,10 @@ impl CoverageReport {
                 sorted_requirements.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for requirement in sorted_requirements {
-                    output.push_str(&format!("- ❌ **[{}]({})**\n", requirement.name, requirement.identifier));
+                    output.push_str(&format!(
+                        "- ❌ **[{}]({})**\n",
+                        requirement.name, requirement.identifier
+                    ));
                 }
                 output.push('\n');
             }
@@ -254,7 +289,10 @@ impl CoverageReport {
                 sorted_verifications.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for verification in sorted_verifications {
-                    output.push_str(&format!("- ✅ **[{}]({})** ({})\n", verification.name, verification.identifier, verification.verification_type));
+                    output.push_str(&format!(
+                        "- ✅ **[{}]({})** ({})\n",
+                        verification.name, verification.identifier, verification.verification_type
+                    ));
                     if !verification.satisfied_by.is_empty() {
                         output.push_str("  - Satisfied by:\n");
                         for id in &verification.satisfied_by {
@@ -269,7 +307,8 @@ impl CoverageReport {
         // Unsatisfied test verifications
         if !self.unsatisfied_test_verifications.files.is_empty() {
             output.push_str("## Unsatisfied Test Verifications\n\n");
-            let mut sorted_files: Vec<_> = self.unsatisfied_test_verifications.files.iter().collect();
+            let mut sorted_files: Vec<_> =
+                self.unsatisfied_test_verifications.files.iter().collect();
             sorted_files.sort_by_key(|(file, _)| *file);
 
             for (file, verifications) in sorted_files {
@@ -278,7 +317,10 @@ impl CoverageReport {
                 sorted_verifications.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for verification in sorted_verifications {
-                    output.push_str(&format!("- ❌ **[{}]({})** ({})\n", verification.name, verification.identifier, verification.verification_type));
+                    output.push_str(&format!(
+                        "- ❌ **[{}]({})** ({})\n",
+                        verification.name, verification.identifier, verification.verification_type
+                    ));
                 }
                 output.push('\n');
             }
@@ -296,7 +338,10 @@ impl CoverageReport {
                 sorted_verifications.sort_by(|a, b| a.name.cmp(&b.name));
 
                 for verification in sorted_verifications {
-                    output.push_str(&format!("- ⚠️  **[{}]({})** ({})\n", verification.name, verification.identifier, verification.verification_type));
+                    output.push_str(&format!(
+                        "- ⚠️  **[{}]({})** ({})\n",
+                        verification.name, verification.identifier, verification.verification_type
+                    ));
                 }
                 output.push('\n');
             }
@@ -304,11 +349,13 @@ impl CoverageReport {
 
         // Requirement implementation coverage
         output.push_str("### Requirement Implementation Coverage\n\n");
-        output.push_str(&format!("- **Total Requirements in Scope:** {}\n", self.summary.total_requirements_in_scope));
+        output.push_str(&format!(
+            "- **Total Requirements in Scope:** {}\n",
+            self.summary.total_requirements_in_scope
+        ));
         output.push_str(&format!(
             "- **Covered Requirements:** {} ({:.1}%)\n",
-            self.summary.covered_requirements,
-            self.summary.implementation_coverage_percentage
+            self.summary.covered_requirements, self.summary.implementation_coverage_percentage
         ));
         output.push_str(&format!(
             "- **Uncovered Requirements:** {}\n\n",
@@ -316,14 +363,21 @@ impl CoverageReport {
         ));
 
         output.push_str("#### Coverage Sources\n\n");
-        output.push_str(&format!("- direct_satisfied: {}\n", self.summary.coverage_sources.direct_satisfied));
+        output.push_str(&format!(
+            "- direct_satisfied: {}\n",
+            self.summary.coverage_sources.direct_satisfied
+        ));
         output.push_str(&format!(
             "- refinement_contract_satisfied_via_attachment: {}\n",
-            self.summary.coverage_sources.refinement_contract_satisfied_via_attachment
+            self.summary
+                .coverage_sources
+                .refinement_contract_satisfied_via_attachment
         ));
         output.push_str(&format!(
             "- refinement_contract_satisfied_via_child: {}\n\n",
-            self.summary.coverage_sources.refinement_contract_satisfied_via_child
+            self.summary
+                .coverage_sources
+                .refinement_contract_satisfied_via_child
         ));
 
         if !self.covered_requirements.files.is_empty() {
@@ -339,9 +393,7 @@ impl CoverageReport {
                 for requirement in sorted_requirements {
                     output.push_str(&format!(
                         "- ✅ **[{}]({})** ({})\n",
-                        requirement.name,
-                        requirement.identifier,
-                        requirement.coverage_source
+                        requirement.name, requirement.identifier, requirement.coverage_source
                     ));
                     if !requirement.evidence.is_empty() {
                         output.push_str("  - Evidence:\n");
@@ -396,9 +448,16 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
     let mut unverified_leaf_files: HashMap<String, Vec<RequirementDetails>> = HashMap::new();
     let mut satisfied_test_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
     let mut unsatisfied_test_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
-    let mut orphaned_verifications_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
-    let mut covered_requirements_files: HashMap<String, Vec<ImplementationCoveredRequirementDetails>> = HashMap::new();
-    let mut uncovered_requirements_files: HashMap<String, Vec<ImplementationUncoveredRequirementDetails>> = HashMap::new();
+    let mut orphaned_verifications_files: HashMap<String, Vec<VerificationDetails>> =
+        HashMap::new();
+    let mut covered_requirements_files: HashMap<
+        String,
+        Vec<ImplementationCoveredRequirementDetails>,
+    > = HashMap::new();
+    let mut uncovered_requirements_files: HashMap<
+        String,
+        Vec<ImplementationUncoveredRequirementDetails>,
+    > = HashMap::new();
 
     // First pass: collect all verification counts
     for element in registry.get_all_elements() {
@@ -406,7 +465,9 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
             total_verifications += 1;
 
             // Check if this verification has any verify relations
-            let verify_relations: Vec<String> = element.relations.iter()
+            let verify_relations: Vec<String> = element
+                .relations
+                .iter()
                 .filter(|r| r.relation_type.name == "verify")
                 .map(|r| match &r.target.link {
                     relation::LinkType::Identifier(id) => id.clone(),
@@ -422,12 +483,16 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                     total_test_verifications += 1;
 
                     // For test verifications, check if they have satisfiedBy relations
-                    let satisfied_by: Vec<String> = element.relations.iter()
+                    let satisfied_by: Vec<String> = element
+                        .relations
+                        .iter()
                         .filter(|r| relation::is_satisfaction_relation(r.relation_type))
                         .map(|r| match &r.target.link {
                             relation::LinkType::Identifier(id) => id.clone(),
                             relation::LinkType::ExternalUrl(url) => url.clone(),
-                            relation::LinkType::InternalPath(path) => path.to_string_lossy().to_string(),
+                            relation::LinkType::InternalPath(path) => {
+                                path.to_string_lossy().to_string()
+                            }
                         })
                         .collect();
 
@@ -440,13 +505,15 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
                     if satisfied_by.is_empty() {
                         // Unsatisfied test verification
-                        unsatisfied_test_files.entry(element.file_path.clone())
+                        unsatisfied_test_files
+                            .entry(element.file_path.clone())
                             .or_default()
                             .push(verification_details);
                     } else {
                         // Satisfied test verification
                         satisfied_test_verifications += 1;
-                        satisfied_test_files.entry(element.file_path.clone())
+                        satisfied_test_files
+                            .entry(element.file_path.clone())
                             .or_default()
                             .push(verification_details);
                     }
@@ -471,7 +538,8 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                     verification_type: element.element_type.as_str().to_string(),
                     satisfied_by: vec![], // Orphaned verifications don't need satisfied_by info here
                 };
-                orphaned_verifications_files.entry(element.file_path.clone())
+                orphaned_verifications_files
+                    .entry(element.file_path.clone())
                     .or_default()
                     .push(orphaned_details);
             }
@@ -693,7 +761,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                             false
                         }
                     }
-                    _ => false
+                    _ => false,
                 }
             });
 
@@ -702,12 +770,16 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                 total_leaf_requirements += 1;
 
                 // Check if it has verifiedBy relations
-                let verified_by: Vec<String> = element.relations.iter()
+                let verified_by: Vec<String> = element
+                    .relations
+                    .iter()
                     .filter(|r| relation::is_verification_relation(r.relation_type))
                     .map(|r| match &r.target.link {
                         relation::LinkType::Identifier(id) => id.clone(),
                         relation::LinkType::ExternalUrl(url) => url.clone(),
-                        relation::LinkType::InternalPath(path) => path.to_string_lossy().to_string(),
+                        relation::LinkType::InternalPath(path) => {
+                            path.to_string_lossy().to_string()
+                        }
                     })
                     .collect();
 
@@ -719,13 +791,15 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
                 if verified_by.is_empty() {
                     // Unverified leaf requirement
-                    unverified_leaf_files.entry(element.file_path.clone())
+                    unverified_leaf_files
+                        .entry(element.file_path.clone())
                         .or_default()
                         .push(requirement_details);
                 } else {
                     // Verified leaf requirement
                     verified_leaf_requirements += 1;
-                    verified_leaf_files.entry(element.file_path.clone())
+                    verified_leaf_files
+                        .entry(element.file_path.clone())
                         .or_default()
                         .push(requirement_details);
                 }
@@ -758,10 +832,14 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         0.0
     };
 
-    let leaf_requirements_coverage_percentage = round_to_two_decimals(leaf_requirements_coverage_percentage);
-    let test_verifications_satisfaction_percentage = round_to_two_decimals(test_verifications_satisfaction_percentage);
-    let orphaned_verifications_percentage = round_to_two_decimals(orphaned_verifications_percentage);
-    let implementation_coverage_percentage = round_to_two_decimals(implementation_coverage_percentage);
+    let leaf_requirements_coverage_percentage =
+        round_to_two_decimals(leaf_requirements_coverage_percentage);
+    let test_verifications_satisfaction_percentage =
+        round_to_two_decimals(test_verifications_satisfaction_percentage);
+    let orphaned_verifications_percentage =
+        round_to_two_decimals(orphaned_verifications_percentage);
+    let implementation_coverage_percentage =
+        round_to_two_decimals(implementation_coverage_percentage);
 
     CoverageReport {
         summary: CoverageSummary {

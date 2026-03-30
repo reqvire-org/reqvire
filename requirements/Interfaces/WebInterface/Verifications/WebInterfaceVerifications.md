@@ -117,6 +117,31 @@ This test verifies that the system exports specifications into HTML format with 
   * verify: [HTML Export](../Features.md#html-export)
 ---
 
+### HTML Export Local Linked Files Verification
+
+This test verifies that HTML export preserves local linked-file references used in exported markdown content.
+
+#### Details
+
+##### Acceptance Criteria:
+- Exported HTML pages shall preserve local file reference paths for markdown-rendered links and images
+- Local non-markdown files referenced by exported markdown content shall exist in the export output
+- Exported HTML pages shall render local file references without converting asset paths to HTML document paths
+
+##### Test Criteria:
+- Create model content with local file references
+- Run HTML export command
+- Verify exported HTML contains the expected local `href` and `<img src>` paths
+- Verify the referenced local files exist in the output tree
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-html-export-local-images/test.sh)
+  * verify: [Local Linked File Export](../Features.md#local-linked-file-export)
+---
+
 ### Model View Element Navigation Test
 
 Test verifies that element names in the model-centric view are clickable links.

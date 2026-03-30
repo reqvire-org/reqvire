@@ -1,4 +1,4 @@
-use maud::{html, Markup, DOCTYPE, PreEscaped};
+use maud::{html, Markup, PreEscaped, DOCTYPE};
 
 /// Base layout for standard pages with Tailwind responsive design
 pub fn base(title: &str, content: Markup, nav_prefix: &str) -> Markup {

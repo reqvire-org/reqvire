@@ -1,8 +1,8 @@
-use crate::graph_registry::GraphRegistry;
-use crate::relation;
+use crate::diagrams::escape_label;
 use crate::element;
 use crate::error::ReqvireError;
-use crate::diagrams::escape_label;
+use crate::graph_registry::GraphRegistry;
+use crate::relation;
 use crate::utils::hash_identifier;
 use serde::Serialize;
 use std::collections::HashSet;
@@ -17,8 +17,8 @@ pub struct ModelCentricReport {
 /// Direction of traversal for model report
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TraversalDirection {
-    Forward,  // Root to leaves (derive, satisfiedBy, verifiedBy, trace)
-    Reverse,  // Leaves to roots (derivedFrom, satisfy, verify)
+    Forward, // Root to leaves (derive, satisfiedBy, verifiedBy, trace)
+    Reverse, // Leaves to roots (derivedFrom, satisfy, verify)
 }
 
 /// Element in model-centric view with nested relations
@@ -78,7 +78,7 @@ pub fn generate_model_report(
     reverse: bool,
     type_filter: Option<Vec<&str>>,
     json_output: bool,
-    diagram_direction: &str,  // "LR" or "TD"
+    diagram_direction: &str, // "LR" or "TD"
 ) -> Result<String, ReqvireError> {
     use std::collections::HashSet;
 
@@ -95,19 +95,28 @@ pub fn generate_model_report(
         }
     }
 
-    let direction = if reverse { TraversalDirection::Reverse } else { TraversalDirection::Forward };
+    let direction = if reverse {
+        TraversalDirection::Reverse
+    } else {
+        TraversalDirection::Forward
+    };
 
     // Determine starting elements
     let mut starting_elements = if let Some(name) = root_element_name {
         // Find element by name
-        let found = registry.nodes.iter()
+        let found = registry
+            .nodes
+            .iter()
             .find(|(_, node)| node.element.name == name);
 
         match found {
             Some((id, _)) => vec![id.clone()],
             None => {
                 eprintln!("❌ Element with name '{}' not found", name);
-                return Err(ReqvireError::ElementError(format!("Element with name '{}' not found", name)));
+                return Err(ReqvireError::ElementError(format!(
+                    "Element with name '{}' not found",
+                    name
+                )));
             }
         }
     } else if let Some(ref types) = type_filter {
@@ -121,11 +130,14 @@ pub fn generate_model_report(
             let type_elements = registry.find_elements_by_type(types.as_slice());
             let hierarchical_relations = relation::get_hierarchical_relation_types();
 
-            type_elements.into_iter()
+            type_elements
+                .into_iter()
                 .filter(|id| {
                     if let Some(element) = registry.get_element(id) {
                         // Check if has any hierarchical parent relation
-                        let has_parent = element.relations.iter()
+                        let has_parent = element
+                            .relations
+                            .iter()
                             .any(|r| hierarchical_relations.contains(&r.relation_type.name));
                         !has_parent
                     } else {
@@ -152,7 +164,8 @@ pub fn generate_model_report(
         // Each starting element gets its own visited set to allow independent traversals
         // This is important for reverse mode where multiple leaves may trace to common ancestors
         let mut visited = HashSet::new();
-        if let Some(element) = build_element_recursive(registry, start_id, &mut visited, direction) {
+        if let Some(element) = build_element_recursive(registry, start_id, &mut visited, direction)
+        {
             elements.push(element);
         }
     }
@@ -167,7 +180,11 @@ pub fn generate_model_report(
             total_elements,
             total_relations,
             filtered_from: root_element_name.map(|s| s.to_string()),
-            direction: if reverse { "Reverse".to_string() } else { "Forward".to_string() },
+            direction: if reverse {
+                "Reverse".to_string()
+            } else {
+                "Forward".to_string()
+            },
             type_filter: type_filter.map(|v| v.into_iter().map(|s| s.to_string()).collect()),
         },
     };
@@ -188,7 +205,6 @@ fn build_element_recursive(
     visited: &mut HashSet<String>,
     direction: TraversalDirection,
 ) -> Option<ModelCentricElement> {
-
     // Prevent infinite recursion
     if visited.contains(element_id) {
         return None;
@@ -237,25 +253,23 @@ fn build_element_recursive(
         let target = match &relation.target.link {
             relation::LinkType::Identifier(target_id) => {
                 // Recursive element
-                if let Some(target_element) = build_element_recursive(registry, target_id, visited, direction) {
+                if let Some(target_element) =
+                    build_element_recursive(registry, target_id, visited, direction)
+                {
                     RelationTarget::Element {
                         element: Box::new(target_element),
                     }
                 } else {
                     continue; // Skip cyclic or missing
                 }
+            }
+            relation::LinkType::InternalPath(path) => RelationTarget::File {
+                path: path.to_string_lossy().to_string(),
+                target_type: "file".to_string(),
             },
-            relation::LinkType::InternalPath(path) => {
-                RelationTarget::File {
-                    path: path.to_string_lossy().to_string(),
-                    target_type: "file".to_string(),
-                }
-            },
-            relation::LinkType::ExternalUrl(url) => {
-                RelationTarget::External {
-                    url: url.clone(),
-                    target_type: "external".to_string(),
-                }
+            relation::LinkType::ExternalUrl(url) => RelationTarget::External {
+                url: url.clone(),
+                target_type: "external".to_string(),
             },
         };
 
@@ -268,7 +282,8 @@ fn build_element_recursive(
     // Relations are already sorted from sorted_relations above
 
     // Build attachments list
-    let attachments: Vec<String> = element.attachments
+    let attachments: Vec<String> = element
+        .attachments
         .iter()
         .map(|a| a.target.as_str())
         .collect();
@@ -285,7 +300,11 @@ fn build_element_recursive(
 }
 
 /// Count total relations from starting elements
-fn count_relations(registry: &GraphRegistry, starting_elements: &[String], direction: TraversalDirection) -> usize {
+fn count_relations(
+    registry: &GraphRegistry,
+    starting_elements: &[String],
+    direction: TraversalDirection,
+) -> usize {
     let mut count = 0;
     let mut visited = HashSet::new();
 
@@ -297,8 +316,13 @@ fn count_relations(registry: &GraphRegistry, starting_elements: &[String], direc
 }
 
 /// Count relations recursively
-fn count_relations_recursive(registry: &GraphRegistry, element_id: &str, visited: &mut HashSet<String>, count: &mut usize, direction: TraversalDirection) {
-
+fn count_relations_recursive(
+    registry: &GraphRegistry,
+    element_id: &str,
+    visited: &mut HashSet<String>,
+    count: &mut usize,
+    direction: TraversalDirection,
+) {
     if visited.contains(element_id) {
         return;
     }
@@ -328,8 +352,14 @@ fn generate_model_text(report: &ModelCentricReport, diagram_direction: &str) -> 
     let mut output = String::new();
 
     // Metadata
-    output.push_str(&format!("**Total Elements**: {}\n", report.metadata.total_elements));
-    output.push_str(&format!("**Total Relations**: {}\n", report.metadata.total_relations));
+    output.push_str(&format!(
+        "**Total Elements**: {}\n",
+        report.metadata.total_elements
+    ));
+    output.push_str(&format!(
+        "**Total Relations**: {}\n",
+        report.metadata.total_relations
+    ));
     output.push_str(&format!("**Direction**: {}\n", report.metadata.direction));
     if let Some(ref filtered) = report.metadata.filtered_from {
         output.push_str(&format!("**Filtered From**: {}\n", filtered));
@@ -348,18 +378,29 @@ fn generate_model_text(report: &ModelCentricReport, diagram_direction: &str) -> 
 }
 
 /// Generate text for an element with mermaid diagram showing its relations
-fn generate_element_text(element: &ModelCentricElement, depth: usize, diagram_direction: &str) -> String {
+fn generate_element_text(
+    element: &ModelCentricElement,
+    depth: usize,
+    diagram_direction: &str,
+) -> String {
     let indent = "  ".repeat(depth);
     let mut output = String::new();
 
     // Element header - make name a link to the element
-    let element_fragment = element.identifier
+    let element_fragment = element
+        .identifier
         .rfind('#')
         .map(|pos| &element.identifier[pos..])
         .unwrap_or("");
-    output.push_str(&format!("{}## [{}]({}{})\n\n", indent, element.name, element.file_path, element_fragment));
+    output.push_str(&format!(
+        "{}## [{}]({}{})\n\n",
+        indent, element.name, element.file_path, element_fragment
+    ));
     output.push_str(&format!("{}**Type**: {}\n", indent, element.element_type));
-    output.push_str(&format!("{}**File**: [{}]({})\n\n", indent, element.file_path, element.file_path));
+    output.push_str(&format!(
+        "{}**File**: [{}]({})\n\n",
+        indent, element.file_path, element.file_path
+    ));
 
     // Mermaid diagram for this element's relations
     if !element.relations.is_empty() {
@@ -367,10 +408,22 @@ fn generate_element_text(element: &ModelCentricElement, depth: usize, diagram_di
         output.push_str(&format!("{}graph {}\n", indent, diagram_direction));
 
         // Add CSS class definitions for colors (MBSE color scheme)
-        output.push_str(&format!("{}  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n", indent));
-        output.push_str(&format!("{}  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n", indent));
-        output.push_str(&format!("{}  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n", indent));
-        output.push_str(&format!("{}  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n", indent));
+        output.push_str(&format!(
+            "{}  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n",
+            indent
+        ));
+        output.push_str(&format!(
+            "{}  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n",
+            indent
+        ));
+        output.push_str(&format!(
+            "{}  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n",
+            indent
+        ));
+        output.push_str(&format!(
+            "{}  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n",
+            indent
+        ));
         output.push_str(&format!("{}\n", indent));
 
         output.push_str(&generate_mermaid_for_element(element, &indent));
@@ -406,7 +459,8 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
             .unwrap_or(file_path)
             .to_string();
 
-        folders.entry(folder)
+        folders
+            .entry(folder)
             .or_default()
             .entry(file_name)
             .or_default()
@@ -416,8 +470,14 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
     let mut output = String::new();
 
     // Add folder styling
-    output.push_str(&format!("{}  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n", indent));
-    output.push_str(&format!("{}  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n", indent));
+    output.push_str(&format!(
+        "{}  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n",
+        indent
+    ));
+    output.push_str(&format!(
+        "{}  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n",
+        indent
+    ));
     output.push_str(&format!("{}\n", indent));
 
     // Sort folders for deterministic output
@@ -428,9 +488,18 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
     for folder_name in folder_names {
         let files = &folders[folder_name];
         let folder_id = hash_identifier(&format!("folder:{}", folder_name));
-        let folder_display = if folder_name.is_empty() { "root" } else { folder_name };
+        let folder_display = if folder_name.is_empty() {
+            "root"
+        } else {
+            folder_name
+        };
 
-        output.push_str(&format!("{}  subgraph {}[\"📁 {}\"]\n", indent, folder_id, escape_label(folder_display)));
+        output.push_str(&format!(
+            "{}  subgraph {}[\"📁 {}\"]\n",
+            indent,
+            folder_id,
+            escape_label(folder_display)
+        ));
 
         // Sort files for deterministic output
         let mut file_names: Vec<&String> = files.keys().collect();
@@ -440,7 +509,12 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
             let elements = &files[file_name];
             let file_id = hash_identifier(&format!("file:{}:{}", folder_name, file_name));
 
-            output.push_str(&format!("{}    subgraph {}[\"📄 {}\"]\n", indent, file_id, escape_label(file_name)));
+            output.push_str(&format!(
+                "{}    subgraph {}[\"📄 {}\"]\n",
+                indent,
+                file_id,
+                escape_label(file_name)
+            ));
 
             // Sort elements for deterministic output
             let mut sorted_elements: Vec<&&ModelCentricElement> = elements.iter().collect();
@@ -456,9 +530,18 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
                     elem_label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
                 }
 
-                output.push_str(&format!("{}      {}[\"{}\"];\n", indent, elem_id, elem_label));
-                output.push_str(&format!("{}      class {} {};\n", indent, elem_id, elem_class));
-                output.push_str(&format!("{}      click {} \"{}\";\n", indent, elem_id, &elem.identifier));
+                output.push_str(&format!(
+                    "{}      {}[\"{}\"];\n",
+                    indent, elem_id, elem_label
+                ));
+                output.push_str(&format!(
+                    "{}      class {} {};\n",
+                    indent, elem_id, elem_class
+                ));
+                output.push_str(&format!(
+                    "{}      click {} \"{}\";\n",
+                    indent, elem_id, &elem.identifier
+                ));
             }
 
             output.push_str(&format!("{}    end\n", indent));
@@ -469,7 +552,11 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
 
     // Now add all relations
     let mut visited_relations = HashSet::new();
-    output.push_str(&generate_relations_recursive(element, indent, &mut visited_relations));
+    output.push_str(&generate_relations_recursive(
+        element,
+        indent,
+        &mut visited_relations,
+    ));
 
     output
 }
@@ -511,25 +598,44 @@ fn generate_relations_recursive(
         match &relation.target {
             RelationTarget::Element { element: target } => {
                 let target_id = hash_identifier(&target.identifier);
-                output.push_str(&format!("{}  {} -->|{}| {};\n", indent, element_id, relation.relation_type, target_id));
+                output.push_str(&format!(
+                    "{}  {} -->|{}| {};\n",
+                    indent, element_id, relation.relation_type, target_id
+                ));
 
                 // Recursively add relations for target
                 output.push_str(&generate_relations_recursive(target, indent, visited));
-            },
+            }
             RelationTarget::File { path, .. } => {
                 let file_id = hash_identifier(&format!("file:{}:{}", element.identifier, idx));
-                output.push_str(&format!("{}  {}[\"{}\"];\n", indent, file_id, escape_label(path)));
+                output.push_str(&format!(
+                    "{}  {}[\"{}\"];\n",
+                    indent,
+                    file_id,
+                    escape_label(path)
+                ));
                 output.push_str(&format!("{}  class {} default;\n", indent, file_id));
                 output.push_str(&format!("{}  click {} \"{}\";\n", indent, file_id, path));
-                output.push_str(&format!("{}  {} -->|{}| {};\n", indent, element_id, relation.relation_type, file_id));
-            },
+                output.push_str(&format!(
+                    "{}  {} -->|{}| {};\n",
+                    indent, element_id, relation.relation_type, file_id
+                ));
+            }
             RelationTarget::External { url, .. } => {
                 let ext_id = hash_identifier(&format!("external:{}:{}", element.identifier, idx));
-                output.push_str(&format!("{}  {}[\"{}\"];\n", indent, ext_id, escape_label(url)));
+                output.push_str(&format!(
+                    "{}  {}[\"{}\"];\n",
+                    indent,
+                    ext_id,
+                    escape_label(url)
+                ));
                 output.push_str(&format!("{}  class {} default;\n", indent, ext_id));
                 output.push_str(&format!("{}  click {} \"{}\";\n", indent, ext_id, url));
-                output.push_str(&format!("{}  {} -->|{}| {};\n", indent, element_id, relation.relation_type, ext_id));
-            },
+                output.push_str(&format!(
+                    "{}  {} -->|{}| {};\n",
+                    indent, element_id, relation.relation_type, ext_id
+                ));
+            }
         }
     }
 

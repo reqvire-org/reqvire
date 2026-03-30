@@ -2,9 +2,9 @@
 // This module implements the unified search command with comprehensive filtering
 
 use crate::element;
+use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
-use crate::error::ReqvireError;
 use globset::{Glob, GlobMatcher};
 use regex::Regex;
 use serde::Serialize;
@@ -53,9 +53,7 @@ impl SearchFilters {
 
         // Parse and validate comma-separated element types
         let type_patterns = if let Some(t) = typ {
-            let types: Vec<String> = t.split(',')
-                .map(|s| s.trim().to_lowercase())
-                .collect();
+            let types: Vec<String> = t.split(',').map(|s| s.trim().to_lowercase()).collect();
 
             // Validate each type
             for typ in &types {
@@ -195,9 +193,10 @@ impl SearchFilters {
         // Have relations filter - must have ALL specified relations
         if !self.have_relations.is_empty() {
             for required_rel in &self.have_relations {
-                let has_relation = elem.relations.iter().any(|r| {
-                    r.relation_type.name.eq_ignore_ascii_case(required_rel)
-                });
+                let has_relation = elem
+                    .relations
+                    .iter()
+                    .any(|r| r.relation_type.name.eq_ignore_ascii_case(required_rel));
                 if !has_relation {
                     return false;
                 }
@@ -207,9 +206,10 @@ impl SearchFilters {
         // Not have relations filter - must NOT have ALL specified relations
         if !self.not_have_relations.is_empty() {
             for forbidden_rel in &self.not_have_relations {
-                let has_relation = elem.relations.iter().any(|r| {
-                    r.relation_type.name.eq_ignore_ascii_case(forbidden_rel)
-                });
+                let has_relation = elem
+                    .relations
+                    .iter()
+                    .any(|r| r.relation_type.name.eq_ignore_ascii_case(forbidden_rel));
                 if has_relation {
                     return false;
                 }
@@ -223,7 +223,9 @@ impl SearchFilters {
 
         // Attachment glob filter - must have an attachment matching the glob
         if let Some(g) = &self.attachment_glob {
-            let has_matching_attachment = elem.attachments.iter()
+            let has_matching_attachment = elem
+                .attachments
+                .iter()
                 .any(|a| g.is_match(a.target.as_str().as_str()));
             if !has_matching_attachment {
                 return false;
@@ -364,7 +366,9 @@ fn build_search_result(
                         element::RequirementType::System => "system-requirement",
                         element::RequirementType::User => "user-requirement",
                     };
-                    *c.total_requirements_types.entry(type_name.to_string()).or_insert(0) += 1;
+                    *c.total_requirements_types
+                        .entry(type_name.to_string())
+                        .or_insert(0) += 1;
                 }
                 element::ElementType::Verification(ver_t) => {
                     let type_name = match ver_t {
@@ -374,7 +378,9 @@ fn build_search_result(
                         element::VerificationType::Inspection => "inspection-verification",
                         element::VerificationType::Demonstration => "demonstration-verification",
                     };
-                    *c.total_verifications_types.entry(type_name.to_string()).or_insert(0) += 1;
+                    *c.total_verifications_types
+                        .entry(type_name.to_string())
+                        .or_insert(0) += 1;
                 }
                 element::ElementType::Refinement(ref_t) => {
                     let type_name = match ref_t {
@@ -382,7 +388,9 @@ fn build_search_result(
                         element::RefinementType::Behavior => "behavior",
                         element::RefinementType::Specification => "specification",
                     };
-                    *c.total_refinements_types.entry(type_name.to_string()).or_insert(0) += 1;
+                    *c.total_refinements_types
+                        .entry(type_name.to_string())
+                        .or_insert(0) += 1;
                 }
                 element::ElementType::Other(custom_type) => {
                     *c.total_other_types.entry(custom_type.clone()).or_insert(0) += 1;
@@ -392,14 +400,19 @@ fn build_search_result(
         }
 
         // Build relation summary
-        let mut rels: Vec<RelationSearchResult> = elem.relations.iter()
+        let mut rels: Vec<RelationSearchResult> = elem
+            .relations
+            .iter()
             .map(|relation| {
                 let (tgt, lt) = match &relation.target.link {
                     relation::LinkType::Identifier(id) => (id.clone(), "identifier".to_string()),
-                    relation::LinkType::ExternalUrl(url) => (url.clone(), "external-url".to_string()),
-                    relation::LinkType::InternalPath(path) => {
-                        (path.to_string_lossy().to_string(), "internal-path".to_string())
+                    relation::LinkType::ExternalUrl(url) => {
+                        (url.clone(), "external-url".to_string())
                     }
+                    relation::LinkType::InternalPath(path) => (
+                        path.to_string_lossy().to_string(),
+                        "internal-path".to_string(),
+                    ),
                 };
                 RelationSearchResult {
                     relation_type: relation.relation_type.name.to_string(),
@@ -413,7 +426,8 @@ fn build_search_result(
 
         // Sort relations for deterministic output (by relation_type, then by target)
         rels.sort_by(|a, b| {
-            a.relation_type.cmp(&b.relation_type)
+            a.relation_type
+                .cmp(&b.relation_type)
                 .then_with(|| a.target.target.cmp(&b.target.target))
         });
 
@@ -421,10 +435,7 @@ fn build_search_result(
         let attachments = if short_mode {
             None
         } else {
-            Some(elem.attachments
-                .iter()
-                .map(|a| a.target.as_str())
-                .collect())
+            Some(elem.attachments.iter().map(|a| a.target.as_str()).collect())
         };
 
         // Build element summary
@@ -433,19 +444,25 @@ fn build_search_result(
             name: elem.name.clone(),
             file: elem.file_path.clone(),
             element_type: elem.element_type.as_str().to_string(),
-            content: if short_mode { None } else { Some(elem.content.clone()) },
+            content: if short_mode {
+                None
+            } else {
+                Some(elem.content.clone())
+            },
             relations: rels,
             attachments,
         };
 
         // Insert into flat file→elements map
-        files.entry(elem.file_path.clone())
+        files
+            .entry(elem.file_path.clone())
             .or_insert_with(|| FileSearchResult {
                 elements: Vec::new(),
                 page_content: None,
                 total_elements: None,
             })
-            .elements.push(es);
+            .elements
+            .push(es);
     }
 
     // Add page content and calculate counts (skip in short mode)
@@ -478,8 +495,10 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
         // Short mode: one line per element
         for file_result in result.files.values() {
             for elem in &file_result.elements {
-                output.push_str(&format!("[{}] {} - {}\n",
-                    elem.element_type, elem.identifier, elem.name));
+                output.push_str(&format!(
+                    "[{}] {} - {}\n",
+                    elem.element_type, elem.identifier, elem.name
+                ));
             }
         }
     } else {
@@ -487,9 +506,11 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
         output.push_str("--- MBSE Search results ---\n");
 
         for (file, file_result) in &result.files {
-            output.push_str(&format!("📂 File: {} (elements: {})\n",
+            output.push_str(&format!(
+                "📂 File: {} (elements: {})\n",
                 file,
-                file_result.total_elements.unwrap_or(0)));
+                file_result.total_elements.unwrap_or(0)
+            ));
 
             // Show page content if available
             if let Some(page_content) = &file_result.page_content {
@@ -514,8 +535,10 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
                 } else {
                     output.push_str("      - Relations:\n");
                     for r in &elem.relations {
-                        output.push_str(&format!("        ↪ {}: {} ({})\n",
-                            r.relation_type, r.target.target, r.target.link_type));
+                        output.push_str(&format!(
+                            "        ↪ {}: {} ({})\n",
+                            r.relation_type, r.target.target, r.target.link_type
+                        ));
                     }
                 }
                 output.push('\n');

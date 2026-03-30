@@ -663,13 +663,16 @@ impl GraphRegistry {
 
             // Preserve current behavior for requirements without parent relation:
             // they are reported by MissingParentRelation. Skip duplicate ownership error in that case.
-            if matches!(element.element_type, ElementType::Requirement(RequirementType::System))
-                && !self.has_hierarchical_parent(element)
+            if matches!(
+                element.element_type,
+                ElementType::Requirement(RequirementType::System)
+            ) && !self.has_hierarchical_parent(element)
             {
                 continue;
             }
 
-            let roots = self.resolve_top_root_user_requirements(element_id, &mut memo, &mut visiting);
+            let roots =
+                self.resolve_top_root_user_requirements(element_id, &mut memo, &mut visiting);
             if roots.len() != 1 {
                 if roots.is_empty() {
                     errors.push(ReqvireError::MixedHierarchicalRelations(format!(
@@ -734,7 +737,10 @@ impl GraphRegistry {
         let parent_ids = self.get_hierarchical_parent_ids(element);
 
         if parent_ids.is_empty() {
-            if matches!(element.element_type, ElementType::Requirement(RequirementType::User)) {
+            if matches!(
+                element.element_type,
+                ElementType::Requirement(RequirementType::User)
+            ) {
                 result.insert(element.identifier.clone());
             }
         } else {
@@ -781,7 +787,11 @@ impl GraphRegistry {
         parent_ids.into_iter().collect()
     }
 
-    fn resolve_relation_identifier(&self, source_element: &Element, target_id: &str) -> Option<String> {
+    fn resolve_relation_identifier(
+        &self,
+        source_element: &Element,
+        target_id: &str,
+    ) -> Option<String> {
         if self.nodes.contains_key(target_id) {
             return Some(target_id.to_string());
         }
@@ -2444,7 +2454,11 @@ impl GraphRegistry {
         let mut relations_to_include: Vec<_> = if with_full_relations {
             element.relations.iter().collect()
         } else {
-            element.relations.iter().filter(|r| r.user_created).collect()
+            element
+                .relations
+                .iter()
+                .filter(|r| r.user_created)
+                .collect()
         };
         relations_to_include.sort_by(|a, b| {
             (&a.relation_type.name, a.target.link.as_str())
@@ -2482,9 +2496,12 @@ impl GraphRegistry {
                             .to_path_buf();
                         let path_str = path.to_string_lossy().to_string();
                         let absolute_path = format!("/{}", path_str);
-                        let relative_path =
-                            crate::utils::to_relative_identifier(&absolute_path, &current_folder, false)
-                                .unwrap_or(path_str.clone());
+                        let relative_path = crate::utils::to_relative_identifier(
+                            &absolute_path,
+                            &current_folder,
+                            false,
+                        )
+                        .unwrap_or(path_str.clone());
                         let display_name = path
                             .file_name()
                             .and_then(|n| n.to_str())

@@ -5,9 +5,9 @@
 // - Diff generation (delegates to diff module)
 // - Diff rendering (delegates to diff module)
 
+use crate::diff::{generate_file_diff, render_file_diffs, FileDiff};
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
-use crate::diff::{FileDiff, generate_file_diff, render_file_diffs};
 use log::debug;
 use std::fs;
 
@@ -21,7 +21,11 @@ pub struct FormatResult {
 
 /// Format all files in the registry, optionally in dry-run mode
 /// When with_full_relations is true, includes all relations (user-created and auto-generated inverse relations)
-pub fn format_files(registry: &GraphRegistry, dry_run: bool, with_full_relations: bool) -> Result<FormatResult, ReqvireError> {
+pub fn format_files(
+    registry: &GraphRegistry,
+    dry_run: bool,
+    with_full_relations: bool,
+) -> Result<FormatResult, ReqvireError> {
     let base_dir = std::env::current_dir()
         .map_err(|e| ReqvireError::PathError(format!("Failed to get current directory: {}", e)))?;
 
@@ -35,7 +39,8 @@ pub fn format_files(registry: &GraphRegistry, dry_run: bool, with_full_relations
 
     for (file_path, elements) in sorted_files {
         // Generate the new markdown content for this file
-        let mut new_content = registry.generate_file_markdown(&file_path, &elements, with_full_relations);
+        let mut new_content =
+            registry.generate_file_markdown(&file_path, &elements, with_full_relations);
 
         // Apply linting rules to ensure consistent formatting
         new_content = apply_formatting_rules(&new_content);
@@ -45,8 +50,7 @@ pub fn format_files(registry: &GraphRegistry, dry_run: bool, with_full_relations
 
         // Read current content if file exists
         let current_content = if full_file_path.exists() {
-            fs::read_to_string(&full_file_path)
-                .map_err(ReqvireError::IoError)?
+            fs::read_to_string(&full_file_path).map_err(ReqvireError::IoError)?
         } else {
             String::new() // File doesn't exist, treat as empty
         };
@@ -65,13 +69,11 @@ pub fn format_files(registry: &GraphRegistry, dry_run: bool, with_full_relations
             if !dry_run {
                 // Create parent directories if needed
                 if let Some(parent_dir) = full_file_path.parent() {
-                    fs::create_dir_all(parent_dir)
-                        .map_err(ReqvireError::IoError)?;
+                    fs::create_dir_all(parent_dir).map_err(ReqvireError::IoError)?;
                 }
 
                 // Write the new content
-                fs::write(&full_file_path, new_content)
-                    .map_err(ReqvireError::IoError)?;
+                fs::write(&full_file_path, new_content).map_err(ReqvireError::IoError)?;
 
                 debug!("Formatted {} with {} elements", file_path, elements.len());
             }
@@ -107,7 +109,10 @@ pub fn render_diff(format_result: &FormatResult) {
         if format_result.diffs.is_empty() {
             println!("✅ No formatting changes needed.");
         } else {
-            println!("Found {} file(s) with formatting changes:\n", format_result.diffs.len());
+            println!(
+                "Found {} file(s) with formatting changes:\n",
+                format_result.diffs.len()
+            );
             render_file_diffs(&format_result.diffs);
             println!("Run with --fix to apply these changes.");
         }

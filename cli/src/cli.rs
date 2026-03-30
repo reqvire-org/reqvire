@@ -1605,8 +1605,10 @@ pub async fn handle_command(
             Ok(0)
         }
         Some(Commands::Submodels { from, json, output }) => {
-            let report =
-                report_submodels::generate_submodels_report(&model_manager.graph_registry, from.as_deref())?;
+            let report = report_submodels::generate_submodels_report(
+                &model_manager.graph_registry,
+                from.as_deref(),
+            )?;
             if json {
                 handle_json_output(&report.to_json_string(), &output)?;
             } else {

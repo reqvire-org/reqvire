@@ -7,10 +7,10 @@ use crate::element::ElementType;
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation::{
-    get_hierarchical_relation_types, LinkType, VERIFY_RELATION, VERIFICATION_TRACES_RELATIONS,
+    get_hierarchical_relation_types, LinkType, VERIFICATION_TRACES_RELATIONS, VERIFY_RELATION,
 };
-use crate::utils;
 use crate::trace_tree_builder;
+use crate::utils;
 use serde::Serialize;
 use std::collections::{BTreeSet, HashMap, HashSet};
 
@@ -99,7 +99,10 @@ impl LintReport {
 
     pub fn print(&self, json: bool, show_only_fixable: bool, show_only_auditable: bool) {
         if json {
-            println!("{}", self.to_json_string(show_only_fixable, show_only_auditable));
+            println!(
+                "{}",
+                self.to_json_string(show_only_fixable, show_only_auditable)
+            );
         } else {
             self.print_text(show_only_fixable, show_only_auditable);
         }
@@ -121,10 +124,18 @@ impl LintReport {
                     } => {
                         println!("### Redundant Verify Relations\n");
                         println!("**Verification: {}**", verification.name);
-                        println!("File: [{}]({})\n", verification.identifier, verification.identifier);
-                        println!("Redundant verify relations (these can be automatically removed):");
+                        println!(
+                            "File: [{}]({})\n",
+                            verification.identifier, verification.identifier
+                        );
+                        println!(
+                            "Redundant verify relations (these can be automatically removed):"
+                        );
                         for rel in redundant_relations {
-                            println!("  * {}: [{}]({})", rel.relation_type, rel.target, rel.target);
+                            println!(
+                                "  * {}: [{}]({})",
+                                rel.relation_type, rel.target, rel.target
+                            );
                         }
                         println!("\nReason: {}\n", rationale);
                         println!("---\n");
@@ -137,7 +148,8 @@ impl LintReport {
                         println!("### Safe Redundant Hierarchical Relations\n");
                         println!("**Element: {}**", element.name);
                         println!("File: [{}]({})\n", element.identifier, element.identifier);
-                        println!("Safe redundant {} relations (these can be automatically removed):",
+                        println!(
+                            "Safe redundant {} relations (these can be automatically removed):",
                             if redundant_relations.len() == 1 {
                                 redundant_relations[0].relation_type.as_str()
                             } else {
@@ -145,7 +157,10 @@ impl LintReport {
                             }
                         );
                         for rel in redundant_relations {
-                            println!("  * {}: [{}]({})", rel.relation_type, rel.target, rel.target);
+                            println!(
+                                "  * {}: [{}]({})",
+                                rel.relation_type, rel.target, rel.target
+                            );
                         }
                         println!("\nReason: {}\n", rationale);
                         println!("---\n");
@@ -167,7 +182,8 @@ impl LintReport {
                         println!("### Maybe-Redundant Hierarchical Relations\n");
                         println!("**Element: {}**", element.name);
                         println!("File: [{}]({})\n", element.identifier, element.identifier);
-                        println!("Potentially redundant {} relations detected:",
+                        println!(
+                            "Potentially redundant {} relations detected:",
                             if potentially_redundant_relations.len() == 1 {
                                 potentially_redundant_relations[0].relation_type.as_str()
                             } else {
@@ -175,7 +191,10 @@ impl LintReport {
                             }
                         );
                         for rel in potentially_redundant_relations {
-                            println!("  * {}: [{}]({})", rel.relation_type, rel.target, rel.target);
+                            println!(
+                                "  * {}: [{}]({})",
+                                rel.relation_type, rel.target, rel.target
+                            );
                         }
                         println!("\nReason: {}\n", rationale);
                         println!("---\n");
@@ -195,7 +214,10 @@ impl LintReport {
                         println!("Source root: {} ({})", source_root_name, source_root);
                         println!("Target: {} ({})", target.name, target.identifier);
                         println!("Target root: {} ({})", target_root_name, target_root);
-                        println!("Relation: {} -> [{}]({})", relation_type, target.identifier, target.identifier);
+                        println!(
+                            "Relation: {} -> [{}]({})",
+                            relation_type, target.identifier, target.identifier
+                        );
                         println!("File: [{}]({})\n", source.identifier, source.identifier);
                         println!("Reason: {}", rationale);
                         println!("\n");
@@ -211,7 +233,10 @@ impl LintReport {
                         println!("**Element: {}**", element.name);
                         println!("File: [{}]({})\n", element.identifier, element.identifier);
                         println!("This element reaches a common ancestor through multiple distinct branch paths:");
-                        println!("  * Common ancestor: [{}]({})", common_ancestor, common_ancestor);
+                        println!(
+                            "  * Common ancestor: [{}]({})",
+                            common_ancestor, common_ancestor
+                        );
                         println!("  * Branch paths:");
                         for path in branch_paths {
                             println!("    - Via: {}", path);
@@ -312,25 +337,41 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
     // Sort issues by element identifier for deterministic output
     auto_fixable.sort_by(|a, b| {
         let id_a = match a {
-            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => &verification.identifier,
-            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => {
+                &verification.identifier
+            }
+            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => {
+                &element.identifier
+            }
         };
         let id_b = match b {
-            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => &verification.identifier,
-            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => {
+                &verification.identifier
+            }
+            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => {
+                &element.identifier
+            }
         };
         id_a.cmp(id_b)
     });
 
     needs_manual_review.sort_by(|a, b| {
         let id_a = match a {
-            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
-            ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => &source.identifier,
+            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => {
+                &element.identifier
+            }
+            ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => {
+                &source.identifier
+            }
             ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
         };
         let id_b = match b {
-            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
-            ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => &source.identifier,
+            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => {
+                &element.identifier
+            }
+            ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => {
+                &source.identifier
+            }
             ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
         };
         id_a.cmp(id_b)
@@ -493,7 +534,8 @@ fn build_requirement_root_assignment(
     let mut root_assignment = HashMap::new();
 
     for requirement_id in &requirement_ids {
-        let roots = resolve_root_candidates(requirement_id, &parent_map, &mut memo, &mut HashSet::new());
+        let roots =
+            resolve_root_candidates(requirement_id, &parent_map, &mut memo, &mut HashSet::new());
         if let Some(root_id) = roots.first().cloned() {
             root_assignment.insert(requirement_id.clone(), root_id);
         }
@@ -587,7 +629,8 @@ fn detect_redundant_verify_relations(registry: &GraphRegistry) -> Vec<AutoFixabl
             }
 
             // Use shared trace tree builder to find redundant relations
-            let redundant_ids = trace_tree_builder::find_redundant_relations(&directly_verified, registry);
+            let redundant_ids =
+                trace_tree_builder::find_redundant_relations(&directly_verified, registry);
 
             if !redundant_ids.is_empty() {
                 // Find the leaf requirement(s) for rationale
@@ -966,7 +1009,7 @@ fn detect_multi_branch_convergence(registry: &GraphRegistry) -> Vec<ManualReview
                     // Must NOT be an ancestor of the common ancestor
                     // (check if this branch appears in the common ancestor's ancestors)
                     if ancestor_ancestors.contains(*branch) {
-                        return false;  // Skip this branch - it's an ancestor of the common ancestor
+                        return false; // Skip this branch - it's an ancestor of the common ancestor
                     }
                     true
                 })
@@ -985,19 +1028,21 @@ fn detect_multi_branch_convergence(registry: &GraphRegistry) -> Vec<ManualReview
                 if let Some(branch_element) = registry.get_element(branch_path) {
                     for rel in &branch_element.relations {
                         if VERIFICATION_TRACES_RELATIONS.contains(&rel.relation_type.name) {
-                            if let crate::relation::LinkType::Identifier(parent_id) = &rel.target.link {
+                            if let crate::relation::LinkType::Identifier(parent_id) =
+                                &rel.target.link
+                            {
                                 if parent_id == ancestor_id {
-                                    return true;  // This branch has the ancestor as a direct parent
+                                    return true; // This branch has the ancestor as a direct parent
                                 }
                             }
                         }
                     }
                 }
-                false  // This branch does NOT have the ancestor as a direct parent
+                false // This branch does NOT have the ancestor as a direct parent
             });
 
             if !all_branches_are_direct_children {
-                continue;  // Skip this candidate - not all branches are direct children
+                continue; // Skip this candidate - not all branches are direct children
             }
 
             // This is a valid multi-branch convergence - report it

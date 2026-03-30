@@ -27,7 +27,7 @@ pub enum ReqvireError {
     #[allow(dead_code)]
     #[error("Duplicate element: {0}")]
     DuplicateElement(String),
-    
+
     #[allow(dead_code)]
     #[error("Duplicate subsection: {0}")]
     DuplicateSubsection(String),
@@ -43,7 +43,7 @@ pub enum ReqvireError {
     #[allow(dead_code)]
     #[error("Missing parent relation: {0}")]
     MissingParentRelation(String),
-    
+
     #[allow(dead_code)]
     #[error("Invalid relation format: {0}")]
     InvalidRelationFormat(String),
@@ -51,19 +51,19 @@ pub enum ReqvireError {
     #[allow(dead_code)]
     #[error("Invalid metadata format: {0}")]
     InvalidMetadataFormat(String),
-    
+
     #[allow(dead_code)]
     #[error("Invalid markdown structure: {0}")]
     InvalidMarkdownStructure(String),
-    
+
     #[allow(dead_code)]
     #[error("Duplicate relation: {0}")]
     DuplicateRelation(String),
-    
+
     #[allow(dead_code)]
     #[error("Unsupported relation type: {0}")]
     UnsupportedRelationType(String),
-    
+
     #[allow(dead_code)]
     #[error("Incompatible element types for relation: {0}")]
     IncompatibleElementTypes(String),
@@ -74,19 +74,19 @@ pub enum ReqvireError {
 
     #[error("Path error: {0}")]
     PathError(String),
-    
+
     #[error("Invalid regex: {0}")]
     InvalidRegex(String),
-    
+
     #[error("Invalid glob pattern: {0}")]
     InvalidGlob(String),
-        
+
     #[error("Initialization error: {0}")]
     InitializationError(String),
-    
-    #[error("Linting error: {0}")]    
-    LintError(String),  
-    
+
+    #[error("Linting error: {0}")]
+    LintError(String),
+
     #[error("{0}")]
     ProcessError(String),
 
@@ -156,5 +156,4 @@ pub enum ReqvireError {
     #[allow(dead_code)]
     #[error("Invalid operation: {0}")]
     InvalidOperation(String),
-
 }

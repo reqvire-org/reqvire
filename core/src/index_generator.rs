@@ -1,15 +1,14 @@
-use std::path::{PathBuf, Path};
-use std::collections::HashMap;
-use crate::graph_registry::GraphRegistry;
 use crate::element::Element;
 use crate::error::ReqvireError;
 use crate::git_commands;
-
+use crate::graph_registry::GraphRegistry;
+use std::collections::HashMap;
+use std::path::{Path, PathBuf};
 
 /// Generates a SpecificationsIndex.md index from the existing element registry
 pub fn generate_readme_index(
     registry: &GraphRegistry,
-    _output_folder: &PathBuf
+    _output_folder: &PathBuf,
 ) -> Result<String, ReqvireError> {
     let mut index_content = String::from("# Specification Index\n\n");
 
@@ -46,7 +45,10 @@ pub fn generate_readme_index(
             } else {
                 generate_element_slug(&element.identifier)
             };
-            index_content.push_str(&format!("- [{}]({}#{})\n", element.name, relative_path, element_id));
+            index_content.push_str(&format!(
+                "- [{}]({}#{})\n",
+                element.name, relative_path, element_id
+            ));
 
             // Add attachment links if present
             if !element.attachments.is_empty() {
@@ -54,16 +56,20 @@ pub fn generate_readme_index(
                     let (attachment_path, attachment_name) = match &attachment.target {
                         crate::element::AttachmentTarget::FilePath(path) => {
                             let path_str = path.to_string_lossy().to_string();
-                            let name = path.file_name()
+                            let name = path
+                                .file_name()
                                 .map(|n| n.to_string_lossy().into_owned())
                                 .unwrap_or_else(|| path_str.clone());
                             (path_str, name)
-                        },
+                        }
                         crate::element::AttachmentTarget::ElementIdentifier(id) => {
                             (id.clone(), id.clone())
-                        },
+                        }
                     };
-                    index_content.push_str(&format!("  - 📎 [{}]({})\n", attachment_name, attachment_path));
+                    index_content.push_str(&format!(
+                        "  - 📎 [{}]({})\n",
+                        attachment_name, attachment_path
+                    ));
                 }
             }
         }
@@ -84,8 +90,7 @@ pub fn generate_readme_index(
 }
 
 fn generate_element_slug(name: &str) -> String {
-    name
-        .to_lowercase()
+    name.to_lowercase()
         .replace(" ", "-")
         .replace(|c: char| !c.is_alphanumeric() && c != '-', "") // Remove special characters
 }
@@ -99,8 +104,7 @@ fn get_relative_path(file: &str) -> String {
                 Ok(relative) => relative.to_string_lossy().into_owned(),
                 Err(_) => file.to_string(), // Fallback to absolute if stripping fails
             }
-        },
-        Err(_) => file.to_string() // Fall back to the file name if git root not found
+        }
+        Err(_) => file.to_string(), // Fall back to the file name if git root not found
     }
 }
-

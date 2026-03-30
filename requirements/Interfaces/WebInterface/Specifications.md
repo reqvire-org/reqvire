@@ -191,6 +191,24 @@ Execute all generation commands treating temporary directory as repository root:
  * type: specification
 ---
 
+### Local Linked File Export Refinement Specification
+
+#### Details
+Local linked-file export behavior during HTML export:
+- Detect local file references in exported markdown content, including standard markdown links and markdown images.
+- Preserve relative linked-file paths in the rendered HTML output.
+- Copy referenced local non-markdown files into the exported artifact tree so rendered `href` and `img src` targets exist.
+- Skip rewriting or copying external URLs, data URLs, anchor-only links, and markdown document links that are exported as HTML pages.
+
+This keeps exported HTML self-contained enough for local linked assets without changing author-written relative paths.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Local Linked File Export](Features.md#local-linked-file-export)
+---
+
 ### HTML Navigation Bar Specification
 
 Specification for the fixed navigation bar in HTML pages.

@@ -153,9 +153,13 @@ pub fn generate_collect_report(
             // Collect refinedBy targets (refinement elements and files)
             for rel in &elem.relations {
                 if rel.relation_type.name == "refinedBy" {
-                    if let Some(item) =
-                        collect_refinement_content(registry, &rel.target, &elem.identifier, depth, git_root)
-                    {
+                    if let Some(item) = collect_refinement_content(
+                        registry,
+                        &rel.target,
+                        &elem.identifier,
+                        depth,
+                        git_root,
+                    ) {
                         refinement_count += 1;
                         items.push(item);
                     }
@@ -164,9 +168,13 @@ pub fn generate_collect_report(
 
             // Collect attachment contents
             for attachment in &elem.attachments {
-                if let Some(item) =
-                    collect_attachment_content(registry, attachment, &elem.identifier, depth, git_root)
-                {
+                if let Some(item) = collect_attachment_content(
+                    registry,
+                    attachment,
+                    &elem.identifier,
+                    depth,
+                    git_root,
+                ) {
                     attachment_count += 1;
                     items.push(item);
                 }
@@ -344,15 +352,15 @@ fn collect_attachment_content(
         AttachmentTarget::ElementIdentifier(elem_id) => {
             // Look up element content from registry
             registry.get_element(elem_id).map(|elem| CollectedItem {
-                    name: elem.name.clone(),
-                    identifier: elem.identifier.clone(),
-                    file_path: elem.file_path.clone(),
-                    element_type: elem.element_type.as_str().to_string(),
-                    content: elem.content.clone(),
-                    depth,
-                    source_type: SourceType::AttachmentElement,
-                    attached_to: Some(parent_identifier.to_string()),
-                })
+                name: elem.name.clone(),
+                identifier: elem.identifier.clone(),
+                file_path: elem.file_path.clone(),
+                element_type: elem.element_type.as_str().to_string(),
+                content: elem.content.clone(),
+                depth,
+                source_type: SourceType::AttachmentElement,
+                attached_to: Some(parent_identifier.to_string()),
+            })
         }
     }
 }
@@ -369,15 +377,15 @@ fn collect_refinement_content(
         relation::LinkType::Identifier(elem_id) => {
             // Element identifier - look up refinement element content
             registry.get_element(elem_id).map(|elem| CollectedItem {
-                    name: elem.name.clone(),
-                    identifier: elem.identifier.clone(),
-                    file_path: elem.file_path.clone(),
-                    element_type: elem.element_type.as_str().to_string(),
-                    content: elem.content.clone(),
-                    depth,
-                    source_type: SourceType::RefinedByElement,
-                    attached_to: Some(parent_identifier.to_string()),
-                })
+                name: elem.name.clone(),
+                identifier: elem.identifier.clone(),
+                file_path: elem.file_path.clone(),
+                element_type: elem.element_type.as_str().to_string(),
+                content: elem.content.clone(),
+                depth,
+                source_type: SourceType::RefinedByElement,
+                attached_to: Some(parent_identifier.to_string()),
+            })
         }
         relation::LinkType::InternalPath(path) => {
             // File path - read file content (same logic as attachment file handling)
@@ -449,65 +457,58 @@ fn generate_text_output(report: &CollectReport) -> String {
         // Add source citation based on source type
         match item.source_type {
             SourceType::Element => {
-                output.push_str(&format!(
-                    "— Source: [{}]({})\n",
-                    item.name, item.identifier
-                ));
+                output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
             }
             SourceType::RefinedByElement => {
                 if let Some(ref parent) = item.attached_to {
                     output.push_str(&format!(
                         "— Source: [{}]({}) refining [{}]({})\n",
-                        item.name, item.identifier,
-                        extract_element_name(parent), parent
+                        item.name,
+                        item.identifier,
+                        extract_element_name(parent),
+                        parent
                     ));
                 } else {
-                    output.push_str(&format!(
-                        "— Source: [{}]({})\n",
-                        item.name, item.identifier
-                    ));
+                    output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
                 }
             }
             SourceType::RefinedByFile => {
                 if let Some(ref parent) = item.attached_to {
                     output.push_str(&format!(
                         "— Source: [{}]({}) refining [{}]({})\n",
-                        item.name, item.identifier,
-                        extract_element_name(parent), parent
+                        item.name,
+                        item.identifier,
+                        extract_element_name(parent),
+                        parent
                     ));
                 } else {
-                    output.push_str(&format!(
-                        "— Source: [{}]({})\n",
-                        item.name, item.identifier
-                    ));
+                    output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
                 }
             }
             SourceType::AttachmentFile => {
                 if let Some(ref parent) = item.attached_to {
                     output.push_str(&format!(
                         "— Source: [{}]({}) attached to [{}]({})\n",
-                        item.name, item.identifier,
-                        extract_element_name(parent), parent
+                        item.name,
+                        item.identifier,
+                        extract_element_name(parent),
+                        parent
                     ));
                 } else {
-                    output.push_str(&format!(
-                        "— Source: [{}]({})\n",
-                        item.name, item.identifier
-                    ));
+                    output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
                 }
             }
             SourceType::AttachmentElement => {
                 if let Some(ref parent) = item.attached_to {
                     output.push_str(&format!(
                         "— Source: [{}]({}) attached to [{}]({})\n",
-                        item.name, item.identifier,
-                        extract_element_name(parent), parent
+                        item.name,
+                        item.identifier,
+                        extract_element_name(parent),
+                        parent
                     ));
                 } else {
-                    output.push_str(&format!(
-                        "— Source: [{}]({})\n",
-                        item.name, item.identifier
-                    ));
+                    output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
                 }
             }
         }
@@ -556,13 +557,7 @@ mod tests {
             extract_element_name("file.md#some-element-name"),
             "Some Element Name"
         );
-        assert_eq!(
-            extract_element_name("path/to/file.md#simple"),
-            "Simple"
-        );
-        assert_eq!(
-            extract_element_name("no-fragment"),
-            "no-fragment"
-        );
+        assert_eq!(extract_element_name("path/to/file.md#simple"), "Simple");
+        assert_eq!(extract_element_name("no-fragment"), "no-fragment");
     }
 }
