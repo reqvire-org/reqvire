@@ -5,6 +5,11 @@
 #### Details
 When validating attachments, the system is expected to enforce attachment scope constraints for refinement-element identifier targets and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.
 
+Attachment scope validation is expected to enforce:
+- Hierarchical independence from the refinement's defining hierarchy
+- Upstream propagation within a hierarchy branch
+- One-direction attachment flow between top-root subgraphs
+
 #### Metadata
  * type: specification
 ---

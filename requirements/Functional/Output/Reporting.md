@@ -20,8 +20,6 @@ When requested the system shall provide human readable and machine readable Syst
   * derive: [Verification Coverage Report](#verification-coverage-report)
   * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
   * refinedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
-  * refinedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
-  * refinedBy: [Error Message Format Specification](Specifications.md#error-message-format-specification)
   * refinedBy: [JSON Output Structure](Specifications.md#json-output-structure)
   * refinedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
   * refinedBy: [Text Output Formatting](Specifications.md#text-output-formatting)

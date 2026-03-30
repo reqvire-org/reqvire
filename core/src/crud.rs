@@ -634,6 +634,18 @@ pub fn attach_element_identifier(
         }
     }
 
+    if let Some(msg) = model_manager
+        .graph_registry
+        .build_attachment_direction_scope_error(
+            &attachment_identifier,
+            &element_id,
+            element_name,
+            None,
+        )
+    {
+        return Err(ReqvireError::InvalidAttachmentScope(msg));
+    }
+
     if target_element
         .attachments
         .iter()

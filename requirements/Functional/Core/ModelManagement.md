@@ -44,9 +44,6 @@ All manipulation operations shall:
 #### Metadata
   * type: user-requirement
 
-#### Attachments
-  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
-
 #### Relations
   * derive: [Attachment Identifier Updates](#attachment-identifier-updates)
   * derive: [Create Element Operation](../Operations/ElementManipulation.md#create-element-operation)
@@ -181,6 +178,7 @@ The system shall enforce scope constraints on refinement-element attachments to 
 #### Relations
   * derivedFrom: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
   * refinedBy: [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
+  * refinedBy: [Attachment Subgraph Direction Constraint](Constraints.md#attachment-subgraph-direction-constraint)
   * refinedBy: [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
   * verifiedBy: [Attachment Scope Constraints Test](Verifications/AttachmentsVerifications.md#attachment-scope-constraints-test)
 ---

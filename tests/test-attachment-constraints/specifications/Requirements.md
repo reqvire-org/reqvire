@@ -61,13 +61,16 @@ Sibling branch of Req B (still child of User Req A).
 
 ### User Req X
 
-Separate branch requirement - can legitimately attach Spec-1.
+Separate branch requirement - can legitimately attach Spec-1 and defines Spec-X.
 
 #### Metadata
   * type: user-requirement
 
 #### Attachments
   * [Spec-1](Refinements.md#spec-1)
+
+#### Relations
+  * refinedBy: [Spec-X](Refinements.md#spec-x)
 ---
 
 ### User Req Y
@@ -129,4 +132,3 @@ A grandchild requirement under Child With Refinement.
 #### Relations
   * derivedFrom: [Child With Refinement](#child-with-refinement)
 ---
-

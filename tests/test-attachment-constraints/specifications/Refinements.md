@@ -22,6 +22,17 @@ This refinement tests the ancestor case - Ancestor Req is a parent of the defini
   * type: specification
 ---
 
+### Spec-X
+
+A valid refinement owned by User Req X.
+
+#### Details
+This refinement is used to verify reverse-direction attachment flow between User Req A and User Req X hierarchies.
+
+#### Metadata
+  * type: specification
+---
+
 ### Orphan-Spec
 
 An orphan refinement without any refine relations.
@@ -32,4 +43,3 @@ This refinement has no refine relations, so it cannot be attached anywhere.
 #### Metadata
   * type: specification
 ---
-

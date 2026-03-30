@@ -56,9 +56,6 @@ Implementation details shall follow the associated refinement specifications.
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Diff Output Format Specification](../Output/Specifications.md#diff-output-format-specification)
-
 #### Relations
   * derivedFrom: [Model Linting](#model-linting)
   * refinedBy: [Lint Auto-fix Capability Refinement Specification](Specifications.md#lint-auto-fix-capability-refinement-specification)

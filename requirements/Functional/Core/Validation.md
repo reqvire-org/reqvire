@@ -98,6 +98,7 @@ Implementation details shall follow the associated refinement specifications.
 
 #### Attachments
   * [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
+  * [Attachment Subgraph Direction Constraint](Constraints.md#attachment-subgraph-direction-constraint)
   * [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
@@ -277,9 +278,6 @@ This ensures users see all relevant errors at once rather than fixing issues one
 
 #### Metadata
   * type: requirement
-
-#### Attachments
-  * [Error Message Format Specification](../Output/Specifications.md#error-message-format-specification)
 
 #### Relations
   * derivedFrom: [Validate Internal Consistency](#validate-internal-consistency)

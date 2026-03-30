@@ -117,6 +117,74 @@ Each command has its own options displayed in a flattened section
 
 #### Metadata
  * type: specification
+
+#### Relations
+ * refine: [CLI Interface Structure](Commands.md#cli-interface-structure)
+---
+
+### Diff Output Format Specification
+
+Git-style diff format for change previews.
+
+#### Details
+**Used by commands:** format, lint, add, rm, mv, rename, mv-file, change-impact
+
+**Format:**
+```diff
+--- a/<file_path>
++++ b/<file_path>
+@@ -<old_start>,<old_count> +<new_start>,<new_count> @@
+-<removed line>
++<added line>
+ <context line>
+```
+
+**Colors:**
+- Red: Removed lines (-)
+- Green: Added lines (+)
+- Cyan: Hunk headers (@@)
+- White: Context lines
+
+**Context:**
+- Show 3 lines before and after changes
+- Collapse large unchanged sections
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [CLI Diff Output](Commands.md#cli-diff-output)
+---
+
+### Error Message Format Specification
+
+Structure for error and warning messages.
+
+#### Details
+**Format:**
+```
+<file_path>:<line_number>: <level>: <message>
+ <context_line>
+ ^--- <pointer to issue>
+```
+
+**Fields:**
+- `file_path`: Git-root-relative path
+- `line_number`: 1-based line number
+- `level`: error | warning | info
+- `message`: Concise description
+- `context_line`: Source line (optional)
+- `suggestion`: How to fix (optional)
+
+**Grouping:**
+- Group errors by file
+- Sort by line number within file
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Detailed Error Handling and Logging](Commands.md#detailed-error-handling-and-logging)
 ---
 
 ### CLI JSON File Output Option Refinement Specification

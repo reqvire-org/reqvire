@@ -24,6 +24,23 @@ Only requirements in a separate branch of the hierarchy (no derivedFrom chain co
   * type: constraint
 ---
 
+### Attachment Subgraph Direction Constraint
+
+Rules for keeping cross-subgraph attachment contracts one-directional.
+
+#### Details
+For cross-subgraph refinement attachments, flow is defined from the attaching requirement's top-root hierarchy to the defining requirement's top-root hierarchy.
+
+**One-direction invariant:**
+- If subgraph `A` attaches a refinement owned by subgraph `B`, then subgraph `B` must not attach refinements owned by subgraph `A`
+- This rule applies at the top-root user-requirement hierarchy level, not only to directly involved requirements
+
+**Rationale**: Attachment contracts are used to model waterfall-style dependency flow between subgraphs. Allowing reverse attachment flow between the same two subgraphs breaks boundary directionality and undermines attachment contracts as one-way dependency edges.
+
+#### Metadata
+  * type: constraint
+---
+
 ### Attachment Satisfied Refinement Constraint
 
 Rules requiring refinements to have a refine relation before being attachable.

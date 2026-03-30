@@ -30,11 +30,12 @@ Attachment management behavior:
 #### Attachments
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
   * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
 #### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * refinedBy: [Attachment Input Auto-Detection Behavior](../../Functional/Core/Behaviors.md#attachment-input-auto-detection-behavior)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
@@ -53,6 +54,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
+  * derive: [Attachment Commands](#attachment-commands)
+  * derive: [CLI Diff Output](#cli-diff-output)
   * derive: [CLI Add Element Command](#cli-add-element-command)
   * derive: [CLI Change Impact Report Command](#cli-change-impact-report-command)
   * derive: [CLI Collect Command](#cli-collect-command)
@@ -79,6 +82,22 @@ Implementation details shall follow the associated refinement specifications.
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
+### CLI Diff Output
+
+The CLI shall provide a standardized diff-style output contract for commands that preview or report file modifications.
+
+#### Details
+The diff output contract shall define a shared presentation format for command results that show line-level file changes.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
+---
+
 ### CLI Add Element Command
 
 The system shall provide an `add` command to create new model elements by accepting element definition in Markdown format from stdin or the `--content` argument, validating the structure, and inserting it into the target file.
@@ -95,7 +114,7 @@ Implementation details shall follow the associated refinement specifications.
   * [Target Location Constraint](../../Functional/Operations/Constraints.md#target-location-constraint)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Create Element Override Behavior](../../Functional/Operations/Behaviors.md#create-element-override-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Create Element Workflow Specification](../../Functional/Operations/Specifications.md#create-element-workflow-specification)
   * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
@@ -335,7 +354,7 @@ Implementation details shall follow the associated refinement specifications.
 #### Attachments
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -359,7 +378,7 @@ The command shall reject moving an element into an existing `# Documents` file w
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Functional/Operations/Constraints.md#target-location-constraint)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Move Element Workflow Specification](../../Functional/Operations/Specifications.md#move-element-workflow-specification)
 
@@ -385,7 +404,7 @@ The command shall reject `mv-file --squash` when the target file is an existing 
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Target Location Constraint](../../Functional/Operations/Constraints.md#target-location-constraint)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
 
 #### Relations
@@ -409,7 +428,7 @@ Implementation details shall follow the associated refinement specifications.
 #### Attachments
   * [Atomic Relation Relink Workflow Specification](../../Functional/Operations/Specifications.md#atomic-relation-relink-workflow-specification)
   * [Atomic Relink Validity Constraint](../../Functional/Operations/Constraints.md#atomic-relink-validity-constraint)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
 
 #### Relations
@@ -432,7 +451,7 @@ Implementation details shall follow the associated refinement specifications.
 #### Attachments
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -454,7 +473,7 @@ Implementation details shall follow the associated refinement specifications.
 #### Attachments
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Delete Element Workflow Specification](../../Functional/Operations/Specifications.md#delete-element-workflow-specification)
 
@@ -478,7 +497,7 @@ Implementation details shall follow the associated refinement specifications.
 #### Attachments
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
 
 #### Relations
@@ -632,7 +651,7 @@ Implementation details shall follow the associated refinement specifications.
 
 #### Attachments
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
 
 #### Relations
@@ -659,7 +678,7 @@ Implementation details shall follow the associated refinement specifications.
   * [Relation Operations Specification](../../Functional/Operations/Specifications.md#relation-operations-specification)
   * [RelationTypes.md](../../Functional/Core/DesignDocuments/RelationTypes.md#relationtypes)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
-  * [Diff Output Format Specification](../../Functional/Output/Specifications.md#diff-output-format-specification)
+  * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -683,7 +702,7 @@ Implementation details shall follow the associated refinement specifications.
   * [Two-Pass Validation Behavior](../../Functional/Core/Behaviors.md#two-pass-validation-behavior)
   * [Validation Error Reporting Behavior](../../Functional/Core/Behaviors.md#validation-error-reporting-behavior)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
-  * [Error Message Format Specification](../../Functional/Output/Specifications.md#error-message-format-specification)
+  * [Error Message Format Specification](Specifications.md#error-message-format-specification)
   * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
   * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 

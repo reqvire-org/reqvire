@@ -76,7 +76,7 @@ Test cases for identifier attachments:
 
 ### Attachment Scope Constraints Test
 
-Verify that attachment scope constraints (hierarchical independence, refine requirement, and upstream propagation) are enforced for refinement-element identifier attachments.
+Verify that attachment scope constraints (hierarchical independence, refine requirement, upstream propagation, and one-direction subgraph flow) are enforced for refinement-element identifier attachments.
 
 #### Details
 **Test cases for refinement hierarchical independence:**
@@ -92,10 +92,16 @@ Verify that attachment scope constraints (hierarchical independence, refine requ
 - Attachments propagate downstream - descendants cannot re-attach
 - Accept attachment when no ancestor or descendant has the same attachment
 
+**Test cases for one-direction subgraph flow:**
+- Error when a subgraph tries to attach a refinement owned by a subgraph that already attaches refinements owned by the first subgraph
+- Link command rejects reverse-direction cross-subgraph attachment creation
+- Merge command rejects merged attachments that would introduce reverse-direction subgraph flow
+
 **Error message formats:**
 - Refinement hierarchy: `'<refinement>' cannot be attached to '<element>' because it is within the refinement's defining hierarchy`
 - Ancestor propagation: `'<attachment>' is already attached at '<ancestor>' which is an ancestor. Attachments propagate downstream.`
 - Descendant conflict: `'<attachment>' is already attached at '<descendant>' which is a descendant. Move attachment to '<element>' if you want it at higher level.`
+- Direction conflict: `'<attachment>' cannot be attached to '<element>' because subgraph '<root>' already receives attachment contracts from subgraph '<other-root>'`
 
 **Test cases for refine requirement:**
 - Model with attachment to orphan refinement (no refine relations) causes `validate` to fail

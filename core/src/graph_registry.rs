@@ -758,6 +758,133 @@ impl GraphRegistry {
         result
     }
 
+    fn resolve_single_top_root_user_requirement(&self, element_id: &str) -> Option<String> {
+        let mut memo: HashMap<String, BTreeSet<String>> = HashMap::new();
+        let mut visiting: HashSet<String> = HashSet::new();
+        let roots = self.resolve_top_root_user_requirements(element_id, &mut memo, &mut visiting);
+        if roots.len() == 1 {
+            roots.into_iter().next()
+        } else {
+            None
+        }
+    }
+
+    fn display_name_for_element(&self, element_id: &str) -> String {
+        self.nodes
+            .get(element_id)
+            .map(|n| n.element.name.clone())
+            .unwrap_or_else(|| element_id.to_string())
+    }
+
+    fn has_attachment_flow_between_roots(
+        &self,
+        source_root_id: &str,
+        target_root_id: &str,
+    ) -> bool {
+        let mut sorted_ids: Vec<&String> = self.nodes.keys().collect();
+        sorted_ids.sort();
+
+        for element_id in sorted_ids {
+            let Some(attacher_root_id) = self.resolve_single_top_root_user_requirement(element_id)
+            else {
+                continue;
+            };
+
+            if attacher_root_id != source_root_id {
+                continue;
+            }
+
+            let Some(node) = self.nodes.get(element_id) else {
+                continue;
+            };
+
+            for attachment in &node.element.attachments {
+                let crate::element::AttachmentTarget::ElementIdentifier(refinement_id) =
+                    &attachment.target
+                else {
+                    continue;
+                };
+
+                if !self.refinement_has_refine_relation(refinement_id) {
+                    continue;
+                }
+
+                for defining_req_id in self.get_defining_requirements(refinement_id) {
+                    let Some(defining_root_id) =
+                        self.resolve_single_top_root_user_requirement(&defining_req_id)
+                    else {
+                        continue;
+                    };
+
+                    if defining_root_id == target_root_id {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        false
+    }
+
+    pub fn build_attachment_direction_scope_error(
+        &self,
+        attachment_identifier: &str,
+        element_id: &str,
+        element_name: &str,
+        file_path: Option<&str>,
+    ) -> Option<String> {
+        let source_root_id = self.resolve_single_top_root_user_requirement(element_id)?;
+
+        let mut cross_subgraph_target = false;
+        for defining_req_id in self.get_defining_requirements(attachment_identifier) {
+            let Some(defining_root_id) =
+                self.resolve_single_top_root_user_requirement(&defining_req_id)
+            else {
+                continue;
+            };
+
+            if defining_root_id != source_root_id {
+                cross_subgraph_target = true;
+                break;
+            }
+        }
+
+        if !cross_subgraph_target {
+            return None;
+        }
+
+        let conflicting_root_id = self
+            .get_defining_requirements(attachment_identifier)
+            .into_iter()
+            .filter_map(|defining_req_id| {
+                self.resolve_single_top_root_user_requirement(&defining_req_id)
+            })
+            .find(|target_root_id| {
+                target_root_id != &source_root_id
+                    && self.has_attachment_flow_between_roots(target_root_id, &source_root_id)
+            })?;
+        let attachment_name = self.display_name_for_element(attachment_identifier);
+        let conflicting_root_name = self.display_name_for_element(&conflicting_root_id);
+        let source_root_name = self.display_name_for_element(&source_root_id);
+
+        let mut msg = format!(
+            "'{}' cannot be attached to '{}' because subgraph '{}' already attaches refinements owned by subgraph '{}'. Attachment flow between subgraphs must remain one-directional.",
+            attachment_name,
+            element_name,
+            conflicting_root_name,
+            source_root_name
+        );
+
+        if let Some(file_path) = file_path {
+            msg.push_str(&format!(
+                " (file: {}, element: {})",
+                file_path, element_name
+            ));
+        }
+
+        Some(msg)
+    }
+
     fn get_hierarchical_parent_ids(&self, element: &Element) -> Vec<String> {
         let hierarchical_relations = get_hierarchical_relation_types();
         let mut parent_ids: BTreeSet<String> = BTreeSet::new();
@@ -885,7 +1012,20 @@ impl GraphRegistry {
                                 }
                             }
 
-                            // Check 3: Upstream propagation constraint (only if no hierarchy violation)
+                            // Check 3: One-direction subgraph flow constraint (only if no hierarchy violation)
+                            if !hierarchy_violation {
+                                if let Some(msg) = self.build_attachment_direction_scope_error(
+                                    identifier,
+                                    &element.identifier,
+                                    &element.name,
+                                    Some(&element.file_path),
+                                ) {
+                                    errors.push(ReqvireError::InvalidAttachmentScope(msg));
+                                    hierarchy_violation = true;
+                                }
+                            }
+
+                            // Check 4: Upstream propagation constraint (only if no other scope violation)
                             if !hierarchy_violation {
                                 if let Some((direction, other_id)) = self
                                     .find_duplicate_attachment_in_hierarchy(
@@ -4213,6 +4353,15 @@ impl GraphRegistry {
                             ),
                         ));
                     }
+                }
+
+                if let Some(msg) = self.build_attachment_direction_scope_error(
+                    att_id,
+                    target_id,
+                    &target_name,
+                    None,
+                ) {
+                    return Err(ReqvireError::InvalidAttachmentScope(msg));
                 }
             }
         }
