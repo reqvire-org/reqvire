@@ -21,6 +21,7 @@ A child requirement derived from alpha for collect testing.
 
 #### Relations
   * derivedFrom: [Test Requirement Alpha](#test-requirement-alpha)
+  * satisfiedBy: [asset.txt](../docs/asset.txt)
 
 ---
 

@@ -950,7 +950,10 @@ impl GraphRegistry {
         debug!("Validating attachment targets...");
         let mut errors = Vec::new();
 
-        for element_node in self.nodes.values() {
+        let mut sorted_nodes: Vec<&ElementNode> = self.nodes.values().collect();
+        sorted_nodes.sort_by(|a, b| a.element.identifier.cmp(&b.element.identifier));
+
+        for element_node in sorted_nodes {
             let element = &element_node.element;
 
             for attachment in &element.attachments {
@@ -1085,7 +1088,10 @@ impl GraphRegistry {
     pub fn get_defining_requirements(&self, refinement_id: &str) -> Vec<String> {
         let mut defining_reqs = Vec::new();
 
-        for (element_id, element_node) in &self.nodes {
+        let mut sorted_nodes: Vec<(&String, &ElementNode)> = self.nodes.iter().collect();
+        sorted_nodes.sort_by(|(a_id, _), (b_id, _)| a_id.cmp(b_id));
+
+        for (element_id, element_node) in sorted_nodes {
             // Check if this element has a refinedBy relation pointing to the refinement
             for relation in &element_node.element.relations {
                 // Use REFINEMENT_RELATIONS - refinedBy is the forward refinement relation from requirement

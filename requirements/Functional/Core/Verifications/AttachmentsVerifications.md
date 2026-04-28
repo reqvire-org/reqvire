@@ -256,6 +256,8 @@ Test cases for filesystem and reporting:
 - Report count of affected Relations
 - Report list of modified specification files
 - Dry-run mode: show changes without applying (file not moved)
+- JSON mode: emit valid structured CRUD result output
+- JSON file mode: write valid structured CRUD result output to `--output <FILE>`
 - Validation passes after move
 
 #### Metadata
@@ -286,6 +288,8 @@ Test cases for filesystem and reporting:
 - Report count of removed Relations
 - Report list of modified specification files
 - Dry-run mode: show changes without applying (file not deleted)
+- JSON mode: emit valid structured CRUD result output
+- JSON file mode: write valid structured CRUD result output to `--output <FILE>`
 - Validation passes after removal
 
 #### Metadata

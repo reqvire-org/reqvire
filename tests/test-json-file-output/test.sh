@@ -6,7 +6,7 @@ set -uo pipefail
 # for every CLI command that supports --json.
 #
 # Acceptance Criteria:
-# - --json --output writes JSON to file for all 17 commands
+# - --json --output writes JSON to file for all supported commands
 # - Confirmation message printed to stdout
 # - File contains valid JSON
 # - File content matches direct --json stdout output (spot-checked)
@@ -128,6 +128,16 @@ test_json_output "rename" "rename.json" rename "Test Verification Beta" "Renamed
 test_json_output "merge" "merge.json" merge "Test Verification Alpha" "Test Verification Beta" --dry-run
 
 test_json_output "mv-file" "mv-file.json" mv-file "specifications/Requirements.md" "specifications/Moved.md" --dry-run
+
+test_json_output "link" "link.json" link "Test Requirement Beta" trace "https://example.com/trace" --dry-run
+
+test_json_output "unlink" "unlink.json" unlink "Test Verification Alpha" "Test Requirement Alpha" --dry-run
+
+test_json_output "relink" "relink.json" relink "Test Verification Alpha" verify "Test Requirement Alpha" "Test Requirement Beta" --dry-run
+
+test_json_output "mv-asset" "mv-asset.json" mv-asset "docs/asset.txt" "docs/asset-renamed.txt" --dry-run
+
+test_json_output "rm-asset" "rm-asset.json" rm-asset "docs/asset.txt" --dry-run
 
 # ========================================
 # Error case: --output without --json

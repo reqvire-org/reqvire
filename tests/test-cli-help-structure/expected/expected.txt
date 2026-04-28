@@ -145,11 +145,15 @@ LINK OPTIONS:
        <RELATION_TYPE>          Relation type OR 'attaching'. Relations: derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace. Use 'attaching' to attach refinement element identifiers (constraint, behavior, specification)
        <TARGET>                 Target: element name, internal path, or external URL (for relations); refinement element identifier for attaching
       --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 UNLINK OPTIONS:
        <SOURCE>                 Source element name
        <TARGET>                 Target element name OR file path
       --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 RELINK OPTIONS:
        <SOURCE>                 Source element name
@@ -157,15 +161,21 @@ RELINK OPTIONS:
        <FROM_TARGET>            Existing target to replace
        <TO_TARGET>              New target
       --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 MV ASSET OPTIONS:
        <OLD_PATH>               Current file path
        <NEW_PATH>               New file path
       --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 RM ASSET OPTIONS:
        <FILE_PATH>              Path to file to remove
       --dry-run                 Preview changes without applying
+      --json                    Output results in JSON format
+      --output <FILE>           Save JSON output to file (requires --json)
 
 CONTAINMENT OPTIONS:
       --json                    Output results in JSON format

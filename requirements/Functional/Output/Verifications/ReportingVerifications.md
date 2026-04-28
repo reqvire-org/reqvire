@@ -110,6 +110,7 @@ This test verifies that the `--output` flag writes JSON output to a file when us
 
 ##### Acceptance Criteria
 - `--output <FILE>` writes JSON to file when combined with `--json`
+- All public commands that expose `--json`, including relation and asset mutation commands, support the same `--output <FILE>` behavior
 - Confirmation message printed to stdout: `✅ Output saved to <filepath>`
 - File contains valid JSON identical to what `--json` alone would produce on stdout
 - `--output` without `--json` produces an error and non-zero exit code
@@ -139,6 +140,10 @@ This test verifies that the `--output` flag writes JSON output to a file when us
    - Create a file with existing content
    - Run command with `--json --output <same-file>`
    - Verify file is overwritten with new JSON content
+
+5. **Mutation command parity**
+   - Run dry-run JSON file output for `link`, `unlink`, `relink`, `mv-asset`, and `rm-asset`
+   - Verify each command writes valid JSON to the requested output file
 
 #### Metadata
   * type: test-verification

@@ -434,7 +434,7 @@ pub enum Commands {
     /// Add relation or attachment between elements
     #[clap(
         name = "link",
-        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n\nRELATION TYPES:\n    derivedFrom  - Source is derived from target (parent traceability)\n    derive       - Source derives target (child traceability)\n    satisfiedBy  - Source requirement is satisfied by target implementation\n    satisfy      - Source implementation satisfies target requirement\n    verifiedBy   - Source requirement is verified by target verification\n    verify       - Source verification verifies target requirement\n    trace        - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach a refinement element identifier to source\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: refinement element identifier (file.md#element-id or #element-id)\n\nUSAGE:\n    reqvire link \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire link \"Test Verification\" verify \"Feature Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\"\n    reqvire link \"System Requirement\" attaching \"#my-constraint-element\""
+        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom  - Source is derived from target (parent traceability)\n    derive       - Source derives target (child traceability)\n    satisfiedBy  - Source requirement is satisfied by target implementation\n    satisfy      - Source implementation satisfies target requirement\n    verifiedBy   - Source requirement is verified by target verification\n    verify       - Source verification verifies target requirement\n    trace        - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach a refinement element identifier to source\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: refinement element identifier (file.md#element-id or #element-id)\n\nUSAGE:\n    reqvire link \"Feature Requirement\" derivedFrom \"System Requirement\"\n    reqvire link \"Test Verification\" verify \"Feature Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\"\n    reqvire link \"System Requirement\" attaching \"#my-constraint-element\""
     )]
     Link {
         /// Source element name
@@ -451,12 +451,20 @@ pub enum Commands {
         /// Preview changes without applying
         #[clap(long, help_heading = "LINK OPTIONS")]
         dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "LINK OPTIONS")]
+        json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "LINK OPTIONS")]
+        output: Option<String>,
     },
 
     /// Remove relation or attachment between elements (auto-detects type)
     #[clap(
         name = "unlink",
-        override_help = "Remove relation or attachment between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n\nAUTO-DETECTION:\n    Searches relations first, then attachments.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Feature Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
+        override_help = "Remove relation or attachment between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Searches relations first, then attachments.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Feature Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
     )]
     Unlink {
         /// Source element name
@@ -468,12 +476,20 @@ pub enum Commands {
         /// Preview changes without applying
         #[clap(long, help_heading = "UNLINK OPTIONS")]
         dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "UNLINK OPTIONS")]
+        json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "UNLINK OPTIONS")]
+        output: Option<String>,
     },
 
     /// Replace an existing relation target with a new target in one operation
     #[clap(
         name = "relink",
-        override_help = "Replace an existing relation target with a new target in one operation\n\nRELINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE>          Relation type to preserve\n       <FROM_TARGET>            Existing target to replace\n       <TO_TARGET>              New target\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire relink \"Child Requirement\" derivedFrom \"Old Parent\" \"New Parent\""
+        override_help = "Replace an existing relation target with a new target in one operation\n\nRELINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE>          Relation type to preserve\n       <FROM_TARGET>            Existing target to replace\n       <TO_TARGET>              New target\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire relink \"Child Requirement\" derivedFrom \"Old Parent\" \"New Parent\""
     )]
     Relink {
         /// Source element name
@@ -491,12 +507,20 @@ pub enum Commands {
         /// Preview changes without applying
         #[clap(long, help_heading = "RELINK OPTIONS")]
         dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "RELINK OPTIONS")]
+        json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "RELINK OPTIONS")]
+        output: Option<String>,
     },
 
     /// Move/rename asset file and update all references (Attachments and Relations)
     #[clap(
         name = "mv-asset",
-        override_help = "Move/rename asset file and update all references\n\nMV-ASSET OPTIONS:\n       <OLD_PATH>               Current file path\n       <NEW_PATH>               New file path\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire mv-asset docs/old.pdf docs/new.pdf"
+        override_help = "Move/rename asset file and update all references\n\nMV-ASSET OPTIONS:\n       <OLD_PATH>               Current file path\n       <NEW_PATH>               New file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire mv-asset docs/old.pdf docs/new.pdf"
     )]
     MvAsset {
         /// Current file path
@@ -508,12 +532,20 @@ pub enum Commands {
         /// Preview changes without applying
         #[clap(long, help_heading = "MV-ASSET OPTIONS")]
         dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "MV-ASSET OPTIONS")]
+        json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "MV-ASSET OPTIONS")]
+        output: Option<String>,
     },
 
     /// Remove asset file and remove all references (Attachments and Relations)
     #[clap(
         name = "rm-asset",
-        override_help = "Remove asset file and remove all references\n\nRM-ASSET OPTIONS:\n       <FILE_PATH>              Path to file to remove\n      --dry-run                 Preview changes without applying\n\nUSAGE:\n    reqvire rm-asset docs/obsolete.pdf"
+        override_help = "Remove asset file and remove all references\n\nRM-ASSET OPTIONS:\n       <FILE_PATH>              Path to file to remove\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nUSAGE:\n    reqvire rm-asset docs/obsolete.pdf"
     )]
     RmAsset {
         /// Path to file to remove
@@ -522,6 +554,14 @@ pub enum Commands {
         /// Preview changes without applying
         #[clap(long, help_heading = "RM-ASSET OPTIONS")]
         dry_run: bool,
+
+        /// Output results in JSON format
+        #[clap(long, help_heading = "RM-ASSET OPTIONS")]
+        json: bool,
+
+        /// Save JSON output to file (requires --json)
+        #[clap(long, value_name = "FILE", help_heading = "RM-ASSET OPTIONS")]
+        output: Option<String>,
     },
 
     /// Generate containment view showing folder/file/element hierarchy
@@ -828,6 +868,11 @@ fn wants_json(args: &Args) -> bool {
         Some(Commands::Model { json, .. }) => *json,
         Some(Commands::Lint { json, .. }) => *json,
         Some(Commands::Submodels { json, .. }) => *json,
+        Some(Commands::Link { json, .. }) => *json,
+        Some(Commands::Unlink { json, .. }) => *json,
+        Some(Commands::Relink { json, .. }) => *json,
+        Some(Commands::MvAsset { json, .. }) => *json,
+        Some(Commands::RmAsset { json, .. }) => *json,
         _ => false,
     }
 }
@@ -889,6 +934,11 @@ pub async fn handle_command(
             Commands::Rename { output, json, .. } => (output.is_some(), *json),
             Commands::Merge { output, json, .. } => (output.is_some(), *json),
             Commands::MvFile { output, json, .. } => (output.is_some(), *json),
+            Commands::Link { output, json, .. } => (output.is_some(), *json),
+            Commands::Unlink { output, json, .. } => (output.is_some(), *json),
+            Commands::Relink { output, json, .. } => (output.is_some(), *json),
+            Commands::MvAsset { output, json, .. } => (output.is_some(), *json),
+            Commands::RmAsset { output, json, .. } => (output.is_some(), *json),
             Commands::Containment { output, json, .. } => (output.is_some(), *json),
             Commands::Resources { output, json, .. } => (output.is_some(), *json),
             Commands::Submodels { output, json, .. } => (output.is_some(), *json),
@@ -1476,11 +1526,13 @@ pub async fn handle_command(
             relation_type,
             target,
             dry_run,
+            json,
+            output,
         }) => {
             let git_root = git_commands::get_git_root_dir()?;
 
             // Check if relation_type is 'attaching' - special keyword for attachments
-            if relation_type == "attaching" {
+            let result = if relation_type == "attaching" {
                 // External URLs are not allowed for attachments
                 if reqvire::utils::is_external_url(&target) {
                     return Err(ReqvireError::ProcessError(format!(
@@ -1489,24 +1541,28 @@ pub async fn handle_command(
                     )));
                 }
 
-                let result = reqvire::crud::attach_element_identifier(
+                reqvire::crud::attach_element_identifier(
                     &mut model_manager,
                     &source,
                     &target,
                     &git_root,
                     dry_run,
-                )?;
-                render_crud_result(&result);
+                )?
             } else {
                 // Regular relation link
-                let result = reqvire::crud::link(
+                reqvire::crud::link(
                     &mut model_manager,
                     &source,
                     &relation_type,
                     &target,
                     &git_root,
                     dry_run,
-                )?;
+                )?
+            };
+
+            if json {
+                handle_json_output(&render_crud_json(&result), &output)?;
+            } else {
                 render_crud_result(&result);
             }
             Ok(0)
@@ -1515,11 +1571,17 @@ pub async fn handle_command(
             source,
             target,
             dry_run,
+            json,
+            output,
         }) => {
             let git_root = git_commands::get_git_root_dir()?;
             let result =
                 reqvire::crud::unlink(&mut model_manager, &source, &target, &git_root, dry_run)?;
-            render_crud_result(&result);
+            if json {
+                handle_json_output(&render_crud_json(&result), &output)?;
+            } else {
+                render_crud_result(&result);
+            }
             Ok(0)
         }
         Some(Commands::Relink {
@@ -1528,6 +1590,8 @@ pub async fn handle_command(
             from_target,
             to_target,
             dry_run,
+            json,
+            output,
         }) => {
             let git_root = git_commands::get_git_root_dir()?;
             let result = reqvire::crud::relink(
@@ -1539,13 +1603,19 @@ pub async fn handle_command(
                 &git_root,
                 dry_run,
             )?;
-            render_crud_result(&result);
+            if json {
+                handle_json_output(&render_crud_json(&result), &output)?;
+            } else {
+                render_crud_result(&result);
+            }
             Ok(0)
         }
         Some(Commands::MvAsset {
             old_path,
             new_path,
             dry_run,
+            json,
+            output,
         }) => {
             let git_root = git_commands::get_git_root_dir()?;
             let result = reqvire::crud::mv_asset(
@@ -1556,15 +1626,28 @@ pub async fn handle_command(
                 dry_run,
             )?;
 
-            render_crud_result(&result);
+            if json {
+                handle_json_output(&render_crud_json(&result), &output)?;
+            } else {
+                render_crud_result(&result);
+            }
             Ok(0)
         }
-        Some(Commands::RmAsset { file_path, dry_run }) => {
+        Some(Commands::RmAsset {
+            file_path,
+            dry_run,
+            json,
+            output,
+        }) => {
             let git_root = git_commands::get_git_root_dir()?;
             let result =
                 reqvire::crud::rm_asset(&mut model_manager, &file_path, &git_root, dry_run)?;
 
-            render_crud_result(&result);
+            if json {
+                handle_json_output(&render_crud_json(&result), &output)?;
+            } else {
+                render_crud_result(&result);
+            }
             Ok(0)
         }
         Some(Commands::Containment {

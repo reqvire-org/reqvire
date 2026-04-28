@@ -101,6 +101,12 @@ This test verifies atomic relation relink behavior, including hierarchical subgr
    - Run `reqvire relink ... --dry-run`.
    - Assert reported changes with no file persistence.
 
+5. **JSON output behavior:**
+   - Run `reqvire relink ... --dry-run --json`.
+   - Assert valid JSON using the shared CRUD result structure.
+   - Run `reqvire relink ... --dry-run --json --output <FILE>`.
+   - Assert the output file is written and contains valid JSON.
+
 #### Metadata
   * type: test-verification
 
@@ -735,6 +741,12 @@ The test shall verify that the `link` command adds relations to elements followi
 2. Verify diff is shown
 3. Verify no changes are applied
 
+**Test Steps - JSON Output:**
+1. Run `reqvire link <source> <relation-type> <target> --dry-run --json`
+2. Verify output is valid JSON using the shared CRUD result structure
+3. Run `reqvire link <source> <relation-type> <target> --dry-run --json --output <FILE>`
+4. Verify output file is written and contains valid JSON
+
 **Test Steps - Validation:**
 1. Link with invalid relation type
 2. Verify error is reported
@@ -765,6 +777,7 @@ The test shall verify that the `link` command adds relations to elements followi
 - Validates relation type against supported types
 - Validates element type compatibility
 - Supports --dry-run preview
+- Supports --json structured output and --json --output file output
 - Reports errors for invalid inputs
 - Enforces single-root ownership: violating links are rejected with deterministic single-root ownership error output
 - External URLs allowed for relations (trace, satisfiedBy, etc.)
@@ -1096,6 +1109,12 @@ The test shall verify that the `unlink` command removes relations from elements 
 2. Verify diff is shown
 3. Verify no changes are applied
 
+**Test Steps - JSON Output:**
+1. Run `reqvire unlink <source> <target> --dry-run --json`
+2. Verify output is valid JSON using the shared CRUD result structure
+3. Run `reqvire unlink <source> <target> --dry-run --json --output <FILE>`
+4. Verify output file is written and contains valid JSON
+
 **Test Steps - Error Cases:**
 1. Unlink non-existent relation
 2. Verify error is reported
@@ -1113,6 +1132,7 @@ The test shall verify that the `unlink` command removes relations from elements 
 - Source resolves by file path first, then element name
 - Target must be existing element name
 - Supports --dry-run preview
+- Supports --json structured output and --json --output file output
 - Reports errors for non-existent relations
 - Reports errors for invalid source/target
 

@@ -8,21 +8,23 @@ The system shall provide attachment management through the unified link/unlink c
 Attachment management behavior:
 
 **Attach (via link):**
-- Syntax: `reqvire link <element-name> attaching <target> [--dry-run]`
+- Syntax: `reqvire link <element-name> attaching <target> [--dry-run] [--json] [--output <FILE>]`
 - Target: Refinement element identifier
 - Create Attachments subsection if doesn't exist
 - Add link to subsection with format `* [display-name](file.md#refinement-id)`
 - Skip if already attached (idempotent)
 - Support many-to-many (same attachment to multiple elements)
 - Support dry-run mode for preview
+- Support structured JSON output and JSON file output
 
 **Detach (via unlink):**
-- Syntax: `reqvire unlink <element-name> <target> [--dry-run]`
+- Syntax: `reqvire unlink <element-name> <target> [--dry-run] [--json] [--output <FILE>]`
 - Auto-detects whether target is relation or attachment
 - Remove link from Attachments subsection
 - Remove subsection if no attachments remain
 - Trigger change impact on element
 - Support dry-run mode for preview
+- Support structured JSON output and JSON file output
 
 #### Metadata
   * type: requirement
@@ -31,6 +33,7 @@ Attachment management behavior:
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Attachment Hierarchical Independence Constraint](../../Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint)
   * [Attachment Satisfied Refinement Constraint](../../Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint)
 
@@ -355,6 +358,7 @@ Implementation details shall follow the associated refinement specifications.
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -452,6 +456,7 @@ Implementation details shall follow the associated refinement specifications.
   * [File Persistence Behavior](../../Functional/Operations/Behaviors.md#file-persistence-behavior)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -679,6 +684,7 @@ Implementation details shall follow the associated refinement specifications.
   * [RelationTypes.md](../../Functional/Core/DesignDocuments/RelationTypes.md#relationtypes)
   * [Dry-Run Mode Behavior](../../Functional/Operations/Behaviors.md#dry-run-mode-behavior)
   * [Diff Output Format Specification](Specifications.md#diff-output-format-specification)
+  * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)

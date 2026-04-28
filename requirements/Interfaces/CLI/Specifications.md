@@ -286,6 +286,8 @@ Model command behavior:
 - Apply changes immediately by default.
 - Support `--dry-run` to preview changes without applying.
 - Output git-style diff showing all affected files.
+- Support `--json` for structured output.
+- Support `--output <FILE>` when `--json` is present.
 - Report all affected elements and relation updates.
 - Exit with code 0 on success and non-zero on error.
 
@@ -346,6 +348,7 @@ The `mv-file` command is expected to:
 - Invoke the functional atomic relation relink operation.
 - Validate candidate model state before persistence.
 - Support `--dry-run` preview and `--json` output.
+- Support `--output <FILE>` when `--json` is present.
 - Reject unresolved source/target references, missing source relation, and post-relink validation failures with non-zero exit status.
 
 #### Metadata
@@ -368,6 +371,8 @@ The `mv-file` command is expected to:
 - Apply changes immediately by default.
 - Support `--dry-run` to preview changes without applying.
 - Output git-style diff showing all affected files.
+- Support `--json` for structured output.
+- Support `--output <FILE>` when `--json` is present.
 - Report all affected elements and removed relations.
 - Exit with code 0 on success and non-zero on error.
 
@@ -625,6 +630,8 @@ The `link` command:
 - Rejects `attaching` targets that are not refinement element identifiers.
 - Rejects duplicate relation/attachment pairs with clear error.
 - Supports `--dry-run` preview.
+- Supports `--json` for structured output.
+- Supports `--output <FILE>` when `--json` is present.
 
 The `unlink` command:
 - Accepts syntax: `reqvire unlink <source> <target>`.
@@ -633,6 +640,8 @@ The `unlink` command:
 - Uses existing element name for source.
 - Accepts element name, element identifier, or file path as target.
 - Supports `--dry-run` preview.
+- Supports `--json` for structured output.
+- Supports `--output <FILE>` when `--json` is present.
 
 Hierarchy ownership behavior:
 - Hierarchical `link`/`unlink` edits that would produce invalid hierarchy state is expected to fail.
