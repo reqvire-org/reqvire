@@ -148,10 +148,18 @@ cd reqvire
 ./scripts/install-codex-skill.sh
 ```
 
-The installer copies `codex-skills/reqvire-syseng` to:
+The installer uses `CODEX_HOME` when it is set. If it is not set, it defaults to `~/.codex`.
+
+It copies `codex-skills/reqvire-syseng` to:
 
 ```text
-${CODEX_HOME:-$HOME/.codex}/skills/reqvire-syseng
+$CODEX_HOME/skills/reqvire-syseng
+```
+
+Default path when `CODEX_HOME` is unset:
+
+```text
+~/.codex/skills/reqvire-syseng
 ```
 
 If you are already inside a local Reqvire checkout, just run:
