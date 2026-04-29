@@ -26,6 +26,34 @@ It unifies system modeling, requirements management, context engineering and AI-
 
 Use Reqvire with coding assistants through Claude Code plugin workflows and Codex skills: **[Install and get started →](#installation)**
 
+Reqvire also ships an **MCP server** for AI tools that support the Model Context Protocol. Run it directly with `npx` and point it at the Reqvire workspace you want the assistant to inspect:
+
+```bash
+npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace mcp
+```
+
+MCP client configuration:
+
+```json
+{
+  "mcpServers": {
+    "reqvire-myrepository": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "@reqvire-org/reqvire@latest",
+        "--workspace",
+        "/absolute/path/to/my/repository",
+        "mcp"
+      ]
+    }
+  }
+}
+```
+
+By default, the MCP server exposes read/report tools only. To allow mutation tools, add `--enable-mutations` after `mcp`.
+
 ---
 
 ## Key Features
@@ -99,6 +127,18 @@ To read more about assistant integrations, see [Coding Assistants](https://www.r
 #### Codex Skill (Reqvire SysEng)
 
 This repository also includes a Codex skill package at `codex-skills/reqvire-syseng`.
+
+The skill uses the npm package by default, so a separate Reqvire binary install is not required for assistant workflows:
+
+```bash
+npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace validate
+```
+
+To pin assistant workflows to a specific Reqvire release, set `REQVIRE_NPX_PACKAGE`, for example:
+
+```bash
+export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
+```
 
 To install it globally on your machine (`$CODEX_HOME/skills`), run:
 

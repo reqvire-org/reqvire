@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 argument-hint: [source-file] [target-file]
 description: Move entire specification file with all its elements to a new location
 model: claude-sonnet-4-5
@@ -11,7 +11,7 @@ Move an entire specification file with all its elements to a new location, autom
 
 ## Current Model Context
 
-- Total elements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
 
 ## User Request
 
@@ -28,7 +28,7 @@ ${1:-The user will provide source and target file paths.}
 
 2. **Preview the move operation:**
    ```bash
-   reqvire mv-file "<source-file>" "<target-file>" --dry-run
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "<source-file>" "<target-file>" --dry-run
    ```
 
    This shows:
@@ -39,7 +39,7 @@ ${1:-The user will provide source and target file paths.}
 
 3. **Apply the file move:**
    ```bash
-   reqvire mv-file "<source-file>" "<target-file>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "<source-file>" "<target-file>"
    ```
 
    The mv-file command automatically:
@@ -52,7 +52,7 @@ ${1:-The user will provide source and target file paths.}
 
 4. **Verify the changes:**
    ```bash
-   reqvire validate
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
    ```
 
 ## Important Notes
@@ -68,7 +68,7 @@ ${1:-The user will provide source and target file paths.}
 When the target file already exists, use the **`--squash`** flag to merge all elements from source into the target file:
 
 ```bash
-reqvire mv-file "<source-file>" "<existing-target-file>" --squash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "<source-file>" "<existing-target-file>" --squash
 ```
 
 **Squash behavior:**
@@ -93,39 +93,39 @@ The mv-file operation will fail with a clear error if:
 
 **Move file within specifications directory:**
 ```bash
-reqvire mv-file "requirements/OldFile.md" "requirements/NewFile.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "requirements/OldFile.md" "requirements/NewFile.md"
 ```
 
 **Move file to different directory:**
 ```bash
-reqvire mv-file "requirements/Auth.md" "security/Authentication.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "requirements/Auth.md" "security/Authentication.md"
 ```
 
 **Preview before moving:**
 ```bash
-reqvire mv-file "specs/File.md" "requirements/File.md" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "specs/File.md" "requirements/File.md" --dry-run
 ```
 
 **Get JSON output with element mappings:**
 ```bash
-reqvire mv-file "old/path.md" "new/path.md" --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "old/path.md" "new/path.md" --json
 ```
 
 **Works from subdirectories (paths relative to current directory):**
 ```bash
 cd submodule/
-reqvire mv-file "specs/File.md" "requirements/File.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "specs/File.md" "requirements/File.md"
 ```
 
 **Squash elements from multiple files:**
 ```bash
 # Merge experimental specs into main requirements
-reqvire mv-file "temp/Experiments.md" "requirements/Requirements.md" --squash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "temp/Experiments.md" "requirements/Requirements.md" --squash
 ```
 
 **Preview squash before applying:**
 ```bash
-reqvire mv-file "old/File.md" "requirements/MainFile.md" --squash --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "old/File.md" "requirements/MainFile.md" --squash --dry-run
 ```
 
 ## When to Use mv-file

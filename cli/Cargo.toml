@@ -13,6 +13,11 @@ documentation.workspace = true
 name = "reqvire"
 path = "src/main.rs"
 
+[package.metadata.dist]
+dist = true
+npm-scope = "@reqvire-org"
+npm-package = "reqvire"
+
 [dependencies]
 reqvire = { workspace = true }
 

@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 argument-hint: <element-name> <file> [index]
 description: Move an element to a different file or position
 model: claude-sonnet-4-5
@@ -11,7 +11,7 @@ Move an existing model element to a different file or position within the model.
 
 ## Current Model Context
 
-- Total elements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
 
 ## User Request
 
@@ -27,7 +27,7 @@ ${1:-The user will provide element name and target location.}
 
 2. **Preview the move operation:**
    ```bash
-   reqvire mv "<element-name>" "<target-file>" --dry-run
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "<element-name>" "<target-file>" --dry-run
    ```
 
    This shows:
@@ -38,7 +38,7 @@ ${1:-The user will provide element name and target location.}
 
 3. **Apply the move:**
    ```bash
-   reqvire mv "<element-name>" "<target-file>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "<element-name>" "<target-file>"
    ```
 
    The mv command automatically:
@@ -51,7 +51,7 @@ ${1:-The user will provide element name and target location.}
 
 4. **Verify the changes:**
    ```bash
-   reqvire validate
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
    ```
 
 ## Important Notes
@@ -80,22 +80,22 @@ The mv operation will fail with a clear error if:
 
 **Move element to different file:**
 ```bash
-reqvire mv "User Authentication" "requirements/Security.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "User Authentication" "requirements/Security.md"
 ```
 
 **Insert at specific position (index 0 = first element in file):**
 ```bash
-reqvire mv "High Priority Req" "requirements/Critical.md" 0
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "High Priority Req" "requirements/Critical.md" 0
 ```
 
 **Preview before moving:**
 ```bash
-reqvire mv "Feature X" "NewFile.md" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "Feature X" "NewFile.md" --dry-run
 ```
 
 **Get JSON output:**
 ```bash
-reqvire mv "Element" "File.md" --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "Element" "File.md" --json
 ```
 
 ## When to Use mv

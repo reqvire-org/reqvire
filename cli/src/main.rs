@@ -1,7 +1,9 @@
 pub mod cli;
 pub mod config;
+mod mcp;
 mod serve;
 
+use crate::cli::apply_workspace;
 use crate::cli::handle_command;
 use crate::cli::Args;
 use crate::config::get_excluded_filename_patterns_glob_set;
@@ -31,6 +33,11 @@ async fn main() {
     }
 
     env_logger::init();
+
+    if let Err(err) = apply_workspace(args.workspace.as_ref()) {
+        error!("{}", err);
+        std::process::exit(1);
+    }
 
     // Run `handle_command` and get exit code
     let exit_code = handle_command(args, &get_excluded_filename_patterns_glob_set())

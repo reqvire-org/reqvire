@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 argument-hint: [current-name] [new-name]
 description: Rename an existing element while updating all relations that reference it
 model: claude-sonnet-4-5
@@ -11,7 +11,7 @@ Rename an existing model element while automatically updating all relation refer
 
 ## Current Model Context
 
-- Total elements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
 
 ## User Request
 
@@ -28,7 +28,7 @@ ${1:-The user will provide element names.}
 
 2. **Preview the rename operation:**
    ```bash
-   reqvire rename "<current-name>" "<new-name>" --dry-run
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rename "<current-name>" "<new-name>" --dry-run
    ```
 
    This shows:
@@ -38,7 +38,7 @@ ${1:-The user will provide element names.}
 
 3. **Apply the rename:**
    ```bash
-   reqvire rename "<current-name>" "<new-name>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rename "<current-name>" "<new-name>"
    ```
 
    The rename command automatically:
@@ -50,7 +50,7 @@ ${1:-The user will provide element names.}
 
 4. **Verify the changes:**
    ```bash
-   reqvire validate
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
    ```
 
 ## Important Notes
@@ -71,17 +71,17 @@ The rename operation will fail with a clear error if:
 
 **Rename a requirement:**
 ```bash
-reqvire rename "User Authentication" "User Login Authentication"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rename "User Authentication" "User Login Authentication"
 ```
 
 **Preview before renaming:**
 ```bash
-reqvire rename "Data Storage" "Persistent Data Storage" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rename "Data Storage" "Persistent Data Storage" --dry-run
 ```
 
 **Get JSON output:**
 ```bash
-reqvire rename "Old Feature" "New Feature" --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rename "Old Feature" "New Feature" --json
 ```
 
 ## When to Use Rename

@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write  # needed to push a Release
+  id-token: write  # needed for npm trusted publishing
 
 jobs:
   build:
@@ -92,13 +93,19 @@ jobs:
             artifacts/*.tar.gz
 
   release:
-    name: Create Release & Attach Archives
+    name: Create Release, Attach Archives & Publish npm
     needs: build
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          registry-url: "https://registry.npmjs.org"
 
       - name: Download All Archives
         uses: actions/download-artifact@v4
@@ -124,3 +131,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Publish npm package
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          VERSION="${GITHUB_REF_NAME#v}"
+          cd npm/reqvire
+
+          npm version "$VERSION" --no-git-tag-version --allow-same-version
+          mkdir -p artifacts
+          cp ../../artifacts/*.tar.gz artifacts/
+
+          npm publish --access public

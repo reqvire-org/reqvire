@@ -1,0 +1,3 @@
+specifications/Moved.md#workspace-flag-child
+specifications/RenamedRequirements.md#workspace-flag-root
+specifications/RenamedRequirements.md#workspace-flag-sibling

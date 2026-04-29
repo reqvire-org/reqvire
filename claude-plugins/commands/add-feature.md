@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Write, Edit, Bash(reqvire:*), SlashCommand
+allowed-tools: Read, Write, Edit, Bash(npx:*), SlashCommand
 argument-hint: [feature-name]
 description: Add a complete feature by orchestrating requirement and verification creation following MBSE workflow
 model: claude-sonnet-4-5
@@ -11,8 +11,8 @@ Add a complete feature by orchestrating multiple commands to create requirements
 
 ## Current Model Context
 
-- Total requirements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
-- Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+- Total requirements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
+- Verification coverage: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
 
 ## User Request
 
@@ -64,14 +64,14 @@ This command orchestrates the complete workflow:
 
 5. **Validate complete feature:**
    ```bash
-   reqvire validate
-   reqvire coverage --filter-name="<feature-name>"
-   reqvire traces --filter-name="<feature-name>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --filter-name="<feature-name>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" traces --filter-name="<feature-name>"
    ```
 
 6. **Clean up model:**
    ```bash
-   reqvire lint --fix
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --fix
    ```
 
 ## Command Flow

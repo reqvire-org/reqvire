@@ -59,6 +59,7 @@ Implementation details shall follow the associated refinement specifications.
 #### Relations
   * derive: [Attachment Commands](#attachment-commands)
   * derive: [CLI Diff Output](#cli-diff-output)
+  * derive: [Explicit Workspace Selection](#explicit-workspace-selection)
   * derive: [CLI Add Element Command](#cli-add-element-command)
   * derive: [CLI Change Impact Report Command](#cli-change-impact-report-command)
   * derive: [CLI Collect Command](#cli-collect-command)
@@ -83,6 +84,30 @@ Implementation details shall follow the associated refinement specifications.
   * derivedFrom: [CLI interface](../Interfaces.md#cli-interface)
   * refinedBy: [CLI Interface Structure Refinement Specification](Specifications.md#cli-interface-structure-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+---
+
+### Explicit Workspace Selection
+
+The system shall allow command invocations to select the Reqvire workspace explicitly without requiring the caller process to start inside the workspace directory.
+
+#### Details
+- The CLI shall provide a global workspace selection option.
+- Workspace selection shall apply before model parsing, ignore-pattern loading, git root discovery, reporting, and mutation execution.
+- Workspace selection shall preserve existing behavior when the option is not provided.
+- Workspace selection shall apply consistently to normal CLI commands and MCP server startup.
+- Workspace selection shall reject invalid workspace directories before executing a command.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Git Repository Scope Specification](../../Functional/Core/Specifications.md#git-repository-scope-specification)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [Explicit Workspace Selection Specification](Specifications.md#explicit-workspace-selection-specification)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * verifiedBy: [Explicit Workspace Selection Verification](Verifications/CLIVerifications.md#explicit-workspace-selection-verification)
 ---
 
 ### CLI Diff Output

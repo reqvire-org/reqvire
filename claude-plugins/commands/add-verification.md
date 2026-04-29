@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Edit, Bash(reqvire:*)
+allowed-tools: Read, Edit, Bash(npx:*)
 argument-hint: [requirement-id]
 description: Add a verification for an existing requirement, checking if verification is needed based on requirement hierarchy
 model: claude-sonnet-4-5
@@ -11,9 +11,9 @@ Add a verification for an existing requirement following Reqvire's bottom roll-u
 
 ## Current Model Context
 
-- Total verifications: !`reqvire search --json | jq -r '.global_counters.verifications'`
-- Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
-- Unverified leaf requirements: !`reqvire coverage --json | jq -r '.summary.unverified_leaf_requirements'`
+- Total verifications: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.verifications'`
+- Verification coverage: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+- Unverified leaf requirements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.unverified_leaf_requirements'`
 
 ## User Request
 
@@ -28,7 +28,7 @@ ${1:-The user will specify which requirement needs verification.}
 
 2. **Check if verification is needed:**
    ```bash
-   reqvire traces --filter-name="<requirement-name>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" traces --filter-name="<requirement-name>"
    ```
 
    Analyze the trace tree:
@@ -37,7 +37,7 @@ ${1:-The user will specify which requirement needs verification.}
 
 3. **Check current coverage:**
    ```bash
-   reqvire coverage --filter-name="<requirement-name>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --filter-name="<requirement-name>"
    ```
 
 4. **If leaf requirement needs verification:**
@@ -52,7 +52,7 @@ ${1:-The user will specify which requirement needs verification.}
 
    For each requirement this verification will verify:
    ```bash
-   reqvire search --filter-id="<requirement-id>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-id="<requirement-id>"
    ```
 
    Extract:
@@ -94,7 +94,7 @@ ${1:-The user will specify which requirement needs verification.}
 7. **Add verification using reqvire add command:**
 
    ```bash
-   reqvire add "requirements/Verifications/<file>.md" <<'EOF'
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/Verifications/<file>.md" <<'EOF'
    ### Verification Name
 
    [Description of verification approach]
@@ -119,14 +119,14 @@ ${1:-The user will specify which requirement needs verification.}
 
    Optional: Insert at specific position (0-based index):
    ```bash
-   reqvire add "requirements/Verifications/<file>.md" 0 <<'EOF'
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/Verifications/<file>.md" 0 <<'EOF'
    ...
    EOF
    ```
 
    Alternative using pipe:
    ```bash
-   cat element.md | reqvire add "requirements/Verifications/<file>.md"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/Verifications/<file>.md" < element.md
    ```
 
    The add command automatically:
@@ -145,13 +145,13 @@ ${1:-The user will specify which requirement needs verification.}
 
 9. **Check updated coverage:**
     ```bash
-    reqvire coverage --filter-name="<requirement-name>"
+    npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --filter-name="<requirement-name>"
     ```
 
 10. **Verify roll-up and check for redundancies:**
     ```bash
-    reqvire traces --filter-name="<verification-name>"
-    reqvire lint --json --output /tmp/lint.json
+    npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" traces --filter-name="<verification-name>"
+    npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --json --output /tmp/lint.json
     ```
 
     Check if verification creates redundant verify relations (verifying both leaf and parent).
@@ -162,17 +162,17 @@ After adding verifications, you may need to reorganize:
 
 **Move verification to different file:**
 ```bash
-reqvire mv "<verification-name>" "requirements/Verifications/<file>.md"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "<verification-name>" "requirements/Verifications/<file>.md"
 ```
 
 **Move verification with specific position (0-based index):**
 ```bash
-reqvire mv "<verification-name>" "<target-file>" 0
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "<verification-name>" "<target-file>" 0
 ```
 
 **Remove verification:**
 ```bash
-reqvire rm "<verification-name>"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rm "<verification-name>"
 ```
 
 ## Decision Logic

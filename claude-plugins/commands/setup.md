@@ -8,7 +8,7 @@ model: claude-sonnet-4-5
 ## Setup Steps
 
 1. Update plugin to latest version
-2. Install/update reqvire CLI binary
+2. Verify the Reqvire npm runner
 3. Ask user permission to update CLAUDE.md with reqvire instructions
 
 ### Step 1: Update Plugin
@@ -42,47 +42,31 @@ cd "$PLUGIN_DIR" && git log --oneline -1
 
 **Note**: User may need to restart Claude Code after plugin update for changes to take effect.
 
-### Step 2: Installing reqvire CLI
+### Step 2: Verify Reqvire via npx
 
-Detect the operating system and install reqvire accordingly:
+Reqvire commands in this plugin use the npm package by default, so users do not need a separate binary install. The default package is `@reqvire-org/reqvire@latest`.
 
-1. First check the platform (look at the `<env>` context for "Platform:" info)
-2. Run the appropriate installation commands for that platform
+Check that Node/npm are available, then verify the Reqvire runner:
 
-#### Linux x86_64
 ```bash
-mkdir -p ~/.local/bin
-curl -fsSL -o /tmp/reqvire.tar.gz https://github.com/Reqvire/reqvire/releases/download/v0.13.0/reqvire-linux-x86_64.tar.gz
-tar -xzf /tmp/reqvire.tar.gz -C ~/.local/bin
-mv ~/.local/bin/reqvire-linux-x86_64 ~/.local/bin/reqvire
-chmod +x ~/.local/bin/reqvire
+node --version
+npm --version
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --version
 ```
 
-#### Mac Silicon (ARM64)
+If the user wants reproducible/pinned command behavior, have them set `REQVIRE_NPX_PACKAGE` before running Claude Code:
+
 ```bash
-mkdir -p ~/.local/bin
-curl -fsSL -o /tmp/reqvire.tar.gz https://github.com/Reqvire/reqvire/releases/download/v0.13.0/reqvire-darwin-aarch64.tar.gz
-tar -xzf /tmp/reqvire.tar.gz -C ~/.local/bin
-mv ~/.local/bin/reqvire-darwin-aarch64 ~/.local/bin/reqvire
-chmod +x ~/.local/bin/reqvire
+export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
 ```
 
-#### Mac Intel (x86_64)
-```bash
-mkdir -p ~/.local/bin
-curl -fsSL -o /tmp/reqvire.tar.gz https://github.com/Reqvire/reqvire/releases/download/v0.13.0/reqvire-darwin-x86_64.tar.gz
-tar -xzf /tmp/reqvire.tar.gz -C ~/.local/bin
-mv ~/.local/bin/reqvire-darwin-x86_64 ~/.local/bin/reqvire
-chmod +x ~/.local/bin/reqvire
-```
+On Windows PowerShell:
 
-#### Windows (PowerShell)
 ```powershell
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.local\bin"
-Invoke-WebRequest -Uri "https://github.com/Reqvire/reqvire/releases/download/v0.13.0/reqvire-windows-x86_64.zip" -OutFile "$env:TEMP\reqvire.zip"
-Expand-Archive -Path "$env:TEMP\reqvire.zip" -DestinationPath "$env:USERPROFILE\.local\bin" -Force
-Rename-Item "$env:USERPROFILE\.local\bin\reqvire-windows-x86_64.exe" "reqvire.exe"
+$env:REQVIRE_NPX_PACKAGE = "@reqvire-org/reqvire@0.13.2"
 ```
+
+If Node/npm are unavailable, tell the user to install Node.js 22 or newer, then rerun `/reqvire:setup`.
 
 ### Step 3: Update CLAUDE.md (Ask Permission First)
 
@@ -109,7 +93,8 @@ If the user approves, add the following content to the repository's CLAUDE.md fi
 1. **Use the `syseng` skill** for all requirements and model work
 2. **Use `/reqvire:*` commands** from the reqvire plugin for model operations
 3. **NEVER manually edit** requirements files without using reqvire commands unless reqvire tool is not able to cover the need.
-4. **ALWAYS validate** the model after changes with `reqvire validate`
+4. **ALWAYS validate** the model after changes with `npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate`
+5. **Pin Reqvire when needed** by setting `REQVIRE_NPX_PACKAGE`, for example `export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2`
 ```
 
 #### Content to add at the BOTTOM of CLAUDE.md:
@@ -124,4 +109,3 @@ If the user approves, add the following content to the repository's CLAUDE.md fi
 - If CLAUDE.md doesn't exist, create it with these sections
 - If CLAUDE.md exists, read it first, then add the top section after the first heading (or at the top if no heading), and append the bottom section at the end
 - Do not duplicate content if it already exists
-

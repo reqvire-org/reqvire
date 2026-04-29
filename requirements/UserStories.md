@@ -189,6 +189,7 @@ As a **System Engineer**, I want to interact with the system model through multi
 This user story covers the different ways to access and manage system models:
 - Command-line interface for automation and scripting
 - Web interface for browsing and visualization
+- MCP interface for typed external tool, IDE, CI, and AI-agent integration
 
 #### Metadata
   * type: user-requirement

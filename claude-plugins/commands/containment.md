@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 description: Analyze model's containment structure (folders, files, and elements) to understand organization and suggest improvements
 model: claude-sonnet-4-5
 ---
@@ -10,14 +10,14 @@ Analyze the physical structure of your Reqvire model to understand how elements 
 
 ## Current Model Context
 
-- Total elements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
-- Total files: !`reqvire search --json | jq -r '.global_counters.total_files'`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
+- Total files: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_files'`
 
 ## Steps
 
 1. **Get containment structure in JSON format:**
    ```bash
-   reqvire containment --json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" containment --json
    ```
 
    This provides the hierarchical structure showing:
@@ -31,13 +31,13 @@ Analyze the physical structure of your Reqvire model to understand how elements 
 2. **Get actual element counts per file:**
    ```bash
    # Count total elements per file
-   reqvire search --json | jq -r '.files | to_entries[] | "\(.key): \(.value.total_elements) elements"'
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.files | to_entries[] | "\(.key): \(.value.total_elements) elements"'
 
    # Find files with many elements (>20)
-   reqvire search --json | jq -r '.files | to_entries[] | select(.value.total_elements > 20) | "\(.key): \(.value.total_elements) elements"'
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.files | to_entries[] | select(.value.total_elements > 20) | "\(.key): \(.value.total_elements) elements"'
 
    # Find files with few elements (<3)
-   reqvire search --json | jq -r '.files | to_entries[] | select(.value.total_elements < 3) | "\(.key): \(.value.total_elements) elements"'
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.files | to_entries[] | select(.value.total_elements < 3) | "\(.key): \(.value.total_elements) elements"'
    ```
 
 3. **Analyze the structure:**
@@ -49,7 +49,7 @@ Analyze the physical structure of your Reqvire model to understand how elements 
 
 4. **Generate text diagram for visualization:**
    ```bash
-   reqvire containment
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" containment
    ```
 
    This creates a Mermaid graph showing the containment tree structure.
@@ -111,19 +111,19 @@ Use containment analysis when:
 
 ```bash
 # 1. Get containment structure (folder/file hierarchy)
-reqvire containment --json --output /tmp/containment.json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" containment --json --output /tmp/containment.json
 
 # 2. Get actual element counts per file
-reqvire search --json | jq -r '.files | to_entries[] | "\(.key): \(.value.total_elements) elements"' > /tmp/file_sizes.txt
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.files | to_entries[] | "\(.key): \(.value.total_elements) elements"' > /tmp/file_sizes.txt
 
 # 3. Find files with many elements (candidates for splitting)
-reqvire search --json | jq -r '.files | to_entries[] | select(.value.total_elements > 20) | "\(.key): \(.value.total_elements) elements"'
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.files | to_entries[] | select(.value.total_elements > 20) | "\(.key): \(.value.total_elements) elements"'
 
 # 4. Find files with few elements (candidates for consolidation)
-reqvire search --json | jq -r '.files | to_entries[] | select(.value.total_elements < 3) | "\(.key): \(.value.total_elements) elements"'
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.files | to_entries[] | select(.value.total_elements < 3) | "\(.key): \(.value.total_elements) elements"'
 
 # 5. Visualize folder structure
-reqvire containment
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" containment
 
 # 6. Plan refactoring based on findings
 ```
@@ -140,7 +140,7 @@ Provide clear, actionable recommendations:
 **Files to Consolidate:**
 - `temp/A.md` (2 elements) + `temp/B.md` (3 elements) → Use:
   ```bash
-  reqvire mv-file "temp/B.md" "temp/A.md" --squash
+  npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv-file "temp/B.md" "temp/A.md" --squash
   ```
 
 **Folder Reorganization:**

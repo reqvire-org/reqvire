@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 description: Find and analyze redundant verify relations in the Reqvire model
 model: claude-sonnet-4-5
 ---
@@ -10,13 +10,13 @@ Analyze the verification traces to find redundant verify relations in the model.
 
 ## Current Status
 
-- Auto-fixable issues: !`reqvire lint --json 2>&1 | jq -r '"\(if .auto_fixable then (.auto_fixable | length) else 0 end) (including redundant verifications)"'`
+- Auto-fixable issues: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --json 2>&1 | jq -r '"\(if .auto_fixable then (.auto_fixable | length) else 0 end) (including redundant verifications)"'`
 
 ## Instructions
 
 1. Run the lint command to find redundancies:
    ```bash
-   reqvire lint --json --output /tmp/lint.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --json --output /tmp/lint.json
    ```
 
 2. Parse the JSON to find redundant verify relations:
@@ -43,7 +43,7 @@ Analyze the verification traces to find redundant verify relations in the model.
 
 5. **Auto-fix option:**
    ```bash
-   reqvire lint --fix
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --fix
    ```
 
 ## Background

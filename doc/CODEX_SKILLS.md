@@ -12,6 +12,18 @@ Use this skill for:
 - model exploration and impact analysis
 - MBSE-first change workflows in Reqvire
 
+The skill uses the Reqvire npm package by default:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
+```
+
+To pin the Reqvire version used by the skill, set:
+
+```bash
+export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
+```
+
 ## Install Globally (User Machine)
 
 Global Codex skills are loaded from `$CODEX_HOME/skills`.

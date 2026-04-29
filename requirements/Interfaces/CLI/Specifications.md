@@ -122,6 +122,29 @@ Each command has its own options displayed in a flattened section
  * refine: [CLI Interface Structure](Commands.md#cli-interface-structure)
 ---
 
+### Explicit Workspace Selection Specification
+
+The CLI is expected to resolve and enter an explicitly selected workspace before executing Reqvire operations.
+
+#### Details
+Workspace selection rules:
+- The global option is `--workspace <DIR>`.
+- The selected workspace path is resolved and canonicalized before command execution.
+- The selected workspace must exist and be a directory.
+- The process current directory is changed to the selected workspace before loading `.gitignore`, `.reqvireignore`, scanning Markdown files, resolving git root, computing reports, or executing mutations.
+- If the selected workspace is a git repository subdirectory, existing Reqvire subtree-scoped scanning behavior is preserved.
+- If `--workspace` is not provided, existing current-working-directory behavior is preserved.
+- Workspace selection is process startup configuration and is not exposed as an MCP tool argument.
+- MCP workspace/session responses report the effective workspace after selection.
+- Invalid workspace paths fail before command execution with a clear error.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Explicit Workspace Selection](Commands.md#explicit-workspace-selection)
+---
+
 ### Diff Output Format Specification
 
 Git-style diff format for change previews.

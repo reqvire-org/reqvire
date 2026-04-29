@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 description: Lint and clean up the Reqvire model by fixing issues and identifying items needing review
 model: claude-sonnet-4-5
 ---
@@ -10,14 +10,14 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
 ## Current Lint Status
 
-- Auto-fixable: !`reqvire lint --json 2>&1 | jq -r '"\(if .auto_fixable then (.auto_fixable | length) else 0 end) issues"'`
-- Manual review: !`reqvire lint --json 2>&1 | jq -r '"\(if .needs_manual_review then (.needs_manual_review | length) else 0 end) items"'`
+- Auto-fixable: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --json 2>&1 | jq -r '"\(if .auto_fixable then (.auto_fixable | length) else 0 end) issues"'`
+- Manual review: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --json 2>&1 | jq -r '"\(if .needs_manual_review then (.needs_manual_review | length) else 0 end) items"'`
 
 ## Steps
 
 1. **Apply auto-fixes immediately:**
    ```bash
-   reqvire lint --fix
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --fix
    ```
 
    This automatically fixes:
@@ -27,7 +27,7 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
 2. **Check for manual review items:**
    ```bash
-   reqvire lint --json --output /tmp/lint.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --json --output /tmp/lint.json
    jq '.needs_manual_review' /tmp/lint.json
    ```
 
@@ -35,7 +35,7 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
    Read affected specifications:
    ```bash
-   reqvire search --filter-id="<element-id>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-id="<element-id>"
    ```
 
    Provide recommendations:
@@ -45,7 +45,7 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
 4. **Validate after changes:**
    ```bash
-   reqvire validate
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
    ```
 
 ## Lint Categories

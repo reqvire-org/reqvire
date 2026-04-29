@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 description: Analyze coverage (verification and implementation) and identify gaps
 model: claude-sonnet-4-5
 ---
@@ -10,21 +10,21 @@ Analyze verification and implementation coverage to identify gaps.
 
 ## Current Coverage
 
-- Total requirements: !`reqvire coverage --json | jq -r '.summary.total_leaf_requirements'`
-- Verified: !`reqvire coverage --json | jq -r '.summary.verified_leaf_requirements'`
-- Coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
-- Unverified: !`reqvire coverage --json | jq -r '.summary.unverified_leaf_requirements'`
-- Implementation scope: !`reqvire coverage --json | jq -r '.summary.total_requirements_in_scope'`
-- Implementation covered: !`reqvire coverage --json | jq -r '.summary.covered_requirements'`
-- Implementation uncovered: !`reqvire coverage --json | jq -r '.summary.uncovered_requirements'`
-- Implementation coverage: !`reqvire coverage --json | jq -r '.summary.implementation_coverage_percentage'`%
+- Total requirements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.total_leaf_requirements'`
+- Verified: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.verified_leaf_requirements'`
+- Coverage: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+- Unverified: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.unverified_leaf_requirements'`
+- Implementation scope: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.total_requirements_in_scope'`
+- Implementation covered: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.covered_requirements'`
+- Implementation uncovered: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.uncovered_requirements'`
+- Implementation coverage: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.implementation_coverage_percentage'`%
 
 ## Steps
 
 1. **Generate coverage report:**
    ```bash
-   reqvire coverage
-   reqvire coverage --json --output /tmp/coverage.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json --output /tmp/coverage.json
    ```
 
 2. **Analyze coverage statistics:**
@@ -46,7 +46,7 @@ Analyze verification and implementation coverage to identify gaps.
 
    For each unverified requirement:
    ```bash
-   reqvire traces --filter-name="<requirement-name>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" traces --filter-name="<requirement-name>"
    ```
 
    Determine:

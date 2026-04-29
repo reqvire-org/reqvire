@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 argument-hint: [requirement-name]
 description: Add a new requirement to the Reqvire model with proper structure and traceability
 model: claude-sonnet-4-5
@@ -11,9 +11,9 @@ Add a new requirement to the Reqvire model following MBSE best practices.
 
 ## Current Model Context
 
-- Total requirements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
-- Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
-- Unverified leaf requirements: !`reqvire coverage --json | jq -r '.summary.unverified_leaf_requirements'`
+- Total requirements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
+- Verification coverage: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+- Unverified leaf requirements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.unverified_leaf_requirements'`
 
 ## User Request
 
@@ -65,7 +65,7 @@ ${1:-The user will provide requirement details.}
 
 3. **Add the requirement using reqvire add command:**
    ```bash
-   reqvire add "<file-path>" <<'EOF'
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "<file-path>" <<'EOF'
    ### Requirement Name
 
    The system shall [capability].
@@ -80,14 +80,14 @@ ${1:-The user will provide requirement details.}
 
    Optional: Insert at specific position (0-based index):
    ```bash
-   reqvire add "<file-path>" 0 <<'EOF'
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "<file-path>" 0 <<'EOF'
    ...
    EOF
    ```
 
    Alternative using pipe:
    ```bash
-   cat element.md | reqvire add "<file-path>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "<file-path>" < element.md
    ```
 
    The add command automatically:
@@ -102,12 +102,12 @@ ${1:-The user will provide requirement details.}
 
    Run traces to check hierarchy:
    ```bash
-   reqvire traces --filter-name="<requirement-name>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" traces --filter-name="<requirement-name>"
    ```
 
 5. **Check coverage:**
    ```bash
-   reqvire coverage --filter-name="<requirement-name>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --filter-name="<requirement-name>"
    ```
 
 6. **Next steps:**
@@ -120,17 +120,17 @@ After adding requirements, you may need to reorganize:
 
 **Move element to different file:**
 ```bash
-reqvire mv "<element-name>" "<target-file>"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "<element-name>" "<target-file>"
 ```
 
 **Move element with specific position (0-based index):**
 ```bash
-reqvire mv "<element-name>" "<target-file>" 0
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" mv "<element-name>" "<target-file>" 0
 ```
 
 **Remove element:**
 ```bash
-reqvire rm "<element-name>"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rm "<element-name>"
 ```
 
 ## Best Practices

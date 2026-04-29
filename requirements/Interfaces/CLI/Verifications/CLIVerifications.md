@@ -90,6 +90,29 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [HTML Export](../../WebInterface/Features.md#html-export)
 ---
 
+### Explicit Workspace Selection Verification
+
+This verification shall prove that Reqvire commands can be launched outside a project while operating on an explicitly selected workspace.
+
+#### Details
+Expected checks:
+- Run a normal CLI report command from outside the target repository using `--workspace <DIR>` and verify it reads the selected workspace model.
+- Run model mutation commands from outside the target repository using `--workspace <DIR>` and verify changed files are written inside the selected workspace.
+- Run file move mutation from outside the target repository using `--workspace <DIR>` and verify the moved file and updated model references remain inside the selected workspace.
+- Run change-impact from outside the target repository using `--workspace <DIR>` and verify git comparison is computed against the selected workspace repository.
+- Run MCP stdio startup from outside the target repository using `--workspace <DIR>` and verify workspace status reports the selected workspace.
+- Verify workspace selection is applied before ignore-pattern loading and model validation.
+- Verify invalid workspace paths fail before command execution.
+- Verify omitting `--workspace` preserves current working directory behavior.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-workspace-flag/test.sh)
+  * verify: [Explicit Workspace Selection](../Commands.md#explicit-workspace-selection)
+---
+
 ### Verification Traces Element Navigation Test
 
 Test verifies that verification element names in the traces report are clickable links.

@@ -26,6 +26,7 @@ codefetch.config.mjs
 
 # Claude Code local settings (user-specific, not plugin files)
 .claude/
+.codex
 
 Plan.md
 PlanTodo.md
@@ -36,3 +37,8 @@ yolo_claude_loop.sh
 # Generated HTML output
 cli/html/
 .serena
+reqvire-agent
+
+# npm package build artifacts
+npm/reqvire/artifacts/
+npm/reqvire/*.tgz

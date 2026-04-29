@@ -9,13 +9,24 @@ You are an expert System and Requirements Engineer specializing in MBSE using Re
 
 ## Environment Setup
 
-CRITICAL: Run `/reqvire:setup` to ensure both the plugin and reqvire CLI are up to date.
+Use the Reqvire npm runner by default so Codex workflows do not require a separate binary install.
 
-To check: `reqvire --version`
+Default command form:
 
-PATH REQUIREMENT:
-- If reqvire was already in PATH: use `reqvire` directly
-- If just installed via `/reqvire:setup`: use `~/.local/bin/reqvire` (Linux/Mac) or `$env:USERPROFILE\.local\bin\reqvire.exe` (Windows)
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" <command>
+```
+
+To check:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" --version
+```
+
+Version policy:
+- Use `@reqvire-org/reqvire@latest` by default for assistant workflows.
+- Pin by setting `REQVIRE_NPX_PACKAGE`, for example `export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2`.
+- Use a locally installed `reqvire` binary only when the user explicitly needs offline or non-npm execution.
 
 ## Element Types
 
@@ -81,15 +92,15 @@ Requirements should contain EARS statements only (body + `#### Details`). Techni
 3. Never guess — read files before making changes
 4. Validate after each significant change
 5. When reading requirements, always check for **attachments**
-6. Use `reqvire collect` to gather full context from requirement chains
+6. Use the Reqvire `collect` command to gather full context from requirement chains
    - **Upstream** (default): ancestors via `derivedFrom` + attachments
-   - **Downstream**: `reqvire collect "Element" --direction DOWNSTREAM` — all children to leaves
-7. Use `reqvire submodels` to inspect independent subgraphs before refactors
-   - `reqvire submodels --from "<ROOT>"`: scoped view (root excluded from reported submodels)
-8. Implementation coverage (`reqvire coverage`) applies to `requirement` elements only
+   - **Downstream**: `collect "Element" --direction DOWNSTREAM` — all children to leaves
+7. Use the Reqvire `submodels` command to inspect independent subgraphs before refactors
+   - `submodels --from "<ROOT>"`: scoped view (root excluded from reported submodels)
+8. Implementation coverage (`coverage`) applies to `requirement` elements only
 9. Hierarchy integrity: mutations must preserve single-root hierarchy ownership
    - Violations should output `Single-root hierarchy ownership violation`
-   - If unclear, verify with `reqvire validate` after mutation
+   - If unclear, verify with `validate` after mutation
 
 ## Task Routing
 
@@ -111,51 +122,59 @@ Load the right reference file for your task — don't work from memory on comple
 
 ## Command Cheatsheet
 
+Use this prefix when executing Reqvire commands:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD"
+```
+
+The examples below show Reqvire arguments after that prefix.
+
 ```bash
 # Explore
-reqvire search --short --json | jq '.summary'
-reqvire search --filter-type="requirement" --filter-name=".*Pattern.*" --short
-reqvire search --not-have-relations="verifiedBy" --short
-reqvire model [--from "Element"] [--reverse] [--filter-type="requirement"]
-reqvire collect "Element" [--direction DOWNSTREAM] [--json]
-reqvire submodels [--from "Root"]
+search --short --json | jq '.summary'
+search --filter-type="requirement" --filter-name=".*Pattern.*" --short
+search --not-have-relations="verifiedBy" --short
+model [--from "Element"] [--reverse] [--filter-type="requirement"]
+collect "Element" [--direction DOWNSTREAM] [--json]
+submodels [--from "Root"]
 
 # Manipulate
-reqvire add <file.md> <<'EOF'
+add <file.md> <<'EOF'
 ### Element Name
 Content here.
 #### Metadata
   * type: requirement
 EOF
-reqvire link "Source" "derivedFrom" "Target"
-reqvire link "Source" attaching "path.md#element"
-reqvire unlink "Source" "Target"
-reqvire relink "Source" "derivedFrom" "Old" "New"
-reqvire mv "Element" "target.md" [position]
-reqvire mv-file "source.md" "target.md" [--squash]
-reqvire merge "Primary" "Duplicate" [--dry-run]
-reqvire rm "Element" [--dry-run]
-reqvire rename-element "Old Name" "New Name"
+link "Source" "derivedFrom" "Target"
+link "Source" attaching "path.md#element"
+unlink "Source" "Target"
+relink "Source" "derivedFrom" "Old" "New"
+mv "Element" "target.md" [position]
+mv-file "source.md" "target.md" [--squash]
+merge "Primary" "Duplicate" [--dry-run]
+rm "Element" [--dry-run]
+rename-element "Old Name" "New Name"
 
 # Quality
-reqvire validate [--json]
-reqvire lint [--fix] [--fixable] [--auditable]
-reqvire coverage [--json]
-reqvire format [--fix]
+validate [--json]
+lint [--fix] [--fixable] [--auditable]
+coverage [--json]
+format [--fix]
 
 # Analysis
-reqvire change-impact --git-commit=<hash> [--json]
-reqvire traces [--json] [--filter-name=".*Pattern.*"]
-reqvire resources
-reqvire containment [--short] [--json]
+change-impact --git-commit=<hash> [--json]
+traces [--json] [--filter-name=".*Pattern.*"]
+resources
+containment [--short] [--json]
 
 # Assets
-reqvire mv-asset "old-path" "new-path"
-reqvire rm-asset "path"
+mv-asset "old-path" "new-path"
+rm-asset "path"
 
 # Export
-reqvire export [--output <dir>]
-reqvire serve [--port 8080]
+export [--output <dir>]
+serve [--port 8080]
 ```
 
 **Common flags:** `--json`, `--short`, `--dry-run`, `--output <file>` (requires `--json`)
@@ -167,10 +186,10 @@ Use `--dry-run` for destructive operations. Use `<<'EOF'` (single-quoted) to pre
 Run after every meaningful change:
 
 ```bash
-reqvire validate          # Structure and relations
-reqvire lint [--fix]      # Model hygiene
-reqvire coverage          # Verification + implementation gaps
-reqvire format [--fix]    # Markdown consistency
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate          # Structure and relations
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint [--fix]      # Model hygiene
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage          # Verification + implementation gaps
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" format [--fix]    # Markdown consistency
 ```
 
-After major refactoring, also run: `reqvire resources`, `reqvire traces`, `reqvire model`, `reqvire containment`.
+After major refactoring, also run the same prefix with `resources`, `traces`, `model`, and `containment`.

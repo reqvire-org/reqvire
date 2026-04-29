@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 description: Analyze the current Reqvire model structure, identify issues, coverage gaps, and provide improvement recommendations
 model: claude-sonnet-4-5
 ---
@@ -10,38 +10,38 @@ Perform comprehensive analysis of the current Reqvire model.
 
 ## Current Model State
 
-- Validation status: !`reqvire validate 2>&1 | head -1`
-- Total elements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
-- Verification coverage: !`reqvire coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
-- Test satisfaction: !`reqvire coverage --json | jq -r '.summary.test_verifications_satisfaction_percentage'`%
+- Validation status: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate 2>&1 | head -1`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
+- Verification coverage: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
+- Test satisfaction: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.test_verifications_satisfaction_percentage'`%
 
 ## Steps
 
 1. **Run validation:**
    ```bash
-   reqvire validate --json --output /tmp/validation.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate --json --output /tmp/validation.json
    ```
 
 2. **Generate model search:**
    ```bash
-   reqvire search --short --json --output /tmp/search.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --short --json --output /tmp/search.json
    ```
 
    Use `--short` to get model structure without full content.
 
 3. **Check coverage:**
    ```bash
-   reqvire coverage --json --output /tmp/coverage.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json --output /tmp/coverage.json
    ```
 
 4. **Run lint checks:**
    ```bash
-   reqvire lint --json --output /tmp/lint.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --json --output /tmp/lint.json
    ```
 
 5. **Analyze submodel boundaries:**
    ```bash
-   reqvire submodels --json --output /tmp/submodels.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" submodels --json --output /tmp/submodels.json
    ```
 
 6. **Analyze the results:**

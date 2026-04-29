@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 description: Consolidate elements using automated merge + intelligent cleanup workflow
 model: claude-sonnet-4-5
 ---
@@ -10,9 +10,9 @@ Consolidate child requirements that only refine their parents (without introduci
 
 ## Model Context
 
-- Total elements: !`reqvire search --json 2>/dev/null | jq -r '.global_counters.total_elements // "N/A"'`
-- Leaf requirements: !`reqvire coverage --json 2>/dev/null | jq -r '.summary.total_leaf_requirements // "N/A"'`
-- Validation status: !`reqvire validate 2>&1 | head -1`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json 2>/dev/null | jq -r '.global_counters.total_elements // "N/A"'`
+- Leaf requirements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json 2>/dev/null | jq -r '.summary.total_leaf_requirements // "N/A"'`
+- Validation status: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate 2>&1 | head -1`
 
 ## When to Use
 
@@ -61,7 +61,7 @@ First, analyze the model to identify consolidation candidates:
 
 ```bash
 # Get model structure
-reqvire search --short --json --output /tmp/search.json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --short --json --output /tmp/search.json
 ```
 
 Review the model structure and identify parent-child requirement pairs based on:
@@ -76,16 +76,16 @@ Once candidates are identified, execute the merge:
 
 ```bash
 # Preview the merge first (recommended)
-reqvire merge "<target-element>" "<source1>" "<source2>" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" merge "<target-element>" "<source1>" "<source2>" --dry-run
 
 # Execute the merge
-reqvire merge "<target-element>" "<source1>" "<source2>"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" merge "<target-element>" "<source1>" "<source2>"
 ```
 
 **Example:**
 ```bash
 # Merge two child refinements into parent
-reqvire merge "Format Consistency Enforcement" "Excess Whitespace Format" "Missing Separators Format"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" merge "Format Consistency Enforcement" "Excess Whitespace Format" "Missing Separators Format"
 ```
 
 ### Step 3: Read Merged Element (CRITICAL)
@@ -94,7 +94,7 @@ After merge, read the merged element to see the raw output:
 
 ```bash
 # Read the merged element to see what needs cleanup
-reqvire search --filter-name="<target-name>" --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-name="<target-name>" --json
 ```
 
 The merged element will have **artifacts that need cleanup**:
@@ -169,7 +169,7 @@ The system shall provide formatting capability for maintaining consistent docume
 Replace the merged element with the clean version:
 
 ```bash
-reqvire add "<file-path>" --override <<'EOF'
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "<file-path>" --override <<'EOF'
 ### <Element Name>
 
 <Clean main content - EARS statement>
@@ -189,7 +189,7 @@ EOF
 
 **Example:**
 ```bash
-reqvire add "requirements/SystemRequirements/Formatting.md" --override <<'EOF'
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/SystemRequirements/Formatting.md" --override <<'EOF'
 ### Format Consistency Enforcement
 
 The system shall provide formatting capability for maintaining consistent document structure.
@@ -220,7 +220,7 @@ After cleanup, validate the model:
 
 ```bash
 # Validate model
-reqvire validate
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
 
 # If validation passes, continue to next consolidation
 # If validation fails, fix issues before continuing
@@ -232,10 +232,10 @@ After all consolidations:
 
 ```bash
 # Format all files
-reqvire format --fix
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" format --fix
 
 # Final validation
-reqvire validate
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
 ```
 
 ## Complete Workflow Example
@@ -244,18 +244,18 @@ Here's a complete example consolidating CLI option children into parent:
 
 ```bash
 # 1. Identify candidates
-reqvire search --filter-name="CLI Traces" --short
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-name="CLI Traces" --short
 # Found: CLI Traces Command, CLI Traces Filter Options, CLI Traces From-Folder Option
 
 # 2. Execute merge
-reqvire merge "CLI Traces Command" "CLI Traces Filter Options" "CLI Traces From-Folder Option"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" merge "CLI Traces Command" "CLI Traces Filter Options" "CLI Traces From-Folder Option"
 
 # 3. Read merged element
-reqvire search --filter-name="CLI Traces Command" --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-name="CLI Traces Command" --json
 # Shows element with "Merged Details" sections
 
 # 4. Prepare and override with clean version
-reqvire add "requirements/CLI/Commands.md" --override <<'EOF'
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" add "requirements/CLI/Commands.md" --override <<'EOF'
 ### CLI Traces Command
 
 The system shall implement traces subcommand for generating verification trace reports.
@@ -286,7 +286,7 @@ Support `--from-folder` option that specifies relative path for portable links:
 EOF
 
 # 5. Validate
-reqvire validate
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
 ```
 
 ## Anti-Patterns (When NOT to Consolidate)

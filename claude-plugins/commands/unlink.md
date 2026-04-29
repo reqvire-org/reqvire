@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 argument-hint: <source> <target>
 description: Remove a relation or attachment (auto-detects type)
 model: claude-sonnet-4-5
@@ -11,7 +11,7 @@ Remove an existing relation or attachment between elements. The command auto-det
 
 ## Current Model Context
 
-- Total elements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
 
 ## User Request
 
@@ -28,7 +28,7 @@ ${1:-The user will provide source element and target.}
 
 2. **Preview the unlink operation:**
    ```bash
-   reqvire unlink "<source-element>" "<target>" --dry-run
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "<source-element>" "<target>" --dry-run
    ```
 
    This shows:
@@ -38,7 +38,7 @@ ${1:-The user will provide source element and target.}
 
 3. **Apply the unlink:**
    ```bash
-   reqvire unlink "<source-element>" "<target>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "<source-element>" "<target>"
    ```
 
    The unlink command automatically:
@@ -49,7 +49,7 @@ ${1:-The user will provide source element and target.}
 
 4. **Verify the changes:**
    ```bash
-   reqvire validate
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
    ```
 
 ## Auto-Detection Behavior
@@ -83,22 +83,22 @@ The unlink operation will fail with a clear error if:
 
 **Remove a relation (auto-detected):**
 ```bash
-reqvire unlink "Feature Requirement" "User Story"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "Feature Requirement" "User Story"
 ```
 
 **Remove an attachment file:**
 ```bash
-reqvire unlink "System Requirement" "docs/SLA.pdf"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "System Requirement" "docs/SLA.pdf"
 ```
 
 **Remove an attached element:**
 ```bash
-reqvire unlink "System Requirement" "Performance Constraint"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "System Requirement" "Performance Constraint"
 ```
 
 **Preview before unlinking:**
 ```bash
-reqvire unlink "Feature X" "Feature Y" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "Feature X" "Feature Y" --dry-run
 ```
 
 ## When to Use unlink

@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*), Bash(git:*)
+allowed-tools: Read, Bash(npx:*), Bash(git:*)
 argument-hint: [commit-hash]
 description: Analyze change impact for modified requirements using git commit history
 model: claude-sonnet-4-5
@@ -39,8 +39,8 @@ ${1:-Comparing against: HEAD~1 (previous commit)}
 
 2. **Run change impact analysis:**
    ```bash
-   reqvire change-impact --git-commit=${1:-HEAD~1}
-   reqvire change-impact --git-commit=${1:-HEAD~1} --json --output /tmp/impact.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact --git-commit=${1:-HEAD~1}
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact --git-commit=${1:-HEAD~1} --json --output /tmp/impact.json
    ```
 
 3. **Analyze the results:**
@@ -56,8 +56,8 @@ ${1:-Comparing against: HEAD~1 (previous commit)}
 4. **For each modified requirement:**
 
    ```bash
-   reqvire search --filter-id="<requirement-id>"
-   reqvire traces --filter-id="<requirement-id>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-id="<requirement-id>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" traces --filter-id="<requirement-id>"
    ```
 
    Identify:

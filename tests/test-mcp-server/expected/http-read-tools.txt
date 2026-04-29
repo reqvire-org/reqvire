@@ -1,0 +1,15 @@
+reqvire.workspace_status
+reqvire.tool_contract
+reqvire.model_revision
+reqvire.read_element
+reqvire.search
+reqvire.model
+reqvire.containment
+reqvire.collect
+reqvire.submodels
+reqvire.lint
+reqvire.coverage
+reqvire.traces
+reqvire.resources
+reqvire.change_impact
+reqvire.format

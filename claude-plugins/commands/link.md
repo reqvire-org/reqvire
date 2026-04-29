@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 argument-hint: <source> <relation-type-or-attaching> <target>
 description: Link elements with a relation or attach files/elements
 model: claude-sonnet-4-5
@@ -11,7 +11,7 @@ Create a relation between elements or attach files/refinement elements. This uni
 
 ## Current Model Context
 
-- Total elements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
 
 ## User Request
 
@@ -30,7 +30,7 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 
 2. **Preview the link operation:**
    ```bash
-   reqvire link "<source-element>" "<relation-type-or-attaching>" "<target>" --dry-run
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "<source-element>" "<relation-type-or-attaching>" "<target>" --dry-run
    ```
 
    This shows:
@@ -40,7 +40,7 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 
 3. **Apply the link:**
    ```bash
-   reqvire link "<source-element>" "<relation-type-or-attaching>" "<target>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "<source-element>" "<relation-type-or-attaching>" "<target>"
    ```
 
    The link command automatically:
@@ -52,7 +52,7 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 
 4. **Verify the changes:**
    ```bash
-   reqvire validate
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
    ```
 
 ## Supported Relation Types
@@ -121,32 +121,32 @@ The link operation will fail with a clear error if:
 
 **Link requirement to parent:**
 ```bash
-reqvire link "Feature Requirement" derivedFrom "User Story"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Feature Requirement" derivedFrom "User Story"
 ```
 
 **Link requirement to implementation file:**
 ```bash
-reqvire link "Authentication Requirement" satisfiedBy "src/auth/login.rs"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Authentication Requirement" satisfiedBy "src/auth/login.rs"
 ```
 
 **Link to external URL:**
 ```bash
-reqvire link "Compliance Requirement" trace "https://example.com/regulations.html"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Compliance Requirement" trace "https://example.com/regulations.html"
 ```
 
 **Attach a document:**
 ```bash
-reqvire link "System Requirement" attaching "docs/SLA.pdf"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" attaching "docs/SLA.pdf"
 ```
 
 **Attach a refinement element:**
 ```bash
-reqvire link "System Requirement" attaching "Performance Constraint"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" attaching "Performance Constraint"
 ```
 
 **Preview before linking:**
 ```bash
-reqvire link "Feature X" trace "Feature Y" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Feature X" trace "Feature Y" --dry-run
 ```
 
 ## When to Use link

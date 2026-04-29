@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 argument-hint: [element-name]
 description: Remove an element from the model
 model: claude-sonnet-4-5
@@ -11,7 +11,7 @@ Remove an existing model element from the specifications.
 
 ## Current Model Context
 
-- Total elements: !`reqvire search --json | jq -r '.global_counters.total_elements'`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json | jq -r '.global_counters.total_elements'`
 
 ## User Request
 
@@ -27,7 +27,7 @@ ${1:-The user will provide element name to remove.}
 
 2. **Preview the remove operation:**
    ```bash
-   reqvire rm "<element-name>" --dry-run
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rm "<element-name>" --dry-run
    ```
 
    This shows:
@@ -37,7 +37,7 @@ ${1:-The user will provide element name to remove.}
 
 3. **Apply the removal:**
    ```bash
-   reqvire rm "<element-name>"
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rm "<element-name>"
    ```
 
    The rm command automatically:
@@ -48,7 +48,7 @@ ${1:-The user will provide element name to remove.}
 
 4. **Verify the changes:**
    ```bash
-   reqvire validate
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
    ```
 
    **Important**: After removing an element, validation may show errors if other elements still reference the removed element. You'll need to manually update or remove those relations.
@@ -75,17 +75,17 @@ The rm operation will fail with a clear error if:
 
 **Remove a requirement:**
 ```bash
-reqvire rm "Deprecated Feature"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rm "Deprecated Feature"
 ```
 
 **Preview before removing:**
 ```bash
-reqvire rm "Old Requirement" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rm "Old Requirement" --dry-run
 ```
 
 **Get JSON output:**
 ```bash
-reqvire rm "Obsolete Element" --json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rm "Obsolete Element" --json
 ```
 
 ## When to Use rm

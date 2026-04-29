@@ -12,8 +12,11 @@ graph TD
         subgraph ReqvireTool["ReqvireTool Subsystem"]
             subgraph UserInterface["UserInterface"]
                 CLI["CLI"]
-                ChatOps["ChatOps"]
+                WebInterface["WebInterface"]
+                MCPServer["MCPServer"]
             end
+            SharedToolContracts["SharedToolContracts"]
+            MutationSafety["MutationSafety"]
             ModelManagement["ModelManagement"]
             ValidationAndReporting["ValidationAndReporting"]
             Storage["Storage"]
@@ -38,6 +41,8 @@ graph TD
     %% Subsystems under Reqvire
     subgraph ReqvireTool["ReqvireTool (subsystem)"]
         UserInterface["UserInterface (component)"]
+        SharedToolContracts["SharedToolContracts (component)"]
+        MutationSafety["MutationSafety (component)"]
         ModelManagement["ModelManagement (component)"]
         ValidationAndReporting["ValidationAndReporting (component)"]
         Storage["Storage (component)"]
@@ -69,7 +74,12 @@ graph TD
     ReqvireTool --> Storage
 
     UserInterface --> CLI["CLI (component)"]
-    UserInterface --> ChatOps["ChatOps (component)"]
+    UserInterface --> WebInterface["WebInterface (component)"]
+    UserInterface --> MCPServer["MCPServer (component)"]
+    MCPServer --> SharedToolContracts
+    SharedToolContracts --> MutationSafety
+    SharedToolContracts --> ModelManagement
+    SharedToolContracts --> ValidationAndReporting
 
     Integrations --> GitHubIntegration
     Integrations --> CICDIntegration
@@ -89,6 +99,7 @@ graph TD
   * trace: [AI-Assisted System Model Management](UserStories.md#ai-assisted-system-model-management)
   * trace: [CLI interface](Interfaces/Interfaces.md#cli-interface)
   * trace: [Web Interface](Interfaces/Interfaces.md#web-interface)
+  * trace: [MCP Interface](Interfaces/Interfaces.md#mcp-interface)
   * trace: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
   * trace: [Model Reports](System/Reporting.md#model-reports)
   * trace: [Validating Structures](UserStories.md#validating-structures)
@@ -104,10 +115,33 @@ The Logical Architecture for Reqvire defines the high-level functional organizat
 classDiagram
     class UserInteraction {
         +CLIInterface
-        +ChatOpsInterface
+        +WebInterface
+        +MCPInterface
     }
     class CLI {
         +InteractWithModelManagement()
+    }
+    class WebInterface {
+        +BrowseGeneratedDocumentation()
+        +NavigateModelReports()
+    }
+    class MCPInterface {
+        +ExposeTypedToolContracts()
+        +ExposeReadOnlyResources()
+        +GateMutationRequests()
+    }
+    class SharedToolContracts {
+        +TypedRequests()
+        +TypedResults()
+        +StructuredErrors()
+        +EvidenceMetadata()
+    }
+    class MutationSafety {
+        +RequireDryRun()
+        +FlushFilesystemWrites()
+        +RefreshInternalGraph()
+        +ReturnDiffs()
+        +SyncGraphFromCoreMutation()
     }
     class ModelManagement {
         +ManageModel()
@@ -121,7 +155,7 @@ classDiagram
         +ProvideAISuggestions()
         +DevelopSystemOfInterest()
         +ApplyAISuggestions()
-        +CallModelManagementFunctions()
+        +CallMCPTools()
     }
     class AIWorkflow {
         +DriveAIAgentsDevelopment()
@@ -161,13 +195,21 @@ classDiagram
 
     %% Relationships
     UserInteraction --> CLI : "Interacts via CLI"
-    UserInteraction --> AI : "Interacts via ChatOps"
+    UserInteraction --> WebInterface : "Browses documentation"
+    UserInteraction --> AI : "Reviews AI suggestions"
     CLI --> ModelManagement
-    AI --> ModelManagement : "Calls Functions for Model Management"
     CLI --> ValidationAndReporting : "Triggers validation/fixing/reporting"
     CLI --> Storage : "Reads/Writes Model Data"
+    WebInterface --> ValidationAndReporting : "Displays generated reports"
+    WebInterface --> Storage : "Reads generated documentation"
+    MCPInterface --> SharedToolContracts : "Adapts MCP protocol"
+    SharedToolContracts --> ModelManagement : "Calls core operations"
+    SharedToolContracts --> ValidationAndReporting : "Calls report operations"
+    SharedToolContracts --> MutationSafety : "Applies write policy"
+    MutationSafety --> ModelManagement : "Executes approved mutations"
+    AI --> MCPInterface : "Calls typed MCP tools"
     AI --> ValidationAndReporting : "Provides AI Validation Suggestions"
-    AI --> Storage : "Saves Approved Changes"
+    AI --> Storage : "Saves approved code changes"
     ValidationAndReporting --> Storage : "Accesses Model Data"
     Integrations --> ValidationAndReporting : "Triggers Validations"
     Integrations --> GitHubIntegration : "Manages GitHub-related tasks"
@@ -185,7 +227,7 @@ classDiagram
     AIWorkflow --> Integrations : "Collaborates with CI/CD and Github"
     AIWorkflow --> SystemOfInterest : "Guides System Development"
     AIWorkflow --> AI : "Drives AI Agent Actions"
-    AIWorkflow --> ModelManagement : "Interacts with Model Management Functions"
+    AIWorkflow --> MCPInterface : "Uses typed model tools"
 ```
 
 #### Metadata
@@ -196,6 +238,7 @@ classDiagram
   * trace: [AI-Assisted System Model Management](UserStories.md#ai-assisted-system-model-management)
   * trace: [CLI interface](Interfaces/Interfaces.md#cli-interface)
   * trace: [Web Interface](Interfaces/Interfaces.md#web-interface)
+  * trace: [MCP Interface](Interfaces/Interfaces.md#mcp-interface)
   * trace: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
   * trace: [Model Reports](System/Reporting.md#model-reports)
   * trace: [Validating Structures](UserStories.md#validating-structures)

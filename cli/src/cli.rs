@@ -1,6 +1,7 @@
+use crate::mcp;
 use crate::serve;
 use anyhow::Result;
-use clap::{CommandFactory, Parser, Subcommand};
+use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
 use globset::GlobSet;
 use log::info;
 use reqvire::change_impact;
@@ -36,8 +37,18 @@ use std::path::PathBuf;
     name = "reqvire"
 )]
 pub struct Args {
+    /// Workspace directory to operate on
+    #[clap(long, global = true, value_name = "DIR")]
+    pub workspace: Option<PathBuf>,
+
     #[clap(subcommand)]
     pub command: Option<Commands>,
+}
+
+#[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
+pub enum McpTransport {
+    Stdio,
+    Http,
 }
 
 #[derive(Subcommand, Debug)]
@@ -61,6 +72,29 @@ pub enum Commands {
         /// Server port
         #[clap(long, default_value = "8080", help_heading = "SERVE OPTIONS")]
         port: u16,
+    },
+
+    /// Start Reqvire MCP server
+    #[clap(
+        name = "mcp",
+        override_help = "Start Reqvire MCP server\n\nMCP OPTIONS:\n      --transport <TRANSPORT>   MCP transport: stdio or http (default: stdio)\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools"
+    )]
+    Mcp {
+        /// MCP transport
+        #[clap(long, value_enum, default_value_t = McpTransport::Stdio, help_heading = "MCP OPTIONS")]
+        transport: McpTransport,
+
+        /// HTTP bind address
+        #[clap(long, default_value = "127.0.0.1", help_heading = "MCP OPTIONS")]
+        host: String,
+
+        /// HTTP server port
+        #[clap(long, default_value = "8081", help_heading = "MCP OPTIONS")]
+        port: u16,
+
+        /// Advertise and allow mutation tools
+        #[clap(long, help_heading = "MCP OPTIONS")]
+        enable_mutations: bool,
     },
 
     /// Format and normalize requirements files. By default, shows preview without applying changes
@@ -667,6 +701,38 @@ impl Args {
     }
 }
 
+pub fn apply_workspace(workspace: Option<&PathBuf>) -> Result<(), ReqvireError> {
+    let Some(workspace) = workspace else {
+        return Ok(());
+    };
+
+    let canonical = std::fs::canonicalize(workspace).map_err(|e| {
+        ReqvireError::PathError(format!(
+            "Failed to resolve workspace '{}': {}",
+            workspace.display(),
+            e
+        ))
+    })?;
+
+    if !canonical.is_dir() {
+        return Err(ReqvireError::PathError(format!(
+            "Workspace '{}' is not a directory",
+            canonical.display()
+        )));
+    }
+
+    std::env::set_current_dir(&canonical).map_err(|e| {
+        ReqvireError::PathError(format!(
+            "Failed to enter workspace '{}': {}",
+            canonical.display(),
+            e
+        ))
+    })?;
+
+    git_commands::clear_git_cache();
+    Ok(())
+}
+
 fn print_custom_help(cmd: &clap::Command) {
     // Print basic info
     if let Some(about) = cmd.get_about() {
@@ -949,6 +1015,25 @@ pub async fn handle_command(
             eprintln!("error: --output requires --json flag");
             return Ok(1);
         }
+    }
+
+    if let Some(Commands::Mcp {
+        transport,
+        host,
+        port,
+        enable_mutations,
+    }) = args.command
+    {
+        return match transport {
+            McpTransport::Stdio => {
+                mcp::serve_stdio(enable_mutations, excluded_filename_patterns).map(|_| 0)
+            }
+            McpTransport::Http => {
+                mcp::serve_http(enable_mutations, excluded_filename_patterns, &host, port)
+                    .await
+                    .map(|_| 0)
+            }
+        };
     }
 
     // Get current working directory once at the start
@@ -1739,6 +1824,7 @@ pub async fn handle_command(
             run_sout(&model_manager.graph_registry)?;
             Ok(0)
         }
+        Some(Commands::Mcp { .. }) => unreachable!("MCP command is handled before model parsing"),
         None => {
             // This case is handled at the beginning of handle_command
             unreachable!("Command is None but should have been handled earlier");
@@ -2269,6 +2355,7 @@ mod tests {
     async fn test_handle_command() {
         // Mock CLI arguments
         let args = Args {
+            workspace: None,
             command: Some(Commands::Export {
                 output: Some("html".to_string()),
             }),
@@ -2291,5 +2378,19 @@ mod tests {
             result.is_ok(),
             "handle_command should execute without errors"
         );
+    }
+
+    #[test]
+    fn workspace_flag_is_global() {
+        let args = Args::parse_from(&["reqvire", "--workspace", "/tmp", "validate"]);
+        assert_eq!(args.workspace, Some(PathBuf::from("/tmp")));
+        assert!(matches!(args.command, Some(Commands::Validate { .. })));
+    }
+
+    #[test]
+    fn apply_workspace_rejects_missing_directory() {
+        let missing = PathBuf::from("/definitely/not/a/reqvire/workspace");
+        let err = apply_workspace(Some(&missing)).unwrap_err();
+        assert!(err.to_string().contains("Failed to resolve workspace"));
     }
 }

@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*), Bash(git:*)
+allowed-tools: Read, Bash(npx:*), Bash(git:*)
 argument-hint: [base-commit]
 description: Generate implementation task plan from requirement changes using change-impact analysis
 model: claude-sonnet-4-5
@@ -34,14 +34,14 @@ Generate implementation task plan from requirement changes on a feature branch.
 
 2. **Run change impact:**
    ```bash
-   reqvire change-impact --git-commit=$BASE_COMMIT --json --output /tmp/impact.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" change-impact --git-commit=$BASE_COMMIT --json --output /tmp/impact.json
    ```
 
 3. **Review impact scope and enumerate covered elements** (from JSON `impact_scope[]`):
 
    The `impact_scope` array shows the per-branch common parent requirements covering all impacted elements. For each scope root, use downstream collect to enumerate all covered children:
    ```bash
-   reqvire collect "<scope-root-name>" --direction DOWNSTREAM --json --output /tmp/scope_<name>.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" collect "<scope-root-name>" --direction DOWNSTREAM --json --output /tmp/scope_<name>.json
    ```
 
    This returns the scope root and all its descendants, giving you the complete list of affected elements under each scope entry.
@@ -50,7 +50,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 
    Get full upstream context using collect:
    ```bash
-   reqvire collect "<requirement-name>" --json --output /tmp/req_<requirement-id>.json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" collect "<requirement-name>" --json --output /tmp/req_<requirement-id>.json
    ```
 
    This provides:
@@ -62,7 +62,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 
    Also get direct details:
    ```bash
-   reqvire search --filter-id="<requirement-id>" --json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-id="<requirement-id>" --json
    ```
 
    Extract:
@@ -75,7 +75,7 @@ Generate implementation task plan from requirement changes on a feature branch.
 
    Get test paths:
    ```bash
-   reqvire search --filter-id="<verification-id>" --json
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-id="<verification-id>" --json
    ```
 
    Extract satisfiedBy relations (test files).
@@ -128,7 +128,7 @@ Generate implementation task plan from requirement changes on a feature branch.
    For each requirement, save a formatted summary:
    ```bash
    # Save collected output to /tmp for reference
-   reqvire collect "<requirement-name>" > /tmp/req_context_<requirement-id>.md
+   npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" collect "<requirement-name>" > /tmp/req_context_<requirement-id>.md
    ```
 
    This provides developers with full context documents they can reference during implementation.

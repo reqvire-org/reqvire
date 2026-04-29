@@ -8,6 +8,9 @@ repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
 
+[package.metadata.dist]
+dist = false
+
 [dependencies]
 # Parsing and content manipulation
 pulldown-cmark = { workspace = true }
@@ -44,4 +47,3 @@ assert_fs = { workspace = true }
 predicates = { workspace = true }
 tempfile = { workspace = true }
 serial_test = { workspace = true }
-

@@ -8,16 +8,28 @@ The use case diagram below highlights the primary interactions between the Reqvi
 ```mermaid
 flowchart LR
     subgraph "ReqvireTool"
-        subgraph "Cli"
+        subgraph "Interfaces"
+            cliInterface[CLI]
+            webInterface[Web/HTML Interface]
+            mcpServer[MCP Server]
+        end
+
+        subgraph "Shared Contracts"
+            toolContracts[Typed Tool Contracts]
+            operationContracts[Shared Operation Contracts]
+            mutationPolicy[Mutation Safety Policy]
+        end
+
+        subgraph "Reqvire Core"
             manageModel((Manage System Model))
             generateDiagrams((Generate Diagrams))
-            analiseRelations((Analyze Relations))
-            reports[Provide Reports]
+            analyzeRelations((Analyze Relations))
+            provideReports[Provide Reports]
             validateStructure((Validate Structure))
             filesStructure[Filesystem Structure]
-            markdownSucture[Markdown Structure]
+            markdownStructure[Markdown Structure]
             modelStructure[Model Structure]
-            reports[Reports]
+            traceability((Traceability))
             handleDiffs((Trace Changes))
             browseModel((Browse Model))
         end
@@ -28,12 +40,17 @@ flowchart LR
     human -. develop .-> developedSystem
 
 
-    subgraph "AI tools"
+    subgraph "MCP Clients"
        aiAgents((AI Agents🤖))
-       aiSuggestions((Suggestions)) 
-       reviewSuggestions((Review Suggestions))                
-       applySuggestions((Apply Approved Suggestions))                
-    end    
+       ideClients[IDE Integrations]
+       ciAdapters[CI Adapters]
+    end
+
+    subgraph "Human-in-the-loop AI Workflow"
+       aiSuggestions((Suggestions))
+       reviewSuggestions((Review Suggestions))
+       applySuggestions((Apply Approved Suggestions))
+    end
 
     subgraph "External Systems"
         ciSystem[CI/CD System]
@@ -52,22 +69,42 @@ flowchart LR
     end
 
     %% Human Interactions
-    human -. use CLI to .-> manageModel
-    human -. use browser to .-> browseModel
+    human -. use .-> cliInterface
+    human -. use browser to .-> webInterface
+    cliInterface -. invokes .-> manageModel
+    webInterface -. renders .-> browseModel
 
     human -. colaborate via .-> GitHubOrSimilar
 
     ReqvireTool -. read/write/get diffs .-> gitRepository
+
+    %% MCP interface
+    aiAgents -. uses MCP .-> mcpServer
+    ideClients -. uses MCP .-> mcpServer
+    ciAdapters -. uses MCP .-> mcpServer
+    ciSystem -. may use .-> ciAdapters
+
+    mcpServer -. exposes .-> toolContracts
+    toolContracts -. reuse .-> operationContracts
+    toolContracts -. call .-> manageModel
+    toolContracts -. call .-> browseModel
+    toolContracts -. call .-> validateStructure
+    toolContracts -. call .-> analyzeRelations
+    toolContracts -. call .-> provideReports
+    toolContracts -. call .-> traceability
+    toolContracts -. call .-> handleDiffs
+    mutationPolicy -. guards .-> manageModel
+    mutationPolicy -. guards .-> handleDiffs
  
     manageModel -. provide .-> validateStructure
-    validateStructure -. include .-> markdownSucture
+    validateStructure -. include .-> markdownStructure
     validateStructure -. include .-> filesStructure  
     validateStructure -. include .-> modelStructure   
-    validateStructure -. include .-> reports
+    validateStructure -. include .-> provideReports
 
     manageModel -. provide .-> traceability
-    manageModel -. provide .-> analiseRelations
-    analiseRelations -. include .-> reports
+    manageModel -. provide .-> analyzeRelations
+    analyzeRelations -. include .-> provideReports
     manageModel -. provide .-> generateDiagrams
     manageModel -. provide .-> handleDiffs
     manageModel -. provide .-> browseModel
@@ -75,10 +112,7 @@ flowchart LR
     browseModel -. include .-> validateStructure
     browseModel -. include .-> generateDiagrams
     browseModel -. include .-> traceability
-    browseModel -. include .-> reports
-
-    aiAgents -. uses MCP server to .-> manageModel
-    aiAgents -. uses MCP server to .-> browseModel
+    browseModel -. include .-> provideReports
 
     aiAgents -. assist in development .-> developedSystem
     aiAgents -. commit code changes .-> gitRepository
@@ -104,7 +138,7 @@ flowchart LR
     model -- guides development of --> developedSystem
 
     %% Reqvire Interactions with SOI
-    handleDiffs -. include .-> reports    
+    handleDiffs -. include .-> provideReports    
 
     %% SOI Feedback Loop
     developedSystem -. feedback .-> model
@@ -118,11 +152,19 @@ This diagram outlines the core interactions, components, and workflows of the **
 
 ### Reqvire Tool
 
-The central component of the system, which facilitates various MBSE-related activities. It consists of two primary submodules:
+The central component of the system, which facilitates various MBSE-related activities. It exposes human and machine interfaces over the same Reqvire core behavior.
 
 #### Tool Interfaces
 
-Tool interfaces are **CLI** (Command Line Interface) and **MCP** (Model Context Protocol) server:
+Tool interfaces are **CLI** (Command Line Interface), **Web/HTML Interface**, and **MCP** (Model Context Protocol) server:
+- CLI: Human and automation interface for direct command execution.
+- Web/HTML Interface: Human browsing and visualization interface for generated documentation, diagrams, reports, and traces.
+- MCP Server: Typed external interface for AI agents, IDE integrations, CI adapters, and other tools.
+
+The MCP server exposes shared tool contracts. It does not expose arbitrary shell execution, does not own model state, and does not bypass Reqvire core semantics.
+
+#### Core Capabilities
+
 - Manage System Model: Core functionality to handle the System model lifecycle including refactoring model.
 - Generate Diagrams: Allows users to generate visual representations of the system model.
  - Diagrams can be generated for different viewpoints.
@@ -172,8 +214,9 @@ These features allow teams to seamlessly integrate System practices into their d
 
 Humans interact with Reqvire tools to manage, refine, and validate System models, as well as to collaborate effectively within development workflows:
 - Via CLI: Users leverage Reqvire’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.
+- Via Browser: Users browse generated HTML documentation, diagrams, reports, and traces.
 - Via AI Agents: Users interact with AI agents to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.
-  - AI agents may laverage Reqvire’s MCP server or consume model directly from the filesystem.
+  - AI agents use Reqvire’s MCP server for typed model evidence, reports, and approved mutation requests.
 - Collaboration: Users integrate Reqvire into agile workflows by collaborating through GitHub or similar platforms to manage repositories, track changes, and maintain traceability.
 
 
@@ -184,6 +227,8 @@ Humans interact with Reqvire tools to manage, refine, and validate System models
 
 - Reqvire uses Git repositories to store and version the System model and developed system.
 - Changes, including approved AI suggestions, are prepared and committed through standard Git workflows.
+- MCP clients receive workspace revision and dirty-state metadata so they can reason about model freshness.
+- MCP mutations must go through Reqvire core and preserve the shared filesystem persistence guarantees.
 
 
 ### CI/CD Integration
@@ -199,8 +244,6 @@ Humans interact with Reqvire tools to manage, refine, and validate System models
 
 - The System Model is implemented into the Developed System, which is stored and versioned in the Git repository.
 - The Reqvire CLI provides tools to validate, analyze, and generate artifacts from the model.
-- AI Agents assist humans by generating suggestions and automating repetitive tasks.
+- The Reqvire MCP server provides typed, protocol-level access to the same Reqvire core operations for AI agents, IDE integrations, and CI adapters.
+- AI Agents assist humans by generating suggestions and preparing approved changes through MCP-backed evidence and mutation contracts.
 - The **CI/CD System** ensures quality control and prevents invalid changes from being merged.
-
-
-

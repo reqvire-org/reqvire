@@ -1,5 +1,5 @@
 ---
-allowed-tools: Read, Bash(reqvire:*)
+allowed-tools: Read, Bash(npx:*)
 argument-hint: <element-name>
 description: Collect and summarize requirement context via derivedFrom chain (upstream) or derive chain (downstream)
 model: claude-sonnet-4-5
@@ -11,8 +11,8 @@ Collect and present a comprehensive summary of requirement context via the deriv
 
 ## Model Context
 
-- Total elements: !`reqvire search --json 2>/dev/null | jq -r '.global_counters.total_elements // "N/A"'`
-- Validation status: !`reqvire validate 2>&1 | head -1`
+- Total elements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --json 2>/dev/null | jq -r '.global_counters.total_elements // "N/A"'`
+- Validation status: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate 2>&1 | head -1`
 
 ## Element
 
@@ -26,7 +26,7 @@ ${1:-The user will provide the element name.}
 Run the `reqvire collect` command to gather the complete requirement context:
 
 ```bash
-reqvire collect "${1}" --json --output /tmp/collect_output.json
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" collect "${1}" --json --output /tmp/collect_output.json
 ```
 
 This command collects:
