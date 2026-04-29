@@ -51,6 +51,7 @@ This verification shall prove that MCP tools use shared Reqvire operation contra
 #### Details
 Expected checks:
 - Run representative Reqvire operations through MCP tools.
+- Run representative Reqvire operations through an external Rust fixture using the public Reqvire tool registry API.
 - Verify result schemas match shared contract definitions.
 - Verify transport-only options such as JSON stdout/file output are not exposed as MCP request fields.
 - Verify no-argument tools use valid MCP object input schemas.
@@ -63,6 +64,7 @@ Expected checks:
 
 #### Relations
   * verify: [MCP Shared Operation Interfaces](../Tools.md#mcp-shared-operation-interfaces)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
 ---
 
 ### MCP HTTP Transport End-to-End Verification
@@ -101,6 +103,7 @@ This verification shall prove that shared Reqvire MCP contracts are protocol-neu
 #### Details
 Expected checks:
 - Verify shared request/result/error/evidence/diff/version types do not depend on MCP SDK runtime types.
+- Verify an in-process Rust application can discover and call Reqvire tools through the public Reqvire library without starting MCP stdio or HTTP transport.
 - Verify the MCP adapter maps shared contracts to MCP `tools/list`, `tools/call`, resources, `structuredContent`, text `content`, and MCP error shapes.
 - Verify CLI and MCP can reuse shared operation contracts without MCP requirements deriving from CLI command requirements.
 
@@ -109,6 +112,7 @@ Expected checks:
 
 #### Relations
   * verify: [MCP Adapter Boundary](../Tools.md#mcp-adapter-boundary)
+  * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
 ---
 
 ### MCP Server State and Cache Verification

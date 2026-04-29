@@ -1,0 +1,11 @@
+[package]
+name = "reqvire-tool-interface-e2e"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+
+[dependencies]
+globset = "0.4"
+reqvire = { path = "../../../../core" }
+serde_json = "1.0"

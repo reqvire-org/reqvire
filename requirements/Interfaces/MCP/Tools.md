@@ -112,6 +112,7 @@ The system shall expose MCP tools through shared typed request and result interf
 - MCP tools shall reuse Reqvire core operation semantics.
 - MCP protocol concerns shall remain at the adapter boundary.
 - MCP tools shall provide machine-readable discovery metadata for clients.
+- Shared Reqvire tool interfaces shall be exposed by the Reqvire library so in-process applications can discover and call the same operations without using MCP transport.
 
 #### Metadata
   * type: requirement
@@ -125,6 +126,7 @@ The system shall expose MCP tools through shared typed request and result interf
   * refinedBy: [MCP Tool Call Contracts Specification](Specifications.md#mcp-tool-call-contracts-specification)
   * verifiedBy: [MCP Shared Operation Contracts Verification](Verifications/MCPVerifications.md#mcp-shared-operation-contracts-verification)
   * verifiedBy: [MCP Tool Call Contracts Verification](Verifications/MCPVerifications.md#mcp-tool-call-contracts-verification)
+  * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
 ---
 
@@ -136,6 +138,7 @@ The system shall keep Reqvire MCP tool interfaces protocol-neutral below the MCP
 - The MCP adapter boundary shall remain independent of MCP transport implementation details.
 - Shared MCP-facing Reqvire structures shall depend on Reqvire model concepts and core operations.
 - The MCP adapter shall map shared Reqvire structures into MCP protocol messages.
+- The MCP adapter shall call the shared Reqvire tool registry instead of owning a separate tool implementation.
 
 #### Metadata
   * type: requirement
@@ -144,6 +147,7 @@ The system shall keep Reqvire MCP tool interfaces protocol-neutral below the MCP
   * derivedFrom: [MCP Interface](../Interfaces.md#mcp-interface)
   * refinedBy: [MCP Contract Layer Boundary Specification](Specifications.md#mcp-contract-layer-boundary-specification)
   * verifiedBy: [MCP Contract Layer Boundary Verification](Verifications/MCPVerifications.md#mcp-contract-layer-boundary-verification)
+  * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
 ---
 

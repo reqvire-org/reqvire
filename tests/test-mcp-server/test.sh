@@ -156,6 +156,15 @@ format_fix_rejected_request() {
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/specifications" "$TEST_DIR/"
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/docs" "$TEST_DIR/"
 
+cargo run --quiet --locked \
+  --manifest-path "$TEST_SCRIPT_DIR/fixtures/tool-interface-app/Cargo.toml" \
+  --target-dir "$TEST_DIR/output/tool-interface-target" \
+  -- "$TEST_DIR" > "$TEST_DIR/output/tool-interface-app.txt" \
+  || fail "Reqvire tool interface library fixture failed" "$TEST_DIR/output/tool-interface-app.txt"
+if ! diff -u "$TEST_SCRIPT_DIR/expected/tool-interface-app.txt" "$TEST_DIR/output/tool-interface-app.txt"; then
+  fail "Reqvire tool interface library output does not match expected"
+fi
+
 DEFAULT_OUTPUT="$TEST_DIR/output/mcp-default.jsonl"
 run_mcp_default "$DEFAULT_OUTPUT" \
   "$(init_request)" \

@@ -25,6 +25,7 @@ pub mod report_resources;
 pub mod report_submodels;
 pub mod search;
 pub mod subsection;
+pub mod tool_interface;
 pub mod trace_tree_builder;
 pub mod utils;
 pub mod verification_trace;

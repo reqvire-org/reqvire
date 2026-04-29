@@ -178,6 +178,7 @@ Contract rules:
 - MCP tool definitions include `outputSchema` for structured results when the result contract is stable.
 - MCP tool calls return `structuredContent` for machine-readable results and include a text content copy when needed for client compatibility.
 - MCP adds protocol metadata, request/result typing, and evidence references around Reqvire operation contracts.
+- In-process library callers can use the shared Reqvire tool registry to receive the same tool definitions and structured operation results before MCP protocol wrapping.
 - Unknown tool calls, malformed requests, and invalid arguments use standard MCP/JSON-RPC protocol errors.
 - Reqvire validation, parse, and business-logic failures use MCP tool execution errors with structured Reqvire error data where available.
 
@@ -197,7 +198,9 @@ Boundary rules:
 - Shared contract types define Reqvire operation requests, results, errors, evidence references, mutation diffs, workspace/model revision metadata, and contract versions.
 - Shared contract types depend on Reqvire model concepts and core operation semantics.
 - Shared contract types do not depend on MCP SDK runtime types, transport types, or client runtime types.
+- The shared Reqvire tool registry is exposed through the Reqvire library for in-process applications that need to discover tool definitions and call tools without MCP transport.
 - The MCP adapter maps shared contracts to MCP `tools/list`, `tools/call`, resources, `structuredContent`, text `content`, and MCP error shapes.
+- The MCP adapter uses the same shared Reqvire tool registry that an in-process application can use directly.
 - Reqvire CLI and MCP may reuse shared operation contracts where they expose the same Reqvire operation, but MCP requirements do not derive from CLI command requirements.
 
 #### Metadata
