@@ -41,7 +41,10 @@ cli/html/
 .reqvire-agent/
 reqvire-agent
 reqvire-agent/.reqvire-agent/
+reqvire-agent.toml
 
 # npm package build artifacts
 npm/reqvire/artifacts/
 npm/reqvire/*.tgz
+
+.env
