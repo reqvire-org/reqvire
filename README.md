@@ -126,7 +126,7 @@ To read more about assistant integrations, see [Coding Assistants](https://www.r
 
 #### Codex Skill (Reqvire SysEng)
 
-This repository also includes a Codex skill package at `codex-skills/reqvire-syseng`.
+This repository includes an installable Codex skill package at `codex-skills/reqvire-syseng`.
 
 The skill uses the npm package by default, so a separate Reqvire binary install is not required for assistant workflows:
 
@@ -140,11 +140,27 @@ To pin assistant workflows to a specific Reqvire release, set `REQVIRE_NPX_PACKA
 export REQVIRE_NPX_PACKAGE=@reqvire-org/reqvire@0.13.2
 ```
 
-To install it globally on your machine (`$CODEX_HOME/skills`), run:
+To install the skill globally on your machine, clone this repository and run the installer:
+
+```bash
+git clone https://github.com/reqvire-org/reqvire.git
+cd reqvire
+./scripts/install-codex-skill.sh
+```
+
+The installer copies `codex-skills/reqvire-syseng` to:
+
+```text
+${CODEX_HOME:-$HOME/.codex}/skills/reqvire-syseng
+```
+
+If you are already inside a local Reqvire checkout, just run:
 
 ```bash
 ./scripts/install-codex-skill.sh
 ```
+
+Restart Codex after installing or updating the skill.
 
 See [doc/CODEX_SKILLS.md](./doc/CODEX_SKILLS.md) for details.
 
