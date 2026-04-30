@@ -34,5 +34,5 @@ pub mod verification_trace;
 pub use crate::element::Element;
 pub use crate::error::ReqvireError;
 pub use crate::graph_registry::GraphRegistry;
-pub use crate::model::ModelManager;
+pub use crate::model::{ModelBuildOptions, ModelManager};
 pub use crate::relation::Relation;

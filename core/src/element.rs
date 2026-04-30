@@ -99,6 +99,13 @@ pub struct Attachment {
     pub content_hash: Option<String>,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct SizeEstimate {
+    pub content_bytes: usize,
+    pub rendered_context_bytes: usize,
+    pub estimated_tokens: usize,
+}
+
 #[derive(Debug, PartialEq, Hash, Eq, Clone)]
 pub enum SubSection {
     Other(String),
@@ -268,6 +275,10 @@ pub struct Element {
     //
     // Attachments - external documents linked to this element
     pub attachments: Vec<Attachment>,
+    //
+    // Optional model-build metadata for JSON evidence consumers.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size_estimate: Option<SizeEstimate>,
 }
 
 impl Element {
@@ -298,6 +309,7 @@ impl Element {
             changed_since_commit: false,
             file_order_index: 0, // Will be set during parsing
             attachments: vec![],
+            size_estimate: None,
         }
     }
 

@@ -63,6 +63,16 @@ run_mcp_mutations() {
   } | (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --enable-mutations) > "$output_file" 2>"${output_file}.stderr"
 }
 
+run_mcp_size_estimates() {
+  local output_file="$1"
+  shift
+  {
+    for request in "$@"; do
+      printf '%s\n' "$request"
+    done
+  } | (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --with-size-estimates) > "$output_file" 2>"${output_file}.stderr"
+}
+
 start_http_mcp() {
   local port="$1"
   local output_prefix="$2"
@@ -133,6 +143,10 @@ read_element_request() {
   jq -n -c '{jsonrpc:"2.0",id:5,method:"tools/call",params:{name:"reqvire.read_element",arguments:{name:"Test Requirement Beta"}}}'
 }
 
+model_request() {
+  jq -n -c '{jsonrpc:"2.0",id:11,method:"tools/call",params:{name:"reqvire.model",arguments:{from:"Test Requirement Alpha"}}}'
+}
+
 collect_request() {
   jq -n -c '{jsonrpc:"2.0",id:6,method:"tools/call",params:{name:"reqvire.collect",arguments:{element_name:"Test Requirement Beta"}}}'
 }
@@ -194,9 +208,11 @@ assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.for
 
 assert_jq_line "$DEFAULT_OUTPUT" 3 '[.result.resources[].uri] | index("reqvire://workspace/status") != null' "resources/list exposes workspace status"
 assert_jq_line "$DEFAULT_OUTPUT" 4 '.result.structuredContent.workspace_root | type == "string"' "workspace_status returns workspace root"
+assert_jq_line "$DEFAULT_OUTPUT" 4 '.result.structuredContent.size_estimates_enabled == false' "workspace_status reports size estimates disabled by default"
 assert_jq_line "$DEFAULT_OUTPUT" 4 '.result.structuredContent.git.head | type == "string"' "workspace_status returns git HEAD"
 assert_jq_line "$DEFAULT_OUTPUT" 4 '.result.structuredContent.model.valid == true and (.result.structuredContent.model.fingerprint | type == "string")' "workspace_status returns model validity and fingerprint"
 assert_jq_line "$DEFAULT_OUTPUT" 5 '.result.structuredContent.name == "Test Requirement Beta"' "read_element returns authoritative element"
+assert_jq_line "$DEFAULT_OUTPUT" 5 '.result.structuredContent | has("size_estimate") | not' "read_element omits size estimate by default"
 assert_jq_line "$DEFAULT_OUTPUT" 6 '.result.structuredContent.starting_element == "specifications/Requirements.md#test-requirement-beta" and (.result.structuredContent.items[] | select(.name=="Test Requirement Beta"))' "collect returns structured content"
 assert_jq_line "$DEFAULT_OUTPUT" 7 '.error.code == -32602 and (.error.data.message | contains("element_name"))' "schema-invalid tool arguments return protocol error"
 assert_jq_line "$DEFAULT_OUTPUT" 8 '.error.code == -32602' "unknown or unadvertised tool returns protocol error"
@@ -207,6 +223,19 @@ UNSUPPORTED_OUTPUT="$TEST_DIR/output/mcp-unsupported-protocol.jsonl"
 run_mcp_default "$UNSUPPORTED_OUTPUT" \
   "$(jq -n -c '{jsonrpc:"2.0",id:1,method:"initialize",params:{protocolVersion:"1900-01-01"}}')"
 assert_jq_line "$UNSUPPORTED_OUTPUT" 1 '.error.message == "Unsupported MCP protocol version"' "unsupported protocol is rejected"
+
+SIZE_OUTPUT="$TEST_DIR/output/mcp-size-estimates.jsonl"
+run_mcp_size_estimates "$SIZE_OUTPUT" \
+  "$(init_request)" \
+  "$(workspace_status_request)" \
+  "$(read_element_request)" \
+  "$(model_request)" \
+  "$(resource_read_request)"
+
+assert_jq_line "$SIZE_OUTPUT" 2 '.result.structuredContent.size_estimates_enabled == true' "workspace_status reports size estimates enabled"
+assert_jq_line "$SIZE_OUTPUT" 3 '.result.structuredContent.size_estimate.content_bytes >= 0 and .result.structuredContent.size_estimate.rendered_context_bytes > 0 and .result.structuredContent.size_estimate.estimated_tokens > 0' "read_element includes size estimate when enabled"
+assert_jq_line "$SIZE_OUTPUT" 4 '[.result.structuredContent.elements[]? | .. | objects | select(has("identifier") and has("name"))] as $elements | ($elements | length) > 0 and all($elements[]; (.size_estimate.content_bytes | type == "number") and (.size_estimate.rendered_context_bytes | type == "number") and (.size_estimate.estimated_tokens | type == "number"))' "model tool includes size estimates when enabled"
+assert_jq_line "$SIZE_OUTPUT" 5 '.result.contents[0].text | fromjson | .size_estimates_enabled == true' "workspace status resource reports size estimates enabled"
 
 DRY_RUN_OUTPUT="$TEST_DIR/output/mcp-mutation-dry-run.jsonl"
 ADD_CONTENT="$(< "$TEST_SCRIPT_DIR/fixtures/mcp-added-requirement.md")"

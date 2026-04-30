@@ -80,6 +80,26 @@ This test verifies that the system correctly extracts and parses element subsect
   * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
 ---
 
+### Element Size Estimate Model Build Verification
+
+This verification shall prove that element size estimates are computed only when model building explicitly enables them.
+
+#### Details
+Expected checks:
+- Build a fixture model without size estimates and verify serialized model elements do not include `size_estimate`.
+- Build the same fixture model with `with_size_estimates` enabled and verify each serialized element includes `size_estimate`.
+- Verify `size_estimate` contains `content_bytes`, `rendered_context_bytes`, and `estimated_tokens`.
+- Verify `rendered_context_bytes` is computed without recursively including the `size_estimate` field itself.
+- Verify source Markdown files are not modified by size-estimate model building.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Opt-In Element Size Estimate Model Build](../ModelManagement.md#opt-in-element-size-estimate-model-build)
+  * satisfiedBy: [test-model-command](../../../../tests/test-model-command/test.sh)
+---
+
 ### Fragment Normalization Test
 
 This test verifies that the system correctly normalizes element name fragments according to GitHub's fragment identifier rules for use in Element IDs and cross-references.

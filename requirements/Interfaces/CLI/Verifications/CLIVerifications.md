@@ -1,5 +1,24 @@
 # Elements
 
+### CLI Size Estimate JSON Option Verification
+
+This verification shall prove that the CLI size-estimate option is JSON-only and enables element size estimates for supported commands.
+
+#### Details
+Expected checks:
+- Run `reqvire model --json --with-size-estimates` and verify element payloads include `size_estimate`.
+- Run `reqvire model --with-size-estimates` without `--json` and verify the command fails with a clear diagnostic.
+- Run `reqvire model --json` without `--with-size-estimates` and verify element payloads omit `size_estimate`.
+- Verify non-JSON model output is unchanged when the option is absent.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [CLI Size Estimate JSON Option](../Commands.md#cli-size-estimate-json-option)
+  * satisfiedBy: [test-model-command](../../../../tests/test-model-command/test.sh)
+---
+
 ### CLI Git Commit Hash Flag Test
 
 This test verifies that the system properly handles the git commit hash flag for change impact analysis.

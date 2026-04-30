@@ -5,7 +5,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
-use crate::element::{Element, ElementType, RequirementType};
+use crate::element::{Element, ElementType, RequirementType, SizeEstimate};
 use crate::error::ReqvireError;
 use crate::git_commands;
 use crate::relation::{
@@ -147,6 +147,30 @@ impl GraphRegistry {
         errors.extend(self.validate_cross_section_duplicates()?);
 
         Ok(errors)
+    }
+
+    /// Populate optional element-level size estimates for JSON evidence consumers.
+    pub fn populate_size_estimates(&mut self) -> Result<(), ReqvireError> {
+        let mut element_ids: Vec<String> = self.nodes.keys().cloned().collect();
+        element_ids.sort();
+
+        for element_id in element_ids {
+            if let Some(node) = self.nodes.get_mut(&element_id) {
+                node.element.size_estimate = None;
+                let rendered_context_bytes = serde_json::to_vec(&node.element)
+                    .map_err(|e| ReqvireError::SerializationError(e.to_string()))?
+                    .len();
+                let content_bytes = node.element.content.len();
+                node.element.size_estimate = Some(SizeEstimate {
+                    content_bytes,
+                    rendered_context_bytes,
+                    estimated_tokens: rendered_context_bytes.div_ceil(4),
+                });
+            }
+        }
+
+        self.build_relation_graph();
+        Ok(())
     }
 
     /// Validates that no element has the same target in both Relations and Attachments subsections
@@ -4667,6 +4691,41 @@ mod tests {
             },
             user_created: true,
         });
+    }
+
+    #[test]
+    fn populate_size_estimates_adds_non_recursive_element_metadata() {
+        let mut registry = GraphRegistry::new();
+        let element = make_element("file.md#size-estimate", "Size Estimate");
+
+        registry
+            .register_element(element, "file.md")
+            .expect("element should register");
+        registry
+            .populate_size_estimates()
+            .expect("size estimates should populate");
+
+        let element = registry
+            .get_element("file.md#size-estimate")
+            .expect("element should be present");
+        let estimate = element
+            .size_estimate
+            .as_ref()
+            .expect("size estimate should be present");
+
+        let mut without_estimate = element.clone();
+        without_estimate.size_estimate = None;
+        let expected_rendered_context_bytes = serde_json::to_vec(&without_estimate).unwrap().len();
+
+        assert_eq!(estimate.content_bytes, element.content.len());
+        assert_eq!(
+            estimate.rendered_context_bytes,
+            expected_rendered_context_bytes
+        );
+        assert_eq!(
+            estimate.estimated_tokens,
+            expected_rendered_context_bytes.div_ceil(4)
+        );
     }
 
     #[test]

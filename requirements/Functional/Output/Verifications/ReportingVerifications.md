@@ -102,6 +102,27 @@ This test verifies that the collect command aggregates content from a requiremen
   * verify: [CLI Collect Command](../../../Interfaces/CLI/Commands.md#cli-collect-command)
 ---
 
+### JSON Element Size Estimate Output Verification
+
+This verification shall prove that JSON model evidence outputs include element size estimates only when explicitly enabled.
+
+#### Details
+Expected checks:
+- Run model JSON output without size estimates and verify element payloads omit `size_estimate`.
+- Run model JSON output with size estimates enabled and verify top-level element payloads include `size_estimate`.
+- Verify nested relation element targets include `size_estimate` when size estimates are enabled.
+- Verify non-JSON model output remains unchanged and does not render size-estimate fields.
+- Verify the size estimate has `content_bytes`, `rendered_context_bytes`, and `estimated_tokens`.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [JSON Element Size Estimate Exposure](../Reporting.md#json-element-size-estimate-exposure)
+  * satisfiedBy: [test-model-command](../../../../tests/test-model-command/test.sh)
+  * satisfiedBy: [test-mcp-server](../../../../tests/test-mcp-server/test.sh)
+---
+
 ### CLI JSON File Output Test
 
 This test verifies that the `--output` flag writes JSON output to a file when used with `--json` across CLI commands.

@@ -1,5 +1,6 @@
 use crate::diagrams::escape_label;
 use crate::element;
+use crate::element::SizeEstimate;
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
@@ -29,6 +30,8 @@ pub struct ModelCentricElement {
     pub element_type: String,
     pub file_path: String,
     pub file_order_index: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub size_estimate: Option<SizeEstimate>,
     pub relations: Vec<ModelCentricRelation>,
     pub attachments: Vec<String>,
 }
@@ -294,6 +297,7 @@ fn build_element_recursive(
         element_type: element.element_type.as_str().to_string(),
         file_path: element.file_path.clone(),
         file_order_index: element.file_order_index,
+        size_estimate: element.size_estimate.clone(),
         relations,
         attachments,
     })

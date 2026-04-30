@@ -14,6 +14,28 @@ Attachment scope validation is expected to enforce:
  * type: specification
 ---
 
+### Element Size Estimate Model Build Specification
+
+Element size estimates are expected to be optional model-build metadata.
+
+#### Details
+- The model build option is named `with_size_estimates`.
+- The default value is `false`.
+- When `with_size_estimates` is `true`, each parsed model element includes an optional `size_estimate` record.
+- The `size_estimate` record contains `content_bytes`, `rendered_context_bytes`, and `estimated_tokens`.
+- `content_bytes` is derived from authoritative element content.
+- `rendered_context_bytes` is derived from the JSON evidence payload for the element, excluding the `size_estimate` field itself.
+- `estimated_tokens` is a deterministic approximation derived from `rendered_context_bytes`.
+- The size estimate is not part of the Markdown model source and must not be persisted into requirement files.
+- Report-level aggregate estimates are not part of this specification.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Opt-In Element Size Estimate Model Build](ModelManagement.md#opt-in-element-size-estimate-model-build)
+---
+
 ### Attachment Target Validation Refinement Specification
 
 #### Details

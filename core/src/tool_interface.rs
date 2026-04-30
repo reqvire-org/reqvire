@@ -13,7 +13,7 @@ use crate::report_resources;
 use crate::report_submodels;
 use crate::search;
 use crate::verification_trace;
-use crate::ModelManager;
+use crate::{ModelBuildOptions, ModelManager};
 use globset::GlobSet;
 use serde_json::{json, Value};
 use std::collections::BTreeSet;
@@ -26,13 +26,23 @@ pub const TOOL_CONTRACT_VERSION: &str = "1";
 
 pub struct ReqvireToolRegistry<'a> {
     enable_mutations: bool,
+    with_size_estimates: bool,
     excluded_filename_patterns: &'a GlobSet,
 }
 
 impl<'a> ReqvireToolRegistry<'a> {
     pub fn new(enable_mutations: bool, excluded_filename_patterns: &'a GlobSet) -> Self {
+        Self::new_with_options(enable_mutations, false, excluded_filename_patterns)
+    }
+
+    pub fn new_with_options(
+        enable_mutations: bool,
+        with_size_estimates: bool,
+        excluded_filename_patterns: &'a GlobSet,
+    ) -> Self {
         Self {
             enable_mutations,
+            with_size_estimates,
             excluded_filename_patterns,
         }
     }
@@ -70,6 +80,7 @@ impl<'a> ReqvireToolRegistry<'a> {
             name,
             args,
             self.enable_mutations,
+            self.with_size_estimates,
             self.excluded_filename_patterns,
         )
     }
@@ -77,10 +88,12 @@ impl<'a> ReqvireToolRegistry<'a> {
     pub fn read_resource(&self, uri: &str) -> Result<Value, ReqvireError> {
         let value = match uri {
             "reqvire://workspace/status" => {
-                workspace_status(self.excluded_filename_patterns).map(|v| resource_contents(uri, v))
+                workspace_status(self.excluded_filename_patterns, self.with_size_estimates)
+                    .map(|v| resource_contents(uri, v))
             }
             "reqvire://workspace/model-revision" => {
-                model_revision(self.excluded_filename_patterns).map(|v| resource_contents(uri, v))
+                model_revision(self.excluded_filename_patterns, self.with_size_estimates)
+                    .map(|v| resource_contents(uri, v))
             }
             "reqvire://tools/contract" => Ok(resource_contents(
                 uri,
@@ -88,6 +101,7 @@ impl<'a> ReqvireToolRegistry<'a> {
                     "mcp_protocol_version": MCP_PROTOCOL_VERSION,
                     "tool_contract_version": TOOL_CONTRACT_VERSION,
                     "mutation_tools_enabled": self.enable_mutations,
+                    "size_estimates_enabled": self.with_size_estimates,
                     "tools": self.tool_definitions()
                 }),
             )),
@@ -102,7 +116,14 @@ impl<'a> ReqvireToolRegistry<'a> {
 }
 
 pub fn validate_startup(excluded_filename_patterns: &GlobSet) -> Result<(), ReqvireError> {
-    load_model(excluded_filename_patterns)
+    validate_startup_with_options(excluded_filename_patterns, false)
+}
+
+pub fn validate_startup_with_options(
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<(), ReqvireError> {
+    load_model_with_options(excluded_filename_patterns, with_size_estimates)
         .map(|_| ())
         .map_err(|err| match err {
             ReqvireError::ValidationError(errors) => {
@@ -476,20 +497,26 @@ fn dispatch_tool(
     name: &str,
     args: &Value,
     enable_mutations: bool,
+    with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<Value, ReqvireError> {
     match name {
-        "reqvire.workspace_status" => workspace_status(excluded_filename_patterns),
+        "reqvire.workspace_status" => {
+            workspace_status(excluded_filename_patterns, with_size_estimates)
+        }
         "reqvire.tool_contract" => Ok(json!({
             "mcp_protocol_version": MCP_PROTOCOL_VERSION,
             "tool_contract_version": TOOL_CONTRACT_VERSION,
             "mutation_tools_enabled": enable_mutations,
+            "size_estimates_enabled": with_size_estimates,
             "tools": tool_definitions(enable_mutations)
         })),
-        "reqvire.model_revision" => model_revision(excluded_filename_patterns),
-        "reqvire.read_element" => read_element(args, excluded_filename_patterns),
+        "reqvire.model_revision" => model_revision(excluded_filename_patterns, with_size_estimates),
+        "reqvire.read_element" => {
+            read_element(args, excluded_filename_patterns, with_size_estimates)
+        }
         "reqvire.search" => search_tool(args, excluded_filename_patterns),
-        "reqvire.model" => model_tool(args, excluded_filename_patterns),
+        "reqvire.model" => model_tool(args, excluded_filename_patterns, with_size_estimates),
         "reqvire.containment" => containment_tool(args, excluded_filename_patterns),
         "reqvire.collect" => collect_tool(args, excluded_filename_patterns),
         "reqvire.submodels" => submodels_tool(args, excluded_filename_patterns),
@@ -517,8 +544,11 @@ fn dispatch_tool(
     }
 }
 
-fn workspace_status(excluded_filename_patterns: &GlobSet) -> Result<Value, ReqvireError> {
-    let model = load_model(excluded_filename_patterns)?;
+fn workspace_status(
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
     let mut files = BTreeSet::new();
     for element in model.graph_registry.get_all_elements() {
         files.insert(element.file_path.clone());
@@ -533,6 +563,7 @@ fn workspace_status(excluded_filename_patterns: &GlobSet) -> Result<Value, Reqvi
         "reqvire_version": env!("CARGO_PKG_VERSION"),
         "mcp_protocol_version": MCP_PROTOCOL_VERSION,
         "tool_contract_version": TOOL_CONTRACT_VERSION,
+        "size_estimates_enabled": with_size_estimates,
         "model": {
             "valid": true,
             "fingerprint": model_fingerprint(&model),
@@ -542,19 +573,27 @@ fn workspace_status(excluded_filename_patterns: &GlobSet) -> Result<Value, Reqvi
     }))
 }
 
-fn model_revision(excluded_filename_patterns: &GlobSet) -> Result<Value, ReqvireError> {
-    let model = load_model(excluded_filename_patterns)?;
+fn model_revision(
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
     Ok(json!({
         "workspace_root": current_dir_string(),
         "git": git_state(),
         "reqvire_version": env!("CARGO_PKG_VERSION"),
         "mcp_protocol_version": MCP_PROTOCOL_VERSION,
         "tool_contract_version": TOOL_CONTRACT_VERSION,
+        "size_estimates_enabled": with_size_estimates,
         "model_fingerprint": model_fingerprint(&model)
     }))
 }
 
-fn read_element(args: &Value, excluded_filename_patterns: &GlobSet) -> Result<Value, ReqvireError> {
+fn read_element(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
     let identifier = string_arg(args, "identifier");
     let name = string_arg(args, "name");
     if identifier.is_none() && name.is_none() {
@@ -563,7 +602,7 @@ fn read_element(args: &Value, excluded_filename_patterns: &GlobSet) -> Result<Va
         ));
     }
 
-    let model = load_model(excluded_filename_patterns)?;
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
     let element = if let Some(identifier) = identifier {
         model.graph_registry.get_element(&identifier)
     } else {
@@ -596,8 +635,12 @@ fn search_tool(args: &Value, excluded_filename_patterns: &GlobSet) -> Result<Val
     )?)
 }
 
-fn model_tool(args: &Value, excluded_filename_patterns: &GlobSet) -> Result<Value, ReqvireError> {
-    let model = load_model(excluded_filename_patterns)?;
+fn model_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<Value, ReqvireError> {
+    let model = load_model_with_options(excluded_filename_patterns, with_size_estimates)?;
     let filter_type = string_arg(args, "filter_type");
     let type_filter: Option<Vec<&str>> = filter_type
         .as_deref()
@@ -954,8 +997,22 @@ fn remove_asset_tool(
 }
 
 fn load_model(excluded_filename_patterns: &GlobSet) -> Result<ModelManager, ReqvireError> {
+    load_model_with_options(excluded_filename_patterns, false)
+}
+
+fn load_model_with_options(
+    excluded_filename_patterns: &GlobSet,
+    with_size_estimates: bool,
+) -> Result<ModelManager, ReqvireError> {
     let mut model = ModelManager::new();
-    model.parse_and_validate(None, excluded_filename_patterns)?;
+    model.parse_and_validate_with_options(
+        None,
+        excluded_filename_patterns,
+        ModelBuildOptions {
+            lenient: false,
+            with_size_estimates,
+        },
+    )?;
     Ok(model)
 }
 

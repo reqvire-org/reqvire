@@ -122,6 +122,25 @@ Each command has its own options displayed in a flattened section
  * refine: [CLI Interface Structure](Commands.md#cli-interface-structure)
 ---
 
+### CLI Size Estimate JSON Option Specification
+
+The CLI `--with-size-estimates` option is expected to be an opt-in JSON evidence option.
+
+#### Details
+- Supported report commands may expose `--with-size-estimates`.
+- The option passes `with_size_estimates = true` into model loading for that command invocation.
+- The option is accepted only when `--json` is also present.
+- Using `--with-size-estimates` without `--json` fails before report execution with an actionable diagnostic.
+- The initial supported command is `model --json --with-size-estimates`.
+- Additional JSON evidence commands may opt in later after their output contracts are specified.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [CLI Size Estimate JSON Option](Commands.md#cli-size-estimate-json-option)
+---
+
 ### Explicit Workspace Selection Specification
 
 The CLI is expected to resolve and enter an explicitly selected workspace before executing Reqvire operations.

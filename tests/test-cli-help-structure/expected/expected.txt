@@ -48,6 +48,7 @@ MCP OPTIONS:
       --host <HOST>             HTTP bind address
       --port <PORT>             HTTP server port
       --enable-mutations        Advertise and allow mutation tools
+      --with-size-estimates     Include element size estimates in model evidence tools
 
 FORMAT OPTIONS:
       --fix                     Apply formatting changes to files
@@ -96,6 +97,7 @@ MODEL OPTIONS:
       --reverse                 Traverse from leaves to roots (follow backward relations)
       --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
       --json                    Output results in JSON format (nested structure)
+      --with-size-estimates     Include element size estimates in JSON output
       --output <FILE>           Save JSON output to file (requires --json)
 
 LINT OPTIONS:

@@ -22,6 +22,7 @@ use reqvire::report_resources;
 use reqvire::report_submodels;
 use reqvire::verification_trace;
 use reqvire::GraphRegistry;
+use reqvire::ModelBuildOptions;
 use reqvire::ModelManager;
 use serde::Serialize;
 use std::collections::HashMap;
@@ -77,7 +78,7 @@ pub enum Commands {
     /// Start Reqvire MCP server
     #[clap(
         name = "mcp",
-        override_help = "Start Reqvire MCP server\n\nMCP OPTIONS:\n      --transport <TRANSPORT>   MCP transport: stdio or http (default: stdio)\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools"
+        override_help = "Start Reqvire MCP server\n\nMCP OPTIONS:\n      --transport <TRANSPORT>   MCP transport: stdio or http (default: stdio)\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --with-size-estimates     Include element size estimates in model evidence tools"
     )]
     Mcp {
         /// MCP transport
@@ -95,6 +96,10 @@ pub enum Commands {
         /// Advertise and allow mutation tools
         #[clap(long, help_heading = "MCP OPTIONS")]
         enable_mutations: bool,
+
+        /// Include element size estimates in model evidence tools
+        #[clap(long, help_heading = "MCP OPTIONS")]
+        with_size_estimates: bool,
     },
 
     /// Format and normalize requirements files. By default, shows preview without applying changes
@@ -263,7 +268,7 @@ pub enum Commands {
     /// - JSON: Nested structure with element details in relations
     /// - Markdown: Mermaid diagrams with all nested relationships
     #[clap(
-        override_help = "Generate model-centric structure with nested relations\n\nBy default, shows root requirements (no hierarchical parent).\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --output <FILE>             Save JSON output to file (requires --json)"
+        override_help = "Generate model-centric structure with nested relations\n\nBy default, shows root requirements (no hierarchical parent).\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save JSON output to file (requires --json)"
     )]
     Model {
         /// Start from specific element by name
@@ -281,6 +286,10 @@ pub enum Commands {
         /// Output results in JSON format (nested structure)
         #[clap(long, help_heading = "MODEL OPTIONS")]
         json: bool,
+
+        /// Include element size estimates in JSON output
+        #[clap(long, help_heading = "MODEL OPTIONS")]
+        with_size_estimates: bool,
 
         /// Save JSON output to file (requires --json)
         #[clap(long, value_name = "FILE", help_heading = "MODEL OPTIONS")]
@@ -1015,6 +1024,18 @@ pub async fn handle_command(
             eprintln!("error: --output requires --json flag");
             return Ok(1);
         }
+
+        if matches!(
+            cmd,
+            Commands::Model {
+                json: false,
+                with_size_estimates: true,
+                ..
+            }
+        ) {
+            eprintln!("error: --with-size-estimates requires --json");
+            return Ok(1);
+        }
     }
 
     if let Some(Commands::Mcp {
@@ -1022,17 +1043,25 @@ pub async fn handle_command(
         host,
         port,
         enable_mutations,
+        with_size_estimates,
     }) = args.command
     {
         return match transport {
-            McpTransport::Stdio => {
-                mcp::serve_stdio(enable_mutations, excluded_filename_patterns).map(|_| 0)
-            }
-            McpTransport::Http => {
-                mcp::serve_http(enable_mutations, excluded_filename_patterns, &host, port)
-                    .await
-                    .map(|_| 0)
-            }
+            McpTransport::Stdio => mcp::serve_stdio(
+                enable_mutations,
+                with_size_estimates,
+                excluded_filename_patterns,
+            )
+            .map(|_| 0),
+            McpTransport::Http => mcp::serve_http(
+                enable_mutations,
+                with_size_estimates,
+                excluded_filename_patterns,
+                &host,
+                port,
+            )
+            .await
+            .map(|_| 0),
         };
     }
 
@@ -1041,11 +1070,22 @@ pub async fn handle_command(
 
     let mut model_manager = ModelManager::new();
     let is_lint_command = matches!(args.command, Some(Commands::Lint { .. }));
-    let parse_result = if is_lint_command {
-        model_manager.parse_and_validate_with_mode(None, excluded_filename_patterns, true)
-    } else {
-        model_manager.parse_and_validate(None, excluded_filename_patterns)
-    };
+    let with_size_estimates = matches!(
+        args.command,
+        Some(Commands::Model {
+            json: true,
+            with_size_estimates: true,
+            ..
+        })
+    );
+    let parse_result = model_manager.parse_and_validate_with_options(
+        None,
+        excluded_filename_patterns,
+        ModelBuildOptions {
+            lenient: is_lint_command,
+            with_size_estimates,
+        },
+    );
 
     let json_output = wants_json(&args);
 
@@ -1267,6 +1307,7 @@ pub async fn handle_command(
             reverse,
             filter_type,
             json,
+            with_size_estimates: _,
             output,
         }) => {
             // Parse filter types if provided

@@ -15,6 +15,12 @@ pub struct ModelManager {
     pub graph_registry: GraphRegistry,
 }
 
+#[derive(Debug, Clone, Copy, Default)]
+pub struct ModelBuildOptions {
+    pub lenient: bool,
+    pub with_size_estimates: bool,
+}
+
 impl Default for ModelManager {
     fn default() -> Self {
         Self::new()
@@ -43,9 +49,25 @@ impl ModelManager {
         excluded_filename_patterns: &GlobSet,
         lenient: bool,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        self.parse_and_validate_with_options(
+            git_commit_hash,
+            excluded_filename_patterns,
+            ModelBuildOptions {
+                lenient,
+                with_size_estimates: false,
+            },
+        )
+    }
+
+    pub fn parse_and_validate_with_options(
+        &mut self,
+        git_commit_hash: Option<&str>,
+        excluded_filename_patterns: &GlobSet,
+        options: ModelBuildOptions,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!(
-            "Starting two-pass validation architecture (lenient={})",
-            lenient
+            "Starting two-pass validation architecture (lenient={}, with_size_estimates={})",
+            options.lenient, options.with_size_estimates
         );
         // Reset state so repeated parse/validate calls always start from a clean model.
         self.graph_registry = GraphRegistry::new();
@@ -60,7 +82,7 @@ impl ModelManager {
                 "Pass 1 validation failed with {} errors",
                 pass1_errors.len()
             );
-            if !lenient {
+            if !options.lenient {
                 return Err(ReqvireError::ValidationError(pass1_errors));
             }
             debug!("Lenient mode: continuing despite Pass 1 errors");
@@ -77,10 +99,14 @@ impl ModelManager {
                 "Pass 2 validation failed with {} errors",
                 pass2_errors.len()
             );
-            if !lenient {
+            if !options.lenient {
                 return Err(ReqvireError::ValidationError(pass2_errors));
             }
             debug!("Lenient mode: continuing despite Pass 2 errors");
+        }
+
+        if options.with_size_estimates {
+            self.graph_registry.populate_size_estimates()?;
         }
 
         debug!("Validation completed");

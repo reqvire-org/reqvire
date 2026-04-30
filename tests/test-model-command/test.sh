@@ -113,6 +113,62 @@ if [ "$EXPECTED_JSON" != "$ACTUAL_JSON" ]; then
     exit 1
 fi
 
+if echo "$OUTPUT" | jq -e '.. | objects | has("size_estimate")' >/dev/null 2>&1; then
+    echo "❌ FAILED: model --json should omit size_estimate unless explicitly enabled"
+    exit 1
+fi
+
+# Test 2b: Size estimates are JSON-only and opt-in
+echo "Running: reqvire model --with-size-estimates without --json" >> "${TEST_DIR}/test_results.log"
+set +e
+SIZE_ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --with-size-estimates 2>&1)
+SIZE_ERROR_EXIT_CODE=$?
+set -e
+
+if [ $SIZE_ERROR_EXIT_CODE -eq 0 ]; then
+    echo "❌ FAILED: model --with-size-estimates without --json should fail"
+    echo "$SIZE_ERROR_OUTPUT"
+    exit 1
+fi
+
+if ! grep -q -- "--with-size-estimates requires --json" <<< "$SIZE_ERROR_OUTPUT"; then
+    echo "❌ FAILED: size-estimate JSON-only diagnostic missing"
+    echo "$SIZE_ERROR_OUTPUT"
+    exit 1
+fi
+
+echo "Running: reqvire model --json --with-size-estimates" >> "${TEST_DIR}/test_results.log"
+set +e
+SIZE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --json --with-size-estimates 2>&1)
+SIZE_EXIT_CODE=$?
+set -e
+
+if [ $SIZE_EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: model --json --with-size-estimates exited with code $SIZE_EXIT_CODE"
+    echo "$SIZE_OUTPUT"
+    exit 1
+fi
+
+echo "$SIZE_OUTPUT" | jq . >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "❌ FAILED: size-estimate output is not valid JSON"
+    exit 1
+fi
+
+if ! echo "$SIZE_OUTPUT" | jq -e '
+  [.elements[]? | .. | objects | select(has("identifier") and has("name"))] as $elements
+  | ($elements | length) > 0
+  and all($elements[];
+    (.size_estimate.content_bytes | type == "number")
+    and (.size_estimate.rendered_context_bytes | type == "number")
+    and (.size_estimate.estimated_tokens | type == "number")
+  )
+' >/dev/null 2>&1; then
+    echo "❌ FAILED: model --json --with-size-estimates should include size estimates on all element payloads"
+    echo "$SIZE_OUTPUT"
+    exit 1
+fi
+
 # Test 3: Filtered Model Markdown Output - Starting from "Model Diagram Generation"
 # Forward relations from this element:
 # - derive -> "Model Filtering Capability" -> "Forward Relation Traversal"

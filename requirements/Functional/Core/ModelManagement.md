@@ -28,7 +28,31 @@ The system shall process structured documents and relations to extract model-rel
   * type: user-requirement
 
 #### Relations
+  * derive: [Opt-In Element Size Estimate Model Build](#opt-in-element-size-estimate-model-build)
   * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
+---
+
+### Opt-In Element Size Estimate Model Build
+
+The system shall support an opt-in model build mode that computes canonical size estimates for parsed model elements.
+
+#### Details
+- Element size estimates shall be model evidence metadata derived during model build when explicitly enabled.
+- Normal model loading shall not compute size estimates by default.
+- Size estimates shall not be written to source Markdown files.
+- The model build option shall be reusable by CLI JSON commands and MCP server startup.
+- Size estimates shall be element-level metadata; report-level aggregate estimates are out of scope for this requirement.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Efficient Processing](#efficient-processing)
+  * refinedBy: [Element Size Estimate Model Build Specification](Specifications.md#element-size-estimate-model-build-specification)
+  * verifiedBy: [Element Size Estimate Model Build Verification](Verifications/ParsingVerifications.md#element-size-estimate-model-build-verification)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [model.rs](../../../core/src/model.rs)
 ---
 
 ### Element Manipulation Operations

@@ -42,6 +42,27 @@ Expected checks:
 
 #### Relations
   * verify: [MCP Server Command](../Tools.md#mcp-server-command)
+  * satisfiedBy: [test-mcp-server](../../../../tests/test-mcp-server/test.sh)
+---
+
+### MCP Size Estimate Startup Verification
+
+This verification shall prove that MCP size estimates are controlled by server startup configuration.
+
+#### Details
+Expected checks:
+- Start `reqvire mcp` without `--with-size-estimates` and verify model element tool responses omit `size_estimate`.
+- Start `reqvire mcp --with-size-estimates` and verify model element tool responses include `size_estimate`.
+- Verify `reqvire.read_element` includes element `size_estimate` when enabled.
+- Verify `reqvire.model` includes element `size_estimate` for top-level and nested relation elements when enabled.
+- Verify workspace status or tool contract reports size-estimate enabled state.
+- Verify `--with-size-estimates` is a startup option and is not accepted as a per-tool MCP argument.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [MCP Server Command](../Tools.md#mcp-server-command)
 ---
 
 ### MCP Shared Operation Contracts Verification

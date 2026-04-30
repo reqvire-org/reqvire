@@ -65,6 +65,7 @@ Implementation details shall follow the associated refinement specifications.
   * derive: [CLI Collect Command](#cli-collect-command)
   * derive: [CLI Containment Command](#cli-containment-command)
   * derive: [CLI Coverage Command](#cli-coverage-command)
+  * derive: [CLI Size Estimate JSON Option](#cli-size-estimate-json-option)
   * derive: [CLI Lint Command](#cli-lint-command)
   * derive: [CLI Merge Element Command](#cli-merge-element-command)
   * derive: [CLI Model Diagram Command](#cli-model-diagram-command)
@@ -295,6 +296,27 @@ Implementation details shall follow the associated refinement specifications.
   * refinedBy: [CLI JSON File Output Option Refinement Specification](Specifications.md#cli-json-file-output-option-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [CLI JSON File Output Test](../../Functional/Output/Verifications/ReportingVerifications.md#cli-json-file-output-test)
+---
+
+### CLI Size Estimate JSON Option
+
+The CLI shall provide an opt-in `--with-size-estimates` option for supported JSON report commands.
+
+#### Details
+- The option shall enable model building with element size estimates for the command invocation.
+- The option shall be valid only for commands that emit JSON model evidence.
+- The option shall require `--json` when used by CLI report commands.
+- If the option is used without `--json`, the CLI shall fail with a clear error.
+- The option shall not change non-JSON output behavior.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Size Estimate JSON Option Specification](Specifications.md#cli-size-estimate-json-option-specification)
+  * verifiedBy: [CLI Size Estimate JSON Option Verification](Verifications/CLIVerifications.md#cli-size-estimate-json-option-verification)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
 ---
 
 ### CLI Lint Command

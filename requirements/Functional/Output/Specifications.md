@@ -49,6 +49,25 @@ Technical specification for content collection from requirement chains.
  * type: specification
 ---
 
+### JSON Element Size Estimate Output Specification
+
+JSON report outputs are expected to preserve element size-estimate metadata when the parsed model contains it.
+
+#### Details
+- JSON output serializers that include model elements shall include the element `size_estimate` field when present.
+- JSON output serializers shall omit `size_estimate` when the model was not built with size estimates enabled.
+- Text, Markdown, Mermaid, D3, HTML, and other non-JSON outputs shall not display size-estimate metadata.
+- The initial output scope is element payloads in `model --json` and equivalent structured model evidence.
+- Nested relation element targets in model JSON shall preserve their own `size_estimate` fields when present.
+- Aggregate report-level `size_estimate` records are deferred and shall not be added by this specification.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [JSON Element Size Estimate Exposure](Reporting.md#json-element-size-estimate-exposure)
+---
+
 ### Collect Output Format Specification
 
 Output format specification for collect command text and JSON modes.

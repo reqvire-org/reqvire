@@ -29,6 +29,7 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
 - The MCP server command shall keep server startup behavior outside the MCP tool surface.
 - The MCP server command shall expose read/report tools by default.
 - The MCP server command shall expose mutation tools only when mutation capability is explicitly enabled at startup.
+- The MCP server command shall support opt-in element size estimates when explicitly enabled at startup.
 
 #### Metadata
   * type: requirement
@@ -36,10 +37,13 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
 #### Relations
   * derivedFrom: [MCP Interface](../Interfaces.md#mcp-interface)
   * refinedBy: [MCP Server Command Specification](Specifications.md#mcp-server-command-specification)
+  * refinedBy: [MCP Size Estimate Startup Specification](Specifications.md#mcp-size-estimate-startup-specification)
   * verifiedBy: [MCP Server Command Verification](Verifications/MCPVerifications.md#mcp-server-command-verification)
+  * verifiedBy: [MCP Size Estimate Startup Verification](Verifications/MCPVerifications.md#mcp-size-estimate-startup-verification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [main.rs](../../../cli/src/main.rs)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
+  * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
 ---
 
 ### MCP Transport Selection

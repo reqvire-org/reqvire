@@ -69,6 +69,25 @@ Command behavior:
   * refine: [MCP Server Command](Tools.md#mcp-server-command)
 ---
 
+### MCP Size Estimate Startup Specification
+
+The MCP server is expected to expose element size estimates only when explicitly enabled at startup.
+
+#### Details
+- `reqvire mcp --with-size-estimates` starts the MCP process with `with_size_estimates = true` for model loading.
+- `reqvire mcp` without the flag starts with size estimates disabled.
+- MCP tool results that serialize model elements include `size_estimate` when the server was started with size estimates enabled.
+- MCP tool results omit `size_estimate` when the server was not started with size estimates enabled.
+- MCP workspace status or tool contract output reports whether size estimates are enabled for the process.
+- The startup flag is a server-process option and is not exposed as a per-tool MCP request argument.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [MCP Server Command](Tools.md#mcp-server-command)
+---
+
 ### MCP Transport Selection Specification
 
 The MCP server is expected to keep transport mechanics separate from Reqvire tool semantics.

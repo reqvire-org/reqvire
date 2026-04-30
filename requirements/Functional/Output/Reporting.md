@@ -13,6 +13,7 @@ When requested the system shall provide human readable and machine readable Syst
 #### Relations
   * derive: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
   * derive: [Collect Content from Requirement Chain](#collect-content-from-requirement-chain)
+  * derive: [JSON Element Size Estimate Exposure](#json-element-size-estimate-exposure)
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
   * derive: [Provide Validation Reports](#provide-validation-reports)
   * derive: [Requirement Implementation Coverage Report](#requirement-implementation-coverage-report)
@@ -23,6 +24,27 @@ When requested the system shall provide human readable and machine readable Syst
   * refinedBy: [JSON Output Structure](Specifications.md#json-output-structure)
   * refinedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
   * refinedBy: [Text Output Formatting](Specifications.md#text-output-formatting)
+---
+
+### JSON Element Size Estimate Exposure
+
+The system shall expose element-level `size_estimate` records in JSON model evidence outputs when the model was built with size estimates enabled.
+
+#### Details
+- JSON outputs that serialize model elements shall include `size_estimate` when element size estimates are enabled.
+- Non-JSON outputs shall not include size-estimate fields and shall remain unchanged.
+- Report-level aggregate size summaries are out of scope.
+- The initial JSON evidence outputs in scope are model evidence outputs that serialize elements directly or as nested relation targets.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Model Reports](#model-reports)
+  * refinedBy: [JSON Element Size Estimate Output Specification](Specifications.md#json-element-size-estimate-output-specification)
+  * verifiedBy: [JSON Element Size Estimate Output Verification](Verifications/ReportingVerifications.md#json-element-size-estimate-output-verification)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
 ---
 
 ### Collect Content from Requirement Chain

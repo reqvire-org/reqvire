@@ -7,8 +7,9 @@ use globset::GlobSet;
 use reqvire::error::ReqvireError;
 use reqvire::tool_interface::{
     request_requires_write_tool, resource_definitions as shared_resource_definitions,
-    tool_definitions as shared_tool_definitions, validate_startup as shared_validate_startup,
-    ReqvireToolRegistry, MCP_PROTOCOL_VERSION as SHARED_MCP_PROTOCOL_VERSION,
+    tool_definitions as shared_tool_definitions,
+    validate_startup_with_options as shared_validate_startup_with_options, ReqvireToolRegistry,
+    MCP_PROTOCOL_VERSION as SHARED_MCP_PROTOCOL_VERSION,
 };
 use serde::Deserialize;
 use serde_json::{json, Value};
@@ -36,15 +37,17 @@ struct ToolCallParams {
 #[derive(Clone)]
 struct HttpMcpState {
     enable_mutations: bool,
+    with_size_estimates: bool,
     excluded_filename_patterns: Arc<GlobSet>,
     write_lock: Arc<Mutex<()>>,
 }
 
 pub fn serve_stdio(
     enable_mutations: bool,
+    with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
 ) -> Result<(), ReqvireError> {
-    shared_validate_startup(excluded_filename_patterns)?;
+    shared_validate_startup_with_options(excluded_filename_patterns, with_size_estimates)?;
 
     let stdin = io::stdin();
     let mut stdout = io::stdout();
@@ -56,7 +59,12 @@ pub fn serve_stdio(
         }
 
         let response = match serde_json::from_str::<Value>(&line) {
-            Ok(raw) => handle_rpc_value(raw, enable_mutations, excluded_filename_patterns),
+            Ok(raw) => handle_rpc_value(
+                raw,
+                enable_mutations,
+                with_size_estimates,
+                excluded_filename_patterns,
+            ),
             Err(err) => Some(rpc_error(
                 Value::Null,
                 -32700,
@@ -76,11 +84,12 @@ pub fn serve_stdio(
 
 pub async fn serve_http(
     enable_mutations: bool,
+    with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
     host: &str,
     port: u16,
 ) -> Result<(), ReqvireError> {
-    shared_validate_startup(excluded_filename_patterns)?;
+    shared_validate_startup_with_options(excluded_filename_patterns, with_size_estimates)?;
 
     let addr = format!("{}:{}", host, port);
     let listener = tokio::net::TcpListener::bind(&addr).await.map_err(|e| {
@@ -89,6 +98,7 @@ pub async fn serve_http(
 
     let state = HttpMcpState {
         enable_mutations,
+        with_size_estimates,
         excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
         write_lock: Arc::new(Mutex::new(())),
     };
@@ -141,12 +151,14 @@ async fn handle_http_rpc(
         handle_rpc_value(
             raw,
             state.enable_mutations,
+            state.with_size_estimates,
             state.excluded_filename_patterns.as_ref(),
         )
     } else {
         handle_rpc_value(
             raw,
             state.enable_mutations,
+            state.with_size_estimates,
             state.excluded_filename_patterns.as_ref(),
         )
     };
@@ -238,6 +250,7 @@ fn text_response(status: StatusCode, text: &str) -> Response<Body> {
 fn handle_rpc_value(
     raw: Value,
     enable_mutations: bool,
+    with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
 ) -> Option<Value> {
     let id = raw.get("id").cloned().unwrap_or(Value::Null);
@@ -268,6 +281,7 @@ fn handle_rpc_value(
             id,
             request.params,
             enable_mutations,
+            with_size_estimates,
             excluded_filename_patterns,
         )),
         "resources/list" => Some(rpc_result(
@@ -278,6 +292,7 @@ fn handle_rpc_value(
             id,
             request.params,
             enable_mutations,
+            with_size_estimates,
             excluded_filename_patterns,
         )),
         "resources/templates/list" => Some(rpc_result(id, json!({ "resourceTemplates": [] }))),
@@ -325,6 +340,7 @@ fn handle_tool_call(
     id: Value,
     params: Value,
     enable_mutations: bool,
+    with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
 ) -> Value {
     let params = match serde_json::from_value::<ToolCallParams>(params) {
@@ -339,7 +355,11 @@ fn handle_tool_call(
         }
     };
 
-    let registry = ReqvireToolRegistry::new(enable_mutations, excluded_filename_patterns);
+    let registry = ReqvireToolRegistry::new_with_options(
+        enable_mutations,
+        with_size_estimates,
+        excluded_filename_patterns,
+    );
 
     if registry.is_mutation_tool(&params.name) && !enable_mutations {
         return rpc_error(
@@ -383,6 +403,7 @@ fn handle_resource_read(
     id: Value,
     params: Value,
     enable_mutations: bool,
+    with_size_estimates: bool,
     excluded_filename_patterns: &GlobSet,
 ) -> Value {
     let uri = match params.get("uri").and_then(Value::as_str) {
@@ -397,7 +418,11 @@ fn handle_resource_read(
         }
     };
 
-    let registry = ReqvireToolRegistry::new(enable_mutations, excluded_filename_patterns);
+    let registry = ReqvireToolRegistry::new_with_options(
+        enable_mutations,
+        with_size_estimates,
+        excluded_filename_patterns,
+    );
     let value = registry.read_resource(uri);
 
     match value {
@@ -554,6 +579,7 @@ mod tests {
                     "arguments": {}
                 }
             }),
+            false,
             false,
             &globset::GlobSetBuilder::new().build().unwrap(),
         )
