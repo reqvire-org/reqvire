@@ -1,2 +1,0 @@
-library-search-total=1
-library-contract-mutations=false

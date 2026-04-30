@@ -1296,3 +1296,40 @@ fn model_fingerprint(model: &ModelManager) -> String {
 
     format!("{:016x}", hasher.finish())
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use globset::{Glob, GlobSetBuilder};
+    use serde_json::json;
+
+    #[test]
+    fn in_process_registry_discovers_protocol_neutral_read_only_tools() {
+        let ignored = ignored_patterns();
+        let registry = ReqvireToolRegistry::new(false, &ignored);
+
+        let tools = registry.tool_definitions();
+        assert!(tools.iter().any(|tool| tool["name"] == "reqvire.search"));
+        assert!(!tools
+            .iter()
+            .any(|tool| tool["name"] == "reqvire.add_element"));
+
+        let contract = registry
+            .call_tool("reqvire.tool_contract", &json!({}))
+            .expect("tool contract should execute through library registry");
+        assert_eq!(contract["mutation_tools_enabled"], false);
+        assert!(contract["tools"]
+            .as_array()
+            .expect("contract tools array")
+            .iter()
+            .any(|tool| tool["name"] == "reqvire.search"));
+    }
+
+    fn ignored_patterns() -> globset::GlobSet {
+        let mut builder = GlobSetBuilder::new();
+        for pattern in ["output/**", "fixtures/**", "expected/**"] {
+            builder.add(Glob::new(pattern).expect("valid ignore glob"));
+        }
+        builder.build().expect("ignore glob set builds")
+    }
+}

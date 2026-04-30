@@ -124,8 +124,8 @@ fi
 
 (cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$TEST_DIR" search --short --filter-name "Workspace Flag") > "$TEST_DIR/output/moved-search.txt" 2>&1 \
   || fail "search after workspace mutations should run" "$TEST_DIR/output/moved-search.txt"
-grep -o 'specifications/[^ ]*#workspace-flag-[a-z]*' "$TEST_DIR/output/moved-search.txt" | sort > "$TEST_DIR/output/moved-file-requirements.txt"
-if ! diff -u "$TEST_SCRIPT_DIR/expected/moved-file-requirements.txt" "$TEST_DIR/output/moved-file-requirements.txt"; then
+grep -o 'specifications/[^ ]*#workspace-flag-[a-z]*' "$TEST_DIR/output/moved-search.txt" | sort > "$TEST_DIR/output/moved-file-element-ids.txt"
+if ! diff -u "$TEST_SCRIPT_DIR/expected/moved-file-element-ids.txt" "$TEST_DIR/output/moved-file-element-ids.txt"; then
   fail "workspace mutation paths do not match expected selected-workspace files"
 fi
 

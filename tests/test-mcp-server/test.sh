@@ -170,14 +170,10 @@ format_fix_rejected_request() {
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/specifications" "$TEST_DIR/"
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/docs" "$TEST_DIR/"
 
-cargo run --quiet --locked \
-  --manifest-path "$TEST_SCRIPT_DIR/fixtures/tool-interface-app/Cargo.toml" \
-  --target-dir "$TEST_DIR/output/tool-interface-target" \
-  -- "$TEST_DIR" > "$TEST_DIR/output/tool-interface-app.txt" \
-  || fail "Reqvire tool interface library fixture failed" "$TEST_DIR/output/tool-interface-app.txt"
-if ! diff -u "$TEST_SCRIPT_DIR/expected/tool-interface-app.txt" "$TEST_DIR/output/tool-interface-app.txt"; then
-  fail "Reqvire tool interface library output does not match expected"
-fi
+(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-name "Test Requirement Beta") > "$TEST_DIR/output/binary-search.json" 2>&1 \
+  || fail "Reqvire binary search failed" "$TEST_DIR/output/binary-search.json"
+jq -e '.global_counters.total_elements == 1' "$TEST_DIR/output/binary-search.json" >/dev/null \
+  || fail "Reqvire binary search should find Test Requirement Beta" "$TEST_DIR/output/binary-search.json"
 
 DEFAULT_OUTPUT="$TEST_DIR/output/mcp-default.jsonl"
 run_mcp_default "$DEFAULT_OUTPUT" \
@@ -346,8 +342,8 @@ jq -e '.result.structuredContent.dry_run == false' "$TEST_DIR/output/mcp-http-co
   || fail "first concurrent HTTP mutation should execute" "$TEST_DIR/output/mcp-http-concurrent-a.json"
 jq -e '.result.structuredContent.dry_run == false' "$TEST_DIR/output/mcp-http-concurrent-b.json" >/dev/null \
   || fail "second concurrent HTTP mutation should execute" "$TEST_DIR/output/mcp-http-concurrent-b.json"
-grep '^### MCP HTTP Concurrent Requirement' "$TEST_DIR/specifications/Requirements.md" > "$TEST_DIR/output/mcp-http-concurrent-requirements.txt"
-if ! diff -u "$TEST_SCRIPT_DIR/expected/http-concurrent-requirements.txt" "$TEST_DIR/output/mcp-http-concurrent-requirements.txt"; then
+grep '^### MCP HTTP Concurrent Requirement' "$TEST_DIR/specifications/Requirements.md" > "$TEST_DIR/output/mcp-http-concurrent-requirement-headings.txt"
+if ! diff -u "$TEST_SCRIPT_DIR/expected/http-concurrent-requirement-headings.txt" "$TEST_DIR/output/mcp-http-concurrent-requirement-headings.txt"; then
   fail "serialized HTTP mutations should preserve both expected filesystem writes"
 fi
 

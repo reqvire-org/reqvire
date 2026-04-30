@@ -168,9 +168,9 @@ if ! grep -q "verify:.*Public API" "$TEST_DIR/specifications/Verifications/Tests
 fi
 
 # Verify Requirements.md was modified correctly
-if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-requirements.txt" "$TEST_DIR/specifications/Requirements.md" > /dev/null; then
+if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-requirements-state.md" "$TEST_DIR/specifications/Requirements.md" > /dev/null; then
   echo "❌ FAILED: Requirements.md does not match expected state after fix"
-  diff -u "${TEST_SCRIPT_DIR}/expected/expected-requirements.txt" "$TEST_DIR/specifications/Requirements.md"
+  diff -u "${TEST_SCRIPT_DIR}/expected/expected-requirements-state.md" "$TEST_DIR/specifications/Requirements.md"
   exit 1
 fi
 
