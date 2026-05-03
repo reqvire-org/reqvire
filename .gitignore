@@ -37,11 +37,8 @@ yolo_claude_loop.sh
 
 # Generated HTML output
 cli/html/
-.serena
 .reqvire-agent/
-reqvire-agent
-reqvire-agent/.reqvire-agent/
-reqvire-agent.toml
+cormilo-agent
 
 # npm package build artifacts
 npm/reqvire/artifacts/
