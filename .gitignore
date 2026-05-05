@@ -43,5 +43,5 @@ cormilo-agent
 # npm package build artifacts
 npm/reqvire/artifacts/
 npm/reqvire/*.tgz
-
+.index
 .env
