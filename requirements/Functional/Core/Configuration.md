@@ -28,7 +28,6 @@ Implementation details shall follow the associated refinement specifications.
 #### Relations
   * derive: [Ignore Files Integration](#ignore-files-integration)
   * derive: [Requirements Processing](#requirements-processing)
-  * derive: [Reserved Repository Files Exclusion](#reserved-repository-files-exclusion)
   * derive: [File Pattern Exclusion for Format](../Operations/Formatting.md#file-pattern-exclusion-for-format)
   * derivedFrom: [Coexistence of Structured and Unstructured Documents](#coexistence-of-structured-and-unstructured-documents)
   * refinedBy: [Ignoring Unstructured Documents Refinement Specification](Specifications.md#ignoring-unstructured-documents-refinement-specification)
@@ -90,23 +89,4 @@ Implementation details shall follow the associated refinement specifications.
   * refinedBy: [Structured Markdown Files Search and Detection Refinement Specification](Specifications.md#structured-markdown-files-search-and-detection-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](Verifications/ValidationVerifications.md#requirements-files-search-and-detection-test)
----
-
-### Reserved Repository Files Exclusion
-
-The system shall automatically exclude certain common repository documentation files from structured markdown processing.
-
-#### Details
-The system shall define which repository documentation filenames are reserved and excluded from parsing.
-
-Reserved files serve general repository documentation purposes rather than structured requirements. This automatic exclusion prevents confusion and reduces the need for explicit .reqvireignore patterns.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * refinedBy: [Reserved Files Specification](Specifications.md#reserved-files-specification)
-  * satisfiedBy: [config.rs](../../../cli/src/config.rs)
-  * verifiedBy: [File Exclusion Test](Verifications/ValidationVerifications.md#file-exclusion-test)
 ---

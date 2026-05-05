@@ -6,13 +6,11 @@ set -euo pipefail
 # Satisfies: specifications/Verifications/ValidationTests.md#file-exclusion-test
 #
 # Acceptance Criteria:
-# - System SHALL always exclude reserved filenames from processing
 # - System SHALL read exclusion patterns from root .gitignore file
 # - System SHALL read exclusion patterns from root .reqvireignore file
-# - System SHALL combine reserved filenames, .gitignore, and .reqvireignore patterns
+# - System SHALL combine .gitignore and .reqvireignore patterns
 # - Files matching .gitignore patterns SHALL be excluded from processing
 # - Files matching .reqvireignore patterns SHALL be excluded from processing
-# - Reserved filenames SHALL be excluded from processing even without ignore files
 # - System SHALL use ONLY root .gitignore file, not nested .gitignore files
 # - System SHALL use ONLY root .reqvireignore file, not nested .reqvireignore files
 # - System SHALL correctly process files when .gitignore is absent
@@ -23,10 +21,10 @@ set -euo pipefail
 # Test Criteria:
 # - Scenario 1: Files matching .gitignore patterns are NOT processed
 # - Scenario 2: Combined exclusion from .gitignore AND .reqvireignore works
-# - Scenario 3: Missing .reqvireignore file - only .gitignore and reserved exclusions applied
+# - Scenario 3: Missing .reqvireignore file - only .gitignore exclusions applied
 # - Scenario 4: Only root .gitignore and .reqvireignore are used - nested files ignored
-# - Scenario 5: Missing .gitignore but .reqvireignore present - .reqvireignore and reserved exclusions applied
-# - Scenario 6: Both files missing - reserved filenames still excluded
+# - Scenario 5: Missing .gitignore but .reqvireignore present - .reqvireignore exclusions applied
+# - Scenario 6: Both files missing - no ignore-file exclusions applied
 
 echo "Starting Gitignore Integration Test..." > "${TEST_DIR}/test_results.log"
 
@@ -613,10 +611,10 @@ if [ $OVERALL_RESULT -eq 0 ]; then
 fi
 
 #############################################################################
-# Scenario 6: Both files missing - reserved filenames still excluded
+# Scenario 6: Both files missing - no ignore-file exclusions applied
 #############################################################################
 echo "" >> "${TEST_DIR}/test_results.log"
-echo "=== Scenario 6: Both files missing - reserved filenames still excluded ===" >> "${TEST_DIR}/test_results.log"
+echo "=== Scenario 6: Both files missing - no ignore-file exclusions applied ===" >> "${TEST_DIR}/test_results.log"
 
 # Clean up files from Scenario 5
 rm -rf "${TEST_DIR}/specifications"
@@ -653,7 +651,7 @@ cat > "${TEST_DIR}/specifications/README.md" << 'EOF'
 
 ### README Requirement
 
-This is a reserved filename and should ALWAYS be excluded.
+This file should be processed when no ignore-file pattern excludes it.
 
 #### Metadata
   * type: requirement
@@ -667,7 +665,7 @@ cat > "${TEST_DIR}/specifications/DRAFT-test.md" << 'EOF'
 
 ### Draft Requirement
 
-This file should be processed (not a reserved filename).
+This file should be processed when no ignore-file pattern excludes it.
 
 #### Metadata
   * type: requirement
@@ -691,7 +689,7 @@ if [ $EXIT_CODE -ne 0 ]; then
     OVERALL_RESULT=1
 fi
 
-# Verify non-reserved files are processed
+# Verify in-scope files are processed
 if ! echo "$OUTPUT" | grep -q "All Requirements 001"; then
     echo "FAILED: AllRequirements.md should be processed" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
@@ -702,151 +700,13 @@ if ! echo "$OUTPUT" | grep -q "Draft Requirement"; then
     OVERALL_RESULT=1
 fi
 
-# Verify reserved filename is ALWAYS excluded (even without ignore files)
-if echo "$OUTPUT" | grep -q "README Requirement"; then
-    echo "FAILED: README.md was processed (reserved filenames should ALWAYS be excluded)" >> "${TEST_DIR}/test_results.log"
+if ! echo "$OUTPUT" | grep -q "README Requirement"; then
+    echo "FAILED: README.md should be processed when no ignore files exclude it" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
 fi
 
 if [ $OVERALL_RESULT -eq 0 ]; then
-    echo "PASSED: Scenario 6 - Reserved filenames excluded even without ignore files" >> "${TEST_DIR}/test_results.log"
-fi
-
-#############################################################################
-# Scenario 7: Reserved filenames always excluded
-#############################################################################
-echo "" >> "${TEST_DIR}/test_results.log"
-echo "=== Scenario 7: Reserved filenames always excluded ===" >> "${TEST_DIR}/test_results.log"
-
-# Clean up files from Scenario 6
-rm -rf "${TEST_DIR}/specifications"
-mkdir -p "${TEST_DIR}/specifications"
-
-# Remove both .gitignore and .reqvireignore to test reserved filenames alone
-rm -f "${TEST_DIR}/.gitignore"
-rm -f "${TEST_DIR}/.reqvireignore"
-
-# Create valid requirements file
-cat > "${TEST_DIR}/specifications/ValidRequirements.md" << 'EOF'
-# Elements
-
-### Test Root
-
-Root requirement for reserved filenames test.
-
-#### Metadata
-  * type: user-requirement
-
-### Valid Requirement 001
-
-This file should be processed.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * derivedFrom: #test-root
-EOF
-
-# Create reserved documentation files
-cat > "${TEST_DIR}/specifications/README.md" << 'EOF'
-# Elements
-### README Requirement
-Reserved filename - should be excluded.
-#### Relations
-  * derivedFrom: ValidRequirements.md#test-root
-EOF
-
-cat > "${TEST_DIR}/specifications/CHANGELOG.md" << 'EOF'
-# CHANGELOG
-### Changelog Requirement
-Reserved filename - should be excluded.
-#### Relations
-  * derivedFrom: ValidRequirements.md#test-root
-EOF
-
-cat > "${TEST_DIR}/specifications/CONTRIBUTING.md" << 'EOF'
-# CONTRIBUTING
-### Contributing Requirement
-Reserved filename - should be excluded.
-#### Relations
-  * derivedFrom: ValidRequirements.md#test-root
-EOF
-
-# Create reserved AI instruction files
-cat > "${TEST_DIR}/specifications/CLAUDE.md" << 'EOF'
-# CLAUDE
-### Claude Requirement
-Reserved AI instruction file - should be excluded.
-#### Relations
-  * derivedFrom: ValidRequirements.md#test-root
-EOF
-
-cat > "${TEST_DIR}/specifications/AGENT.md" << 'EOF'
-# AGENT
-### Agent Requirement
-Reserved AI instruction file - should be excluded.
-#### Relations
-  * derivedFrom: ValidRequirements.md#test-root
-EOF
-
-cat > "${TEST_DIR}/specifications/CURSOR.md" << 'EOF'
-# CURSOR
-### Cursor Requirement
-Reserved AI instruction file - should be excluded.
-#### Relations
-  * derivedFrom: ValidRequirements.md#test-root
-EOF
-
-cat > "${TEST_DIR}/specifications/COPILOT.md" << 'EOF'
-# COPILOT
-### Copilot Requirement
-Reserved AI instruction file - should be excluded.
-#### Relations
-  * derivedFrom: ValidRequirements.md#test-root
-EOF
-
-# Run reqvire search
-set +e
-OUTPUT=$(cd "${TEST_DIR}" && "$REQVIRE_BIN" search 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-
-# Check that command succeeded gracefully
-if [ $EXIT_CODE -ne 0 ]; then
-    echo "FAILED: Command failed when processing reserved filenames" >> "${TEST_DIR}/test_results.log"
-    OVERALL_RESULT=1
-fi
-
-# Verify valid file is processed
-if ! echo "$OUTPUT" | grep -q "Valid Requirement 001"; then
-    echo "FAILED: ValidRequirements.md should be processed" >> "${TEST_DIR}/test_results.log"
-    OVERALL_RESULT=1
-fi
-
-# Verify reserved documentation files are NOT processed
-RESERVED_DOCS=("README Requirement" "Changelog Requirement" "Contributing Requirement")
-for doc in "${RESERVED_DOCS[@]}"; do
-    if echo "$OUTPUT" | grep -q "$doc"; then
-        echo "FAILED: Reserved documentation file was processed: $doc" >> "${TEST_DIR}/test_results.log"
-        OVERALL_RESULT=1
-    fi
-done
-
-# Verify reserved AI instruction files are NOT processed
-RESERVED_AI=("Claude Requirement" "Agent Requirement" "Cursor Requirement" "Copilot Requirement")
-for ai in "${RESERVED_AI[@]}"; do
-    if echo "$OUTPUT" | grep -q "$ai"; then
-        echo "FAILED: Reserved AI instruction file was processed: $ai" >> "${TEST_DIR}/test_results.log"
-        OVERALL_RESULT=1
-    fi
-done
-
-if [ $OVERALL_RESULT -eq 0 ]; then
-    echo "PASSED: Scenario 7 - All reserved filenames properly excluded" >> "${TEST_DIR}/test_results.log"
+    echo "PASSED: Scenario 6 - System works gracefully without ignore files" >> "${TEST_DIR}/test_results.log"
 fi
 
 #############################################################################

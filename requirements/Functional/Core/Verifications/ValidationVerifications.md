@@ -178,15 +178,14 @@ This test verifies that the system correctly validates relation types based on e
 
 ### File Exclusion Test
 
-This test verifies that Reqvire correctly reads and applies exclusion patterns from the repository root .gitignore file, .reqvireignore file, and reserved filenames.
+This test verifies that Reqvire correctly reads and applies exclusion patterns from the repository root .gitignore file and .reqvireignore file.
 
 #### Details
 
 ##### Acceptance Criteria
 - System shall read exclusion patterns from root .gitignore file
 - System shall read exclusion patterns from root .reqvireignore file
-- System shall automatically exclude reserved repository documentation files
-- System shall combine patterns from .gitignore, .reqvireignore, and reserved filenames
+- System shall combine patterns from .gitignore and .reqvireignore
 - Files matching patterns from any source shall be excluded from processing
 - System shall use ONLY root .gitignore file, not nested .gitignore files
 - System shall use ONLY root .reqvireignore file, not nested .reqvireignore files
@@ -209,37 +208,29 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
    - Verify files matching .reqvireignore patterns are NOT processed
    - Verify files NOT matching patterns ARE processed
 
-3. **Reserved filenames exclusion:**
-   - Create reserved documentation files (e.g., README.md, LICENSE.md, CONTRIBUTING.md) with structured markdown content
-   - Run reqvire summary command
-   - Verify reserved files are NOT processed as structured markdown
-   - Verify reserved files can still be referenced in relations
-   - Verify files NOT matching reserved patterns ARE processed
-
-4. **Combined exclusion patterns:**
+3. **Combined exclusion patterns:**
    - Add patterns to .gitignore (e.g., "**/build/**")
    - Add different patterns to .reqvireignore (e.g., "**/DRAFT*.md")
-   - Create reserved files (e.g., README.md)
    - Create files matching all pattern sets
    - Verify files matching patterns from ANY source are excluded
    - Verify only non-matching files are processed
 
-5. **Missing .gitignore handling:**
+4. **Missing .gitignore handling:**
    - Run reqvire in environment without .gitignore file but with .reqvireignore
    - Verify command succeeds without errors
-   - Verify only .reqvireignore exclusions and reserved filenames are applied
+   - Verify only .reqvireignore exclusions are applied
 
-6. **Missing .reqvireignore handling:**
+5. **Missing .reqvireignore handling:**
    - Run reqvire in environment without .reqvireignore file but with .gitignore
    - Verify command succeeds without errors
-   - Verify only .gitignore exclusions and reserved filenames are applied
+   - Verify only .gitignore exclusions are applied
 
-7. **Both files missing handling:**
+6. **Both files missing handling:**
    - Run reqvire in environment without .gitignore or .reqvireignore files
    - Verify command succeeds without errors
-   - Verify only reserved filename exclusions are applied
+   - Verify no ignore-file exclusions are applied
 
-8. **Nested files ignored:**
+7. **Nested files ignored:**
    - Create nested .gitignore in subdirectory with different patterns
    - Create nested .reqvireignore in subdirectory with different patterns
    - Verify patterns from nested files are NOT applied
@@ -251,7 +242,6 @@ This test verifies that Reqvire correctly reads and applies exclusion patterns f
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-gitignore-integration/test.sh)
   * verify: [Ignore Files Integration](../Configuration.md#ignore-files-integration)
-  * verify: [Reserved Repository Files Exclusion](../Configuration.md#reserved-repository-files-exclusion)
 ---
 
 ### Invalid Header Structure Test

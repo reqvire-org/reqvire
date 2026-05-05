@@ -1,4 +1,5 @@
 pub mod change_impact;
+pub mod config;
 pub mod containment;
 pub mod crud;
 pub mod diagrams;

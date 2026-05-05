@@ -289,7 +289,6 @@ The system is expected to implement relations following clearly defined specific
 Requirements-processing scope behavior:
 - Applies `.gitignore` exclusions for files not in version-control processing scope.
 - Applies `.reqvireignore` exclusions for files excluded from requirements parsing.
-- Applies reserved repository filename exclusions (for example `README.md`, `LICENSE.md`).
 - Parses remaining in-scope files through the structured model pipeline.
 
 #### Metadata
@@ -307,44 +306,11 @@ Specification for how requirements files are discovered and processed.
 **File Discovery:**
 - Parse all .md files from git repository root
 - Apply .gitignore and .reqvireignore exclusions
-- Reserved files (README.md, LICENSE.md) are excluded
 
 **Processing Pipeline:**
 - Pass 1: Element collection and local validation
 - Pass 2: Graph construction and relation validation
 - GraphRegistry built from ElementRegistry after Pass 1
-
-#### Metadata
- * type: specification
----
-
-### Reserved Files Specification
-
-Reserved repository documentation filenames automatically excluded from structured markdown processing.
-
-#### Details
-The following filenames are reserved for general repository documentation and are automatically excluded from requirements parsing:
-
-**Reserved Filenames:**
-- `README.md` - Project overview and documentation
-- `CHANGELOG.md`, `CHANGES.md` - Version history and release notes
-- `CONTRIBUTING.md` - Contribution guidelines
-- `LICENSE.md` - License information
-- `CODE_OF_CONDUCT.md` - Community conduct standards
-- `SECURITY.md` - Security policies and vulnerability reporting
-- `AUTHORS.md` - Project contributors and credits
-- `ROADMAP.md` - Project roadmap and future plans
-
-**Exclusion Rules:**
-- Reserved filenames are excluded from structured markdown parsing across the entire repository
-- Reserved files can be referenced in file relations to elements (excluded from parsing but linkable)
-- Exclusion is combined with .gitignore and .reqvireignore patterns
-- Files matching reserved filenames are excluded regardless of ignore file configuration
-
-**Scope:**
-- Applies to exact filename matches (case-sensitive on case-sensitive filesystems)
-- Applies at all directory levels in the repository
-- Takes precedence before ignore pattern evaluation
 
 #### Metadata
  * type: specification
