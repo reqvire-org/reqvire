@@ -1,8 +1,3 @@
-use axum::body::{Body, Bytes};
-use axum::extract::State;
-use axum::http::{header, HeaderMap, Response, StatusCode};
-use axum::routing::post;
-use axum::Router;
 use globset::GlobSet;
 use reqvire::error::ReqvireError;
 use reqvire::tool_interface::{
@@ -11,8 +6,22 @@ use reqvire::tool_interface::{
     validate_startup_with_options as shared_validate_startup_with_options, ReqvireToolRegistry,
     MCP_PROTOCOL_VERSION as SHARED_MCP_PROTOCOL_VERSION,
 };
+use rmcp::{
+    handler::server::ServerHandler,
+    model::{
+        CallToolRequestParams, CallToolResult, Implementation, ListResourceTemplatesResult,
+        ListResourcesResult, ListToolsResult, PaginatedRequestParams, ReadResourceRequestParams,
+        ReadResourceResult, ServerCapabilities, ServerInfo, Tool,
+    },
+    service::{MaybeSendFuture, RequestContext, RoleServer},
+    transport::streamable_http_server::{
+        session::local::LocalSessionManager, StreamableHttpServerConfig, StreamableHttpService,
+    },
+    ErrorData as McpError,
+};
 use serde::Deserialize;
 use serde_json::{json, Value};
+use std::future::Future;
 use std::io::{self, BufRead, Write};
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -35,11 +44,151 @@ struct ToolCallParams {
 }
 
 #[derive(Clone)]
-struct HttpMcpState {
+struct ReqvireMcpServer {
     enable_mutations: bool,
     with_size_estimates: bool,
     excluded_filename_patterns: Arc<GlobSet>,
     write_lock: Arc<Mutex<()>>,
+}
+
+impl ReqvireMcpServer {
+    fn new(
+        enable_mutations: bool,
+        with_size_estimates: bool,
+        excluded_filename_patterns: &GlobSet,
+    ) -> Self {
+        Self {
+            enable_mutations,
+            with_size_estimates,
+            excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
+            write_lock: Arc::new(Mutex::new(())),
+        }
+    }
+
+    async fn call_handler(
+        &self,
+        method: &str,
+        params: Value,
+        serialize: bool,
+    ) -> Result<Value, McpError> {
+        if serialize {
+            let _guard = self.write_lock.lock().await;
+            return self.call_handler_unlocked(method, params);
+        }
+        self.call_handler_unlocked(method, params)
+    }
+
+    fn call_handler_unlocked(&self, method: &str, params: Value) -> Result<Value, McpError> {
+        let response = handle_rpc_value(
+            json!({
+                "jsonrpc": "2.0",
+                "id": 1,
+                "method": method,
+                "params": params
+            }),
+            self.enable_mutations,
+            self.with_size_estimates,
+            self.excluded_filename_patterns.as_ref(),
+        )
+        .ok_or_else(|| McpError::internal_error("MCP request produced no response", None))?;
+        if let Some(error) = response.get("error") {
+            return Err(McpError::internal_error(error.to_string(), None));
+        }
+        response
+            .get("result")
+            .cloned()
+            .ok_or_else(|| McpError::internal_error("MCP response missing result", None))
+    }
+}
+
+impl ServerHandler for ReqvireMcpServer {
+    fn get_info(&self) -> ServerInfo {
+        ServerInfo::new(
+            ServerCapabilities::builder()
+                .enable_tools()
+                .enable_resources()
+                .build(),
+        )
+        .with_server_info(Implementation::new("reqvire", env!("CARGO_PKG_VERSION")))
+    }
+
+    fn list_tools(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> impl Future<Output = Result<ListToolsResult, McpError>> + MaybeSendFuture + '_ {
+        async move {
+            let result = self.call_handler("tools/list", json!({}), false).await?;
+            let tools = serde_json::from_value::<Vec<Tool>>(
+                result.get("tools").cloned().unwrap_or_else(|| json!([])),
+            )
+            .map_err(|error| McpError::internal_error(error.to_string(), None))?;
+            Ok(ListToolsResult::with_all_items(tools))
+        }
+    }
+
+    fn call_tool(
+        &self,
+        request: CallToolRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> impl Future<Output = Result<CallToolResult, McpError>> + MaybeSendFuture + '_ {
+        async move {
+            let arguments = request
+                .arguments
+                .map(Value::Object)
+                .unwrap_or_else(|| json!({}));
+            let serialize = request_requires_write_tool(&request.name, Some(&arguments));
+            let result = self
+                .call_handler(
+                    "tools/call",
+                    json!({
+                        "name": request.name.as_ref(),
+                        "arguments": arguments
+                    }),
+                    serialize,
+                )
+                .await?;
+            serde_json::from_value::<CallToolResult>(result)
+                .map_err(|error| McpError::internal_error(error.to_string(), None))
+        }
+    }
+
+    fn list_resources(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> impl Future<Output = Result<ListResourcesResult, McpError>> + MaybeSendFuture + '_ {
+        async move {
+            let result = self
+                .call_handler("resources/list", json!({}), false)
+                .await?;
+            serde_json::from_value::<ListResourcesResult>(result)
+                .map_err(|error| McpError::internal_error(error.to_string(), None))
+        }
+    }
+
+    fn read_resource(
+        &self,
+        request: ReadResourceRequestParams,
+        _context: RequestContext<RoleServer>,
+    ) -> impl Future<Output = Result<ReadResourceResult, McpError>> + MaybeSendFuture + '_ {
+        async move {
+            let result = self
+                .call_handler("resources/read", json!({ "uri": request.uri }), false)
+                .await?;
+            serde_json::from_value::<ReadResourceResult>(result)
+                .map_err(|error| McpError::internal_error(error.to_string(), None))
+        }
+    }
+
+    fn list_resource_templates(
+        &self,
+        _request: Option<PaginatedRequestParams>,
+        _context: RequestContext<RoleServer>,
+    ) -> impl Future<Output = Result<ListResourceTemplatesResult, McpError>> + MaybeSendFuture + '_
+    {
+        std::future::ready(Ok(ListResourceTemplatesResult::with_all_items(vec![])))
+    }
 }
 
 pub fn serve_stdio(
@@ -96,16 +245,21 @@ pub async fn serve_http(
         ReqvireError::ProcessError(format!("Failed to start MCP HTTP server: {}", e))
     })?;
 
-    let state = HttpMcpState {
+    let server = ReqvireMcpServer::new(
         enable_mutations,
         with_size_estimates,
-        excluded_filename_patterns: Arc::new(excluded_filename_patterns.clone()),
-        write_lock: Arc::new(Mutex::new(())),
-    };
-
-    let app = Router::new()
-        .route("/mcp", post(handle_http_rpc).get(http_method_not_allowed))
-        .with_state(state);
+        excluded_filename_patterns,
+    );
+    let service: StreamableHttpService<ReqvireMcpServer, LocalSessionManager> =
+        StreamableHttpService::new(
+            move || Ok(server.clone()),
+            LocalSessionManager::default().into(),
+            StreamableHttpServerConfig::default()
+                .with_allowed_origins(loopback_allowed_origins())
+                .with_stateful_mode(false)
+                .with_json_response(true),
+        );
+    let app = axum::Router::new().nest_service("/mcp", service);
 
     eprintln!("MCP HTTP server listening at http://{}/mcp", addr);
 
@@ -119,132 +273,15 @@ pub async fn serve_http(
     Ok(())
 }
 
-async fn handle_http_rpc(
-    State(state): State<HttpMcpState>,
-    headers: HeaderMap,
-    body: Bytes,
-) -> Response<Body> {
-    if !origin_is_allowed(&headers) {
-        return text_response(
-            StatusCode::FORBIDDEN,
-            "Forbidden: non-loopback Origin is not allowed",
-        );
-    }
-
-    let raw = match serde_json::from_slice::<Value>(&body) {
-        Ok(raw) => raw,
-        Err(err) => {
-            return json_response(
-                StatusCode::OK,
-                rpc_error(
-                    Value::Null,
-                    -32700,
-                    "Parse error",
-                    Some(json!({ "message": err.to_string() })),
-                ),
-            );
-        }
-    };
-
-    let response = if request_requires_write(&raw) {
-        let _guard = state.write_lock.lock().await;
-        handle_rpc_value(
-            raw,
-            state.enable_mutations,
-            state.with_size_estimates,
-            state.excluded_filename_patterns.as_ref(),
-        )
-    } else {
-        handle_rpc_value(
-            raw,
-            state.enable_mutations,
-            state.with_size_estimates,
-            state.excluded_filename_patterns.as_ref(),
-        )
-    };
-
-    match response {
-        Some(value) => json_response(StatusCode::OK, value),
-        None => text_response(StatusCode::ACCEPTED, ""),
-    }
-}
-
-async fn http_method_not_allowed() -> Response<Body> {
-    text_response(StatusCode::METHOD_NOT_ALLOWED, "Method Not Allowed")
-}
-
-fn request_requires_write(raw: &Value) -> bool {
-    if raw.get("method").and_then(Value::as_str) != Some("tools/call") {
-        return false;
-    }
-
-    let params = raw.get("params").unwrap_or(&Value::Null);
-    let tool_name = match params.get("name").and_then(Value::as_str) {
-        Some(name) => name,
-        None => return false,
-    };
-
-    request_requires_write_tool(tool_name, params.get("arguments"))
-}
-
-fn origin_is_allowed(headers: &HeaderMap) -> bool {
-    let Some(origin) = headers.get(header::ORIGIN) else {
-        return true;
-    };
-
-    let Ok(origin) = origin.to_str() else {
-        return false;
-    };
-
-    loopback_origin(origin)
-}
-
-fn loopback_origin(origin: &str) -> bool {
-    let lower = origin.to_ascii_lowercase();
-    if lower == "null" || lower.starts_with("file:") {
-        return false;
-    }
-
-    let Some(authority_and_path) = lower
-        .strip_prefix("http://")
-        .or_else(|| lower.strip_prefix("https://"))
-    else {
-        return false;
-    };
-
-    let authority = authority_and_path
-        .split('/')
-        .next()
-        .unwrap_or(authority_and_path);
-    let host = if authority.starts_with('[') {
-        authority
-            .split(']')
-            .next()
-            .map(|value| format!("{}]", value))
-            .unwrap_or_default()
-    } else {
-        authority.split(':').next().unwrap_or(authority).to_string()
-    };
-
-    host == "localhost" || host.starts_with("127.") || host == "[::1]" || host == "::1"
-}
-
-fn json_response(status: StatusCode, value: Value) -> Response<Body> {
-    Response::builder()
-        .status(status)
-        .header(header::CONTENT_TYPE, "application/json")
-        .body(Body::from(value.to_string()))
-        .unwrap_or_else(|_| {
-            text_response(StatusCode::INTERNAL_SERVER_ERROR, "Internal Server Error")
-        })
-}
-
-fn text_response(status: StatusCode, text: &str) -> Response<Body> {
-    Response::builder()
-        .status(status)
-        .header(header::CONTENT_TYPE, "text/plain; charset=utf-8")
-        .body(Body::from(text.to_string()))
-        .unwrap_or_else(|_| Response::new(Body::empty()))
+fn loopback_allowed_origins() -> [&'static str; 6] {
+    [
+        "http://localhost",
+        "https://localhost",
+        "http://127.0.0.1",
+        "https://127.0.0.1",
+        "http://[::1]",
+        "https://[::1]",
+    ]
 }
 
 fn handle_rpc_value(

@@ -95,7 +95,7 @@ This verification shall prove that the Reqvire MCP HTTP transport preserves MCP 
 #### Details
 Expected checks:
 - Start `reqvire mcp --transport http` and verify the server binds to `127.0.0.1` by default.
-- Start `reqvire mcp --transport http --host 127.0.0.1 --port <PORT>` and verify MCP JSON-RPC requests are accepted at fixed endpoint `/mcp`.
+- Start `reqvire mcp --transport http --host 127.0.0.1 --port <PORT>` and verify standard MCP streamable HTTP requests are accepted at fixed endpoint `/mcp`.
 - Verify `reqvire mcp --transport stdio` preserves the current newline-delimited stdio behavior.
 - Verify HTTP `tools/list`, `resources/list`, and representative `tools/call` responses match stdio tool names, schemas, annotations, mutation gating, and structured result semantics.
 - Verify HTTP requests without an `Origin` header are accepted.
@@ -105,7 +105,7 @@ Expected checks:
 - Verify mutation-capable HTTP mode still requires explicit `--enable-mutations` and does not become enabled by selecting HTTP transport.
 - Verify concurrent HTTP mutation requests for the same workspace are serialized so filesystem writes and post-mutation model refresh cannot interleave.
 - Verify a read after an HTTP mutation observes the refreshed model state and reports the observed model revision or fingerprint.
-- Verify HTTP GET without implemented SSE streaming returns method-not-allowed behavior and does not execute tools.
+- Verify HTTP transport behavior is provided by RMCP rather than a Reqvire-owned HTTP JSON-RPC parser.
 
 #### Metadata
   * type: test-verification
