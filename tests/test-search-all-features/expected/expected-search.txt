@@ -87,6 +87,24 @@ Total elements: 8
   system-requirement: 3
   user-requirement: 3
 
+📋 Requirement Governance Metadata:
+  Status:
+    approved: 6
+    draft: 0
+    review: 0
+  Priority:
+    critical: 0
+    high: 0
+    low: 0
+    medium: 6
+  Risk:
+    critical: 0
+    high: 0
+    low: 6
+    medium: 0
+  Owner:
+    unassigned: 6
+
 📋 Verification Types:
   analysis-verification: 0
   demonstration-verification: 0

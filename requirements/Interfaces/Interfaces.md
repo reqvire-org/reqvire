@@ -45,7 +45,7 @@ The system shall provide a Model Context Protocol interface for external tools, 
 #### Relations
   * derive: [MCP Protocol Standard Conformance](MCP/Tools.md#mcp-protocol-standard-conformance)
   * derive: [MCP Server Command](MCP/Tools.md#mcp-server-command)
-  * derive: [MCP Transport Selection](MCP/Tools.md#mcp-transport-selection)
+  * derive: [MCP Streamable HTTP Transport](MCP/Tools.md#mcp-streamable-http-transport)
   * derive: [MCP Streamable HTTP Transport Safety](MCP/Tools.md#mcp-streamable-http-transport-safety)
   * derive: [MCP Mutation Concurrency Control](MCP/Tools.md#mcp-mutation-concurrency-control)
   * derive: [MCP Adapter Boundary](MCP/Tools.md#mcp-adapter-boundary)

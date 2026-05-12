@@ -207,6 +207,30 @@ Test cases:
   * verify: [Format Duplicate Removal](../Formatting.md#format-duplicate-removal)
 ---
 
+### Requirement Governance Metadata Formatting Verification
+
+This verification shall prove that formatting and rewrite operations preserve authored requirement governance metadata without persisting inherited or default governance metadata values.
+
+#### Details
+Expected checks:
+- Create a parent requirement with explicit governance metadata.
+- Create child requirements that omit one or more governance metadata keys.
+- Run `reqvire format --fix`.
+- Verify explicitly authored governance metadata remains in each element's `#### Metadata` subsection.
+- Verify inherited governance metadata is not inserted into child requirement Markdown.
+- Verify default governance metadata is not inserted into requirement Markdown.
+- Verify governance metadata is not inserted into refinement element Markdown.
+- Verify metadata indentation and ordering remain deterministic after formatting.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-requirement-governance-metadata/test.sh)
+  * verify: [Requirement Governance Metadata](../../Core/ModelManagement.md#requirement-governance-metadata)
+  * verify: [Format Consistency Enforcement](../Formatting.md#format-consistency-enforcement)
+---
+
 ### Full Relations Insertion Verification
 
 This test verifies that the --with-full-relations flag correctly inserts all registered relations (user-created and auto-generated) into elements during formatting.

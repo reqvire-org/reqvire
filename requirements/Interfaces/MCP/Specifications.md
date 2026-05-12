@@ -88,20 +88,18 @@ The MCP server is expected to expose element size estimates only when explicitly
   * refine: [MCP Server Command](Tools.md#mcp-server-command)
 ---
 
-### MCP Transport Selection Specification
+### MCP Streamable HTTP Transport Specification
 
-The MCP server is expected to keep transport mechanics separate from Reqvire tool semantics.
+The MCP server is expected to use RMCP Streamable HTTP as its protocol transport.
 
 #### Details
-Transport selection rules:
-- `reqvire mcp` defaults to stdio transport.
-- `reqvire mcp --transport stdio` explicitly selects stdio transport.
-- `reqvire mcp --transport http` selects Streamable HTTP transport when implemented.
-- Transport selection is a server startup concern and is not exposed as an MCP tool.
-- Tool names, input schemas, output schemas, annotations, resources, mutation gating, and Reqvire core behavior are identical across transports unless the MCP protocol requires transport-specific metadata.
-- Stdio transport uses newline-delimited JSON-RPC over stdin/stdout and writes diagnostics only to stderr.
+Transport rules:
+- `reqvire mcp` starts RMCP Streamable HTTP transport.
+- Stdio transport is not supported and is not accepted as a compatibility mode.
+- Transport implementation is a server startup concern and is not exposed as an MCP tool.
+- Tool names, input schemas, output schemas, annotations, resources, mutation gating, and Reqvire core behavior are independent from HTTP transport mechanics unless the MCP protocol requires transport-specific metadata.
 - Streamable HTTP transport uses the Rust `rmcp` streamable HTTP server transport according to MCP Streamable HTTP rules.
-- HTTP transport startup options include host and port when HTTP transport is implemented.
+- HTTP transport startup options include host and port.
 - HTTP transport defaults to `127.0.0.1` and fixed endpoint `/mcp`.
 - HTTP transport is appropriate for long-running local service use, multiple clients, and future streaming/server-to-client notifications.
 
@@ -109,7 +107,7 @@ Transport selection rules:
   * type: specification
 
 #### Relations
-  * refine: [MCP Transport Selection](Tools.md#mcp-transport-selection)
+  * refine: [MCP Streamable HTTP Transport](Tools.md#mcp-streamable-http-transport)
 ---
 
 ### MCP Streamable HTTP Transport Safety Specification
@@ -373,7 +371,7 @@ Model evidence tool contracts:
 
 | Tool | inputSchema | outputSchema / structuredContent | annotations |
 | --- | --- | --- | --- |
-| `reqvire.search` | `short`, `filter_file`, `filter_name`, `filter_type`, `filter_content`, `filter_page_content`, `have_relations`, `not_have_relations`, `has_attachments`, `filter_attachment`. | Search summary and matched elements with ids, names, types, files, snippets, relations, and attachments. | Read-only. |
+| `reqvire.search` | `short`, `filter_file`, `filter_name`, `filter_type`, `filter_status`, `filter_priority`, `filter_risk`, `filter_owner`, `filter_content`, `filter_page_content`, `have_relations`, `not_have_relations`, `has_attachments`, `filter_attachment`. | Search summary and matched elements with ids, names, types, files, snippets, effective governance metadata, relations, and attachments. | Read-only. |
 | `reqvire.read_element` | Required `element_name` or `element_id`; optional `include_content`, `include_relations`, `include_attachments`. | One resolved element with content, type, file path, relations, attachments, parent/child refs, refinement refs, verification refs, and satisfaction/resource refs. | Read-only. |
 | `reqvire.model` | Optional `from`, `reverse`, `filter_type`. | Nested logical model structure, roots, selected subtree, relation direction, filtered element types, and included evidence. | Read-only. |
 | `reqvire.containment` | Optional `short`. | Folder/file/element physical hierarchy with element ids, names, types, and file paths. | Read-only. |
@@ -420,6 +418,24 @@ The MCP interface is expected to expose read-only model evidence tools grounded 
 
 #### Details
 Model evidence tool behavior is inherited from attached Reqvire search, model, containment, collect, and submodel contracts. MCP adds typed request/result schemas, workspace/model revision metadata, and evidence references describing which elements, files, relations, and attachments were included.
+
+`reqvire.search` tool calls are expected to expose typed request fields equivalent to the stable Reqvire search filters:
+- `short`: optional boolean controlling abbreviated output.
+- `filter_file`: optional file path glob.
+- `filter_name`: optional element name regex.
+- `filter_type`: optional element type filter string.
+- `filter_status`: optional comma-separated requirement governance status filter (`draft`, `review`, `approved`).
+- `filter_priority`: optional comma-separated requirement governance priority filter (`low`, `medium`, `high`, `critical`).
+- `filter_risk`: optional comma-separated requirement governance risk filter (`low`, `medium`, `high`, `critical`).
+- `filter_owner`: optional regex over effective requirement governance owner.
+- `filter_content`: optional element content regex.
+- `filter_page_content`: optional parent file page content regex.
+- `have_relations`: optional comma-separated relation type list requiring all listed relations.
+- `not_have_relations`: optional comma-separated relation type list excluding elements that have all listed relations.
+- `has_attachments`: optional boolean requiring at least one attachment.
+- `filter_attachment`: optional attachment target glob.
+
+Governance metadata filters apply to effective governance metadata values and exclude non-requirement-family elements when active. Successful `reqvire.search` structured results include effective governance metadata for requirement-family element evidence.
 
 #### Metadata
   * type: specification
@@ -618,7 +634,7 @@ The MCP server is expected to start with safe local-first access behavior.
 
 #### Details
 Access rules:
-- Prefer stdio or local-only transport first.
+- Prefer local-only HTTP transport first.
 - Do not expose arbitrary shell execution.
 - Do not expose arbitrary filesystem reads.
 - File evidence is limited to files referenced by the Reqvire model.

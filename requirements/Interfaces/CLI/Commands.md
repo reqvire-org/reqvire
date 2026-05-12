@@ -587,6 +587,7 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Attachments
+  * [Requirement Governance Metadata Specification](../../Functional/Core/Specifications.md#requirement-governance-metadata-specification)
   * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Short Mode Behavior](../../Functional/Output/Behaviors.md#short-mode-behavior)

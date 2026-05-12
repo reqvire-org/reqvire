@@ -20,6 +20,27 @@ This behavior mirrors the existing relation target update behavior used when mov
   * type: behavior
 ---
 
+### Requirement Governance Metadata Inheritance Behavior
+
+When requirement governance metadata is missing from a requirement element, the model resolves effective governance metadata from the nearest requirement ancestor or from the governance metadata defaults.
+
+#### Details
+Resolution follows this order for each governance metadata key independently:
+
+1. **Explicit value**: Use the value authored on the current element in `#### Metadata`.
+2. **Inherited value**: If the current element omits the key, walk requirement hierarchy ancestors through `derivedFrom` / `derive` relations and use the nearest explicit value.
+3. **Default value**: If no ancestor defines the key, use the default value from the Requirement Governance Metadata Specification.
+
+Refinement elements do not participate in governance metadata inheritance as metadata authors. When model evidence needs governance context for a refinement element, the context shall be resolved from the refinement's directly owning requirement.
+
+The model shall retain enough source information for consumers to distinguish explicit, inherited, and default effective values.
+
+Formatting and rewrite operations shall not insert inherited or default values into Markdown source. Only explicit metadata authored by the user, or explicitly changed by a mutation operation, shall be persisted.
+
+#### Metadata
+  * type: behavior
+---
+
 ### Attachment Input Auto-Detection Behavior
 
 When attaching or detaching via CLI commands, the system shall resolve attachment targets as refinement-element identifiers.

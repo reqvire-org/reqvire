@@ -86,7 +86,7 @@ The system shall support the following reserved subsections with predefined stru
 The system shall support following reserved subsections:
  * **Relations**: Define relationships between elements
  * **Details**: Extend requirement text with additional information
- * **Metadata**: Define element type and classification
+ * **Metadata**: Define element type, requirement governance metadata, and classification
  * **Attachments**: Link Refinement elements
    - Can contain element identifiers only (markdown links to Refinement elements ONLY)
 
@@ -101,6 +101,7 @@ Each reserved subsection has specific parsing rules, validation requirements, an
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * refinedBy: [ReservedSubsections](DesignDocuments/ReservedSubsections.md#reservedsubsections)
   * refinedBy: [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)
+  * refinedBy: [Requirement Governance Metadata Specification](Specifications.md#requirement-governance-metadata-specification)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Attachment Output Rendering Verification](Verifications/AttachmentsVerifications.md#attachment-output-rendering-verification)

@@ -97,6 +97,63 @@ Element types are identified through a reserved `type` metadata property in the 
  * type: specification
 ---
 
+### Requirement Governance Metadata Specification
+
+Specification for declaring requirement governance metadata keys and values through the Metadata subsection.
+
+#### Details
+Requirement governance metadata is declared in the `#### Metadata` subsection of requirement-family elements (`requirement` and `user-requirement`).
+
+Requirement governance metadata covers requirement management accountability and decision context: `status` represents the requirement lifecycle state, `priority` represents planning importance, `risk` represents realization risk, and `owner` represents maintenance accountability.
+
+Elements outside the requirement family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Refinement elements (`constraint`, `behavior`, and `specification`) obtain governance context from their directly owning requirement instead of authored metadata.
+
+When any non-requirement-family element declares requirement governance metadata keys, the validator is expected to report an error indicating that governance metadata is only valid on requirement-family elements.
+
+**Declaration Format:**
+- ` * status: <status-value>`
+- ` * priority: <priority-value>`
+- ` * risk: <risk-value>`
+- ` * owner: <owner-value>`
+
+**Status Values:**
+- `draft`: The requirement is being authored or revised and is not ready for formal review.
+- `review`: The requirement is ready for, or currently under, stakeholder or engineering review.
+- `approved`: The requirement definition has completed review and is accepted as authoritative for downstream work.
+
+Default: `approved`.
+
+Only explicit `status: approved` metadata indicates that the requirement itself has been approved. Inherited or default status values are effective model context and must not be treated as approval evidence.
+
+**Priority Values:**
+- `low`: Useful or desirable, but deferrable without major mission, stakeholder, or integration impact.
+- `medium`: Normal planning importance; expected to be delivered unless schedule, cost, or scope tradeoffs require adjustment.
+- `high`: Important to mission, stakeholder value, integration, or compliance and should be protected during tradeoffs.
+- `critical`: Essential; failure to satisfy creates unacceptable mission, safety, compliance, contractual, or release impact.
+
+Default: `medium`.
+
+**Risk Values:**
+- `low`: Requirement realization is well understood, stable, feasible, and straightforward to verify.
+- `medium`: Requirement realization has manageable uncertainty, moderate implementation or verification complexity, or limited downstream coupling.
+- `high`: Requirement realization has significant technical uncertainty, volatility, verification difficulty, integration exposure, or likely downstream rework.
+- `critical`: Requirement realization has severe uncertainty or exposure where failure, change, or non-compliance may materially affect mission, safety, compliance, cost, or schedule.
+
+Default: `low`.
+
+Risk represents requirement realization risk in the systems engineering sense: uncertainty and exposure associated with implementing, integrating, changing, or verifying the requirement. Risk is distinct from priority and does not by itself define hazard severity.
+
+**Owner Value:**
+- `owner` is a free-form string identifying the accountable person, role, or team responsible for maintaining the requirement.
+
+Default: absent / unassigned. Structured effective metadata represents an unassigned owner as an empty string.
+
+Effective value inheritance and persistence behavior are defined by the Requirement Governance Metadata Inheritance Behavior.
+
+#### Metadata
+ * type: specification
+---
+
 ### Excluded File Relation Validation Refinement Specification
 
 #### Details
@@ -244,8 +301,11 @@ Refinement elements serve as detailed documentation that augments requirements a
 - They are primarily referenced through the Attachments subsection of other elements
 - Their `refine` relation links back to the requirement they refine, establishing ownership
 - Each refinement can only be owned by one requirement (uniqueness constraint)
+- They do not define requirement governance metadata; governance context for a refinement is obtained from its directly owning requirement
 
 When a Refinement element contains relations other than `refine`, the validator is expected to report an error indicating that only `refine` relations are allowed for refinement types.
+
+When a Refinement element declares requirement governance metadata keys (`status`, `priority`, `risk`, or `owner`), the validator is expected to report an error indicating that governance metadata is only valid on requirement-family elements.
 
 #### Metadata
  * type: specification

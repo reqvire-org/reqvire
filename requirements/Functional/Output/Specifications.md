@@ -68,6 +68,63 @@ JSON report outputs are expected to preserve element size-estimate metadata when
  * refine: [JSON Element Size Estimate Exposure](Reporting.md#json-element-size-estimate-exposure)
 ---
 
+### Requirement Governance Metadata JSON Output Specification
+
+Structured model evidence outputs are expected to expose effective requirement governance metadata with stable source information.
+
+#### Details
+- Full search JSON output and equivalent MCP structured search results shall include `governance_metadata` for requirement-family element payloads (`requirement` and `user-requirement`).
+- Non-requirement-family element payloads shall omit `governance_metadata`.
+- The `governance_metadata` object shall contain `status`, `priority`, `risk`, and `owner` entries.
+- Each entry shall contain:
+ - `value`: the effective value after explicit, inherited, and default resolution.
+ - `source`: one of `explicit`, `inherited`, or `default`.
+ - `source_identifier`: the requirement ancestor identifier that supplied the value when `source` is `inherited`.
+- `source_identifier` shall be omitted when `source` is `explicit` or `default`.
+- `owner.value` shall be a string and shall be empty when the effective owner is unassigned.
+- Enum values and defaults shall match the Requirement Governance Metadata Specification.
+- Full search JSON output shall include global governance summary counters under `global_counters.total_governance_metadata`.
+- Governance summary counters shall be computed from effective metadata for matched requirement-family elements only.
+- Governance summary counters shall include `status`, `priority`, `risk`, and `owner` maps.
+- Status, priority, and risk summary maps shall include all accepted enum values with zero counts when no matched requirement has that value.
+- Owner summary maps shall count effective owner values and represent empty/unassigned owner as `unassigned`.
+- Full text search output shall render equivalent governance summary counts in the summary section.
+- Short search output shall omit global counters, including governance summary counters.
+
+Example:
+
+```json
+{
+ "governance_metadata": {
+ "status": {
+ "value": "approved",
+ "source": "inherited",
+ "source_identifier": "requirements/System.md#parent-requirement"
+ },
+ "priority": {
+ "value": "high",
+ "source": "explicit"
+ },
+ "risk": {
+ "value": "low",
+ "source": "default"
+ },
+ "owner": {
+ "value": "Platform Team",
+ "source": "inherited",
+ "source_identifier": "requirements/System.md#parent-requirement"
+ }
+ }
+}
+```
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Search Report Generator](Reporting.md#search-report-generator)
+---
+
 ### Collect Output Format Specification
 
 Output format specification for collect command text and JSON modes.

@@ -7,7 +7,7 @@ This verification shall prove that Reqvire MCP initialization, capabilities, too
 #### Details
 Expected checks:
 - Initialize the server using MCP protocol revision `2025-11-25` and verify the response includes `protocolVersion`, standard MCP `capabilities`, and `serverInfo`.
-- Initialize with an unsupported protocol revision and verify standard MCP initialization error handling.
+- Send a request with an unsupported `Mcp-Protocol-Version` HTTP header and verify RMCP rejects it before tool execution.
 - Verify the server declares MCP `tools` capability when tool calls are available.
 - Verify the server declares MCP `resources` capability only when resources are available.
 - Verify MVP capability objects do not advertise prompts, logging, completions, or tasks unless those features are implemented.
@@ -94,10 +94,10 @@ This verification shall prove that the Reqvire MCP HTTP transport preserves MCP 
 
 #### Details
 Expected checks:
-- Start `reqvire mcp --transport http` and verify the server binds to `127.0.0.1` by default.
-- Start `reqvire mcp --transport http --host 127.0.0.1 --port <PORT>` and verify standard MCP streamable HTTP requests are accepted at fixed endpoint `/mcp`.
-- Verify `reqvire mcp --transport stdio` preserves the current newline-delimited stdio behavior.
-- Verify HTTP `tools/list`, `resources/list`, and representative `tools/call` responses match stdio tool names, schemas, annotations, mutation gating, and structured result semantics.
+- Start `reqvire mcp` and verify the server binds to `127.0.0.1` by default.
+- Start `reqvire mcp --host 127.0.0.1 --port <PORT>` and verify standard MCP streamable HTTP requests are accepted at fixed endpoint `/mcp`.
+- Verify `reqvire mcp --transport stdio` is rejected because stdio compatibility mode is not supported.
+- Verify HTTP `tools/list`, `resources/list`, and representative `tools/call` responses expose the expected tool names, schemas, annotations, mutation gating, and structured result semantics.
 - Verify HTTP requests without an `Origin` header are accepted.
 - Verify HTTP requests with loopback `Origin` headers are accepted.
 - Verify HTTP requests with non-loopback, `null`, file, or malformed `Origin` headers are rejected before tool execution.
@@ -111,7 +111,7 @@ Expected checks:
   * type: test-verification
 
 #### Relations
-  * verify: [MCP Transport Selection](../Tools.md#mcp-transport-selection)
+  * verify: [MCP Streamable HTTP Transport](../Tools.md#mcp-streamable-http-transport)
   * verify: [MCP Streamable HTTP Transport Safety](../Tools.md#mcp-streamable-http-transport-safety)
   * verify: [MCP Mutation Concurrency Control](../Tools.md#mcp-mutation-concurrency-control)
   * satisfiedBy: [test.sh](../../../../tests/test-mcp-server/test.sh)
@@ -124,7 +124,7 @@ This verification shall prove that shared Reqvire MCP contracts are protocol-neu
 #### Details
 Expected checks:
 - Verify shared request/result/error/evidence/diff/version types do not depend on MCP SDK runtime types.
-- Verify an in-process Rust application can discover and call Reqvire tools through the public Reqvire library without starting MCP stdio or HTTP transport.
+- Verify an in-process Rust application can discover and call Reqvire tools through the public Reqvire library without starting MCP HTTP transport.
 - Verify the MCP adapter maps shared contracts to MCP `tools/list`, `tools/call`, resources, `structuredContent`, text `content`, and MCP error shapes.
 - Verify CLI and MCP can reuse shared operation contracts without MCP requirements deriving from CLI command requirements.
 
@@ -221,6 +221,8 @@ This verification shall prove that every advertised MCP tool has a complete tool
 Expected checks:
 - For every tool returned by `tools/list`, verify `name`, `description`, `inputSchema`, annotations, and any declared `outputSchema`.
 - Verify every `inputSchema` is a JSON object schema and rejects unsupported arguments.
+- Verify `reqvire.search` inputSchema advertises governance metadata filter fields `filter_status`, `filter_priority`, `filter_risk`, and `filter_owner`.
+- Verify `reqvire.search` rejects unsupported governance metadata filter values with accepted-value diagnostics.
 - Verify no-argument tools use an empty object schema.
 - Verify every successful tool call that declares `outputSchema` returns `structuredContent` conforming to that schema.
 - Verify every successful tool call includes compatible text `content` for clients that do not consume structured content.
@@ -386,10 +388,10 @@ This verification shall prove that MCP does not expose arbitrary shell execution
 
 ### MCP Server End-to-End Verification
 
-This verification shall prove the Reqvire MCP server behavior through the external CLI/stdin/stdout protocol boundary.
+This verification shall prove the Reqvire MCP server behavior through the external RMCP Streamable HTTP protocol boundary.
 
 #### Details
-The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initialization, capabilities, tool discovery, resource discovery and reads, structured tool calls, protocol error handling, default mutation-tool omission, mutation-mode tool exposure, dry-run mutation behavior, persisted mutation behavior, post-mutation reads, and startup validation failure handling.
+The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initialization, capabilities, tool discovery, resource discovery and reads, structured tool calls, protocol error handling, stdio transport rejection, default mutation-tool omission, mutation-mode tool exposure, dry-run mutation behavior, persisted mutation behavior, post-mutation reads, and startup validation failure handling.
 
 #### Metadata
   * type: test-verification

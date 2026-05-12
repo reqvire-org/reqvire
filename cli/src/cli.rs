@@ -1,7 +1,7 @@
 use crate::mcp;
 use crate::serve;
 use anyhow::Result;
-use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
+use clap::{CommandFactory, Parser, Subcommand};
 use globset::GlobSet;
 use log::info;
 use reqvire::change_impact;
@@ -46,12 +46,6 @@ pub struct Args {
     pub command: Option<Commands>,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, ValueEnum)]
-pub enum McpTransport {
-    Stdio,
-    Http,
-}
-
 #[derive(Subcommand, Debug)]
 pub enum Commands {
     /// Export model to browsable HTML documentation with complete traceability
@@ -78,13 +72,9 @@ pub enum Commands {
     /// Start Reqvire MCP server
     #[clap(
         name = "mcp",
-        override_help = "Start Reqvire MCP server\n\nMCP OPTIONS:\n      --transport <TRANSPORT>   MCP transport: stdio or http (default: stdio)\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --with-size-estimates     Include element size estimates in model evidence tools"
+        override_help = "Start Reqvire MCP Streamable HTTP server\n\nMCP OPTIONS:\n      --host <HOST>             HTTP bind address (default: 127.0.0.1)\n      --port <PORT>             HTTP server port (default: 8081)\n      --enable-mutations        Advertise and allow mutation tools\n      --with-size-estimates     Include element size estimates in model evidence tools"
     )]
     Mcp {
-        /// MCP transport
-        #[clap(long, value_enum, default_value_t = McpTransport::Stdio, help_heading = "MCP OPTIONS")]
-        transport: McpTransport,
-
         /// HTTP bind address
         #[clap(long, default_value = "127.0.0.1", help_heading = "MCP OPTIONS")]
         host: String,
@@ -140,7 +130,7 @@ pub enum Commands {
 
     /// Search and filter model elements with comprehensive filtering options
     #[clap(
-        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
+        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
     )]
     Search {
         /// Output results in JSON format
@@ -166,6 +156,30 @@ pub enum Commands {
         /// Only include elements of the given type(s). Supports comma-separated list. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
         filter_type: Option<String>,
+
+        /// Only include requirement-family elements with matching effective status values
+        #[clap(
+            long,
+            value_name = "STATUS[,STATUS...]",
+            help_heading = "SEARCH OPTIONS"
+        )]
+        filter_status: Option<String>,
+
+        /// Only include requirement-family elements with matching effective priority values
+        #[clap(
+            long,
+            value_name = "PRIORITY[,PRIORITY...]",
+            help_heading = "SEARCH OPTIONS"
+        )]
+        filter_priority: Option<String>,
+
+        /// Only include requirement-family elements with matching effective risk values
+        #[clap(long, value_name = "RISK[,RISK...]", help_heading = "SEARCH OPTIONS")]
+        filter_risk: Option<String>,
+
+        /// Only include requirement-family elements whose effective owner matches this regular expression
+        #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
+        filter_owner: Option<String>,
 
         /// Only include elements whose content matches this regular expression
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
@@ -1039,30 +1053,21 @@ pub async fn handle_command(
     }
 
     if let Some(Commands::Mcp {
-        transport,
         host,
         port,
         enable_mutations,
         with_size_estimates,
     }) = args.command
     {
-        return match transport {
-            McpTransport::Stdio => mcp::serve_stdio(
-                enable_mutations,
-                with_size_estimates,
-                excluded_filename_patterns,
-            )
-            .map(|_| 0),
-            McpTransport::Http => mcp::serve_http(
-                enable_mutations,
-                with_size_estimates,
-                excluded_filename_patterns,
-                &host,
-                port,
-            )
-            .await
-            .map(|_| 0),
-        };
+        return mcp::serve_http(
+            enable_mutations,
+            with_size_estimates,
+            excluded_filename_patterns,
+            &host,
+            port,
+        )
+        .await
+        .map(|_| 0);
     }
 
     // Get current working directory once at the start
@@ -1130,6 +1135,10 @@ pub async fn handle_command(
             filter_file,
             filter_name,
             filter_type,
+            filter_status,
+            filter_priority,
+            filter_risk,
+            filter_owner,
             filter_content,
             filter_page_content,
             have_relations,
@@ -1142,6 +1151,10 @@ pub async fn handle_command(
                 filter_file.as_deref(),
                 filter_name.as_deref(),
                 filter_type.as_deref(),
+                filter_status.as_deref(),
+                filter_priority.as_deref(),
+                filter_risk.as_deref(),
+                filter_owner.as_deref(),
                 filter_content.as_deref(),
                 filter_page_content.as_deref(),
                 have_relations.as_deref(),

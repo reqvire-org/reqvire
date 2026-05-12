@@ -30,6 +30,16 @@ assert_jq_line() {
   fi
 }
 
+pick_port() {
+  python3 - <<'PY'
+import socket
+s = socket.socket()
+s.bind(("127.0.0.1", 0))
+print(s.getsockname()[1])
+s.close()
+PY
+}
+
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 OUTSIDE_DIR="$(mktemp -d -t reqvire-workspace-outside-XXXXXX)"
 
@@ -137,10 +147,47 @@ if ! grep -q "Workspace Flag Child" "$TEST_DIR/output/change-impact.txt"; then
 fi
 
 MCP_OUTPUT="$TEST_DIR/output/mcp-workspace.jsonl"
-{
-  jq -n -c '{jsonrpc:"2.0",id:1,method:"initialize",params:{protocolVersion:"2025-11-25"}}'
-  jq -n -c '{jsonrpc:"2.0",id:2,method:"tools/call",params:{name:"reqvire.workspace_status",arguments:{}}}'
-} | (cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$TEST_DIR" mcp) > "$MCP_OUTPUT" 2>"$MCP_OUTPUT.stderr"
+MCP_PORT="$(pick_port)"
+(cd "$OUTSIDE_DIR" && "$REQVIRE_BIN" --workspace "$TEST_DIR" mcp --host 127.0.0.1 --port "$MCP_PORT") > "$MCP_OUTPUT.stdout" 2>"$MCP_OUTPUT.stderr" &
+MCP_PID=$!
+trap 'kill "$MCP_PID" >/dev/null 2>&1 || true; wait "$MCP_PID" >/dev/null 2>&1 || true' EXIT
+
+INIT_REQUEST="$(jq -n -c '{jsonrpc:"2.0",id:1,method:"initialize",params:{protocolVersion:"2025-11-25",capabilities:{},clientInfo:{name:"reqvire-test",version:"0"}}}')"
+STATUS_REQUEST="$(jq -n -c '{jsonrpc:"2.0",id:2,method:"tools/call",params:{name:"reqvire.workspace_status",arguments:{}}}')"
+
+: > "$MCP_OUTPUT"
+for _ in $(seq 1 50); do
+  if curl -sS -o "$TEST_DIR/output/mcp-workspace-init.json" \
+    -H 'Content-Type: application/json' \
+    -H 'Accept: application/json, text/event-stream' \
+    --data "$INIT_REQUEST" \
+    "http://127.0.0.1:${MCP_PORT}/mcp" >/dev/null 2>&1; then
+    if jq -e '.result.protocolVersion == "2025-11-25"' "$TEST_DIR/output/mcp-workspace-init.json" >/dev/null 2>&1; then
+      break
+    fi
+  fi
+  sleep 0.1
+done
+
+if ! jq -e '.result.protocolVersion == "2025-11-25"' "$TEST_DIR/output/mcp-workspace-init.json" >/dev/null 2>&1; then
+  fail "MCP should initialize from explicit workspace" "$MCP_OUTPUT.stderr"
+fi
+
+cat "$TEST_DIR/output/mcp-workspace-init.json" >> "$MCP_OUTPUT"
+printf '\n' >> "$MCP_OUTPUT"
+curl -sS -o "$TEST_DIR/output/mcp-workspace-status.json" \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -H 'Mcp-Protocol-Version: 2025-11-25' \
+  --data "$STATUS_REQUEST" \
+  "http://127.0.0.1:${MCP_PORT}/mcp" \
+  || fail "MCP workspace_status request should run" "$MCP_OUTPUT.stderr"
+cat "$TEST_DIR/output/mcp-workspace-status.json" >> "$MCP_OUTPUT"
+printf '\n' >> "$MCP_OUTPUT"
+
+kill "$MCP_PID" >/dev/null 2>&1 || true
+wait "$MCP_PID" >/dev/null 2>&1 || true
+trap - EXIT
 
 assert_jq_line "$MCP_OUTPUT" 1 '.result.protocolVersion == "2025-11-25"' "MCP should initialize from explicit workspace"
 if ! json_line "$MCP_OUTPUT" 2 | jq -e --arg workspace "$TEST_DIR" '.result.structuredContent.workspace_root == $workspace' >/dev/null 2>&1; then

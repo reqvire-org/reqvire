@@ -20,6 +20,29 @@ Type assignment behavior shall follow the associated refinement specifications.
   * verifiedBy: [Default Element Type Assignment Test](Verifications/ValidationVerifications.md#default-element-type-assignment-test)
 ---
 
+### Requirement Governance Metadata
+
+The system shall support governance metadata for requirement elements, including status, priority, risk, and owner, with effective values resolved from authored metadata, hierarchy inheritance, and defaults.
+
+#### Details
+Governance metadata behavior shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Requirement Governance Metadata Specification](Specifications.md#requirement-governance-metadata-specification)
+
+#### Relations
+  * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
+  * refinedBy: [Requirement Governance Metadata Inheritance Behavior](Behaviors.md#requirement-governance-metadata-inheritance-behavior)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
+  * verifiedBy: [Requirement Governance Metadata Verification](Verifications/ParsingVerifications.md#requirement-governance-metadata-verification)
+  * verifiedBy: [Requirement Governance Metadata Formatting Verification](../Operations/Verifications/FormattingVerifications.md#requirement-governance-metadata-formatting-verification)
+---
+
 ### Efficient Processing
 
 The system shall process structured documents and relations to extract model-relevant information efficiently.

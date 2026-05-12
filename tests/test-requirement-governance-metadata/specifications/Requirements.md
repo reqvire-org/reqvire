@@ -1,0 +1,67 @@
+# Elements
+
+### Root Requirement
+
+The system shall provide a parent requirement with explicit governance metadata.
+
+#### Metadata
+  * type: user-requirement
+  * status: approved
+  * priority: high
+  * risk: medium
+  * owner: Platform Team
+---
+
+### Child Inherits Governance
+
+The system shall provide a child requirement that inherits governance metadata.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Root Requirement](#root-requirement)
+---
+
+### Child Overrides Governance
+
+The system shall provide a child requirement that overrides selected governance metadata.
+
+#### Metadata
+  * type: requirement
+  * status: review
+  * risk: critical
+
+#### Relations
+  * derivedFrom: [Root Requirement](#root-requirement)
+---
+
+### Independent Requirement
+
+The system shall provide a requirement that uses governance metadata defaults.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Default Governance Root](#default-governance-root)
+---
+
+### Default Governance Root
+
+The system shall provide a root requirement without authored governance metadata.
+
+#### Metadata
+  * type: user-requirement
+---
+
+### Refinement Contract
+
+This refinement augments the root requirement and must not author governance metadata.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Root Requirement](#root-requirement)
+---

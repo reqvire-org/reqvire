@@ -46,22 +46,22 @@ The system shall provide `reqvire mcp` as the command that starts the Reqvire MC
   * satisfiedBy: [tool_interface.rs](../../../core/src/tool_interface.rs)
 ---
 
-### MCP Transport Selection
+### MCP Streamable HTTP Transport
 
-The system shall support explicit MCP transport selection while keeping stdio as the default local transport.
+The system shall provide MCP service through RMCP Streamable HTTP transport.
 
 #### Details
-- The MCP server shall select its transport at startup.
-- The MCP server shall use stdio as the default local transport.
-- The MCP server shall support Streamable HTTP as an explicit transport target.
-- MCP transport selection shall not change Reqvire tool semantics.
+- The MCP server shall use Streamable HTTP as the only supported MCP transport.
+- The MCP server shall start an RMCP-backed HTTP endpoint by default.
+- The MCP server shall not expose newline-delimited stdio JSON-RPC compatibility mode.
+- MCP transport mechanics shall not change Reqvire tool semantics.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [MCP Interface](../Interfaces.md#mcp-interface)
-  * refinedBy: [MCP Transport Selection Specification](Specifications.md#mcp-transport-selection-specification)
+  * refinedBy: [MCP Streamable HTTP Transport Specification](Specifications.md#mcp-streamable-http-transport-specification)
   * verifiedBy: [MCP HTTP Transport End-to-End Verification](Verifications/MCPVerifications.md#mcp-http-transport-end-to-end-verification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
@@ -249,6 +249,7 @@ The system shall expose MCP read tools that return model evidence needed by exte
   * type: requirement
 
 #### Attachments
+  * [Requirement Governance Metadata Specification](../../Functional/Core/Specifications.md#requirement-governance-metadata-specification)
   * [Flexible Search Type Filtering Refinement Specification](../../Functional/Output/Specifications.md#flexible-search-type-filtering-refinement-specification)
   * [Containment View Report Refinement Specification](../../Functional/Output/Specifications.md#containment-view-report-refinement-specification)
   * [Collect Content Specification](../../Functional/Output/Specifications.md#collect-content-specification)

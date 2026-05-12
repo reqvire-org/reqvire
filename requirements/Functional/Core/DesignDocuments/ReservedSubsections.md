@@ -59,18 +59,19 @@ Additional context about action X:
 
 Must be defined with a level 4 header: `#### Metadata`.
 
-The Metadata subsection stores element properties including type and custom attributes.
+The Metadata subsection stores element properties including type, requirement governance metadata where valid, and custom attributes.
 
 **Parsing Rules:**
 - Contains properties in list format: `* property_name: property_value`
 - Property entries are listed as bullet points (`*`), with **two spaces** (`  *`) of indentation followed by property_name + ': ' + property_value
-- May include any custom properties, not just `type`
+- May include custom properties, but reserved property names have the constraints defined by their owning specifications
 
 **Reserved Properties:**
 
 The following properties have special meaning:
 
 - `type`: Defines the element type (supported types are defined in [Supported Element Types Specification](../Specifications.md#supported-element-types-specification))
+- `status`, `priority`, `risk`, `owner`: Define requirement governance metadata for requirement-family elements only (defined in [Requirement Governance Metadata Specification](../Specifications.md#requirement-governance-metadata-specification))
 - Additional reserved properties may be defined in future releases
 
 **Examples:**
@@ -81,8 +82,8 @@ This is a verification element.
 
 #### Metadata
   * type: verification
-  * priority: high
-  * owner: team-a
+  * domain: safety
+  * review_method: inspection
 
 #### Relations
 * verifies: [Some Requirement](#some-requirement)
@@ -98,8 +99,8 @@ Some details.
 
 #### Metadata
   * type: verification
-  * priority: high
-  * owner: team-a
+  * domain: safety
+  * review_method: inspection
 
 #### Relations
   * verifies: [Some Requirement](#some-requirement)

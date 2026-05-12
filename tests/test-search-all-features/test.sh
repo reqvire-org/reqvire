@@ -65,6 +65,11 @@ if ! echo "$OUTPUT" | jq -e '.global_counters.total_files' >/dev/null; then
   exit 1
 fi
 
+if ! echo "$OUTPUT" | jq -e '.global_counters.total_governance_metadata.status.approved == 6 and .global_counters.total_governance_metadata.owner.unassigned == 6' >/dev/null; then
+  echo "FAILED: JSON missing governance metadata summary counters"
+  exit 1
+fi
+
 # Check that file summaries include the count fields
 FIRST_FILE=$(echo "$OUTPUT" | jq -r '.files | keys[0]')
 if ! echo "$OUTPUT" | jq -e ".files[\"$FIRST_FILE\"].total_elements" >/dev/null; then

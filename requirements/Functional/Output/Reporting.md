@@ -211,9 +211,13 @@ The system shall define comprehensive search filtering capabilities:
 - By file path patterns
 - By element name patterns
 - By element type
+- By requirement governance metadata values
 - By element content patterns
 - By presence/absence of relations
 - By presence/absence of attachments
+
+Search result element evidence shall include effective requirement governance metadata when applicable.
+Search result summaries shall include effective requirement governance metadata counts for matched requirement-family elements.
 
 The system shall define custom element type tracking:
 - Identify types not in standard categories
@@ -223,11 +227,13 @@ The system shall define custom element type tracking:
   * type: requirement
 
 #### Attachments
+  * [Requirement Governance Metadata Specification](../Core/Specifications.md#requirement-governance-metadata-specification)
   * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
   * [Resources Report Format Specification](Specifications.md#resources-report-format-specification)
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
+  * refinedBy: [Requirement Governance Metadata JSON Output Specification](Specifications.md#requirement-governance-metadata-json-output-specification)
   * refinedBy: [SearchFiltering](DesignDocuments/SearchFiltering.md#searchfiltering)
   * satisfiedBy: [filters.rs](../../../core/src/filters.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)

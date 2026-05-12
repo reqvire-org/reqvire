@@ -100,6 +100,33 @@ Expected checks:
   * satisfiedBy: [test-model-command](../../../../tests/test-model-command/test.sh)
 ---
 
+### Requirement Governance Metadata Verification
+
+This verification shall prove that requirement governance metadata is parsed, validated against the governance metadata contract, and exposed as effective model evidence without losing whether each value is explicit, inherited, or default.
+
+#### Details
+Expected checks:
+- Create a requirement hierarchy with parent metadata values for `status`, `priority`, `risk`, and `owner`.
+- Create child requirements that omit some governance metadata keys.
+- Verify explicit child values override inherited parent values key by key.
+- Verify omitted child values inherit from the nearest requirement ancestor.
+- Verify omitted values with no ancestor metadata use the specification defaults.
+- Verify model evidence distinguishes explicit, inherited, and default governance metadata values.
+- Verify invalid enum values for `status`, `priority`, and `risk` are rejected with clear diagnostics naming the invalid key and accepted values.
+- Verify `owner` accepts a free-form string.
+- Verify inherited or default `status: approved` is not treated as explicit approval evidence.
+- Verify non-requirement-family elements that declare `status`, `priority`, `risk`, or `owner` metadata are rejected with clear diagnostics.
+- Verify governance context for a refinement element is resolved from its directly owning requirement through `refine` / `refinedBy`, not from metadata authored on the refinement.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-requirement-governance-metadata/test.sh)
+  * verify: [Refinement Element Structure Constraints](../ModelManagement.md#refinement-element-structure-constraints)
+  * verify: [Requirement Governance Metadata](../ModelManagement.md#requirement-governance-metadata)
+---
+
 ### Fragment Normalization Test
 
 This test verifies that the system correctly normalizes element name fragments according to GitHub's fragment identifier rules for use in Element IDs and cross-references.

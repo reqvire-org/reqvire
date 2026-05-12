@@ -42,7 +42,7 @@ Verify that metadata repositioning maintains blank line spacing.
 
 #### Metadata
   * type: verification
-  * status: implemented
+  * implementation-status: implemented
 
 #### Details
 
@@ -80,7 +80,7 @@ Content line 2.
 Content line 3.
 #### Metadata
   * type: verification
-  * status: implemented
+  * implementation-status: implemented
 #### Details
 Detail content here.
 

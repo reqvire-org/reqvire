@@ -804,6 +804,8 @@ This test verifies that the system provides a unified `search` command functiona
 - Supplying an invalid regex to any regex-based filter fails with a non-zero exit code and displays a clear error message
 - Search results must include all relations for each element
 - Search results must include all attachments for each element (omitted in short mode)
+- Search JSON results must include effective governance metadata for requirement-family elements
+- Search JSON and text summaries must include effective governance metadata counters for matched requirement-family elements
 - **Enhanced Content Display**: Search must display page content (frontmatter before first element) when not in short mode
 - **Count Information**: Search must show counts for files and elements in full mode (omitted in short mode)
 - **Short Mode Behavior**: Short mode omits: `content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_elements`, `global_counters`, `attachments`
@@ -846,6 +848,10 @@ This test verifies that the system provides a unified `search` command functiona
    - `--filter-type="constraint"` (Refinement type)
    - `--filter-type="behavior"` (Refinement type)
    - `--filter-type="specification"` (Refinement type)
+   - `--filter-status=approved` (effective governance status)
+   - `--filter-priority=high,critical` (effective governance priority)
+   - `--filter-risk=high,critical` (effective governance risk)
+   - `--filter-owner="Platform.*"` (effective governance owner regex)
    - `--filter-content="MUST"` (regex)
    - `--filter-page-content="architecture"` (regex)
    - `--have-relations=verifiedBy` (comma-separated)
@@ -916,6 +922,19 @@ This test verifies that the system provides a unified `search` command functiona
     Command: `reqvire search --short --json`
     - Element objects do NOT contain `attachments` field
     - Field is completely absent (not empty array)
+
+18. **Governance metadata in search output and filters**
+    Command: `reqvire search --json`
+    - Requirement-family element objects include effective governance metadata with value and source information
+    - Inherited governance metadata entries include `source_identifier` for the requirement ancestor that supplied the value
+    - Explicit and default governance metadata entries omit `source_identifier`
+    - `--filter-status`, `--filter-priority`, and `--filter-risk` match effective enum values
+    - `--filter-owner` matches effective owner values by regex
+    - Governance metadata filters exclude non-requirement-family elements
+    - Invalid governance metadata filter values fail with clear accepted-value diagnostics
+    - JSON summary includes governance metadata counters for status, priority, risk, and owner
+    - Text summary includes equivalent governance metadata counters
+    - Unassigned owner is summarized as `unassigned`
 
 #### Metadata
   * type: test-verification

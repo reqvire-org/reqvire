@@ -34,7 +34,7 @@ Detail content here.
 
 #### Metadata
   * type: test-verification
-  * status: implemented
+  * implementation-status: implemented
 ---
 
 ### Generate Diagrams
@@ -74,7 +74,7 @@ This test verifies that when metadata is repositioned from early position to end
 
 #### Metadata
   * type: test-verification
-  * status: implemented
+  * implementation-status: implemented
 ---
 
 ### Missing Blank Line Test

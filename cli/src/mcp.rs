@@ -4,14 +4,13 @@ use reqvire::tool_interface::{
     request_requires_write_tool, resource_definitions as shared_resource_definitions,
     tool_definitions as shared_tool_definitions,
     validate_startup_with_options as shared_validate_startup_with_options, ReqvireToolRegistry,
-    MCP_PROTOCOL_VERSION as SHARED_MCP_PROTOCOL_VERSION,
 };
 use rmcp::{
     handler::server::ServerHandler,
     model::{
-        CallToolRequestParams, CallToolResult, Implementation, ListResourceTemplatesResult,
-        ListResourcesResult, ListToolsResult, PaginatedRequestParams, ReadResourceRequestParams,
-        ReadResourceResult, ServerCapabilities, ServerInfo, Tool,
+        CallToolRequestParams, CallToolResult, ErrorCode, Implementation,
+        ListResourceTemplatesResult, ListResourcesResult, ListToolsResult, PaginatedRequestParams,
+        ReadResourceRequestParams, ReadResourceResult, ServerCapabilities, ServerInfo, Tool,
     },
     service::{MaybeSendFuture, RequestContext, RoleServer},
     transport::streamable_http_server::{
@@ -22,11 +21,8 @@ use rmcp::{
 use serde::Deserialize;
 use serde_json::{json, Value};
 use std::future::Future;
-use std::io::{self, BufRead, Write};
 use std::sync::Arc;
 use tokio::sync::Mutex;
-
-const MCP_PROTOCOL_VERSION: &str = SHARED_MCP_PROTOCOL_VERSION;
 
 #[derive(Debug, Deserialize)]
 struct RpcRequest {
@@ -92,7 +88,14 @@ impl ReqvireMcpServer {
         )
         .ok_or_else(|| McpError::internal_error("MCP request produced no response", None))?;
         if let Some(error) = response.get("error") {
-            return Err(McpError::internal_error(error.to_string(), None));
+            let code = error.get("code").and_then(Value::as_i64).unwrap_or(-32603) as i32;
+            let message = error
+                .get("message")
+                .and_then(Value::as_str)
+                .unwrap_or("MCP request failed")
+                .to_string();
+            let data = error.get("data").cloned();
+            return Err(McpError::new(ErrorCode(code), message, data));
         }
         response
             .get("result")
@@ -191,46 +194,6 @@ impl ServerHandler for ReqvireMcpServer {
     }
 }
 
-pub fn serve_stdio(
-    enable_mutations: bool,
-    with_size_estimates: bool,
-    excluded_filename_patterns: &GlobSet,
-) -> Result<(), ReqvireError> {
-    shared_validate_startup_with_options(excluded_filename_patterns, with_size_estimates)?;
-
-    let stdin = io::stdin();
-    let mut stdout = io::stdout();
-
-    for line in stdin.lock().lines() {
-        let line = line.map_err(ReqvireError::IoError)?;
-        if line.trim().is_empty() {
-            continue;
-        }
-
-        let response = match serde_json::from_str::<Value>(&line) {
-            Ok(raw) => handle_rpc_value(
-                raw,
-                enable_mutations,
-                with_size_estimates,
-                excluded_filename_patterns,
-            ),
-            Err(err) => Some(rpc_error(
-                Value::Null,
-                -32700,
-                "Parse error",
-                Some(json!({ "message": err.to_string() })),
-            )),
-        };
-
-        if let Some(response) = response {
-            writeln!(stdout, "{}", response).map_err(ReqvireError::IoError)?;
-            stdout.flush().map_err(ReqvireError::IoError)?;
-        }
-    }
-
-    Ok(())
-}
-
 pub async fn serve_http(
     enable_mutations: bool,
     with_size_estimates: bool,
@@ -309,7 +272,6 @@ fn handle_rpc_value(
 
     let id = request.id.unwrap_or(Value::Null);
     match request.method.as_str() {
-        "initialize" => initialize(id, request.params),
         "tools/list" => Some(rpc_result(
             id,
             json!({ "tools": shared_tool_definitions(enable_mutations) }),
@@ -340,37 +302,6 @@ fn handle_rpc_value(
             Some(json!({ "method": request.method })),
         )),
     }
-}
-
-fn initialize(id: Value, params: Value) -> Option<Value> {
-    if let Some(client_version) = params.get("protocolVersion").and_then(Value::as_str) {
-        if client_version != MCP_PROTOCOL_VERSION {
-            return Some(rpc_error(
-                id,
-                -32000,
-                "Unsupported MCP protocol version",
-                Some(json!({
-                    "expected": MCP_PROTOCOL_VERSION,
-                    "received": client_version
-                })),
-            ));
-        }
-    }
-
-    Some(rpc_result(
-        id,
-        json!({
-            "protocolVersion": MCP_PROTOCOL_VERSION,
-            "capabilities": {
-                "tools": {},
-                "resources": {}
-            },
-            "serverInfo": {
-                "name": "reqvire",
-                "version": env!("CARGO_PKG_VERSION")
-            }
-        }),
-    ))
 }
 
 fn handle_tool_call(
@@ -586,22 +517,6 @@ mod tests {
 
         assert!(names.contains(&"reqvire.add_element".to_string()));
         assert!(names.contains(&"reqvire.link".to_string()));
-    }
-
-    #[test]
-    fn initialize_response_uses_standard_capabilities() {
-        let response =
-            initialize(json!(1), json!({ "protocolVersion": MCP_PROTOCOL_VERSION })).unwrap();
-        let result = response.get("result").unwrap();
-
-        assert_eq!(result.get("protocolVersion").unwrap(), MCP_PROTOCOL_VERSION);
-        assert!(result.get("capabilities").unwrap().get("tools").is_some());
-        assert!(result
-            .get("capabilities")
-            .unwrap()
-            .get("resources")
-            .is_some());
-        assert!(result.get("serverInfo").is_some());
     }
 
     #[test]

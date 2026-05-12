@@ -44,7 +44,6 @@ SERVE OPTIONS:
       --port <PORT>             Server port
 
 MCP OPTIONS:
-      --transport <TRANSPORT>   MCP transport
       --host <HOST>             HTTP bind address
       --port <PORT>             HTTP server port
       --enable-mutations        Advertise and allow mutation tools
@@ -67,6 +66,10 @@ SEARCH OPTIONS:
       --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
       --filter-name <REGEX>     Only include elements whose name matches this regular expression
       --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
+      --filter-status <STATUS[,STATUS...]> Only include requirement-family elements with matching effective status values
+      --filter-priority <PRIORITY[,PRIORITY...]> Only include requirement-family elements with matching effective priority values
+      --filter-risk <RISK[,RISK...]> Only include requirement-family elements with matching effective risk values
+      --filter-owner <REGEX>    Only include requirement-family elements whose effective owner matches this regular expression
       --filter-content <REGEX>  Only include elements whose content matches this regular expression
       --filter-page-content <REGEX> Only include elements whose parent file page content matches this regular expression
       --have-relations <LIST>   Only include elements that have ALL specified relations (comma-separated, e.g., "verifiedBy,satisfiedBy")

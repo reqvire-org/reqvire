@@ -5,7 +5,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
-use crate::element::{Element, ElementType, RequirementType, SizeEstimate};
+use crate::element::{
+    Element, ElementType, GovernanceMetadataEntry, GovernanceMetadataSource,
+    RequirementGovernanceMetadata, RequirementType, SizeEstimate,
+};
 use crate::error::ReqvireError;
 use crate::git_commands;
 use crate::relation::{
@@ -136,6 +139,9 @@ impl GraphRegistry {
 
         // Validate Refinement elements have only refine relations
         errors.extend(self.validate_refinement_elements()?);
+
+        // Validate reserved requirement governance metadata
+        errors.extend(self.validate_governance_metadata()?);
 
         // Validate refinement ownership uniqueness (each refinement owned by at most one requirement)
         errors.extend(self.validate_refinement_ownership_uniqueness()?);
@@ -1454,6 +1460,74 @@ impl GraphRegistry {
         Ok(errors)
     }
 
+    fn validate_governance_metadata(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating requirement governance metadata...");
+        let mut errors = Vec::new();
+
+        for element_node in self.nodes.values() {
+            let element = &element_node.element;
+            let governance_keys: Vec<&str> = element
+                .metadata
+                .keys()
+                .filter(|key| crate::element::is_governance_metadata_key(key))
+                .map(String::as_str)
+                .collect();
+
+            if governance_keys.is_empty() {
+                continue;
+            }
+
+            if !element.element_type.is_requirement() {
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "File {}: Element '{}' (type: {}) declares requirement governance metadata keys {:?}. Governance metadata is only valid on requirement-family elements (requirement, user-requirement).",
+                    element.file_path,
+                    element.name,
+                    element.element_type.as_str(),
+                    governance_keys
+                )));
+                continue;
+            }
+
+            if let Some(value) = element.metadata.get("status") {
+                if !crate::element::is_valid_governance_status(value) {
+                    errors.push(ReqvireError::InvalidMetadataFormat(format!(
+                        "File {}: Requirement '{}' has invalid governance metadata status '{}'. Accepted values: {}.",
+                        element.file_path,
+                        element.name,
+                        value,
+                        crate::element::GOVERNANCE_STATUS_VALUES.join(", ")
+                    )));
+                }
+            }
+
+            if let Some(value) = element.metadata.get("priority") {
+                if !crate::element::is_valid_governance_priority(value) {
+                    errors.push(ReqvireError::InvalidMetadataFormat(format!(
+                        "File {}: Requirement '{}' has invalid governance metadata priority '{}'. Accepted values: {}.",
+                        element.file_path,
+                        element.name,
+                        value,
+                        crate::element::GOVERNANCE_PRIORITY_VALUES.join(", ")
+                    )));
+                }
+            }
+
+            if let Some(value) = element.metadata.get("risk") {
+                if !crate::element::is_valid_governance_risk(value) {
+                    errors.push(ReqvireError::InvalidMetadataFormat(format!(
+                        "File {}: Requirement '{}' has invalid governance metadata risk '{}'. Accepted values: {}.",
+                        element.file_path,
+                        element.name,
+                        value,
+                        crate::element::GOVERNANCE_RISK_VALUES.join(", ")
+                    )));
+                }
+            }
+        }
+
+        Ok(errors)
+    }
+
     /// Validates that each refinement is owned by at most one requirement via refinedBy.
     /// A refinement element or file can only appear as a target of refinedBy from one requirement.
     fn validate_refinement_ownership_uniqueness(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
@@ -1923,6 +1997,115 @@ impl GraphRegistry {
         let mut elements: Vec<&Element> = self.nodes.values().map(|node| &node.element).collect();
         elements.sort_by(|a, b| a.identifier.cmp(&b.identifier));
         elements
+    }
+
+    pub fn resolve_governance_metadata(
+        &self,
+        element: &Element,
+    ) -> Option<RequirementGovernanceMetadata> {
+        if !element.element_type.is_requirement() {
+            return None;
+        }
+
+        Some(RequirementGovernanceMetadata {
+            status: self.resolve_governance_entry(element, "status", "approved"),
+            priority: self.resolve_governance_entry(element, "priority", "medium"),
+            risk: self.resolve_governance_entry(element, "risk", "low"),
+            owner: self.resolve_governance_entry(element, "owner", ""),
+        })
+    }
+
+    fn resolve_governance_entry(
+        &self,
+        element: &Element,
+        key: &str,
+        default_value: &str,
+    ) -> GovernanceMetadataEntry {
+        if let Some(value) = element.metadata.get(key) {
+            return GovernanceMetadataEntry {
+                value: value.clone(),
+                source: GovernanceMetadataSource::Explicit,
+                source_identifier: None,
+            };
+        }
+
+        for ancestor_id in self.requirement_ancestors_nearest_first(&element.identifier) {
+            if let Some(ancestor) = self.nodes.get(&ancestor_id).map(|node| &node.element) {
+                if let Some(value) = ancestor.metadata.get(key) {
+                    return GovernanceMetadataEntry {
+                        value: value.clone(),
+                        source: GovernanceMetadataSource::Inherited,
+                        source_identifier: Some(ancestor.identifier.clone()),
+                    };
+                }
+            }
+        }
+
+        GovernanceMetadataEntry {
+            value: default_value.to_string(),
+            source: GovernanceMetadataSource::Default,
+            source_identifier: None,
+        }
+    }
+
+    fn requirement_ancestors_nearest_first(&self, element_id: &str) -> Vec<String> {
+        let mut result = Vec::new();
+        let mut visited = HashSet::new();
+        let mut current_level = vec![element_id.to_string()];
+
+        visited.insert(element_id.to_string());
+
+        while !current_level.is_empty() {
+            let mut next_level = Vec::new();
+
+            for current_id in &current_level {
+                let mut parents = self.requirement_parent_ids(current_id);
+                parents.sort();
+
+                for parent_id in parents {
+                    if visited.insert(parent_id.clone()) {
+                        result.push(parent_id.clone());
+                        next_level.push(parent_id);
+                    }
+                }
+            }
+
+            current_level = next_level;
+        }
+
+        result
+    }
+
+    fn requirement_parent_ids(&self, element_id: &str) -> Vec<String> {
+        let mut parents = BTreeSet::new();
+
+        if let Some(node) = self.nodes.get(element_id) {
+            for relation in &node.element.relations {
+                if relation.relation_type.name == "derivedFrom" {
+                    if let LinkType::Identifier(parent_id) = &relation.target.link {
+                        if self
+                            .nodes
+                            .get(parent_id)
+                            .is_some_and(|parent| parent.element.element_type.is_requirement())
+                        {
+                            parents.insert(parent_id.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        for (candidate_id, candidate) in &self.nodes {
+            if candidate.element.relations.iter().any(|relation| {
+                relation.relation_type.name == "derive"
+                    && matches!(&relation.target.link, LinkType::Identifier(target_id) if target_id == element_id)
+            }) && candidate.element.element_type.is_requirement()
+            {
+                parents.insert(candidate_id.clone());
+            }
+        }
+
+        parents.into_iter().collect()
     }
 
     /// Find all requirements without hierarchical parent relations (root requirements)

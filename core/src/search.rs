@@ -15,6 +15,10 @@ pub struct SearchFilters {
     file_glob: Option<GlobMatcher>,
     name_re: Option<Regex>,
     type_patterns: Option<Vec<String>>,
+    status_values: Option<Vec<String>>,
+    priority_values: Option<Vec<String>>,
+    risk_values: Option<Vec<String>>,
+    owner_re: Option<Regex>,
     content_re: Option<Regex>,
     page_content_re: Option<Regex>,
     have_relations: Vec<String>,
@@ -30,6 +34,10 @@ impl SearchFilters {
         file: Option<&str>,
         name_regex: Option<&str>,
         typ: Option<&str>,
+        status: Option<&str>,
+        priority: Option<&str>,
+        risk: Option<&str>,
+        owner_regex: Option<&str>,
         content: Option<&str>,
         page_content: Option<&str>,
         have_relations: Option<&str>,
@@ -71,6 +79,40 @@ impl SearchFilters {
             None
         };
 
+        fn parse_enum_values(
+            property: &str,
+            input: Option<&str>,
+            accepted: &[&str],
+        ) -> Result<Option<Vec<String>>, ReqvireError> {
+            if let Some(input) = input {
+                let values: Vec<String> = input
+                    .split(',')
+                    .map(|value| value.trim().to_lowercase())
+                    .filter(|value| !value.is_empty())
+                    .collect();
+
+                for value in &values {
+                    if !accepted.contains(&value.as_str()) {
+                        return Err(ReqvireError::ProcessError(format!(
+                            "Invalid governance metadata {} '{}'. Accepted values: {}.",
+                            property,
+                            value,
+                            accepted.join(", ")
+                        )));
+                    }
+                }
+
+                Ok(Some(values))
+            } else {
+                Ok(None)
+            }
+        }
+
+        let status_values = parse_enum_values("status", status, element::GOVERNANCE_STATUS_VALUES)?;
+        let priority_values =
+            parse_enum_values("priority", priority, element::GOVERNANCE_PRIORITY_VALUES)?;
+        let risk_values = parse_enum_values("risk", risk, element::GOVERNANCE_RISK_VALUES)?;
+        let owner_re = owner_regex.map(compile_regex).transpose()?;
         let content_re = content.map(compile_regex).transpose()?;
         let page_content_re = page_content.map(compile_regex).transpose()?;
         let attachment_glob = attachment.map(compile_glob).transpose()?;
@@ -116,6 +158,10 @@ impl SearchFilters {
             file_glob,
             name_re,
             type_patterns,
+            status_values,
+            priority_values,
+            risk_values,
+            owner_re,
             content_re,
             page_content_re,
             have_relations,
@@ -168,6 +214,41 @@ impl SearchFilters {
 
             if !matches_any {
                 return false;
+            }
+        }
+
+        let has_governance_filter = self.status_values.is_some()
+            || self.priority_values.is_some()
+            || self.risk_values.is_some()
+            || self.owner_re.is_some();
+
+        if has_governance_filter {
+            let Some(governance) = registry.resolve_governance_metadata(elem) else {
+                return false;
+            };
+
+            if let Some(values) = &self.status_values {
+                if !values.contains(&governance.status.value) {
+                    return false;
+                }
+            }
+
+            if let Some(values) = &self.priority_values {
+                if !values.contains(&governance.priority.value) {
+                    return false;
+                }
+            }
+
+            if let Some(values) = &self.risk_values {
+                if !values.contains(&governance.risk.value) {
+                    return false;
+                }
+            }
+
+            if let Some(re) = &self.owner_re {
+                if !re.is_match(&governance.owner.value) {
+                    return false;
+                }
             }
         }
 
@@ -262,6 +343,8 @@ struct ElementSearchResult {
     element_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     content: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    governance_metadata: Option<element::RequirementGovernanceMetadata>,
     relations: Vec<RelationSearchResult>,
     #[serde(skip_serializing_if = "Option::is_none")]
     attachments: Option<Vec<String>>,
@@ -287,8 +370,17 @@ struct GlobalSearchCounters {
     total_requirements_types: BTreeMap<String, usize>,
     total_verifications_types: BTreeMap<String, usize>,
     total_refinements_types: BTreeMap<String, usize>,
+    total_governance_metadata: GovernanceMetadataCounters,
     #[serde(skip_serializing_if = "BTreeMap::is_empty")]
     total_other_types: BTreeMap<String, usize>,
+}
+
+#[derive(Serialize)]
+struct GovernanceMetadataCounters {
+    status: BTreeMap<String, usize>,
+    priority: BTreeMap<String, usize>,
+    risk: BTreeMap<String, usize>,
+    owner: BTreeMap<String, usize>,
 }
 
 impl Default for GlobalSearchCounters {
@@ -309,12 +401,36 @@ impl Default for GlobalSearchCounters {
         refinements.insert("constraint".to_string(), 0);
         refinements.insert("specification".to_string(), 0);
 
+        let mut governance_status = BTreeMap::new();
+        for value in element::GOVERNANCE_STATUS_VALUES {
+            governance_status.insert((*value).to_string(), 0);
+        }
+
+        let mut governance_priority = BTreeMap::new();
+        for value in element::GOVERNANCE_PRIORITY_VALUES {
+            governance_priority.insert((*value).to_string(), 0);
+        }
+
+        let mut governance_risk = BTreeMap::new();
+        for value in element::GOVERNANCE_RISK_VALUES {
+            governance_risk.insert((*value).to_string(), 0);
+        }
+
+        let mut governance_owner = BTreeMap::new();
+        governance_owner.insert("unassigned".to_string(), 0);
+
         Self {
             total_elements: 0,
             total_files: 0,
             total_requirements_types: requirements,
             total_verifications_types: verifications,
             total_refinements_types: refinements,
+            total_governance_metadata: GovernanceMetadataCounters {
+                status: governance_status,
+                priority: governance_priority,
+                risk: governance_risk,
+                owner: governance_owner,
+            },
             total_other_types: BTreeMap::new(),
         }
     }
@@ -369,6 +485,28 @@ fn build_search_result(
                     *c.total_requirements_types
                         .entry(type_name.to_string())
                         .or_insert(0) += 1;
+
+                    if let Some(governance) = registry.resolve_governance_metadata(elem) {
+                        *c.total_governance_metadata
+                            .status
+                            .entry(governance.status.value)
+                            .or_insert(0) += 1;
+                        *c.total_governance_metadata
+                            .priority
+                            .entry(governance.priority.value)
+                            .or_insert(0) += 1;
+                        *c.total_governance_metadata
+                            .risk
+                            .entry(governance.risk.value)
+                            .or_insert(0) += 1;
+
+                        let owner = if governance.owner.value.is_empty() {
+                            "unassigned".to_string()
+                        } else {
+                            governance.owner.value
+                        };
+                        *c.total_governance_metadata.owner.entry(owner).or_insert(0) += 1;
+                    }
                 }
                 element::ElementType::Verification(ver_t) => {
                     let type_name = match ver_t {
@@ -448,6 +586,11 @@ fn build_search_result(
                 None
             } else {
                 Some(elem.content.clone())
+            },
+            governance_metadata: if short_mode {
+                None
+            } else {
+                registry.resolve_governance_metadata(elem)
             },
             relations: rels,
             attachments,
@@ -561,6 +704,25 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
                 }
                 output.push('\n');
             }
+
+            output.push_str("📋 Requirement Governance Metadata:\n");
+            output.push_str("  Status:\n");
+            for (value, count) in &c.total_governance_metadata.status {
+                output.push_str(&format!("    {}: {}\n", value, count));
+            }
+            output.push_str("  Priority:\n");
+            for (value, count) in &c.total_governance_metadata.priority {
+                output.push_str(&format!("    {}: {}\n", value, count));
+            }
+            output.push_str("  Risk:\n");
+            for (value, count) in &c.total_governance_metadata.risk {
+                output.push_str(&format!("    {}: {}\n", value, count));
+            }
+            output.push_str("  Owner:\n");
+            for (value, count) in &c.total_governance_metadata.owner {
+                output.push_str(&format!("    {}: {}\n", value, count));
+            }
+            output.push('\n');
 
             // Verification types
             if !c.total_verifications_types.is_empty() {

@@ -43,41 +43,11 @@ assert_jq_line() {
   fi
 }
 
-run_mcp_default() {
-  local output_file="$1"
-  shift
-  {
-    for request in "$@"; do
-      printf '%s\n' "$request"
-    done
-  } | (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp) > "$output_file" 2>"${output_file}.stderr"
-}
-
-run_mcp_mutations() {
-  local output_file="$1"
-  shift
-  {
-    for request in "$@"; do
-      printf '%s\n' "$request"
-    done
-  } | (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --enable-mutations) > "$output_file" 2>"${output_file}.stderr"
-}
-
-run_mcp_size_estimates() {
-  local output_file="$1"
-  shift
-  {
-    for request in "$@"; do
-      printf '%s\n' "$request"
-    done
-  } | (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --with-size-estimates) > "$output_file" 2>"${output_file}.stderr"
-}
-
 start_http_mcp() {
   local port="$1"
   local output_prefix="$2"
   shift 2
-  (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --transport http --host 127.0.0.1 --port "$port" "$@") > "${output_prefix}.stdout" 2> "${output_prefix}.stderr" &
+  (cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --host 127.0.0.1 --port "$port" "$@") > "${output_prefix}.stdout" 2> "${output_prefix}.stderr" &
   HTTP_MCP_PID=$!
 }
 
@@ -98,6 +68,7 @@ wait_for_http_mcp() {
   for _ in $(seq 1 50); do
     if curl -sS -o "$output_file" \
       -H 'Content-Type: application/json' \
+      -H 'Accept: application/json, text/event-stream' \
       --data "$request" \
       "http://127.0.0.1:${port}/mcp" >/dev/null 2>&1; then
       if jq -e '.result.protocolVersion == "2025-11-25"' "$output_file" >/dev/null 2>&1; then
@@ -117,14 +88,29 @@ http_mcp_call() {
   shift 3
   curl -sS -o "$output_file" \
     -H 'Content-Type: application/json' \
+    -H 'Accept: application/json, text/event-stream' \
+    -H "Mcp-Protocol-Version: ${MCP_PROTOCOL_VERSION}" \
     "$@" \
     --data "$request" \
     "http://127.0.0.1:${port}/mcp"
 }
 
+run_http_mcp_sequence() {
+  local port="$1"
+  local output_file="$2"
+  local tmp_file="${output_file}.tmp"
+  shift 2
+  : > "$output_file"
+  for request in "$@"; do
+    http_mcp_call "$port" "$request" "$tmp_file" || return 1
+    cat "$tmp_file" >> "$output_file"
+    printf '\n' >> "$output_file"
+  done
+}
+
 init_request() {
   jq -n -c --arg version "$MCP_PROTOCOL_VERSION" \
-    '{jsonrpc:"2.0",id:1,method:"initialize",params:{protocolVersion:$version}}'
+    '{jsonrpc:"2.0",id:1,method:"initialize",params:{protocolVersion:$version,capabilities:{},clientInfo:{name:"reqvire-test",version:"0"}}}'
 }
 
 tools_list_request() {
@@ -175,8 +161,21 @@ cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/docs" "$TEST_DIR/"
 jq -e '.global_counters.total_elements == 1' "$TEST_DIR/output/binary-search.json" >/dev/null \
   || fail "Reqvire binary search should find Test Requirement Beta" "$TEST_DIR/output/binary-search.json"
 
+set +e
+(cd "$TEST_DIR" && "$REQVIRE_BIN" mcp --transport stdio) > "$TEST_DIR/output/mcp-stdio-removed.stdout" 2> "$TEST_DIR/output/mcp-stdio-removed.stderr"
+STDIO_EXIT=$?
+set +e
+if [ "$STDIO_EXIT" -eq 0 ]; then
+  fail "stdio MCP transport should not be accepted"
+fi
+
 DEFAULT_OUTPUT="$TEST_DIR/output/mcp-default.jsonl"
-run_mcp_default "$DEFAULT_OUTPUT" \
+DEFAULT_PORT="$(pick_port)"
+DEFAULT_OUTPUT_PREFIX="$TEST_DIR/output/mcp-default"
+start_http_mcp "$DEFAULT_PORT" "$DEFAULT_OUTPUT_PREFIX"
+trap stop_http_mcp EXIT
+wait_for_http_mcp "$DEFAULT_PORT" "$TEST_DIR/output/mcp-default-init.json" || fail "default MCP HTTP server did not start" "${DEFAULT_OUTPUT_PREFIX}.stderr"
+run_http_mcp_sequence "$DEFAULT_PORT" "$DEFAULT_OUTPUT" \
   "$(init_request)" \
   "$(tools_list_request)" \
   "$(resources_list_request)" \
@@ -186,7 +185,9 @@ run_mcp_default "$DEFAULT_OUTPUT" \
   "$(schema_error_request)" \
   "$(unknown_tool_request)" \
   "$(resource_read_request)" \
-  "$(format_fix_rejected_request)"
+  "$(format_fix_rejected_request)" || fail "default MCP HTTP request sequence failed"
+stop_http_mcp
+trap - EXIT
 
 assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.protocolVersion == "2025-11-25"' "initialize reports supported protocol"
 assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.capabilities.tools | type == "object"' "initialize reports standard tools capability"
@@ -200,6 +201,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.mcp"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.command") == null and index("reqvire.shell") == null and index("reqvire.sout") == null' "tools/list omits shell-style tools"
 assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; (.name|type=="string") and (.description|type=="string") and (.inputSchema.type=="object") and (.outputSchema|type=="object") and (.annotations|type=="object"))' "each tool has MCP tool contract fields"
 assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; ((.inputSchema.properties // {}) | has("json") | not) and ((.inputSchema.properties // {}) | has("output") | not))' "tool schemas omit CLI transport options"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.search") | .inputSchema.properties | has("filter_status") and has("filter_priority") and has("filter_risk") and has("filter_owner")' "search tool schema advertises governance metadata filters"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.format") | .annotations.readOnlyHint == true and .inputSchema.properties.fix.enum == [false]' "format is preview-only in default mode"
 
 assert_jq_line "$DEFAULT_OUTPUT" 3 '[.result.resources[].uri] | index("reqvire://workspace/status") != null' "resources/list exposes workspace status"
@@ -215,18 +217,37 @@ assert_jq_line "$DEFAULT_OUTPUT" 8 '.error.code == -32602' "unknown or unadverti
 assert_jq_line "$DEFAULT_OUTPUT" 9 '.result.contents[0].uri == "reqvire://workspace/status" and .result.contents[0].mimeType == "application/json"' "resources/read returns JSON resource content"
 assert_jq_line "$DEFAULT_OUTPUT" 10 '.error.code == -32602' "format fix is rejected by default schema"
 
-UNSUPPORTED_OUTPUT="$TEST_DIR/output/mcp-unsupported-protocol.jsonl"
-run_mcp_default "$UNSUPPORTED_OUTPUT" \
-  "$(jq -n -c '{jsonrpc:"2.0",id:1,method:"initialize",params:{protocolVersion:"1900-01-01"}}')"
-assert_jq_line "$UNSUPPORTED_OUTPUT" 1 '.error.message == "Unsupported MCP protocol version"' "unsupported protocol is rejected"
+UNSUPPORTED_PORT="$(pick_port)"
+UNSUPPORTED_OUTPUT_PREFIX="$TEST_DIR/output/mcp-unsupported-protocol"
+start_http_mcp "$UNSUPPORTED_PORT" "$UNSUPPORTED_OUTPUT_PREFIX"
+trap stop_http_mcp EXIT
+wait_for_http_mcp "$UNSUPPORTED_PORT" "$TEST_DIR/output/mcp-unsupported-startup-init.json" || fail "unsupported protocol test MCP HTTP server did not start" "${UNSUPPORTED_OUTPUT_PREFIX}.stderr"
+UNSUPPORTED_HEADER_STATUS="$(curl -sS -o "$TEST_DIR/output/mcp-unsupported-protocol.txt" -w "%{http_code}" \
+  -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -H 'Mcp-Protocol-Version: 1900-01-01' \
+  --data "$(tools_list_request)" \
+  "http://127.0.0.1:${UNSUPPORTED_PORT}/mcp")"
+stop_http_mcp
+trap - EXIT
+if [ "$UNSUPPORTED_HEADER_STATUS" != "400" ]; then
+  fail "unsupported MCP-Protocol-Version header should be rejected" "$TEST_DIR/output/mcp-unsupported-protocol.txt"
+fi
 
 SIZE_OUTPUT="$TEST_DIR/output/mcp-size-estimates.jsonl"
-run_mcp_size_estimates "$SIZE_OUTPUT" \
+SIZE_PORT="$(pick_port)"
+SIZE_OUTPUT_PREFIX="$TEST_DIR/output/mcp-size-estimates"
+start_http_mcp "$SIZE_PORT" "$SIZE_OUTPUT_PREFIX" --with-size-estimates
+trap stop_http_mcp EXIT
+wait_for_http_mcp "$SIZE_PORT" "$TEST_DIR/output/mcp-size-estimates-init.json" || fail "size-estimates MCP HTTP server did not start" "${SIZE_OUTPUT_PREFIX}.stderr"
+run_http_mcp_sequence "$SIZE_PORT" "$SIZE_OUTPUT" \
   "$(init_request)" \
   "$(workspace_status_request)" \
   "$(read_element_request)" \
   "$(model_request)" \
-  "$(resource_read_request)"
+  "$(resource_read_request)" || fail "size-estimates MCP HTTP request sequence failed"
+stop_http_mcp
+trap - EXIT
 
 assert_jq_line "$SIZE_OUTPUT" 2 '.result.structuredContent.size_estimates_enabled == true' "workspace_status reports size estimates enabled"
 assert_jq_line "$SIZE_OUTPUT" 3 '.result.structuredContent.size_estimate.content_bytes >= 0 and .result.structuredContent.size_estimate.rendered_context_bytes > 0 and .result.structuredContent.size_estimate.estimated_tokens > 0' "read_element includes size estimate when enabled"
@@ -235,10 +256,17 @@ assert_jq_line "$SIZE_OUTPUT" 5 '.result.contents[0].text | fromjson | .size_est
 
 DRY_RUN_OUTPUT="$TEST_DIR/output/mcp-mutation-dry-run.jsonl"
 ADD_CONTENT="$(< "$TEST_SCRIPT_DIR/fixtures/mcp-added-requirement.md")"
-run_mcp_mutations "$DRY_RUN_OUTPUT" \
+DRY_RUN_PORT="$(pick_port)"
+DRY_RUN_OUTPUT_PREFIX="$TEST_DIR/output/mcp-mutation-dry-run"
+start_http_mcp "$DRY_RUN_PORT" "$DRY_RUN_OUTPUT_PREFIX" --enable-mutations
+trap stop_http_mcp EXIT
+wait_for_http_mcp "$DRY_RUN_PORT" "$TEST_DIR/output/mcp-mutation-dry-run-init.json" || fail "dry-run MCP HTTP server did not start" "${DRY_RUN_OUTPUT_PREFIX}.stderr"
+run_http_mcp_sequence "$DRY_RUN_PORT" "$DRY_RUN_OUTPUT" \
   "$(init_request)" \
   "$(tools_list_request)" \
-  "$(jq -n -c --arg content "$ADD_CONTENT" '{jsonrpc:"2.0",id:3,method:"tools/call",params:{name:"reqvire.add_element",arguments:{file:"specifications/Requirements.md",content:$content,dry_run:true}}}')"
+  "$(jq -n -c --arg content "$ADD_CONTENT" '{jsonrpc:"2.0",id:3,method:"tools/call",params:{name:"reqvire.add_element",arguments:{file:"specifications/Requirements.md",content:$content,dry_run:true}}}')" || fail "dry-run MCP HTTP request sequence failed"
+stop_http_mcp
+trap - EXIT
 
 assert_jq_line "$DRY_RUN_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.add_element") != null and index("reqvire.link") != null' "mutation mode advertises mutation tools"
 assert_jq_line "$DRY_RUN_OUTPUT" 2 '.result.tools[] | select(.name=="reqvire.add_element") | .annotations.readOnlyHint == false' "mutation tools are non-read-only"
@@ -249,10 +277,17 @@ if grep -q "MCP Added Requirement" "$TEST_DIR/specifications/Requirements.md"; t
 fi
 
 MUTATION_OUTPUT="$TEST_DIR/output/mcp-mutation-execute.jsonl"
-run_mcp_mutations "$MUTATION_OUTPUT" \
+MUTATION_PORT="$(pick_port)"
+MUTATION_OUTPUT_PREFIX="$TEST_DIR/output/mcp-mutation-execute"
+start_http_mcp "$MUTATION_PORT" "$MUTATION_OUTPUT_PREFIX" --enable-mutations
+trap stop_http_mcp EXIT
+wait_for_http_mcp "$MUTATION_PORT" "$TEST_DIR/output/mcp-mutation-execute-init.json" || fail "mutation MCP HTTP server did not start" "${MUTATION_OUTPUT_PREFIX}.stderr"
+run_http_mcp_sequence "$MUTATION_PORT" "$MUTATION_OUTPUT" \
   "$(init_request)" \
   "$(jq -n -c --arg content "$ADD_CONTENT" '{jsonrpc:"2.0",id:4,method:"tools/call",params:{name:"reqvire.add_element",arguments:{file:"specifications/Requirements.md",content:$content,dry_run:false}}}')" \
-  "$(jq -n -c '{jsonrpc:"2.0",id:5,method:"tools/call",params:{name:"reqvire.read_element",arguments:{name:"MCP Added Requirement"}}}')"
+  "$(jq -n -c '{jsonrpc:"2.0",id:5,method:"tools/call",params:{name:"reqvire.read_element",arguments:{name:"MCP Added Requirement"}}}')" || fail "mutation MCP HTTP request sequence failed"
+stop_http_mcp
+trap - EXIT
 
 assert_jq_line "$MUTATION_OUTPUT" 2 '.result.structuredContent.dry_run == false and (.result.structuredContent.diffs | length) >= 1' "executing mutation returns persisted diffs"
 grep -q "MCP Added Requirement" "$TEST_DIR/specifications/Requirements.md" || fail "executing mutation did not update the fixture file"
@@ -270,9 +305,9 @@ if ! diff -u "$TEST_SCRIPT_DIR/expected/http-read-tools.txt" "$TEST_DIR/output/m
   fail "HTTP default tools/list does not match expected read-only tool set"
 fi
 jq -e '[.result.tools[].name] | index("reqvire.search") != null and index("reqvire.add_element") == null' "$TEST_DIR/output/mcp-http-tools.json" >/dev/null \
-  || fail "HTTP default tools/list should match stdio read-only mutation gating" "$TEST_DIR/output/mcp-http-tools.json"
+  || fail "HTTP default tools/list should expose read-only tools and omit mutation tools" "$TEST_DIR/output/mcp-http-tools.json"
 jq -e 'all(.result.tools[]; (.inputSchema.type=="object") and (.outputSchema|type=="object") and (.annotations|type=="object"))' "$TEST_DIR/output/mcp-http-tools.json" >/dev/null \
-  || fail "HTTP tools/list should expose the same schema fields as stdio" "$TEST_DIR/output/mcp-http-tools.json"
+  || fail "HTTP tools/list should expose schema and annotation fields" "$TEST_DIR/output/mcp-http-tools.json"
 
 http_mcp_call "$HTTP_PORT" "$(resources_list_request)" "$TEST_DIR/output/mcp-http-resources.json" || fail "HTTP resources/list request failed"
 jq -e '[.result.resources[].uri] | index("reqvire://workspace/status") != null' "$TEST_DIR/output/mcp-http-resources.json" >/dev/null \
@@ -289,6 +324,8 @@ jq -e '.result.structuredContent.workspace_root | type == "string"' "$TEST_DIR/o
 
 INVALID_ORIGIN_STATUS="$(curl -sS -o "$TEST_DIR/output/mcp-http-invalid-origin.txt" -w "%{http_code}" \
   -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -H "Mcp-Protocol-Version: ${MCP_PROTOCOL_VERSION}" \
   -H 'Origin: https://evil.example' \
   --data "$(workspace_status_request)" \
   "http://127.0.0.1:${HTTP_PORT}/mcp")"
@@ -298,6 +335,8 @@ fi
 
 NULL_ORIGIN_STATUS="$(curl -sS -o "$TEST_DIR/output/mcp-http-null-origin.txt" -w "%{http_code}" \
   -H 'Content-Type: application/json' \
+  -H 'Accept: application/json, text/event-stream' \
+  -H "Mcp-Protocol-Version: ${MCP_PROTOCOL_VERSION}" \
   -H 'Origin: null' \
   --data "$(workspace_status_request)" \
   "http://127.0.0.1:${HTTP_PORT}/mcp")"
@@ -359,9 +398,21 @@ INVALID_DIR="$(mktemp -d -t reqvire-mcp-invalid-XXXXXX)"
 cp -a "$TEST_SCRIPT_DIR/fixtures/invalid-startup/." "$INVALID_DIR/"
 
 set +e
-printf '%s\n' "$(init_request)" | (cd "$INVALID_DIR" && "$REQVIRE_BIN" mcp) > "$TEST_DIR/output/mcp-invalid-startup.stdout" 2> "$TEST_DIR/output/mcp-invalid-startup.stderr"
+INVALID_PORT="$(pick_port)"
+(cd "$INVALID_DIR" && "$REQVIRE_BIN" mcp --host 127.0.0.1 --port "$INVALID_PORT") > "$TEST_DIR/output/mcp-invalid-startup.stdout" 2> "$TEST_DIR/output/mcp-invalid-startup.stderr" &
+INVALID_PID=$!
+for _ in $(seq 1 50); do
+  if ! kill -0 "$INVALID_PID" >/dev/null 2>&1; then
+    break
+  fi
+  sleep 0.1
+done
+if kill -0 "$INVALID_PID" >/dev/null 2>&1; then
+  kill "$INVALID_PID" >/dev/null 2>&1 || true
+fi
+wait "$INVALID_PID"
 INVALID_EXIT=$?
-set -e
+set +e
 
 if [ "$INVALID_EXIT" -eq 0 ]; then
   fail "invalid model should prevent MCP startup"

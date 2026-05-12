@@ -4,6 +4,27 @@ use serde::Serialize;
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+pub const GOVERNANCE_METADATA_KEYS: &[&str] = &["status", "priority", "risk", "owner"];
+pub const GOVERNANCE_STATUS_VALUES: &[&str] = &["draft", "review", "approved"];
+pub const GOVERNANCE_PRIORITY_VALUES: &[&str] = &["low", "medium", "high", "critical"];
+pub const GOVERNANCE_RISK_VALUES: &[&str] = &["low", "medium", "high", "critical"];
+
+pub fn is_governance_metadata_key(key: &str) -> bool {
+    GOVERNANCE_METADATA_KEYS.contains(&key)
+}
+
+pub fn is_valid_governance_status(value: &str) -> bool {
+    GOVERNANCE_STATUS_VALUES.contains(&value)
+}
+
+pub fn is_valid_governance_priority(value: &str) -> bool {
+    GOVERNANCE_PRIORITY_VALUES.contains(&value)
+}
+
+pub fn is_valid_governance_risk(value: &str) -> bool {
+    GOVERNANCE_RISK_VALUES.contains(&value)
+}
+
 /// All valid element types that can be used in --filter-type arguments.
 /// These values match what ElementType::as_str() returns for each variant.
 ///
@@ -104,6 +125,30 @@ pub struct SizeEstimate {
     pub content_bytes: usize,
     pub rendered_context_bytes: usize,
     pub estimated_tokens: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "lowercase")]
+pub enum GovernanceMetadataSource {
+    Explicit,
+    Inherited,
+    Default,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct GovernanceMetadataEntry {
+    pub value: String,
+    pub source: GovernanceMetadataSource,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub source_identifier: Option<String>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct RequirementGovernanceMetadata {
+    pub status: GovernanceMetadataEntry,
+    pub priority: GovernanceMetadataEntry,
+    pub risk: GovernanceMetadataEntry,
+    pub owner: GovernanceMetadataEntry,
 }
 
 #[derive(Debug, PartialEq, Hash, Eq, Clone)]
@@ -230,6 +275,10 @@ impl ElementType {
     /// Returns true if this element type is a Refinement type
     pub fn is_refinement(&self) -> bool {
         matches!(self, ElementType::Refinement(_))
+    }
+
+    pub fn is_requirement(&self) -> bool {
+        matches!(self, ElementType::Requirement(_))
     }
 
     /// Returns the main type category for merge compatibility

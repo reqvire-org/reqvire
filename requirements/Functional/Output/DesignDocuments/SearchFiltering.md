@@ -16,6 +16,8 @@ This specification defines the functional requirements for a filtering subsystem
 
 The filters shall be composable and applied conjunctively (i.e., all active filters must match for an element to be included). The filtering system must support both human-readable text output and structured machine-readable output (e.g., JSON), as well as abbreviated short mode output.
 
+Full search summaries include governance metadata counters for matched requirement-family elements. The counters use effective metadata after explicit, inherited, and default resolution.
+
 ---
 
 ## Filtering Scope
@@ -25,6 +27,7 @@ Filtering shall operate on the level of individual `Element` objects in the mode
 - `file_path: String`
 - `name: String`
 - `element_type: ElementType`
+- effective requirement governance metadata (status, priority, risk, owner) when applicable
 - `content: String`
 - `relations: Vec<Relation>`
 - `page_content: String` (from parent file)
@@ -83,7 +86,23 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 4. Content Filter (Regex)
+### 4. Requirement Governance Metadata Filters
+
+**Purpose:** Include only requirement-family elements whose effective governance metadata matches the requested values.
+
+**Inputs:**
+- `filter-status`: comma-separated list of accepted status values (`draft`, `review`, `approved`)
+- `filter-priority`: comma-separated list of accepted priority values (`low`, `medium`, `high`, `critical`)
+- `filter-risk`: comma-separated list of accepted risk values (`low`, `medium`, `high`, `critical`)
+- `filter-owner`: Rust-compatible regular expression applied to effective owner value
+
+**Match Target:** Effective requirement governance metadata after explicit, inherited, and default resolution.
+
+**Behavior:** Status, priority, and risk filters apply exact OR matching within each comma-separated filter. Owner filtering applies regex matching. Invalid governance enum values and invalid owner regex patterns must cause an immediate user-facing error. Elements that are not requirement-family elements are excluded when any governance metadata filter is active.
+
+---
+
+### 5. Content Filter (Regex)
 
 **Purpose:** Include only elements whose body content matches a regular expression.
 
@@ -95,7 +114,7 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 5. Page Content Filter (Regex)
+### 6. Page Content Filter (Regex)
 
 **Purpose:** Include only elements whose parent file's page content (frontmatter) matches a regular expression.
 
@@ -107,7 +126,7 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 6. Have Relations Filter (Comma-separated list)
+### 7. Have Relations Filter (Comma-separated list)
 
 **Purpose:** Include only elements that have ALL specified relation types.
 
@@ -119,7 +138,7 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 7. Not Have Relations Filter (Comma-separated list)
+### 8. Not Have Relations Filter (Comma-separated list)
 
 **Purpose:** Include only elements that do NOT have ALL specified relation types.
 
@@ -142,6 +161,7 @@ All filters are applied **conjunctively**. That is, an element is included in th
 - Invalid regular expressions must produce a fatal error with a descriptive message.
 - Invalid glob patterns should fail at startup with appropriate feedback.
 - Unknown or malformed `type` filters should be rejected with a list of accepted values.
+- Unknown or malformed governance metadata enum filters should be rejected with a list of accepted values for that property.
 - Invalid relation type names in `--have-relations` or `--not-have-relations` shall produce an error listing valid relation types.
 
 ---
@@ -166,6 +186,10 @@ The filtering system must evaluate filters with minimal passes over element data
 | `type = constraint` | Only constraint refinement elements |
 | `type = behavior` | Only behavior refinement elements |
 | `type = specification` | Only specification refinement elements |
+| `status = approved` | Requirement-family elements whose effective status is approved |
+| `priority = high,critical` | Requirement-family elements whose effective priority is high or critical |
+| `risk = critical` | Requirement-family elements whose effective risk is critical |
+| `owner = "Platform.*"` | Requirement-family elements whose effective owner matches the regex |
 | `filter-file = "System*"` + `name = ".*GPS.*"` | Elements in System files with GPS in name |
 | `have-relations = verifiedBy,satisfiedBy` | Elements that have both verifiedBy AND satisfiedBy relations |
 | `not-have-relations = verifiedBy` | Elements that do NOT have any verifiedBy relations |

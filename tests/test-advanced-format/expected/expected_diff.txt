@@ -179,7 +179,7 @@ Found 7 file(s) with formatting changes:
   033 +   ␤
   034 +   #### Metadata
   035 +     * type: test-verification
-  036 +     * status: implemented
+  036 +     * implementation-status: implemented
   037 +   ---
   038 +   ␤
   039     ### Generate Diagrams
@@ -213,7 +213,7 @@ Found 7 file(s) with formatting changes:
   063     Verify that metadata repositioning maintains blank line spacing.
   064 -   #### Metadata
   064 -     * type: verification
-  064 -     * status: implemented
+  064 -     * implementation-status: implemented
   064 -   ␤
   064     #### Details
   065 -   ␤
@@ -226,7 +226,7 @@ Found 7 file(s) with formatting changes:
   070       * [ ] Content structure is preserved
   071 +   #### Metadata
   072 +     * type: test-verification
-  073 +     * status: implemented
+  073 +     * implementation-status: implemented
   074     ---
   075 -   ### Details Block Formatting Test
   075 +   ### Missing Blank Line Test
@@ -253,7 +253,7 @@ Found 7 file(s) with formatting changes:
   082 -   Content line 3.
   082 -   #### Metadata
   082 -     * type: verification
-  082 -     * status: implemented
+  082 -     * implementation-status: implemented
   082 -   #### Details
   082 -   Detail content here.
   082 -   ␤

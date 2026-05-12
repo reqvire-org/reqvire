@@ -8,6 +8,24 @@
           "file": "specifications/Requirements.md",
           "type": "user-requirement",
           "content": "This requirement tests special characters in element names including commas and slashes.",
+          "governance_metadata": {
+            "status": {
+              "value": "approved",
+              "source": "default"
+            },
+            "priority": {
+              "value": "medium",
+              "source": "default"
+            },
+            "risk": {
+              "value": "low",
+              "source": "default"
+            },
+            "owner": {
+              "value": "",
+              "source": "default"
+            }
+          },
           "relations": [
             {
               "relation_type": "derivedFrom",
@@ -25,6 +43,24 @@
           "file": "specifications/Requirements.md",
           "type": "requirement",
           "content": "This requirement specifically tests validation of relations to files in the DesignSpecifications folder.",
+          "governance_metadata": {
+            "status": {
+              "value": "approved",
+              "source": "default"
+            },
+            "priority": {
+              "value": "medium",
+              "source": "default"
+            },
+            "risk": {
+              "value": "low",
+              "source": "default"
+            },
+            "owner": {
+              "value": "",
+              "source": "default"
+            }
+          },
           "relations": [
             {
               "relation_type": "derivedFrom",
@@ -49,6 +85,24 @@
           "file": "specifications/Requirements.md",
           "type": "user-requirement",
           "content": "This requirement specifically tests validation of 'Other' subsections\n\n\n#### Subsection 1\n\nSome text of subsection 1\n\n\n#### Subsection 2\n\nSome text of subsection 2",
+          "governance_metadata": {
+            "status": {
+              "value": "approved",
+              "source": "default"
+            },
+            "priority": {
+              "value": "medium",
+              "source": "default"
+            },
+            "risk": {
+              "value": "low",
+              "source": "default"
+            },
+            "owner": {
+              "value": "",
+              "source": "default"
+            }
+          },
           "relations": [],
           "attachments": []
         },
@@ -58,6 +112,24 @@
           "file": "specifications/Requirements.md",
           "type": "requirement",
           "content": "This requirement has valid relations to existing files, using markdown link format.",
+          "governance_metadata": {
+            "status": {
+              "value": "approved",
+              "source": "default"
+            },
+            "priority": {
+              "value": "medium",
+              "source": "default"
+            },
+            "risk": {
+              "value": "low",
+              "source": "default"
+            },
+            "owner": {
+              "value": "",
+              "source": "default"
+            }
+          },
           "relations": [
             {
               "relation_type": "derive",
@@ -110,6 +182,24 @@
           "file": "specifications/Requirements.md",
           "type": "requirement",
           "content": "This requirement has valid relations to existing files, using standard format.",
+          "governance_metadata": {
+            "status": {
+              "value": "approved",
+              "source": "default"
+            },
+            "priority": {
+              "value": "medium",
+              "source": "default"
+            },
+            "risk": {
+              "value": "low",
+              "source": "default"
+            },
+            "owner": {
+              "value": "",
+              "source": "default"
+            }
+          },
           "relations": [
             {
               "relation_type": "derive",
@@ -162,6 +252,24 @@
           "file": "specifications/Requirements.md",
           "type": "user-requirement",
           "content": "Top-level user requirement used as hierarchy parent for system requirements in this fixture.",
+          "governance_metadata": {
+            "status": {
+              "value": "approved",
+              "source": "default"
+            },
+            "priority": {
+              "value": "medium",
+              "source": "default"
+            },
+            "risk": {
+              "value": "low",
+              "source": "default"
+            },
+            "owner": {
+              "value": "",
+              "source": "default"
+            }
+          },
           "relations": [
             {
               "relation_type": "derive",
@@ -232,6 +340,28 @@
     "total_requirements_types": {
       "system-requirement": 3,
       "user-requirement": 3
+    },
+    "total_governance_metadata": {
+      "status": {
+        "approved": 6,
+        "draft": 0,
+        "review": 0
+      },
+      "priority": {
+        "critical": 0,
+        "high": 0,
+        "low": 0,
+        "medium": 6
+      },
+      "risk": {
+        "critical": 0,
+        "high": 0,
+        "low": 6,
+        "medium": 0
+      },
+      "owner": {
+        "unassigned": 6
+      }
     },
     "total_verifications_types": {
       "analysis-verification": 0,

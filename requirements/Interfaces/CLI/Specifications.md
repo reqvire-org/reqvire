@@ -504,6 +504,10 @@ Search command features:
 - By file path glob: `--filter-file="src/**/*Reqs.md"`
 - By element name regex: `--filter-name=".*safety.*"`
 - By element type: `--filter-type="requirement"` (exact match)
+- By effective governance status: `--filter-status=approved`
+- By effective governance priority: `--filter-priority=high,critical`
+- By effective governance risk: `--filter-risk=high,critical`
+- By effective governance owner regex: `--filter-owner="Platform.*"`
 - By element content regex: `--filter-content="MUST"`
 - By page content regex: `--filter-page-content="architecture"`
 - By having relations: `--have-relations=verifiedBy,satisfiedBy` (comma-separated, must have ALL)
@@ -518,10 +522,12 @@ Short mode behavior:
 Error handling:
 - Invalid regex patterns is expected to return clear error message showing the faulty pattern and exit
 - Invalid relation type names is expected to return error with list of valid relation types
+- Invalid governance metadata filter values are expected to return clear error messages with the accepted values
 
 Default output:
 - Human-readable text format when neither `--json` nor `--short` is specified
 - Full detail mode showing all element metadata and relations
+- Full JSON output includes effective governance metadata for requirement-family elements
 
 #### Metadata
  * type: specification
