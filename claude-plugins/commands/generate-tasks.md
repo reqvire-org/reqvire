@@ -70,6 +70,9 @@ Generate implementation task plan from requirement changes on a feature branch.
    - verifiedBy relations (tests to run)
    - satisfiedBy relations (code to update)
    - derivedFrom relations (context)
+   - governance_metadata values (status, priority, risk, owner)
+
+   Treat `owner` as an accountability/routing label. It may be a person, role, team, department, subsystem group, or task owner.
 
 5. **For each verification:**
 
@@ -86,6 +89,7 @@ Generate implementation task plan from requirement changes on a feature branch.
    - Extract parent requirement purpose (why this exists)
    - Identify key specifications (how to implement)
    - Note important constraints and validation rules
+   - Carry effective governance status, priority, risk, and owner routing
    - Summarize in ~2-3 sentences
 
    **For new requirements:**
@@ -94,6 +98,8 @@ Generate implementation task plan from requirement changes on a feature branch.
      Context: [2-3 sentence summary from collected chain]
      Purpose: [Why - from parent requirement]
      Implementation: [Key specs/API endpoints from collected data]
+     Governance: status={status}, priority={priority}, risk={risk}, owner={owner-or-unassigned}
+     Owner routing: [person/role/team/department/subsystem/task owner from governance owner]
 
      ☐ Review full requirement context: [link to collect output]
      ☐ Review requirement: [link to blob]
@@ -108,6 +114,8 @@ Generate implementation task plan from requirement changes on a feature branch.
    ☐ Update "{Requirement Name}" ({REQ-ID})
      Context: [What changed - from collected chain]
      Impact: [Affected specs/constraints from collected data]
+     Governance: status={status}, priority={priority}, risk={risk}, owner={owner-or-unassigned}
+     Owner routing: [person/role/team/department/subsystem/task owner from governance owner]
 
      ☐ Review full requirement context: [link to collect output]
      ☐ Review changes: [link to blob]
@@ -152,6 +160,9 @@ Generate implementation task plan from requirement changes on a feature branch.
 - New requirements: X
 - Modified requirements: Y
 - Tests to run: Z
+- Owners / routing groups: owner-1 (N), owner-2 (M), unassigned (K)
+- High/critical priorities: N
+- High/critical risks: M
 
 ## Tasks
 {TodoWrite formatted tasks with context summaries}
@@ -176,3 +187,4 @@ Each context document shows:
 - Links to exact requirement versions via git blob URLs
 - Repository-agnostic: no technology assumptions
 - Always read full requirements, not just summaries
+- Use governance metadata for prioritization, risk surfacing, and owner routing

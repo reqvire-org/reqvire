@@ -1,6 +1,16 @@
 ---
 name: reqvire-syseng
-description: Expert MBSE and requirements engineer. Use when (1) exploring models and finding requirements, (2) adding features with proper MBSE traceability, (3) refactoring cluttered models and extracting specifications, (4) generating implementation tasks from requirement changes, (5) validating model health or checking coverage, (6) any work involving reqvire commands. Triggers on: requirement management, specification extraction, verification traceability, change impact analysis, model refactoring, EARS patterns, or any reqvire CLI usage.
+description: >-
+  Expert MBSE and requirements engineer. Use when (1) exploring models and
+  finding requirements, (2) adding features with proper MBSE traceability,
+  (3) refactoring cluttered models and extracting specifications, (4)
+  generating implementation tasks from requirement changes, including
+  governance metadata, owner routing, priority, risk, and status, (5)
+  validating model health or checking coverage, (6) any work involving
+  reqvire commands. Triggers on: requirement management, requirement
+  governance, ownership/owner routing, specification extraction, verification
+  traceability, change impact analysis, model refactoring, EARS patterns, or
+  any reqvire CLI usage.
 ---
 
 # System and Requirements Engineer Skill
@@ -75,6 +85,40 @@ User Requirement → derive → Requirement
 - Relations syntax: `  * derivedFrom: [Parent](path.md#parent)`
 - Attachments syntax: `  * [Name](path.md#element)`
 
+## Requirement Governance Metadata
+
+Requirement-family elements (`requirement`, `user-requirement`) may define governance metadata in `#### Metadata`:
+
+| Key | Values | Default | Meaning |
+|-----|--------|---------|---------|
+| `status` | `draft`, `review`, `approved` | `approved` | Lifecycle readiness for use in engineering decisions |
+| `priority` | `low`, `medium`, `high`, `critical` | `medium` | Relative implementation/planning importance |
+| `risk` | `low`, `medium`, `high`, `critical` | `low` | Requirement-driven delivery, safety, compliance, integration, or validation risk |
+| `owner` | free-form string | unassigned | Accountability/routing label; may be a person, role, team, department, subsystem group, or task owner |
+
+Missing governance fields inherit from the nearest parent requirement; otherwise defaults apply. Search JSON exposes effective values and their sources under `governance_metadata`. Text and JSON search summaries expose governance counters.
+
+Governance metadata belongs directly on requirement-family elements only. Refinements and verifications must not author `status`, `priority`, `risk`, or `owner` in metadata; they receive governance context from their owning or linked requirement.
+
+### When and How to Use Governance
+
+Use governance metadata whenever work involves planning, prioritization, routing, readiness, or risk:
+
+- **Task generation and implementation planning**: include effective `status`, `priority`, `risk`, and `owner` in task summaries
+- **Triage and search**: use `--filter-status`, `--filter-priority`, `--filter-risk`, and `--filter-owner` before manually scanning files
+- **Change impact review**: surface high/critical priority or risk requirements first
+- **Ownership routing**: route questions and tasks using `owner`; it may name a person, role, team, department, subsystem group, or task owner
+- **Model cleanup/refactoring**: preserve explicit governance metadata and keep inherited/default values implicit unless the user asks to author them
+
+Do not use governance metadata as a substitute for model structure:
+
+- `status` does not replace verification, validation, or coverage
+- `priority` does not change requirement hierarchy or traceability
+- `risk` describes requirement-level delivery/safety/compliance/integration/validation risk; it is not a test result
+- `owner` does not replace `refinedBy` ownership or implementation `satisfiedBy` links
+
+When adding new requirements, omit governance keys unless the user, source requirement, or specification explicitly defines them. Defaults and inheritance are still effective in the graph model.
+
 ## EARS Patterns
 
 - **Ubiquitous**: "The system shall [capability]"
@@ -101,6 +145,10 @@ Requirements should contain EARS statements only (body + `#### Details`). Techni
 9. Hierarchy integrity: mutations must preserve single-root hierarchy ownership
    - Violations should output `Single-root hierarchy ownership violation`
    - If unclear, verify with `validate` after mutation
+10. Treat governance metadata as planning context
+   - Preserve explicit values when editing requirements
+   - Do not add governance keys to refinements or verifications
+   - Use `owner` as an accountability/routing label, not necessarily a person
 
 ## Task Routing
 
@@ -120,7 +168,15 @@ Load the right reference file for your task — don't work from memory on comple
 
 **Quick tasks** (no reference needed): search, validate, single link/unlink/move, collect context.
 
-## Command Cheatsheet
+## Quick Start Common Workflows
+
+- Explore requirements with `search`, then gather full context with `collect`
+- Add or modify requirements only after reading the existing requirement chain
+- Keep governance metadata on requirement-family elements only
+- Route implementation tasks by effective `owner`, `priority`, `risk`, and `status`
+- Validate after meaningful edits with `validate`, then run `lint`, `coverage`, or `format` as needed
+
+## Command Reference
 
 Use this prefix when executing Reqvire commands:
 
@@ -135,6 +191,10 @@ The examples below show Reqvire arguments after that prefix.
 search --short --json | jq '.summary'
 search --filter-type="requirement" --filter-name=".*Pattern.*" --short
 search --not-have-relations="verifiedBy" --short
+search --filter-status="review" --short
+search --filter-priority="high,critical" --short
+search --filter-risk="high,critical" --json
+search --filter-owner="Platform|Safety" --json
 model [--from "Element"] [--reverse] [--filter-type="requirement"]
 collect "Element" [--direction DOWNSTREAM] [--json]
 submodels [--from "Root"]
@@ -181,7 +241,7 @@ serve [--port 8080]
 
 Use `--dry-run` for destructive operations. Use `<<'EOF'` (single-quoted) to prevent shell expansion in heredocs.
 
-## Validation Checklist
+## Validation & Quality Checklist
 
 Run after every meaningful change:
 

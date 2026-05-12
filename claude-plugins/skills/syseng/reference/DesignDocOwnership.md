@@ -14,6 +14,8 @@ Use this reference when normalizing design document ownership so each document e
 
 Assign each design/refinement document element to a single owning requirement via `refinedBy` (identifier target), while other requirements consume it through attachments.
 
+This ownership is refinement/document ownership, not requirement governance ownership. Requirement governance `owner` metadata is a separate routing/accountability label on requirement-family elements and may name a person, role, team, department, subsystem group, or task owner.
+
 ## Mandatory Boundary Clarification (Human Checkpoint)
 
 Confirm before bulk edits:
