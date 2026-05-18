@@ -197,10 +197,14 @@ The system shall define element type relation compatibility constraints.
 
 ### Refinement Element Structure Constraints
 
-The system shall restrict Refinement elements (constraint, behavior, specification) to only allow `refine` relations.
+The system shall restrict Refinement elements (`constraint`, `behavior`, `specification`, `state`, `input-output`) to only allow `refine` relations.
 
 #### Details
 Refinement relation usage shall follow the associated refinement specifications.
+
+State refinements shall model lifecycle states, state machines, allowed transitions, and state-dependent contract behavior owned by a requirement.
+
+Input-output refinements shall model payloads, documents, messages, schemas, fixtures, and data contracts owned by a requirement.
 
 #### Metadata
   * type: requirement

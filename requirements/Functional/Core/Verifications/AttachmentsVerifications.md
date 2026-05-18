@@ -12,7 +12,7 @@ Test cases for identifier attachments:
 - Many-to-many: same refinement identifier attaches to multiple elements
 - Dry-run mode makes no changes
 - Attach Refinement element by identifier target
-- Only Refinement types allowed (constraint, behavior, specification)
+- Only Refinement types allowed (constraint, behavior, specification, state, input-output)
 - Error when attaching non-Refinement element (requirement, verification, etc.)
 - Error when identifier target is unresolved
 - Error when target is not a valid refinement identifier
@@ -176,7 +176,7 @@ Verify the system correctly parses Attachments subsections using refinement elem
 
 #### Details
 Test cases for element identifiers:
-- Parse markdown links to Refinement elements (constraint, behavior, specification)
+- Parse markdown links to Refinement elements (constraint, behavior, specification, state, input-output)
 - Normalize element identifiers like relation targets
 - Support full identifier format `file.md#element-name`
 - Support same-file format `#element-name`
@@ -198,7 +198,7 @@ Verify the system validates attachment targets as refinement element identifiers
 
 #### Details
 Test cases for element identifiers:
-- Accept Refinement element identifiers (constraint, behavior, specification)
+- Accept Refinement element identifiers (constraint, behavior, specification, state, input-output)
 - Reject non-Refinement element identifiers (requirement, user-requirement, verification)
 - Reject file-path attachment syntax
 - Error message indicates expected Refinement type

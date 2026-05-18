@@ -1216,7 +1216,7 @@ This test verifies that the verification-traces command filter options work corr
    Command: `reqvire verification-traces --filter-type="test-verification"`
    - exits code **0**
    - output contains only test-verification elements
-   - analysis, inspection, demonstration verifications are excluded
+   - analysis, inspection, demonstration, and formal proof verifications are excluded
 
 7. **Combined Filters**
    Command: `reqvire verification-traces --filter-type="test-verification" --filter-name=".*Test"`

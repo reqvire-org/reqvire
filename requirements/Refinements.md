@@ -30,7 +30,7 @@ Reqvire implements requirement refinement through explicit refinement elements l
 
 #### Details
 **SysML Refine Stereotype:**
-- Refinement content is captured in dedicated elements (`specification`, `constraint`, `behavior`)
+- Refinement content is captured in dedicated elements (`specification`, `constraint`, `behavior`, `state`, `input-output`)
 - Requirement owns refinement via `refinedBy`; refinement points back via `refine`
 - Refinement elements can be attached by external requirements when ownership constraints allow
 
@@ -39,6 +39,8 @@ Reqvire implements requirement refinement through explicit refinement elements l
 - Requirement text stays intent-focused (EARS-style), with concise detail pointers
 - Clarifying information and rationale are captured in linked refinements
 - Refinements provide attachment-ready specification contracts across submodels
+- `state` refinements capture lifecycle states, state machines, allowed transitions, terminal states, and state-dependent contract behavior.
+- `input-output` refinements capture payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries.
 
 #### Metadata
   * type: specification
@@ -66,7 +68,7 @@ Reqvire implements SysML relation stereotypes for requirements management.
 
 **Refinement Ownership:**
 - `refine`/`refinedBy`: SysML Refine stereotype
-- Links refinement elements (specification, constraint, behavior) and specification files to requirements
+- Links refinement elements (specification, constraint, behavior, state, input-output) and specification files to requirements
 - Establishes ownership: each refinement can only be owned by one requirement
 - Together with the requirement, refinements drive implementation
 
@@ -100,6 +102,7 @@ Element types supported by the system for classification and behavior determinat
 | `analysis-verification` | Verification through formal analysis of documentation or code |
 | `inspection-verification` | Verification through formal inspection or review |
 | `demonstration-verification` | Verification through demonstration in a realistic environment |
+| `formal-proof-verification` | Verification through formal proof, model checking, theorem proving, or generated formal evidence |
 
 **Refinement Types:**
 
@@ -108,6 +111,8 @@ Element types supported by the system for classification and behavior determinat
 | `constraint` | Documents constraints that limit or bound the system | Only `refine` relations allowed |
 | `behavior` | Documents behavior details and operational specifications | Only `refine` relations allowed |
 | `specification` | Documents detailed specifications and technical descriptions | Only `refine` relations allowed |
+| `state` | Documents lifecycle states, state machines, transitions, and state-dependent contracts | Only `refine` relations allowed |
+| `input-output` | Documents payloads, messages, documents, schemas, fixtures, and data contracts | Only `refine` relations allowed |
 
 **Other Types:**
 
@@ -169,6 +174,7 @@ Reqvire supports verification coverage analysis per INCOSE best practices.
 - analysis-verification: Analysis and review
 - inspection-verification: Physical inspection
 - demonstration-verification: Demonstration of capability
+- formal-proof-verification: Formal proof, model checking, theorem proving, or generated formal evidence
 
 #### Metadata
   * type: specification

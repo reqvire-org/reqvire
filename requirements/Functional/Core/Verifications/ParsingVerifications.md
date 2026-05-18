@@ -16,7 +16,7 @@ This test verifies that the system correctly extracts and parses element subsect
 
 **Metadata Parsing:**
 - System shall extract element type from `* type:` metadata entry
-- System shall support all element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification, other
+- System shall support all element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification, constraint, behavior, specification, state, input-output, other
 - System shall assign default type 'requirement' when no type metadata present
 
 **Relations Parsing:**
@@ -253,7 +253,7 @@ This test verifies that non-reserved subsections (subsections other than Relatio
 
 ### Refinement Element Type Parsing Test
 
-This test verifies that the system parses Refinement element types (constraint, behavior, specification) from metadata and that type-based search filters return the expected elements.
+This test verifies that the system parses Refinement element types (constraint, behavior, specification, state, input-output) from metadata and that type-based search filters return the expected elements.
 
 #### Details
 
@@ -263,6 +263,8 @@ This test verifies that the system parses Refinement element types (constraint, 
   - `Test Constraint Element` with type `constraint`
   - `Test Behavior Element` with type `behavior`
   - `Test Specification Element` with type `specification`
+  - `Test State Element` with type `state`
+  - `Test Input Output Element` with type `input-output`
 - `reqvire search --filter-type=constraint --json` returns exactly 1 element.
 - `reqvire search --filter-type=behavior --json` returns exactly 1 element.
 - `reqvire search --filter-type=specification --json` returns exactly 1 element.

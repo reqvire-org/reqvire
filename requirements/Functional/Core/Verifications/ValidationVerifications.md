@@ -34,7 +34,7 @@ This test verifies that the system assigns the default type 'requirement' to all
 **Explicit Type Metadata Overrides:**
 - System shall allow explicit type specification via Metadata subsection
 - System shall respect explicit type metadata when present
-- System shall support all standard element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, other
+- System shall support all standard element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification, state, input-output, other
 
 ##### Test Criteria
 1. **Default type assignment verification:**
@@ -310,7 +310,7 @@ This verification test checks that Reqvire correctly identifies and reports inva
 - System should detect and report requirement elements with verifiedBy relations pointing to non-existing verification elements
 - System should detect and report requirement elements with satisfiedBy relations pointing to other requirement elements (incompatible types)
 - System should detect and report verification elements with satisfiedBy relations pointing to other verification elements (incompatible types)
-- System should detect and report non-test-verification elements with satisfiedBy relations (only test-verification may use satisfiedBy, trace is always allowed)
+- System should detect and report non-evidence-backed verification elements with satisfiedBy relations (only test-verification and formal-proof-verification may use satisfiedBy, trace is always allowed)
 - System should detect and report if system requirement is missing parent relation
 - System should detect and report if there is circular dependency in requirements
 - Pass 2 validation should only execute when Pass 1 completes without errors
@@ -318,6 +318,7 @@ This verification test checks that Reqvire correctly identifies and reports inva
 **General Requirements:**
 - System should allow requirement elements with satisfiedBy relations pointing to existing implementation files
 - System should allow test-verification elements with satisfiedBy relations pointing to existing test scripts
+- System should allow formal-proof-verification elements with satisfiedBy relations pointing to existing proof evidence artifacts
 - System should report clear error messages with details about the invalid format
 - Two separate test scenarios should validate Pass 1 and Pass 2 errors independently
 

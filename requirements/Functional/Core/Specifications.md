@@ -42,7 +42,7 @@ Element size estimates are expected to be optional model-build metadata.
 Attachment targets support refinement-element identifier references only.
 
 **Identifier Targets:**
-- Must point to Refinement element types only (constraint, behavior, specification)
+- Must point to Refinement element types only (`constraint`, `behavior`, `specification`, `state`, `input-output`)
 - Normalized like relation targets (resolved to full identifier path)
 - Validation is expected to reject identifiers pointing to non-Refinement elements
 - Validation is expected to reject unresolved identifiers
@@ -70,9 +70,12 @@ Supported element types:
 - `analysis-verification`
 - `inspection-verification`
 - `demonstration-verification`
+- `formal-proof-verification`
 - `constraint` (refinement type)
 - `behavior` (refinement type)
 - `specification` (refinement type)
+- `state` (refinement type)
+- `input-output` (refinement type)
 - `other`
 
 #### Metadata
@@ -106,7 +109,7 @@ Requirement governance metadata is declared in the `#### Metadata` subsection of
 
 Requirement governance metadata covers requirement management accountability and decision context: `status` represents the requirement lifecycle state, `priority` represents planning importance, `risk` represents realization risk, and `owner` represents maintenance accountability.
 
-Elements outside the requirement family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Refinement elements (`constraint`, `behavior`, and `specification`) obtain governance context from their directly owning requirement instead of authored metadata.
+Elements outside the requirement family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Refinement elements (`constraint`, `behavior`, `specification`, `state`, and `input-output`) obtain governance context from their directly owning requirement instead of authored metadata.
 
 When any non-requirement-family element declares requirement governance metadata keys, the validator is expected to report an error indicating that governance metadata is only valid on requirement-family elements.
 
@@ -318,12 +321,12 @@ The validator enforces the constraints defined in the [Element Type Relation Com
 
 - For `derivedFrom`/`derive` relations, validate that both source and target are requirement types (`requirement` or `user-requirement`)
 - For `verifiedBy`/`verify` relations, validate that one endpoint is a requirement element and the other is a verification element
-- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a system requirement (`requirement`) or test-verification element and the other is an implementation element; `user-requirement` is expected to not use `satisfiedBy`/`satisfy`
-- For `refinedBy`, require identifier targets that resolve to refinement elements (constraint, behavior, specification)
+- For `satisfiedBy`/`satisfy` relations, validate that one endpoint is a system requirement (`requirement`), test-verification element, or formal-proof-verification element and the other is an implementation or evidence artifact; `user-requirement` is expected to not use `satisfiedBy`/`satisfy`
+- For `refinedBy`, require identifier targets that resolve to refinement elements (`constraint`, `behavior`, `specification`, `state`, `input-output`)
 - For `refinedBy`, reject plain file-path targets (InternalPath), including `# Documents` file links without element fragments
-- For verification elements with `satisfiedBy` relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)
+- For verification elements with `satisfiedBy` relations, validate that only evidence-backed verification elements (`test-verification` and `formal-proof-verification`) may use satisfiedBy (other verification types should not have satisfiedBy relations)
 - `trace` relations are always allowed for any non-refinement element type
-- Refinement types (`constraint`, `behavior`, `specification`) can only have `refine` relations and cannot have Attachments subsections
+- Refinement types (`constraint`, `behavior`, `specification`, `state`, `input-output`) can only have `refine` relations and cannot have Attachments subsections
 - Warnings should be issued when relation endpoints have incompatible element types
 
 This validation occurs:

@@ -83,15 +83,15 @@ Validation rules for element type and relation type combinations.
 | Relation Type | Allowed Source Types | Allowed Target Types |
 |---------------|---------------------|---------------------|
 | derivedFrom/derive | requirement, user-requirement | requirement, user-requirement |
-| satisfiedBy/satisfy | requirement, test-verification | InternalPath |
+| satisfiedBy/satisfy | requirement, test-verification, formal-proof-verification | InternalPath |
 | refinedBy/refine | requirement, user-requirement | refinement types, InternalPath |
 | verifiedBy/verify | requirement, user-requirement | All verification types |
 | trace | Any (except refinement types) | Any |
 
 **Key Constraints:**
 - derivedFrom/derive restricted to requirement types only
-- Refinement types (constraint, behavior, specification) can only have `refine` relations
-- Only test-verification can use satisfiedBy among verification types
+- Refinement types (constraint, behavior, specification, state, input-output) can only have `refine` relations
+- Only evidence-backed verification types (`test-verification`, `formal-proof-verification`) can use satisfiedBy among verification types
 - Elements with type "other" can only use trace relations
 
 #### Metadata

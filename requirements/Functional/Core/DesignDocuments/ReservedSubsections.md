@@ -143,7 +143,7 @@ The system shall meet defined performance criteria.
 
 ### Element Identifier Attachments
 
-Element identifier attachments link to Refinement elements (constraint, behavior, specification types) within the model.
+Element identifier attachments link to Refinement elements (constraint, behavior, specification, state, input-output types) within the model.
 
 **Parsing Rules:**
 - Support markdown link syntax with fragment identifiers: `* [Element Name](path#element-id)`
@@ -154,7 +154,7 @@ Element identifier attachments link to Refinement elements (constraint, behavior
 
 **Validation Rules:**
 - Target element must exist in the model
-- Target element must be a Refinement type (constraint, behavior, specification)
+- Target element must be a Refinement type (constraint, behavior, specification, state, input-output)
 - Non-Refinement element identifiers are rejected with a validation error
 - Target refinement must have at least one `refine` relation (no orphan refinements)
 - Attaching requirement must be outside the refinement's defining hierarchy (hierarchical independence)

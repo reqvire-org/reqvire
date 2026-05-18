@@ -583,7 +583,7 @@ The system is expected to support filtering verification traces by verification 
 The following filter options is expected to be supported:
 - `--filter-id=<id>`: Generate trace for a specific verification element by its full identifier
 - `--filter-name=<regex>`: Filter verifications by name using regular expression matching
-- `--filter-type=<type>`: Filter by verification type (test-verification, analysis-verification, inspection-verification, demonstration-verification)
+- `--filter-type=<type>`: Filter by verification type (test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification)
 
 Filters is expected to be combinable, and when multiple filters are specified, only verifications matching ALL filter criteria is expected to be included in the output.
 

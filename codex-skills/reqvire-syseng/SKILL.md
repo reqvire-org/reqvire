@@ -47,7 +47,10 @@ Version policy:
 | Refinements | `specification` | Detailed definitions satisfying requirements |
 | | `constraint` | Limits and boundaries on system behavior |
 | | `behavior` | How the system behaves in specific conditions |
-| Verifications | `test-verification` | Automated/manual testing (can have satisfiedBy) |
+| | `state` | Lifecycle states, state machines, transitions, and state-dependent contracts |
+| | `input-output` | Payloads, messages, documents, schemas, fixtures, and data contracts |
+| Verifications | `test-verification` | Automated/manual testing (evidence-backed; requires satisfiedBy) |
+| | `formal-proof-verification` | Formal proof, model checking, theorem proving, generated fixtures, or proof reports (evidence-backed; requires satisfiedBy) |
 | | `analysis-verification` | Review, calculation, simulation |
 | | `inspection-verification` | Visual examination, audit |
 | | `demonstration-verification` | Showing capability works |
@@ -57,7 +60,7 @@ Version policy:
 | Relation | Allowed Sources | Purpose |
 |----------|-----------------|---------|
 | `derivedFrom` / `derive` | Any requirement type | Traceability to parent requirements |
-| `satisfiedBy` / `satisfy` | `requirement`, `test-verification` only | Link to implementation artifacts |
+| `satisfiedBy` / `satisfy` | `requirement`, `test-verification`, `formal-proof-verification` only | Link to implementation or evidence artifacts |
 | `verifiedBy` / `verify` | Any requirement type | Link to verification elements |
 | `refinedBy` / `refine` | Any requirement type | Ownership of refinement elements |
 | `trace` | Any | Non-directional traceability |
@@ -65,15 +68,16 @@ Version policy:
 
 **Key constraints:**
 - `user-requirement` must NOT use `satisfiedBy`/`satisfy`
+- Among verification types, only evidence-backed verifications (`test-verification`, `formal-proof-verification`) may use `satisfiedBy`/`satisfy`
 - Each refinement owned by exactly one requirement (via `refinedBy`)
 - Only requirements OUTSIDE the owner's derivation hierarchy can attach a refinement
 
 **Traceability flow:**
 ```
 User Requirement → derive → Requirement
-                              ├── refinedBy → Spec/Constraint/Behavior
+                              ├── refinedBy → Spec/Constraint/Behavior/State/Input-Output
                               ├── satisfiedBy → Code
-                              └── verifiedBy → Verification → satisfiedBy → Test
+                              └── verifiedBy → Verification → satisfiedBy → Test/Proof evidence
 ```
 
 ## Document Structure

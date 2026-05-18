@@ -27,8 +27,8 @@ Type compatibility rules for merging elements.
 #### Details
 **Main Type Categories:**
 - **Requirement types**: `requirement`, `user-requirement`
-- **Verification types**: `test-verification`, `analysis-verification`, `inspection-verification`, `demonstration-verification`
-- **Refinement types**: `constraint`, `behavior`, `specification`
+- **Verification types**: `test-verification`, `analysis-verification`, `inspection-verification`, `demonstration-verification`, `formal-proof-verification`
+- **Refinement types**: `constraint`, `behavior`, `specification`, `state`, `input-output`
 - **Other**: Any element type not in above categories
 
 **Compatibility Rules:**

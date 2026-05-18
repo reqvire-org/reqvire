@@ -76,7 +76,7 @@ These relations connect requirements to implementations:
 
 These relations establish ownership of refinement artifacts by requirements:
 
-- **refinedBy/refine**: Links requirements to refinement elements (specification, constraint, behavior) that augment the requirement definition. Each refinement can only be owned by one requirement (uniqueness constraint). Together with the requirement, these artifacts drive implementation.
+- **refinedBy/refine**: Links requirements to refinement elements (specification, constraint, behavior, state, input-output) that augment the requirement definition. Each refinement can only be owned by one requirement (uniqueness constraint). Together with the requirement, these artifacts drive implementation.
 
 ### 4. Verification Relations
 
@@ -147,19 +147,24 @@ This section defines which element types can use which relation types as source 
 | **analysis-verification** | verify, trace | verifiedBy, trace |
 | **inspection-verification** | verify, trace | verifiedBy, trace |
 | **demonstration-verification** | verify, trace | verifiedBy, trace |
+| **formal-proof-verification** | verify, satisfiedBy, trace | verifiedBy, satisfy, trace |
 | **constraint** | refine | refinedBy, Attachment |
 | **behavior** | refine | refinedBy, Attachment |
 | **specification** | refine | refinedBy, Attachment |
+| **state** | refine | refinedBy, Attachment |
+| **input-output** | refine | refinedBy, Attachment |
 | **other** | trace | trace |
 
 ### Key Constraints
 
 1. **derivedFrom/derive restricted to requirement types**: Only `requirement` and `user-requirement` elements can participate in derivation relationships. This ensures clean hierarchical requirement decomposition without mixing verification or other element types.
 
-2. **Refinement types can only have refine relations**: Elements of type `constraint`, `behavior`, and `specification` can only use `refine` relations to link to the requirement they refine. Each refinement can only be owned by one requirement. They can also be referenced via the Attachments subsection of other elements.
+2. **Refinement types can only have refine relations**: Elements of type `constraint`, `behavior`, `specification`, `state`, and `input-output` can only use `refine` relations to link to the requirement they refine. Each refinement can only be owned by one requirement. They can also be referenced via the Attachments subsection of other elements.
 
 3. **satisfiedBy/satisfy restricted to implementable elements**: `satisfiedBy` links system requirements (`requirement`) and test verifications to implementation files (code). `user-requirement` elements are not valid sources/targets for satisfaction relations. Refinement elements are not valid targets for `satisfiedBy`; use `refinedBy` instead.
 
-4. **test-verification special case**: Among verification types, only `test-verification` can use `satisfiedBy` relations (to link to test implementations). Other verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
+4. **evidence-backed verification special cases**: Among verification types, `test-verification` and `formal-proof-verification` can use `satisfiedBy` relations. `test-verification` links to test implementations. `formal-proof-verification` links to formal proof artifacts, model-checking artifacts, theorem files, generated fixtures, or proof reports. Other verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
 
-5. **other type conservative**: Elements with type `other` can only use `trace` relations to maintain flexibility while avoiding semantic conflicts.
+5. **formal-proof-verification evidence**: `formal-proof-verification` represents verification by formal proof, model checking, theorem proving, or other mathematically structured evidence. It verifies requirements through the same `verify`/`verifiedBy` relation family as other verification types and is expected to have at least one `satisfiedBy` artifact demonstrating the proof or generated evidence.
+
+6. **other type conservative**: Elements with type `other` can only use `trace` relations to maintain flexibility while avoiding semantic conflicts.
