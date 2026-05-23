@@ -42,7 +42,10 @@ This is the UPDATED feature A with new content.
 New details section added.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature Test Crud Override Specifications Requirements Md](#test-feature-test-crud-override-specifications-requirements-md)
 '
 
 set +e
@@ -88,7 +91,10 @@ DUPLICATE_ELEMENT='### Feature A
 This is a duplicate.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature Test Crud Override Specifications Requirements Md](#test-feature-test-crud-override-specifications-requirements-md)
 '
 
 set +e
@@ -161,7 +167,10 @@ DRYRUN_ELEMENT='### Feature A
 Attempted override that would orphan Feature B.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature Test Crud Override Specifications Requirements Md](#test-feature-test-crud-override-specifications-requirements-md)
 '
 
 set +e

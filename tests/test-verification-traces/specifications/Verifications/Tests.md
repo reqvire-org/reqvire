@@ -58,7 +58,7 @@ This analysis verifies security requirements through code review.
   * type: analysis-verification
 
 #### Relations
-  * verify: [Data Protection](../UserRequirements.md#data-protection)
+  * verify: [Data Protection](../Features.md#data-protection)
 
 ---
 

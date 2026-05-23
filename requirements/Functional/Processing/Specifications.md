@@ -27,7 +27,7 @@ Provide reviewers with a high-level scope summary by finding the per-branch lowe
 - Circular references: maintain visited set to prevent infinite loops
 
 **Output:**
-- Text: `### Impact Scope` section with bulleted list of scope root requirements with links
+- Text: `### Impact Scope` section with bulleted list of impacted feature or requirement scope roots with links
 - JSON: `"impact_scope"` array of objects with `name` and `element_id` fields
 
 #### Metadata
@@ -39,11 +39,12 @@ Provide reviewers with a high-level scope summary by finding the per-branch lowe
 Rules for determining verification status of parent requirements based on child verification.
 
 #### Details
-**Roll-up Rules:**
-- When a requirement has children (through derivedFrom relations), it is considered verified if ALL of its child requirements are verified, regardless of whether the parent has direct verifiedBy relations
-- When a requirement has no children (leaf requirement), it is considered verified if it has direct verifiedBy relations
-- A parent with any unverified child is expected to be marked as unverified (❌), even if the parent itself has direct verification
-- Verification status rolls up from leaf requirements through the entire parent chain to root requirements
+Canonical verification roll-up rules, evidence-backed verification semantics, and feature coverage states are defined by the Reqvire verification rollup ontology.
+
+Implementation behavior:
+- Coverage and trace outputs shall compute requirement verification state from the requirement hierarchy and direct `verifiedBy`/`verify` evidence.
+- Parent requirement state shall be computed from child requirement state according to the roll-up contract.
+- Feature coverage state shall be computed from requirements that specify the feature, child requirement roll-up, and descendant feature coverage.
 
 **Applicability:**
 This strategy applies to all verification matrices, coverage reports, and trace outputs.
@@ -54,11 +55,11 @@ This strategy applies to all verification matrices, coverage reports, and trace 
 
 ### Verification Trace Tree Construction
 
-Algorithm for building upward trace trees from verification elements to root requirements.
+Algorithm for building upward trace trees from verification elements to owning feature roots.
 
 #### Details
 **Purpose:**
-Build a tree structure showing how verifications trace upward through the requirement hierarchy to root requirements. Used for trace reports, redundancy detection, and coverage analysis.
+Build a tree structure showing how verifications trace upward through the requirement hierarchy and owning feature context. Used for trace reports, redundancy detection, and coverage analysis.
 
 **Algorithm Steps:**
 
@@ -69,9 +70,10 @@ Build a tree structure showing how verifications trace upward through the requir
  - Follow `verify` relations to get target requirements
  - Mark these as "directly verified" in the tree
 
-3. **Traverse upward through derivedFrom**
+3. **Traverse upward through specify and derivedFrom**
  - For each requirement, follow `derivedFrom` relations to parent requirements
- - Continue recursively until reaching root requirements (no parents)
+ - Follow `specify` to the owning feature when the requirement root is reached
+ - Continue recursively through feature `derivedFrom` until reaching a feature root
 
 4. **Build tree structure**
  - Preserve all paths (a requirement may be reached through multiple children)

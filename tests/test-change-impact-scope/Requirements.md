@@ -2,10 +2,10 @@
 
 ### Branch A
 
-The system shall provide branch A functionality.
+Branch A feature scope.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 ---
 
@@ -14,7 +14,7 @@ The system shall provide branch A functionality.
 The system shall implement leaf A1 feature.
 
 #### Relations
-  * derivedFrom: [Branch A](#branch-a)
+  * specify: [Branch A](#branch-a)
 
 ---
 
@@ -23,16 +23,16 @@ The system shall implement leaf A1 feature.
 The system shall implement leaf A2 feature.
 
 #### Relations
-  * derivedFrom: [Branch A](#branch-a)
+  * specify: [Branch A](#branch-a)
 
 ---
 
 ### Branch B
 
-The system shall provide branch B functionality.
+Branch B feature scope.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 ---
 
@@ -41,7 +41,16 @@ The system shall provide branch B functionality.
 The system shall implement leaf B1 feature.
 
 #### Relations
-  * derivedFrom: [Branch B](#branch-b)
+  * specify: [Branch B](#branch-b)
+
+---
+
+### Standalone Feature
+
+Standalone feature scope.
+
+#### Metadata
+  * type: feature
 
 ---
 
@@ -49,7 +58,7 @@ The system shall implement leaf B1 feature.
 
 The system shall provide standalone functionality.
 
-#### Metadata
-  * type: user-requirement
+#### Relations
+  * specify: [Standalone Feature](#standalone-feature)
 
 ---

@@ -1,16 +1,22 @@
-**Total Elements**: 1
-**Total Relations**: 14
+**Total Elements**: 2
+**Total Relations**: 17
 **Direction**: Forward
 
-## [Model Structure Exploration](specifications/UserRequirements.md#model-structure-exploration)
+## [Model Command Ontology](specifications/Ontologies.md#model-command-ontology)
 
-**Type**: user-requirement
-**File**: [specifications/UserRequirements.md](specifications/UserRequirements.md)
+**Type**: ontology
+**File**: [specifications/Ontologies.md](specifications/Ontologies.md)
+
+## [Test Feature Test Model Command Specifications Features Md](specifications/Features.md#test-feature-test-model-command-specifications-features-md)
+
+**Type**: feature
+**File**: [specifications/Features.md](specifications/Features.md)
 
 ```mermaid
-graph LR
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+graph TD
+  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
@@ -18,10 +24,18 @@ graph LR
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
+    subgraph 52b96646352f3ec7["📄 Features.md"]
+      1ef18bbc2a9e2de["Model Structure Exploration"];
+      class 1ef18bbc2a9e2de systemRequirement;
+      click 1ef18bbc2a9e2de "specifications/Features.md#model-structure-exploration";
+      cc4f0d848ef4201f["Test Feature Test Model Command Specifications Features Md<br/>📎 specifications/Ontologies.md#model-command-ontology"];
+      class cc4f0d848ef4201f feature;
+      click cc4f0d848ef4201f "specifications/Features.md#test-feature-test-model-command-specifications-features-md";
+    end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
-      6208b4add030277e["Default Root Filtering"];
-      class 6208b4add030277e systemRequirement;
-      click 6208b4add030277e "specifications/SystemRequirements.md#default-root-filtering";
+      f352ca56d3ce0fdd["Default Model Roots"];
+      class f352ca56d3ce0fdd systemRequirement;
+      click f352ca56d3ce0fdd "specifications/SystemRequirements.md#default-model-roots";
       f7eb2f9d9cd7bb11["Forward Relation Traversal"];
       class f7eb2f9d9cd7bb11 systemRequirement;
       click f7eb2f9d9cd7bb11 "specifications/SystemRequirements.md#forward-relation-traversal";
@@ -37,11 +51,9 @@ graph LR
       836c732a54d7f48f["Model Filtering Capability"];
       class 836c732a54d7f48f systemRequirement;
       click 836c732a54d7f48f "specifications/SystemRequirements.md#model-filtering-capability";
-    end
-    subgraph 6e2c14866f0b0117["📄 UserRequirements.md"]
-      906507e3072a273["Model Structure Exploration"];
-      class 906507e3072a273 userRequirement;
-      click 906507e3072a273 "specifications/UserRequirements.md#model-structure-exploration";
+      28d69f5dca868721["Pure Mermaid Output Format"];
+      class 28d69f5dca868721 systemRequirement;
+      click 28d69f5dca868721 "specifications/SystemRequirements.md#pure-mermaid-output-format";
     end
   end
   subgraph 9f0649e759bd2822["📁 specifications/Verifications"]
@@ -66,16 +78,18 @@ graph LR
       click fb891ab92c9824aa "specifications/Verifications/Tests.md#reverse-traversal-test";
     end
   end
-  906507e3072a273 -->|derive| 25879bdc5e196bec;
+  cc4f0d848ef4201f -->|specifiedBy| 1ef18bbc2a9e2de;
+  1ef18bbc2a9e2de -->|derive| 25879bdc5e196bec;
   25879bdc5e196bec -->|verifiedBy| 2f7b3b3deb29891d;
-  906507e3072a273 -->|derive| b7ec4bb3813f1dea;
+  1ef18bbc2a9e2de -->|derive| b7ec4bb3813f1dea;
   b7ec4bb3813f1dea -->|derive| 5abb4a3caae293d9;
   b7ec4bb3813f1dea -->|derive| 836c732a54d7f48f;
-  836c732a54d7f48f -->|derive| 6208b4add030277e;
-  6208b4add030277e -->|verifiedBy| a2368d1b4b67f0d7;
+  836c732a54d7f48f -->|derive| f352ca56d3ce0fdd;
+  f352ca56d3ce0fdd -->|verifiedBy| a2368d1b4b67f0d7;
   836c732a54d7f48f -->|derive| f7eb2f9d9cd7bb11;
   f7eb2f9d9cd7bb11 -->|verifiedBy| 293200814c46cd0d;
   f7eb2f9d9cd7bb11 -->|verifiedBy| fb891ab92c9824aa;
   836c732a54d7f48f -->|verifiedBy| bbd610799ac8e00f;
   b7ec4bb3813f1dea -->|verifiedBy| 6e0e2613c4bfcfcb;
+  1ef18bbc2a9e2de -->|derive| 28d69f5dca868721;
 ```

@@ -1,35 +1,46 @@
 # Elements
 
-### User Requirement Parent
 
-A top-level user requirement.
+### Test Feature Test Element Type Relation Compatibility Valid Cases Specifications
 
-#### Metadata
-  * type: user-requirement
-
----
-
-### User Requirement Child
-
-User requirement deriving from another user requirement.
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
-
+  * type: feature
 ---
 
-### System Requirement from User Req
+### Feature Parent
 
-System requirement deriving from user requirement.
+A top-level feature.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-cases-specifications)
+---
+
+### Feature Child
+
+User requirement deriving from another feature.
+
+#### Metadata
+  * type: requirement
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-cases-specifications)
+  * derivedFrom: [Feature Parent](#feature-parent)
+
+---
+
+### System Requirement from User Req
+
+System requirement deriving from feature.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature Parent](#feature-parent)
 
 ---
 
@@ -53,7 +64,7 @@ Requirement satisfied by implementation file.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * derivedFrom: [Feature Parent](#feature-parent)
   * satisfiedBy: [impl.rs](impl.rs)
 
 ---
@@ -66,7 +77,7 @@ Test verification can use satisfiedBy.
   * type: test-verification
 
 #### Relations
-  * verify: [User Requirement Parent](#user-requirement-parent)
+  * verify: [Feature Parent](#feature-parent)
   * satisfiedBy: [test.sh](test.sh)
 
 ---
@@ -79,7 +90,7 @@ Requirement verified by test verification.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * derivedFrom: [Feature Parent](#feature-parent)
   * verifiedBy: [Test Verification with SatisfiedBy](#test-verification-with-satisfiedby)
 
 ---
@@ -92,7 +103,7 @@ Requirement verified by analysis verification.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * derivedFrom: [Feature Parent](#feature-parent)
   * verifiedBy: [Analysis Verification](#analysis-verification)
 
 ---
@@ -105,7 +116,7 @@ Analysis verification verifying a requirement.
   * type: analysis-verification
 
 #### Relations
-  * verify: [User Requirement Parent](#user-requirement-parent)
+  * verify: [Feature Parent](#feature-parent)
 
 ---
 
@@ -117,7 +128,7 @@ Inspection verification verifying a requirement.
   * type: inspection-verification
 
 #### Relations
-  * verify: [User Requirement Parent](#user-requirement-parent)
+  * verify: [Feature Parent](#feature-parent)
 
 ---
 
@@ -129,7 +140,7 @@ Demonstration verification verifying a requirement.
   * type: demonstration-verification
 
 #### Relations
-  * verify: [User Requirement Parent](#user-requirement-parent)
+  * verify: [Feature Parent](#feature-parent)
 
 ---
 
@@ -168,7 +179,7 @@ Requirement that asks for behavior definition, refined by a behavior element.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * derivedFrom: [Feature Parent](#feature-parent)
   * refinedBy: [Behavior Element](#behavior-element)
 
 ---
@@ -181,7 +192,7 @@ Requirement that asks for specification, refined by a specification element.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * derivedFrom: [Feature Parent](#feature-parent)
   * refinedBy: [Specification Element](#specification-element)
 
 ---
@@ -194,7 +205,7 @@ Requirement that asks for constraint definition, refined by a constraint element
   * type: requirement
 
 #### Relations
-  * derivedFrom: [User Requirement Parent](#user-requirement-parent)
+  * derivedFrom: [Feature Parent](#feature-parent)
   * refinedBy: [Constraint Element](#constraint-element)
 
 ---

@@ -5,11 +5,11 @@
 The system shall provide command line interface (CLI) to faciliate model management.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [CLI Interface Structure](CLI/Commands.md#cli-interface-structure)
-  * derivedFrom: [System Model Interfaces](../UserStories.md#system-model-interfaces)
+  * specify: [Command-Line Interface](../Features/Interfaces.md#command-line-interface)
 ---
 
 ### Web Interface
@@ -20,12 +20,12 @@ The system SHALL provide a web-based interface to browse the System model docume
 Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [HTML Export](WebInterface/Features.md#html-export)
   * derive: [Serve Command](WebInterface/Features.md#serve-command)
-  * derivedFrom: [System Model Interfaces](../UserStories.md#system-model-interfaces)
+  * specify: [Web Documentation Interface](../Features/Interfaces.md#web-documentation-interface)
   * refinedBy: [Web Interface Refinement Specification](WebInterface/Specifications.md#web-interface-refinement-specification)
 ---
 
@@ -40,7 +40,7 @@ The system shall provide a Model Context Protocol interface for external tools, 
 - The MCP interface shall avoid becoming a client-specific abstraction.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [MCP Protocol Standard Conformance](MCP/Tools.md#mcp-protocol-standard-conformance)
@@ -62,6 +62,6 @@ The system shall provide a Model Context Protocol interface for external tools, 
   * derive: [MCP Resource Interface](MCP/Tools.md#mcp-resource-interface)
   * derive: [MCP Compatibility Versioning](MCP/Tools.md#mcp-compatibility-versioning)
   * derive: [MCP Access Control Baseline](MCP/Tools.md#mcp-access-control-baseline)
-  * derivedFrom: [System Model Interfaces](../UserStories.md#system-model-interfaces)
+  * specify: [MCP Tool Interface](../Features/Interfaces.md#mcp-tool-interface)
   * refinedBy: [MCP Interface Boundary Specification](MCP/Specifications.md#mcp-interface-boundary-specification)
 ---

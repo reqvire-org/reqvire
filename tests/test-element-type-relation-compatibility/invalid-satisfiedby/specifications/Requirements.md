@@ -1,12 +1,23 @@
 # Elements
 
-### Target User Requirement
 
-A user requirement for testing.
+### Test Feature Test Element Type Relation Compatibility Invalid Satisfiedby Specifications
+
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
 
+### Target Feature
+
+A feature for testing.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-satisfiedby-specifications)
 ---
 
 ### Target Test Verification
@@ -17,7 +28,7 @@ A test verification element.
   * type: test-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
 
 ---
 
@@ -29,7 +40,7 @@ INVALID: Analysis verification cannot use satisfiedBy (only test-verification ca
   * type: analysis-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
   * satisfiedBy: [analysis-doc.txt](analysis-doc.txt)
 
 ---
@@ -42,7 +53,7 @@ INVALID: Inspection verification cannot use satisfiedBy.
   * type: inspection-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
   * satisfiedBy: [inspection-checklist.txt](inspection-checklist.txt)
 
 ---
@@ -55,19 +66,19 @@ INVALID: Demonstration verification cannot use satisfiedBy.
   * type: demonstration-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
   * satisfiedBy: [demo-script.sh](demo-script.sh)
 
 ---
 
-### User Requirement with SatisfiedBy
+### Feature with SatisfiedBy
 
 INVALID: User requirements cannot use satisfiedBy.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-satisfiedby-specifications)
   * satisfiedBy: [impl.txt](impl.txt)
 
 ---
@@ -80,8 +91,8 @@ INVALID: satisfiedBy must point to implementation file, not another requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
-  * satisfiedBy: [Target User Requirement](#target-user-requirement)
+  * derivedFrom: [Target Feature](#target-feature)
+  * satisfiedBy: [Target Feature](#target-feature)
 
 ---
 
@@ -93,7 +104,7 @@ INVALID: satisfiedBy must point to implementation file, not another verification
   * type: test-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
   * satisfiedBy: [Target Test Verification](#target-test-verification)
 
 ---
@@ -103,7 +114,7 @@ INVALID: satisfiedBy must point to implementation file, not another verification
 INVALID: Other type can only use trace relations.
 
 #### Metadata
-  * type: other
+  * type: other-other
 
 #### Relations
   * satisfiedBy: [impl.txt](impl.txt)

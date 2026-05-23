@@ -22,12 +22,7 @@ Automated tools should flag all impacted requirements for review.
 
 ### Relation Categories for Change Propagation
 
-For change propagation purposes, relations can be categorized into several groups:
-
-1. **Hierarchical Relations** - Changes propagate from parent to child elements (derivedFrom)
-2. **Satisfaction Relations** - Changes to requirements affect implementations (satisfiedBy)
-3. **Verification Relations** - Changes to requirements invalidate verifications (verifiedBy)
-4. **Traceability Relations** - No change propagation, for documentation only (trace)
+Change propagation relation categories are defined by the Reqvire relation and change-impact ontologies. This design document applies those categories when computing impacted elements and review scope.
 
 ---
 
@@ -52,7 +47,7 @@ When a requirement changes, impact analysis must be conducted based on its relat
 
 1. **Diff Analysis**:
    - Compare elements between versions using stable Element IDs (not location-based identifiers)
-   - Identify changes by type:
+   - Identify changes using the change-kind vocabulary defined by the Reqvire change impact ontology:
      - **Content Changes**: Element ID exists in both versions, content hash differs
      - **Additions**: Element ID exists only in current version
      - **Removals**: Element ID exists only in previous version
@@ -94,7 +89,7 @@ When a requirement changes, impact analysis must be conducted based on its relat
 
 5. **Impact Classification**:
    - Assign impact severity levels based on relation types
-   - Classify changes as:
+   - Classify changes using the impact-classification vocabulary defined by the Reqvire change impact ontology:
      - Direct: Changes to the element itself
      - Indirect: Changes propagated from related elements
      - Potential: Changes that might affect an element based on semantic analysis

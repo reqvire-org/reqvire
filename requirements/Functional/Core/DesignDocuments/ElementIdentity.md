@@ -14,6 +14,8 @@
 
 The system maintains two distinct concepts for element identification:
 
+Element identity and addressing concepts are defined by the Reqvire core element ontology. This design document specifies how the parser and change-detection implementation apply those concepts.
+
 ### Element ID
 
 An **Element ID** is a stable unique identifier for element identity:
@@ -61,6 +63,8 @@ An **Element Identifier** is a location-based reference for addressing:
 ## Implicit Containment Model
 
 Element location is tracked separately from element identity:
+
+Element location is a core ontology concept used by parser and report behavior; it is not an authored relation family.
 
 - **file_path field**: Records which file contains the element (implicit file containment)
 - **No explicit relations**: Containment is not expressed as relations in the Relations subsection

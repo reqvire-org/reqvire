@@ -1,4 +1,4 @@
-Found 7 file(s) with formatting changes:
+Found 9 file(s) with formatting changes:
 
 📄 AttachmentTest.md
   01     # Elements
@@ -21,40 +21,91 @@ Found 7 file(s) with formatting changes:
 
 
 📄 Behaviors.md
-  01     # Elements
+  01 -   # Elements
+  01 +   # Elements
   02
+  03 -   ␤
+  03 -   ### Test Feature Test Advanced Format Behaviors Md
+  03 -   ␤
+  03 -   Test feature root for migrated requirement fixtures.
+  03 -   ␤
+  03 -   #### Metadata
+  03 -     * type: feature
+  03 -   ---
+  03 -   ␤
   03     ### Behavior Owner
+  04
+  05     Owner for the behavior element (separate hierarchy).
+  06
+  07     #### Metadata
+  08       * type: requirement
+  09 +   ␤
+  10     #### Relations
+  11 -     * specify: [Test Feature](#test-feature-test-advanced-format-behaviors-md)
+  11       * refinedBy: [My Test Behavior](#my-test-behavior)
+  12 +     * specify: [Test Feature Test Advanced Format Behaviors Md](#test-feature-test-advanced-format-behaviors-md)
+  13     ---
+  14
+  15     ### My Test Behavior
 
-  17
-  18     #### Metadata
-  19       * type: behavior
-  20 -   ␤
-  20     ---
+  18
+  19     #### Metadata
+  20       * type: behavior
+  21 +   ---
+  22
+  23 +   ### Test Feature Test Advanced Format Behaviors Md
+  24 +   ␤
+  25 +   Test feature root for migrated requirement fixtures.
+  26 +   ␤
+  27 +   #### Metadata
+  28 +     * type: feature
+  29     ---
 
 
 
 📄 MOEs.md
   01     # Elements
-  02 -   ### MOE_UA
-  02 -   User adoption measure.
   02 +   ### MOE_CE
   03
+  04 -   ### Test Feature Test Advanced Format Moes Md
   04 +   Cost effectiveness measure.
-  05 +   ␤
-  06     #### Metadata
-  07       * type: user-requirement
-  08 +   ---
-  09
-  10 -   ### MOE_CE
-  10 -   Cost effectiveness measure.
-  10 +   ### MOE_UA
-  11
-  12 +   User adoption measure.
-  13 +   ␤
-  14     #### Metadata
-  15       * type: user-requirement
-  16 +   ---
-  17
+  05
+  06 -   Test feature root for migrated requirement fixtures.
+  06 +   #### Metadata
+  07 +     * type: requirement
+  08
+  09 -   #### Metadata
+  09 -     * type: feature
+  09 +   #### Relations
+  10 +     * specify: [Test Feature Test Advanced Format Moes Md](#test-feature-test-advanced-format-moes-md)
+  11     ---
+  12
+  13     ### MOE_UA
+  14 +   ␤
+  15     User adoption measure.
+  16
+  17     #### Metadata
+  18       * type: requirement
+  19
+  20     #### Relations
+  21 -     * specify: [Test Feature](#test-feature-test-advanced-format-moes-md)
+  21 -   ### MOE_CE
+  21 -   Cost effectiveness measure.
+  21 +     * specify: [Test Feature Test Advanced Format Moes Md](#test-feature-test-advanced-format-moes-md)
+  22 +   ---
+  23
+  24 +   ### Test Feature Test Advanced Format Moes Md
+  25 +   ␤
+  26 +   Test feature root for migrated requirement fixtures.
+  27 +   ␤
+  28     #### Metadata
+  29 -     * type: requirement
+  29 +     * type: feature
+  30 +   ---
+  31
+  32 -   #### Relations
+  32 -     * specify: [Test Feature](#test-feature-test-advanced-format-moes-md)
+  32 -   ␤
 
 
 
@@ -117,164 +168,302 @@ Found 7 file(s) with formatting changes:
 
 📄 TestNoHeaders.md
   01     # Elements
-  02 -   ### Element Without Section
   02 +   ### Another Element
   03
-  04 -   This element has no page header and no section header.
+  04 -   ### Test Feature Test Advanced Format Testnoheaders Md
   04 +   Content here.
   05
-  06     #### Metadata
-  07       * type: user-requirement
-  08     ---
-  09 -   ### Another Element
-  09 +   ### Element Without Section
-  10
-  11 -   Content here.
-  11 +   This element has no page header and no section header.
+  06 -   Test feature root for migrated requirement fixtures.
+  06 +   #### Metadata
+  07 +     * type: requirement
+  08
+  09 -   #### Metadata
+  09 -     * type: feature
+  09 +   #### Relations
+  10 +     * specify: [Test Feature Test Advanced Format Testnoheaders Md](#test-feature-test-advanced-format-testnoheaders-md)
+  11     ---
   12
-  13     #### Metadata
-  14       * type: user-requirement
+  13     ### Element Without Section
 
+  18       * type: requirement
+  19
+  20     #### Relations
+  21 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnoheaders-md)
+  21 +     * specify: [Test Feature Test Advanced Format Testnoheaders Md](#test-feature-test-advanced-format-testnoheaders-md)
+  22     ---
+  23 -   ### Another Element
+  23 +   ### Test Feature Test Advanced Format Testnoheaders Md
+  24
+  25 -   Content here.
+  25 +   Test feature root for migrated requirement fixtures.
+  26
+  27     #### Metadata
+  28 -     * type: requirement
+  28 +     * type: feature
+  29 +   ---
+  30
+  31 -   #### Relations
+  31 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnoheaders-md)
+  31 -   ---
+
+
+
+📄 TestNoPageHeader.md
+  01 -   # Elements
+  01 +   # Elements
+  02
+  03 -   ␤
+  03 -   ### Test Feature Test Advanced Format Testnopageheader Md
+  03 -   ␤
+  03 -   Test feature root for migrated requirement fixtures.
+  03 -   ␤
+  03 -   #### Metadata
+  03 -     * type: feature
+  03 -   ---
+  03 -   ␤
+  03     ### Element Alpha
+  04
+  05     This file has section header but no page header.
+
+  08       * type: requirement
+  09
+  10     #### Relations
+  11 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnopageheader-md)
+  11 +     * specify: [Test Feature Test Advanced Format Testnopageheader Md](#test-feature-test-advanced-format-testnopageheader-md)
+  12     ---
+  13
+  14     ### Element Beta
+
+  19       * type: requirement
+  20
+  21     #### Relations
+  22 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnopageheader-md)
+  22 +     * specify: [Test Feature Test Advanced Format Testnopageheader Md](#test-feature-test-advanced-format-testnopageheader-md)
+  23     ---
+  24 +   ␤
+  25 +   ### Test Feature Test Advanced Format Testnopageheader Md
+  26 +   ␤
+  27 +   Test feature root for migrated requirement fixtures.
+  28 +   ␤
+  29 +   #### Metadata
+  30 +     * type: feature
+  31 +   ---
+  32 +   ␤
+
+
+
+📄 TestNoSectionHeader.md
+  01 -   # Elements
+  01 +   # Elements
+  02
+  03 -   ␤
+  03 -   ### Test Feature Test Advanced Format Testnosectionheader Md
+  03 -   ␤
+  03 -   Test feature root for migrated requirement fixtures.
+  03 -   ␤
+  03 -   #### Metadata
+  03 -     * type: feature
+  03 -   ---
+  03 -   ␤
+  03     ### Element One
+  04
+  05     This file has page header but no section header.
+
+  08       * type: requirement
+  09
+  10     #### Relations
+  11 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnosectionheader-md)
+  11 +     * specify: [Test Feature Test Advanced Format Testnosectionheader Md](#test-feature-test-advanced-format-testnosectionheader-md)
+  12     ---
+  13
+  14     ### Element Two
+
+  19       * type: requirement
+  20
+  21     #### Relations
+  22 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnosectionheader-md)
+  22 +     * specify: [Test Feature Test Advanced Format Testnosectionheader Md](#test-feature-test-advanced-format-testnosectionheader-md)
+  23     ---
+  24 +   ␤
+  25 +   ### Test Feature Test Advanced Format Testnosectionheader Md
+  26 +   ␤
+  27 +   Test feature root for migrated requirement fixtures.
+  28 +   ␤
+  29 +   #### Metadata
+  30 +     * type: feature
+  31 +   ---
+  32 +   ␤
 
 
 
 📄 UserStories.md
   001     # Elements
-  002
-  003     Personas:
-
-  005     2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
-  006     3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
-  007     4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
-  008 +   ### Details Block Formatting Test
-  009
-  010 -   ### Managing MBSE Models
-  010 +   Element with details block that should not be formatted.
-  011 +   <details>
-  012 +   <summary>Click to expand</summary>
+  002 +   ### Details Block Formatting Test
+  003
+  004 -   ### Test Feature Test Advanced Format Userstories Md
+  004 +   Element with details block that should not be formatted.
+  005 +   <details>
+  006 +   <summary>Click to expand</summary>
+  007
+  008 -   Test feature root for migrated requirement fixtures.
+  008 +   #### This Should Not Get Blank Line
+  009 +   Content inside details block.
+  010 +   ####Another Header Without Space
+  011 +   More content that should remain untouched.
+  012 +   </details>
   013
-  014 -   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
-  014 +   #### This Should Not Get Blank Line
-  015 +   Content inside details block.
-  016 +   ####Another Header Without Space
-  017 +   More content that should remain untouched.
-  018 +   </details>
-  019
-  020     #### Metadata
-  021       * type: user-requirement
-  022 +   ---
-  023
-  024 -   #### Relations
-  024 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  024 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
-  024 +   ### Exact Blank Line Count Test
-  025
-  026 +   Test that exactly one blank line is added before Metadata when repositioned.
-  027 +   Content line 1.
-  028 +   Content line 2.
-  029 +   Content line 3.
-  030 +   ␤
-  031 +   #### Details
-  032 +   Detail content here.
-  033 +   ␤
-  034 +   #### Metadata
-  035 +     * type: test-verification
-  036 +     * implementation-status: implemented
-  037 +   ---
-  038 +   ␤
-  039     ### Generate Diagrams
-  040 +   ␤
-  041     As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
-  042
-  043     #### Metadata
-  044       * type: user-requirement
-  045
-  046     #### Relations
-  047 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  047 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  048 +   ---
-  049
-  050 -   ---
-  050 +   ### Managing MBSE Models
-  051
-  052 -   ### Missing Blank Line Test
-  052 -   This element has content but no blank line before metadata.
-  052 +   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
-  053 +   ␤
-  054     #### Metadata
-  055       * type: user-requirement
-  056 +   #### Relations
-  057 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
-  058 +     * trace: [MOE_UA](MOEs.md#moe_ua)
-  059     ---
-  060
-  061     ### Metadata Repositioning Test
-  062
-  063     Verify that metadata repositioning maintains blank line spacing.
-  064 -   #### Metadata
-  064 -     * type: verification
-  064 -     * implementation-status: implemented
+  014     #### Metadata
+  015 -     * type: feature
+  015 +     * type: requirement
+  016 +   ␤
+  017 +   #### Relations
+  018 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  019     ---
+  020 -   Personas:
+  020 -   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
+  020 -   2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
+  020 -   3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
+  020 -   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  020 +   ### Exact Blank Line Count Test
+  021
+  022 +   Test that exactly one blank line is added before Metadata when repositioned.
+  023 +   Content line 1.
+  024 +   Content line 2.
+  025 +   Content line 3.
+  026
+  027 -   ### Managing MBSE Models
+  027 +   #### Details
+  028 +   Detail content here.
+  029
+  030 -   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
+  030 -   ␤
+  030     #### Metadata
+  031 -     * type: requirement
+  031 -   #### Relations
+  031 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
+  031 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  031 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
+  031 +     * type: test-verification
+  032 +     * implementation-status: implemented
+  033 +   ---
+  034
+  035     ### Generate Diagrams
+  036 +   ␤
+  037     As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
+  038
+  039     #### Metadata
+  040       * type: requirement
+  041 +   ␤
+  042     #### Relations
+  043 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
+  043 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
+  043 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  044 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  045 +   ---
+  046
+  047 -   ---
+  047 +   ### Managing MBSE Models
+  048
+  049 -   ### Missing Blank Line Test
+  049 -   This element has content but no blank line before metadata.
+  049 +   As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
+  050 +   ␤
+  051     #### Metadata
+  052       * type: requirement
+  053
+  054     #### Relations
+  055 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
+  055 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
+  056 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  057 +     * trace: [MOE_UA](MOEs.md#moe_ua)
+  058     ---
+  059
+  060     ### Metadata Repositioning Test
+  061
+  062     Verify that metadata repositioning maintains blank line spacing.
+  063 -   #### Metadata
+  063 -     * type: verification
+  063 -     * implementation-status: implemented
+  063 -   ␤
+  063     #### Details
   064 -   ␤
-  064     #### Details
-  065 -   ␤
-  065     This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
-  066
-  067     ##### Acceptance Criteria
-  068 -   ␤
-  068       * [ ] Metadata is moved to end position
-  069       * [ ] Blank line exists before metadata after repositioning
-  070       * [ ] Content structure is preserved
-  071 +   #### Metadata
-  072 +     * type: test-verification
-  073 +     * implementation-status: implemented
-  074     ---
-  075 -   ### Details Block Formatting Test
-  075 +   ### Missing Blank Line Test
-  076
-  077 -   Element with details block that should not be formatted.
-  077 -   <details>
-  077 -   <summary>Click to expand</summary>
-  077 +   This element has content but no blank line before metadata.
-  078
-  079 -   #### This Should Not Get Blank Line
-  079 -   Content inside details block.
-  079 -   ####Another Header Without Space
-  079 -   More content that should remain untouched.
-  079 -   </details>
-  079     #### Metadata
-  080       * type: user-requirement
-  081 -   ␤
-  081     ---
-  082 -   ### Exact Blank Line Count Test
-  082 -   ␤
-  082 -   Test that exactly one blank line is added before Metadata when repositioned.
-  082 -   Content line 1.
-  082 -   Content line 2.
-  082 -   Content line 3.
-  082 -   #### Metadata
-  082 -     * type: verification
-  082 -     * implementation-status: implemented
-  082 -   #### Details
-  082 -   Detail content here.
-  082 -   ␤
-  082 -   ---
-  082 -   ␤
-  082     ### Root User Requirement
-  083
-  084     Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+  064     This test verifies that when metadata is repositioned from early position to end position, a blank line is properly added before the metadata section.
+  065
+  066     ##### Acceptance Criteria
+  067 -   ␤
+  067       * [ ] Metadata is moved to end position
+  068       * [ ] Blank line exists before metadata after repositioning
+  069       * [ ] Content structure is preserved
+  070 +   #### Metadata
+  071 +     * type: test-verification
+  072 +     * implementation-status: implemented
+  073     ---
+  074 -   ### Details Block Formatting Test
+  074 +   ### Missing Blank Line Test
+  075
+  076 -   Element with details block that should not be formatted.
+  076 -   <details>
+  076 -   <summary>Click to expand</summary>
+  076 +   This element has content but no blank line before metadata.
+  077
+  078 -   #### This Should Not Get Blank Line
+  078 -   Content inside details block.
+  078 -   ####Another Header Without Space
+  078 -   More content that should remain untouched.
+  078 -   </details>
+  078     #### Metadata
+  079       * type: requirement
+  080
+  081     #### Relations
+  082 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
+  082 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  083     ---
+  084 -   ### Exact Blank Line Count Test
+  084 -   ␤
+  084 -   Test that exactly one blank line is added before Metadata when repositioned.
+  084 -   Content line 1.
+  084 -   Content line 2.
+  084 -   Content line 3.
+  084 -   #### Metadata
+  084 -     * type: verification
+  084 -     * implementation-status: implemented
+  084 -   #### Details
+  084 -   Detail content here.
+  084 -   ␤
+  084 -   ---
+  084 -   ␤
+  084     ### Root Feature
   085
-  086     #### Metadata
-  087       * type: user-requirement
-  088 -   ␤
-  088     ---
-  089
-  090     ### External URL Preservation Test
+  086     Top-level feature used as hierarchy parent for system requirements in this fixture.
 
-  097     #### Relations
-  098       * derivedFrom: [Root User Requirement](#root-user-requirement)
-  099       * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
-  100 -   ␤
-  100     ---
+  089       * type: requirement
+  090
+  091     #### Relations
+  092 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
+  092 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  093     ---
+  094
+  095     ### External URL Preservation Test
+
+  102     #### Relations
+  103       * derivedFrom: [Root Feature](#root-feature)
+  104       * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
+  105 +   ---
+  106
+  107 +   ### Test Feature Test Advanced Format Userstories Md
+  108 +   ␤
+  109 +   Test feature root for migrated requirement fixtures.
+  110 +   ␤
+  111 +   ␤
+  112 +   Personas:
+  113 +   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
+  114 +   2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
+  115 +   3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
+  116 +   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
+  117 +   ␤
+  118 +   #### Metadata
+  119 +     * type: feature
+  120     ---
 
 
 

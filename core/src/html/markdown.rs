@@ -216,7 +216,8 @@ fn generate_d3_tree_html(json_data: &str) -> String {
     const colors = {{
         "folder": "#9E9E9E",
         "file": "#B8860B",
-        "user-requirement": "#7E57C2",
+        "feature": "#BBDEFB",
+        "ontology": "#B08A00",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",
         "verification": "#4CAF50",
@@ -230,7 +231,8 @@ fn generate_d3_tree_html(json_data: &str) -> String {
     const icons = {{
         "folder": "📁",
         "file": "📄",
-        "user-requirement": "👤",
+        "feature": "👤",
+        "ontology": "◉",
         "system-requirement": "📐",
         "requirement": "📐",
         "verification": "✅",
@@ -553,7 +555,8 @@ fn generate_d3_sankey_html(json_data: &str) -> String {
 
     // Colors matching Reqvire theme
     const colors = {{
-        "user-requirement": "#7E57C2",
+        "feature": "#BBDEFB",
+        "ontology": "#B08A00",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",
         "verification": "#4CAF50",
@@ -729,7 +732,8 @@ fn generate_d3_sunburst_html(json_data: &str) -> String {
         "folder": "#9E9E9E",
         "file": "#B8860B",
         "design-document": "#607D8B",
-        "user-requirement": "#7E57C2",
+        "feature": "#BBDEFB",
+        "ontology": "#B08A00",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",
         "verification": "#4CAF50",
@@ -743,7 +747,8 @@ fn generate_d3_sunburst_html(json_data: &str) -> String {
     const icons = {{
         "folder": "📁",
         "file": "📄",
-        "user-requirement": "👤",
+        "feature": "👤",
+        "ontology": "◉",
         "system-requirement": "📐",
         "requirement": "📐",
         "verification": "✅",
@@ -1066,7 +1071,8 @@ fn generate_d3_icicle_html(json_data: &str) -> String {
         "folder": "#9E9E9E",
         "file": "#B8860B",
         "design-document": "#607D8B",
-        "user-requirement": "#7E57C2",
+        "feature": "#BBDEFB",
+        "ontology": "#B08A00",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",
         "verification": "#4CAF50",
@@ -1103,7 +1109,7 @@ fn generate_d3_icicle_html(json_data: &str) -> String {
         .attr("transform", d => `translate(${{d.y0}},${{d.x0}})`);
 
     const rect = cell.append("rect")
-        .attr("width", d => d.y1 - d.y0 - 1)
+        .attr("width", d => rectWidth(d))
         .attr("height", d => rectHeight(d))
         .attr("fill", d => getColor(d.data.type))
         .attr("fill-opacity", d => d.children ? 0.8 : 0.6)
@@ -1221,6 +1227,7 @@ fn generate_d3_icicle_html(json_data: &str) -> String {
             .attr("transform", d => `translate(${{d.target.y0}},${{d.target.x0}})`);
 
         rect.transition(t)
+            .attr("width", d => rectWidth(d.target))
             .attr("height", d => rectHeight(d.target));
 
         text.transition(t)
@@ -1240,8 +1247,12 @@ fn generate_d3_icicle_html(json_data: &str) -> String {
         zoomTo(target);
     }}
 
+    function rectWidth(d) {{
+        return Math.max(0, d.y1 - d.y0 - 1);
+    }}
+
     function rectHeight(d) {{
-        return d.x1 - d.x0 - 1;
+        return Math.max(0, d.x1 - d.x0 - 1);
     }}
 
     function labelVisible(d) {{

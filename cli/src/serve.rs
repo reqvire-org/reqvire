@@ -168,6 +168,8 @@ fn content_type_for_path(path: &Path) -> &'static str {
         Some("svg") => "image/svg+xml",
         Some("css") => "text/css",
         Some("js") => "application/javascript",
+        Some("ttl") | Some("turtle") => "text/turtle; charset=utf-8",
+        Some("jsonld") => "application/ld+json",
         _ => "text/plain",
     }
 }

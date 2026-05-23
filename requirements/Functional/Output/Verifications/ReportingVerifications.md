@@ -8,14 +8,14 @@ This test verifies that the collect command aggregates content from a requiremen
 
 ##### Acceptance Criteria
 - System shall provide CLI command `collect` that aggregates content from requirement chains
-- Command shall accept requirement element name as positional argument
+- Command shall accept feature or requirement element name as positional argument
 - Command shall support `--json` flag for JSON output format
 - Command shall support `--direction` flag with values UPSTREAM (default) and DOWNSTREAM
 - When direction is UPSTREAM, command shall traverse derivedFrom relations in reverse direction (child to parents)
 - When direction is DOWNSTREAM, command shall traverse derive relations in forward direction (parent to children)
 - Command shall collect element content and attachment contents
 - Command shall output with source citations
-- Command shall reject non-requirement element types with error
+- Command shall reject element types other than feature or requirement with error
 
 ##### Test Criteria
 1. **Basic Text Output**
@@ -52,7 +52,7 @@ This test verifies that the collect command aggregates content from a requiremen
 6. **Error Handling - Non-Requirement Type**
    Command: `reqvire collect <verification-name>`
    - exits non-zero
-   - error message indicates element must be requirement type
+   - error message indicates element must be a feature or requirement type
 
 7. **Output Ordering**
    - Flat list structure
@@ -60,7 +60,7 @@ This test verifies that the collect command aggregates content from a requiremen
    - Same-depth elements sorted alphabetically by name
 
 8. **Downstream Text Output**
-   Command: `reqvire collect <root-requirement-name> --direction DOWNSTREAM`
+   Command: `reqvire collect <top-level-requirement-name> --direction DOWNSTREAM`
    - exits code **0**
    - output contains content from starting requirement (depth 0)
    - output contains content from child requirements
@@ -68,7 +68,7 @@ This test verifies that the collect command aggregates content from a requiremen
    - starting element appears first, children appear after
 
 9. **Downstream JSON Output**
-   Command: `reqvire collect <root-requirement-name> --direction DOWNSTREAM --json`
+   Command: `reqvire collect <top-level-requirement-name> --direction DOWNSTREAM --json`
    - exits code **0**
    - output parses as valid JSON
    - JSON contains `direction` field with value `downstream`
@@ -76,7 +76,7 @@ This test verifies that the collect command aggregates content from a requiremen
    - each item has correct depth reflecting distance from starting element
 
 10. **Downstream Descendant Chain Collection**
-    - Starting from root requirement
+    - Starting from top-level requirement
     - Collects content from all derive descendants
     - Starting element at depth 0
     - Same-depth elements sorted alphabetically
@@ -94,12 +94,39 @@ This test verifies that the collect command aggregates content from a requiremen
     - exits non-zero
     - error message indicates invalid direction
 
+14. **Feature/Requirement Bridge Direction**
+    - Requirement UPSTREAM includes owning feature context through `specify`
+    - Requirement DOWNSTREAM does not include feature context
+    - Feature UPSTREAM includes parent features only
+    - Feature DOWNSTREAM includes child features, requirements that specify each feature, and requirement descendants
+
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-collect-command/test.sh)
   * verify: [CLI Collect Command](../../../Interfaces/CLI/Commands.md#cli-collect-command)
+---
+
+### Feature Collect Traversal Test
+
+This test verifies collect traversal for `feature`, `requirement`, and the directional `specifiedBy`/`specify` bridge.
+
+#### Details
+Test cases:
+1. Collecting a requirement UPSTREAM includes its owning feature and feature ancestors.
+2. Collecting a requirement DOWNSTREAM includes requirement descendants only.
+3. Collecting a feature UPSTREAM includes feature ancestors only.
+4. Collecting a feature DOWNSTREAM includes child features, requirements that specify each feature, and requirement descendants.
+5. Attached ontology context is included when collecting feature context.
+6. Collecting a requirement includes ontology context inherited from the owning feature path without requiring direct requirement ontology attachments.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-collect-command/test.sh)
+  * verify: [Feature Collect Traversal](../../Core/ModelManagement.md#feature-collect-traversal)
 ---
 
 ### JSON Element Size Estimate Output Verification
@@ -198,7 +225,7 @@ This test verifies that the system correctly extracts the physical containment h
    - Verify element identifier is extracted correctly
    - Verify element name matches H3 header text
    - Verify element type from Metadata is captured
-   - Test with multiple element types (requirement, verification, user-requirement)
+   - Test with multiple element types (feature, requirement, verification)
 
 4. **Ordering verification:**
    - Verify folders are sorted alphabetically
@@ -232,6 +259,7 @@ This test verifies that the system correctly extracts the physical containment h
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
+  * verify: [Containment View Report](../Reporting.md#containment-view-report)
 ---
 
 ### Containment View Design Documents Test
@@ -310,6 +338,7 @@ This test verifies that the system generates valid, well-structured JSON output 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
+  * verify: [Containment View Report](../Reporting.md#containment-view-report)
 ---
 
 ### Containment View Mermaid Diagram Test
@@ -342,11 +371,12 @@ This test verifies that the system generates valid Mermaid flowchart diagrams wi
 
 4. **Styling:**
    - Verify `class` directives for element types
-   - Test `userRequirement` class has correct colors
-   - Test `systemRequirement` class has correct colors
-   - Test `verification` class has correct colors
+   - Test `feature` class emits `fill:#BBDEFB`, `stroke:#1976D2`, and `stroke-width:2.5px`
+   - Test `systemRequirement` class emits `fill:#E1D8EE`, `stroke:#673AB7`, and `stroke-width:1.5px`
+   - Test `verification` class emits `fill:#DCEDC8`, `stroke:#4CAF50`, and `stroke-width:2px`
    - Test `default` class for other types
    - Verify CSS class definitions are included
+   - Verify feature class styling is used consistently in containment, model, verification trace, Markdown, and HTML export diagrams
 
 5. **Clickable links:**
    - Verify `click` directives for all element nodes
@@ -382,6 +412,7 @@ This test verifies that the system generates valid Mermaid flowchart diagrams wi
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
+  * verify: [Containment View Report](../Reporting.md#containment-view-report)
 ---
 
 ### Containment View Text Output Test
@@ -403,8 +434,8 @@ This test verifies that the system generates correctly formatted human-readable 
    - Test all element types have correct bracket notation
 
 3. **Element type display:**
-   - Test `[requirement]` for system requirements
-   - Test `[user-requirement]` for user requirements
+   - Test `[requirement]` for requirements
+   - Test `[feature]` for feature elements
    - Test `[verification]` and `[test-verification]` for verifications
    - Test custom element types
 
@@ -432,6 +463,7 @@ This test verifies that the system generates correctly formatted human-readable 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
+  * verify: [Containment View Report](../Reporting.md#containment-view-report)
 ---
 
 ### Custom Element Type Tracking Test
@@ -446,7 +478,7 @@ This test verifies that the system correctly tracks and displays custom element 
 - Text output SHALL display custom types in alphabetical order
 - JSON output SHALL include `custom_element_types` field in global_counters
 - Custom types field SHALL be omitted from JSON when no custom types exist
-- Standard types (requirement, user-requirement, verification types) SHALL NOT be counted as custom
+- Standard types (feature, requirement, verification types, and refinement types) SHALL NOT be counted as custom
 - File-type elements SHALL NOT be counted as custom types
 
 ##### Test Criteria
@@ -457,7 +489,7 @@ This test verifies that the system correctly tracks and displays custom element 
    - custom types appear after standard types
    - format: `Custom (type-name): count`
    - custom types are sorted alphabetically
-   - standard types (System Requirements, User Requirements, Verifications) appear first
+   - standard types (Features, System Requirements, Verifications, and Refinements) appear first
 
 2. **Custom Types in JSON Output**
    Command: `reqvire summary --json` (on test data with custom types)
@@ -477,7 +509,7 @@ This test verifies that the system correctly tracks and displays custom element 
 
 4. **Standard Types Not Counted as Custom**
    - Verify requirements with type `requirement` are NOT in custom_element_types
-   - Verify requirements with type `user-requirement` are NOT in custom_element_types
+   - Verify features with type `feature` are NOT in custom_element_types
    - Verify verifications with type `test-verification` are NOT in custom_element_types
    - Verify verifications with type `analysis-verification` are NOT in custom_element_types
    - Verify verifications with type `inspection-verification` are NOT in custom_element_types
@@ -514,6 +546,7 @@ This test verifies that the system correctly tracks and displays custom element 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-search-all-features/test.sh)
+  * verify: [Search Report Generator](../Reporting.md#search-report-generator)
 ---
 
 ### HTML Export Containment View Integration Test
@@ -579,6 +612,8 @@ This test verifies that the containment view is correctly integrated into HTML e
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
+  * verify: [Containment View Report](../Reporting.md#containment-view-report)
+  * verify: [HTML Export](../../../Interfaces/WebInterface/Features.md#html-export)
 ---
 
 ### Model Command Verification
@@ -588,21 +623,22 @@ Comprehensive test verifying model command generates model-centric nested output
 #### Details
 
 ##### Acceptance Criteria
-1. `reqvire model` generates model-centric output showing root requirements with nested relations
+1. `reqvire model` generates model-centric output showing ontology-root and feature-root structures with nested relations
 2. `reqvire model --from=<name>` generates nested structure starting from specified element
 3. `reqvire model --json` generates valid JSON with nested element structure
 4. `reqvire model --from=<name> --json` generates filtered JSON from specified starting point
-5. Default mode filters to root requirements (no hierarchical parent relations)
-6. Relations contain full target element details recursively
+5. Default mode filters to top-level model roots according to model traversal rules
+6. `reqvire model --mmd` generates pure Mermaid flowchart text without a Markdown wrapper
+7. Relations contain full target element details recursively
 
 ##### Test Criteria
-1. **Default Model Output (Root Requirements)**
+1. **Default Model Output (Model Roots)**
    Command: `reqvire model --json`
    - exits code **0**
    - output parses as valid JSON
-   - JSON contains `elements` array with root requirements only at top level
+   - JSON contains `elements` array with model roots at top level
    - JSON contains `metadata` with total_elements, total_relations, filtered_from (null)
-   - Only requirements without hierarchical parent relations at top level
+   - Only elements selected by default root traversal appear at top level
    - Nested relations contain full element details recursively
 
 2. **Filtered Model Output (From Specific Element)**
@@ -616,12 +652,18 @@ Comprehensive test verifying model command generates model-centric nested output
 3. **Markdown Output with Mermaid Diagrams**
    Command: `reqvire model`
    - exits code **0**
-   - output contains `# Model Structure`
    - output contains metadata (Total Elements, Total Relations)
    - output contains Mermaid diagram blocks showing all nested relations
    - diagrams use hash identifiers for node IDs
 
-4. **Nested JSON Structure Validation**
+4. **Pure Mermaid Output**
+   Command: `reqvire model --mmd`
+   - exits code **0**
+   - output begins with Mermaid graph syntax
+   - output does not contain Markdown fenced code blocks
+   - output includes ontology, feature, requirement, and attachment edges when present in the model context
+
+5. **Nested JSON Structure Validation**
    Command: `reqvire model --json`
    - JSON has keys: `elements`, `metadata`
    - Each element has: `identifier`, `name`, `element_type`, `file_path`, `section`, `section_index`, `relations`, `attachments`
@@ -804,8 +846,8 @@ This test verifies that the system provides a unified `search` command functiona
 - Supplying an invalid regex to any regex-based filter fails with a non-zero exit code and displays a clear error message
 - Search results must include all relations for each element
 - Search results must include all attachments for each element (omitted in short mode)
-- Search JSON results must include effective governance metadata for requirement-family elements
-- Search JSON and text summaries must include effective governance metadata counters for matched requirement-family elements
+- Search JSON results must include effective governance metadata for governance-bearing elements
+- Search JSON and text summaries must include effective governance metadata counters for matched governance-bearing elements
 - **Enhanced Content Display**: Search must display page content (frontmatter before first element) when not in short mode
 - **Count Information**: Search must show counts for files and elements in full mode (omitted in short mode)
 - **Short Mode Behavior**: Short mode omits: `content`, `page_content`, `verified_relations_count`, `satisfied_relations_count`, `element_count`, `total_elements`, `global_counters`, `attachments`
@@ -844,7 +886,7 @@ This test verifies that the system provides a unified `search` command functiona
    For each flag in turn, run both JSON and text modes:
    - `--filter-file="**/*Reqs.md"` (glob)
    - `--filter-name=".*safety.*"` (regex)
-   - `--filter-type="user-requirement"` (exact)
+   - `--filter-type="feature"` (exact)
    - `--filter-type="constraint"` (Refinement type)
    - `--filter-type="behavior"` (Refinement type)
    - `--filter-type="specification"` (Refinement type)
@@ -925,12 +967,12 @@ This test verifies that the system provides a unified `search` command functiona
 
 18. **Governance metadata in search output and filters**
     Command: `reqvire search --json`
-    - Requirement-family element objects include effective governance metadata with value and source information
+    - Governance-bearing element objects include effective governance metadata with value and source information
     - Inherited governance metadata entries include `source_identifier` for the requirement ancestor that supplied the value
     - Explicit and default governance metadata entries omit `source_identifier`
     - `--filter-status`, `--filter-priority`, and `--filter-risk` match effective enum values
     - `--filter-owner` matches effective owner values by regex
-    - Governance metadata filters exclude non-requirement-family elements
+    - Governance metadata filters exclude non-governance-bearing elements
     - Invalid governance metadata filter values fail with clear accepted-value diagnostics
     - JSON summary includes governance metadata counters for status, priority, risk, and owner
     - Text summary includes equivalent governance metadata counters
@@ -941,6 +983,26 @@ This test verifies that the system provides a unified `search` command functiona
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-search-all-features/test.sh)
+  * verify: [Search Report Generator](../Reporting.md#search-report-generator)
+  * verify: [CLI Search Command](../../../Interfaces/CLI/Commands.md#cli-search-command)
+---
+
+### Semantic Contract Search JSON Test
+
+Test verifies that search JSON exposes semantic-contract ADT content and derived semantic-contract identity.
+
+#### Details
+Test cases:
+- `search --filter-type=semantic-contract --json` returns semantic-contract elements.
+- JSON includes `semantic_contract.iri`.
+- JSON includes `ontology.ontology.language`, content, and fenced block line number.
+- JSON includes `semantic_contract.shapes.language` and content when Shapes exists.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-contract-json/test.sh)
   * verify: [Search Report Generator](../Reporting.md#search-report-generator)
   * verify: [CLI Search Command](../../../Interfaces/CLI/Commands.md#cli-search-command)
 ---
@@ -970,16 +1032,16 @@ Test cases:
 
 ### Submodels Report Verification
 
-This test verifies that the `submodels` command reports independent requirement hierarchies and cross-submodel requirement couplings with deterministic output.
+This test verifies that the `submodels` command reports independent feature-rooted submodels and cross-submodel requirement couplings with deterministic output.
 
 #### Details
 
 ##### Acceptance Criteria
 - System shall provide CLI command `submodels`
-- Command shall support `--from <NAME>` to scope report to one requirement subtree
+- Command shall support `--from <NAME>` to scope report to one feature or requirement subtree
 - Command shall support `--json` flag for JSON output format
 - Text output shall include:
-  - discovered submodels grouped by top root
+  - discovered feature-rooted submodels
   - per-submodel requirement counts
   - cross-submodel requirement coupling list
   - summary totals
@@ -994,6 +1056,7 @@ This test verifies that the `submodels` command reports independent requirement 
    - output contains `## Cross-Submodel Couplings`
    - output contains `## Summary`
    - summary block includes `**Submodels:**`, `**Requirements:**`, and `**Cross-Submodel Couplings:**`
+   - submodel roots are feature elements, not requirement roots
    - summary counts match fixture totals
    - output matches expected fixture
 
@@ -1002,6 +1065,7 @@ This test verifies that the `submodels` command reports independent requirement 
    - exits code **0**
    - output parses under `jq`
    - contains `submodels` array with root metadata and requirement counts
+   - full-report `submodels` entries use feature roots
    - contains `cross_submodel_couplings` array with source/target and relation type fields
    - summary fields match fixture totals:
      - `summary.total_submodels`
@@ -1009,7 +1073,23 @@ This test verifies that the `submodels` command reports independent requirement 
      - `summary.total_cross_submodel_couplings`
    - output matches expected fixture
 
-3. **Root filter output**
+3. **Feature filter output**
+   Command: `reqvire submodels --from "Feature One"`
+   - exits code **0**
+   - selected feature appears as the scoped feature submodel entry
+   - requirement count includes requirements that specify the feature and their descendants
+   - output contains only submodel data and couplings relevant to selected feature scope
+   - output matches expected filtered fixture
+
+4. **Feature filter JSON output**
+   Command: `reqvire submodels --from "Feature One" --json`
+   - exits code **0**
+   - output parses under `jq`
+   - selected feature appears in `submodels` array
+   - `summary.total_requirements` and `summary.total_cross_submodel_couplings` are derived from selected feature scope
+   - output matches expected filtered JSON fixture
+
+5. **Requirement filter output**
    Command: `reqvire submodels --from "Root One"`
    - exits code **0**
    - selected scope is not listed as a submodel entry
@@ -1019,7 +1099,7 @@ This test verifies that the `submodels` command reports independent requirement 
    - summary `Requirements` and `Cross-Submodel Couplings` counts reflect selected scope only
    - output matches expected filtered fixture
 
-4. **Root filter JSON output**
+6. **Requirement filter JSON output**
    Command: `reqvire submodels --from "Root One" --json`
    - exits code **0**
    - output parses under `jq`
@@ -1029,7 +1109,7 @@ This test verifies that the `submodels` command reports independent requirement 
    - `summary.total_requirements` and `summary.total_cross_submodel_couplings` are derived from selected-scope couplings
    - output matches expected filtered JSON fixture
 
-5. **Root filter missing root error**
+7. **Root filter missing root error**
    Command: `reqvire submodels --from "Missing Root"`
    - exits non-zero
    - error message indicates selected scope was not found
@@ -1052,7 +1132,7 @@ This test verifies that the TraceFlow view page is correctly generated during HT
 ##### Acceptance Criteria
 - System shall generate `traceflow.html` file during HTML export
 - TraceFlow page shall contain D3.js Sankey diagram visualization
-- Sankey diagram shall show flow from user requirements to system requirements to verifications
+- Sankey diagram shall show flow from feature-level product capabilities to requirements to verifications
 - Navigation bar shall include "TraceFlow" link after "Traces"
 - Diagram shall support pan/zoom with mouse wheel and buttons
 - Diagram shall support touch pinch-zoom for mobile devices
@@ -1098,7 +1178,7 @@ This test verifies that the TraceFlow view page is correctly generated during HT
 
 ### Verification Coverage Report Test
 
-This test verifies that the system correctly generates verification coverage reports focusing on leaf requirements, showing the percentage and details of satisfied and unsatisfied test-verification elements, and identifying orphaned verifications.
+This test verifies that the system correctly generates verification coverage reports focusing on leaf requirements, showing the percentage and details of satisfied and unsatisfied evidence-backed verification elements, and identifying orphaned verifications.
 
 #### Details
 
@@ -1106,14 +1186,14 @@ This test verifies that the system correctly generates verification coverage rep
 - System shall provide a CLI command `coverage` that generates coverage reports focusing on leaf requirements
 - Command shall support `--json` flag for JSON output format
 - Coverage report shall include summary section with total counts and percentages for leaf requirements
-- Coverage report shall show breakdown by verification type (test, analysis, inspection, demonstration)
+- Coverage report shall show breakdown by verification type (test, formal-proof, analysis, inspection, demonstration)
 - Coverage report shall list verified leaf requirements grouped by file and section
 - Coverage report shall list unverified leaf requirements with details
-- Coverage report shall list satisfied test-verification elements (those with satisfiedBy relations)
-- Coverage report shall list unsatisfied test-verification elements (those without satisfiedBy relations)
+- Coverage report shall list satisfied evidence-backed verifications (`test-verification` and `formal-proof-verification`) with `satisfiedBy` relations
+- Coverage report shall list unsatisfied evidence-backed verifications (`test-verification` and `formal-proof-verification`) without `satisfiedBy` relations
 - Coverage report shall list orphaned verifications (verifications without any verify relations to requirements)
 - Coverage report shall show orphaned verifications count and percentage in summary section
-- Non-test-verification elements (analysis, inspection, demonstration) are considered satisfied by default (no satisfiedBy required)
+- Non-evidence-backed verification elements (analysis, inspection, demonstration) are considered satisfied by default (no satisfiedBy required)
 - JSON output shall be valid and machine-readable
 - Text output shall be human-readable with clear formatting
 
@@ -1127,8 +1207,8 @@ This test verifies that the system correctly generates verification coverage rep
    - output contains coverage percentage calculation for leaf requirements
    - verified leaf requirements are marked with ✅
    - unverified leaf requirements are marked with ❌
-   - satisfied test-verification elements are marked with ✅
-   - unsatisfied test-verification elements are marked with ❌
+   - satisfied evidence-backed verification elements are marked with ✅
+   - unsatisfied evidence-backed verification elements are marked with ❌
 
 2. **JSON Coverage Report**
    Command: `reqvire coverage-report --json`
@@ -1137,14 +1217,14 @@ This test verifies that the system correctly generates verification coverage rep
    - JSON contains `summary` object with leaf requirements counts and percentages
    - JSON contains `verified_leaf_requirements` and `unverified_leaf_requirements` sections
    - JSON contains `satisfied_test_verifications` and `unsatisfied_test_verifications` sections
-   - verification details include identifier, name, section, type, and satisfied_by relations (for test-verification only)
+   - verification details include identifier, name, section, type, and satisfied_by relations for evidence-backed verification types
 
 3. **Coverage Calculation**
    - Leaf requirements coverage percentage calculated as (verified_leaf_requirements/total_leaf_requirements * 100)
-   - Test-verification satisfaction percentage calculated as (satisfied_test_verifications/total_test_verifications * 100)
+   - Evidence-backed verification satisfaction percentage calculated as (satisfied_test_verifications/total_test_verifications * 100), where the existing JSON field includes both test and formal-proof verifications
    - Verification types correctly categorized
-   - Test-verification elements without satisfiedBy relations are flagged as unsatisfied
-   - Test-verification elements with valid satisfiedBy relations are considered satisfied
+   - Test-verification and formal-proof-verification elements without satisfiedBy relations are flagged as unsatisfied
+   - Test-verification and formal-proof-verification elements with valid satisfiedBy relations are considered satisfied
    - Analysis, inspection, and demonstration verifications are considered satisfied by default (no satisfiedBy evaluation)
 
 #### Metadata
@@ -1155,9 +1235,29 @@ This test verifies that the system correctly generates verification coverage rep
   * verify: [CLI Coverage Command](../../../Interfaces/CLI/Commands.md#cli-coverage-command)
 ---
 
+### Feature Coverage Rollup Test
+
+This test verifies that feature coverage is reported by rolling up the requirements that specify each feature.
+
+#### Details
+Expected checks:
+- Feature elements are not directly verified through `verifiedBy`.
+- Requirements that specify a feature contribute verification coverage to that feature.
+- Child requirements contribute through the requirement `derive` hierarchy.
+- Child features contribute through the feature `derive` hierarchy.
+- Feature coverage output remains separate from structural validation.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-coverage-report/test.sh)
+  * verify: [Feature Coverage Rollup](../../Core/ModelManagement.md#feature-coverage-rollup)
+---
+
 ### Verification Traces Filter Options Test
 
-This test verifies that the verification-traces command filter options work correctly when generating upward trace trees from verification elements to root requirements.
+This test verifies that the verification-traces command filter options work correctly when generating upward trace trees from verification elements to owning feature roots.
 
 #### Details
 
@@ -1168,7 +1268,7 @@ This test verifies that the verification-traces command filter options work corr
 - Mermaid diagrams shall show verification element as root with arrows following relation semantics
 - Mermaid diagrams shall include clickable links on all nodes (verifications and requirements)
 - Directly verified requirements shall be marked/highlighted in diagrams using CSS classes
-- System shall traverse all upward parent relations to reach root requirements
+- System shall traverse all upward parent relations to reach owning feature roots
 - System shall merge multiple verification paths into single tree per verification
 - System shall support `--filter-id=<id>` filter for specific verification element
 - System shall support `--filter-name=<regex>` for filtering by verification name pattern
@@ -1290,8 +1390,8 @@ This test verifies that the --from-folder option correctly generates relative li
 7. **From-Folder Path Calculation Correctness**
    - For from-folder `a/b/c` and identifier `specs/req.md#id`:
      - Link should be `../../../specs/req.md#id`
-   - For from-folder `output` and identifier `specifications/UserRequirements.md#element`:
-     - Link should be `../specifications/UserRequirements.md#element`
+   - For from-folder `output` and identifier `specifications/Requirements.md#element`:
+     - Link should be `../specifications/Requirements.md#element`
    - Path traversal (..) count matches folder depth
 
 8. **From-Folder Special Case for Root**

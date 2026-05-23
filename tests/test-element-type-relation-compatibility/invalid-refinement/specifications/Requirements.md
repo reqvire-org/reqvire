@@ -1,12 +1,23 @@
 # Elements
 
-### Target User Requirement
 
-A user requirement for testing.
+### Test Feature Test Element Type Relation Compatibility Invalid Refinement Specifications
+
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
 
+### Target Feature
+
+A feature for testing.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-refinement-specifications)
 ---
 
 ### Constraint with DerivedFrom
@@ -17,7 +28,7 @@ INVALID: Constraint (refinement type) cannot have Relations subsection.
   * type: constraint
 
 #### Relations
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * derivedFrom: [Target Feature](#target-feature)
 
 ---
 
@@ -29,7 +40,7 @@ INVALID: Constraint (refinement type) cannot have Relations subsection.
   * type: constraint
 
 #### Relations
-  * trace: [Target User Requirement](#target-user-requirement)
+  * trace: [Target Feature](#target-feature)
 
 ---
 
@@ -41,7 +52,7 @@ INVALID: Behavior (refinement type) cannot have Relations subsection.
   * type: behavior
 
 #### Relations
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * derivedFrom: [Target Feature](#target-feature)
 
 ---
 
@@ -53,7 +64,7 @@ INVALID: Behavior (refinement type) cannot have Relations subsection.
   * type: behavior
 
 #### Relations
-  * trace: [Target User Requirement](#target-user-requirement)
+  * trace: [Target Feature](#target-feature)
 
 ---
 
@@ -65,7 +76,7 @@ INVALID: Specification (refinement type) cannot have Relations subsection.
   * type: specification
 
 #### Relations
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * derivedFrom: [Target Feature](#target-feature)
 
 ---
 
@@ -77,6 +88,6 @@ INVALID: Specification (refinement type) cannot have Relations subsection.
   * type: specification
 
 #### Relations
-  * trace: [Target User Requirement](#target-user-requirement)
+  * trace: [Target Feature](#target-feature)
 
 ---

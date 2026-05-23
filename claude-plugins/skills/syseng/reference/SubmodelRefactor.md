@@ -17,6 +17,8 @@ Use this reference when splitting the model into independent submodels with atta
 - Hierarchical relations are used only for internal decomposition within a submodel
 - Cross-submodel dependencies are expressed through explicit attachment contracts, not hierarchical coupling
 - This preserves boundary clarity and keeps `collect`, change-impact, and coverage outputs deterministic
+- A broad feature root may own child features, but requirements should specify the local child feature when that child is the real capability slice
+- Do not collapse unrelated work under one feature root just to share ontology; attach the shared ontology from the consuming feature instead
 
 ## Mandatory Human Boundary Check
 
@@ -25,7 +27,7 @@ Before applying refactor operations, confirm with the user:
 - Submodel ownership map (who owns which folders/elements)
 - Which cross-submodel dependencies are allowed as attachments
 - Which relation types are forbidden across submodels (`derive`, `derivedFrom`, `refinedBy`, `verifiedBy`)
-- Where shared contracts live (refinement elements and their owner requirements)
+- Where shared contracts live (ontology elements for vocabulary, requirement-owned semantic contracts for shape profiles, or other requirement-owned refinement elements)
 
 Do not run bulk unlink/move operations before this confirmation.
 
@@ -36,9 +38,11 @@ When a relation crosses intended submodel boundaries, either:
 1. Move/reparent to restore hierarchical ownership
 2. Replace cross-boundary hierarchy links with attachment-based refinement contracts
 
+When one feature root is too broad, first split it into real child features, then move requirements to specify the child feature that owns their local capability. Keep the parent feature as a capability grouping only when its children still form one coherent root submodel.
+
 ## Refactor Procedure (Recursive)
 
-1. Start from each top root and inspect its first-level children
+1. Start from each feature root and inspect its first-level feature and requirement children
 2. For each first-level child, inspect all direct children and relation edges
 3. Continue recursively for each descendant branch until leaf requirements
 4. At each level, enforce:
@@ -62,10 +66,11 @@ A submodel may contain internal sub-boundaries (nested domains) with separate ow
 
 3. **Migrate links**
    - For each cross-submodel relation, either move element into owning submodel or replace with attachment
-   - Ensure each receiving submodel attaches all required external specifications
+   - Ensure each receiving feature submodel attaches required external ontology, and each receiving requirement attaches required reusable specifications or semantic contracts
+   - Preserve dependency visibility: if a requirement relied on a moved concept, add concept references, a local refinement, or an attachment so `collect` still explains the dependency
 
 4. **Validate semantic completeness**
-   - `reqvire collect "<requirement>" --json` must include required attached specs
+   - `reqvire collect "<feature-or-requirement>" --json` must include required feature-attached ontology, specs, and semantic contracts
    - `reqvire change-impact --git-commit="<base>"` must report impacts when attached contracts change
    - Repeat `reqvire lint --json` — target: fewer or no `cross_submodel_hierarchical_relation` findings
 

@@ -1,11 +1,23 @@
 # Elements
 
-### Root User Requirement
 
-Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+### Test Feature Test Resources Report Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
+
+### Root Feature
+
+Top-level feature used as hierarchy parent for system requirements in this fixture.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-resources-report-specifications-requirements-md)
 ---
 
 ### System Performance
@@ -16,7 +28,7 @@ The system shall meet performance requirements.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root User Requirement](#root-user-requirement)
+  * derivedFrom: [Root Feature](#root-feature)
   * satisfiedBy: [impl.rs](../core/src/impl.rs)
 ---
 
@@ -28,7 +40,7 @@ The system shall ensure data integrity across all operations.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root User Requirement](#root-user-requirement)
+  * derivedFrom: [Root Feature](#root-feature)
   * satisfiedBy: [impl.rs](../core/src/impl.rs)
   * trace: [design.md](../docs/design.md)
 ---
@@ -44,7 +56,7 @@ The system shall provide a user-friendly interface.
   * [UI Mockup Spec](#ui-mockup-spec)
 
 #### Relations
-  * derivedFrom: [Root User Requirement](#root-user-requirement)
+  * derivedFrom: [Root Feature](#root-feature)
 ---
 
 ### API Requirements
@@ -58,7 +70,7 @@ The system shall provide a RESTful API.
   * [API Contract Spec](#api-contract-spec)
 
 #### Relations
-  * derivedFrom: [Root User Requirement](#root-user-requirement)
+  * derivedFrom: [Root Feature](#root-feature)
   * satisfiedBy: [api.rs](../core/src/api.rs)
 ---
 
@@ -67,9 +79,9 @@ The system shall provide a RESTful API.
 Owner requirement for documentation refinement contracts.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-resources-report-specifications-requirements-md)
   * refinedBy: [UI Mockup Spec](#ui-mockup-spec)
   * refinedBy: [API Contract Spec](#api-contract-spec)
 ---

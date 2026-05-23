@@ -1,13 +1,46 @@
 # Elements
 
-### User Req A
 
-Top-level user requirement that defines Spec-1 via refinedBy.
+### User Req A Feature
+
+Feature root for User Req A hierarchy.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
 
+### User Req X Feature
+
+Feature root for User Req X hierarchy.
+
+#### Metadata
+  * type: feature
+---
+
+### User Req Y Feature
+
+Feature root for User Req Y hierarchy.
+
+#### Metadata
+  * type: feature
+---
+
+### Ancestor Req Feature
+
+Feature root for Ancestor Req hierarchy.
+
+#### Metadata
+  * type: feature
+---
+
+### User Req A
+
+Top-level feature that defines Spec-1 via refinedBy.
+
+#### Metadata
+  * type: requirement
 #### Relations
+  * specify: [User Req A Feature](#user-req-a-feature)
   * derive: [Req B](#req-b)
   * derive: [Req D](#req-d)
   * refinedBy: [Spec-1](Refinements.md#spec-1)
@@ -64,12 +97,12 @@ Sibling branch of Req B (still child of User Req A).
 Separate branch requirement - can legitimately attach Spec-1 and defines Spec-X.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Attachments
   * [Spec-1](Refinements.md#spec-1)
 
 #### Relations
+  * specify: [User Req X Feature](#user-req-x-feature)
   * refinedBy: [Spec-X](Refinements.md#spec-x)
 ---
 
@@ -78,9 +111,9 @@ Separate branch requirement - can legitimately attach Spec-1 and defines Spec-X.
 Another separate branch with its own hierarchy.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [User Req Y Feature](#user-req-y-feature)
   * derive: [Req Y1](#req-y1)
 ---
 
@@ -103,9 +136,9 @@ Child of User Req Y in a completely separate hierarchy - can attach Spec-1.
 A requirement that has children with refinedBy to a refinement.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Ancestor Req Feature](#ancestor-req-feature)
   * derive: [Child With Refinement](#child-with-refinement)
 ---
 

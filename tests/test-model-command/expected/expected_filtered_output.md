@@ -9,9 +9,10 @@
 **File**: [specifications/SystemRequirements.md](specifications/SystemRequirements.md)
 
 ```mermaid
-graph LR
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+graph TD
+  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
@@ -20,9 +21,9 @@ graph LR
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
-      6208b4add030277e["Default Root Filtering"];
-      class 6208b4add030277e systemRequirement;
-      click 6208b4add030277e "specifications/SystemRequirements.md#default-root-filtering";
+      f352ca56d3ce0fdd["Default Model Roots"];
+      class f352ca56d3ce0fdd systemRequirement;
+      click f352ca56d3ce0fdd "specifications/SystemRequirements.md#default-model-roots";
       f7eb2f9d9cd7bb11["Forward Relation Traversal"];
       class f7eb2f9d9cd7bb11 systemRequirement;
       click f7eb2f9d9cd7bb11 "specifications/SystemRequirements.md#forward-relation-traversal";
@@ -62,8 +63,8 @@ graph LR
   b7ec4bb3813f1dea -->|derive| 5abb4a3caae293d9;
   5abb4a3caae293d9 -->|verifiedBy| 2f7b3b3deb29891d;
   b7ec4bb3813f1dea -->|derive| 836c732a54d7f48f;
-  836c732a54d7f48f -->|derive| 6208b4add030277e;
-  6208b4add030277e -->|verifiedBy| a2368d1b4b67f0d7;
+  836c732a54d7f48f -->|derive| f352ca56d3ce0fdd;
+  f352ca56d3ce0fdd -->|verifiedBy| a2368d1b4b67f0d7;
   836c732a54d7f48f -->|derive| f7eb2f9d9cd7bb11;
   f7eb2f9d9cd7bb11 -->|verifiedBy| 293200814c46cd0d;
   f7eb2f9d9cd7bb11 -->|verifiedBy| fb891ab92c9824aa;

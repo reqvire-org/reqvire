@@ -48,13 +48,23 @@ mkdir -p "${TEST_DIR}/specifications/Verifications"
 cat > "${TEST_DIR}/specifications/Requirements.md" << 'EOF'
 # Elements
 
+### Root Feature
+
+This is the feature root.
+
+#### Metadata
+  * type: feature
+---
 
 ### Root Requirement
 
 This is the root requirement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: #root-feature
 
 ### Derived Requirement 1
 

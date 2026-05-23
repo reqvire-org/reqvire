@@ -1,14 +1,25 @@
 # Elements
 
-This file should be processed.
 
-### Root User Requirement
+### Test Feature Test Excluded Patterns Specifications Systemrequirements Validfile Md
 
-Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
 
+This file should be processed.
+
+### Root Feature
+
+Top-level feature used as hierarchy parent for system requirements in this fixture.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-excluded-patterns-specifications-systemrequirements-validfile-md)
 ---
 
 ### SYS 001 System Requirement
@@ -19,7 +30,7 @@ This is a system requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root User Requirement](#root-user-requirement)
+  * derivedFrom: [Root Feature](#root-feature)
   * satisfiedBy: [../DesignSpecifications/ExcludedFile.md](../DesignSpecifications/ExcludedFile.md)
   
 ---
@@ -33,5 +44,5 @@ Users must be able to send direct messages to other users.
 * priority: high
 
 #### Relations
-* derivedFrom: [Root User Requirement](#root-user-requirement)
+* derivedFrom: [Root Feature](#root-feature)
 * satisfiedBy: [../DesignSpecifications/DirectMessages.md](../DesignSpecifications/DirectMessages.md)  

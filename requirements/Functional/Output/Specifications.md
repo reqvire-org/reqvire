@@ -8,17 +8,19 @@ Technical specification for content collection from requirement chains.
 **Input Validation:**
 - Element name is required positional argument
 - Element must exist in the model
-- Element must be a requirement type (requirement or user-requirement)
+- Element must be a feature or requirement element
 - Error with non-zero exit if element not found or invalid type
 
 **Traversal Rules:**
-- Start from specified requirement element
-- When direction is UPSTREAM (default):
- - Traverse derivedFrom relations in reverse direction (child to parents)
- - Continue until root ancestors reached (elements with no derivedFrom)
-- When direction is DOWNSTREAM:
- - Traverse derive relations in forward direction (parent to children)
- - Continue until leaf descendants reached (elements with no derive to other requirements)
+- Start from specified feature or requirement element
+- When direction is UPSTREAM from a requirement:
+ - Traverse requirement `derivedFrom` parents, cross to the owning feature through `specify` or inherited ownership, then traverse feature `derivedFrom` parents
+- When direction is UPSTREAM from a feature:
+ - Traverse feature `derivedFrom` parents only
+- When direction is DOWNSTREAM from a requirement:
+ - Traverse child requirements through `derive` only
+- When direction is DOWNSTREAM from a feature:
+ - Traverse child features through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`
 - Include the starting element in output
 
 **Content Collection:**
@@ -41,12 +43,44 @@ Technical specification for content collection from requirement chains.
 
 **Error Handling:**
 - Element not found: Error with message
-- Element not a requirement type: Error with message
+- Element not a feature or requirement type: Error with message
 - Attachment file not found: Warning, continue with other content
 - Circular reference: Detect and break cycle
 
 #### Metadata
  * type: specification
+
+#### Relations
+ * refine: [Collect Feature and Requirement Context](Reporting.md#collect-feature-and-requirement-context)
+---
+
+### Feature Collect Traversal Specification
+
+#### Details
+Collect supports `feature` and `requirement` start elements.
+
+Default collection excludes implementation/evidence relations (`satisfiedBy`, `verify`, `verifiedBy`) and generic `trace` relations.
+
+When starting from a `requirement`:
+- UPSTREAM traverses requirement parents through `derivedFrom`, then crosses to the owning feature through `specify` or inherited feature ownership, then traverses parent features through `derivedFrom`.
+- DOWNSTREAM traverses child requirements through `derive` only and does not cross to features.
+- The collected content includes ontology context inherited from the owning feature path, plus each traversed requirement's requirement-detail refinements and requirement-owned contract attachments.
+
+When starting from a `feature`:
+- UPSTREAM traverses parent features through `derivedFrom` only and does not include requirements that specify those features.
+- DOWNSTREAM traverses child features through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`.
+- The collected content includes attached ontology context for feature elements, inherited ontology context for descendant feature and requirement elements, and requirement-owned semantic contracts, requirement-detail refinements, and attachments for requirement elements.
+
+The `specifiedBy`/`specify` bridge is therefore directional:
+- Requirement UPSTREAM uses the bridge to add feature context.
+- Feature DOWNSTREAM uses the bridge to add specified requirement context.
+- Feature UPSTREAM and requirement DOWNSTREAM do not use the bridge.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Feature Collect Traversal](../Core/ModelManagement.md#feature-collect-traversal)
 ---
 
 ### JSON Element Size Estimate Output Specification
@@ -73,8 +107,8 @@ JSON report outputs are expected to preserve element size-estimate metadata when
 Structured model evidence outputs are expected to expose effective requirement governance metadata with stable source information.
 
 #### Details
-- Full search JSON output and equivalent MCP structured search results shall include `governance_metadata` for requirement-family element payloads (`requirement` and `user-requirement`).
-- Non-requirement-family element payloads shall omit `governance_metadata`.
+- Full search JSON output and equivalent MCP structured search results shall include `governance_metadata` for governance-bearing element payloads (`feature` and `requirement`).
+- Non-governance-bearing element payloads shall omit `governance_metadata`.
 - The `governance_metadata` object shall contain `status`, `priority`, `risk`, and `owner` entries.
 - Each entry shall contain:
  - `value`: the effective value after explicit, inherited, and default resolution.
@@ -84,7 +118,7 @@ Structured model evidence outputs are expected to expose effective requirement g
 - `owner.value` shall be a string and shall be empty when the effective owner is unassigned.
 - Enum values and defaults shall match the Requirement Governance Metadata Specification.
 - Full search JSON output shall include global governance summary counters under `global_counters.total_governance_metadata`.
-- Governance summary counters shall be computed from effective metadata for matched requirement-family elements only.
+- Governance summary counters shall be computed from effective metadata for matched governance-bearing elements only.
 - Governance summary counters shall include `status`, `priority`, `risk`, and `owner` maps.
 - Status, priority, and risk summary maps shall include all accepted enum values with zero counts when no matched requirement has that value.
 - Owner summary maps shall count effective owner values and represent empty/unassigned owner as `unassigned`.
@@ -183,9 +217,7 @@ Each collected content block followed by source citation and separator:
 ```
 
 **Source Type Values:**
-- `element` - Content from model element
-- `refined_by_element` - Content from refinement element (via refinedBy relation)
-- `attachment_element` - Content from attached refinement element
+Collect source type vocabulary is defined by the Reqvire report ontology.
 
 #### Metadata
  * type: specification
@@ -217,8 +249,9 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 **Element Type Colors:**
 | Element Type | Color Name | Hex Code | Usage |
 |--------------|------------|----------|-------|
+| Feature | Feature Blue | #BBDEFB | Product/capability feature roots |
+| Ontology | Muted Sunflower | #F4E3A1 | First-class ontology vocabulary/model terms |
 | Requirement | Deep Purple | #673AB7 | Core requirements, goals |
-| User Requirement | Light Purple | #7E57C2 | User-level requirements |
 | Verification | Emerald Green | #4CAF50 | Validation criteria, testing |
 | Refinement | Orange | #FF9800 | Behaviors, constraints, specifications |
 | Other | Cool Gray | #9E9E9E | Other element types |
@@ -242,7 +275,7 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 |-----------|----------|------|
 | folder | #9E9E9E | 📁 |
 | file | #FFCA28 | 📄 |
-| user-requirement | #7E57C2 | 👤 |
+| feature | #BBDEFB | ◆ |
 | requirement | #673AB7 | 📐 |
 | verification | #4CAF50 | ✅ |
 | refinement | #FF9800 | 🔧 |
@@ -389,7 +422,7 @@ Label format example:
 Users is expected to be able to specify multiple element types in a single search operation using comma-separated values (e.g., `requirement,test-verification,behavior`).
 
 This capability enables:
-- Searching across related type categories (all requirement types, all verification types)
+- Searching across related type categories (features, requirements, verification types, and refinement types)
 - Building complex queries without multiple search invocations
 - Improved workflow efficiency for model analysis and reporting
 
@@ -413,7 +446,7 @@ Technical specification for implementation coverage report output structure.
  - `covered_requirements`
  - `uncovered_requirements`
  - `implementation_coverage_percentage`
- - `coverage_sources` object with counts for `direct_satisfied`, `refinement_contract_satisfied_via_attachment`, `refinement_contract_satisfied_via_child`
+ - `coverage_sources` object keyed by implementation coverage source names defined by the Reqvire report ontology
 - `covered_requirements` contains per-element:
  - `identifier`, `name`
  - `coverage_source`
@@ -488,6 +521,36 @@ JSON output conventions:
 
 #### Metadata
  * type: specification
+
+#### Relations
+ * refine: [Model Reports](Reporting.md#model-reports)
+---
+
+### Report Command Catalog Specification
+
+Report command catalog for model reporting capabilities.
+
+#### Details
+Report commands:
+- `collect`: feature-or-requirement context collection, with upstream or downstream traversal and source citations.
+- `coverage`: requirement verification coverage, evidence-backed verification satisfaction, implementation coverage, and feature coverage rollup.
+- `traces`: verification-to-feature-root traceability trees.
+- `search`: model element search with relations, attachments, semantic-contract fields, and effective governance metadata.
+- `submodels`: independent feature-rooted subgraphs, cross-submodel couplings, and summary totals.
+- `resources`: relation file targets and attachment identifier targets grouped by resource.
+- `ontologies`: collected ontology `Ontology` and semantic-contract `Shapes` Turtle blocks.
+- `model`: logical model graph traversal with optional direction and type filtering.
+- `lint`: model quality findings grouped for auto-fix or manual review.
+- `change-impact`: changed, added, removed, relocated, and impacted model elements with propagation evidence.
+- `containment`: folder, file, and element containment.
+- `export`: static HTML documentation.
+- `serve`: local browsable documentation server.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Model Reports](Reporting.md#model-reports)
 ---
 
 ### Markdown Report Style Specification
@@ -580,7 +643,8 @@ Styling conventions for Mermaid diagrams in CLI output and HTML export.
 **Diagram Node Classes (CSS):**
 | Class Name | Fill Color | Stroke Color | Usage |
 |------------|------------|--------------|-------|
-| userRequirement | #D1C4E9 | #7E57C2 | Top-level user requirements |
+| feature | #BBDEFB | #1976D2 | Product/stakeholder feature elements |
+| ontology | #F4E3A1 | #B08A00 | First-class ontology elements |
 | systemRequirement | #E1D8EE | #673AB7 | System-level requirements |
 | requirement | #ECEFF1 | #673AB7 | Generic requirements |
 | verified | #D1C4E9 | #7E57C2 | Directly verified requirements |
@@ -590,6 +654,16 @@ Styling conventions for Mermaid diagrams in CLI output and HTML export.
 | attachment | #EFEBE9 | #8D6E63 | Design documents |
 | impacted | #FFAAAA | - | Change impact nodes |
 | changed | #FFDD57 | - | Changed nodes |
+
+**Color Scheme Contract:**
+- Mermaid diagrams that render feature elements shall emit `classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px`.
+- Mermaid diagrams that render ontology elements shall emit `classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px`.
+- Mermaid diagrams that render requirements shall emit `classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px`.
+- Mermaid diagrams that render generic requirements shall emit `classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px` when the diagram format uses a generic requirement class.
+- Mermaid diagrams that render verification elements shall emit `classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px`.
+- Feature styling shall be visually distinct from requirement styling; feature elements shall not reuse the purple requirement color family.
+- Ontology styling shall be visually distinct from feature, requirement, verification, and refinement styling; ontology elements use a muted sunflower color family.
+- The same feature and ontology color contracts apply to containment diagrams, model diagrams, verification trace diagrams, generated Markdown, and HTML export Mermaid blocks.
 
 **Relation Line Styles:**
 | Relation Type | Color | Line Style |
@@ -620,13 +694,13 @@ Technical specification for interactive Mermaid diagram navigation and filtering
 #### Details
 **Model Navigation and Filtering:**
 Users is expected to be able to generate and view model structure diagrams from any starting point:
-- Default view shows root requirements (no hierarchical parent)
+- Default view shows ontology roots and feature roots according to model hierarchy traversal rules
 - Filter from specific element using --from flag
 - Generate complete model structure with nested relations showing element details recursively
 - Mermaid diagrams display all nested relations recursively
 
 **Diagram Output:**
-The system is expected to generate Mermaid diagrams embedded in markdown format for visual representation of the model structure.
+The system is expected to generate Mermaid diagrams embedded in markdown format for visual representation of the model structure. When pure Mermaid output is requested, the system emits Mermaid text only, without Markdown prose or fenced code blocks.
 
 **Interactive Capabilities:**
 The visualization helps users:
@@ -644,6 +718,7 @@ The visualization helps users:
 #### Details
 Model output format rules:
 - Markdown format includes embedded Mermaid diagram with model structure.
+- Pure Mermaid format includes only Mermaid flowchart text with no Markdown wrapper.
 - Markdown shows hierarchical structure using containment subgraphs (folders > files > elements).
 - Mermaid diagrams use folder and file subgraphs to visually group elements by physical location.
 - JSON format uses structured data with folders, files, sections, elements, relations, and attachments.
@@ -662,13 +737,11 @@ Model output format rules:
 Technical specification for requirement implementation coverage classification logic.
 
 #### Details
-Implementation coverage scope includes only elements of type `requirement`. Elements of type `user-requirement` are excluded from implementation coverage.
+Implementation coverage source vocabulary is defined by the Reqvire report ontology.
 
-**Coverage Sources:**
-- `direct_satisfied`: requirement has one or more `satisfiedBy` relations.
-- `refinement_contract_satisfied_via_attachment`: requirement has no direct satisfaction but has owned refinements (`refinedBy`) attached by a directly satisfied requirement.
-- `refinement_contract_satisfied_via_child`: requirement has no direct satisfaction but owns refinements and has directly satisfied derived descendants.
-- `uncovered`: no implementation evidence from any source.
+Implementation coverage scope includes only elements of type `requirement`. Elements of type `feature` are excluded from direct implementation coverage and receive implementation coverage through feature roll-up.
+
+The report shall classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `refinedBy`, attachment, and child requirement evidence.
 
 #### Metadata
  * type: specification
@@ -683,10 +756,7 @@ Technical specification for submodels report structure and deterministic orderin
 
 #### Details
 **Submodel Boundary Principle:**
-- Reqvire models are structured as independent hierarchical submodels, each with clear ownership, lifecycle, and stakeholder responsibility.
-- Hierarchical relations are used only for internal decomposition within a submodel.
-- Cross-submodel dependencies are expressed through explicit attachment contracts, not hierarchical coupling.
-- This preserves boundary clarity, supports independent evolution of submodels, and keeps collect, change-impact, and coverage outputs deterministic and auditable.
+Canonical submodel, feature-root submodel, scoped submodel, and cross-submodel coupling concepts are defined by the Reqvire report ontology.
 
 **Refactor Rule:**
 When a relation crosses intended submodel boundaries, either:
@@ -695,7 +765,7 @@ When a relation crosses intended submodel boundaries, either:
 
 **Refactor Procedure:**
 Apply boundary refactoring recursively, top-down:
-1. Start from each top root and inspect its first-level children.
+1. Start from each feature root and inspect its first-level feature and requirement children.
 2. For each first-level child, inspect all direct children and relation edges.
 3. Continue recursively for each descendant branch until leaf requirements.
 4. At each level, enforce:
@@ -711,10 +781,13 @@ A submodel may contain internal sub-boundaries (nested domains) with separate ow
 Cross-internal-boundary dependencies should be modeled as explicit attachment contracts when they represent contractual dependency, not hierarchical ownership.
 
 **Submodel Resolution Rules:**
-- A submodel root is a requirement element with no hierarchical parent relation.
-- Submodel membership is resolved using hierarchical relations only, in downstream direction.
-- Each requirement is expected to be assigned to one resolved top root for report grouping.
-- For scope-scoped report generation, the selected requirement defines report scope; it is not itself reported as a submodel entry.
+- A submodel root is a feature element with no feature parent relation.
+- Feature submodel membership is resolved through feature `derivedFrom`/`derive` hierarchy.
+- Requirement membership is resolved through `specify`/`specifiedBy` and requirement hierarchy.
+- Each requirement is expected to be assigned to one resolved feature root for report grouping.
+- For full report generation, submodel entries are feature roots, not requirement roots.
+- For feature-scoped report generation, the selected feature is reported as the scoped submodel and its requirement count includes requirements that specify the selected feature or descendant features, including descendant requirements.
+- For requirement-scoped report generation, the selected requirement defines a scope boundary; it is not itself reported as a submodel entry.
 
 **Report Content:**
 - List all discovered submodels with:
@@ -728,23 +801,26 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
  - source and target root context
 
 **Cross-Submodel Coupling Scope:**
-- Include requirement-to-requirement relations where source and target belong to different top roots.
+- Include requirement-to-requirement relations where source and target belong to different feature roots.
 - Use explicit relation targets only (no inferred transitive links).
-- For scope-scoped report generation, include only couplings relevant to submodels inside the selected scope.
+- For scope-scoped report generation, include only couplings where the source or target requirement is inside the selected scope.
 
 **Scope Resolution Rules:**
-- In scope mode, select a requirement by name and compute the induced downstream subtree via hierarchical relations.
-- Submodel roots for scope mode are first-level roots of this induced subtree where no parent in the induced subtree exists.
-- If the selected boundary has no children in the induced subtree, `submodels` output is empty.
+- In scope mode, select a feature or requirement by name.
+- Feature scope computes the selected feature subtree through feature hierarchy, then includes requirements that specify those features and their requirement descendants. The selected feature appears as the scoped submodel entry.
+- Requirement scope computes the selected requirement subtree through requirement hierarchy. The selected requirement is excluded from the `submodels` output, and first-level child requirement branches are reported as scoped requirement submodels.
+- If a selected requirement boundary has no children in the induced subtree, `submodels` output is empty.
 
 **Output Formats:**
 *Text/Markdown Format:*
 - Human-readable sectioned report with deterministic ordering
+- Introductory text states that submodels are independent feature-rooted subgraphs resolved through feature ownership relations.
 - Markdown links for source/target/root identifiers
 - Summary section with totals
 - When filtered by scope:
  - output submodels discovered within selected scope
- - do not output selected scope boundary as a submodel entry
+ - output the selected feature when filtering by feature
+ - do not output the selected requirement when filtering by requirement
  - summary counts are computed from filtered output only
 
 *JSON Format:*
@@ -753,7 +829,8 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
 - Stable sort order for reproducible automation output
 - When filtered by scope:
  - JSON includes only filtered-scope submodel data and relevant couplings
- - selected scope boundary is excluded from `submodels` array
+ - selected feature scope appears in `submodels` array
+ - selected requirement scope is excluded from `submodels` array
 
 **Summary Section Semantics:**
 - Summary reports:
@@ -810,6 +887,40 @@ The resources report is expected to consist of two sections:
 
 #### Metadata
  * type: specification
+---
+
+### Ontology Collection Output Specification
+
+The ontology collection output defines how Reqvire exposes ontology and SHACL content for export, serve, and downstream semantic tooling.
+
+#### Details
+The output shall:
+- Collect all ontology `#### Ontology` and semantic-contract `#### Shapes` fenced Turtle blocks from the graph registry.
+- Use the reusable semantic index built for ontology and semantic-contract validation so Turtle parsing is performed once per block.
+- Emit RDF/Turtle by default, preserving collected block content with source comments.
+- Emit JSON-LD when requested by the CLI `--jsonld` option.
+- Support full semantic model export when requested by the CLI `--full` option or MCP `full: true` argument.
+- In full semantic model export mode, append RDF triples for Reqvire model context:
+  - all parsed feature, requirement, ontology, semantic-contract, verification, and refinement elements
+  - element id, identifier, name, type, file path, and source line
+  - internal model relations, including `derive`, `derivedFrom`, `specify`, `specifiedBy`, `refine`, `refinedBy`, `verify`, `verifiedBy`, `satisfy`, `satisfiedBy`, and `trace`
+  - element attachments, including feature-to-ontology attachments and requirement-to-contract attachments
+  - concept references from model elements to ontology terms
+  - ontology term declaration edges from ontology elements to declared terms
+  - semantic-contract shape reference edges from semantic contracts to referenced ontology terms
+- Include source element identifier, source name, file path, section kind, and line number in the semantic index used by rendering/export.
+- Avoid requiring a persistent RDF store for this collection path; full export is an in-memory RDF projection over the graph registry and semantic index. Persistent RDF stores and SPARQL-backed search are reserved for later query support.
+
+**HTML Export:**
+- HTML export shall include `ontologies.ttl`.
+- HTML export shall include an Ontologies page that summarizes collected ontology and shape blocks, renders a graph explorer from parsed semantic-index quads, provides node search and inspection, supports full-window graph expansion, collapses anonymous SHACL property-shape blank nodes and RDF list infrastructure into readable owning-shape inspector constraints by default, lists the source Turtle blocks, and links to `ontologies.ttl`.
+- The exported navigation shall include an Ontologies link.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Ontology and Shapes Collection](Reporting.md#ontology-and-shapes-collection)
 ---
 
 ### SysML Rendering Specification
@@ -884,7 +995,9 @@ Default text output (when neither `--json` nor other format flags specified):
 ### Trace Relation Non-Directional Behavior Refinement Specification
 
 #### Details
-The trace relation behavior is expected to include:
+Canonical trace relation meaning, direction, and change-impact propagation semantics are defined by the Reqvire relation ontology.
+
+The implementation behavior is expected to include:
 
 1. **Circular Dependency Exclusion**:
 - Trace relations is expected to not be traversed during circular dependency detection
@@ -920,7 +1033,9 @@ Visual styling rules for verification trace diagrams.
 **Diagram Output:**
 Verification trace diagrams is expected to use the same visual styling as other mermaid diagrams:
 - Containment structure with folder and file subgraphs showing physical location of elements
-- Element type-based CSS classes (userRequirement, systemRequirement, verification) for consistent coloring
+- Element type-based CSS classes (feature, ontology, systemRequirement, verification) for consistent coloring
+- Feature nodes use the canonical feature color contract from Mermaid Diagram Style Specification
+- Ontology nodes use the canonical muted sunflower ontology color contract from Mermaid Diagram Style Specification
 - Directly verified requirements highlighted with appropriate styling
 
 #### Metadata

@@ -3,6 +3,7 @@
 // CLI should only parse arguments and call these functions
 
 use crate::diff::{generate_crud_diffs, generate_file_diff, CrudOperation, CrudResult, FileDiff};
+use crate::element::{Attachment, AttachmentTarget};
 use crate::error::ReqvireError;
 use crate::model::ModelManager;
 use globset::GlobSet;
@@ -38,7 +39,10 @@ fn finalize_crud_operation(
     modified_before: &HashSet<String>,
     git_root: &Path,
     dry_run: bool,
+    removed_declaration_source: Option<&str>,
 ) -> Result<Vec<FileDiff>, ReqvireError> {
+    validate_semantic_contracts_after_mutation(model_manager, removed_declaration_source)?;
+
     let modified_files = collect_new_modified_files(model_manager, modified_before);
     let diffs = generate_crud_diffs(&model_manager.graph_registry, &modified_files, git_root)?;
 
@@ -49,6 +53,67 @@ fn finalize_crud_operation(
     }
 
     Ok(diffs)
+}
+
+fn validate_semantic_contracts_after_mutation(
+    model_manager: &ModelManager,
+    removed_declaration_source: Option<&str>,
+) -> Result<(), ReqvireError> {
+    let semantic_errors = if let Some(source) = removed_declaration_source {
+        model_manager
+            .graph_registry
+            .validate_semantic_contracts_after_removal(source)?
+    } else {
+        model_manager
+            .graph_registry
+            .validate_semantic_contracts_in_memory()?
+    };
+
+    if semantic_errors.is_empty() {
+        Ok(())
+    } else {
+        Err(ReqvireError::ValidationError(semantic_errors))
+    }
+}
+
+fn validate_semantic_contracts_after_attachment_candidate(
+    model_manager: &ModelManager,
+    element_id: &str,
+    attachment_identifier: &str,
+    attach: bool,
+) -> Result<(), ReqvireError> {
+    let mut candidate = model_manager.graph_registry.clone();
+    let Some(node) = candidate.nodes.get_mut(element_id) else {
+        return Err(ReqvireError::ElementNotFound(format!(
+            "Element '{}' not found",
+            element_id
+        )));
+    };
+
+    if attach {
+        if !node
+            .element
+            .attachments
+            .iter()
+            .any(|attachment| attachment.target.as_str() == attachment_identifier)
+        {
+            node.element.attachments.push(Attachment {
+                target: AttachmentTarget::ElementIdentifier(attachment_identifier.to_string()),
+                content_hash: None,
+            });
+        }
+    } else {
+        node.element
+            .attachments
+            .retain(|attachment| attachment.target.as_str() != attachment_identifier);
+    }
+
+    let semantic_errors = candidate.validate_semantic_contracts_in_memory()?;
+    if semantic_errors.is_empty() {
+        Ok(())
+    } else {
+        Err(ReqvireError::ValidationError(semantic_errors))
+    }
 }
 
 fn enforce_single_root_after_mutation(model_manager: &ModelManager) -> Result<(), ReqvireError> {
@@ -103,6 +168,8 @@ pub fn add_element(
     // Track which files were modified before the operation
     // IMPORTANT: Must track BEFORE any modifications (including override removal)
     let modified_before = snapshot_modified_files(model_manager);
+    let registry_snapshot = model_manager.graph_registry.clone();
+    let mut removed_declaration_source = None;
 
     // If override is requested, extract element name and remove existing element first
     if override_existing {
@@ -119,6 +186,7 @@ pub fn add_element(
             model_manager
                 .graph_registry
                 .remove_element_with_cleanup(&existing_id)?;
+            removed_declaration_source = Some(existing_id);
         }
     }
 
@@ -129,7 +197,19 @@ pub fn add_element(
         excluded_patterns,
     )?;
 
-    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
+    let diffs = match finalize_crud_operation(
+        model_manager,
+        &modified_before,
+        git_root,
+        dry_run,
+        removed_declaration_source.as_deref(),
+    ) {
+        Ok(diffs) => diffs,
+        Err(err) => {
+            model_manager.graph_registry = registry_snapshot;
+            return Err(err);
+        }
+    };
 
     // Create result structure
     let operation = if override_existing {
@@ -189,13 +269,26 @@ pub fn remove_element(
 
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
+    let registry_snapshot = model_manager.graph_registry.clone();
 
     // Remove element using core business logic (includes orphan validation)
     let _affected_files = model_manager
         .graph_registry
         .remove_element_with_cleanup(element_id)?;
 
-    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
+    let diffs = match finalize_crud_operation(
+        model_manager,
+        &modified_before,
+        git_root,
+        dry_run,
+        Some(element_id),
+    ) {
+        Ok(diffs) => diffs,
+        Err(err) => {
+            model_manager.graph_registry = registry_snapshot;
+            return Err(err);
+        }
+    };
 
     // Create result structure
     Ok(CrudResult {
@@ -260,7 +353,14 @@ pub fn move_element(
         return Err(err);
     }
 
-    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
+    let diffs =
+        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
+            Ok(diffs) => diffs,
+            Err(err) => {
+                model_manager.graph_registry = registry_snapshot;
+                return Err(err);
+            }
+        };
 
     // Create result structure
     Ok(CrudResult {
@@ -299,13 +399,21 @@ pub fn rename_element(
 
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
+    let registry_snapshot = model_manager.graph_registry.clone();
 
     // Rename element using core business logic
     let new_id = model_manager
         .graph_registry
         .rename_element(element_id, new_name)?;
 
-    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
+    let diffs =
+        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
+            Ok(diffs) => diffs,
+            Err(err) => {
+                model_manager.graph_registry = registry_snapshot;
+                return Err(err);
+            }
+        };
 
     // Create result structure showing the rename
     Ok(CrudResult {
@@ -341,6 +449,7 @@ pub fn move_file(
 
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
+    let registry_snapshot = model_manager.graph_registry.clone();
 
     // Move file using core business logic
     let identifier_mappings = model_manager.graph_registry.move_file(
@@ -349,7 +458,14 @@ pub fn move_file(
         squash,
     )?;
 
-    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
+    let diffs =
+        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
+            Ok(diffs) => diffs,
+            Err(err) => {
+                model_manager.graph_registry = registry_snapshot;
+                return Err(err);
+            }
+        };
 
     if !dry_run {
         // Delete the source file from disk
@@ -536,7 +652,7 @@ fn resolve_attachment_identifier_for_element(
 ) -> Result<String, ReqvireError> {
     if !attachment_target.contains('#') {
         return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Invalid attachment target '{}'. Attachments must use refinement element identifiers in the form 'file.md#element-id' or '#element-id'.",
+            "Invalid attachment target '{}'. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
             attachment_target
         )));
     }
@@ -558,13 +674,13 @@ fn resolve_attachment_identifier_for_element(
         .unwrap_or_else(|| std::path::Path::new("."));
     crate::utils::normalize_identifier(attachment_target, base_path).map_err(|e| {
         ReqvireError::InvalidAttachmentTarget(format!(
-            "Invalid attachment target '{}': {}. Attachments must use refinement element identifiers in the form 'file.md#element-id' or '#element-id'.",
+            "Invalid attachment target '{}': {}. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
             attachment_target, e
         ))
     })
 }
 
-/// Attach a Refinement element identifier to an element.
+/// Attach an ontology or compatible refinement element identifier to an element.
 pub fn attach_element_identifier(
     model_manager: &mut ModelManager,
     element_name: &str,
@@ -596,22 +712,42 @@ pub fn attach_element_identifier(
             ))
         })?;
 
-    if !attachment_element.element_type.is_refinement() {
-        return Err(ReqvireError::InvalidAttachmentTarget(
-            format!(
-                "Element '{}' is not a Refinement type (constraint, behavior, specification). Only Refinement elements can be attached.",
-                attachment_element.name
-            )
-        ));
+    if !attachment_element.element_type.is_refinement()
+        && !attachment_element.element_type.is_ontology()
+    {
+        return Err(ReqvireError::InvalidAttachmentTarget(format!(
+            "Element '{}' is not an attachable type. Only ontology elements and compatible Refinement elements can be attached.",
+            attachment_element.name
+        )));
     }
 
-    if !model_manager
-        .graph_registry
-        .refinement_has_refine_relation(&attachment_identifier)
+    let target_is_ontology = attachment_element.element_type.is_ontology();
+    let attachment_type_valid = if target_element.element_type.is_feature() {
+        target_is_ontology
+    } else if target_element.element_type.is_requirement() {
+        attachment_element.element_type.is_requirement_refinement()
+    } else {
+        attachment_element.element_type.is_requirement_refinement()
+    };
+
+    if !attachment_type_valid {
+        return Err(ReqvireError::InvalidAttachmentTarget(format!(
+            "Element '{}' (type: {}) cannot attach '{}' (type: {}). Feature attachments may target ontology only; requirement attachments may target requirement-owned semantic-contract, constraint, behavior, specification, state, or input-output.",
+            element_name,
+            target_element.element_type.as_str(),
+            attachment_element.name,
+            attachment_element.element_type.as_str()
+        )));
+    }
+
+    if attachment_element.element_type.is_refinement()
+        && !model_manager
+            .graph_registry
+            .refinement_has_refine_relation(&attachment_identifier)
     {
         return Err(ReqvireError::InvalidAttachmentTarget(
             format!(
-                "'{}' has no refine relation. Refinements must refine a requirement before they can be attached.",
+                "'{}' has no refine relation. Refinements must refine a feature or requirement before they can be attached.",
                 attachment_element.name
             )
         ));
@@ -627,23 +763,25 @@ pub fn attach_element_identifier(
         {
             return Err(ReqvireError::InvalidAttachmentScope(
                 format!(
-                    "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the refinedBy chain.",
+                    "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from elements outside the refinedBy chain.",
                     attachment_element.name, element_name
                 )
             ));
         }
     }
 
-    if let Some(msg) = model_manager
-        .graph_registry
-        .build_attachment_direction_scope_error(
-            &attachment_identifier,
-            &element_id,
-            element_name,
-            None,
-        )
-    {
-        return Err(ReqvireError::InvalidAttachmentScope(msg));
+    if attachment_element.element_type.is_refinement() {
+        if let Some(msg) = model_manager
+            .graph_registry
+            .build_attachment_direction_scope_error(
+                &attachment_identifier,
+                &element_id,
+                element_name,
+                None,
+            )
+        {
+            return Err(ReqvireError::InvalidAttachmentScope(msg));
+        }
     }
 
     if target_element
@@ -667,6 +805,13 @@ pub fn attach_element_identifier(
             attachment_target, element_name
         )));
     }
+
+    validate_semantic_contracts_after_attachment_candidate(
+        model_manager,
+        &element_id,
+        &attachment_identifier,
+        true,
+    )?;
 
     let absolute_file_path = git_root.join(&file_path);
     let content = fs::read_to_string(&absolute_file_path).map_err(ReqvireError::IoError)?;
@@ -793,6 +938,14 @@ pub fn detach_element_identifier(
         &attachment_display_name,
         &relative_identifier,
     )?;
+
+    validate_semantic_contracts_after_attachment_candidate(
+        model_manager,
+        &element_id,
+        &attachment_identifier,
+        false,
+    )?;
+
     let diff = generate_file_diff(&file_path, &content, &new_content);
 
     if !dry_run {
@@ -1151,6 +1304,11 @@ pub fn merge_elements(
         .merge_elements(&target_id, &source_ids)?;
 
     if let Err(err) = enforce_single_root_after_mutation(model_manager) {
+        model_manager.graph_registry = registry_snapshot;
+        return Err(err);
+    }
+
+    if let Err(err) = validate_semantic_contracts_after_mutation(model_manager, None) {
         model_manager.graph_registry = registry_snapshot;
         return Err(err);
     }
@@ -1717,7 +1875,14 @@ pub fn link(
         return Err(err);
     }
 
-    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
+    let diffs =
+        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
+            Ok(diffs) => diffs,
+            Err(err) => {
+                model_manager.graph_registry = registry_snapshot;
+                return Err(err);
+            }
+        };
 
     Ok(CrudResult {
         operation: CrudOperation::Update,
@@ -1822,7 +1987,14 @@ pub fn relink(
         return Err(err);
     }
 
-    let diffs = finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
+    let diffs =
+        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
+            Ok(diffs) => diffs,
+            Err(err) => {
+                model_manager.graph_registry = registry_snapshot;
+                return Err(err);
+            }
+        };
 
     Ok(CrudResult {
         operation: CrudOperation::Update,
@@ -1866,6 +2038,7 @@ pub fn unlink(
 
     // Track modified files before
     let modified_before = snapshot_modified_files(model_manager);
+    let registry_snapshot = model_manager.graph_registry.clone();
 
     // Try to remove relation via graph_registry
     // This handles element-to-element relations (NOT attachments)
@@ -1876,8 +2049,19 @@ pub fn unlink(
         Some((_modified_file, relation_type, target_display)) => {
             // Relation was found and removed
             // Get newly modified files
-            let diffs =
-                finalize_crud_operation(model_manager, &modified_before, git_root, dry_run)?;
+            let diffs = match finalize_crud_operation(
+                model_manager,
+                &modified_before,
+                git_root,
+                dry_run,
+                None,
+            ) {
+                Ok(diffs) => diffs,
+                Err(err) => {
+                    model_manager.graph_registry = registry_snapshot;
+                    return Err(err);
+                }
+            };
 
             Ok(CrudResult {
                 operation: CrudOperation::Update,

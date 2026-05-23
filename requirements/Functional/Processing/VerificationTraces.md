@@ -2,25 +2,22 @@
 
 ### Verification Upward Traceability
 
-The system shall provide upward traceability from verifications to root requirements, showing the complete requirement hierarchy and verification coverage.
+The system shall provide upward traceability from verifications to owning feature roots, showing the complete requirement hierarchy, feature context, and verification coverage.
 
 #### Details
-When analyzing verification coverage, the system shall trace from verification elements upward through the requirement hierarchy to root requirements.
+When analyzing verification coverage, the system shall trace from verification elements upward through the requirement hierarchy and owning feature context.
 
 When generating trace reports, the system shall indicate which requirements are directly verified versus transitively covered.
 
 When detecting model quality issues, the system shall identify redundant verification relations where a verification directly verifies both a leaf requirement and its ancestor.
 
 #### Metadata
-  * type: user-requirement
-
-#### Attachments
-  * [Traceability Reporting Specification](../../Refinements.md#traceability-reporting-specification)
+  * type: requirement
 
 #### Relations
   * derive: [Verification Roll-up Strategy](#verification-roll-up-strategy)
   * derive: [Verification Trace Builder](#verification-trace-builder)
-  * derivedFrom: [Verification Traceability](../../UserStories.md#verification-traceability)
+  * specify: [Verification Traceability](../../Features/Verification.md#verification-traceability)
 ---
 
 ### Verification Roll-up Strategy
@@ -38,7 +35,7 @@ The system shall implement a verification roll-up strategy where parent requirem
 
 ### Verification Trace Builder
 
-The system shall provide functionality to build upward trace trees from verification elements by traversing all upward parent relations to reach root requirements, merging all paths into a single tree structure with marked directly-verified requirements.
+The system shall provide functionality to build upward trace trees from verification elements by traversing all upward parent relations to reach owning feature roots, merging all paths into a single tree structure with marked directly-verified requirements.
 
 #### Metadata
   * type: requirement

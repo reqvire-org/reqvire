@@ -1,5 +1,14 @@
 # Elements
 
+
+### Test Feature Test Element Type Relation Compatibility Invalid Refinement Attachment
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Constraint With Attachment
 
 A constraint element with an attachment (not allowed).
@@ -16,9 +25,9 @@ A constraint element with an attachment (not allowed).
 Owner requirement for Attachment Spec.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-refinement-attachment)
   * refinedBy: [Attachment Spec](#attachment-spec)
 ---
 

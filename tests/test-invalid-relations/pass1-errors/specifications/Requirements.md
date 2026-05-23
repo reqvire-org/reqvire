@@ -1,5 +1,14 @@
 # Elements
 
+
+### Test Feature Test Invalid Relations Pass1 Errors Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 This document contains requirements with Pass 1 validation errors (parsing/format issues).
 
 
@@ -8,9 +17,9 @@ This document contains requirements with Pass 1 validation errors (parsing/forma
 This is a valid requirement.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * trace: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
@@ -20,9 +29,9 @@ This is a valid requirement.
 Duplicate element name - should trigger duplicate element error.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * derivedFrom: [Valid Requirement](#valid-requirement)
 
 ---
@@ -54,9 +63,9 @@ This is not ok - invalid format.
 This requirement has an invalid relation type with a typo.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * derivedFrom: [Valid Requirement](#valid-requirement)
   * satisfiedBBy: [ValidImplementation.txt](ValidImplementation.txt)
 
@@ -67,9 +76,9 @@ This requirement has an invalid relation type with a typo.
 This requirement has duplicate subsection.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * derivedFrom: [Valid Requirement](#valid-requirement)
 
 #### Relations
@@ -86,9 +95,9 @@ This requirement has a level 5 header before reserved subsections.
 Level 5+ headers can only appear inside Details subsection.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * derivedFrom: [Valid Requirement](#valid-requirement)
 
 ---

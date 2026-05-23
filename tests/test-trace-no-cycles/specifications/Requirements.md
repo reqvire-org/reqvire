@@ -1,5 +1,14 @@
 # Elements
 
+
+### Test Feature Test Trace No Cycles Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 This document contains requirements with trace relations that form cycles to verify they don't cause circular dependency errors.
 
 
@@ -8,9 +17,9 @@ This document contains requirements with trace relations that form cycles to ver
 This requirement has trace relations that would form a cycle if trace relations were considered for dependency checking.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-trace-no-cycles-specifications-requirements-md)
   * trace: [Requirement Beta](#requirement-beta)
   * derive: [Child Requirement Alpha](#child-requirement-alpha)
 
@@ -21,9 +30,9 @@ This requirement has trace relations that would form a cycle if trace relations 
 This requirement traces back to Alpha, forming a trace cycle that should not be detected as a circular dependency.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-trace-no-cycles-specifications-requirements-md)
   * trace: [Requirement Gamma](#requirement-gamma)
   * derive: [Child Requirement Beta](#child-requirement-beta)
 
@@ -34,9 +43,9 @@ This requirement traces back to Alpha, forming a trace cycle that should not be 
 This requirement completes the trace cycle back to Alpha, which should be allowed since trace is non-directional.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-trace-no-cycles-specifications-requirements-md)
   * trace: [Requirement Alpha](#requirement-alpha)
   * derive: [Child Requirement Gamma](#child-requirement-gamma)
 
@@ -83,9 +92,9 @@ This is a valid child requirement of Gamma.
 This requirement has multiple trace relations forming complex patterns that should not trigger circular dependency errors.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-trace-no-cycles-specifications-requirements-md)
   * trace: [Requirement Alpha](#requirement-alpha)
   * trace: [Requirement Beta](#requirement-beta)
   * trace: [Requirement Gamma](#requirement-gamma)

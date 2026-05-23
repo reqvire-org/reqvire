@@ -29,11 +29,11 @@
     {
       "id": 2,
       "name": "add-requirement",
-      "prompt": "I need to add a new user requirement for 'Batch Export' - the system should support exporting multiple specification files at once into a single archive. Derive a system requirement from it and add a test verification. Use the MBSE workflow. Put user requirements in requirements/UserRequirements.md and system requirements in requirements/SystemRequirements/Requirements.md. Don't actually run the commands, just show me the exact reqvire commands you would run.",
-      "expected_output": "Should follow MBSE order: user-requirement first, then system requirement with derivedFrom, then test-verification with verify relation. Should use reqvire add with heredoc syntax. Should include proper EARS statements.",
+      "prompt": "I need to add a new feature for 'Batch Export' - the system should support exporting multiple specification files at once into a single archive. Add the feature, add a requirement that specifies it, and add a test verification for that requirement. Use the MBSE workflow. Put features in requirements/Features.md and requirements in requirements/Functional/Operations/Specifications.md. Don't actually run the commands, just show me the exact reqvire commands you would run.",
+      "expected_output": "Should follow MBSE order: feature first, then requirement with specify relation to the feature, then test-verification with verify relation to the requirement. Should use reqvire add with heredoc syntax. Should include proper EARS statements.",
       "assertions": [
-        {"text": "Creates user-requirement before system requirement (MBSE order)", "type": "must_pass"},
-        {"text": "System requirement has derivedFrom relation to user requirement", "type": "must_pass"},
+        {"text": "Creates feature context before requirement (MBSE order)", "type": "must_pass"},
+        {"text": "Requirement has specify relation to feature", "type": "must_pass"},
         {"text": "Creates test-verification with verify relation to system requirement", "type": "must_pass"},
         {"text": "Uses EARS pattern (shall statement) in requirement text", "type": "should_pass"},
         {"text": "Uses reqvire add with heredoc or --content syntax", "type": "should_pass"},

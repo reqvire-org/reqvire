@@ -1,23 +1,23 @@
 ## Submodels
 
-Independent requirement hierarchies resolved via `derivedFrom` relations.
+Independent feature-rooted subgraphs resolved via feature ownership relations.
 
-### [Root One](specifications/Requirements.md#root-one)
-  * Type: user-requirement
+### [Feature One](specifications/Requirements.md#feature-one)
+  * Type: feature
   * Requirements: 5
 ---
 
-### [Root Two](specifications/Requirements.md#root-two)
-  * Type: user-requirement
+### [Feature Two](specifications/Requirements.md#feature-two)
+  * Type: feature
   * Requirements: 3
 ---
 
 ## Cross-Submodel Couplings
 
-Requirement-to-requirement relations where source and target belong to different top roots.
+Requirement-to-requirement relations where source and target belong to different feature roots.
 
-  * [Invoice Requirement](specifications/Requirements.md#invoice-requirement) --trace--> [Identity Requirement](specifications/Requirements.md#identity-requirement) (Root One -> Root Two)
-  * [Session Requirement](specifications/Requirements.md#session-requirement) --trace--> [Payments Requirement](specifications/Requirements.md#payments-requirement) (Root Two -> Root One)
+  * [Invoice Requirement](specifications/Requirements.md#invoice-requirement) --trace--> [Identity Requirement](specifications/Requirements.md#identity-requirement) (Feature One -> Feature Two)
+  * [Session Requirement](specifications/Requirements.md#session-requirement) --trace--> [Payments Requirement](specifications/Requirements.md#payments-requirement) (Feature Two -> Feature One)
 
 ## Summary
 

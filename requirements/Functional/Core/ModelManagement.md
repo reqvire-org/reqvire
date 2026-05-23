@@ -8,39 +8,16 @@ The system shall automatically assign the **default type `requirement`** to all 
 Type assignment behavior shall follow the associated refinement specifications.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Attachments
   * [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)
 
 #### Relations
-  * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
   * refinedBy: [Default Requirement Type Assignment Refinement Specification](Specifications.md#default-requirement-type-assignment-refinement-specification)
+  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
   * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
   * verifiedBy: [Default Element Type Assignment Test](Verifications/ValidationVerifications.md#default-element-type-assignment-test)
----
-
-### Requirement Governance Metadata
-
-The system shall support governance metadata for requirement elements, including status, priority, risk, and owner, with effective values resolved from authored metadata, hierarchy inheritance, and defaults.
-
-#### Details
-Governance metadata behavior shall follow the associated refinement specifications.
-
-#### Metadata
-  * type: requirement
-
-#### Attachments
-  * [Requirement Governance Metadata Specification](Specifications.md#requirement-governance-metadata-specification)
-
-#### Relations
-  * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
-  * refinedBy: [Requirement Governance Metadata Inheritance Behavior](Behaviors.md#requirement-governance-metadata-inheritance-behavior)
-  * satisfiedBy: [element.rs](../../../core/src/element.rs)
-  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
-  * satisfiedBy: [search.rs](../../../core/src/search.rs)
-  * verifiedBy: [Requirement Governance Metadata Verification](Verifications/ParsingVerifications.md#requirement-governance-metadata-verification)
-  * verifiedBy: [Requirement Governance Metadata Formatting Verification](../Operations/Verifications/FormattingVerifications.md#requirement-governance-metadata-formatting-verification)
 ---
 
 ### Efficient Processing
@@ -48,11 +25,11 @@ Governance metadata behavior shall follow the associated refinement specificatio
 The system shall process structured documents and relations to extract model-relevant information efficiently.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Opt-In Element Size Estimate Model Build](#opt-in-element-size-estimate-model-build)
-  * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
+  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
 ---
 
 ### Opt-In Element Size Estimate Model Build
@@ -72,10 +49,10 @@ The system shall support an opt-in model build mode that computes canonical size
 #### Relations
   * derivedFrom: [Efficient Processing](#efficient-processing)
   * refinedBy: [Element Size Estimate Model Build Specification](Specifications.md#element-size-estimate-model-build-specification)
-  * verifiedBy: [Element Size Estimate Model Build Verification](Verifications/ParsingVerifications.md#element-size-estimate-model-build-verification)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
+  * verifiedBy: [Element Size Estimate Model Build Verification](Verifications/ParsingVerifications.md#element-size-estimate-model-build-verification)
 ---
 
 ### Element Manipulation Operations
@@ -89,7 +66,7 @@ All manipulation operations shall:
 - Preserve traceability where appropriate
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Attachment Identifier Updates](#attachment-identifier-updates)
@@ -101,9 +78,10 @@ All manipulation operations shall:
   * derive: [Relation Consistency Maintenance](../Operations/ElementManipulation.md#relation-consistency-maintenance)
   * derive: [Rename Element Operation](../Operations/ElementManipulation.md#rename-element-operation)
   * derive: [Target Location Validation and Auto-Creation](../Operations/ElementManipulation.md#target-location-validation-and-auto-creation)
-  * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
   * refinedBy: [Dry-Run Mode Behavior](../Operations/Behaviors.md#dry-run-mode-behavior)
   * refinedBy: [File Persistence Behavior](../Operations/Behaviors.md#file-persistence-behavior)
+  * refinedBy: [Operation Command Contract Specification](../Operations/Specifications.md#operation-command-contract-specification)
+  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
 ---
 
 ### Attachment Identifier Updates
@@ -140,15 +118,13 @@ The system shall use the Git repository root as the project base for path resolu
 - When run from a subdirectory, the system shall validate that all references stay within scope boundaries following clearly defined specifications
 
 #### Metadata
-  * type: user-requirement
-
-#### Attachments
-  * [Containment Specification](../../Refinements.md#containment-specification)
+  * type: requirement
 
 #### Relations
-  * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
   * refinedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
   * refinedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
+  * refinedBy: [Containment Specification](../../Refinements.md#containment-specification)
+  * specify: [Defining Model Structure](../../Features.md#defining-model-structure)
   * verifiedBy: [Subdirectory Processing Verification](Verifications/ValidationVerifications.md#subdirectory-processing-verification)
 ---
 
@@ -159,17 +135,14 @@ The system shall implement relations following clearly defined specifications fo
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Relation Semantics Specification](../../Refinements.md#relation-semantics-specification)
-
 #### Relations
   * derive: [Element Type Relation Compatibility](#element-type-relation-compatibility)
   * derive: [Relation Management Operations](#relation-management-operations)
-  * derive: [Validate Relation Types](Validation.md#validate-relation-types)
   * derive: [Trace Relation Non-Directional Behavior](../Output/DiagramGeneration.md#trace-relation-non-directional-behavior)
   * derivedFrom: [Identifiers and Relations](StructureAndParsing.md#identifiers-and-relations)
   * refinedBy: [RelationTypes](DesignDocuments/RelationTypes.md#relationtypes)
   * refinedBy: [Relation Types and behaviors Refinement Specification](Specifications.md#relation-types-and-behaviors-refinement-specification)
+  * refinedBy: [Relation Semantics Specification](../../Refinements.md#relation-semantics-specification)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
 ---
@@ -184,27 +157,89 @@ The system shall define element type relation compatibility constraints.
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
-
 #### Relations
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
   * refinedBy: [Element Type Relation Compatibility Constraint](Constraints.md#element-type-relation-compatibility-constraint)
+  * refinedBy: [Supported Element Types Specification](../../Refinements.md#supported-element-types-specification)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [relation.rs](../../../core/src/relation.rs)
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 
-### Refinement Element Structure Constraints
+### Feature Model Structure
 
-The system shall restrict Refinement elements (`constraint`, `behavior`, `specification`, `state`, `input-output`) to only allow `refine` relations.
+The system shall support `feature` elements as product/capability roots that are specified by requirements.
 
 #### Details
-Refinement relation usage shall follow the associated refinement specifications.
+Feature model behavior shall follow the relation type and validation specifications.
 
-State refinements shall model lifecycle states, state machines, allowed transitions, and state-dependent contract behavior owned by a requirement.
+#### Metadata
+  * type: requirement
 
-Input-output refinements shall model payloads, documents, messages, schemas, fixtures, and data contracts owned by a requirement.
+#### Relations
+  * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
+  * refinedBy: [Feature Model Structure Specification](Specifications.md#feature-model-structure-specification)
+  * verifiedBy: [Feature Element Relation Compatibility Test](Verifications/ValidationVerifications.md#feature-element-relation-compatibility-test)
+---
+
+### Feature Collect Traversal
+
+The system shall collect feature and requirement context using separate feature and requirement hierarchy traversal with the `specifiedBy`/`specify` bridge only where directionally intended.
+
+#### Details
+Collect traversal behavior shall follow the associated output specification.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature Model Structure](#feature-model-structure)
+  * refinedBy: [Feature Collect Traversal Specification](../Output/Specifications.md#feature-collect-traversal-specification)
+  * verifiedBy: [Feature Collect Traversal Test](../Output/Verifications/ReportingVerifications.md#feature-collect-traversal-test)
+---
+
+### Feature Coverage Rollup
+
+The system shall report feature verification and implementation coverage by rolling up coverage from requirements that specify each feature.
+
+#### Details
+Feature coverage shall remain separate from feature validation. Feature elements are not directly verified or satisfied.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature Model Structure](#feature-model-structure)
+  * verifiedBy: [Feature Coverage Rollup Test](../Output/Verifications/ReportingVerifications.md#feature-coverage-rollup-test)
+---
+
+### Ontology and Semantic Contract Model
+
+The system shall support first-class `ontology` elements for reusable semantic vocabulary and requirement-owned `semantic-contract` refinement elements for obligation-specific SHACL shape profiles.
+
+#### Details
+Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated `requirements/Ontologies` folder rather than nested in feature files. Requirement-owned semantic contracts shall define SHACL shape profiles for one obligation and must not define ontology vocabulary.
+
+Feature elements attach ontology elements to make vocabulary reachable for the feature, descendant features, and requirements that specify that feature context. Requirement elements must not attach ontology directly; they inherit ontology context through their owning feature path. Requirement elements may refine to semantic contracts when an obligation needs a closed-world profile over reachable ontology terms.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature Model Structure](#feature-model-structure)
+  * refinedBy: [Semantic Contract Structure Specification](Specifications.md#semantic-contract-structure-specification)
+  * verifiedBy: [Semantic Contract Ontology Declaration Validation Test](Verifications/ValidationVerifications.md#semantic-contract-ontology-declaration-validation-test)
+  * verifiedBy: [Semantic Contract Ownership Validation Test](Verifications/ValidationVerifications.md#semantic-contract-ownership-validation-test)
+  * verifiedBy: [Semantic Contract Section Validation Test](Verifications/ValidationVerifications.md#semantic-contract-section-validation-test)
+  * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](Verifications/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
+---
+
+### Refinement Element Structure Constraints
+
+The system shall restrict Refinement elements (`source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, `input-output`) to only allow `refine` relations.
+
+#### Details
+Refinement relation validation shall enforce the subtype-compatible refinement vocabulary defined by the Reqvire feature, requirement, ontology, and semantic-contract model contracts.
 
 #### Metadata
   * type: requirement
@@ -229,8 +264,8 @@ The system shall enforce scope constraints on refinement-element attachments to 
 #### Relations
   * derivedFrom: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
   * refinedBy: [Attachment Hierarchical Independence Constraint](Constraints.md#attachment-hierarchical-independence-constraint)
-  * refinedBy: [Attachment Subgraph Direction Constraint](Constraints.md#attachment-subgraph-direction-constraint)
   * refinedBy: [Attachment Satisfied Refinement Constraint](Constraints.md#attachment-satisfied-refinement-constraint)
+  * refinedBy: [Attachment Subgraph Direction Constraint](Constraints.md#attachment-subgraph-direction-constraint)
   * verifiedBy: [Attachment Scope Constraints Test](Verifications/AttachmentsVerifications.md#attachment-scope-constraints-test)
 ---
 
@@ -265,6 +300,29 @@ When unlinking, the system shall:
   * verifiedBy: [Unlink Command Verification](../Operations/Verifications/ElementManipulationVerifications.md#unlink-command-verification)
 ---
 
+### Requirement Governance Metadata
+
+The system shall support governance metadata for requirement elements, including status, priority, risk, and owner, with effective values resolved from authored metadata, hierarchy inheritance, and defaults.
+
+#### Details
+Governance metadata behavior shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Requirement Governance Metadata Specification](Specifications.md#requirement-governance-metadata-specification)
+
+#### Relations
+  * refinedBy: [Requirement Governance Metadata Inheritance Behavior](Behaviors.md#requirement-governance-metadata-inheritance-behavior)
+  * satisfiedBy: [element.rs](../../../core/src/element.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * satisfiedBy: [search.rs](../../../core/src/search.rs)
+  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
+  * verifiedBy: [Requirement Governance Metadata Verification](Verifications/ParsingVerifications.md#requirement-governance-metadata-verification)
+  * verifiedBy: [Requirement Governance Metadata Formatting Verification](../Operations/Verifications/FormattingVerifications.md#requirement-governance-metadata-formatting-verification)
+---
+
 ### Template-Based Model Bootstrapping
 
 The system shall enable systems engineers to quickly bootstrap new System models from predefined templates stored in Git repositories, accelerating project initialization and promoting best-practice model structures.
@@ -287,10 +345,10 @@ reqvire init --template <github-repo-url>
 The system discovers all available templates in the repository and allows the user to select which template to apply.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
-  * derivedFrom: [Operating on Model Elements](../../UserStories.md#operating-on-model-elements)
+  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
 ---
 
 ### Verification Type Categories

@@ -29,10 +29,10 @@ The `add` command is expected to:
 Command syntax: `reqvire collect <element-name> [--direction UPSTREAM|DOWNSTREAM] [--json]`
 
 **Arguments:**
-- `<element-name>` - Required. Name of the requirement element to collect from.
+- `<element-name>` - Required. Name of the feature or requirement element to collect from.
 
 **Options:**
-- `--direction <DIRECTION>` - Traversal direction. Values: `UPSTREAM` (default) or `DOWNSTREAM`. UPSTREAM traverses derivedFrom relations to ancestors; DOWNSTREAM traverses derive relations to descendants.
+- `--direction <DIRECTION>` - Traversal direction. Values: `UPSTREAM` (default) or `DOWNSTREAM`. Requirement UPSTREAM traverses requirement parents and crosses to the owning feature through `specify`; requirement DOWNSTREAM follows child requirements. Feature UPSTREAM follows feature parents only; feature DOWNSTREAM follows child features and requirements through `specifiedBy`.
 - `--json` - Output in JSON format instead of text
 
 **Exit codes:**
@@ -55,8 +55,9 @@ Coverage command behavior:
 - Include breakdowns by file, section, and verification type
 - Show satisfaction status of test-verification elements (those with `satisfiedBy` relations)
 - Show orphaned verifications (verification elements without any `verify` relations to requirements)
-- Include requirement implementation coverage summary for `requirement` elements only (exclude `user-requirement`)
-- Classify covered requirements by implementation source (`direct_satisfied`, `refinement_contract_satisfied_via_attachment`, `refinement_contract_satisfied_via_child`)
+- Include requirement implementation coverage summary for `requirement` elements only
+- Include feature coverage roll-up from requirements connected through `specifiedBy` / `specify`
+- Classify covered requirements using the implementation coverage source vocabulary defined by the Reqvire report ontology
 - Show implementation-uncovered requirements with identifiers and names
 - Emit all coverage percentages with at most 2 decimal places in text and JSON output
 - Uses [Verification Roll-up Strategy](../../Functional/Processing/VerificationTraces.md#verification-roll-up-strategy)
@@ -72,6 +73,26 @@ Command output is written to stdout for easy redirection to files.
 
 #### Relations
  * refine: [CLI Coverage Command](Commands.md#cli-coverage-command)
+---
+
+### CLI Ontologies Command Refinement Specification
+
+#### Details
+The `ontologies` command shall collect ontology `#### Ontology` content and semantic-contract `#### Shapes` content for downstream tooling:
+- Command syntax: `reqvire ontologies [--jsonld] [--full] [--output <FILE>]`
+- Default output format: RDF/Turtle (`.ttl`)
+- `--jsonld`: emit JSON-LD instead of Turtle
+- `--full`: include generated RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, and semantic-contract shape references
+- `--output <FILE>`: write the selected format to the requested file instead of stdout
+- The command shall use the graph-registry semantic index used by validation.
+- The default mode shall preserve the current artifact-only export of authored ontology and SHACL blocks.
+- The full mode shall append an in-memory RDF projection of the Reqvire graph registry context without requiring a persistent RDF store.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [CLI Ontologies Command](Commands.md#cli-ontologies-command)
 ---
 
 ### CLI Interface Structure Refinement Specification
@@ -105,7 +126,13 @@ mv-asset Move/rename asset file and update references
 rm-asset Remove asset file and remove references
 containment Generate containment view
 resources Generate resources report
+ontologies Collect ontology elements and semantic-contract SHACL shapes
 help Print help for commands
+
+Ontologies options:
+--jsonld Output JSON-LD format instead of RDF/Turtle (.ttl)
+--full Include Reqvire model context triples in the semantic export
+--output <FILE> Save output to file
 
 Options:
 -h, --help Print help
@@ -302,9 +329,11 @@ Model command behavior:
 - Support `--from=<name>` for filtering from a specific element by name.
 - Use globally unique element names for name-based lookup.
 - Support `--json` for JSON output format.
+- Support `--mmd` for pure Mermaid flowchart output without Markdown wrapper text or fenced code blocks.
 - Support `--reverse` for leaf-to-root traversal.
 - Support `--filter-type=<types>` with comma-separated element types to filter starting points.
 - Default to Markdown output with embedded Mermaid diagram.
+- When neither `--from` nor `--filter-type` is provided in forward mode, use ontology roots and feature roots as default starting elements.
 - Integrate with existing model diagram generation functionality.
 
 #### Metadata
@@ -527,7 +556,7 @@ Error handling:
 Default output:
 - Human-readable text format when neither `--json` nor `--short` is specified
 - Full detail mode showing all element metadata and relations
-- Full JSON output includes effective governance metadata for requirement-family elements
+- Full JSON output includes effective governance metadata for governance-bearing elements (`feature` and `requirement`)
 
 #### Metadata
  * type: specification
@@ -538,15 +567,16 @@ Default output:
 #### Details
 Submodels command behavior:
 - Be invoked as `reqvire submodels`.
-- Support `--from <NAME>` to scope report to one requirement subtree by name.
+- Support `--from <NAME>` to scope report to one feature or requirement subtree by name.
 - Support `--json` for JSON output format.
 - Default to human-readable text output when `--json` is not present.
-- Report independent requirement submodels using hierarchical (`derivedFrom`) relations.
+- Report independent feature-rooted submodels using feature hierarchy, `specifiedBy`, and requirement hierarchy.
 - Report cross-submodel requirement couplings using explicit requirement-to-requirement relations.
-- In `--from` mode, treat selected requirement as scope boundary and exclude it from reported `submodels` entries.
+- In `--from` mode for a feature, report the selected feature as the scoped feature submodel and count requirements in the selected feature subtree.
+- In `--from` mode for a requirement, treat the selected requirement as a scope boundary and exclude it from reported `submodels` entries.
 - Provide deterministic ordering for submodels and couplings.
 - Include summary totals for submodels, requirements, and cross-submodel couplings.
-- Return a clear error when `--from <NAME>` does not match any requirement scope source.
+- Return a clear error when `--from <NAME>` does not match any feature or requirement scope source.
 - Exit with status code 0 on success and non-zero on errors.
 
 Command output is written to stdout for easy redirection to files.
@@ -568,7 +598,7 @@ The command is expected to:
 - Show verification elements as roots with arrows following relation semantics
 - Include clickable links on all nodes (verifications and requirements) in Mermaid diagrams
 - Highlight directly verified requirements using CSS classes in diagrams
-- Traverse all upward parent relations to reach root requirements
+- Traverse all upward parent relations to reach feature-rooted requirements
 - Merge multiple verification paths into a single tree per verification
 - Exit with status code 0 on success
 - Exit with non-zero status code on errors

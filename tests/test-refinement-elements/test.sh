@@ -8,7 +8,7 @@ set -euo pipefail
 #   - specifications/System/Core/Verifications/ParsingVerifications.md#refinement-relations-rejection-test
 #
 # Acceptance Criteria:
-# - Refinement element types (constraint, behavior, specification) are parsed correctly
+# - Refinement element types (constraint, behavior, specification, state, input-output) are parsed correctly
 # - Refinement element types are displayed correctly in JSON output
 # - Search filtering by Refinement types works correctly
 # - Validation fails when Refinement elements have Relations subsection
@@ -17,6 +17,8 @@ set -euo pipefail
 # - Parse constraint type from metadata
 # - Parse behavior type from metadata
 # - Parse specification type from metadata
+# - Parse state type from metadata
+# - Parse input-output type from metadata
 # - Filter elements by Refinement types
 # - Reject Refinement elements with Relations
 
@@ -98,9 +100,35 @@ if [ "$SPEC_TYPE" != "specification" ]; then
 fi
 
 # ==================================
-# Test 4: Filter by Constraint Type
+# Test 4: State Type Parsing
 # ==================================
-echo "Test 4: Search filtering by constraint type..."
+echo "Test 4: State type parsing..."
+
+STATE_TYPE=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "Test State Element") | .type')
+if [ "$STATE_TYPE" != "state" ]; then
+  echo "FAILED: State type not parsed correctly"
+  echo "  Expected: state"
+  echo "  Actual: $STATE_TYPE"
+  exit 1
+fi
+
+# ==================================
+# Test 5: Input-Output Type Parsing
+# ==================================
+echo "Test 5: Input-output type parsing..."
+
+INPUT_OUTPUT_TYPE=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "Test Input Output Element") | .type')
+if [ "$INPUT_OUTPUT_TYPE" != "input-output" ]; then
+  echo "FAILED: Input-output type not parsed correctly"
+  echo "  Expected: input-output"
+  echo "  Actual: $INPUT_OUTPUT_TYPE"
+  exit 1
+fi
+
+# ==================================
+# Test 6: Filter by Constraint Type
+# ==================================
+echo "Test 6: Search filtering by constraint type..."
 
 set +e
 CONSTRAINT_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type="constraint" --json 2>&1)
@@ -123,9 +151,9 @@ if [ "$CONSTRAINT_COUNT" -ne 1 ]; then
 fi
 
 # ==================================
-# Test 5: Filter by Behavior Type
+# Test 7: Filter by Behavior Type
 # ==================================
-echo "Test 5: Search filtering by behavior type..."
+echo "Test 7: Search filtering by behavior type..."
 
 set +e
 BEHAVIOR_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type="behavior" --json 2>&1)
@@ -148,9 +176,9 @@ if [ "$BEHAVIOR_COUNT" -ne 1 ]; then
 fi
 
 # ==================================
-# Test 6: Filter by Specification Type
+# Test 8: Filter by Specification Type
 # ==================================
-echo "Test 6: Search filtering by specification type..."
+echo "Test 8: Search filtering by specification type..."
 
 set +e
 SPEC_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type="specification" --json 2>&1)
@@ -173,9 +201,57 @@ if [ "$SPEC_COUNT" -ne 1 ]; then
 fi
 
 # ==================================
-# Test 7: Refinement With Relations Rejection
+# Test 9: Filter by State Type
 # ==================================
-echo "Test 7: Validation rejects Refinement with Relations..."
+echo "Test 9: Search filtering by state type..."
+
+set +e
+STATE_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type="state" --json 2>&1)
+FILTER_EXIT=$?
+set -e
+
+if [ $FILTER_EXIT -ne 0 ]; then
+  echo "FAILED: Filter by state type failed"
+  echo "$STATE_JSON"
+  exit 1
+fi
+
+STATE_COUNT=$(echo "$STATE_JSON" | jq '[.files | to_entries[] | .value.elements[]] | length')
+if [ "$STATE_COUNT" -ne 1 ]; then
+  echo "FAILED: Filter by state returned wrong count"
+  echo "  Expected: 1"
+  echo "  Actual: $STATE_COUNT"
+  exit 1
+fi
+
+# ==================================
+# Test 10: Filter by Input-Output Type
+# ==================================
+echo "Test 10: Search filtering by input-output type..."
+
+set +e
+INPUT_OUTPUT_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type="input-output" --json 2>&1)
+FILTER_EXIT=$?
+set -e
+
+if [ $FILTER_EXIT -ne 0 ]; then
+  echo "FAILED: Filter by input-output type failed"
+  echo "$INPUT_OUTPUT_JSON"
+  exit 1
+fi
+
+INPUT_OUTPUT_COUNT=$(echo "$INPUT_OUTPUT_JSON" | jq '[.files | to_entries[] | .value.elements[]] | length')
+if [ "$INPUT_OUTPUT_COUNT" -ne 1 ]; then
+  echo "FAILED: Filter by input-output returned wrong count"
+  echo "  Expected: 1"
+  echo "  Actual: $INPUT_OUTPUT_COUNT"
+  exit 1
+fi
+
+# ==================================
+# Test 11: Refinement With Invalid Relations Rejection
+# ==================================
+echo "Test 11: Validation rejects Refinement with invalid Relations..."
 
 # Helper to assert refinement-with-relations is rejected for a given refinement type
 assert_invalid_refinement_relations_rejected() {
@@ -209,7 +285,7 @@ EOF
   fi
 
   # Verify error message mentions refinement/type/relations context
-  if ! echo "$VALIDATION_OUTPUT" | grep -qi "constraint\|behavior\|specification\|refinement\|relations"; then
+  if ! echo "$VALIDATION_OUTPUT" | grep -qi "constraint\|behavior\|specification\|state\|input-output\|refinement\|relations"; then
     echo "FAILED: Error message should mention refinement/relations issue for type ${refinement_type}"
     echo "Output: $VALIDATION_OUTPUT"
     exit 1
@@ -225,10 +301,16 @@ assert_invalid_refinement_relations_rejected "behavior" "Invalid Behavior With R
 # Specification with relations -> rejected
 assert_invalid_refinement_relations_rejected "specification" "Invalid Specification With Relations"
 
+# State with relations -> rejected
+assert_invalid_refinement_relations_rejected "state" "Invalid State With Relations"
+
+# Input-output with relations -> rejected
+assert_invalid_refinement_relations_rejected "input-output" "Invalid Input Output With Relations"
+
 # ==================================
-# Test 8: Attachment Identifier to Refinement Element
+# Test 12: Attachment Identifier to Refinement Element
 # ==================================
-echo "Test 8: Attachment identifier to Refinement element..."
+echo "Test 12: Attachment identifier to Refinement element..."
 
 # Remove invalid file for this test
 rm -f "$TEST_DIR/specifications/InvalidRefinement.md"
@@ -272,9 +354,9 @@ if [ "$ATTACHMENTS" == "null" ] || [ "$ATTACHMENTS" == "[]" ]; then
 fi
 
 # ==================================
-# Test 9: Rename Refinement Element Updates Attachment Identifiers
+# Test 13: Rename Refinement Element Updates Attachment Identifiers
 # ==================================
-echo "Test 9: Rename Refinement element updates attachment identifiers..."
+echo "Test 13: Rename Refinement element updates attachment identifiers..."
 
 # Rename the constraint element
 set +e
@@ -331,9 +413,9 @@ if [ $RENAME_EXIT -ne 0 ]; then
 fi
 
 # ==================================
-# Test 10: Move Refinement Element Updates Attachment Identifiers
+# Test 14: Move Refinement Element Updates Attachment Identifiers
 # ==================================
-echo "Test 10: Move Refinement element updates attachment identifiers..."
+echo "Test 14: Move Refinement element updates attachment identifiers..."
 
 # Create a new file to move to
 cat > "$TEST_DIR/specifications/Refinements.md" <<'EOF'

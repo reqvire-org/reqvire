@@ -31,7 +31,7 @@ Analyze verification and implementation coverage to identify gaps.
    - Extract total leaf requirements count (verification scope)
    - Calculate verification percentage
    - Identify unverified requirements count
-   - Extract implementation scope count (`requirement` elements only; excludes `user-requirement`)
+   - Extract implementation scope count (`requirement` elements only; excludes `feature`)
 
 3. **Identify unverified leaf requirements:**
 
@@ -77,6 +77,6 @@ Analyze verification and implementation coverage to identify gaps.
 
 - Focus on leaf requirements for verification
 - Parent requirements inherit coverage from children
-- Implementation coverage does not include `user-requirement`
+- Implementation coverage does not include `feature`; feature coverage rolls up from requirements that specify features
 - Use `/add-verification` to create missing verifications
 - Run `reqvire coverage` after adding verifications to confirm improvement

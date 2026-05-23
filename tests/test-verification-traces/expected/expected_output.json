@@ -20,9 +20,9 @@
                 "is_directly_verified": true,
                 "children": [
                   {
-                    "id": "specifications/UserRequirements.md#user-authentication",
+                    "id": "specifications/Features.md#user-authentication",
                     "name": "User Authentication",
-                    "type": "user-requirement",
+                    "type": "requirement",
                     "is_directly_verified": false,
                     "children": []
                   }
@@ -63,9 +63,9 @@
                     "is_directly_verified": false,
                     "children": [
                       {
-                        "id": "specifications/UserRequirements.md#user-authentication",
+                        "id": "specifications/Features.md#user-authentication",
                         "name": "User Authentication",
-                        "type": "user-requirement",
+                        "type": "requirement",
                         "is_directly_verified": false,
                         "children": []
                       }
@@ -95,9 +95,9 @@
                 "is_directly_verified": true,
                 "children": [
                   {
-                    "id": "specifications/UserRequirements.md#data-protection",
+                    "id": "specifications/Features.md#data-protection",
                     "name": "Data Protection",
-                    "type": "user-requirement",
+                    "type": "requirement",
                     "is_directly_verified": false,
                     "children": []
                   }
@@ -126,9 +126,9 @@
                 "is_directly_verified": true,
                 "children": [
                   {
-                    "id": "specifications/UserRequirements.md#coverage-reports",
+                    "id": "specifications/Features.md#coverage-reports",
                     "name": "Coverage Reports",
-                    "type": "user-requirement",
+                    "type": "requirement",
                     "is_directly_verified": false,
                     "children": []
                   }
@@ -152,14 +152,14 @@
           "file": "specifications/Verifications/Tests.md",
           "type": "analysis-verification",
           "directly_verified_requirements": [
-            "specifications/UserRequirements.md#data-protection"
+            "specifications/Features.md#data-protection"
           ],
           "trace_tree": {
             "requirements": [
               {
-                "id": "specifications/UserRequirements.md#data-protection",
+                "id": "specifications/Features.md#data-protection",
                 "name": "Data Protection",
-                "type": "user-requirement",
+                "type": "requirement",
                 "is_directly_verified": true,
                 "children": []
               }
@@ -185,9 +185,9 @@
                 "is_directly_verified": true,
                 "children": [
                   {
-                    "id": "specifications/UserRequirements.md#user-authentication",
+                    "id": "specifications/Features.md#user-authentication",
                     "name": "User Authentication",
-                    "type": "user-requirement",
+                    "type": "requirement",
                     "is_directly_verified": false,
                     "children": []
                   }

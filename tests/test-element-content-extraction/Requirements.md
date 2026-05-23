@@ -1,5 +1,14 @@
 # Elements
 
+
+### Test Feature Test Element Content Extraction Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 This file should be processed.
 
 
@@ -8,27 +17,31 @@ This file should be processed.
 Root requirement for relations to work.
 
 #### Metadata
-* type: user-requirement
+* type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-content-extraction-requirements-md)
 ### REQ 1
 
 This is simple requirement with main text only.
 
 #### Metadata
-* type: user-requirement
+* type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-content-extraction-requirements-md)
 ### REQ 1A
 
 This is simple requirement with main text and details.
 
 #### Metadata
-* type: user-requirement
-
+* type: requirement
 #### Details
 
 REQ 1A details.
 
-
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-content-extraction-requirements-md)
 ### REQ 2
 
 Requirement with main text and relations.

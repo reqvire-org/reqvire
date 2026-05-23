@@ -11,11 +11,11 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Satisfies: specifications/Verifications/ReportsTests.md#model-command-verification
 #
 # Acceptance Criteria:
-# - `reqvire model` generates model-centric output showing root requirements with nested relations
+# - `reqvire model` generates model-centric output showing ontology roots and feature roots with nested relations
 # - `reqvire model --from=<name>` generates nested structure from specified element
 # - `reqvire model --json` generates valid JSON with nested element structure
 # - `reqvire model --from=<name> --json` generates filtered JSON from specified starting point
-# - Default mode filters to root requirements (no hierarchical parent relations)
+# - Default mode filters to ontology roots and feature roots
 # - Relations contain full target element details recursively
 #
 # Test Criteria:
@@ -47,8 +47,8 @@ if ! grep -q '```mermaid' <<< "$OUTPUT"; then
     exit 1
 fi
 
-if ! grep -q 'graph LR' <<< "$OUTPUT"; then
-    echo "❌ FAILED: Mermaid diagram missing 'graph LR' declaration"
+if ! grep -q 'graph TD' <<< "$OUTPUT"; then
+    echo "❌ FAILED: Mermaid diagram missing 'graph TD' declaration"
     exit 1
 fi
 
@@ -61,6 +61,46 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_output.md" "${TEST_DIR}/actua
     echo "Expected: ${TEST_DIR}/expected_output.md"
     echo "Actual: ${TEST_DIR}/actual_output.md"
     diff -u "${TEST_SCRIPT_DIR}/expected/expected_output.md" "${TEST_DIR}/actual_output.md"
+    exit 1
+fi
+
+# Test 1b: Pure Mermaid Output
+echo "Running: reqvire model --mmd" >> "${TEST_DIR}/test_results.log"
+set +e
+MMD_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --mmd 2>&1)
+MMD_EXIT_CODE=$?
+set -e
+
+echo "Exit code: $MMD_EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$MMD_OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $MMD_EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: model --mmd command exited with code $MMD_EXIT_CODE"
+    echo "$MMD_OUTPUT"
+    exit 1
+fi
+
+if ! grep -q '^graph TD' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output missing Mermaid graph declaration"
+    echo "$MMD_OUTPUT"
+    exit 1
+fi
+
+if grep -q '```' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output should not contain Markdown fences"
+    echo "$MMD_OUTPUT"
+    exit 1
+fi
+
+if ! grep -q 'Model Command Ontology' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output should include ontology roots"
+    echo "$MMD_OUTPUT"
+    exit 1
+fi
+
+if ! grep -q -- '-->|attaches|' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output should include attachment edges"
+    echo "$MMD_OUTPUT"
     exit 1
 fi
 

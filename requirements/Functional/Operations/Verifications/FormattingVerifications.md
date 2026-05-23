@@ -68,7 +68,7 @@ This test verifies that the format command reorders elements following the Eleme
 
 ### Format Command Requirements Verification
 
-This test verifies the format command requirements from SystemRequirements and UserRequirements, focusing on normalizing and standardizing System models for consistency and readability.
+This test verifies the format command requirements, focusing on normalizing and standardizing Reqvire models for consistency and readability.
 
 #### Details
 

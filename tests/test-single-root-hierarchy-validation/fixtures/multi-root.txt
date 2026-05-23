@@ -5,7 +5,7 @@
 First top-level root.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 ---
 
 ### Root Two
@@ -13,17 +13,17 @@ First top-level root.
 Second top-level root.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 ---
 
 ### Shared Child Requirement
 
-Invalid: resolves to two top roots.
+Invalid: resolves to two owning features.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root One](#root-one)
-  * derivedFrom: [Root Two](#root-two)
+  * specify: [Root One](#root-one)
+  * specify: [Root Two](#root-two)
 ---

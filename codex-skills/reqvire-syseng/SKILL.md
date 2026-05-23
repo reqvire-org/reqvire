@@ -42,56 +42,144 @@ Version policy:
 
 | Category | Type | Purpose |
 |----------|------|---------|
-| User Requirements | `user-requirement` | Stakeholder needs (business, customer, compliance) |
-| System Requirements | `requirement` | Technical implementation (functional, performance, interface) |
-| Refinements | `specification` | Detailed definitions satisfying requirements |
+| Features | `feature` | Product, stakeholder, regulatory, or external capability roots specified by requirements |
+| Requirements | `requirement` | Implementable system obligations (functional, performance, interface, compliance) |
+| Ontology | `ontology` | First-class OWL/Turtle vocabulary and semantic model terms reusable by features and requirements |
+| Feature Refinements | `source` | External need, regulation, policy, or source material owned by a feature |
+| Requirement Refinements | `specification` | Detailed definitions satisfying requirements |
 | | `constraint` | Limits and boundaries on system behavior |
 | | `behavior` | How the system behaves in specific conditions |
 | | `state` | Lifecycle states, state machines, transitions, and state-dependent contracts |
 | | `input-output` | Payloads, messages, documents, schemas, fixtures, and data contracts |
+| | `semantic-contract` | Requirement-owned SHACL shape profile over reachable ontology context |
 | Verifications | `test-verification` | Automated/manual testing (evidence-backed; requires satisfiedBy) |
 | | `formal-proof-verification` | Formal proof, model checking, theorem proving, generated fixtures, or proof reports (evidence-backed; requires satisfiedBy) |
 | | `analysis-verification` | Review, calculation, simulation |
 | | `inspection-verification` | Visual examination, audit |
 | | `demonstration-verification` | Showing capability works |
 
+## Feature, Requirement, Ontology, and Semantic Contract Guidance
+
+A `feature` answers:
+- What capability, product area, stakeholder need, regulatory area, external obligation, or domain slice is this?
+- Why does this area exist in the product model?
+- What stakeholder, regulatory, source, or policy context owns it?
+- What ontology or source context defines its domain language?
+- Which requirements belong under this capability?
+
+A feature is not a weaker requirement. It is the capability anchor. It may own `source` refinements and attach `ontology` elements because those define vocabulary, external context, source authority, domain structure, and reusable meaning for the capability before individual system obligations are written.
+
+A `requirement` answers:
+- What must the system do?
+- Under what condition, interface, state, or scope?
+- What implementation or evidence can satisfy it?
+- What verification proves it?
+
+A requirement is the obligation anchor. It should stay testable, implementation-facing, and evidence-facing. Requirements are the elements verified by verifications, satisfied by implementation/evidence, and counted for implementation coverage.
+
+Use an `ontology` when content defines reusable domain or model meaning:
+- `X is a Y`
+- `X has property Z`
+- `X relates to Y`
+- this domain term means...
+
+Use a requirement-owned `semantic-contract` when one obligation needs a closed-world SHACL profile over reachable ontology terms. Semantic contracts must have `#### Shapes`, must refine a requirement, and must not contain `#### Ontology`.
+
+Use `#### Concept References` when readable prose should bind human labels to ontology terms without filling the requirement text with CURIEs. The referenced IRI or CURIE must be declared by reachable ontology context.
+
+Cleanup rule: ontology should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in requirement-owned `specification`, `behavior`, `state`, `input-output`, or `semantic-contract` refinements.
+
+Use a `requirement` when the statement says what the system must do, especially when it naturally reads as `The system shall...`.
+
+## System Model Construction Method
+
+When constructing or refactoring a Reqvire system model:
+
+1. Inspect feature-root subgraphs with `submodels` and inspect the ontology plane with `search --filter-type=ontology`.
+2. Decide whether work belongs to an existing feature root, a child feature, a new independent feature root, or the shared ontology hierarchy.
+3. Keep ontology elements in `requirements/Ontologies`; features attach ontology from there instead of nesting ontology in feature files.
+4. Treat ontology as first-class and orthogonal to feature requirements: ontology defines reusable terms and relationships; features attach ontology so requirements inherit it through the owning feature path.
+5. Keep hierarchy inside feature, requirement, or ontology families; cross-root reuse must be explicit attachments.
+6. Move stable reusable meaning to ontology; keep obligations in requirements and exact implementation/interface behavior in requirement-owned refinements.
+7. Attach ontology to the consuming feature, or attach reusable requirement-owned contracts to consuming requirements, instead of using hierarchy to cross submodel boundaries.
+8. Update verifications and e2e fixtures in the same slice when requirements, report shape, names, or output expectations change.
+9. Validate in slices with `validate`, `lint`, `submodels`, and focused tests before broadening the refactor.
+
+## Ontology Commands
+
+Use CLI ontology collection when a shell workflow needs reusable RDF/SHACL output:
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" ontologies
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" ontologies --jsonld
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" ontologies --full
+```
+
+For MCP workflows, use the read-only `reqvire.ontologies` tool. It accepts optional `format: "turtle"` or `format: "jsonld"` and optional `full: true`. Default mode returns serialized authored ontology/SHACL content plus semantic index summary, source block metadata, diagnostics, ontology declarations, and SHACL references. Full mode also includes generated Reqvire model context triples for elements, relations, attachments, concept references, ontology declarations, and shape references.
+
+## Model Commands
+
+Use the model command when a shell workflow needs a structural model view. Without `--from` or `--filter-type`, `model` starts from ontology roots and feature roots. Use `--mmd` when a downstream tool expects pure Mermaid text instead of Markdown.
+
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model --mmd
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" model --json
+```
+
 ## Relation Types
 
 | Relation | Allowed Sources | Purpose |
 |----------|-----------------|---------|
-| `derivedFrom` / `derive` | Any requirement type | Traceability to parent requirements |
+| `derivedFrom` / `derive` | `feature`, `requirement`, `ontology` | Hierarchy within the same family: feature-to-feature, requirement-to-requirement, or ontology-to-ontology |
+| `specify` / `specifiedBy` | `requirement` / `feature` | Bridge from requirements to their owning feature |
 | `satisfiedBy` / `satisfy` | `requirement`, `test-verification`, `formal-proof-verification` only | Link to implementation or evidence artifacts |
-| `verifiedBy` / `verify` | Any requirement type | Link to verification elements |
-| `refinedBy` / `refine` | Any requirement type | Ownership of refinement elements |
+| `verifiedBy` / `verify` | `requirement` / verification element | Link requirements to verification elements |
+| `refinedBy` / `refine` | `feature`, `requirement` | Ownership of subtype-compatible refinement elements |
 | `trace` | Any | Non-directional traceability |
-| Attachments | Requirements outside owner's hierarchy | Reference existing refinements |
+| Attachments | `feature`, `requirement` | Reference existing ontology or compatible requirement-owned refinement contracts across explicit subgraph boundaries |
 
 **Key constraints:**
-- `user-requirement` must NOT use `satisfiedBy`/`satisfy`
+- Requirements specify features through `specify`; features point back to those requirements with `specifiedBy`
+- Feature hierarchy uses `derivedFrom`/`derive` only between features
+- Requirement hierarchy uses `derivedFrom`/`derive` only between requirements
+- Ontology hierarchy uses `derivedFrom`/`derive` only between ontology elements; ontology elements do not author attachments
+- Features are not directly satisfied or verified; feature coverage rolls up from requirements that specify them
 - Among verification types, only evidence-backed verifications (`test-verification`, `formal-proof-verification`) may use `satisfiedBy`/`satisfy`
-- Each refinement owned by exactly one requirement (via `refinedBy`)
-- Only requirements OUTSIDE the owner's derivation hierarchy can attach a refinement
+- Each refinement is owned by exactly one valid owner via `refinedBy`
+- Feature attachments may target `ontology` elements only
+- Requirement attachments may target requirement-owned `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements only
 
 **Traceability flow:**
 ```
-User Requirement → derive → Requirement
-                              ├── refinedBy → Spec/Constraint/Behavior/State/Input-Output
-                              ├── satisfiedBy → Code
-                              └── verifiedBy → Verification → satisfiedBy → Test/Proof evidence
+Feature
+  ├── refinedBy → Source
+  ├── attach → Ontology
+  ├── derive → Subfeature
+  └── specifiedBy → Requirement
+
+Requirement
+  ├── specify → Feature
+  ├── derive → Child Requirement
+  ├── attach → Reusable Requirement Contract
+  ├── refinedBy → Semantic-Contract/Spec/Constraint/Behavior/State/Input-Output
+  ├── satisfiedBy → Code
+  └── verifiedBy → Verification → satisfiedBy → Test/Proof evidence
 ```
 
 ## Document Structure
 
 - Files begin with `# Elements` (multi-element) or `# Documents` (single-element)
 - Elements are `###` headers with unique names per file
-- Reserved `####` subsections: **Metadata**, **Relations**, **Details**, **Attachments**
+- Reserved `####` subsections: **Metadata**, **Relations**, **Details**, **Attachments**, **Concept References**
+- Ontology elements require exactly one `#### Ontology` fenced Turtle block; semantic contracts require exactly one `#### Shapes` fenced Turtle block
 - Non-reserved `####` subsections become element content (use for inline specs/behaviors)
 - Relations syntax: `  * derivedFrom: [Parent](path.md#parent)`
 - Attachments syntax: `  * [Name](path.md#element)`
 
 ## Requirement Governance Metadata
 
-Requirement-family elements (`requirement`, `user-requirement`) may define governance metadata in `#### Metadata`:
+Governance-bearing elements (`feature`, `requirement`) may define governance metadata in `#### Metadata`:
 
 | Key | Values | Default | Meaning |
 |-----|--------|---------|---------|
@@ -100,9 +188,9 @@ Requirement-family elements (`requirement`, `user-requirement`) may define gover
 | `risk` | `low`, `medium`, `high`, `critical` | `low` | Requirement-driven delivery, safety, compliance, integration, or validation risk |
 | `owner` | free-form string | unassigned | Accountability/routing label; may be a person, role, team, department, subsystem group, or task owner |
 
-Missing governance fields inherit from the nearest parent requirement; otherwise defaults apply. Search JSON exposes effective values and their sources under `governance_metadata`. Text and JSON search summaries expose governance counters.
+Missing governance fields inherit from the nearest parent feature or requirement through `derivedFrom` and `specify`; otherwise defaults apply. Search JSON exposes effective values and their sources under `governance_metadata`. Text and JSON search summaries expose governance counters.
 
-Governance metadata belongs directly on requirement-family elements only. Refinements and verifications must not author `status`, `priority`, `risk`, or `owner` in metadata; they receive governance context from their owning or linked requirement.
+Governance metadata belongs directly on feature and requirement elements only. Refinements and verifications must not author `status`, `priority`, `risk`, or `owner` in metadata; they receive governance context from their owning or linked feature/requirement.
 
 ### When and How to Use Governance
 
@@ -163,6 +251,7 @@ Load the right reference file for your task — don't work from memory on comple
 | **Explore model** | [explore.md](references/explore.md) | Understanding structure, browsing, traceability analysis |
 | **Add features** | [AddFeature.md](references/AddFeature.md) | New functionality, MBSE workflow, requirements hierarchy |
 | **Refactor model** | [ConsolidateRequirements.md](references/ConsolidateRequirements.md) | Cluttered/duplicated model, fixing relations/ownership |
+| **Refactor feature/semantic contracts** | [FeatureSemanticContractRefactor.md](references/FeatureSemanticContractRefactor.md) | Split feature scope, reusable ontology/semantic-contract meaning, and requirement obligations |
 | **Extract specs** | [SpecificationsExtractionLogic.md](references/SpecificationsExtractionLogic.md) | Embedded details in requirements, separating EARS from specs |
 | **Clean language** | [SpecificationLanguageCleanup.md](references/SpecificationLanguageCleanup.md) | Normative wording in refinements, language ownership |
 | **Generate tasks** | [CreatingTasks.md](references/CreatingTasks.md) | Implementation plans from requirement changes |
@@ -174,9 +263,9 @@ Load the right reference file for your task — don't work from memory on comple
 
 ## Quick Start Common Workflows
 
-- Explore requirements with `search`, then gather full context with `collect`
-- Add or modify requirements only after reading the existing requirement chain
-- Keep governance metadata on requirement-family elements only
+- Explore features and requirements with `search`, then gather full context with `collect`
+- Add or modify requirements only after reading the owning feature and requirement chain
+- Keep governance metadata on feature and requirement elements only
 - Route implementation tasks by effective `owner`, `priority`, `risk`, and `status`
 - Validate after meaningful edits with `validate`, then run `lint`, `coverage`, or `format` as needed
 
@@ -199,7 +288,7 @@ search --filter-status="review" --short
 search --filter-priority="high,critical" --short
 search --filter-risk="high,critical" --json
 search --filter-owner="Platform|Safety" --json
-model [--from "Element"] [--reverse] [--filter-type="requirement"]
+model [--from "Element"] [--reverse] [--filter-type="requirement"] [--mmd]
 collect "Element" [--direction DOWNSTREAM] [--json]
 submodels [--from "Root"]
 

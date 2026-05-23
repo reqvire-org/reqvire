@@ -102,11 +102,35 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [CLI Change Impact Report Command](../Commands.md#cli-change-impact-report-command)
   * verify: [CLI Coverage Command](../Commands.md#cli-coverage-command)
   * verify: [CLI JSON File Output Option](../Commands.md#cli-json-file-output-option)
+  * verify: [CLI Ontologies Command](../Commands.md#cli-ontologies-command)
   * verify: [CLI Search Command](../Commands.md#cli-search-command)
   * verify: [CLI Traces Command](../Commands.md#cli-traces-command)
   * verify: [Format Command](../Commands.md#format-command)
   * verify: [Validate Command](../Commands.md#validate-command)
   * verify: [HTML Export](../../WebInterface/Features.md#html-export)
+---
+
+### CLI Ontologies Command Verification
+
+This verification shall prove that the ontologies command and export workflow collect ontology `Ontology` content and semantic-contract `Shapes` content.
+
+#### Details
+Expected checks:
+- Run `reqvire ontologies` and verify Turtle output contains ontology declarations and SHACL shape references.
+- Run `reqvire ontologies --jsonld` and verify the output is valid JSON-LD.
+- Run `reqvire ontologies --full` and verify Turtle output contains Reqvire model context triples linking the feature, ontology, requirement, and semantic-contract elements.
+- Run `reqvire ontologies --full --jsonld` and verify JSON-LD output contains Reqvire model context triples.
+- Run `reqvire export --output <DIR>` and verify `ontologies.ttl` and `ontologies.html` are generated.
+- Verify exported `ontologies.ttl` contains collected ontology content.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-ontologies-command/test.sh)
+  * verify: [CLI Ontologies Command](../Commands.md#cli-ontologies-command)
+  * verify: [Ontology and Shapes Collection](../../../Functional/Output/Reporting.md#ontology-and-shapes-collection)
+  * verify: [Ontologies View Generation](../../WebInterface/Features.md#ontologies-view-generation)
 ---
 
 ### Explicit Workspace Selection Verification

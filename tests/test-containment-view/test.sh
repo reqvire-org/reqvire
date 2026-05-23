@@ -129,8 +129,8 @@ echo ""
 echo "Test 4: Element type styling..."
 
 # Verify CSS class definitions exist
-if ! echo "$MERMAID_DIAGRAM" | grep -q "classDef userRequirement"; then
-  echo "❌ FAILED: Missing userRequirement class definition"
+if ! echo "$MERMAID_DIAGRAM" | grep -q "classDef feature"; then
+  echo "❌ FAILED: Missing feature class definition"
   exit 1
 fi
 
@@ -145,8 +145,8 @@ if ! echo "$MERMAID_DIAGRAM" | grep -q "classDef verification"; then
 fi
 
 # Verify class assignments exist
-if ! echo "$MERMAID_DIAGRAM" | grep -q "class .* userRequirement"; then
-  echo "❌ FAILED: No elements assigned userRequirement class"
+if ! echo "$MERMAID_DIAGRAM" | grep -q "class .* feature"; then
+  echo "❌ FAILED: No elements assigned feature class"
   exit 1
 fi
 
@@ -223,7 +223,7 @@ REQUIRED_ELEMENTS=(
   "User Authentication"
   "Export to CSV"
   "High Performance"
-  "Root User Requirement"
+  "Root Feature"
   "Test Verification Element"
   "Analysis Verification Element"
   "Inspection Verification Element"

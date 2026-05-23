@@ -90,7 +90,7 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ## Background
 
-[Explain the requirement chain and why this requirement exists. Describe the derivedFrom chain from root requirements down to this element. For each level in the hierarchy, explain the refinement - how each child adds specificity or detail to its parent. This section tells the "why" story.]
+[Explain the feature and requirement chain and why this requirement exists. Describe the owning feature context, the specify bridge, and the derivedFrom chain down to this element. For each level in the hierarchy, explain how each child adds specificity or detail to its parent. This section tells the "why" story.]
 
 ## Detailed Specifications
 

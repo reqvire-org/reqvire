@@ -12,7 +12,7 @@
 
 ## Overview
 
-The TraceFlow view displays the verification traceability flow using an interactive D3.js Sankey diagram visualization. This view shows how requirements flow through the system from user requirements to system requirements to verifications, providing a clear visual representation of the traceability relationships.
+The TraceFlow view displays the verification traceability flow using an interactive D3.js Sankey diagram visualization. This view shows how product features are specified by requirements and how requirements flow to verifications, providing a clear visual representation of the traceability relationships.
 
 The TraceFlow page is accessible via the "TraceFlow" link in the navigation bar, positioned after "Traces".
 
@@ -24,13 +24,13 @@ The TraceFlow visualization displays the traceability hierarchy as a Sankey flow
 
 **Structure:**
 - Left-to-right flow showing requirement hierarchy
-- Nodes represent elements (requirements, verifications)
-- Links represent relations (derivedFrom, verifiedBy)
+- Nodes represent elements (features, requirements, verifications)
+- Links represent relations (specifiedBy, derivedFrom, verifiedBy)
 - Link width proportional to the number of connections
 - Color-coded by element type
 
 **Node Types:**
-- User requirements (purple)
+- Features (blue)
 - System requirements (deep purple)
 - Verifications (green)
 - Test verifications (green)
@@ -50,8 +50,8 @@ The visualization uses consistent colors matching other diagrams:
 
 | Type | Color | Description |
 |------|-------|-------------|
-| user-requirement | #7E57C2 | Purple for user requirements |
-| requirement | #673AB7 | Deep purple for system requirements |
+| feature | #BBDEFB | Blue for product/capability features |
+| requirement | #673AB7 | Deep purple for requirements |
 | verification | #4CAF50 | Green for verifications |
 | test-verification | #4CAF50 | Green for test verifications |
 

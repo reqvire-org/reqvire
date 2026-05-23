@@ -108,12 +108,12 @@ else
   assert_eq "high" "$(json_value "$SEARCH_JSON" "Child Overrides Governance" ".governance_metadata.priority.value")" "override child inherited priority value"
   assert_eq "inherited" "$(json_value "$SEARCH_JSON" "Child Overrides Governance" ".governance_metadata.priority.source")" "override child inherited priority source"
 
-  assert_eq "4" "$(echo "$SEARCH_JSON" | jq -r '.global_counters.total_governance_metadata.status.approved')" "summary approved status count"
+  assert_eq "5" "$(echo "$SEARCH_JSON" | jq -r '.global_counters.total_governance_metadata.status.approved')" "summary approved status count"
   assert_eq "1" "$(echo "$SEARCH_JSON" | jq -r '.global_counters.total_governance_metadata.status.review')" "summary review status count"
   assert_eq "3" "$(echo "$SEARCH_JSON" | jq -r '.global_counters.total_governance_metadata.priority.high')" "summary high priority count"
-  assert_eq "2" "$(echo "$SEARCH_JSON" | jq -r '.global_counters.total_governance_metadata.risk.low')" "summary low risk count"
+  assert_eq "3" "$(echo "$SEARCH_JSON" | jq -r '.global_counters.total_governance_metadata.risk.low')" "summary low risk count"
   assert_eq "3" "$(echo "$SEARCH_JSON" | jq -r '.global_counters.total_governance_metadata.owner["Platform Team"]')" "summary owner count"
-  assert_eq "2" "$(echo "$SEARCH_JSON" | jq -r '.global_counters.total_governance_metadata.owner.unassigned')" "summary unassigned owner count"
+  assert_eq "3" "$(echo "$SEARCH_JSON" | jq -r '.global_counters.total_governance_metadata.owner.unassigned')" "summary unassigned owner count"
 fi
 
 echo "Test 2.1: Text search summary includes governance metadata counters"
@@ -128,7 +128,7 @@ else
   if ! echo "$SEARCH_TEXT" | grep -q "Requirement Governance Metadata"; then
     fail "search text summary should include governance metadata section"
   fi
-  if ! echo "$SEARCH_TEXT" | grep -q "    approved: 4"; then
+  if ! echo "$SEARCH_TEXT" | grep -q "    approved: 5"; then
     fail "search text summary should include approved status count"
   fi
   if ! echo "$SEARCH_TEXT" | grep -q "    high: 3"; then
@@ -137,7 +137,7 @@ else
   if ! echo "$SEARCH_TEXT" | grep -q "    Platform Team: 3"; then
     fail "search text summary should include owner count"
   fi
-  if ! echo "$SEARCH_TEXT" | grep -q "    unassigned: 2"; then
+  if ! echo "$SEARCH_TEXT" | grep -q "    unassigned: 3"; then
     fail "search text summary should include unassigned owner count"
   fi
 fi
@@ -177,7 +177,7 @@ assert_search_rejects() {
   fi
 }
 
-assert_search_names "--filter-status=approved" "Child Inherits Governance|Default Governance Root|Independent Requirement|Root Requirement" "filter by inherited and default status"
+assert_search_names "--filter-status=approved" "Child Inherits Governance|Default Governance Root|Independent Requirement|Root Requirement|Test Feature Test Requirement Governance Metadata Specifications Requirements Md" "filter by inherited and default status"
 assert_search_names "--filter-status=review" "Child Overrides Governance" "filter by explicit review status"
 assert_search_names "--filter-priority=high" "Child Inherits Governance|Child Overrides Governance|Root Requirement" "filter by inherited priority"
 assert_search_names "--filter-risk=critical" "Child Overrides Governance" "filter by explicit critical risk"

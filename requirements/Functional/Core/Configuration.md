@@ -5,14 +5,14 @@
 The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same System model.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Attachments
   * [Refinement Specification](../../Refinements.md#refinement-specification)
 
 #### Relations
   * derive: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
+  * specify: [Defining Model Structure](../../Features.md#defining-model-structure)
 ---
 
 ### Ignoring Unstructured Documents

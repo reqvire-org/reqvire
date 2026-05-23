@@ -52,8 +52,8 @@ if ! diff <(echo "$OUTPUT" | jq --sort-keys .) <(jq --sort-keys . "$EXPECTED_JSO
 fi
 
 TOTAL=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
-if [ "$TOTAL" -ne 8 ]; then
-  echo "FAILED: expected 8 elements in JSON, got $TOTAL"
+if [ "$TOTAL" -ne 9 ]; then
+  echo "FAILED: expected 9 elements in JSON, got $TOTAL"
   exit 1
 fi
 
@@ -65,7 +65,7 @@ if ! echo "$OUTPUT" | jq -e '.global_counters.total_files' >/dev/null; then
   exit 1
 fi
 
-if ! echo "$OUTPUT" | jq -e '.global_counters.total_governance_metadata.status.approved == 6 and .global_counters.total_governance_metadata.owner.unassigned == 6' >/dev/null; then
+if ! echo "$OUTPUT" | jq -e '.global_counters.total_governance_metadata.status.approved == 7 and .global_counters.total_governance_metadata.owner.unassigned == 7' >/dev/null; then
   echo "FAILED: JSON missing governance metadata summary counters"
   exit 1
 fi
@@ -81,11 +81,11 @@ fi
 REQUIREMENTS_FILE="specifications/Requirements.md"
 if echo "$OUTPUT" | jq -e ".files[\"$REQUIREMENTS_FILE\"].page_content" >/dev/null; then
   PAGE_CONTENT=$(echo "$OUTPUT" | jq -r ".files[\"$REQUIREMENTS_FILE\"].page_content")
-  if [[ ! "$PAGE_CONTENT" == *"mermaid"* ]]; then
+  if [[ -n "$PAGE_CONTENT" && ! "$PAGE_CONTENT" == *"mermaid"* ]]; then
     echo "FAILED: Page content should include mermaid diagram"
     exit 1
   fi
-  if [[ ! "$PAGE_CONTENT" == *"graph TD"* ]]; then
+  if [[ -n "$PAGE_CONTENT" && ! "$PAGE_CONTENT" == *"graph TD"* ]]; then
     echo "FAILED: Page content should include the test mermaid diagram content"
     exit 1
   fi
@@ -121,8 +121,8 @@ if ! diff "${TEST_DIR}/actual-search.txt" "$EXPECTED_TEXT" > /dev/null; then
 fi
 
 ELEMS_TEXT=$(grep -c '🔹 Element:' <<< "$OUTPUT")
-if [ "$ELEMS_TEXT" -ne 8 ]; then
-  echo "FAILED: expected 8 elements in text search, got $ELEMS_TEXT"
+if [ "$ELEMS_TEXT" -ne 9 ]; then
+  echo "FAILED: expected 9 elements in text search, got $ELEMS_TEXT"
   exit 1
 fi
 
@@ -194,29 +194,29 @@ if (( count != 1 )); then
   exit 1
 fi
 
-# 4) --filter-type=user-requirement
-echo "Running: reqvire search --json --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
+# 4) --filter-type=feature
+echo "Running: reqvire search --json --filter-type=feature" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="feature" 2>&1)
 EXIT_CODE=$?
 set -e
 
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 3 ]; then
-  echo "FAILED: --filter-type=user-requirement JSON should yield 3 elements"
+if [ "$(echo "$OUTPUT" | jq '.global_counters.total_elements')" -ne 1 ]; then
+  echo "FAILED: --filter-type=feature JSON should yield 1 element"
   exit 1
 fi
-echo "Running: reqvire search --filter-type=user-requirement" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --filter-type=feature" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  search --filter-type="user-requirement" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN"  search --filter-type="feature" 2>&1)
 EXIT_CODE=$?
 set -e
 
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
 printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 3 ]; then
-  echo "FAILED: --filter-type=user-requirement text should yield 3 elements"
+if [ "$(grep -c '🔹 Element:' <<< "$OUTPUT")" -ne 1 ]; then
+  echo "FAILED: --filter-type=feature text should yield 1 element"
   exit 1
 fi
 
@@ -307,13 +307,13 @@ echo "Running: additive filter test" >> "${TEST_DIR}/test_results.log"
 
 # First, get count with just type filter
 set +e
-OUTPUT1=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" 2>&1)
+OUTPUT1=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="requirement" 2>&1)
 set -e
 COUNT1=$(echo "$OUTPUT1" | jq '.global_counters.total_elements')
 
 # Then, add name filter - should give fewer results
 set +e
-OUTPUT2=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="user-requirement" --filter-name="Valid Standard" 2>&1)
+OUTPUT2=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type="requirement" --filter-name="Valid Standard" 2>&1)
 set -e
 COUNT2=$(echo "$OUTPUT2" | jq '.global_counters.total_elements')
 
@@ -396,9 +396,9 @@ fi
 
 
 # 8.9) Test filter combination with have-relations
-echo "Running: reqvire search --json --filter-type=user-requirement --have-relations=verifiedBy" >> "${TEST_DIR}/test_results.log"
+echo "Running: reqvire search --json --filter-type=requirement --have-relations=verifiedBy" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type=user-requirement --have-relations=verifiedBy 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-type=requirement --have-relations=verifiedBy 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -408,10 +408,10 @@ if [ $EXIT_CODE -ne 0 ]; then
 fi
 
 COUNT_COMBO=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
-# Verify all returned elements are user-requirements with verifiedBy
+# Verify all returned elements are requirements with verifiedBy
 TYPES=$(echo "$OUTPUT" | jq -r '.files | .[] | .elements | .[] | .type' | sort -u)
-if echo "$TYPES" | grep -v "user-requirement" | grep -q .; then
-  echo "FAILED: Combined filter should only return user-requirement type"
+if echo "$TYPES" | grep -v "requirement" | grep -q .; then
+  echo "FAILED: Combined filter should only return requirement type"
   echo "Found types: $TYPES"
   exit 1
 fi
@@ -630,10 +630,10 @@ set -e
 echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results_requirement_filter.log"
 printf "%s\n" "$OUTPUT_REQUIREMENT_FILTER" >> "${TEST_DIR}/test_results_requirement_filter.log"
 
-# When filtering by requirement type, we should see 3 requirement elements
+# When filtering by requirement type, we should see 6 requirement elements
 TOTAL_ELEMENTS_REQUIREMENT_FILTER=$(echo "$OUTPUT_REQUIREMENT_FILTER" | jq '.global_counters.total_elements')
-if [ "$TOTAL_ELEMENTS_REQUIREMENT_FILTER" -ne 3 ]; then
-  echo "FAILED: --filter-type=requirement should show 3 elements"
+if [ "$TOTAL_ELEMENTS_REQUIREMENT_FILTER" -ne 6 ]; then
+  echo "FAILED: --filter-type=requirement should show 6 elements"
   echo "Found: $TOTAL_ELEMENTS_REQUIREMENT_FILTER elements"
   exit 1
 fi

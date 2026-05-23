@@ -52,9 +52,9 @@
       "refinement_contract_satisfied_via_child": 1
     },
     "covered_requirements": 5,
-    "implementation_coverage_percentage": 71.43,
-    "total_requirements_in_scope": 7,
-    "uncovered_requirements": 2
+    "implementation_coverage_percentage": 62.5,
+    "total_requirements_in_scope": 8,
+    "uncovered_requirements": 3
   },
   "uncovered_requirements": {
     "files": {
@@ -62,6 +62,10 @@
         {
           "identifier": "specifications/Requirements.md#derived-intermediate",
           "name": "Derived Intermediate"
+        },
+        {
+          "identifier": "specifications/Requirements.md#root-requirement",
+          "name": "Root Requirement"
         },
         {
           "identifier": "specifications/Requirements.md#uncovered-requirement",

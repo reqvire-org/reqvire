@@ -1,11 +1,23 @@
 # Elements
 
-### Parent Requirement
 
-A parent user requirement.
+### Test Feature Test Format Full Relations Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
+
+### Parent Requirement
+
+A parent feature.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-format-full-relations-specifications-requirements-md)
 ---
 
 ### Child Requirement

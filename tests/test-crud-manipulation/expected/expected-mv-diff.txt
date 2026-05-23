@@ -19,28 +19,28 @@ Moved element: Feature C (specifications/OtherRequirements.md#feature-c)
 
 
 📄 specifications/Requirements.md
-  [37m01     # Elements[0m
-  [37m02[0m
-  [37m03     ### Feature D Constraint[0m
+  [37m001     # Elements[0m
+  [37m002[0m
+  [37m003     ### Feature D Constraint[0m
 
-  [37m37     #### Relations[0m
-  [37m38       * derivedFrom: [Feature A](#feature-a)[0m
-  [37m39     ---[0m
-  [31m40 -   ### Feature C[0m
-  [31m40 -   ␤[0m
-  [31m40 -   This is a test requirement for feature C with relations.[0m
-  [31m40 -   ␤[0m
-  [31m40 -   #### Metadata[0m
-  [31m40 -     * type: requirement[0m
-  [31m40 -   ␤[0m
-  [31m40 -   #### Relations[0m
-  [31m40 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [31m40 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
-  [31m40 -   ---[0m
-  [31m40 -   ␤[0m
-  [37m40     ### Feature D[0m
-  [37m41[0m
-  [37m42     This is a newly added feature.[0m
+  [37m040     #### Relations[0m
+  [37m041       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m042     ---[0m
+  [31m043 -   ### Feature C[0m
+  [31m043 -   ␤[0m
+  [31m043 -   This is a test requirement for feature C with relations.[0m
+  [31m043 -   ␤[0m
+  [31m043 -   #### Metadata[0m
+  [31m043 -     * type: requirement[0m
+  [31m043 -   ␤[0m
+  [31m043 -   #### Relations[0m
+  [31m043 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [31m043 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [31m043 -   ---[0m
+  [31m043 -   ␤[0m
+  [37m043     ### Feature D[0m
+  [37m044[0m
+  [37m045     This is a newly added feature.[0m
 
 
 

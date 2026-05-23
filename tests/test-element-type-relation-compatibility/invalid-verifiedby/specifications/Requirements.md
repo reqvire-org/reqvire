@@ -1,12 +1,23 @@
 # Elements
 
-### Target User Requirement
 
-A user requirement for testing.
+### Test Feature Test Element Type Relation Compatibility Invalid Verifiedby Specifications
+
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
 
+### Target Feature
+
+A feature for testing.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-verifiedby-specifications)
 ---
 
 ### Target Test Verification
@@ -17,7 +28,7 @@ A test verification element.
   * type: test-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
 
 ---
 
@@ -29,7 +40,7 @@ INVALID: Verification elements cannot use verifiedBy (they use verify instead).
   * type: test-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
   * verifiedBy: [Target Test Verification](#target-test-verification)
 
 ---
@@ -42,8 +53,8 @@ INVALID: verifiedBy must point to verification element, not requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
-  * verifiedBy: [Target User Requirement](#target-user-requirement)
+  * derivedFrom: [Target Feature](#target-feature)
+  * verifiedBy: [Target Feature](#target-feature)
 
 ---
 
@@ -52,7 +63,7 @@ INVALID: verifiedBy must point to verification element, not requirement.
 INVALID: Other type can only use trace relations.
 
 #### Metadata
-  * type: other
+  * type: other-other
 
 #### Relations
   * verifiedBy: [Target Test Verification](#target-test-verification)
@@ -67,7 +78,7 @@ INVALID: Requirements should use verifiedBy, not verify.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
-  * verify: [Target User Requirement](#target-user-requirement)
+  * derivedFrom: [Target Feature](#target-feature)
+  * verify: [Target Feature](#target-feature)
 
 ---

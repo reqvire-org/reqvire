@@ -159,9 +159,10 @@ Technical specification for HTML export generation pipeline.
 Execute all generation commands treating temporary directory as repository root:
 1. Generate all Mermaid diagrams in markdown files
 2. Generate index.md (interactive D3.js tree showing containment hierarchy - main entry point)
-3. Generate model.md (model-centric visualization with nested relations from root requirements)
+3. Generate model.md (model-centric visualization with nested relations from model roots)
 4. Generate traces.md (verification upward traceability)
 5. Generate coverage.md (verification coverage report)
+6. Generate ontologies.ttl and ontologies.html from the semantic index
 
 **HTML Conversion:**
 - Convert all markdown files to HTML with embedded styles
@@ -221,6 +222,8 @@ The navigation bar must include (left to right):
 - Model: Link to model.html (model-centric view with nested relations)
 - Traces: Link to traces.html (verification upward traceability report)
 - Coverage: Link to coverage.html (verification coverage report)
+- Resources: Link to resources.html (referenced files and attachment targets)
+- Ontologies: Link to ontologies.html (ontology and SHACL collection)
 
 The navigation bar must be:
 - Always visible (fixed position) while scrolling
@@ -229,6 +232,30 @@ The navigation bar must be:
 
 #### Metadata
  * type: specification
+---
+
+### Ontologies View Generation Refinement Specification
+
+#### Details
+Ontologies view generation behavior:
+- Uses the semantic index built from graph-registry ontology and semantic-contract elements.
+- Displays summary counts for Ontology blocks, Shapes blocks, RDF quads, and total blocks.
+- Renders an interactive ontology graph from parsed semantic-index quads without reparsing Turtle in the browser.
+- Colors OWL/RDFS terms, SHACL shapes, literal values, and generic RDF nodes distinctly.
+- Provides a visible legend for OWL/RDFS terms, SHACL shapes, generic RDF resources, literal values, and RDF predicate edges.
+- Provides graph search, node focus, neighbor highlighting, and an inspector for full URI, RDF type, comments, and SHACL constraints.
+- Collapses anonymous SHACL `sh:property [ ... ]` blank nodes into their owning shape inspector constraints instead of rendering them as standalone graph nodes by default.
+- Collapses RDF list infrastructure (`rdf:first`, `rdf:rest`, and `rdf:nil`) into readable inspector values for constraints such as `sh:in` instead of rendering list plumbing as graph nodes.
+- Provides an expand control that presents the ontology graph explorer in a full-window overlay and restores the embedded view without losing graph state.
+- Lists each collected block with source element identifier, source name, file path, line number, block kind, and Turtle content.
+- Provides client-side filtering over source identifiers, names, paths, and Turtle content.
+- Links to the exported `ontologies.ttl` artifact.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Ontologies View Generation](Features.md#ontologies-view-generation)
 ---
 
 ### Model View Element Navigation Refinement Specification
@@ -251,7 +278,7 @@ Model-view element navigation behavior:
 
 #### Details
 Model-centric view generation behavior:
-- Uses root requirements (no hierarchical parent) as top-level entries.
+- Uses model roots selected by default traversal rules as top-level entries.
 - Expands relations recursively with full target element details.
 - Includes summary metadata for element and relation counts.
 - Generates Mermaid diagrams for nested relation structures.

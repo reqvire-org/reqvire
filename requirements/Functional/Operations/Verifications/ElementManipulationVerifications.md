@@ -599,6 +599,25 @@ The test shall verify that existing model elements can be deleted, all relations
 9. Delete the last remaining parent
 10. Verify the operation is rejected (child would be orphaned)
 
+**Test Steps - Semantic Reference Deletion Prevention:**
+1. Create an ontology element that declares an ontology term.
+2. Create another semantic contract whose Shapes section references that ontology term.
+3. Attempt to delete the declaring ontology element.
+4. Verify the operation is rejected before persistence.
+5. Verify the error includes the referencing semantic-contract identifier, reference kind, missing IRI, and the removed ontology identifier.
+6. Verify the declaring ontology remains in the source file.
+
+**Test Steps - Centralized Semantic Mutation Validation:**
+1. Attempt to add a semantic contract with a Shapes reference to an undeclared IRI.
+2. Verify `add` is rejected before persistence and reports the referencing contract, reference kind, missing IRI, and fix guidance.
+3. Attempt to add a semantic contract with a Shapes reference to an IRI declared outside reachable feature ontology context.
+4. Verify `add` is rejected before persistence and reports the referencing contract, reference kind, referenced IRI, declaring ontology, owner context, and guidance to attach the ontology to the owning or consuming feature.
+5. Attempt to unlink a feature ontology attachment that is required to make a semantic reference reachable.
+6. Verify `unlink` is rejected before persistence and the attachment remains in the source file.
+7. Attempt to override an ontology element that declares an ontology term referenced elsewhere with replacement content that no longer declares that term.
+8. Verify `add --override` is rejected before persistence and reports the removed declaration source.
+9. Verify the original declaring ontology remains in the source file after the failed override.
+
 **Success Criteria:**
 - Element is completely removed from the source file
 - All incoming relations (relations from other elements to the deleted element) are removed
@@ -611,6 +630,8 @@ The test shall verify that existing model elements can be deleted, all relations
 - Deletion of parent elements with orphaned children is rejected
 - Error message clearly lists orphaned children with resolution guidance
 - Deletion succeeds when children have other parent relations
+- Deletion that would leave dangling semantic-contract SHACL references is rejected with actionable references before files are written
+- Add, unlink, and override mutations that would leave dangling or outside-context semantic-contract SHACL references are rejected by the shared pre-persistence mutation validation
 
 **Test Coverage:**
 - Delete element with `derivedFrom` relations pointing to it
@@ -623,6 +644,11 @@ The test shall verify that existing model elements can be deleted, all relations
 - Delete parent element with children (single parent - rejected)
 - Delete parent element with children having multiple parents (allowed)
 - Error message validation for orphaned children prevention
+- Delete ontology that would leave dangling semantic references (rejected)
+- Add semantic contract with dangling semantic references (rejected)
+- Add semantic contract with outside-context semantic references (rejected)
+- Unlink feature ontology attachment required for ontology context reachability (rejected)
+- Override ontology declaration source with replacement that drops the declaration (rejected)
 
 #### Metadata
   * type: test-verification

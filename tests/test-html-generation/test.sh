@@ -21,7 +21,16 @@ cat > "$TEST_MODEL_DIR/requirements/Requirements.md" << 'EOF'
 ### Root Requirement
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
+
+### Root System Requirement
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Root Requirement](#root-requirement)
 ---
 EOF
 
@@ -34,7 +43,7 @@ cat > "$TEST_MODEL_DIR/requirements/System/Core.md" << 'EOF'
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root Requirement](../Requirements.md#root-requirement)
+  * derivedFrom: [Root System Requirement](../Requirements.md#root-system-requirement)
 ---
 EOF
 
@@ -73,7 +82,10 @@ cat > "$TEST_MODEL_DIR/requirements/System/Test.md" << 'EOF'
 This is a test requirement for validating nested file exports.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Core Requirement](Core.md#core-requirement)
 EOF
 cd "$TEST_MODEL_DIR" && "$REQVIRE_CMD" export --output "$OUTPUT_DIR" 2>&1 | grep -q "Total Markdown files exported"
 grep -q 'href="../../index.html"' "$OUTPUT_DIR/requirements/System/Test.html"

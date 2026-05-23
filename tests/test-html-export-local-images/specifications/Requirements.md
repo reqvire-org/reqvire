@@ -1,12 +1,23 @@
 # Elements
 
+
+### Test Feature Test Html Export Local Images Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Root Requirement
 
 The system SHALL preserve local image references in exported HTML.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-html-export-local-images-specifications-requirements-md)
 ---
 
 ### Local Image Requirement

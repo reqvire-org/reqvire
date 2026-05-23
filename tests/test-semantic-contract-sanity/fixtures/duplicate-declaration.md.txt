@@ -1,0 +1,58 @@
+# Elements
+
+### Billing Feature
+
+Billing feature.
+
+#### Metadata
+  * type: feature
+
+#### Attachments
+  * [Billing Ontology](#billing-ontology)
+---
+
+### Billing Ontology
+
+Billing ontology.
+
+#### Metadata
+  * type: ontology
+
+#### Ontology
+```turtle
+@prefix billing: <urn:reqvire:test:billing:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+billing:Invoice a owl:Class .
+```
+---
+
+### Reporting Feature
+
+Reporting feature.
+
+#### Metadata
+  * type: feature
+
+#### Attachments
+  * [Reporting Ontology](#reporting-ontology)
+---
+
+### Reporting Ontology
+
+Reporting ontology.
+
+#### Metadata
+  * type: ontology
+
+#### Relations
+  * derivedFrom: [Billing Ontology](#billing-ontology)
+
+#### Ontology
+```turtle
+@prefix billing: <urn:reqvire:test:billing:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+billing:Invoice a owl:Class .
+```
+---

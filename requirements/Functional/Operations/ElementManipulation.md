@@ -65,6 +65,24 @@ The system shall provide the capability to delete existing model elements while 
   * verifiedBy: [Delete Element Test](Verifications/ElementManipulationVerifications.md#delete-element-test)
 ---
 
+### CRUD Semantic Contract Mutation Validation
+
+The system shall validate semantic-contract reference integrity before persisting graph-backed CRUD mutations.
+
+#### Details
+When a CRUD mutation changes model elements or relations, the system shall reject the candidate model before persistence if any semantic-contract Shapes reference becomes undeclared by all ontology elements or is declared only outside reachable feature ontology context.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
+  * refinedBy: [CRUD Semantic Contract Validation Specification](Specifications.md#crud-semantic-contract-validation-specification)
+  * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * verifiedBy: [Delete Element Test](Verifications/ElementManipulationVerifications.md#delete-element-test)
+---
+
 ### Element Manipulation File Persistence
 
 The system shall persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.

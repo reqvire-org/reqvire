@@ -1,16 +1,30 @@
 # Elements
 
+### Parent Feature
+
+This is a parent feature for testing requirement-owned refinement elements.
+
+#### Metadata
+  * type: feature
+
+#### Relations
+  * specifiedBy: [Parent Requirement](#parent-requirement)
+---
+
 ### Parent Requirement
 
 This is a parent requirement for testing Refinement elements.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
+  * specify: [Parent Feature](#parent-feature)
   * refinedBy: [Test Constraint Element](#test-constraint-element)
   * refinedBy: [Test Behavior Element](#test-behavior-element)
   * refinedBy: [Test Specification Element](#test-specification-element)
+  * refinedBy: [Test State Element](#test-state-element)
+  * refinedBy: [Test Input Output Element](#test-input-output-element)
 ---
 
 ### Test Constraint Element
@@ -49,12 +63,50 @@ This is a detailed specification document containing technical requirements and 
 
 ---
 
+### Test State Element
+
+This element documents state details for testing purposes.
+
+#### Metadata
+  * type: state
+
+#### Details
+This is a state refinement that describes lifecycle states and transitions.
+
+---
+
+### Test Input Output Element
+
+This element documents input/output details for testing purposes.
+
+#### Metadata
+  * type: input-output
+
+#### Details
+This is an input-output refinement that describes payload structure and data contracts.
+
+---
+
+### Separate Branch Feature
+
+A separate feature hierarchy for testing attachments.
+
+#### Metadata
+  * type: feature
+
+#### Relations
+  * specifiedBy: [Separate Branch Requirement](#separate-branch-requirement)
+---
+
 ### Separate Branch Requirement
 
 A separate requirement hierarchy for testing attachments.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Separate Branch Feature](#separate-branch-feature)
 ---
 
 ### Requirement With Refinement Attachment

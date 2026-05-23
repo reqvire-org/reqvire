@@ -77,6 +77,7 @@ Implementation details shall follow the associated refinement specifications.
   * derive: [CLI Remove Element Command](#cli-remove-element-command)
   * derive: [CLI Rename Element Command](#cli-rename-element-command)
   * derive: [CLI Resources Command](#cli-resources-command)
+  * derive: [CLI Ontologies Command](#cli-ontologies-command)
   * derive: [CLI Search Command](#cli-search-command)
   * derive: [CLI Submodels Command](#cli-submodels-command)
   * derive: [CLI Traces Command](#cli-traces-command)
@@ -372,7 +373,7 @@ Implementation details shall follow the associated refinement specifications.
 System shall provide CLI command to generate model diagrams with optional filtering and output format selection.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated refinement specifications. The command shall support default model-root traversal, filtered traversal, Markdown output, pure Mermaid output, and JSON output.
 
 #### Metadata
   * type: requirement
@@ -380,6 +381,7 @@ Implementation details shall follow the associated refinement specifications.
 #### Attachments
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
+  * [Model Diagram Output Formats Refinement Specification](../../Functional/Output/Specifications.md#model-diagram-output-formats-refinement-specification)
   * [Reverse Relation Traversal Behavior](../../Functional/Output/Behaviors.md#reverse-relation-traversal-behavior)
   * [Start Element Type Filter Behavior](../../Functional/Output/Behaviors.md#start-element-type-filter-behavior)
   * [Type Validation Error Behavior](../../Functional/Core/Behaviors.md#type-validation-error-behavior)
@@ -389,6 +391,8 @@ Implementation details shall follow the associated refinement specifications.
   * refinedBy: [CLI Model Diagram Command Refinement Specification](Specifications.md#cli-model-diagram-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
+  * verifiedBy: [Model Command Verification](../../Functional/Output/Verifications/ReportingVerifications.md#model-command-verification)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
 ---
 
 ### CLI Move Asset Command
@@ -576,6 +580,34 @@ Implementation details shall follow the associated refinement specifications.
   * verifiedBy: [Resources Report Verification](../../Functional/Output/Verifications/ReportingVerifications.md#resources-report-verification)
 ---
 
+### CLI Ontologies Command
+
+The system shall provide an `ontologies` command that collects all ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry, with an optional full semantic model projection.
+
+#### Details
+The command shall:
+- Emit RDF/Turtle by default.
+- Support `--jsonld` to emit JSON-LD instead of Turtle.
+- Support `--full` to include RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, and semantic-contract shape references.
+- Support `--output <FILE>` to write the selected format to a file.
+- Reuse the semantic index built from the graph registry instead of reparsing Turtle separately from validation.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Semantic Contract Structure Specification](../../Functional/Core/Specifications.md#semantic-contract-structure-specification)
+  * [Ontology Collection Output Specification](../../Functional/Output/Specifications.md#ontology-collection-output-specification)
+
+#### Relations
+  * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
+  * refinedBy: [CLI Ontologies Command Refinement Specification](Specifications.md#cli-ontologies-command-refinement-specification)
+  * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
+  * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
+  * verifiedBy: [CLI Ontologies Command Verification](Verifications/CLIVerifications.md#cli-ontologies-command-verification)
+  * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
+---
+
 ### CLI Search Command
 
 The system shall provide a unified search function, activated by the `search` root command, which shall search and report on model elements with comprehensive filtering capabilities.
@@ -605,13 +637,13 @@ Implementation details shall follow the associated refinement specifications.
 
 ### CLI Submodels Command
 
-The system shall provide a `submodels` command that reports independent requirement hierarchies and cross-submodel requirement couplings.
+The system shall provide a `submodels` command that reports independent feature-rooted hierarchies and cross-submodel requirement couplings.
 
 #### Details
 The command shall support:
-- `--from <NAME>` to scope report output to one requirement subtree by name
+- `--from <NAME>` to scope report output to one feature or requirement subtree by name
 - `--json` and `--output <FILE>` for machine-readable output
-- In `--from` mode, selected requirement is a scope boundary and is not listed as a submodel entry
+- In `--from` mode, selected feature scopes are listed as the scoped feature submodel; selected requirement scopes are treated as boundaries and are not listed as submodel entries
 
 Implementation details shall follow the associated refinement specifications.
 
@@ -632,7 +664,7 @@ Implementation details shall follow the associated refinement specifications.
 
 ### CLI Traces Command
 
-The system shall provide a `traces` command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy from verifications to root requirements.
+The system shall provide a `traces` command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy and owning feature context.
 
 #### Details
 Implementation details shall follow the associated refinement specifications.

@@ -1,1 +1,1 @@
-error: Invalid attachment scope: 'Spec-X' cannot be attached to 'Req D' because subgraph 'User Req X' already attaches refinements owned by subgraph 'User Req A'. Attachment flow between subgraphs must remain one-directional.
+error: Invalid attachment scope: 'Spec-X' cannot be attached to 'Req D' because subgraph 'User Req X Feature' already attaches refinements owned by subgraph 'User Req A Feature'. Attachment flow between subgraphs must remain one-directional.

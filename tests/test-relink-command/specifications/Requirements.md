@@ -1,9 +1,21 @@
 # Elements
 
+
+### Test Feature Test Relink Command Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Root Requirement
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-relink-command-specifications-requirements-md)
 ---
 
 ### Old Parent

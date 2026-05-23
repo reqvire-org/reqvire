@@ -1,21 +1,34 @@
 # Elements
 
-### Test User Requirement One
 
-This is a test user requirement.
+### Test Feature Test Multi Type Search Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: feature
 ---
 
-### Test User Requirement Two
+### Test Feature One
 
-This is another test user requirement.
+This is a test feature.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-multi-type-search-specifications-requirements-md)
+---
+
+### Test Feature Two
+
+This is another test feature.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-multi-type-search-specifications-requirements-md)
 ---
 
 ### Test Requirement One
@@ -26,7 +39,7 @@ This is a test system requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Test User Requirement One](#test-user-requirement-one)
+  * derivedFrom: [Test Feature One](#test-feature-one)
 
 ---
 
@@ -38,7 +51,7 @@ This is another test system requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Test User Requirement Two](#test-user-requirement-two)
+  * derivedFrom: [Test Feature Two](#test-feature-two)
 
 ---
 
@@ -77,6 +90,6 @@ This is a test specification.
 This is a test custom element type.
 
 #### Metadata
-  * type: custom-type
+  * type: other-custom-type
 
 ---

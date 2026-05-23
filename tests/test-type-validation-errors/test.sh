@@ -98,4 +98,37 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
+# Test 4: New standard types are accepted by search and model filters
+for TYPE in state input-output formal-proof-verification source semantic-contract feature ontology; do
+  echo "Test 4: Valid --filter-type $TYPE is accepted by search" >> "${TEST_DIR}/test_results.log"
+  set +e
+  OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type="$TYPE" --json 2>&1)
+  EXIT_CODE=$?
+  set -e
+
+  echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+  printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+  if [ $EXIT_CODE -ne 0 ]; then
+    echo "FAILED: $TYPE should be accepted as a valid search filter type"
+    echo "$OUTPUT"
+    exit 1
+  fi
+
+  echo "Test 4: Valid --filter-type $TYPE is accepted by model" >> "${TEST_DIR}/test_results.log"
+  set +e
+  OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --filter-type="$TYPE" --json 2>&1)
+  EXIT_CODE=$?
+  set -e
+
+  echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+  printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+  if [ $EXIT_CODE -ne 0 ]; then
+    echo "FAILED: $TYPE should be accepted as a valid model filter type"
+    echo "$OUTPUT"
+    exit 1
+  fi
+done
+
 exit 0

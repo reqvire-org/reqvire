@@ -1,12 +1,23 @@
 # Elements
 
+
+### Test Feature Test Change Impact Element Relocation Specifications Firstfile Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Battery Saver
 
 The system shall disable non-essential background services when battery levels drop below 15%.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature Test Change Impact Element Relocation Specifications Firstfile Md](#test-feature-test-change-impact-element-relocation-specifications-firstfile-md)
 ---
 
 ### Power Efficiency
@@ -41,4 +52,6 @@ The system shall monitor battery levels continuously.
 #### Metadata
   * type: requirement
 
+#### Relations
+  * derivedFrom: [Battery Saver](#battery-saver)
 ---

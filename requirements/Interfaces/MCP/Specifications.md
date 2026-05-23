@@ -316,6 +316,7 @@ Common semantic obligations:
 - Results indicate dirty/clean workspace state when that affects interpretation.
 - Results expose evidence references to the files, elements, relations, attachments, reports, or diffs used to produce the result when those concepts are relevant.
 - Element-shaped results expose stable element identity, element type, source location, and requested relation/attachment/content views when those concepts are relevant.
+- Element-shaped results preserve semantic model ADT fields when present: `ontology`, `semantic_contract`, and `concept_references`.
 - Model-shaped results expose enough hierarchy, containment, and submodel boundary information to match the corresponding Reqvire operation contract.
 - Mutation-shaped results expose preview/executed state, changed files, diffs or equivalent change descriptions, diagnostics, affected scope, and refreshed revision metadata when available.
 - Error-shaped results expose stable Reqvire error semantics and recovery context when available.
@@ -355,55 +356,40 @@ Common output envelope fields:
 - `evidence`: files, elements, relations, attachments, or reports used to produce the result.
 - `warnings`: non-fatal diagnostics.
 
-Read/report tools use annotations `readOnlyHint: true`, `destructiveHint: false`, and `openWorldHint: false`.
+Workspace/session tools:
+- `reqvire.workspace_status`
+- `reqvire.tool_contract`
+- `reqvire.model_revision`
 
-Mutation tools are present only when the server starts with `reqvire mcp --enable-mutations`. Mutation tools use annotations `readOnlyHint: false`, conservative `destructiveHint` values, and `openWorldHint: false`.
+Model evidence tools:
+- `reqvire.search`
+- `reqvire.read_element`
+- `reqvire.model`
+- `reqvire.containment`
+- `reqvire.collect`
+- `reqvire.submodels`
+- `reqvire.ontologies`
 
-Workspace/session tool contracts:
+Quality and traceability tools:
+- `reqvire.lint`
+- `reqvire.coverage`
+- `reqvire.traces`
+- `reqvire.resources`
+- `reqvire.change_impact`
 
-| Tool | inputSchema | outputSchema / structuredContent | annotations |
-| --- | --- | --- | --- |
-| `reqvire.workspace_status` | Empty object. | Workspace root, git `HEAD`, dirty state, Reqvire version, MCP protocol revision, Reqvire tool contract version, startup validation summary, last diagnostics summary. | Read-only. |
-| `reqvire.tool_contract` | Optional `tool_name`. | Current startup-mode tool list, per-tool schema revisions, Reqvire tool contract version, MCP protocol revision, tool list revision, Reqvire capability flags such as `read_reports` and `mutations_enabled`. | Read-only. |
-| `reqvire.model_revision` | Empty object. | Model fingerprint, source file metadata, excluded-pattern metadata, cache freshness, git `HEAD`, dirty state. | Read-only. |
-
-Model evidence tool contracts:
-
-| Tool | inputSchema | outputSchema / structuredContent | annotations |
-| --- | --- | --- | --- |
-| `reqvire.search` | `short`, `filter_file`, `filter_name`, `filter_type`, `filter_status`, `filter_priority`, `filter_risk`, `filter_owner`, `filter_content`, `filter_page_content`, `have_relations`, `not_have_relations`, `has_attachments`, `filter_attachment`. | Search summary and matched elements with ids, names, types, files, snippets, effective governance metadata, relations, and attachments. | Read-only. |
-| `reqvire.read_element` | Required `element_name` or `element_id`; optional `include_content`, `include_relations`, `include_attachments`. | One resolved element with content, type, file path, relations, attachments, parent/child refs, refinement refs, verification refs, and satisfaction/resource refs. | Read-only. |
-| `reqvire.model` | Optional `from`, `reverse`, `filter_type`. | Nested logical model structure, roots, selected subtree, relation direction, filtered element types, and included evidence. | Read-only. |
-| `reqvire.containment` | Optional `short`. | Folder/file/element physical hierarchy with element ids, names, types, and file paths. | Read-only. |
-| `reqvire.collect` | Required `element_name`; optional `direction`. | Collected requirement context including ancestry, refinements, verifications, implementation links, attachments, and source evidence. | Read-only. |
-| `reqvire.submodels` | Optional `from`. | Canonical submodel boundaries, root elements, internal elements, cross-submodel findings, and attachment contract consumers. | Read-only. |
-
-Quality and traceability tool contracts:
-
-| Tool | inputSchema | outputSchema / structuredContent | annotations |
-| --- | --- | --- | --- |
-| `reqvire.lint` | Optional `fixable`, `auditable`; `fix` is not accepted in read/report mode. | Lint findings grouped by severity/category, auditable findings, fixability metadata, and evidence references. | Read-only in default mode. |
-| `reqvire.coverage` | Empty object. | Verification coverage summary, implementation coverage summary, uncovered requirements, unsatisfied verifications, orphaned verifications, and evidence. | Read-only. |
-| `reqvire.traces` | Optional `from_folder`, `links_with_blobs`, `filter_id`, `filter_name`, `filter_type`. | Verification trace tree paths, linked resources, filtered elements, and evidence references. | Read-only. |
-| `reqvire.resources` | Empty object. | Files referenced by `satisfiedBy`, `trace`, and attachments, with owning elements and relation evidence. | Read-only. |
-| `reqvire.change_impact` | Required `git_commit` or equivalent model-diff selector. | Compared commit, current `HEAD`, dirty state, impacted elements, impacted submodels, changed files, and propagation evidence. | Read-only. |
-
-Mutation and maintenance tool contracts:
-
-| Tool | inputSchema | outputSchema / structuredContent | annotations |
-| --- | --- | --- | --- |
-| `reqvire.format` | Optional `fix`, `with_full_relations`; `fix: true` requires mutation mode. | Preview or execution result with changed files, diffs, formatting summary, validation summary, and affected scope. | Read-only when `fix` is false; non-read-only when `fix` is true. |
-| `reqvire.add_element` | Required `file`, `content`; optional `override_existing`, `dry_run`. | Created element metadata, changed files, diffs, validation summary, and affected scope. | Non-read-only, destructive false unless replacing existing content. |
-| `reqvire.remove_element` | Required `element_name`; optional `dry_run`. | Removed element metadata, changed files, diffs, validation summary, relation cleanup summary, and affected scope. | Non-read-only, destructive true. |
-| `reqvire.move_element` | Required `element_name`, `file`; optional `dry_run`. | Moved element metadata, source/target files, diffs, validation summary, and affected scope. | Non-read-only, destructive true. |
-| `reqvire.rename_element` | Required `element_name`, `new_name`; optional `dry_run`. | Renamed element metadata, updated references, changed files, diffs, validation summary, and affected scope. | Non-read-only, destructive true. |
-| `reqvire.merge_elements` | Required `target`, `sources`; optional `dry_run`. | Merge result, absorbed elements, changed files, diffs, compatibility diagnostics, validation summary, and affected scope. | Non-read-only, destructive true. |
-| `reqvire.move_file` | Required `source_file`, `target_file`; optional `squash`, `dry_run`. | File move result, updated identifiers/references, changed files, diffs, validation summary, and affected scope. | Non-read-only, destructive true. |
-| `reqvire.link` | Required `source`, `relation_type`, `target`; optional `dry_run`. | Added relation or attachment, changed files, diffs, validation summary, and affected scope. | Non-read-only, destructive false. |
-| `reqvire.unlink` | Required `source`, `target`; optional `dry_run`. | Removed relation or attachment, changed files, diffs, validation summary, and affected scope. | Non-read-only, destructive true. |
-| `reqvire.relink` | Required `source`, `relation_type`, `from_target`, `to_target`; optional `dry_run`. | Atomic relation target replacement, changed files, diffs, validation summary, and affected scope. | Non-read-only, destructive true. |
-| `reqvire.move_asset` | Required `old_path`, `new_path`; optional `dry_run`. | Asset move result, updated references, changed files, diffs, validation summary, and affected scope. | Non-read-only, destructive true. |
-| `reqvire.remove_asset` | Required `file_path`; optional `dry_run`. | Asset removal result, updated references, changed files, diffs, validation summary, and affected scope. | Non-read-only, destructive true. |
+Mutation and maintenance tools:
+- `reqvire.format`
+- `reqvire.add_element`
+- `reqvire.remove_element`
+- `reqvire.move_element`
+- `reqvire.rename_element`
+- `reqvire.merge_elements`
+- `reqvire.move_file`
+- `reqvire.link`
+- `reqvire.unlink`
+- `reqvire.relink`
+- `reqvire.move_asset`
+- `reqvire.remove_asset`
 
 #### Metadata
   * type: specification
@@ -417,7 +403,7 @@ Mutation and maintenance tool contracts:
 The MCP interface is expected to expose read-only model evidence tools grounded in Reqvire core reports and lookup behavior.
 
 #### Details
-Model evidence tool behavior is inherited from attached Reqvire search, model, containment, collect, and submodel contracts. MCP adds typed request/result schemas, workspace/model revision metadata, and evidence references describing which elements, files, relations, and attachments were included.
+Model evidence tool behavior is inherited from attached Reqvire search, model, containment, collect, submodel, and ontology collection contracts. MCP adds typed request/result schemas, workspace/model revision metadata, and evidence references describing which elements, files, relations, attachments, ontology blocks, and shape blocks were included.
 
 `reqvire.search` tool calls are expected to expose typed request fields equivalent to the stable Reqvire search filters:
 - `short`: optional boolean controlling abbreviated output.
@@ -435,7 +421,19 @@ Model evidence tool behavior is inherited from attached Reqvire search, model, c
 - `has_attachments`: optional boolean requiring at least one attachment.
 - `filter_attachment`: optional attachment target glob.
 
-Governance metadata filters apply to effective governance metadata values and exclude non-requirement-family elements when active. Successful `reqvire.search` structured results include effective governance metadata for requirement-family element evidence.
+Governance metadata filters apply to effective governance metadata values and exclude non-governance-bearing elements when active. Successful `reqvire.search` structured results include effective governance metadata for feature and requirement element evidence.
+
+Semantic model evidence rules:
+- `filter_type` accepts all canonical element type tokens supported by Reqvire core, including `feature`, `requirement`, `ontology`, `semantic-contract`, `source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, and verification types.
+- `reqvire.search --filter-type=ontology` through MCP returns ontology elements with parsed ontology ADT content when full results are requested.
+- `reqvire.search --filter-type=semantic-contract` through MCP returns requirement-owned shape contracts with parsed semantic-contract ADT content when full results are requested.
+- `reqvire.read_element` returns `concept_references` for elements that author `#### Concept References`.
+- `reqvire.collect` includes reachable ontology context using the same feature-attached ontology inheritance traversal as Reqvire core.
+- `reqvire.model` and `reqvire.submodels` preserve feature roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and attachment edges needed for semantic dependency traceability.
+- `reqvire.ontologies` exposes the same semantic collection as the CLI `ontologies` command.
+- `reqvire.ontologies` accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
+- `reqvire.ontologies` accepts optional `full` boolean; omitted or false returns authored ontology and SHACL artifacts only, while true includes generated Reqvire model context triples.
+- `reqvire.ontologies` returns selected serialized semantic content, semantic index summary, collected block metadata, diagnostics, ontology declarations, and SHACL shape references.
 
 #### Metadata
   * type: specification
@@ -449,10 +447,7 @@ Governance metadata filters apply to effective governance metadata values and ex
 Every MCP tool is expected to declare its side-effect class and availability.
 
 #### Details
-Side-effect classes:
-- `read_only`: tool must not mutate filesystem, model graph, or persistent cache state in ways that change observable model behavior.
-- `conditional_mutation`: tool can run read-only or mutating depending on request arguments; mutating arguments require mutation mode.
-- `mutation`: tool can mutate model files or referenced assets and is only available when the server starts with `reqvire mcp --enable-mutations`.
+Canonical MCP side-effect classes are defined by the Reqvire interface ontology.
 
 Classification rules:
 - `read_only` tools are advertised in default `tools/list`.
@@ -461,38 +456,39 @@ Classification rules:
 - `conditional_mutation` tools reject or omit mutating arguments unless mutation mode is enabled.
 - `mutation` tools are omitted from default `tools/list`.
 - `mutation` tools are advertised only in mutation mode and use MCP annotations `readOnlyHint: false`, `openWorldHint: false`, and conservative `destructiveHint`.
-- Operation-specific preview requests for mutation tools still count as mutation-class tool calls because they expose mutation planning and must use the mutation tool contract.
 
-Tool side-effect classification:
+Read-only tools:
+- `reqvire.workspace_status`
+- `reqvire.tool_contract`
+- `reqvire.model_revision`
+- `reqvire.search`
+- `reqvire.read_element`
+- `reqvire.model`
+- `reqvire.containment`
+- `reqvire.collect`
+- `reqvire.submodels`
+- `reqvire.ontologies`
+- `reqvire.lint`
+- `reqvire.coverage`
+- `reqvire.traces`
+- `reqvire.resources`
+- `reqvire.change_impact`
 
-| Tool | Side-effect class | Default availability | Mutation-mode availability | Annotation contract |
-| --- | --- | --- | --- | --- |
-| `reqvire.workspace_status` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.tool_contract` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.model_revision` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.search` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.read_element` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.model` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.containment` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.collect` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.submodels` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.lint` | `read_only` | Advertised without mutating `fix` argument | Advertised without mutating `fix` argument until a separate mutation contract is added | Read-only, not destructive, closed world. |
-| `reqvire.coverage` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.traces` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.resources` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.change_impact` | `read_only` | Advertised | Advertised | Read-only, not destructive, closed world. |
-| `reqvire.format` | `conditional_mutation` | Advertised only with `fix: false` preview behavior | Advertised with `fix` mutation argument | Read-only when `fix` is false; non-read-only and destructive false when `fix` is true. |
-| `reqvire.add_element` | `mutation` | Omitted | Advertised | Non-read-only, destructive false unless replacing existing content. |
-| `reqvire.remove_element` | `mutation` | Omitted | Advertised | Non-read-only, destructive true. |
-| `reqvire.move_element` | `mutation` | Omitted | Advertised | Non-read-only, destructive true. |
-| `reqvire.rename_element` | `mutation` | Omitted | Advertised | Non-read-only, destructive true. |
-| `reqvire.merge_elements` | `mutation` | Omitted | Advertised | Non-read-only, destructive true. |
-| `reqvire.move_file` | `mutation` | Omitted | Advertised | Non-read-only, destructive true. |
-| `reqvire.link` | `mutation` | Omitted | Advertised | Non-read-only, destructive false. |
-| `reqvire.unlink` | `mutation` | Omitted | Advertised | Non-read-only, destructive true. |
-| `reqvire.relink` | `mutation` | Omitted | Advertised | Non-read-only, destructive true. |
-| `reqvire.move_asset` | `mutation` | Omitted | Advertised | Non-read-only, destructive true. |
-| `reqvire.remove_asset` | `mutation` | Omitted | Advertised | Non-read-only, destructive true. |
+Conditional mutation tools:
+- `reqvire.format`
+
+Mutation tools:
+- `reqvire.add_element`
+- `reqvire.remove_element`
+- `reqvire.move_element`
+- `reqvire.rename_element`
+- `reqvire.merge_elements`
+- `reqvire.move_file`
+- `reqvire.link`
+- `reqvire.unlink`
+- `reqvire.relink`
+- `reqvire.move_asset`
+- `reqvire.remove_asset`
 
 #### Metadata
   * type: specification
@@ -525,6 +521,7 @@ Mutation exposure and safety rules:
 - Mutation tools are registered and returned by MCP `tools/list` only when the server is started with `reqvire mcp --enable-mutations`.
 - Mutation operation semantics are inherited from attached Reqvire functional/operation contracts.
 - Controlled mutations update the Reqvire in-memory graph through core mutation logic before filesystem flush.
+- Controlled mutations run the same semantic model validation gates as Reqvire core before persistence. This includes ontology element structure, single connected ontology root, ontology attachment compatibility, semantic-contract `Shapes` reference reachability, and `Concept References` resolution.
 - Durable writes flush modified files to the filesystem with the same guarantees as attached file persistence behavior.
 - The MCP server keeps its internal graph synchronized from the updated core graph after each successful mutation before serving subsequent model reads.
 - The MCP server avoids mandatory full reparse after controlled mutations; full reparse is reserved for external filesystem drift, changed source fingerprints, or operations that require it.

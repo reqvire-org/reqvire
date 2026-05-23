@@ -2,7 +2,7 @@
 set -uo pipefail
 
 # Test: Format Command Requirements Verification
-# This test verifies the format command requirements from SystemRequirements and UserRequirements
+# This test verifies the format command requirements from SystemRequirements and Features
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -192,10 +192,10 @@ if ! grep -A 5 "Personas:" UserStories.md | grep -q "$EXPECTED_PERSONA"; then
     exit 1
 fi
 
-# Test 3.5: Check that user-requirement metadata is preserved/added
-EXPECTED_USER_REQ_METADATA="type: user-requirement"
-if ! grep -q "$EXPECTED_USER_REQ_METADATA" UserStories.md; then
-    echo "FAIL: user-requirement metadata not preserved/added"
+# Test 3.5: Check that requirement metadata is preserved/added
+EXPECTED_REQ_METADATA="type: requirement"
+if ! grep -q "$EXPECTED_REQ_METADATA" UserStories.md; then
+    echo "FAIL: requirement metadata not preserved/added"
     exit 1
 fi
 

@@ -1,6 +1,6 @@
 ## Submodels
 
-Independent requirement hierarchies resolved via `derivedFrom` relations.
+Independent feature-rooted subgraphs resolved via feature ownership relations.
 
 ### [Receipt Requirement](specifications/Requirements.md#receipt-requirement)
   * Type: requirement
@@ -9,7 +9,7 @@ Independent requirement hierarchies resolved via `derivedFrom` relations.
 
 ## Cross-Submodel Couplings
 
-Requirement-to-requirement relations where source and target belong to different top roots.
+Requirement-to-requirement relations where source and target belong to different feature roots.
 
 *No cross-submodel requirement couplings found.*
 

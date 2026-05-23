@@ -1,11 +1,22 @@
 # Elements
 
+### Root Feature
+
+This is the feature root.
+
+#### Metadata
+  * type: feature
+---
+
 ### Root Requirement
 
 This is the root requirement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Root Feature](#root-feature)
 ---
 
 ### Derived Requirement 1

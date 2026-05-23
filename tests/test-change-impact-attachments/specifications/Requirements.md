@@ -1,13 +1,22 @@
 # Elements
 
+
+### Test Feature Test Change Impact Attachments Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Top Level Requirement
 
 The system shall provide data processing capabilities.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-change-impact-attachments-specifications-requirements-md)
   * derive: [Data Processing Requirement](#data-processing-requirement)
   * derive: [Data Validation Requirement](#data-validation-requirement)
 ---
@@ -59,9 +68,9 @@ The system shall validate data according to the format specification.
 Owner requirement for specifications (separate from main hierarchy).
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-change-impact-attachments-specifications-requirements-md)
   * refinedBy: [Data Format Spec](#data-format-spec)
 ---
 
@@ -87,9 +96,9 @@ The system shall export data in the specified format.
   * [Export Format Spec](#export-format-spec)
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-change-impact-attachments-specifications-requirements-md)
   * derive: [Export Implementation](#export-implementation)
   * verifiedBy: [Export Test](Verifications.md#export-test)
 ---
@@ -99,9 +108,9 @@ The system shall export data in the specified format.
 Owner requirement for export format refinement.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-change-impact-attachments-specifications-requirements-md)
   * refinedBy: [Export Format Spec](#export-format-spec)
 ---
 

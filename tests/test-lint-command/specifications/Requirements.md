@@ -1,12 +1,23 @@
 # Elements
 
+
+### Test Feature Test Lint Command Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Root Requirement
 
 This is the root requirement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-lint-command-specifications-requirements-md)
 ---
 
 ### Parent Requirement
@@ -78,8 +89,10 @@ This requirement reaches root through MULTIPLE convergent paths (via parent-requ
 This is an independent root for cross-submodel boundary checks.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-lint-command-specifications-requirements-md)
 ---
 
 ### Standalone Child

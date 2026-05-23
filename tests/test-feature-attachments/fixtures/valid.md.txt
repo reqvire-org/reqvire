@@ -1,0 +1,84 @@
+# Elements
+
+### Billing Feature
+
+Billing feature.
+
+#### Metadata
+  * type: feature
+
+#### Attachments
+  * [Shared Ontology](#shared-ontology)
+
+#### Relations
+  * specifiedBy: [Billing Requirement](#billing-requirement)
+---
+
+### Billing Ontology
+
+Billing ontology.
+
+#### Metadata
+  * type: ontology
+
+#### Ontology
+```turtle
+@prefix billing: <urn:reqvire:test:billing:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+billing:Invoice a owl:Class .
+```
+---
+
+### Shared Feature
+
+Shared feature.
+
+#### Metadata
+  * type: feature
+
+#### Relations
+  * trace: [Shared Ontology](#shared-ontology)
+---
+
+### Shared Ontology
+
+Shared ontology.
+
+#### Metadata
+  * type: ontology
+
+#### Relations
+  * derivedFrom: [Billing Ontology](#billing-ontology)
+
+#### Ontology
+```turtle
+@prefix shared: <urn:reqvire:test:shared:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+shared:Money a owl:Class .
+```
+---
+
+### Billing Requirement
+
+The system shall support billing.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Billing Feature](#billing-feature)
+  * refinedBy: [Billing Detail](#billing-detail)
+---
+
+### Billing Detail
+
+Billing detail.
+
+#### Metadata
+  * type: input-output
+
+#### Relations
+  * refine: [Billing Requirement](#billing-requirement)
+---

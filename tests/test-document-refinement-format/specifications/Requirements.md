@@ -1,11 +1,23 @@
 # Elements
 
+
+### Test Feature Test Document Refinement Format Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Root User Need
 
 The system shall define a root requirement for hierarchy validation.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-document-refinement-format-specifications-requirements-md)
 ---
 
 ### Parent Requirement

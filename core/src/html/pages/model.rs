@@ -2,7 +2,7 @@ use maud::{html, Markup, PreEscaped};
 
 /// Generate model view page with Mermaid diagrams
 ///
-/// The model page displays a model-centric view starting from root requirements,
+/// The model page displays a model-centric view starting from ontology roots and feature roots,
 /// showing complete relation trees with embedded Mermaid diagrams for each section.
 ///
 /// # Arguments

@@ -284,12 +284,14 @@ impl ChangeImpactReport {
                     render_change_impact_tree_json(&elem.change_impact_tree, base_url, git_commit);
                 json!({
                     "element_id": element_url,
+                    "name": elem.name,
                     "old_content": elem.old_content,
                     "new_content": elem.new_content,
                     "content_changed": elem.content_changed,
                     "added_relations": added_relations,
                     "removed_relations": removed_relations,
-                    "change_impact_tree": impact_tree
+                    "change_impact_tree": impact_tree,
+                    "changed_attachments": elem.changed_attachments
                 })
             })
             .collect();
@@ -833,7 +835,9 @@ pub fn apply_smart_filtering(
     let mut referenced_ids = HashSet::new();
     for added in &report.added {
         for rel_node in &added.change_impact_tree.relations {
-            collect_tree_ids_recursively(&rel_node.element_node, &mut referenced_ids);
+            if is_smart_filter_child_relation(&rel_node.relation_trigger) {
+                collect_tree_ids_recursively(&rel_node.element_node, &mut referenced_ids);
+            }
         }
         // Also collect attachment element identifiers
         collect_attachment_element_ids(&added.change_impact_tree.element, &mut referenced_ids);
@@ -841,7 +845,9 @@ pub fn apply_smart_filtering(
 
     for changed in &report.changed {
         for rel_node in &changed.change_impact_tree.relations {
-            collect_tree_ids_recursively(&rel_node.element_node, &mut referenced_ids);
+            if is_smart_filter_child_relation(&rel_node.relation_trigger) {
+                collect_tree_ids_recursively(&rel_node.element_node, &mut referenced_ids);
+            }
         }
         // Also collect attachment element identifiers
         collect_attachment_element_ids(&changed.change_impact_tree.element, &mut referenced_ids);
@@ -855,8 +861,8 @@ pub fn apply_smart_filtering(
         collect_attachment_ids_from_tree(&changed.change_impact_tree, &mut referenced_ids);
     }
 
-    // Step 4: Filter out added/changed elements that are referenced elsewhere (not root)
-    // This includes elements referenced via relations OR via attachments
+    // Step 4: Filter out added/changed elements that are referenced elsewhere (not root).
+    // This includes elements referenced via downstream relations OR via attachments.
     report
         .added
         .retain(|e| !referenced_ids.contains(&e.element_id));
@@ -871,8 +877,17 @@ fn collect_tree_ids_recursively(node: &ElementNode, set: &mut HashSet<String>) {
 
     // Recursively process all children
     for relation in &node.relations {
-        collect_tree_ids_recursively(&relation.element_node, set);
+        if is_smart_filter_child_relation(&relation.relation_trigger) {
+            collect_tree_ids_recursively(&relation.element_node, set);
+        }
     }
+}
+
+fn is_smart_filter_child_relation(relation_type: &str) -> bool {
+    matches!(
+        relation_type,
+        "derive" | "specifiedBy" | "satisfiedBy" | "refinedBy" | "verifiedBy"
+    )
 }
 
 /// Collect element identifiers from attachments (for smart filtering)
@@ -979,8 +994,85 @@ fn normalize_relation_for_comparison(rel: &Relation) -> (String, String) {
     (relation_type, rel.target.link.as_str().to_string())
 }
 
+fn is_scope_element(elem: &element::Element) -> bool {
+    matches!(
+        elem.element_type,
+        element::ElementType::Feature | element::ElementType::Requirement(_)
+    )
+}
+
+fn resolve_scope_relation_target_id(
+    registry: &graph_registry::GraphRegistry,
+    relation: &Relation,
+) -> Option<String> {
+    if let LinkType::Identifier(id) = &relation.target.link {
+        if registry.get_element(id).is_some() {
+            return Some(id.clone());
+        }
+    }
+
+    relation.target.element_id.as_ref().and_then(|stable_id| {
+        registry
+            .nodes
+            .values()
+            .find(|node| node.element.id == *stable_id)
+            .map(|node| node.element.identifier.clone())
+    })
+}
+
+fn find_scope_parent_id(
+    registry: &graph_registry::GraphRegistry,
+    element_id: &str,
+) -> Option<String> {
+    let elem = registry.get_element(element_id)?;
+
+    let allowed_parent_type = match elem.element_type {
+        element::ElementType::Feature => Some(element::ElementType::Feature),
+        element::ElementType::Requirement(_) => None,
+        _ => return None,
+    };
+
+    if matches!(
+        elem.element_type,
+        element::ElementType::Feature | element::ElementType::Requirement(_)
+    ) {
+        if let Some(parent_id) = elem
+            .relations
+            .iter()
+            .find(|r| r.relation_type.name == "derivedFrom")
+            .and_then(|r| resolve_scope_relation_target_id(registry, r))
+        {
+            if let Some(parent) = registry.get_element(&parent_id) {
+                match (&allowed_parent_type, &parent.element_type) {
+                    (Some(element::ElementType::Feature), element::ElementType::Feature)
+                    | (None, element::ElementType::Requirement(_)) => return Some(parent_id),
+                    _ => {}
+                }
+            }
+        }
+    }
+
+    if matches!(elem.element_type, element::ElementType::Requirement(_)) {
+        return elem
+            .relations
+            .iter()
+            .find(|r| r.relation_type.name == "specify")
+            .and_then(|r| resolve_scope_relation_target_id(registry, r))
+            .filter(|parent_id| {
+                registry.get_element(parent_id).is_some_and(|parent| {
+                    matches!(parent.element_type, element::ElementType::Feature)
+                })
+            });
+    }
+
+    None
+}
+
 /// Compute the impact scope: the per-branch lowest common ancestors of all
-/// impacted requirements through the derivedFrom hierarchy.
+/// impacted feature/requirement elements. Requirement scope walks
+/// `derivedFrom` requirement parents first, then crosses to the specifying
+/// feature through `specify`; feature scope walks only feature
+/// `derivedFrom` parents.
 ///
 /// Algorithm:
 /// 1. Collect requirement IDs from changed + added elements
@@ -994,9 +1086,7 @@ pub fn compute_impact_scope(
     reference: &graph_registry::GraphRegistry,
     report: &ChangeImpactReport,
 ) -> Vec<ImpactScopeRoot> {
-    let hierarchical_relations = relation::get_hierarchical_relation_types();
-
-    // Step 1: Collect requirement element IDs from changed + added
+    // Step 1: Collect feature/requirement element IDs from changed + added
     // Use all_changed/all_added IDs (pre-smart-filtering) for complete scope
     let mut scope_set: HashSet<String> = HashSet::new();
 
@@ -1006,17 +1096,17 @@ pub fn compute_impact_scope(
         .chain(report.all_added_element_ids.iter())
     {
         if let Some(elem) = current.get_element(id) {
-            if matches!(elem.element_type, element::ElementType::Requirement(_)) {
+            if is_scope_element(elem) {
                 scope_set.insert(id.clone());
             }
         }
     }
 
-    // Step 2: For removed elements, walk derivedFrom in reference to find
+    // Step 2: For removed elements, walk model parent relations in reference to find
     // first parent that still exists in current registry
     for removed in &report.removed {
         if let Some(ref_elem) = reference.get_element(&removed.element_id) {
-            if !matches!(ref_elem.element_type, element::ElementType::Requirement(_)) {
+            if !is_scope_element(ref_elem) {
                 continue;
             }
             let mut visited = HashSet::new();
@@ -1024,16 +1114,7 @@ pub fn compute_impact_scope(
             visited.insert(current_id.clone());
 
             loop {
-                // Find derivedFrom parent in reference registry
-                let parent_id = reference.get_element(&current_id).and_then(|elem| {
-                    elem.relations
-                        .iter()
-                        .find(|r| hierarchical_relations.contains(&r.relation_type.name))
-                        .and_then(|r| match &r.target.link {
-                            LinkType::Identifier(id) => Some(id.clone()),
-                            _ => None,
-                        })
-                });
+                let parent_id = find_scope_parent_id(reference, &current_id);
 
                 match parent_id {
                     Some(pid) => {
@@ -1043,8 +1124,7 @@ pub fn compute_impact_scope(
                         // Check if this parent exists in current registry
                         if current.get_element(&pid).is_some() {
                             if let Some(elem) = current.get_element(&pid) {
-                                if matches!(elem.element_type, element::ElementType::Requirement(_))
-                                {
+                                if is_scope_element(elem) {
                                     scope_set.insert(pid);
                                 }
                             }
@@ -1065,20 +1145,12 @@ pub fn compute_impact_scope(
 
     // Step 3: Bottom-up merge loop
     loop {
-        // For each element in scope_set, find its derivedFrom parent in current registry
+        // For each element in scope_set, find its model parent in current registry
         let mut parent_map: HashMap<String, Vec<String>> = HashMap::new();
         let mut no_parent: Vec<String> = Vec::new();
 
         for id in &scope_set {
-            let parent_id = current.get_element(id).and_then(|elem| {
-                elem.relations
-                    .iter()
-                    .find(|r| hierarchical_relations.contains(&r.relation_type.name))
-                    .and_then(|r| match &r.target.link {
-                        LinkType::Identifier(pid) => Some(pid.clone()),
-                        _ => None,
-                    })
-            });
+            let parent_id = find_scope_parent_id(current, id);
 
             match parent_id {
                 Some(pid) => {

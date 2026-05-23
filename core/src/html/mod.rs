@@ -28,7 +28,7 @@ pub use layouts::{base, diagram_layout};
 pub use maud::Markup;
 
 // Re-export page generators for external use
-pub use pages::{coverage, index, model, resources, traceflow, traces};
+pub use pages::{coverage, index, model, ontologies, resources, traceflow, traces};
 
 use crate::error::ReqvireError;
 use std::path::{Path, PathBuf};
@@ -186,6 +186,14 @@ pub fn generate_traceflow_page(html_content: &str, nav_prefix: &str) -> String {
 /// Generate resources page with new component system
 pub fn generate_resources_page(html_content: &str, nav_prefix: &str) -> String {
     pages::resources::render(html_content, nav_prefix).into_string()
+}
+
+/// Generate ontologies page with new component system
+pub fn generate_ontologies_page(
+    report: &crate::semantic_contract::SemanticIndex,
+    nav_prefix: &str,
+) -> String {
+    pages::ontologies::render(report, nav_prefix).into_string()
 }
 
 #[cfg(test)]

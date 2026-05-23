@@ -162,10 +162,13 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
             }
             seen_subsections.insert(subsection.clone());
 
-            // If transitioning to Details subsection, add the header to content
-            if subsection == SubSection::Details {
+            // If transitioning to content-bearing subsection, add the header to content
+            if subsection == SubSection::Details
+                || subsection == SubSection::ConceptReferences
+                || matches!(subsection, SubSection::Other(_))
+            {
                 if let Some(element) = &mut current_element {
-                    element.add_content("\n#### Details\n");
+                    element.add_content(&format!("\n{}\n", line));
                 }
             }
 
@@ -184,6 +187,8 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
         // Parse content for Requirement or Details subsections
         } else if current_subsection == SubSection::Requirement
             || current_subsection == SubSection::Details
+            || current_subsection == SubSection::ConceptReferences
+            || matches!(current_subsection, SubSection::Other(_))
         {
             if let Some(element) = &mut current_element {
                 if trimmed.starts_with("<details") {
@@ -272,7 +277,7 @@ pub fn parse_single_element(content: &str, file_path: &str) -> Result<Element, R
                             if !href.contains('#') {
                                 return Err(ReqvireError::InvalidAttachmentFormat(
                                     format!(
-                                        "Invalid attachment target '{}'. Attachments must use refinement element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                        "Invalid attachment target '{}'. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                         href
                                     )
                                 ));
@@ -657,7 +662,7 @@ fn parse_documents_file(
                         Ok(href) => {
                             if !href.contains('#') {
                                 errors.push(ReqvireError::InvalidAttachmentFormat(format!(
-                                    "Invalid attachment identifier in document file '{}', line {}: '{}'. Attachments must use refinement element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                    "Invalid attachment identifier in document file '{}', line {}: '{}'. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                     file,
                                     line_num + 1,
                                     href
@@ -959,10 +964,11 @@ pub fn parse_elements(
                 }
             }
 
-            // If transitioning to Details or non-reserved subsection, add the header to content
+            // If transitioning to content-bearing subsection, add the header to content
             if !skip_current_element {
                 if let Some(element) = &mut current_element {
                     if subsection == SubSection::Details
+                        || subsection == SubSection::ConceptReferences
                         || matches!(subsection, SubSection::Other(_))
                     {
                         element.add_content(&format!("\n{}\n", line));
@@ -973,6 +979,7 @@ pub fn parse_elements(
             current_subsection = subsection;
         } else if (current_subsection == SubSection::Requirement
             || current_subsection == SubSection::Details
+            || current_subsection == SubSection::ConceptReferences
             || matches!(current_subsection, SubSection::Other(_)))
             && current_element.is_some()
             && !skip_current_element
@@ -1132,7 +1139,7 @@ pub fn parse_elements(
                         Ok(href) => {
                             if !href.contains('#') {
                                 let msg = format!(
-                                    "Invalid attachment identifier in element '{}': '{}' (file: {}, line {}). Attachments must use refinement element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                    "Invalid attachment identifier in element '{}': '{}' (file: {}, line {}). Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                     element.name, href, file, line_num + 1
                                 );
                                 errors.push(ReqvireError::InvalidAttachmentFormat(msg.clone()));

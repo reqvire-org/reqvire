@@ -22,6 +22,9 @@ Reqvire implements containment hierarchy through filesystem structure.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * refine: [Git Repository as Project Root](Functional/Core/ModelManagement.md#git-repository-as-project-root)
 ---
 
 ### Refinement Specification
@@ -29,7 +32,7 @@ Reqvire implements containment hierarchy through filesystem structure.
 Reqvire implements requirement refinement through explicit refinement elements linked to requirements.
 
 #### Details
-**SysML Refine Stereotype:**
+**Refinement Ownership:**
 - Refinement content is captured in dedicated elements (`specification`, `constraint`, `behavior`, `state`, `input-output`)
 - Requirement owns refinement via `refinedBy`; refinement points back via `refine`
 - Refinement elements can be attached by external requirements when ownership constraints allow
@@ -44,138 +47,85 @@ Reqvire implements requirement refinement through explicit refinement elements l
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * refine: [Refinement Element Structure Constraints](Functional/Core/ModelManagement.md#refinement-element-structure-constraints)
 ---
 
 ### Relation Semantics Specification
 
-Reqvire implements SysML relation stereotypes for requirements management.
+Reqvire implements relation semantics for ownership, hierarchy, verification, implementation satisfaction, attachments, and traceability.
 
 #### Details
-**Requirement Decomposition:**
-- `derive`/`derivedFrom`: SysML DeriveReqt stereotype
-- Parent requirements decompose into child requirements
-- Maintains traceability from stakeholder needs to system requirements
-
-**Verification Linkage:**
-- `verify`/`verifiedBy`: SysML Verify stereotype
-- Links test cases and verification methods to requirements
-- Enables verification coverage analysis
-
-**Implementation Satisfaction:**
-- `satisfy`/`satisfiedBy`: SysML Satisfy stereotype
-- Links implementation artifacts (code) to requirements
-- Demonstrates requirement fulfillment
-
-**Refinement Ownership:**
-- `refine`/`refinedBy`: SysML Refine stereotype
-- Links refinement elements (specification, constraint, behavior, state, input-output) and specification files to requirements
-- Establishes ownership: each refinement can only be owned by one requirement
-- Together with the requirement, refinements drive implementation
-
-**General Traceability:**
-- `trace`: SysML Trace stereotype
-- Loose coupling between related elements
-- Cross-reference without hierarchical dependency
+- Relation names, inverse names, allowed source/target families, ownership semantics, and change-impact propagation are defined by the Reqvire relation ontology.
+- Implementation relation validators shall enforce the relation ontology together with element-type compatibility constraints.
+- Report and mutation code shall use the same relation direction and propagation semantics so validation, collect, submodels, coverage, and change impact remain consistent.
+- `trace` remains non-owning documentation traceability and must not be used as a substitute for hierarchy, refinement ownership, verification, satisfaction, or attachment dependencies.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * refine: [Relation Types and behaviors](Functional/Core/ModelManagement.md#relation-types-and-behaviors)
 ---
 
 ### Supported Element Types Specification
 
-Element types supported by the system for classification and behavior determination, aligned with SysML and systems engineering standards.
+Element types supported by the system for classification and behavior determination.
 
 #### Details
-**Requirement Types:**
+The canonical type vocabulary is defined by the Reqvire core element, feature, requirement, ontology, semantic-contract, and verification model contracts.
 
-| Type | Description |
-|------|-------------|
-| `requirement` | System requirement (default type if not specified) |
-| `user-requirement` | User requirement representing stakeholder needs |
+The implementation shall use those contracts as the authoritative source for:
+- feature, requirement, refinement, verification, and custom type categories
+- default element type semantics
+- feature-owned and requirement-owned refinement type semantics
+- evidence-backed verification type semantics
 
-**Verification Types:**
-
-| Type | Description |
-|------|-------------|
-| `verification` | Verification through testing (equivalent to `test-verification`) |
-| `test-verification` | Explicit verification through testing with documented test procedures |
-| `analysis-verification` | Verification through formal analysis of documentation or code |
-| `inspection-verification` | Verification through formal inspection or review |
-| `demonstration-verification` | Verification through demonstration in a realistic environment |
-| `formal-proof-verification` | Verification through formal proof, model checking, theorem proving, or generated formal evidence |
-
-**Refinement Types:**
-
-| Type | Description | Constraints |
-|------|-------------|-------------|
-| `constraint` | Documents constraints that limit or bound the system | Only `refine` relations allowed |
-| `behavior` | Documents behavior details and operational specifications | Only `refine` relations allowed |
-| `specification` | Documents detailed specifications and technical descriptions | Only `refine` relations allowed |
-| `state` | Documents lifecycle states, state machines, transitions, and state-dependent contracts | Only `refine` relations allowed |
-| `input-output` | Documents payloads, messages, documents, schemas, fixtures, and data contracts | Only `refine` relations allowed |
-
-**Other Types:**
-
-| Type | Description |
-|------|-------------|
-| `other` | Generic custom element type |
-| `other-TYPENAME` | Named custom element type (e.g., `other-interface`, `other-actor`) |
-
-**Custom Type Pattern:**
-- Use `other-TYPENAME` where TYPENAME is the custom type name
-- TYPENAME must be at least one character (e.g., `other-x` is valid, `other-` alone is not)
-- Custom types can only use `trace` relations
+Parser-facing behavior remains:
+- When `type` metadata is omitted, the element type is `requirement`.
+- `type` metadata uses the exact element-type token declared in the semantic vocabulary.
+- `other` and `other-TYPENAME` are custom trace-only types.
+- `other-TYPENAME` requires at least one character after `other-`; `other-` alone is invalid.
+- Custom types can only use `trace` relations.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * refine: [Element Type Relation Compatibility](Functional/Core/ModelManagement.md#element-type-relation-compatibility)
 ---
 
 ### Traceability Reporting Specification
 
-Reqvire provides traceability reports per ISO/IEC/IEEE 29148.
+Reqvire provides traceability reports over the Reqvire feature, requirement, verification, refinement, attachment, and implementation graph.
 
 #### Details
-**Upward Traceability:**
-- Trace from implementation to requirements
-- Trace from tests to requirements
-- Verification coverage reports
-
-**Downward Traceability:**
-- Trace from stakeholder needs to system requirements
-- Derive chain visualization
-- Model-centric hierarchical views
-
-**Bidirectional Traceability:**
-- Impact analysis for requirement changes
-- Affected elements identification
-- Change propagation tracking
+- Traceability reports shall use Reqvire relation semantics for traversal direction, ownership, and evidence links.
+- Upward reports shall trace implementation and verification evidence to requirements and owning feature roots where applicable.
+- Downstream reports shall trace feature roots to specified requirements and requirement descendants.
+- Change-impact reports shall use propagation relations, attachments, semantic dependencies, and impact scope rules to identify affected elements.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * refine: [Model Reports](Functional/Output/Reporting.md#model-reports)
 ---
 
 ### Verification Coverage Specification
 
-Reqvire supports verification coverage analysis per INCOSE best practices.
+Reqvire supports verification coverage analysis for requirement verification and feature roll-up.
 
 #### Details
-**Coverage Metrics:**
-- Requirements with verification links (verifiedBy)
-- Requirements without verification (coverage gaps)
-- Verification completeness percentage
-
-**Coverage Reports:**
-- List unverified requirements
-- Group by element type
-- Identify critical gaps
-
-**Verification Types:**
-- test-verification: Automated or manual tests
-- analysis-verification: Analysis and review
-- inspection-verification: Physical inspection
-- demonstration-verification: Demonstration of capability
-- formal-proof-verification: Formal proof, model checking, theorem proving, or generated formal evidence
+- Verification type vocabulary, evidence-backed verification semantics, and feature coverage vocabulary are defined by the Reqvire verification and verification rollup ontologies.
+- Coverage reports shall classify verified and unverified requirements from `verifiedBy`/`verify` relations.
+- Coverage reports shall use the ontology-defined evidence-backed flag to decide whether a verification requires `satisfiedBy` evidence for coverage satisfaction.
+- Feature coverage shall be reported by rolling up coverage from requirements that specify each feature and from descendant feature subgraphs.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * refine: [Verification Coverage Report](Functional/Output/Reporting.md#verification-coverage-report)
 ---

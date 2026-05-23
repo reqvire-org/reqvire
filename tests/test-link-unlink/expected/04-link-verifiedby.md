@@ -5,11 +5,12 @@
 Top-level container for test requirements.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Feature Requirement](#feature-requirement)
   * derive: [No Relations Requirement](#no-relations-requirement)
+  * specify: [Test Feature Test Link Unlink Specifications Requirements Md](#test-feature-test-link-unlink-specifications-requirements-md)
 ---
 
 ### Another Requirement
@@ -45,5 +46,13 @@ A requirement without initial relations that link/unlink commands will modify.
 
 #### Relations
   * derivedFrom: [System Requirements](#system-requirements)
+---
+
+### Test Feature Test Link Unlink Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
 ---
 

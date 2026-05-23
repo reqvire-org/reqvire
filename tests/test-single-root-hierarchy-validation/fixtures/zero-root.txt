@@ -2,7 +2,7 @@
 
 ### Requirement A
 
-Invalid: cycle of requirements without top user-requirement root.
+Invalid: cycle of requirements without owning feature.
 
 #### Metadata
   * type: requirement
@@ -13,7 +13,7 @@ Invalid: cycle of requirements without top user-requirement root.
 
 ### Requirement B
 
-Invalid: cycle of requirements without top user-requirement root.
+Invalid: cycle of requirements without owning feature.
 
 #### Metadata
   * type: requirement

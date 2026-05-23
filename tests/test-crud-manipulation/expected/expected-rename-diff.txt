@@ -38,10 +38,10 @@ Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#fea
   [32m14 +   This is a newly added feature.[0m
   [37m15[0m
   [37m16     #### Metadata[0m
-  [31m17 -     * type: user-requirement[0m
-  [32m17 +     * type: requirement[0m
-  [32m18 +   ␤[0m
-  [32m19 +   #### Relations[0m
+  [37m17       * type: requirement[0m
+  [37m18[0m
+  [37m19     #### Relations[0m
+  [31m20 -     * specify: [Test Feature Test Crud Manipulation Specifications Requirements Md](#test-feature-test-crud-manipulation-specifications-requirements-md)[0m
   [32m20 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
   [37m21     ---[0m
   [31m22 -   ### Feature A[0m
@@ -79,26 +79,26 @@ Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#fea
   [32m43 +   This is a parent requirement.[0m
   [37m44[0m
   [37m45     #### Metadata[0m
-  [31m46 -     * type: requirement[0m
-  [31m46 -   ␤[0m
-  [31m46 -   #### Relations[0m
-  [31m46 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m46 +     * type: user-requirement[0m
-  [37m47     ---[0m
-  [31m48 -   ### Feature E[0m
-  [32m48 +   ### Feature Alpha[0m
-  [37m49[0m
-  [31m50 -   This feature has an attachment to a refinement element.[0m
-  [32m50 +   This is a test requirement for feature A.[0m
-  [37m51[0m
-  [37m52     #### Metadata[0m
-  [37m53       * type: requirement[0m
-  [31m54 -   #### Attachments[0m
-  [31m54 -     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
-  [31m54 -   ␤[0m
-  [37m54     #### Relations[0m
-  [31m55 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m55 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [37m56     ---[0m
-  [37m57[0m
-  [37m58     ### Separate Requirement Branch[0m
+  [37m46       * type: requirement[0m
+  [37m47[0m
+  [37m48     #### Relations[0m
+  [31m49 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m49 +     * specify: [Test Feature Test Crud Manipulation Specifications Requirements Md](#test-feature-test-crud-manipulation-specifications-requirements-md)[0m
+  [37m50     ---[0m
+  [31m51 -   ### Feature E[0m
+  [32m51 +   ### Feature Alpha[0m
+  [37m52[0m
+  [31m53 -   This feature has an attachment to a refinement element.[0m
+  [32m53 +   This is a test requirement for feature A.[0m
+  [37m54[0m
+  [37m55     #### Metadata[0m
+  [37m56       * type: requirement[0m
+  [31m57 -   #### Attachments[0m
+  [31m57 -     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
+  [31m57 -   ␤[0m
+  [37m57     #### Relations[0m
+  [31m58 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [32m58 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [37m59     ---[0m
+  [37m60[0m
+  [37m61     ### Separate Requirement Branch[0m

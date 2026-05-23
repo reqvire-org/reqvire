@@ -16,7 +16,7 @@ This test verifies that the system correctly extracts and parses element subsect
 
 **Metadata Parsing:**
 - System shall extract element type from `* type:` metadata entry
-- System shall support all element types: requirement, user-requirement, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification, constraint, behavior, specification, state, input-output, other
+- System shall support all element types: feature, requirement, ontology, verification, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output, other
 - System shall assign default type 'requirement' when no type metadata present
 
 **Relations Parsing:**
@@ -115,8 +115,8 @@ Expected checks:
 - Verify invalid enum values for `status`, `priority`, and `risk` are rejected with clear diagnostics naming the invalid key and accepted values.
 - Verify `owner` accepts a free-form string.
 - Verify inherited or default `status: approved` is not treated as explicit approval evidence.
-- Verify non-requirement-family elements that declare `status`, `priority`, `risk`, or `owner` metadata are rejected with clear diagnostics.
-- Verify governance context for a refinement element is resolved from its directly owning requirement through `refine` / `refinedBy`, not from metadata authored on the refinement.
+- Verify non-governance-bearing elements that declare `status`, `priority`, `risk`, or `owner` metadata are rejected with clear diagnostics.
+- Verify governance context for a refinement element is resolved from its owning feature or requirement through `refine` / `refinedBy`, not from metadata authored on the refinement.
 
 #### Metadata
   * type: test-verification

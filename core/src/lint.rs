@@ -356,25 +356,25 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
     });
 
     needs_manual_review.sort_by(|a, b| {
-        let id_a = match a {
+        let key_a = match a {
             ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => {
-                &element.identifier
+                element.identifier.clone()
             }
             ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => {
-                &source.identifier
+                source.identifier.clone()
             }
-            ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
+            ManualReviewIssue::MultiBranchConvergence { element, .. } => element.identifier.clone(),
         };
-        let id_b = match b {
+        let key_b = match b {
             ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => {
-                &element.identifier
+                element.identifier.clone()
             }
             ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => {
-                &source.identifier
+                source.identifier.clone()
             }
-            ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
+            ManualReviewIssue::MultiBranchConvergence { element, .. } => element.identifier.clone(),
         };
-        id_a.cmp(id_b)
+        key_a.cmp(&key_b)
     });
 
     LintReport {

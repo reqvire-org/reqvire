@@ -1,12 +1,23 @@
 # Elements
 
+
+### Test Feature Test Crud Manipulation Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Parent Feature
 
 This is a parent requirement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-crud-manipulation-specifications-requirements-md)
 ---
 
 ### Feature A
@@ -59,5 +70,8 @@ This feature has special characters in its name including commas and slashes.
 A separate requirement hierarchy for testing attachments.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-crud-manipulation-specifications-requirements-md)
 ---

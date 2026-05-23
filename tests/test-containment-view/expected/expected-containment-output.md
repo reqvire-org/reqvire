@@ -3,9 +3,10 @@
 ```mermaid
 graph TD
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:2px;
@@ -32,6 +33,7 @@ graph TD
   class specifications_Folder1_Subfolder1 folder
   subgraph specifications/Folder1/Subfolder1/FileA["📄 FileA.md"]
     direction TB
+    7488cbb08215a66a["Test Feature Test Containment View Specifications Folder1 Subfolder1 Filea Md"]
     58d1cd147301f9e3["User Authentication"]
   end
   specifications_Folder1_Subfolder1 --> specifications/Folder1/Subfolder1/FileA
@@ -65,26 +67,30 @@ graph TD
     17cdb2bd8b866540["Custom Type Element"]
     27ce8e2d3add00a7["Demonstration Verification Element"]
     e65293d51dd83e69["Inspection Verification Element"]
-    2a302bfb04c46059["Root User Requirement"]
+    eeb35c5b552286e5["Root Feature"]
+    8020964005272779["Test Feature Test Containment View Specifications Rootfile Md"]
     939fef5f29ad393f["Test Verification Element"]
   end
   specifications --> specifications/RootFile
 
   %% Element type styling
   class e08a9833904afb54 systemRequirement
-  class 58d1cd147301f9e3 userRequirement
+  class 7488cbb08215a66a feature
+  class 58d1cd147301f9e3 systemRequirement
   class 25af44158bf43fcc systemRequirement
   class 747610138c5b111b systemRequirement
   class 8be34e37b1135168 verification
   class 17cdb2bd8b866540 default
   class 27ce8e2d3add00a7 verification
   class e65293d51dd83e69 verification
-  class 2a302bfb04c46059 userRequirement
+  class eeb35c5b552286e5 systemRequirement
+  class 8020964005272779 feature
   class 939fef5f29ad393f verification
 
   %% Clickable links
   click specifications_Folder1_DesignDocuments_DesignDoc1 "specifications/Folder1/DesignDocuments/DesignDoc1.md"
   click e08a9833904afb54 "specifications/Folder1/FileB.md#export-to-csv"
+  click 7488cbb08215a66a "specifications/Folder1/Subfolder1/FileA.md#test-feature-test-containment-view-specifications-folder1-subfolder1-filea-md"
   click 58d1cd147301f9e3 "specifications/Folder1/Subfolder1/FileA.md#user-authentication"
   click 25af44158bf43fcc "specifications/Folder2/FileC.md#high-performance"
   click 747610138c5b111b "specifications/ParentOnly/ChildFolder/DeepFile.md#deep-nested-element"
@@ -92,6 +98,7 @@ graph TD
   click 17cdb2bd8b866540 "specifications/RootFile.md#custom-type-element"
   click 27ce8e2d3add00a7 "specifications/RootFile.md#demonstration-verification-element"
   click e65293d51dd83e69 "specifications/RootFile.md#inspection-verification-element"
-  click 2a302bfb04c46059 "specifications/RootFile.md#root-user-requirement"
+  click eeb35c5b552286e5 "specifications/RootFile.md#root-feature"
+  click 8020964005272779 "specifications/RootFile.md#test-feature-test-containment-view-specifications-rootfile-md"
   click 939fef5f29ad393f "specifications/RootFile.md#test-verification-element"
 ```

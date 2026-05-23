@@ -22,7 +22,7 @@ flowchart LR
 
         subgraph "Reqvire Core"
             manageModel((Manage System Model))
-            generateDiagrams((Generate Diagrams))
+            generateDiagrams((Visualize Model))
             analyzeRelations((Analyze Relations))
             provideReports[Provide Reports]
             validateStructure((Validate Structure))
@@ -161,12 +161,12 @@ Tool interfaces are **CLI** (Command Line Interface), **Web/HTML Interface**, an
 - Web/HTML Interface: Human browsing and visualization interface for generated documentation, diagrams, reports, and traces.
 - MCP Server: Typed external interface for AI agents, IDE integrations, CI adapters, and other tools.
 
-The MCP server exposes shared tool contracts. It does not expose arbitrary shell execution, does not own model state, and does not bypass Reqvire core semantics.
+The MCP server exposes shared tool contracts, including semantic model evidence through `reqvire.ontologies`. It does not expose arbitrary shell execution, does not own model state, and does not bypass Reqvire core semantics.
 
 #### Core Capabilities
 
 - Manage System Model: Core functionality to handle the System model lifecycle including refactoring model.
-- Generate Diagrams: Allows users to generate visual representations of the system model.
+- Visualize Model: Allows users to generate visual representations of the system model.
  - Diagrams can be generated for different viewpoints.
 - Analyze Relations: Provides tools to analyze relationships and dependencies within the model.
 - Provide Reports: Generates structured reports based on the model and analysis.

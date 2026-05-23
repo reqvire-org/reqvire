@@ -5,7 +5,7 @@
 The system shall define a dedicated AI-assistant skills submodel that provides instruction contracts for Reqvire modeling workflows and traceable implementation artifacts.
 
 #### Metadata
- * type: user-requirement
+ * type: requirement
 
 #### Attachments
  * [Refinement Specification](../../Refinements.md#refinement-specification)
@@ -16,7 +16,7 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
 #### Relations
  * derive: [AI Skills Instruction Contracts](#ai-skills-instruction-contracts)
  * derive: [AI Skills Markdown Implementation Artifacts](#ai-skills-markdown-implementation-artifacts)
- * derivedFrom: [AI Assistant Skill Authoring for Reqvire](../../UserStories.md#ai-assistant-skill-authoring-for-reqvire)
+ * specify: [AI-Assisted System Model Management](../../Features/Integration.md#ai-assisted-system-model-management)
 ---
 
 ### AI Skills Instruction Contracts
@@ -24,7 +24,7 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
 The system shall define AI skill instruction contracts that describe MBSE-first Reqvire workflows, including boundary clarification and verification-aligned change sequencing.
 
 #### Details
-Implementation details shall follow the associated refinement specification.
+Instruction contract details shall follow the associated refinement specification.
 
 #### Metadata
  * type: requirement
@@ -39,7 +39,7 @@ Implementation details shall follow the associated refinement specification.
 The system shall produce traceable markdown skill artifacts that implement the AI assistant skill guidance contracts for supported assistant ecosystems.
 
 #### Details
-Implementation details shall follow the associated refinement specification.
+Artifact contract details shall follow the associated refinement specification.
 
 #### Metadata
  * type: requirement
@@ -54,13 +54,17 @@ Implementation details shall follow the associated refinement specification.
 
 ### AI Skills Instruction Contract Specification
 
+AI skill instruction contracts define MBSE-first Reqvire modeling workflows, boundary checkpoints, and verification-aligned change sequencing.
+
 #### Details
-The AI skills instruction contract is expected to define:
-- MBSE change sequence: requirements -> refinements -> verifications -> implementation links.
-- Explicit human boundary checkpoint before cross-submodel refactors.
-- Verification alignment policy: verification criteria must match explicit assertions in test cases.
-- Coverage interpretation guidance for verification and implementation coverage.
-- Mandatory validation and lint checks after meaningful model updates.
+Instruction contract rules:
+- Skill workflows start from feature and requirement context.
+- Skill workflows separate semantic contracts from obligations.
+- Skill workflows align verifications before implementation changes.
+- Skill workflows run validation and lint after meaningful model updates.
+- Cross-submodel refactors require explicit human confirmation before changing boundaries.
+- Verification guidance distinguishes verification coverage from implementation coverage.
+- Model-refactor examples include correct and incorrect examples where that improves assistant behavior.
 
 #### Metadata
  * type: specification
@@ -71,13 +75,14 @@ The AI skills instruction contract is expected to define:
 
 ### AI Skills Markdown Artifact Specification
 
+AI skills markdown artifacts define the assistant-facing files that implement the Reqvire system engineering guidance.
+
 #### Details
-The markdown implementation artifacts is expected to:
-- Be versioned in repository paths consumed by supported assistant runtimes.
-- Capture task patterns with explicit "Do It When" triggers.
-- Include correct and incorrect examples for model-refactor workflows.
-- Require circle-back confirmation for expected submodel boundaries.
-- Remain synchronized across Codex and Claude plugin variants.
+Artifact contract rules:
+- Codex skill artifacts live under `codex-skills/reqvire-syseng`.
+- Claude skill artifacts live under `claude-plugins/skills/syseng`.
+- Equivalent guidance should stay synchronized between Codex and Claude skill artifacts.
+- Assistant artifact changes should preserve MBSE workflow guidance and verification-aligned change sequencing.
 
 #### Metadata
  * type: specification

@@ -12,6 +12,7 @@ use crate::report_model;
 use crate::report_resources;
 use crate::report_submodels;
 use crate::search;
+use crate::semantic_contract::{self, SemanticExportFormat};
 use crate::verification_trace;
 use crate::{ModelBuildOptions, ModelManager};
 use globset::GlobSet;
@@ -224,7 +225,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.collect",
-            "Collect requirement context upstream or downstream.",
+            "Collect feature or requirement context upstream or downstream.",
             required_object_schema(
                 vec![
                     ("element_name", json!({ "type": "string" })),
@@ -240,6 +241,17 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
             "reqvire.submodels",
             "Analyze independent requirement submodels.",
             object_schema(vec![("from", json!({ "type": "string" }))]),
+        ),
+        read_tool(
+            "reqvire.ontologies",
+            "Collect ontology elements and semantic-contract SHACL shapes.",
+            object_schema(vec![
+                (
+                    "format",
+                    json!({ "type": "string", "enum": ["turtle", "jsonld"], "default": "turtle" }),
+                ),
+                ("full", json!({ "type": "boolean", "default": false })),
+            ]),
         ),
         read_tool(
             "reqvire.lint",
@@ -524,6 +536,7 @@ fn dispatch_tool(
         "reqvire.containment" => containment_tool(args, excluded_filename_patterns),
         "reqvire.collect" => collect_tool(args, excluded_filename_patterns),
         "reqvire.submodels" => submodels_tool(args, excluded_filename_patterns),
+        "reqvire.ontologies" => ontologies_tool(args, excluded_filename_patterns),
         "reqvire.lint" => lint_tool(args, excluded_filename_patterns),
         "reqvire.coverage" => coverage_tool(excluded_filename_patterns),
         "reqvire.traces" => traces_tool(args, excluded_filename_patterns),
@@ -710,6 +723,56 @@ fn submodels_tool(
         string_arg(args, "from").as_deref(),
     )?;
     parse_json_string(report.to_json_string())
+}
+
+fn ontologies_tool(
+    args: &Value,
+    excluded_filename_patterns: &GlobSet,
+) -> Result<Value, ReqvireError> {
+    let model = load_model(excluded_filename_patterns)?;
+    let index = semantic_contract::build_semantic_index(&model.graph_registry);
+    let format = string_arg(args, "format").unwrap_or_else(|| "turtle".to_string());
+    let full = bool_arg(args, "full", false);
+    match format.as_str() {
+        "turtle" => Ok(json!({
+            "format": "turtle",
+            "full": full,
+            "content": if full {
+                index.serialize_full(SemanticExportFormat::Turtle, &model.graph_registry)?
+            } else {
+                index.serialize(SemanticExportFormat::Turtle)?
+            },
+            "summary": index.summary,
+            "blocks": index.blocks,
+            "diagnostics": index.diagnostics,
+            "ontology_declarations": index.ontology_declarations,
+            "shape_references": index.shape_references
+        })),
+        "jsonld" => {
+            let content = if full {
+                index.serialize_full(SemanticExportFormat::JsonLd, &model.graph_registry)?
+            } else {
+                index.serialize(SemanticExportFormat::JsonLd)?
+            };
+            let jsonld: Value = serde_json::from_str(&content)
+                .map_err(|e| ReqvireError::SerializationError(e.to_string()))?;
+            Ok(json!({
+                "format": "jsonld",
+                "full": full,
+                "content": content,
+                "jsonld": jsonld,
+                "summary": index.summary,
+                "blocks": index.blocks,
+                "diagnostics": index.diagnostics,
+                "ontology_declarations": index.ontology_declarations,
+                "shape_references": index.shape_references
+            }))
+        }
+        other => Err(ReqvireError::ProcessError(format!(
+            "Invalid ontology format '{}'. Valid values: turtle, jsonld",
+            other
+        ))),
+    }
 }
 
 fn lint_tool(args: &Value, excluded_filename_patterns: &GlobSet) -> Result<Value, ReqvireError> {
@@ -1081,6 +1144,7 @@ fn read_tool_names() -> Vec<&'static str> {
         "reqvire.containment",
         "reqvire.collect",
         "reqvire.submodels",
+        "reqvire.ontologies",
         "reqvire.lint",
         "reqvire.coverage",
         "reqvire.traces",

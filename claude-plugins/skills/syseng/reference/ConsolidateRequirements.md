@@ -82,7 +82,7 @@ reqvire link "API Authorization Specification" "refinedBy" "Authorization System
 
 ### Step 4: Consolidate Constraints
 
-Find a root requirement that asks for constraints to be defined. Add `refinedBy` relations to all constraint elements using the link command:
+Find the owning requirement that asks for constraints to be defined. Add `refinedBy` relations to all constraint elements using the link command:
 
 ```bash
 # Link constraint to requirement that defines it
@@ -178,8 +178,9 @@ When merge is acceptable:
 ## When to Split Requirements (using derivedFrom)
 
 **1. Type separation** - Don't mix requirement types:
-- User requirements (stakeholder needs) should not contain system requirements (technical details)
-- Split when a requirement mixes "what users need" with "how the system implements it"
+- Features should capture product/stakeholder/regulatory scope, not detailed system obligations
+- Requirements should capture what the system shall do, not reusable domain vocabulary or ontology structure
+- Split when a feature mixes capability scope with implementable obligations, or when a requirement mixes obligations with reusable semantic definitions
 
 **2. Change impact & containment:**
 - Scope isolation - Changes shouldn't require re-verification of unrelated aspects
@@ -201,7 +202,7 @@ When merge is acceptable:
 The system shall implement API Access Authorization following clearly defined specifications.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 #### Attachments
   * [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
@@ -214,7 +215,7 @@ The system shall implement API Access Authorization following clearly defined sp
 The system shall implement API Access Authorization following clearly defined specifications.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 #### Relations
   * refinedBy: [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)

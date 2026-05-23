@@ -1,13 +1,23 @@
 # Elements
 
+### Existing Feature
+
+Existing feature scope.
+
+#### Metadata
+* type: feature
+
+---
+
 ### Existing Requirement One
 
 This is an existing requirement.
 
 #### Metadata
-* type: user-requirement
+* type: requirement
 
 #### Relations
+  * specify: [Existing Feature](#existing-feature)
   * verifiedBy: [Existing Verification](#existing-verification)
 
 ---
@@ -17,7 +27,10 @@ This is an existing requirement.
 This is another existing requirement.
 
 #### Metadata
-* type: user-requirement
+* type: requirement
+
+#### Relations
+  * specify: [Existing Feature](#existing-feature)
 
 ---
 

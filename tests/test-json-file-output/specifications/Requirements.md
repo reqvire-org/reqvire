@@ -1,13 +1,22 @@
 # Elements
 
-### Test Requirement Alpha
 
-A root user requirement for JSON file output testing.
+### Test Feature Test Json File Output Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
 
+### Test Requirement Alpha
+
+A root feature for JSON file output testing.
+
+#### Metadata
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-json-file-output-specifications-requirements-md)
   * verifiedBy: [Test Verification Alpha](#test-verification-alpha)
 
 ---

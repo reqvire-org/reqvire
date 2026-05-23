@@ -378,7 +378,19 @@ cat > "$TEST_DIR/specifications/Detailed.md" <<'EOF'
 Parent for testing.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
+
+### Parent System Req
+
+Parent system requirement for testing.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Parent Req](#parent-req)
+---
 
 ### Feature With Details
 
@@ -394,7 +406,7 @@ This is additional detail about the feature.
 It can span multiple paragraphs.
 
 #### Relations
-  * derivedFrom: [Parent Req](#parent-req)
+  * derivedFrom: [Parent System Req](#parent-system-req)
 EOF
 
 # Validate first

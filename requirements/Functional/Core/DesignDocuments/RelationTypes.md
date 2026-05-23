@@ -22,26 +22,7 @@ A relation type in Reqvire:
 
 ### Relation Usage Categories
 
-Relations are categorized by their usage in different system functions:
-
-1. **Diagram Rendering (Forward)** - Relations that are rendered in visual diagrams to avoid duplicate arrows
-   - Only one relation from each opposite pair is shown (e.g., `derive` but not `derivedFrom`)
-   - Used for forward traversal (root to leaf) in model views
-   - Those are: `derive`, `satisfiedBy`, `refinedBy`, `verifiedBy`, `trace`
-
-2. **Reverse Traversal (Backward)** - Relations used for leaf-to-root traversal
-   - Opposite of diagram rendering relations
-   - Used for reverse model views and upward traceability
-   - Those are: `derivedFrom`, `satisfy`, `refine`, `verify`
-
-3. **Change Propagation** - Relations through which changes propagate to dependent elements
-   - When an element changes, impact flows through these relation types
-   - Those are: `derive`, `satisfiedBy`, `refinedBy`, `verifiedBy`
-
-4. **Verification traces**: Relations through which propagation from the verification element to requirements in traced (verification roll-up)
-   - Trace which requirements verification verifies: directly or indirecty
-     - Parents inherit status from children via derive (e.g., ALL children verified => parent Verified).
-   - Those are: `derivedFrom`
+Relation usage categories are reusable model vocabulary and are defined by the Reqvire relation ontology. Implementations use those ontology terms to keep diagram rendering, reverse traversal, change propagation, and verification roll-up aligned.
 
 ## Comprehensive Relation Type Table
 
@@ -49,6 +30,8 @@ Relations are categorized by their usage in different system functions:
 |---------------|---------------|-------------------|-------------------|-------------------|-------------|
 | **derivedFrom** | derive | No | Yes | No | Links a child element to the parent element it is derived from |
 | **derive** | derivedFrom | Yes | No | Yes | Links a parent element to child elements derived from it |
+| **specify** | specifiedBy | No | Yes | No | Links a requirement to the feature it specifies |
+| **specifiedBy** | specify | Yes | No | Yes | Links a feature to a requirement that specifies it |
 | **satisfiedBy** | satisfy | Yes | No | Yes | Links a requirement to implementation elements that satisfy it |
 | **satisfy** | satisfiedBy | No | Yes | No | Links an implementation to the requirement it satisfies |
 | **refinedBy** | refine | Yes | No | Yes | Links a requirement to refinement elements |
@@ -59,44 +42,15 @@ Relations are categorized by their usage in different system functions:
 
 ## Relation Categories
 
-Relations are grouped into logical categories based on their semantic meaning:
-
-### 1. Hierarchical/Transitive Relations
-
-These relations define hierarchical structures and transitive ancestry within the model:
-- **derivedFrom/derive**: Derivation of elements from higher-level elements
-
-### 2. Satisfaction Relations
-
-These relations connect requirements to implementations:
-
-- **satisfiedBy/satisfy**: Links requirements to code and implementation files
-
-### 3. Refinement Relations
-
-These relations establish ownership of refinement artifacts by requirements:
-
-- **refinedBy/refine**: Links requirements to refinement elements (specification, constraint, behavior, state, input-output) that augment the requirement definition. Each refinement can only be owned by one requirement (uniqueness constraint). Together with the requirement, these artifacts drive implementation.
-
-### 4. Verification Relations
-
-These relations connect requirements to verification elements:
-
-- **verifiedBy/verify**: Links requirements to tests, validations, or other verification artifacts
-
-### 5. Traceability Relations
-
-These relations establish lightweight connections for documentation:
-
-- **trace**: Simple non-directional traceability without strong semantic meaning or change propagation
+Relation semantic categories are defined by the Reqvire relation ontology. This design document applies those categories to parser, validator, report, and impact-analysis behavior.
 
 ## Change Impact Rules
 
 When an element changes, the impact propagates according to these rules:
 
 1. **Hierarchical Changes**:
-   - Changes to parent elements propagate to all children
-   - This includes derivation relationships
+   - Changes to parent feature, requirement, or ontology elements propagate to all children in the same hierarchy family
+   - This includes derivation relationships through `derive`
 
 2. **Requirement Changes**:
    - Changes to requirements propagate to all satisfying implementations
@@ -115,7 +69,11 @@ When an element changes, the impact propagates according to these rules:
    - Changes to requirements propagate to owned refinement artifacts via `refinedBy`
    - Refinements define and augment requirements; changes to the requirement may require updating its refinements
 
-6. **Trace Relationships**:
+6. **Ontology Changes**:
+   - Changes to ontology elements propagate through ontology hierarchy via `derive`
+   - Changes to ontology content affect feature elements that attach the ontology, descendant feature contexts, requirements that specify those feature contexts, and semantic-contract shapes that reference reachable ontology terms
+
+7. **Trace Relationships**:
    - Changes do not propagate through trace relationships
    - Trace relationships are used for documentation and discovery purposes only
 
@@ -127,44 +85,53 @@ This section defines which element types can use which relation types as source 
 
 | Relation Type | Allowed Source Types | Allowed Target Types | Notes |
 |---------------|---------------------|---------------------|-------|
-| **derivedFrom** | requirement, user-requirement | requirement, user-requirement | Hierarchical requirement decomposition only |
-| **derive** | requirement, user-requirement | requirement, user-requirement | Inverse of derivedFrom |
-| **satisfiedBy** | requirement, test-verification | InternalPath (files) | System requirements/tests link to implementations |
-| **satisfy** | InternalPath (files) | requirement, test-verification | Inverse of satisfiedBy (auto-generated) |
-| **refinedBy** | requirement, user-requirement | refinement types | Requirements link to refinement elements (including elements defined in `# Documents` files via identifier links) |
-| **refine** | refinement types | requirement, user-requirement | Inverse of refinedBy (auto-generated) |
-| **verifiedBy** | requirement, user-requirement | All verification types | Requirements link to verifications |
-| **verify** | All verification types | requirement, user-requirement | Verifications link to requirements |
+| **derivedFrom** | feature, requirement, ontology | same source family only | Feature, requirement, and ontology hierarchy families stay separate |
+| **derive** | feature, requirement, ontology | same source family only | Inverse of derivedFrom |
+| **specify** | requirement | feature | Requirement specifies a feature |
+| **specifiedBy** | feature | requirement | Feature is specified by a requirement |
+| **satisfiedBy** | requirement, test-verification, formal-proof-verification | InternalPath (files) | System requirements and evidence-backed verifications link to implementation or evidence artifacts |
+| **satisfy** | InternalPath (files) | requirement, test-verification, formal-proof-verification | Inverse of satisfiedBy (auto-generated) |
+| **refinedBy** | feature, requirement | subtype-specific refinement types | Features own source refinements; requirements own semantic contracts and requirement-detail refinements |
+| **refine** | refinement types | feature, requirement | Inverse of refinedBy (auto-generated), constrained by refinement subtype |
+| **verifiedBy** | requirement | All verification types | Requirements link to verifications |
+| **verify** | All verification types | requirement | Verifications link to requirements |
 | **trace** | Any (except refinement types) | Any | Documentation/discovery, no type constraints |
 
 ### Element-Centric View
 
 | Element Type | Can Use as Source | Can Be Target Of |
 |--------------|-------------------|------------------|
+| **feature** | derivedFrom, derive, specifiedBy, refinedBy, trace | derivedFrom, derive, specify, refine, trace |
 | **requirement** | derivedFrom, derive, satisfiedBy, refinedBy, verifiedBy, trace | derivedFrom, derive, satisfy, refine, verify, trace |
-| **user-requirement** | derivedFrom, derive, refinedBy, verifiedBy, trace | derivedFrom, derive, refine, verify, trace |
 | **test-verification** | verify, satisfiedBy, trace | verifiedBy, satisfy, trace |
 | **analysis-verification** | verify, trace | verifiedBy, trace |
 | **inspection-verification** | verify, trace | verifiedBy, trace |
 | **demonstration-verification** | verify, trace | verifiedBy, trace |
 | **formal-proof-verification** | verify, satisfiedBy, trace | verifiedBy, satisfy, trace |
-| **constraint** | refine | refinedBy, Attachment |
-| **behavior** | refine | refinedBy, Attachment |
-| **specification** | refine | refinedBy, Attachment |
-| **state** | refine | refinedBy, Attachment |
-| **input-output** | refine | refinedBy, Attachment |
+| **ontology** | derivedFrom, derive, trace | derivedFrom, derive, trace, Feature Attachment |
+| **source** | refine | refinedBy |
+| **semantic-contract** | refine | refinedBy, Requirement Attachment |
+| **constraint** | refine | refinedBy, Requirement Attachment |
+| **behavior** | refine | refinedBy, Requirement Attachment |
+| **specification** | refine | refinedBy, Requirement Attachment |
+| **state** | refine | refinedBy, Requirement Attachment |
+| **input-output** | refine | refinedBy, Requirement Attachment |
 | **other** | trace | trace |
 
 ### Key Constraints
 
-1. **derivedFrom/derive restricted to requirement types**: Only `requirement` and `user-requirement` elements can participate in derivation relationships. This ensures clean hierarchical requirement decomposition without mixing verification or other element types.
+1. **derivedFrom/derive restricted to hierarchy families**: `feature` derives only from `feature`, `requirement` derives only from `requirement`, and `ontology` derives only from `ontology`. Feature, requirement, and ontology hierarchy must not be mixed through `derivedFrom`/`derive`.
 
-2. **Refinement types can only have refine relations**: Elements of type `constraint`, `behavior`, `specification`, `state`, and `input-output` can only use `refine` relations to link to the requirement they refine. Each refinement can only be owned by one requirement. They can also be referenced via the Attachments subsection of other elements.
+2. **Feature-to-requirement bridge**: requirements use `specify` to point to the feature they specify. Features use `specifiedBy` to point to requirements that specify them. System requirements must have an immediate parent through either `derivedFrom` to another requirement or `specify` to a feature.
 
-3. **satisfiedBy/satisfy restricted to implementable elements**: `satisfiedBy` links system requirements (`requirement`) and test verifications to implementation files (code). `user-requirement` elements are not valid sources/targets for satisfaction relations. Refinement elements are not valid targets for `satisfiedBy`; use `refinedBy` instead.
+3. **Refinement types can only have refine relations**: Elements of type `source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output` can only use `refine` relations to link to their compatible owner. `source` refines features; `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output` refine requirements. Each refinement can only be owned by one valid owner.
 
-4. **evidence-backed verification special cases**: Among verification types, `test-verification` and `formal-proof-verification` can use `satisfiedBy` relations. `test-verification` links to test implementations. `formal-proof-verification` links to formal proof artifacts, model-checking artifacts, theorem files, generated fixtures, or proof reports. Other verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
+4. **satisfiedBy/satisfy restricted to implementable elements**: `satisfiedBy` links requirements and evidence-backed verifications to implementation/evidence files. Feature elements are not valid sources/targets for satisfaction relations.
 
-5. **formal-proof-verification evidence**: `formal-proof-verification` represents verification by formal proof, model checking, theorem proving, or other mathematically structured evidence. It verifies requirements through the same `verify`/`verifiedBy` relation family as other verification types and is expected to have at least one `satisfiedBy` artifact demonstrating the proof or generated evidence.
+5. **evidence-backed verification special cases**: Among verification types, `test-verification` and `formal-proof-verification` can use `satisfiedBy` relations. `test-verification` links to test implementations. `formal-proof-verification` links to formal proof artifacts, model-checking artifacts, theorem files, generated fixtures, or proof reports. Other verification types (`analysis-verification`, `inspection-verification`, `demonstration-verification`) cannot use `satisfiedBy`.
 
-6. **other type conservative**: Elements with type `other` can only use `trace` relations to maintain flexibility while avoiding semantic conflicts.
+6. **Feature verification is roll-up only**: Feature elements are validated structurally and semantically, but are not directly verified through `verifiedBy`.
+
+7. **formal-proof-verification evidence**: `formal-proof-verification` represents verification by formal proof, model checking, theorem proving, or other mathematically structured evidence. It verifies requirements through the same `verify`/`verifiedBy` relation family as other verification types and is expected to have at least one `satisfiedBy` artifact demonstrating the proof or generated evidence.
+
+8. **other type conservative**: Elements with type `other` can only use `trace` relations to maintain flexibility while avoiding semantic conflicts.

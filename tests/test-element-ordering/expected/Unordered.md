@@ -5,7 +5,10 @@
 Parent A is a root element with children.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature Test Element Ordering Requirements Unordered Md](#test-feature-test-element-ordering-requirements-unordered-md)
 ---
 
 ### Child A
@@ -57,5 +60,16 @@ Child B element that derives from Parent A.
 Standalone element with no file-local parents.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature Test Element Ordering Requirements Unordered Md](#test-feature-test-element-ordering-requirements-unordered-md)
+---
+
+### Test Feature Test Element Ordering Requirements Unordered Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
 ---

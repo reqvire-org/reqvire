@@ -1,13 +1,22 @@
 # Elements
 
+
+### Test Feature Test Advanced Format Behaviors Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Behavior Owner
 
 Owner for the behavior element (separate hierarchy).
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-advanced-format-behaviors-md)
   * refinedBy: [My Test Behavior](#my-test-behavior)
 ---
 

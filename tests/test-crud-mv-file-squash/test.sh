@@ -139,7 +139,7 @@ echo "Test 5: Verify correct element count after squash..."
 
 # Count total elements (both existing and moved)
 ELEMENT_COUNT=$(grep -c "^### " "$TEST_DIR/specifications/Target.md")
-EXPECTED_COUNT=4  # 2 existing + 2 moved
+EXPECTED_COUNT=5  # feature + 2 existing + 2 moved
 
 if [ "$ELEMENT_COUNT" -ne "$EXPECTED_COUNT" ]; then
   echo "❌ FAILED: Expected $EXPECTED_COUNT elements, found $ELEMENT_COUNT"

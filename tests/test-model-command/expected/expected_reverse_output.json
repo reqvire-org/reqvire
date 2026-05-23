@@ -10,8 +10,8 @@
         {
           "relation_type": "verify",
           "element": {
-            "identifier": "specifications/SystemRequirements.md#default-root-filtering",
-            "name": "Default Root Filtering",
+            "identifier": "specifications/SystemRequirements.md#default-model-roots",
+            "name": "Default Model Roots",
             "element_type": "requirement",
             "file_path": "specifications/SystemRequirements.md",
             "file_order_index": 3,
@@ -37,12 +37,27 @@
                           {
                             "relation_type": "derivedFrom",
                             "element": {
-                              "identifier": "specifications/UserRequirements.md#model-structure-exploration",
+                              "identifier": "specifications/Features.md#model-structure-exploration",
                               "name": "Model Structure Exploration",
-                              "element_type": "user-requirement",
-                              "file_path": "specifications/UserRequirements.md",
-                              "file_order_index": 0,
-                              "relations": [],
+                              "element_type": "requirement",
+                              "file_path": "specifications/Features.md",
+                              "file_order_index": 1,
+                              "relations": [
+                                {
+                                  "relation_type": "specify",
+                                  "element": {
+                                    "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
+                                    "name": "Test Feature Test Model Command Specifications Features Md",
+                                    "element_type": "feature",
+                                    "file_path": "specifications/Features.md",
+                                    "file_order_index": 0,
+                                    "relations": [],
+                                    "attachments": [
+                                      "specifications/Ontologies.md#model-command-ontology"
+                                    ]
+                                  }
+                                }
+                              ],
                               "attachments": []
                             }
                           }
@@ -89,12 +104,27 @@
                     {
                       "relation_type": "derivedFrom",
                       "element": {
-                        "identifier": "specifications/UserRequirements.md#model-structure-exploration",
+                        "identifier": "specifications/Features.md#model-structure-exploration",
                         "name": "Model Structure Exploration",
-                        "element_type": "user-requirement",
-                        "file_path": "specifications/UserRequirements.md",
-                        "file_order_index": 0,
-                        "relations": [],
+                        "element_type": "requirement",
+                        "file_path": "specifications/Features.md",
+                        "file_order_index": 1,
+                        "relations": [
+                          {
+                            "relation_type": "specify",
+                            "element": {
+                              "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
+                              "name": "Test Feature Test Model Command Specifications Features Md",
+                              "element_type": "feature",
+                              "file_path": "specifications/Features.md",
+                              "file_order_index": 0,
+                              "relations": [],
+                              "attachments": [
+                                "specifications/Ontologies.md#model-command-ontology"
+                              ]
+                            }
+                          }
+                        ],
                         "attachments": []
                       }
                     }
@@ -146,12 +176,27 @@
                           {
                             "relation_type": "derivedFrom",
                             "element": {
-                              "identifier": "specifications/UserRequirements.md#model-structure-exploration",
+                              "identifier": "specifications/Features.md#model-structure-exploration",
                               "name": "Model Structure Exploration",
-                              "element_type": "user-requirement",
-                              "file_path": "specifications/UserRequirements.md",
-                              "file_order_index": 0,
-                              "relations": [],
+                              "element_type": "requirement",
+                              "file_path": "specifications/Features.md",
+                              "file_order_index": 1,
+                              "relations": [
+                                {
+                                  "relation_type": "specify",
+                                  "element": {
+                                    "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
+                                    "name": "Test Feature Test Model Command Specifications Features Md",
+                                    "element_type": "feature",
+                                    "file_path": "specifications/Features.md",
+                                    "file_order_index": 0,
+                                    "relations": [],
+                                    "attachments": [
+                                      "specifications/Ontologies.md#model-command-ontology"
+                                    ]
+                                  }
+                                }
+                              ],
                               "attachments": []
                             }
                           }
@@ -189,12 +234,27 @@
               {
                 "relation_type": "derivedFrom",
                 "element": {
-                  "identifier": "specifications/UserRequirements.md#model-structure-exploration",
+                  "identifier": "specifications/Features.md#model-structure-exploration",
                   "name": "Model Structure Exploration",
-                  "element_type": "user-requirement",
-                  "file_path": "specifications/UserRequirements.md",
-                  "file_order_index": 0,
-                  "relations": [],
+                  "element_type": "requirement",
+                  "file_path": "specifications/Features.md",
+                  "file_order_index": 1,
+                  "relations": [
+                    {
+                      "relation_type": "specify",
+                      "element": {
+                        "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
+                        "name": "Test Feature Test Model Command Specifications Features Md",
+                        "element_type": "feature",
+                        "file_path": "specifications/Features.md",
+                        "file_order_index": 0,
+                        "relations": [],
+                        "attachments": [
+                          "specifications/Ontologies.md#model-command-ontology"
+                        ]
+                      }
+                    }
+                  ],
                   "attachments": []
                 }
               }
@@ -219,7 +279,7 @@
             "name": "JSON Output Format",
             "element_type": "requirement",
             "file_path": "specifications/SystemRequirements.md",
-            "file_order_index": 5,
+            "file_order_index": 6,
             "relations": [
               {
                 "relation_type": "derivedFrom",
@@ -233,12 +293,27 @@
                     {
                       "relation_type": "derivedFrom",
                       "element": {
-                        "identifier": "specifications/UserRequirements.md#model-structure-exploration",
+                        "identifier": "specifications/Features.md#model-structure-exploration",
                         "name": "Model Structure Exploration",
-                        "element_type": "user-requirement",
-                        "file_path": "specifications/UserRequirements.md",
-                        "file_order_index": 0,
-                        "relations": [],
+                        "element_type": "requirement",
+                        "file_path": "specifications/Features.md",
+                        "file_order_index": 1,
+                        "relations": [
+                          {
+                            "relation_type": "specify",
+                            "element": {
+                              "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
+                              "name": "Test Feature Test Model Command Specifications Features Md",
+                              "element_type": "feature",
+                              "file_path": "specifications/Features.md",
+                              "file_order_index": 0,
+                              "relations": [],
+                              "attachments": [
+                                "specifications/Ontologies.md#model-command-ontology"
+                              ]
+                            }
+                          }
+                        ],
                         "attachments": []
                       }
                     }
@@ -258,6 +333,18 @@
             "element_type": "requirement",
             "file_path": "specifications/SystemRequirements.md",
             "file_order_index": 4,
+            "relations": [],
+            "attachments": []
+          }
+        },
+        {
+          "relation_type": "verify",
+          "element": {
+            "identifier": "specifications/SystemRequirements.md#pure-mermaid-output-format",
+            "name": "Pure Mermaid Output Format",
+            "element_type": "requirement",
+            "file_path": "specifications/SystemRequirements.md",
+            "file_order_index": 5,
             "relations": [],
             "attachments": []
           }
@@ -302,12 +389,27 @@
                           {
                             "relation_type": "derivedFrom",
                             "element": {
-                              "identifier": "specifications/UserRequirements.md#model-structure-exploration",
+                              "identifier": "specifications/Features.md#model-structure-exploration",
                               "name": "Model Structure Exploration",
-                              "element_type": "user-requirement",
-                              "file_path": "specifications/UserRequirements.md",
-                              "file_order_index": 0,
-                              "relations": [],
+                              "element_type": "requirement",
+                              "file_path": "specifications/Features.md",
+                              "file_order_index": 1,
+                              "relations": [
+                                {
+                                  "relation_type": "specify",
+                                  "element": {
+                                    "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
+                                    "name": "Test Feature Test Model Command Specifications Features Md",
+                                    "element_type": "feature",
+                                    "file_path": "specifications/Features.md",
+                                    "file_order_index": 0,
+                                    "relations": [],
+                                    "attachments": [
+                                      "specifications/Ontologies.md#model-command-ontology"
+                                    ]
+                                  }
+                                }
+                              ],
                               "attachments": []
                             }
                           }
@@ -329,7 +431,7 @@
   ],
   "metadata": {
     "total_elements": 6,
-    "total_relations": 14,
+    "total_relations": 17,
     "filtered_from": null,
     "direction": "Reverse"
   }

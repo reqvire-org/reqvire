@@ -1,0 +1,1 @@
+Unknown SHACL class is rejected

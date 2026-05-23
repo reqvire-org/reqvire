@@ -1,0 +1,1 @@
+Outside-context semantic reference is rejected

@@ -111,8 +111,8 @@ Both visualizations use consistent colors matching Mermaid diagrams:
 | folder | #9E9E9E | Gray for directories |
 | file | #B8860B | Dark goldenrod for files |
 | design-document | #607D8B | Blue-gray for design docs |
-| user-requirement | #7E57C2 | Purple for user requirements |
-| requirement | #673AB7 | Deep purple for system requirements |
+| feature | #BBDEFB | Blue for product/capability features |
+| requirement | #673AB7 | Deep purple for requirements |
 | verification | #4CAF50 | Green for verifications |
 | test-verification | #4CAF50 | Green for test verifications |
 | refinement | #FF9800 | Orange for refinements |
@@ -161,9 +161,9 @@ Both visualizations consume JSON data in this format:
           "link": "requirements/UserStories.html",
           "children": [
             {
-              "name": "User Authentication",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#user-authentication",
+              "name": "Authentication",
+              "type": "feature",
+              "link": "requirements/UserStories.html#authentication",
               "children": [
                 {
                   "name": "auth-design",

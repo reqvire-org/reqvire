@@ -1,0 +1,107 @@
+#!/bin/bash
+set -uo pipefail
+
+TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+copy_fixture() {
+  local fixture="$1"
+  rm -rf "${TEST_DIR}/specifications"
+  mkdir -p "${TEST_DIR}/specifications"
+  cp "${TEST_SCRIPT_DIR}/fixtures/${fixture}" "${TEST_DIR}/specifications/Requirements.md"
+}
+
+assert_diff() {
+  local expected="$1"
+  local actual="$2"
+  local description="$3"
+
+  if ! diff -u "$expected" "$actual"; then
+    echo "FAILED: ${description}"
+    echo ""
+    echo "If changes are intentional, update ${expected}"
+    exit 1
+  fi
+}
+
+copy_fixture "valid.md.txt"
+set +e
+(cd "$TEST_DIR" && "$REQVIRE_BIN" validate > /tmp/feature-attachments-valid.out 2>&1)
+EXIT_CODE=$?
+set -e
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "FAILED: valid feature ontology attachment should validate"
+  cat /tmp/feature-attachments-valid.out
+  exit 1
+fi
+assert_diff "${TEST_SCRIPT_DIR}/expected/valid.txt" /tmp/feature-attachments-valid.out "valid output mismatch"
+
+copy_fixture "requirement-attaches-ontology.md.txt"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE=$?
+set -e
+if [ $EXIT_CODE -eq 0 ]; then
+  echo "FAILED: requirement attachment to ontology should fail"
+  exit 1
+fi
+if echo "$OUTPUT" | grep -qi "Requirement attachments" && echo "$OUTPUT" | grep -qi "ontology"; then
+  printf "Requirement attachment to ontology is rejected\n" > /tmp/feature-attachments-requirement-ontology-invalid.out
+else
+  printf "%s\n" "$OUTPUT" > /tmp/feature-attachments-requirement-ontology-invalid.out
+fi
+assert_diff \
+  "${TEST_SCRIPT_DIR}/expected/requirement-attaches-ontology.txt" \
+  /tmp/feature-attachments-requirement-ontology-invalid.out \
+  "requirement ontology attachment invalid output mismatch"
+
+copy_fixture "feature-attaches-requirement-detail.md.txt"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE=$?
+set -e
+if [ $EXIT_CODE -eq 0 ]; then
+  echo "FAILED: feature attachment to requirement-detail refinement should fail"
+  exit 1
+fi
+if echo "$OUTPUT" | grep -qi "Feature attachments may target ontology only"; then
+  printf "Feature attachment to requirement-detail refinement is rejected\n" > /tmp/feature-attachments-feature-invalid.out
+else
+  printf "%s\n" "$OUTPUT" > /tmp/feature-attachments-feature-invalid.out
+fi
+assert_diff \
+  "${TEST_SCRIPT_DIR}/expected/feature-attaches-requirement-detail.txt" \
+  /tmp/feature-attachments-feature-invalid.out \
+  "feature invalid attachment output mismatch"
+
+copy_fixture "requirement-attaches-requirement-semantic-contract.md.txt"
+set +e
+(cd "$TEST_DIR" && "$REQVIRE_BIN" validate > /tmp/feature-attachments-requirement-valid.out 2>&1)
+EXIT_CODE=$?
+set -e
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "FAILED: requirement attachment to requirement-owned semantic-contract should validate"
+  cat /tmp/feature-attachments-requirement-valid.out
+  exit 1
+fi
+assert_diff "${TEST_SCRIPT_DIR}/expected/valid.txt" /tmp/feature-attachments-requirement-valid.out "requirement semantic-contract attachment valid output mismatch"
+
+copy_fixture "requirement-attaches-feature-semantic-contract.md.txt"
+set +e
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE=$?
+set -e
+if [ $EXIT_CODE -eq 0 ]; then
+  echo "FAILED: feature attachment to semantic-contract should fail"
+  exit 1
+fi
+if echo "$OUTPUT" | grep -qi "Feature attachments may target ontology only"; then
+  printf "Feature attachment to semantic-contract is rejected\n" > /tmp/feature-attachments-requirement-invalid.out
+else
+  printf "%s\n" "$OUTPUT" > /tmp/feature-attachments-requirement-invalid.out
+fi
+assert_diff \
+  "${TEST_SCRIPT_DIR}/expected/requirement-attaches-feature-semantic-contract.txt" \
+  /tmp/feature-attachments-requirement-invalid.out \
+  "requirement invalid attachment output mismatch"
+
+exit 0

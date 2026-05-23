@@ -1,5 +1,14 @@
 # Elements
 
+
+### Test Feature Test Search All Features Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 This document contains correctly formatted relations to existing targets, to verify validation passes.
 
 This is page frontmatter content that should appear in the summary.
@@ -12,13 +21,15 @@ graph TD;
 
 Additional page content to test mermaid diagram inclusion in page summaries.
 
-### Root User Requirement
+### Root Feature
 
-Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+Top-level feature used as hierarchy parent for system requirements in this fixture.
 
 #### Metadata
-* type: user-requirement
+* type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-search-all-features-specifications-requirements-md)
 ---
 
 ### Verification of Standard Relations
@@ -55,7 +66,7 @@ This requirement has valid relations to existing files, using markdown link form
 * type: requirement
 
 #### Relations
-* derivedFrom: #root-user-requirement
+* derivedFrom: #root-feature
 * satisfiedBy: [./DesignSpecifications/SampleDSD.md](./DesignSpecifications/SampleDSD.md)
 * trace: [Design Specification](DesignSpecifications/SampleDSD.md)
 * verifiedBy: [Verification of Standard Relations](#verification-of-standard-relations)
@@ -81,8 +92,7 @@ This requirement specifically tests validation of relations to files in the Desi
 This requirement specifically tests validation of 'Other' subsections
 
 #### Metadata
-* type: user-requirement
-
+* type: requirement
 #### Subsection 1
 
 Some text of subsection 1
@@ -91,6 +101,9 @@ Some text of subsection 1
 
 Some text of subsection 2
 
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-search-all-features-specifications-requirements-md)
 ---
 
 ### Search Command Verification
@@ -106,7 +119,7 @@ This test verifies that the search command supports all filter types and combine
 
 ##### Test Criteria
 1. `reqvire search --json` returns valid JSON with all elements
-2. `reqvire search --filter-type=user-requirement` returns only user-requirements
+2. `reqvire search --filter-type=feature` returns only features
 3. Element count with two filters is <= element count with one filter (additive behavior)
 
 #### Metadata
@@ -123,9 +136,9 @@ This test verifies that the search command supports all filter types and combine
 This requirement tests special characters in element names including commas and slashes.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-search-all-features-specifications-requirements-md)
   * derivedFrom: #requirement-with-valid-standard-relations
 
 ---

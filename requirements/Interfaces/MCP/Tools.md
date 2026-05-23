@@ -241,7 +241,8 @@ The system shall expose MCP read tools that return model evidence needed by exte
 
 #### Details
 - The MCP interface shall expose read tools for authoritative Reqvire model evidence.
-- Model evidence tools shall support element lookup, model structure, containment, collection, and submodel analysis.
+- Model evidence tools shall support element lookup, model structure, containment, collection, submodel analysis, and ontology/SHACL semantic collection.
+- Model evidence tools shall expose the canonical feature/requirement/ontology model, including `ontology` elements, `#### Concept References`, and requirement-owned `semantic-contract` shape profiles where the underlying Reqvire operation returns them.
 - Model evidence tools shall include revision metadata when model state affects interpretation.
 - Model evidence tools shall not mutate the model or filesystem.
 
@@ -254,6 +255,7 @@ The system shall expose MCP read tools that return model evidence needed by exte
   * [Containment View Report Refinement Specification](../../Functional/Output/Specifications.md#containment-view-report-refinement-specification)
   * [Collect Content Specification](../../Functional/Output/Specifications.md#collect-content-specification)
   * [Requirement Submodels Report Specification](../../Functional/Output/Specifications.md#requirement-submodels-report-specification)
+  * [Ontology Collection Output Specification](../../Functional/Output/Specifications.md#ontology-collection-output-specification)
 
 #### Relations
   * derivedFrom: [MCP Interface](../Interfaces.md#mcp-interface)
@@ -316,6 +318,7 @@ The system shall expose mutation tools only through typed Reqvire core operation
 #### Details
 - The MCP interface shall expose mutation tools only after explicit mutation enablement.
 - MCP mutation tools shall use Reqvire core mutation logic.
+- MCP mutation tools shall preserve Reqvire semantic model validation, including ontology attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, and single ontology-root validation.
 - MCP mutation tools shall preserve Reqvire filesystem persistence behavior.
 - MCP mutation results shall report changed model evidence.
 - MCP mutation execution shall refresh MCP-visible model state after successful mutation.

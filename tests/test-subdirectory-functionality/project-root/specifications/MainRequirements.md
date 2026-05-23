@@ -1,5 +1,14 @@
 # Elements
 
+
+### Test Feature Test Subdirectory Functionality Project Root Specifications Mainrequirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 This file contains main requirements that should NOT be processed when run from a subdirectory.
 
 
@@ -17,9 +26,9 @@ This is a main requirement that should be ignored when processing only the submo
 This is the main system requirement.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-subdirectory-functionality-project-root-specifications-mainrequirements-md)
     * derive: [Main Requirement One](#main-requirement-one)
 
 ---

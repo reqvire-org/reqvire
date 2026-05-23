@@ -12,8 +12,6 @@ GitHub workflow behavior for docs export:
 - Commits generated documentation changes with a standard commit message.
 - Pushes documentation updates back to `main`.
 
-This keeps `docs/` synchronized for GitHub Pages without manual export steps.
-
 #### Metadata
   * type: specification
 
@@ -47,6 +45,8 @@ Example:
 Comment syntax for code traceability markers by file extension.
 
 #### Details
+Traceability relation kinds and comment style kinds are defined by the Reqvire code traceability ontology. This specification maps concrete source file extensions to those ontology-defined comment style kinds and gives parser examples.
+
 | Extension | Comment Style | Example |
 |-----------|---------------|---------|
 | `.bat`, `.cmd` | `REM` | `REM [reqvire::satisfies: Req1] START` |
@@ -58,6 +58,40 @@ Comment syntax for code traceability markers by file extension.
 
 #### Metadata
   * type: specification
+
+#### Relations
+  * refine: [Comment Style by File Extension](CodeAlignment.md#comment-style-by-file-extension)
+---
+
+### Pull Request Change Log Workflow Specification
+
+#### Details
+Pull request change-log workflow behavior:
+- Triggers during pull-request review.
+- Summarizes system model and related component changes.
+- Produces a pull-request change log that is reviewable by contributors.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Generate Change Logs for Pull Requests](GitHubIntegration.md#generate-change-logs-for-pull-requests)
+---
+
+### Pull Request Validation Workflow Specification
+
+#### Details
+Pull request validation workflow behavior:
+- Triggers when a pull request is updated.
+- Runs `reqvire validate`.
+- Runs `reqvire lint`.
+- Reports pull-request validation results as workflow evidence.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Automate Pull Request Validations](GitHubIntegration.md#automate-pull-request-validations)
 ---
 
 ### Slash Style Comment Refinement Specification
@@ -86,13 +120,13 @@ void processSensorData() {
 ### Traceability Format Refinement Specification
 
 #### Details
+Traceability marker relation kinds are defined by the Reqvire code traceability ontology.
+
 Traceability marker syntax behavior:
 - Parses `[reqvire::...]` marker blocks and extracts associated requirement identifiers.
 - Uses block markers in the form:
   `[reqvire::<relation_type>: <element identifier>] START ... [reqvire::<relation_type>: <element identifier>] END`
-- Restricts `<relation_type>` to:
-  - `satisfies`
-  - `trace`
+- Restricts `<relation_type>` to ontology-defined traceability relation kind tokens.
 - Resolves `<element identifier>` as the traced requirement target.
 
 #### Metadata

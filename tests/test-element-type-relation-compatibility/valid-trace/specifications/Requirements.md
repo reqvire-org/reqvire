@@ -1,36 +1,47 @@
 # Elements
 
-### User Requirement A
 
-A user requirement for testing trace relations.
+### Test Feature Test Element Type Relation Compatibility Valid Trace Specifications
 
-#### Metadata
-  * type: user-requirement
-
----
-
-### User Requirement B
-
-Another user requirement.
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
-
-#### Relations
-  * trace: [User Requirement A](#user-requirement-a)
-
+  * type: feature
 ---
 
-### System Requirement A
+### Feature A
 
-System requirement with trace to user requirement.
+A feature for testing trace relations.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [User Requirement A](#user-requirement-a)
-  * trace: [User Requirement B](#user-requirement-b)
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-trace-specifications)
+---
+
+### Feature B
+
+Another feature.
+
+#### Metadata
+  * type: requirement
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-trace-specifications)
+  * trace: [Feature A](#feature-a)
+
+---
+
+### System Requirement A
+
+System requirement with trace to feature.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Feature A](#feature-a)
+  * trace: [Feature B](#feature-b)
 
 ---
 
@@ -42,7 +53,7 @@ Test verification with trace to requirement.
   * type: test-verification
 
 #### Relations
-  * verify: [User Requirement A](#user-requirement-a)
+  * verify: [Feature A](#feature-a)
   * trace: [System Requirement A](#system-requirement-a)
 
 ---
@@ -55,7 +66,7 @@ Test verification with trace to another verification.
   * type: test-verification
 
 #### Relations
-  * verify: [User Requirement B](#user-requirement-b)
+  * verify: [Feature B](#feature-b)
   * trace: [Test Verification A](#test-verification-a)
 
 ---
@@ -68,8 +79,8 @@ Analysis verification can use trace.
   * type: analysis-verification
 
 #### Relations
-  * verify: [User Requirement A](#user-requirement-a)
-  * trace: [User Requirement B](#user-requirement-b)
+  * verify: [Feature A](#feature-a)
+  * trace: [Feature B](#feature-b)
 
 ---
 
@@ -81,7 +92,7 @@ Inspection verification can use trace.
   * type: inspection-verification
 
 #### Relations
-  * verify: [User Requirement A](#user-requirement-a)
+  * verify: [Feature A](#feature-a)
   * trace: [Test Verification A](#test-verification-a)
 
 ---
@@ -94,7 +105,7 @@ Demonstration verification can use trace.
   * type: demonstration-verification
 
 #### Relations
-  * verify: [User Requirement A](#user-requirement-a)
+  * verify: [Feature A](#feature-a)
   * trace: [Analysis Verification with Trace](#analysis-verification-with-trace)
 
 ---
@@ -104,10 +115,10 @@ Demonstration verification can use trace.
 Other type can only use trace relations.
 
 #### Metadata
-  * type: other
+  * type: other-other
 
 #### Relations
-  * trace: [User Requirement A](#user-requirement-a)
+  * trace: [Feature A](#feature-a)
 
 ---
 
@@ -116,7 +127,7 @@ Other type can only use trace relations.
 Other type tracing to another other element.
 
 #### Metadata
-  * type: other
+  * type: other-other
 
 #### Relations
   * trace: [Other Element A](#other-element-a)

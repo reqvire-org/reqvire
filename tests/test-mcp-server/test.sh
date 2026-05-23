@@ -129,8 +129,28 @@ read_element_request() {
   jq -n -c '{jsonrpc:"2.0",id:5,method:"tools/call",params:{name:"reqvire.read_element",arguments:{name:"Test Requirement Beta"}}}'
 }
 
+semantic_requirement_request() {
+  jq -n -c '{jsonrpc:"2.0",id:11,method:"tools/call",params:{name:"reqvire.read_element",arguments:{name:"MCP Semantic Requirement"}}}'
+}
+
+ontology_search_request() {
+  jq -n -c '{jsonrpc:"2.0",id:12,method:"tools/call",params:{name:"reqvire.search",arguments:{filter_type:"ontology"}}}'
+}
+
+ontologies_request() {
+  jq -n -c '{jsonrpc:"2.0",id:14,method:"tools/call",params:{name:"reqvire.ontologies",arguments:{}}}'
+}
+
+ontologies_jsonld_request() {
+  jq -n -c '{jsonrpc:"2.0",id:15,method:"tools/call",params:{name:"reqvire.ontologies",arguments:{format:"jsonld"}}}'
+}
+
+ontologies_full_request() {
+  jq -n -c '{jsonrpc:"2.0",id:16,method:"tools/call",params:{name:"reqvire.ontologies",arguments:{full:true}}}'
+}
+
 model_request() {
-  jq -n -c '{jsonrpc:"2.0",id:11,method:"tools/call",params:{name:"reqvire.model",arguments:{from:"Test Requirement Alpha"}}}'
+  jq -n -c '{jsonrpc:"2.0",id:13,method:"tools/call",params:{name:"reqvire.model",arguments:{from:"Test Requirement Alpha"}}}'
 }
 
 collect_request() {
@@ -155,6 +175,78 @@ format_fix_rejected_request() {
 
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/specifications" "$TEST_DIR/"
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/docs" "$TEST_DIR/"
+cat >> "$TEST_DIR/specifications/Requirements.md" <<'EOF'
+
+### MCP Semantic Feature
+
+MCP semantic feature for readable Access Token model concepts.
+
+#### Metadata
+  * type: feature
+
+#### Attachments
+  * [MCP Access Token Ontology](#mcp-access-token-ontology)
+
+#### Relations
+  * specifiedBy: [MCP Semantic Requirement](#mcp-semantic-requirement)
+---
+
+### MCP Access Token Ontology
+
+Access token ontology for MCP semantic evidence.
+
+#### Metadata
+  * type: ontology
+
+#### Ontology
+```turtle
+@prefix mcp: <urn:reqvire:test:mcp:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+mcp:AccessToken a owl:Class .
+mcp:subject a owl:ObjectProperty .
+```
+---
+
+### MCP Semantic Requirement
+
+The system shall expose MCP semantic evidence for readable Access Token model concepts.
+
+#### Metadata
+  * type: requirement
+
+#### Concept References
+  * Access Token: mcp:AccessToken
+
+#### Relations
+  * specify: [MCP Semantic Feature](#mcp-semantic-feature)
+  * refinedBy: [MCP Access Token Shape Contract](#mcp-access-token-shape-contract)
+---
+
+### MCP Access Token Shape Contract
+
+MCP access token shape contract.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * refine: [MCP Semantic Requirement](#mcp-semantic-requirement)
+
+#### Shapes
+```turtle
+@prefix mcp: <urn:reqvire:test:mcp:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+mcp:AccessTokenShape
+  a sh:NodeShape ;
+  sh:targetClass mcp:AccessToken ;
+  sh:property [
+    sh:path mcp:subject ;
+  ] .
+```
+---
+EOF
 
 (cd "$TEST_DIR" && "$REQVIRE_BIN" search --json --filter-name "Test Requirement Beta") > "$TEST_DIR/output/binary-search.json" 2>&1 \
   || fail "Reqvire binary search failed" "$TEST_DIR/output/binary-search.json"
@@ -185,7 +277,12 @@ run_http_mcp_sequence "$DEFAULT_PORT" "$DEFAULT_OUTPUT" \
   "$(schema_error_request)" \
   "$(unknown_tool_request)" \
   "$(resource_read_request)" \
-  "$(format_fix_rejected_request)" || fail "default MCP HTTP request sequence failed"
+  "$(format_fix_rejected_request)" \
+  "$(semantic_requirement_request)" \
+  "$(ontology_search_request)" \
+  "$(ontologies_request)" \
+  "$(ontologies_jsonld_request)" \
+  "$(ontologies_full_request)" || fail "default MCP HTTP request sequence failed"
 stop_http_mcp
 trap - EXIT
 
@@ -216,6 +313,13 @@ assert_jq_line "$DEFAULT_OUTPUT" 7 '.error.code == -32602 and (.error.data.messa
 assert_jq_line "$DEFAULT_OUTPUT" 8 '.error.code == -32602' "unknown or unadvertised tool returns protocol error"
 assert_jq_line "$DEFAULT_OUTPUT" 9 '.result.contents[0].uri == "reqvire://workspace/status" and .result.contents[0].mimeType == "application/json"' "resources/read returns JSON resource content"
 assert_jq_line "$DEFAULT_OUTPUT" 10 '.error.code == -32602' "format fix is rejected by default schema"
+assert_jq_line "$DEFAULT_OUTPUT" 11 '.result.structuredContent.concept_references[0].label == "Access Token" and .result.structuredContent.concept_references[0].iri == "mcp:AccessToken"' "read_element returns concept references"
+assert_jq_line "$DEFAULT_OUTPUT" 12 '.result.structuredContent.files[]?.elements[] | select(.name=="MCP Access Token Ontology") | .ontology.ontology.content | contains("mcp:AccessToken")' "search returns ontology ADT content"
+assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.format == "turtle" and (.result.structuredContent.content | contains("mcp:AccessToken")) and (.result.structuredContent.content | contains("mcp:AccessTokenShape"))' "ontologies tool returns Turtle semantic content"
+assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.summary.ontology_blocks >= 1 and .result.structuredContent.summary.shape_blocks >= 1' "ontologies tool returns semantic index summary"
+assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.blocks[] | select(.source_name=="MCP Access Token Ontology" and .kind=="ontology")' "ontologies tool returns ontology block metadata"
+assert_jq_line "$DEFAULT_OUTPUT" 14 '.result.structuredContent.format == "jsonld" and (.result.structuredContent.jsonld | type == "array") and (.result.structuredContent.jsonld | length) > 0' "ontologies tool returns JSON-LD semantic content"
+assert_jq_line "$DEFAULT_OUTPUT" 15 '.result.structuredContent.full == true and (.result.structuredContent.content | contains("reqvire:attaches")) and (.result.structuredContent.content | contains("urn:reqvire:element:mcp-semantic-feature"))' "ontologies tool returns full model context triples"
 
 UNSUPPORTED_PORT="$(pick_port)"
 UNSUPPORTED_OUTPUT_PREFIX="$TEST_DIR/output/mcp-unsupported-protocol"

@@ -21,7 +21,9 @@ It consists of a file path and optionally an element name (fragment).
 
 Identifiers are used for writing relations in markdown and cross-referencing between elements. The system resolves identifiers to Element IDs during parsing for internal tracking and change detection. When an element is relocated to a different file or section, its identifier changes but its Element ID remains stable.
 
-## Identifier in markdown document can be of several types
+## Identifier in markdown document can resolve to several reference target kinds
+
+Reference target kind vocabulary is defined by the Reqvire core element ontology. This design document specifies parser syntax and resolution behavior for those target kinds.
 
 -**Identifier**
   - An internal system element reference with fragment, pointing to specific elements within markdown documents.

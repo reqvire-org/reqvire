@@ -1,5 +1,14 @@
 # Elements
 
+
+### Test Feature Test Html Export Specifications Testrequirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 This document contains test requirements for HTML export testing.
 
 
@@ -8,8 +17,10 @@ This document contains test requirements for HTML export testing.
 The system SHALL support HTML export functionality with proper link handling.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-html-export-specifications-testrequirements-md)
 ---
 
 ### Test Requirement 1

@@ -9,29 +9,39 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Test: Change Impact Smart Filtering
 # --------------------------------------
 # Acceptance Criteria:
-# - New parent elements appear in the "New Elements" section
+# - New feature root elements appear in the "New Elements" section
 # - New child elements (with parent relationships to other new elements) are filtered out
 # - Filtered child elements are shown in parent's relations with "(new)" marker
 # - Verification elements that are not children remain in the report
 #
 # Test Criteria:
-# - When adding a parent and child requirement together, only parent appears in "New Elements"
+# - When adding a feature, parent requirement, and child requirement together, only feature appears in "New Elements"
 # - When adding a requirement and its verification, both appear (verification is not a child)
 # - Child elements are visible in the parent's change impact tree with appropriate markers
 
 
 # The run_tests.sh script has already created initial git commit with Requirements.md
-# Now add new parent-child requirements and verification
+# Now add a new feature, parent-child requirements, and verification
 cat >> "${TEST_DIR}/Requirements.md" << 'EOF'
+
+### New Feature
+
+This is a new feature that will appear in the report.
+
+#### Metadata
+  * type: feature
+
+---
 
 ### New Parent Requirement
 
-This is a new parent requirement that will appear in the report.
+This is a new parent requirement under the new feature.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
+  * specify: [New Feature](#new-feature)
   * derive: [New Child Requirement](#new-child-requirement)
   * verifiedBy: [New Verification](#new-verification)
 
@@ -117,21 +127,27 @@ if ! echo "$JSON_OUTPUT" | jq . >/dev/null 2>&1; then
     exit 1
 fi
 
-# Check that only 1 new element is in the JSON (parent only, child is filtered)
+# Check that only 1 new element is in the JSON (feature only, requirement children are filtered)
 NEW_COUNT=$(echo "$JSON_OUTPUT" | jq '.added | length')
 if [ "$NEW_COUNT" -ne 1 ]; then
-    echo "❌ FAILED: Expected 1 new element in JSON (parent only), got $NEW_COUNT"
+    echo "❌ FAILED: Expected 1 new element in JSON (feature only), got $NEW_COUNT"
     echo "Elements found:"
     echo "$JSON_OUTPUT" | jq '.added[].element_id'
     exit 1
 fi
 
 # Verify the correct elements are present
+FEATURE_PRESENT=$(echo "$JSON_OUTPUT" | jq '.added | map(select(.element_id | contains("new-feature"))) | length')
 PARENT_PRESENT=$(echo "$JSON_OUTPUT" | jq '.added | map(select(.element_id | contains("new-parent-requirement"))) | length')
 CHILD_PRESENT=$(echo "$JSON_OUTPUT" | jq '.added | map(select(.element_id | contains("new-child-requirement"))) | length')
 
-if [ "$PARENT_PRESENT" -ne 1 ]; then
-    echo "❌ FAILED: New Parent Requirement not found in JSON output"
+if [ "$FEATURE_PRESENT" -ne 1 ]; then
+    echo "❌ FAILED: New Feature not found in JSON output"
+    exit 1
+fi
+
+if [ "$PARENT_PRESENT" -ne 0 ]; then
+    echo "❌ FAILED: New Parent Requirement should be filtered out but was found in JSON output"
     exit 1
 fi
 

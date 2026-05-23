@@ -1,5 +1,5 @@
 **Total Elements**: 6
-**Total Relations**: 14
+**Total Relations**: 17
 **Direction**: Reverse
 
 ## [Default Filtering Test](specifications/Verifications/Tests.md#default-filtering-test)
@@ -8,9 +8,10 @@
 **File**: [specifications/Verifications/Tests.md](specifications/Verifications/Tests.md)
 
 ```mermaid
-graph LR
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+graph TD
+  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
@@ -18,21 +19,24 @@ graph LR
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
+    subgraph 52b96646352f3ec7["📄 Features.md"]
+      1ef18bbc2a9e2de["Model Structure Exploration"];
+      class 1ef18bbc2a9e2de systemRequirement;
+      click 1ef18bbc2a9e2de "specifications/Features.md#model-structure-exploration";
+      cc4f0d848ef4201f["Test Feature Test Model Command Specifications Features Md<br/>📎 specifications/Ontologies.md#model-command-ontology"];
+      class cc4f0d848ef4201f feature;
+      click cc4f0d848ef4201f "specifications/Features.md#test-feature-test-model-command-specifications-features-md";
+    end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
-      6208b4add030277e["Default Root Filtering"];
-      class 6208b4add030277e systemRequirement;
-      click 6208b4add030277e "specifications/SystemRequirements.md#default-root-filtering";
+      f352ca56d3ce0fdd["Default Model Roots"];
+      class f352ca56d3ce0fdd systemRequirement;
+      click f352ca56d3ce0fdd "specifications/SystemRequirements.md#default-model-roots";
       b7ec4bb3813f1dea["Model Diagram Generation"];
       class b7ec4bb3813f1dea systemRequirement;
       click b7ec4bb3813f1dea "specifications/SystemRequirements.md#model-diagram-generation";
       836c732a54d7f48f["Model Filtering Capability"];
       class 836c732a54d7f48f systemRequirement;
       click 836c732a54d7f48f "specifications/SystemRequirements.md#model-filtering-capability";
-    end
-    subgraph 6e2c14866f0b0117["📄 UserRequirements.md"]
-      906507e3072a273["Model Structure Exploration"];
-      class 906507e3072a273 userRequirement;
-      click 906507e3072a273 "specifications/UserRequirements.md#model-structure-exploration";
     end
   end
   subgraph 9f0649e759bd2822["📁 specifications/Verifications"]
@@ -42,10 +46,11 @@ graph LR
       click a2368d1b4b67f0d7 "specifications/Verifications/Tests.md#default-filtering-test";
     end
   end
-  a2368d1b4b67f0d7 -->|verify| 6208b4add030277e;
-  6208b4add030277e -->|derivedFrom| 836c732a54d7f48f;
+  a2368d1b4b67f0d7 -->|verify| f352ca56d3ce0fdd;
+  f352ca56d3ce0fdd -->|derivedFrom| 836c732a54d7f48f;
   836c732a54d7f48f -->|derivedFrom| b7ec4bb3813f1dea;
-  b7ec4bb3813f1dea -->|derivedFrom| 906507e3072a273;
+  b7ec4bb3813f1dea -->|derivedFrom| 1ef18bbc2a9e2de;
+  1ef18bbc2a9e2de -->|specify| cc4f0d848ef4201f;
 ```
 
 ## [Filter Type Test](specifications/Verifications/Tests.md#filter-type-test)
@@ -54,9 +59,10 @@ graph LR
 **File**: [specifications/Verifications/Tests.md](specifications/Verifications/Tests.md)
 
 ```mermaid
-graph LR
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+graph TD
+  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
@@ -64,6 +70,14 @@ graph LR
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
+    subgraph 52b96646352f3ec7["📄 Features.md"]
+      1ef18bbc2a9e2de["Model Structure Exploration"];
+      class 1ef18bbc2a9e2de systemRequirement;
+      click 1ef18bbc2a9e2de "specifications/Features.md#model-structure-exploration";
+      cc4f0d848ef4201f["Test Feature Test Model Command Specifications Features Md<br/>📎 specifications/Ontologies.md#model-command-ontology"];
+      class cc4f0d848ef4201f feature;
+      click cc4f0d848ef4201f "specifications/Features.md#test-feature-test-model-command-specifications-features-md";
+    end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       b7ec4bb3813f1dea["Model Diagram Generation"];
       class b7ec4bb3813f1dea systemRequirement;
@@ -71,11 +85,6 @@ graph LR
       836c732a54d7f48f["Model Filtering Capability"];
       class 836c732a54d7f48f systemRequirement;
       click 836c732a54d7f48f "specifications/SystemRequirements.md#model-filtering-capability";
-    end
-    subgraph 6e2c14866f0b0117["📄 UserRequirements.md"]
-      906507e3072a273["Model Structure Exploration"];
-      class 906507e3072a273 userRequirement;
-      click 906507e3072a273 "specifications/UserRequirements.md#model-structure-exploration";
     end
   end
   subgraph 9f0649e759bd2822["📁 specifications/Verifications"]
@@ -87,7 +96,8 @@ graph LR
   end
   bbd610799ac8e00f -->|verify| 836c732a54d7f48f;
   836c732a54d7f48f -->|derivedFrom| b7ec4bb3813f1dea;
-  b7ec4bb3813f1dea -->|derivedFrom| 906507e3072a273;
+  b7ec4bb3813f1dea -->|derivedFrom| 1ef18bbc2a9e2de;
+  1ef18bbc2a9e2de -->|specify| cc4f0d848ef4201f;
 ```
 
 ## [From Flag Filtering Test](specifications/Verifications/Tests.md#from-flag-filtering-test)
@@ -96,9 +106,10 @@ graph LR
 **File**: [specifications/Verifications/Tests.md](specifications/Verifications/Tests.md)
 
 ```mermaid
-graph LR
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+graph TD
+  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
@@ -106,6 +117,14 @@ graph LR
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
+    subgraph 52b96646352f3ec7["📄 Features.md"]
+      1ef18bbc2a9e2de["Model Structure Exploration"];
+      class 1ef18bbc2a9e2de systemRequirement;
+      click 1ef18bbc2a9e2de "specifications/Features.md#model-structure-exploration";
+      cc4f0d848ef4201f["Test Feature Test Model Command Specifications Features Md<br/>📎 specifications/Ontologies.md#model-command-ontology"];
+      class cc4f0d848ef4201f feature;
+      click cc4f0d848ef4201f "specifications/Features.md#test-feature-test-model-command-specifications-features-md";
+    end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       f7eb2f9d9cd7bb11["Forward Relation Traversal"];
       class f7eb2f9d9cd7bb11 systemRequirement;
@@ -116,11 +135,6 @@ graph LR
       836c732a54d7f48f["Model Filtering Capability"];
       class 836c732a54d7f48f systemRequirement;
       click 836c732a54d7f48f "specifications/SystemRequirements.md#model-filtering-capability";
-    end
-    subgraph 6e2c14866f0b0117["📄 UserRequirements.md"]
-      906507e3072a273["Model Structure Exploration"];
-      class 906507e3072a273 userRequirement;
-      click 906507e3072a273 "specifications/UserRequirements.md#model-structure-exploration";
     end
   end
   subgraph 9f0649e759bd2822["📁 specifications/Verifications"]
@@ -133,7 +147,8 @@ graph LR
   293200814c46cd0d -->|verify| f7eb2f9d9cd7bb11;
   f7eb2f9d9cd7bb11 -->|derivedFrom| 836c732a54d7f48f;
   836c732a54d7f48f -->|derivedFrom| b7ec4bb3813f1dea;
-  b7ec4bb3813f1dea -->|derivedFrom| 906507e3072a273;
+  b7ec4bb3813f1dea -->|derivedFrom| 1ef18bbc2a9e2de;
+  1ef18bbc2a9e2de -->|specify| cc4f0d848ef4201f;
 ```
 
 ## [Model Generation Test](specifications/Verifications/Tests.md#model-generation-test)
@@ -142,9 +157,10 @@ graph LR
 **File**: [specifications/Verifications/Tests.md](specifications/Verifications/Tests.md)
 
 ```mermaid
-graph LR
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+graph TD
+  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
@@ -152,15 +168,18 @@ graph LR
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
+    subgraph 52b96646352f3ec7["📄 Features.md"]
+      1ef18bbc2a9e2de["Model Structure Exploration"];
+      class 1ef18bbc2a9e2de systemRequirement;
+      click 1ef18bbc2a9e2de "specifications/Features.md#model-structure-exploration";
+      cc4f0d848ef4201f["Test Feature Test Model Command Specifications Features Md<br/>📎 specifications/Ontologies.md#model-command-ontology"];
+      class cc4f0d848ef4201f feature;
+      click cc4f0d848ef4201f "specifications/Features.md#test-feature-test-model-command-specifications-features-md";
+    end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       b7ec4bb3813f1dea["Model Diagram Generation"];
       class b7ec4bb3813f1dea systemRequirement;
       click b7ec4bb3813f1dea "specifications/SystemRequirements.md#model-diagram-generation";
-    end
-    subgraph 6e2c14866f0b0117["📄 UserRequirements.md"]
-      906507e3072a273["Model Structure Exploration"];
-      class 906507e3072a273 userRequirement;
-      click 906507e3072a273 "specifications/UserRequirements.md#model-structure-exploration";
     end
   end
   subgraph 9f0649e759bd2822["📁 specifications/Verifications"]
@@ -171,7 +190,8 @@ graph LR
     end
   end
   6e0e2613c4bfcfcb -->|verify| b7ec4bb3813f1dea;
-  b7ec4bb3813f1dea -->|derivedFrom| 906507e3072a273;
+  b7ec4bb3813f1dea -->|derivedFrom| 1ef18bbc2a9e2de;
+  1ef18bbc2a9e2de -->|specify| cc4f0d848ef4201f;
 ```
 
 ## [Output Format Test](specifications/Verifications/Tests.md#output-format-test)
@@ -180,9 +200,10 @@ graph LR
 **File**: [specifications/Verifications/Tests.md](specifications/Verifications/Tests.md)
 
 ```mermaid
-graph LR
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+graph TD
+  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
@@ -190,6 +211,14 @@ graph LR
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
+    subgraph 52b96646352f3ec7["📄 Features.md"]
+      1ef18bbc2a9e2de["Model Structure Exploration"];
+      class 1ef18bbc2a9e2de systemRequirement;
+      click 1ef18bbc2a9e2de "specifications/Features.md#model-structure-exploration";
+      cc4f0d848ef4201f["Test Feature Test Model Command Specifications Features Md<br/>📎 specifications/Ontologies.md#model-command-ontology"];
+      class cc4f0d848ef4201f feature;
+      click cc4f0d848ef4201f "specifications/Features.md#test-feature-test-model-command-specifications-features-md";
+    end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       5abb4a3caae293d9["JSON Output Format"];
       class 5abb4a3caae293d9 systemRequirement;
@@ -200,11 +229,9 @@ graph LR
       b7ec4bb3813f1dea["Model Diagram Generation"];
       class b7ec4bb3813f1dea systemRequirement;
       click b7ec4bb3813f1dea "specifications/SystemRequirements.md#model-diagram-generation";
-    end
-    subgraph 6e2c14866f0b0117["📄 UserRequirements.md"]
-      906507e3072a273["Model Structure Exploration"];
-      class 906507e3072a273 userRequirement;
-      click 906507e3072a273 "specifications/UserRequirements.md#model-structure-exploration";
+      28d69f5dca868721["Pure Mermaid Output Format"];
+      class 28d69f5dca868721 systemRequirement;
+      click 28d69f5dca868721 "specifications/SystemRequirements.md#pure-mermaid-output-format";
     end
   end
   subgraph 9f0649e759bd2822["📁 specifications/Verifications"]
@@ -216,8 +243,10 @@ graph LR
   end
   2f7b3b3deb29891d -->|verify| 5abb4a3caae293d9;
   5abb4a3caae293d9 -->|derivedFrom| b7ec4bb3813f1dea;
-  b7ec4bb3813f1dea -->|derivedFrom| 906507e3072a273;
+  b7ec4bb3813f1dea -->|derivedFrom| 1ef18bbc2a9e2de;
+  1ef18bbc2a9e2de -->|specify| cc4f0d848ef4201f;
   2f7b3b3deb29891d -->|verify| 25879bdc5e196bec;
+  2f7b3b3deb29891d -->|verify| 28d69f5dca868721;
 ```
 
 ## [Reverse Traversal Test](specifications/Verifications/Tests.md#reverse-traversal-test)
@@ -226,9 +255,10 @@ graph LR
 **File**: [specifications/Verifications/Tests.md](specifications/Verifications/Tests.md)
 
 ```mermaid
-graph LR
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+graph TD
+  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
@@ -236,6 +266,14 @@ graph LR
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
+    subgraph 52b96646352f3ec7["📄 Features.md"]
+      1ef18bbc2a9e2de["Model Structure Exploration"];
+      class 1ef18bbc2a9e2de systemRequirement;
+      click 1ef18bbc2a9e2de "specifications/Features.md#model-structure-exploration";
+      cc4f0d848ef4201f["Test Feature Test Model Command Specifications Features Md<br/>📎 specifications/Ontologies.md#model-command-ontology"];
+      class cc4f0d848ef4201f feature;
+      click cc4f0d848ef4201f "specifications/Features.md#test-feature-test-model-command-specifications-features-md";
+    end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       f7eb2f9d9cd7bb11["Forward Relation Traversal"];
       class f7eb2f9d9cd7bb11 systemRequirement;
@@ -246,11 +284,6 @@ graph LR
       836c732a54d7f48f["Model Filtering Capability"];
       class 836c732a54d7f48f systemRequirement;
       click 836c732a54d7f48f "specifications/SystemRequirements.md#model-filtering-capability";
-    end
-    subgraph 6e2c14866f0b0117["📄 UserRequirements.md"]
-      906507e3072a273["Model Structure Exploration"];
-      class 906507e3072a273 userRequirement;
-      click 906507e3072a273 "specifications/UserRequirements.md#model-structure-exploration";
     end
   end
   subgraph 9f0649e759bd2822["📁 specifications/Verifications"]
@@ -263,5 +296,6 @@ graph LR
   fb891ab92c9824aa -->|verify| f7eb2f9d9cd7bb11;
   f7eb2f9d9cd7bb11 -->|derivedFrom| 836c732a54d7f48f;
   836c732a54d7f48f -->|derivedFrom| b7ec4bb3813f1dea;
-  b7ec4bb3813f1dea -->|derivedFrom| 906507e3072a273;
+  b7ec4bb3813f1dea -->|derivedFrom| 1ef18bbc2a9e2de;
+  1ef18bbc2a9e2de -->|specify| cc4f0d848ef4201f;
 ```

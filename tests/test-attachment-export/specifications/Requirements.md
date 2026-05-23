@@ -1,11 +1,23 @@
 # Elements
 
+
+### Test Feature Test Attachment Export Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Root Requirement
 
 The system shall provide core functionality.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-attachment-export-specifications-requirements-md)
 ---
 
 ### System Feature Requirement
@@ -25,9 +37,9 @@ The system shall implement the feature as specified in the attached design docum
 Owner requirement for the design specification contract.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-attachment-export-specifications-requirements-md)
   * refinedBy: [Design Spec Contract](../docs/DesignSpec.md#design-spec-contract)
 ---
 

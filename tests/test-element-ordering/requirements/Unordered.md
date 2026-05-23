@@ -1,11 +1,20 @@
 # Elements
 
+
+### Test Feature Test Element Ordering Requirements Unordered Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Child B
 
 Child B element that derives from Parent A.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Parent A](#parent-a)
@@ -16,7 +25,7 @@ Child B element that derives from Parent A.
 Grandchild Z derives from Child A.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Child A](#child-a)
@@ -27,7 +36,10 @@ Grandchild Z derives from Child A.
 Parent A is a root element with children.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-ordering-requirements-unordered-md)
 ---
 
 ### Grandchild M
@@ -35,7 +47,7 @@ Parent A is a root element with children.
 Grandchild M derives from Child A.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Child A](#child-a)
@@ -46,7 +58,7 @@ Grandchild M derives from Child A.
 Child A derives from Parent A.
 
 #### Metadata
-  * type: system-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Parent A](#parent-a)
@@ -57,5 +69,8 @@ Child A derives from Parent A.
 Standalone element with no file-local parents.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-ordering-requirements-unordered-md)
 ---

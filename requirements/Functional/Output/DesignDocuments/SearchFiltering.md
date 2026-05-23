@@ -16,7 +16,7 @@ This specification defines the functional requirements for a filtering subsystem
 
 The filters shall be composable and applied conjunctively (i.e., all active filters must match for an element to be included). The filtering system must support both human-readable text output and structured machine-readable output (e.g., JSON), as well as abbreviated short mode output.
 
-Full search summaries include governance metadata counters for matched requirement-family elements. The counters use effective metadata after explicit, inherited, and default resolution.
+Full search summaries include governance metadata counters for matched governance-bearing elements (`feature` and `requirement`). The counters use effective metadata after explicit, inherited, and default resolution.
 
 ---
 
@@ -68,15 +68,20 @@ The filtering system **must support the following filters**, which may be active
 
 **Input:** One of the following valid string identifiers:
 
+- `"feature"` - Product/capability feature
 - `"requirement"` - System requirement (default type)
-- `"user-requirement"` - User requirement
 - `"verification"` / `"test-verification"` - Test verification
 - `"analysis-verification"` - Analysis verification
 - `"inspection-verification"` - Inspection verification
 - `"demonstration-verification"` - Demonstration verification
+- `"formal-proof-verification"` - Formal proof/model-checking/theorem verification
+- `"source"` - Feature-owned source/context refinement
+- `"semantic-contract"` - Requirement-owned SHACL semantic contract refinement
 - `"constraint"` - Refinement documenting constraints
 - `"behavior"` - Refinement documenting behavior details
 - `"specification"` - Refinement documenting specifications
+- `"state"` - Refinement documenting lifecycle state
+- `"input-output"` - Refinement documenting payloads, messages, fixtures, or data contracts
 - `"file"` - File element
 - Any user-defined type (e.g., `"interface"`, `"design"`)
 
@@ -86,9 +91,9 @@ The filtering system **must support the following filters**, which may be active
 
 ---
 
-### 4. Requirement Governance Metadata Filters
+### 4. Governance Metadata Filters
 
-**Purpose:** Include only requirement-family elements whose effective governance metadata matches the requested values.
+**Purpose:** Include only governance-bearing elements whose effective governance metadata matches the requested values.
 
 **Inputs:**
 - `filter-status`: comma-separated list of accepted status values (`draft`, `review`, `approved`)
@@ -96,9 +101,9 @@ The filtering system **must support the following filters**, which may be active
 - `filter-risk`: comma-separated list of accepted risk values (`low`, `medium`, `high`, `critical`)
 - `filter-owner`: Rust-compatible regular expression applied to effective owner value
 
-**Match Target:** Effective requirement governance metadata after explicit, inherited, and default resolution.
+**Match Target:** Effective governance metadata after explicit, inherited, and default resolution.
 
-**Behavior:** Status, priority, and risk filters apply exact OR matching within each comma-separated filter. Owner filtering applies regex matching. Invalid governance enum values and invalid owner regex patterns must cause an immediate user-facing error. Elements that are not requirement-family elements are excluded when any governance metadata filter is active.
+**Behavior:** Status, priority, and risk filters apply exact OR matching within each comma-separated filter. Owner filtering applies regex matching. Invalid governance enum values and invalid owner regex patterns must cause an immediate user-facing error. Elements that are not governance-bearing elements are excluded when any governance metadata filter is active.
 
 ---
 
@@ -186,10 +191,10 @@ The filtering system must evaluate filters with minimal passes over element data
 | `type = constraint` | Only constraint refinement elements |
 | `type = behavior` | Only behavior refinement elements |
 | `type = specification` | Only specification refinement elements |
-| `status = approved` | Requirement-family elements whose effective status is approved |
-| `priority = high,critical` | Requirement-family elements whose effective priority is high or critical |
-| `risk = critical` | Requirement-family elements whose effective risk is critical |
-| `owner = "Platform.*"` | Requirement-family elements whose effective owner matches the regex |
+| `status = approved` | Feature and requirement elements whose effective status is approved |
+| `priority = high,critical` | Feature and requirement elements whose effective priority is high or critical |
+| `risk = critical` | Feature and requirement elements whose effective risk is critical |
+| `owner = "Platform.*"` | Feature and requirement elements whose effective owner matches the regex |
 | `filter-file = "System*"` + `name = ".*GPS.*"` | Elements in System files with GPS in name |
 | `have-relations = verifiedBy,satisfiedBy` | Elements that have both verifiedBy AND satisfiedBy relations |
 | `not-have-relations = verifiedBy` | Elements that do NOT have any verifiedBy relations |

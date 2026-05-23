@@ -9,7 +9,7 @@ The system SHALL implement role-based authorization for API access.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Authorization Specification](UserRequirements.md#authorization-specification)
+  * derivedFrom: [Authorization Specification](Features.md#authorization-specification)
 
 ---
 
@@ -60,6 +60,6 @@ The system SHALL support multi-tenant organization management.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Membership Management](UserRequirements.md#membership-management)
+  * derivedFrom: [Membership Management](Features.md#membership-management)
 
 ---

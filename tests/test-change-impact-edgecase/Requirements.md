@@ -1,12 +1,23 @@
 # Elements
 
+
+### Test Feature Test Change Impact Edgecase Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Deployments
 
 Root requiement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-change-impact-edgecase-requirements-md)
 ---
 
 ### Deployment Plugins
@@ -14,9 +25,9 @@ Root requiement.
 The system shall allow authorized users in EnvironmentsArea to add, remove, and configure plugins for deployments.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-change-impact-edgecase-requirements-md)
   * derivedFrom: [Deployments](#deployments)
 ---
 
@@ -30,9 +41,9 @@ The system shall allow authorized users in EnvironmentsArea to add plugins to en
  * The plugin should be added to all nodes part of the deployment.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-change-impact-edgecase-requirements-md)
   * verifiedBy: [Validate Plugin Management](Verifications.md#validate-plugin-management)
   * derivedFrom: [Deployment Plugins](#deployment-plugins)
 ---
@@ -46,8 +57,8 @@ The system shall provide users the ability to remove plugins from deployments wh
  * The plugin should be removied from all nodes part of the deployment.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-change-impact-edgecase-requirements-md)
   * verifiedBy: [Validate Plugin Removal](Verifications.md#validate-plugin-removal)
   * derivedFrom: [Deployment Plugins](#deployment-plugins)

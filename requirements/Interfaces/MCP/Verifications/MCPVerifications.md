@@ -203,6 +203,7 @@ Expected checks:
 - Verify successful tool calls return `structuredContent` conforming to the declared `outputSchema`.
 - Verify structured results identify relevant workspace/model revision and dirty state when model state affects interpretation.
 - Verify structured results expose evidence references when the underlying Reqvire operation produces file, element, relation, attachment, report, or diff evidence.
+- Verify element-shaped results preserve semantic model ADT fields when present, including `ontology`, `semantic_contract`, and `concept_references`.
 - Verify element/model/mutation/error-shaped results preserve the semantic obligations of the corresponding shared Reqvire result contract without requiring terminal-output parsing.
 - Verify removing or renaming stable structured fields requires a Reqvire tool contract version change.
 
@@ -248,6 +249,9 @@ This verification shall prove that model evidence tools return authoritative Req
 #### Details
 Expected checks:
 - Search, read element, model, containment, collect, and submodels tools return data matching Reqvire core reports.
+- Search supports `filter_type=ontology` and returns parsed ontology ADT content.
+- Read element returns `concept_references` for elements that author `#### Concept References`.
+- Collect returns reachable ontology context for feature and requirement elements using Reqvire core feature-attached ontology inheritance traversal.
 - Results include evidence references for relevant files, elements, relations, and attachments.
 - Read tools are allowed on dirty worktrees only when the result marks dirty state.
 - Read tools do not mutate the filesystem.
@@ -265,7 +269,10 @@ This verification shall prove that quality and traceability tools return structu
 
 #### Details
 Expected checks:
-- Lint, coverage, traces, resources, and change-impact tools match shared Reqvire operation contracts.
+- Lint, coverage, traces, resources, ontologies, and change-impact tools match shared Reqvire operation contracts.
+- Ontologies tool returns collected ontology `Ontology` blocks and semantic-contract `Shapes` blocks in Turtle by default.
+- Ontologies tool supports JSON-LD output through a typed MCP argument.
+- Ontologies tool supports `full: true` and returns Reqvire model context triples alongside ontology and SHACL content.
 - Startup validation failures are returned before the MCP server starts.
 - Git comparison tools include compared commit and current `HEAD` metadata.
 - Diagnostics are structured and machine-actionable.
@@ -310,6 +317,7 @@ Expected checks:
 - Mutation tools are present in MCP `tools/list` and accept execution requests only when the server was started with `--enable-mutations`.
 - Operation-specific preview mutation requests, such as `dry_run: true`, return changed files and diffs or equivalent change descriptions without filesystem changes.
 - Non-dry-run requests use Reqvire core mutation logic and flush filesystem changes before reporting success.
+- Non-dry-run mutation requests that would break feature-only ontology attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
 - After successful mutation, subsequent MCP reads observe the refreshed internal graph state.
 - Post-mutation results include validation summary, refreshed model revision, and affected element/submodel metadata.
 
@@ -391,7 +399,7 @@ This verification shall prove that MCP does not expose arbitrary shell execution
 This verification shall prove the Reqvire MCP server behavior through the external RMCP Streamable HTTP protocol boundary.
 
 #### Details
-The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initialization, capabilities, tool discovery, resource discovery and reads, structured tool calls, protocol error handling, stdio transport rejection, default mutation-tool omission, mutation-mode tool exposure, dry-run mutation behavior, persisted mutation behavior, post-mutation reads, and startup validation failure handling.
+The e2e test starts `reqvire mcp` in a fixture workspace and verifies MCP initialization, capabilities, tool discovery, resource discovery and reads, structured tool calls including ontology semantic collection, protocol error handling, stdio transport rejection, default mutation-tool omission, mutation-mode tool exposure, dry-run mutation behavior, persisted mutation behavior, post-mutation reads, and startup validation failure handling.
 
 #### Metadata
   * type: test-verification

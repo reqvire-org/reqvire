@@ -10,6 +10,8 @@
 
 # Reserved Subsections Specification
 
+Reserved subsection vocabulary is defined by the Reqvire core element ontology. This specification defines parser-facing syntax, validation, and serialization behavior for those ontology-defined subsection concepts.
+
 ## Relations Subsection
 
 Must be defined with a level 4 header: `#### Relations`.
@@ -26,7 +28,7 @@ The Relations subsection defines relationships between elements using markdown b
 #### Relations
 * derivedFrom: [Parent Requirement](../path/file.md#parent)
 * satisfiedBy: [Implementation](../../src/module.rs)
-* verifies: [Target Requirement](file.md#target)
+* verify: [Target Requirement](file.md#target)
 ```
 
 ## Details Subsection
@@ -71,7 +73,7 @@ The Metadata subsection stores element properties including type, requirement go
 The following properties have special meaning:
 
 - `type`: Defines the element type (supported types are defined in [Supported Element Types Specification](../Specifications.md#supported-element-types-specification))
-- `status`, `priority`, `risk`, `owner`: Define requirement governance metadata for requirement-family elements only (defined in [Requirement Governance Metadata Specification](../Specifications.md#requirement-governance-metadata-specification))
+- `status`, `priority`, `risk`, `owner`: Define governance metadata for feature and requirement elements only (defined in [Requirement Governance Metadata Specification](../Specifications.md#requirement-governance-metadata-specification))
 - Additional reserved properties may be defined in future releases
 
 **Examples:**
@@ -86,7 +88,7 @@ This is a verification element.
   * review_method: inspection
 
 #### Relations
-* verifies: [Some Requirement](#some-requirement)
+* verify: [Some Requirement](#some-requirement)
 ```
 
 ```markdown
@@ -103,47 +105,18 @@ Some details.
   * review_method: inspection
 
 #### Relations
-  * verifies: [Some Requirement](#some-requirement)
+  * verify: [Some Requirement](#some-requirement)
 ```
 
 ## Attachments Subsection
 
 Must be defined with a level 4 header: `#### Attachments`.
 
-The Attachments subsection links external resources to elements. Attachments support two target types:
-
-1. **File Paths**: Links to external documents (PDFs, spreadsheets, images, etc.)
-2. **Element Identifiers**: Links to Refinement elements within the model
-
-### File Path Attachments
-
-**Parsing Rules:**
-- Support markdown link syntax: `* [path](path)`
-- Link text equals path (git-root-relative)
-- Many-to-many relationship (multiple requirements can link same document)
-- Never parse attachment files (treat as opaque)
-- Auto-cleanup: remove subsection when empty
-
-**Validation Rules:**
-- Verify file existence on filesystem
-- Validate markdown link format: `[path](path)`
-- Detect duplicate attachments within element
-- Report missing attachment targets as validation errors
-
-**Examples:**
-```markdown
-### System Performance Requirements
-
-The system shall meet defined performance criteria.
-
-#### Attachments
-* [docs/SLO.pdf](docs/SLO.pdf)
-* [docs/benchmarks.xlsx](docs/benchmarks.xlsx)
-```
+The Attachments subsection links an element to explicit dependency elements. Feature attachments consume ontology context. Requirement attachments consume reusable requirement-owned contracts.
 
 ### Element Identifier Attachments
 
-Element identifier attachments link to Refinement elements (constraint, behavior, specification, state, input-output types) within the model.
+Element identifier attachments link to model elements that are attachable under the Reqvire relation and attachment compatibility model.
 
 **Parsing Rules:**
 - Support markdown link syntax with fragment identifiers: `* [Element Name](path#element-id)`
@@ -154,21 +127,27 @@ Element identifier attachments link to Refinement elements (constraint, behavior
 
 **Validation Rules:**
 - Target element must exist in the model
-- Target element must be a Refinement type (constraint, behavior, specification, state, input-output)
-- Non-Refinement element identifiers are rejected with a validation error
-- Target refinement must have at least one `refine` relation (no orphan refinements)
-- Attaching requirement must be outside the refinement's defining hierarchy (hierarchical independence)
+- Feature attachment targets must be ontology elements.
+- Requirement attachment targets must be requirement-owned `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` elements.
+- Requirement-owned refinement targets must have exactly one compatible `refine` relation before they are attachable.
+- Non-attachable element identifiers are rejected with a validation error.
+- Redundant same-hierarchy attachments and invalid cross-subgraph attachment flow are rejected by attachment validation.
 
 **Examples:**
 ```markdown
-### System Performance Requirements
+### API Feature
 
-The system shall meet defined performance criteria.
+Feature context.
 
 #### Attachments
-* [docs/SLO.pdf](docs/SLO.pdf)
-* [Response Time Constraint](Constraints.md#response-time-constraint)
-* [Timeout Behavior](Behaviors.md#timeout-behavior)
+* [API Ontology](../Ontologies/Interfaces.md#api-ontology)
 ```
 
-See [Refinement Elements Specification](RefinementElements.md) for details on refinement element types.
+```markdown
+### API Requirement
+
+The system shall expose an API contract.
+
+#### Attachments
+* [Reusable Payload Shape](Contracts.md#reusable-payload-shape)
+```

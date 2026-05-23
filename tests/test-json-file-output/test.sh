@@ -116,7 +116,7 @@ test_json_output "add" "add.json" add "specifications/Requirements.md" \
 A new element for testing.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 " --dry-run
 
 test_json_output "rm" "rm.json" rm "Test Verification Beta" --dry-run

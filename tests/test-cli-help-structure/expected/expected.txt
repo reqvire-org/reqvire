@@ -10,7 +10,7 @@ Commands:
   validate          Validate model
   search            Search and filter model elements with comprehensive filtering options
   change-impact     Analyze change impact and provide report
-  traces            Generate verification traces showing upward paths from verifications to root requirements
+  traces            Generate verification traces showing upward paths from verifications to feature-rooted requirements
   coverage          Generate verification and implementation coverage report
   model             Generate model-centric structure with nested relations
   lint              Analyze model quality and detect issues in requirements relations
@@ -27,8 +27,9 @@ Commands:
   rm-asset          Remove asset file and remove all references (Attachments and Relations)
   containment       Generate containment view showing folder/file/element hierarchy
   resources         Generate resources report showing files referenced by the model
+  ontologies        Collect ontology elements and semantic-contract SHACL shapes
   submodels         Analyze independent requirement submodels and cross-submodel couplings
-  collect           Collect content from requirement chain
+  collect           Collect content from feature or requirement context
   help               Print this message or the help of the given subcommand(s)
 
 Options:
@@ -65,7 +66,7 @@ SEARCH OPTIONS:
       --short                   Output abbreviated format (one-line per element in text, omit fields in JSON)
       --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
       --filter-name <REGEX>     Only include elements whose name matches this regular expression
-      --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
+      --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: feature, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
       --filter-status <STATUS[,STATUS...]> Only include requirement-family elements with matching effective status values
       --filter-priority <PRIORITY[,PRIORITY...]> Only include requirement-family elements with matching effective priority values
       --filter-risk <RISK[,RISK...]> Only include requirement-family elements with matching effective risk values
@@ -98,10 +99,11 @@ COVERAGE OPTIONS:
 MODEL OPTIONS:
       --from <NAME>             Start from specific element by name
       --reverse                 Traverse from leaves to roots (follow backward relations)
-      --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: user-requirement, requirement, test-verification, analysis-verification, inspection-verification, demonstration-verification, constraint, behavior, specification. Custom: other-TYPENAME
+      --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: feature, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
       --json                    Output results in JSON format (nested structure)
+      --mmd                     Output pure Mermaid flowchart text
       --with-size-estimates     Include element size estimates in JSON output
-      --output <FILE>           Save JSON output to file (requires --json)
+      --output <FILE>           Save output to file (requires --json or --mmd)
 
 LINT OPTIONS:
       --fixable                 Show only auto-fixable issues
@@ -155,8 +157,8 @@ MV FILE OPTIONS:
 
 LINK OPTIONS:
        <SOURCE>                 Source element name
-       <RELATION_TYPE>          Relation type OR 'attaching'. Relations: derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace. Use 'attaching' to attach refinement element identifiers (constraint, behavior, specification)
-       <TARGET>                 Target: element name, internal path, or external URL (for relations); refinement element identifier for attaching
+       <RELATION_TYPE>          Relation type OR 'attaching'. Relations: derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace. Use 'attaching' to attach feature ontology context or compatible requirement-owned refinement contracts
+       <TARGET>                 Target: element name, internal path, or external URL (for relations); ontology for feature attachments or compatible refinement element identifier for requirement attachments
       --dry-run                 Preview changes without applying
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
@@ -199,13 +201,18 @@ RESOURCES OPTIONS:
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
+ONTOLOGIES OPTIONS:
+      --jsonld                  Output JSON-LD format instead of RDF/Turtle (.ttl)
+      --full                    Include Reqvire model context triples in the semantic export
+      --output <FILE>           Save output to file
+
 SUBMODELS OPTIONS:
       --from <NAME>             Scope report to a specific requirement subtree by name
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)
 
 COLLECT OPTIONS:
-       <ELEMENT_NAME>           Name of the requirement element to collect from
+       <ELEMENT_NAME>           Name of the feature or requirement element to collect from
       --direction <DIRECTION>   Traversal direction: UPSTREAM (ancestors) or DOWNSTREAM (descendants)
       --json                    Output results in JSON format
       --output <FILE>           Save JSON output to file (requires --json)

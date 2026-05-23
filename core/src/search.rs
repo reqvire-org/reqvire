@@ -345,6 +345,12 @@ struct ElementSearchResult {
     content: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     governance_metadata: Option<element::RequirementGovernanceMetadata>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    semantic_contract: Option<element::SemanticContract>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    ontology: Option<element::Ontology>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    concept_references: Vec<element::ConceptReference>,
     relations: Vec<RelationSearchResult>,
     #[serde(skip_serializing_if = "Option::is_none")]
     attachments: Option<Vec<String>>,
@@ -367,6 +373,7 @@ struct TargetSearchResult {
 struct GlobalSearchCounters {
     total_elements: usize,
     total_files: usize,
+    total_ontology_types: BTreeMap<String, usize>,
     total_requirements_types: BTreeMap<String, usize>,
     total_verifications_types: BTreeMap<String, usize>,
     total_refinements_types: BTreeMap<String, usize>,
@@ -387,19 +394,27 @@ impl Default for GlobalSearchCounters {
     fn default() -> Self {
         // Initialize with all standard types at 0
         let mut requirements = BTreeMap::new();
+        requirements.insert("feature".to_string(), 0);
         requirements.insert("system-requirement".to_string(), 0);
-        requirements.insert("user-requirement".to_string(), 0);
+
+        let mut ontology = BTreeMap::new();
+        ontology.insert("ontology".to_string(), 0);
 
         let mut verifications = BTreeMap::new();
         verifications.insert("test-verification".to_string(), 0);
+        verifications.insert("formal-proof-verification".to_string(), 0);
         verifications.insert("analysis-verification".to_string(), 0);
         verifications.insert("inspection-verification".to_string(), 0);
         verifications.insert("demonstration-verification".to_string(), 0);
 
         let mut refinements = BTreeMap::new();
+        refinements.insert("source".to_string(), 0);
+        refinements.insert("semantic-contract".to_string(), 0);
         refinements.insert("behavior".to_string(), 0);
         refinements.insert("constraint".to_string(), 0);
         refinements.insert("specification".to_string(), 0);
+        refinements.insert("state".to_string(), 0);
+        refinements.insert("input-output".to_string(), 0);
 
         let mut governance_status = BTreeMap::new();
         for value in element::GOVERNANCE_STATUS_VALUES {
@@ -422,6 +437,7 @@ impl Default for GlobalSearchCounters {
         Self {
             total_elements: 0,
             total_files: 0,
+            total_ontology_types: ontology,
             total_requirements_types: requirements,
             total_verifications_types: verifications,
             total_refinements_types: refinements,
@@ -477,10 +493,35 @@ fn build_search_result(
 
             // Count by element type category
             match &elem.element_type {
+                element::ElementType::Feature => {
+                    *c.total_requirements_types
+                        .entry("feature".to_string())
+                        .or_insert(0) += 1;
+
+                    if let Some(governance) = registry.resolve_governance_metadata(elem) {
+                        *c.total_governance_metadata
+                            .status
+                            .entry(governance.status.value)
+                            .or_insert(0) += 1;
+                        *c.total_governance_metadata
+                            .priority
+                            .entry(governance.priority.value)
+                            .or_insert(0) += 1;
+                        *c.total_governance_metadata
+                            .risk
+                            .entry(governance.risk.value)
+                            .or_insert(0) += 1;
+                        let owner = if governance.owner.value.trim().is_empty() {
+                            "unassigned".to_string()
+                        } else {
+                            governance.owner.value
+                        };
+                        *c.total_governance_metadata.owner.entry(owner).or_insert(0) += 1;
+                    }
+                }
                 element::ElementType::Requirement(req_t) => {
                     let type_name = match req_t {
                         element::RequirementType::System => "system-requirement",
-                        element::RequirementType::User => "user-requirement",
                     };
                     *c.total_requirements_types
                         .entry(type_name.to_string())
@@ -508,10 +549,16 @@ fn build_search_result(
                         *c.total_governance_metadata.owner.entry(owner).or_insert(0) += 1;
                     }
                 }
+                element::ElementType::Ontology => {
+                    *c.total_ontology_types
+                        .entry("ontology".to_string())
+                        .or_insert(0) += 1;
+                }
                 element::ElementType::Verification(ver_t) => {
                     let type_name = match ver_t {
                         element::VerificationType::Default => "test-verification",
                         element::VerificationType::Test => "test-verification",
+                        element::VerificationType::FormalProof => "formal-proof-verification",
                         element::VerificationType::Analysis => "analysis-verification",
                         element::VerificationType::Inspection => "inspection-verification",
                         element::VerificationType::Demonstration => "demonstration-verification",
@@ -522,9 +569,13 @@ fn build_search_result(
                 }
                 element::ElementType::Refinement(ref_t) => {
                     let type_name = match ref_t {
+                        element::RefinementType::Source => "source",
+                        element::RefinementType::SemanticContract => "semantic-contract",
                         element::RefinementType::Constraint => "constraint",
                         element::RefinementType::Behavior => "behavior",
                         element::RefinementType::Specification => "specification",
+                        element::RefinementType::State => "state",
+                        element::RefinementType::InputOutput => "input-output",
                     };
                     *c.total_refinements_types
                         .entry(type_name.to_string())
@@ -591,6 +642,21 @@ fn build_search_result(
                 None
             } else {
                 registry.resolve_governance_metadata(elem)
+            },
+            semantic_contract: if short_mode {
+                None
+            } else {
+                elem.semantic_contract.clone()
+            },
+            ontology: if short_mode {
+                None
+            } else {
+                elem.ontology.clone()
+            },
+            concept_references: if short_mode {
+                Vec::new()
+            } else {
+                elem.concept_references.clone()
             },
             relations: rels,
             attachments,
@@ -700,6 +766,14 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
             if !c.total_requirements_types.is_empty() {
                 output.push_str("📋 Requirement Types:\n");
                 for (type_name, count) in &c.total_requirements_types {
+                    output.push_str(&format!("  {}: {}\n", type_name, count));
+                }
+                output.push('\n');
+            }
+
+            if !c.total_ontology_types.is_empty() {
+                output.push_str("📋 Ontology Types:\n");
+                for (type_name, count) in &c.total_ontology_types {
                     output.push_str(&format!("  {}: {}\n", type_name, count));
                 }
                 output.push('\n');

@@ -311,12 +311,23 @@ rm -f "$TEST_DIR/specifications/Verifications.md"
 cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 # Elements
 
+### Test Feature
+
+Feature root.
+
+#### Metadata
+  * type: feature
+---
+
 ### Parent Req
 
 Parent.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature)
 ---
 
 ### Child Req
@@ -327,6 +338,7 @@ Child.
   * type: requirement
 
 #### Relations
+  * specify: [Test Feature](#test-feature)
   * derivedFrom: [Parent Req](#parent-req)
 ---
 EOF
@@ -346,6 +358,9 @@ Child.
 
 #### Metadata
   * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature)
 ---
 
 ### Parent Req
@@ -353,7 +368,18 @@ Child.
 Parent.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature)
+---
+
+### Test Feature
+
+Feature root.
+
+#### Metadata
+  * type: feature
 ---
 
 EOF
@@ -375,16 +401,16 @@ rm -f "$TEST_DIR/specifications/Verifications.md"
 cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 # Elements
 
-### Root A
+### Feature A
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 ---
 
-### Root B
+### Feature B
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 ---
 
 ### Parent A
@@ -393,7 +419,7 @@ cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root A](#root-a)
+  * specify: [Feature A](#feature-a)
 ---
 
 ### Parent B
@@ -402,7 +428,7 @@ cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root B](#root-b)
+  * specify: [Feature B](#feature-b)
 ---
 
 ### Child
@@ -411,6 +437,7 @@ cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
   * type: requirement
 
 #### Relations
+  * specify: [Feature A](#feature-a)
   * derivedFrom: [Parent A](#parent-a)
 ---
 EOF

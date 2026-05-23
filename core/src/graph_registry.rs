@@ -7,7 +7,7 @@ use std::sync::LazyLock;
 
 use crate::element::{
     Element, ElementType, GovernanceMetadataEntry, GovernanceMetadataSource,
-    RequirementGovernanceMetadata, RequirementType, SizeEstimate,
+    RequirementGovernanceMetadata, SizeEstimate,
 };
 use crate::error::ReqvireError;
 use crate::git_commands;
@@ -15,6 +15,7 @@ use crate::relation::{
     self, get_hierarchical_relation_types, LinkType, IMPACT_PROPAGATION_RELATIONS,
     REFINEMENT_RELATIONS, SATISFACTION_RELATIONS,
 };
+use crate::semantic_contract;
 use crate::Relation;
 use globset::GlobSet;
 use regex::Regex;
@@ -128,6 +129,9 @@ impl GraphRegistry {
         // Validate relations
         let mut errors = self.validate_relations(excluded_filename_patterns)?;
 
+        // Validate authored element type metadata
+        errors.extend(self.validate_element_type_metadata()?);
+
         // Validate non-test-verification satisfiedBy relations
         errors.extend(self.validate_non_test_verification_satisfied_by()?);
 
@@ -140,6 +144,9 @@ impl GraphRegistry {
         // Validate Refinement elements have only refine relations
         errors.extend(self.validate_refinement_elements()?);
 
+        // Validate ontology elements and ontology graph shape
+        errors.extend(self.validate_ontology_elements()?);
+
         // Validate reserved requirement governance metadata
         errors.extend(self.validate_governance_metadata()?);
 
@@ -151,6 +158,9 @@ impl GraphRegistry {
 
         // Validate no cross-section duplicates (same target in Relations and Attachments)
         errors.extend(self.validate_cross_section_duplicates()?);
+
+        // Validate semantic-contract reserved sections, declarations, and references
+        errors.extend(self.validate_semantic_contracts(None)?);
 
         Ok(errors)
     }
@@ -490,6 +500,32 @@ impl GraphRegistry {
                             }
                         }
                         crate::relation::LinkType::InternalPath(ref file_path) => {
+                            let file_target_type = ElementType::File;
+                            if crate::relation::get_relation_element_type_description(
+                                relation.relation_type.name,
+                            )
+                            .is_some()
+                                && !crate::relation::validate_relation_element_types(
+                                    relation.relation_type.name,
+                                    &source_node.element.element_type,
+                                    &file_target_type,
+                                )
+                            {
+                                let expected =
+                                    crate::relation::get_relation_element_type_description(
+                                        relation.relation_type.name,
+                                    )
+                                    .unwrap_or_default();
+                                errors.push(ReqvireError::IncompatibleElementTypes(format!(
+                                    "Relation '{}' from '{}' ({:?}) to file target '{}' has incompatible element types. {}",
+                                    relation.relation_type.name,
+                                    source_node.element.identifier,
+                                    source_node.element.element_type,
+                                    file_path.to_string_lossy(),
+                                    expected
+                                )));
+                            }
+
                             // Validate file existence for InternalPath targets
                             // InternalPath contains normalized paths from normalize_identifier which are git-root-relative
                             let git_root = match crate::git_commands::get_git_root_dir() {
@@ -562,6 +598,27 @@ impl GraphRegistry {
         None
     }
 
+    fn validate_element_type_metadata(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let mut errors = Vec::new();
+
+        for node in self.nodes.values() {
+            let element = &node.element;
+            let Some(type_value) = element.metadata.get("type") else {
+                continue;
+            };
+
+            if !crate::element::is_valid_element_type(type_value) {
+                errors.push(ReqvireError::InvalidMetadataFormat(format!(
+                    "Invalid element type '{}'. Valid types: {}",
+                    type_value,
+                    crate::element::element_types_help()
+                )));
+            }
+        }
+
+        Ok(errors)
+    }
+
     /// Validates that only test-verification elements can have satisfiedBy relations
     /// Returns a list of validation errors for non-test-verification elements with satisfiedBy
     fn validate_non_test_verification_satisfied_by(
@@ -588,20 +645,21 @@ impl GraphRegistry {
                             | crate::element::VerificationType::Inspection
                             | crate::element::VerificationType::Demonstration => {
                                 errors.push(ReqvireError::IncompatibleElementTypes(
-                                    format!("Non-test-verification element with satisfiedBy relation: '{}' (type: {:?}) cannot have satisfiedBy relations. Only test-verification elements may use satisfiedBy.",
+                                    format!("Non-evidence-backed verification element with satisfiedBy relation: '{}' (type: {:?}) cannot have satisfiedBy relations. Only test-verification and formal-proof-verification elements may use satisfiedBy.",
                                         element.identifier,
                                         verification_type
                                     )
                                 ));
                             }
                             crate::element::VerificationType::Default
-                            | crate::element::VerificationType::Test => {
-                                // These are valid - test verifications can have satisfiedBy
+                            | crate::element::VerificationType::Test
+                            | crate::element::VerificationType::FormalProof => {
+                                // These are valid evidence-backed verifications.
                             }
                         }
                     }
                     _ => {
-                        // Requirement-type compatibility (including user-requirement restriction)
+                        // Requirement-type compatibility is validated by relation element-type checks.
                         // is validated by relation element-type checks.
                     }
                 }
@@ -631,33 +689,21 @@ impl GraphRegistry {
             );
         }
 
-        // Check for missing hierarchical parent relations
-        let valid_hierarchical_relations = get_hierarchical_relation_types();
+        // Check for missing requirement parent relations.
         for element_node in &sorted_nodes {
             let element = &element_node.element;
             let element_file = &element.file_path;
 
-            // Important: Only system requirements need hierarchical parent (derivedFrom)
-            if let ElementType::Requirement(req_type) = &element.element_type {
-                match req_type {
-                    RequirementType::User => continue,
-                    RequirementType::System => {
-                        let has_hierarchical_parent = element
-                            .relations
-                            .iter()
-                            .any(|r| valid_hierarchical_relations.contains(&r.relation_type.name));
-
-                        if !has_hierarchical_parent {
-                            errors.push(ReqvireError::MissingParentRelation(
-                                format!("File {}: Element '{}' has no hierarchical parent relation (needs derivedFrom)", element_file, element.name),
-                            ));
-                        }
-                    }
-                }
+            if matches!(element.element_type, ElementType::Requirement(_))
+                && !self.has_requirement_parent(element)
+            {
+                errors.push(ReqvireError::MissingParentRelation(
+                    format!("File {}: Element '{}' has no requirement parent relation (needs derivedFrom to a requirement or specify to a feature)", element_file, element.name),
+                ));
             }
         }
 
-        // Enforce single top-root user-requirement ownership for hierarchy elements.
+        // Enforce single feature ownership for feature/requirement graph elements.
         errors.extend(self.validate_single_root_hierarchy_ownership()?);
 
         if errors.is_empty() {
@@ -684,36 +730,30 @@ impl GraphRegistry {
             let element = &element_node.element;
             let is_hierarchy_element = matches!(
                 element.element_type,
-                ElementType::Requirement(RequirementType::System)
-                    | ElementType::Requirement(RequirementType::User)
+                ElementType::Feature | ElementType::Requirement(_)
             );
             if !is_hierarchy_element {
                 continue;
             }
 
-            // Preserve current behavior for requirements without parent relation:
-            // they are reported by MissingParentRelation. Skip duplicate ownership error in that case.
-            if matches!(
-                element.element_type,
-                ElementType::Requirement(RequirementType::System)
-            ) && !self.has_hierarchical_parent(element)
+            if matches!(element.element_type, ElementType::Requirement(_))
+                && !self.has_requirement_parent(element)
             {
                 continue;
             }
 
-            let roots =
-                self.resolve_top_root_user_requirements(element_id, &mut memo, &mut visiting);
+            let roots = self.resolve_owning_features(element_id, &mut memo, &mut visiting);
             if roots.len() != 1 {
                 if roots.is_empty() {
                     errors.push(ReqvireError::MixedHierarchicalRelations(format!(
-                        "Element '{}' ({}) must resolve to exactly one top root user-requirement via hierarchical relations, but resolved to 0 roots",
+                        "Element '{}' ({}) must resolve to exactly one owning feature via feature/requirement relations, but resolved to 0 features",
                         element.name, element.identifier
                     )));
                 } else {
                     let roots_count = roots.len();
                     let roots_list = roots.into_iter().collect::<Vec<_>>().join(", ");
                     errors.push(ReqvireError::MixedHierarchicalRelations(format!(
-                        "Element '{}' ({}) must resolve to exactly one top root user-requirement via hierarchical relations, but resolved to {} roots: {}",
+                        "Element '{}' ({}) must resolve to exactly one owning feature via feature/requirement relations, but resolved to {} features: {}",
                         element.name,
                         element.identifier,
                         roots_count,
@@ -734,15 +774,14 @@ impl GraphRegistry {
         self.validate_single_root_hierarchy_ownership()
     }
 
-    fn has_hierarchical_parent(&self, element: &Element) -> bool {
-        let hierarchical_relations = get_hierarchical_relation_types();
+    fn has_requirement_parent(&self, element: &Element) -> bool {
         element.relations.iter().any(|relation| {
-            hierarchical_relations.contains(&relation.relation_type.name)
+            matches!(relation.relation_type.name, "derivedFrom" | "specify")
                 && matches!(relation.target.link, LinkType::Identifier(_))
         })
     }
 
-    fn resolve_top_root_user_requirements(
+    fn resolve_owning_features(
         &self,
         element_id: &str,
         memo: &mut HashMap<String, BTreeSet<String>>,
@@ -764,22 +803,15 @@ impl GraphRegistry {
             return result;
         };
 
-        let parent_ids = self.get_hierarchical_parent_ids(element);
+        let parent_ids = self.get_feature_ownership_parent_ids(element);
+        if matches!(element.element_type, ElementType::Feature) && parent_ids.is_empty() {
+            result.insert(element.identifier.clone());
+        }
 
-        if parent_ids.is_empty() {
-            if matches!(
-                element.element_type,
-                ElementType::Requirement(RequirementType::User)
-            ) {
-                result.insert(element.identifier.clone());
-            }
-        } else {
-            for parent_id in parent_ids {
-                let parent_roots =
-                    self.resolve_top_root_user_requirements(&parent_id, memo, visiting);
-                for root in parent_roots {
-                    result.insert(root);
-                }
+        for parent_id in parent_ids {
+            let parent_roots = self.resolve_owning_features(&parent_id, memo, visiting);
+            for root in parent_roots {
+                result.insert(root);
             }
         }
 
@@ -788,10 +820,10 @@ impl GraphRegistry {
         result
     }
 
-    fn resolve_single_top_root_user_requirement(&self, element_id: &str) -> Option<String> {
+    fn resolve_single_owning_feature(&self, element_id: &str) -> Option<String> {
         let mut memo: HashMap<String, BTreeSet<String>> = HashMap::new();
         let mut visiting: HashSet<String> = HashSet::new();
-        let roots = self.resolve_top_root_user_requirements(element_id, &mut memo, &mut visiting);
+        let roots = self.resolve_owning_features(element_id, &mut memo, &mut visiting);
         if roots.len() == 1 {
             roots.into_iter().next()
         } else {
@@ -815,8 +847,7 @@ impl GraphRegistry {
         sorted_ids.sort();
 
         for element_id in sorted_ids {
-            let Some(attacher_root_id) = self.resolve_single_top_root_user_requirement(element_id)
-            else {
+            let Some(attacher_root_id) = self.resolve_single_owning_feature(element_id) else {
                 continue;
             };
 
@@ -841,7 +872,7 @@ impl GraphRegistry {
 
                 for defining_req_id in self.get_defining_requirements(refinement_id) {
                     let Some(defining_root_id) =
-                        self.resolve_single_top_root_user_requirement(&defining_req_id)
+                        self.resolve_single_owning_feature(&defining_req_id)
                     else {
                         continue;
                     };
@@ -863,12 +894,11 @@ impl GraphRegistry {
         element_name: &str,
         file_path: Option<&str>,
     ) -> Option<String> {
-        let source_root_id = self.resolve_single_top_root_user_requirement(element_id)?;
+        let source_root_id = self.resolve_single_owning_feature(element_id)?;
 
         let mut cross_subgraph_target = false;
         for defining_req_id in self.get_defining_requirements(attachment_identifier) {
-            let Some(defining_root_id) =
-                self.resolve_single_top_root_user_requirement(&defining_req_id)
+            let Some(defining_root_id) = self.resolve_single_owning_feature(&defining_req_id)
             else {
                 continue;
             };
@@ -886,9 +916,7 @@ impl GraphRegistry {
         let conflicting_root_id = self
             .get_defining_requirements(attachment_identifier)
             .into_iter()
-            .filter_map(|defining_req_id| {
-                self.resolve_single_top_root_user_requirement(&defining_req_id)
-            })
+            .filter_map(|defining_req_id| self.resolve_single_owning_feature(&defining_req_id))
             .find(|target_root_id| {
                 target_root_id != &source_root_id
                     && self.has_attachment_flow_between_roots(target_root_id, &source_root_id)
@@ -915,25 +943,30 @@ impl GraphRegistry {
         Some(msg)
     }
 
-    fn get_hierarchical_parent_ids(&self, element: &Element) -> Vec<String> {
-        let hierarchical_relations = get_hierarchical_relation_types();
+    fn get_feature_ownership_parent_ids(&self, element: &Element) -> Vec<String> {
         let mut parent_ids: BTreeSet<String> = BTreeSet::new();
 
         for relation in &element.relations {
-            if !hierarchical_relations.contains(&relation.relation_type.name) {
-                continue;
-            }
+            let expected_parent_type = match (&element.element_type, relation.relation_type.name) {
+                (ElementType::Feature, "derivedFrom") => "feature",
+                (ElementType::Requirement(_), "derivedFrom") => "requirement",
+                (ElementType::Requirement(_), "specify") => "feature",
+                _ => continue,
+            };
 
             if let LinkType::Identifier(ref target_id) = relation.target.link {
                 if let Some(parent_identifier) =
                     self.resolve_relation_identifier(element, target_id)
                 {
                     if let Some(parent) = self.get_element(&parent_identifier) {
-                        if matches!(
-                            parent.element_type,
-                            ElementType::Requirement(RequirementType::System)
-                                | ElementType::Requirement(RequirementType::User)
-                        ) {
+                        let parent_matches = match expected_parent_type {
+                            "feature" => matches!(parent.element_type, ElementType::Feature),
+                            "requirement" => {
+                                matches!(parent.element_type, ElementType::Requirement(_))
+                            }
+                            _ => false,
+                        };
+                        if parent_matches {
                             parent_ids.insert(parent.identifier.clone());
                         }
                     }
@@ -990,7 +1023,7 @@ impl GraphRegistry {
                 match &attachment.target {
                     crate::element::AttachmentTarget::FilePath(file_path) => {
                         errors.push(ReqvireError::InvalidAttachmentTarget(format!(
-                            "File {}: Element '{}' has attachment '{}' which is a file path. Attachments must target refinement element identifiers (file.md#element-id).",
+                            "File {}: Element '{}' has attachment '{}' which is a file path. Attachments must target attachable element identifiers (file.md#element-id).",
                             element.file_path,
                             element.name,
                             file_path.display()
@@ -1000,11 +1033,12 @@ impl GraphRegistry {
                     crate::element::AttachmentTarget::ElementIdentifier(identifier) => {
                         // Validate that the identifier points to an existing Refinement element
                         if let Some(target_node) = self.nodes.get(identifier) {
-                            // Check if target is a Refinement element type
-                            if !target_node.element.element_type.is_refinement() {
+                            if !target_node.element.element_type.is_refinement()
+                                && !target_node.element.element_type.is_ontology()
+                            {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "File {}: Element '{}' has attachment to '{}' which is not a Refinement element (constraint, behavior, specification)",
+                                        "File {}: Element '{}' has attachment to '{}' which is not an attachable element",
                                         element.file_path,
                                         element.name,
                                         identifier
@@ -1013,16 +1047,45 @@ impl GraphRegistry {
                                 continue;
                             }
 
-                            // Check 1: Satisfied Refinement Constraint - refinement must have a refine relation
-                            if !self.refinement_has_refine_relation(identifier) {
+                            let target_is_ontology = target_node.element.element_type.is_ontology();
+                            let attachment_type_valid = if element.element_type.is_feature() {
+                                target_is_ontology
+                            } else if element.element_type.is_requirement() {
+                                target_node.element.element_type.is_requirement_refinement()
+                            } else {
+                                target_node.element.element_type.is_requirement_refinement()
+                            };
+
+                            if !attachment_type_valid {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "'{}' has no refine relation. Refinements must refine a requirement before they can be attached. (file: {}, element: {})",
+                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Feature attachments may target ontology only; requirement attachments may target requirement-owned semantic-contract, constraint, behavior, specification, state, or input-output.",
+                                        element.file_path,
+                                        element.name,
+                                        element.element_type.as_str(),
+                                        identifier,
+                                        target_node.element.element_type.as_str()
+                                    ),
+                                ));
+                                continue;
+                            }
+
+                            // Check 1: Refinement targets must have a refine relation. Ontology is not a refinement.
+                            if target_node.element.element_type.is_refinement()
+                                && !self.refinement_has_refine_relation(identifier)
+                            {
+                                errors.push(ReqvireError::InvalidAttachmentTarget(
+                                    format!(
+                                        "'{}' has no refine relation. Refinements must refine a feature or requirement before they can be attached. (file: {}, element: {})",
                                         target_node.element.name,
                                         element.file_path,
                                         element.name
                                     ),
                                 ));
+                                continue;
+                            }
+
+                            if target_is_ontology {
                                 continue;
                             }
 
@@ -1033,7 +1096,7 @@ impl GraphRegistry {
                                 if self.is_in_hierarchy(&element.identifier, &defining_req_id) {
                                     errors.push(ReqvireError::InvalidAttachmentScope(
                                         format!(
-                                            "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the refinedBy chain. (file: {}, element: {})",
+                                            "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from elements outside the refinedBy chain. (file: {}, element: {})",
                                             target_node.element.name,
                                             element.name,
                                             element.file_path,
@@ -1112,11 +1175,19 @@ impl GraphRegistry {
         Ok(errors)
     }
 
-    /// Get the defining requirements for a refinement element.
-    /// A defining requirement is one that has a `refinedBy` relation pointing to the refinement.
-    /// Returns a list of requirement identifiers.
-    pub fn get_defining_requirements(&self, refinement_id: &str) -> Vec<String> {
-        let mut defining_reqs = Vec::new();
+    /// Return the derived semantic-contract IRI for a semantic-contract element.
+    pub fn semantic_contract_iri(&self, element_id: &str) -> Option<String> {
+        let element = &self.nodes.get(element_id)?.element;
+        if element.element_type.is_semantic_contract() {
+            Some(element.semantic_contract_iri())
+        } else {
+            None
+        }
+    }
+
+    /// Get the elements that own a refinement via `refinedBy`.
+    pub fn get_refinement_owners(&self, refinement_id: &str) -> Vec<String> {
+        let mut owners = Vec::new();
 
         let mut sorted_nodes: Vec<(&String, &ElementNode)> = self.nodes.iter().collect();
         sorted_nodes.sort_by(|(a_id, _), (b_id, _)| a_id.cmp(b_id));
@@ -1131,14 +1202,207 @@ impl GraphRegistry {
                 {
                     if let LinkType::Identifier(target_id) = &relation.target.link {
                         if target_id == refinement_id {
-                            defining_reqs.push(element_id.clone());
+                            owners.push(element_id.clone());
                         }
                     }
                 }
             }
         }
 
-        defining_reqs
+        owners
+    }
+
+    /// Get the defining owners for a refinement element.
+    ///
+    /// Kept for existing callers; the returned IDs may now be feature or requirement
+    /// owners depending on the refinement subtype.
+    pub fn get_defining_requirements(&self, refinement_id: &str) -> Vec<String> {
+        self.get_refinement_owners(refinement_id)
+    }
+
+    pub fn get_feature_refinement_owner(&self, refinement_id: &str) -> Option<String> {
+        let owners = self.get_refinement_owners(refinement_id);
+        if owners.len() != 1 {
+            return None;
+        }
+        let owner_id = owners[0].clone();
+        let owner = self.nodes.get(&owner_id)?;
+        if owner.element.element_type.is_feature() {
+            Some(owner_id)
+        } else {
+            None
+        }
+    }
+
+    pub fn get_requirement_refinement_owner(&self, refinement_id: &str) -> Option<String> {
+        let owners = self.get_refinement_owners(refinement_id);
+        if owners.len() != 1 {
+            return None;
+        }
+        let owner_id = owners[0].clone();
+        let owner = self.nodes.get(&owner_id)?;
+        if owner.element.element_type.is_requirement() {
+            Some(owner_id)
+        } else {
+            None
+        }
+    }
+
+    pub fn get_feature_attached_ontologies(&self, feature_id: &str) -> Vec<String> {
+        let Some(feature_node) = self.nodes.get(feature_id) else {
+            return Vec::new();
+        };
+
+        let mut ontologies = Vec::new();
+        for attachment in &feature_node.element.attachments {
+            let crate::element::AttachmentTarget::ElementIdentifier(target_id) = &attachment.target
+            else {
+                continue;
+            };
+            if self
+                .nodes
+                .get(target_id)
+                .is_some_and(|node| node.element.element_type.is_ontology())
+            {
+                ontologies.push(target_id.clone());
+            }
+        }
+        ontologies.sort();
+        ontologies.dedup();
+        ontologies
+    }
+
+    pub fn get_feature_ancestor_ids(&self, feature_id: &str) -> Vec<String> {
+        let mut ancestors = Vec::new();
+        let mut visited = HashSet::new();
+        let mut stack = vec![feature_id.to_string()];
+
+        while let Some(current_id) = stack.pop() {
+            let Some(node) = self.nodes.get(&current_id) else {
+                continue;
+            };
+
+            let mut parents = Vec::new();
+            for relation in &node.element.relations {
+                if relation.relation_type.name != "derivedFrom" {
+                    continue;
+                }
+                let LinkType::Identifier(parent_id) = &relation.target.link else {
+                    continue;
+                };
+                if self
+                    .nodes
+                    .get(parent_id)
+                    .is_some_and(|parent| parent.element.element_type.is_feature())
+                {
+                    parents.push(parent_id.clone());
+                }
+            }
+            parents.sort();
+            for parent_id in parents {
+                if visited.insert(parent_id.clone()) {
+                    ancestors.push(parent_id.clone());
+                    stack.push(parent_id);
+                }
+            }
+        }
+
+        ancestors
+    }
+
+    pub fn build_feature_ontology_context(&self, feature_id: &str) -> Vec<String> {
+        let mut context = BTreeSet::new();
+        let mut feature_ids = self.get_feature_ancestor_ids(feature_id);
+        feature_ids.push(feature_id.to_string());
+
+        for current_feature_id in feature_ids {
+            for ontology_id in self.get_feature_attached_ontologies(&current_feature_id) {
+                context.insert(ontology_id);
+            }
+        }
+
+        self.expand_ontology_context(context)
+    }
+
+    pub fn get_requirement_ancestor_ids(&self, requirement_id: &str) -> Vec<String> {
+        let mut ancestors = Vec::new();
+        let mut visited = HashSet::new();
+        let mut stack = vec![requirement_id.to_string()];
+
+        while let Some(current_id) = stack.pop() {
+            let Some(node) = self.nodes.get(&current_id) else {
+                continue;
+            };
+
+            let mut parents = Vec::new();
+            for relation in &node.element.relations {
+                if relation.relation_type.name != "derivedFrom" {
+                    continue;
+                }
+                let LinkType::Identifier(parent_id) = &relation.target.link else {
+                    continue;
+                };
+                if self
+                    .nodes
+                    .get(parent_id)
+                    .is_some_and(|parent| parent.element.element_type.is_requirement())
+                {
+                    parents.push(parent_id.clone());
+                }
+            }
+            parents.sort();
+            for parent_id in parents {
+                if visited.insert(parent_id.clone()) {
+                    ancestors.push(parent_id.clone());
+                    stack.push(parent_id);
+                }
+            }
+        }
+
+        ancestors
+    }
+
+    pub fn build_requirement_ontology_context(&self, requirement_id: &str) -> Vec<String> {
+        let mut context = BTreeSet::new();
+
+        if let Some(feature_id) = self.resolve_single_owning_feature(requirement_id) {
+            for ontology_id in self.build_feature_ontology_context(&feature_id) {
+                context.insert(ontology_id);
+            }
+        }
+
+        self.expand_ontology_context(context)
+    }
+
+    fn expand_ontology_context(&self, ontology_ids: BTreeSet<String>) -> Vec<String> {
+        let mut context = BTreeSet::new();
+        let mut stack: Vec<String> = ontology_ids.into_iter().collect();
+
+        while let Some(ontology_id) = stack.pop() {
+            if !context.insert(ontology_id.clone()) {
+                continue;
+            }
+            let Some(node) = self.nodes.get(&ontology_id) else {
+                continue;
+            };
+            for relation in &node.element.relations {
+                if relation.relation_type.name != "derivedFrom" {
+                    continue;
+                }
+                let LinkType::Identifier(target_id) = &relation.target.link else {
+                    continue;
+                };
+                if self
+                    .nodes
+                    .get(target_id)
+                    .is_some_and(|target| target.element.element_type.is_ontology())
+                {
+                    stack.push(target_id.clone());
+                }
+            }
+        }
+
+        context.into_iter().collect()
     }
 
     /// Check if a refinement element has at least one `refine` relation.
@@ -1460,6 +1724,107 @@ impl GraphRegistry {
         Ok(errors)
     }
 
+    fn validate_ontology_elements(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        debug!("Validating ontology element constraints...");
+        let mut errors = Vec::new();
+        let mut ontology_ids: Vec<String> = self
+            .nodes
+            .iter()
+            .filter_map(|(id, node)| {
+                if node.element.element_type.is_ontology() {
+                    Some(id.clone())
+                } else {
+                    None
+                }
+            })
+            .collect();
+        ontology_ids.sort();
+
+        for ontology_id in &ontology_ids {
+            let Some(node) = self.nodes.get(ontology_id) else {
+                continue;
+            };
+            let element = &node.element;
+
+            if !element.attachments.is_empty() {
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "File {}: Ontology element '{}' cannot have attachments. Features attach ontology elements as semantic context consumers.",
+                    element.file_path, element.name
+                )));
+            }
+
+            for relation in element.relations.iter().filter(|r| r.user_created) {
+                if !matches!(
+                    relation.relation_type.name,
+                    "derive" | "derivedFrom" | "trace"
+                ) {
+                    errors.push(ReqvireError::IncompatibleElementTypes(format!(
+                        "Ontology element '{}' can only use derive, derivedFrom, or trace relations. Invalid relation: {}.",
+                        element.identifier, relation.relation_type.name
+                    )));
+                }
+            }
+        }
+
+        if ontology_ids.len() > 1 {
+            let mut visited = BTreeSet::new();
+            let mut stack = vec![ontology_ids[0].clone()];
+            while let Some(current_id) = stack.pop() {
+                if !visited.insert(current_id.clone()) {
+                    continue;
+                }
+                let Some(node) = self.nodes.get(&current_id) else {
+                    continue;
+                };
+                for relation in &node.element.relations {
+                    if !matches!(relation.relation_type.name, "derive" | "derivedFrom") {
+                        continue;
+                    }
+                    let LinkType::Identifier(target_id) = &relation.target.link else {
+                        continue;
+                    };
+                    if self
+                        .nodes
+                        .get(target_id)
+                        .is_some_and(|target| target.element.element_type.is_ontology())
+                    {
+                        stack.push(target_id.clone());
+                    }
+                }
+                for (candidate_id, candidate_node) in &self.nodes {
+                    if !candidate_node.element.element_type.is_ontology() {
+                        continue;
+                    }
+                    for relation in &candidate_node.element.relations {
+                        if !matches!(relation.relation_type.name, "derive" | "derivedFrom") {
+                            continue;
+                        }
+                        let LinkType::Identifier(target_id) = &relation.target.link else {
+                            continue;
+                        };
+                        if target_id == &current_id {
+                            stack.push(candidate_id.clone());
+                        }
+                    }
+                }
+            }
+
+            let disconnected: Vec<String> = ontology_ids
+                .iter()
+                .filter(|id| !visited.contains(*id))
+                .cloned()
+                .collect();
+            if !disconnected.is_empty() {
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "Disconnected ontology graph: ontology elements must belong to one connected ontology root graph through derive/derivedFrom relations. Disconnected ontology elements: {}.",
+                    disconnected.join(", ")
+                )));
+            }
+        }
+
+        Ok(errors)
+    }
+
     fn validate_governance_metadata(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating requirement governance metadata...");
         let mut errors = Vec::new();
@@ -1477,9 +1842,9 @@ impl GraphRegistry {
                 continue;
             }
 
-            if !element.element_type.is_requirement() {
+            if !element.element_type.is_governance_bearing() {
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "File {}: Element '{}' (type: {}) declares requirement governance metadata keys {:?}. Governance metadata is only valid on requirement-family elements (requirement, user-requirement).",
+                    "File {}: Element '{}' (type: {}) declares requirement governance metadata keys {:?}. Governance metadata is only valid on feature and requirement elements.",
                     element.file_path,
                     element.name,
                     element.element_type.as_str(),
@@ -1528,12 +1893,346 @@ impl GraphRegistry {
         Ok(errors)
     }
 
-    /// Validates that each refinement is owned by at most one requirement via refinedBy.
-    /// A refinement element or file can only appear as a target of refinedBy from one requirement.
+    pub fn validate_semantic_contracts_in_memory(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
+        self.validate_semantic_contracts(None)
+    }
+
+    pub fn validate_semantic_contracts_after_removal(
+        &self,
+        removed_declaration_source: &str,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        self.validate_semantic_contracts(Some(removed_declaration_source))
+    }
+
+    fn validate_semantic_contracts(
+        &self,
+        removed_declaration_source: Option<&str>,
+    ) -> Result<Vec<ReqvireError>, ReqvireError> {
+        let mut errors = Vec::new();
+        let semantic_index = semantic_contract::build_semantic_index(self);
+        for diagnostic in &semantic_index.diagnostics {
+            errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                "File {}: semantic model element '{}' at line {}: {}",
+                diagnostic.file_path, diagnostic.source, diagnostic.line_number, diagnostic.message
+            )));
+        }
+
+        for node in self.nodes.values() {
+            let element = &node.element;
+            if !element.element_type.is_semantic_contract() {
+                continue;
+            }
+            let owners = self.get_refinement_owners(&element.identifier);
+            if owners.len() != 1 {
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "Semantic contract '{}' must refine exactly one requirement.",
+                    element.identifier
+                )));
+                continue;
+            }
+            let Some(owner) = self.nodes.get(&owners[0]) else {
+                continue;
+            };
+            if !owner.element.element_type.is_requirement() {
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "Semantic contract '{}' must refine a requirement, not '{}'.",
+                    element.identifier,
+                    owner.element.element_type.as_str()
+                )));
+            }
+        }
+
+        for reference in &semantic_index.shape_references {
+            if semantic_index
+                .ontology_declarations
+                .contains_key(&reference.iri)
+            {
+                let Some(owner_requirement_id) =
+                    self.semantic_contract_owner_requirement(&reference.element_identifier)
+                else {
+                    continue;
+                };
+                let context: BTreeSet<String> = self
+                    .build_requirement_ontology_context(&owner_requirement_id)
+                    .into_iter()
+                    .collect();
+                let declaration_sources: BTreeSet<String> = semantic_index
+                    .ontology_declarations
+                    .get(&reference.iri)
+                    .into_iter()
+                    .flat_map(|declarations| {
+                        declarations
+                            .iter()
+                            .map(|declaration| declaration.element_identifier.clone())
+                    })
+                    .collect();
+                if declaration_sources
+                    .iter()
+                    .any(|declaration_source| context.contains(declaration_source))
+                {
+                    continue;
+                }
+
+                let declaring_contract = declaration_sources
+                    .iter()
+                    .next()
+                    .cloned()
+                    .unwrap_or_else(|| "unknown semantic contract".to_string());
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable from owning requirement '{}' through feature-attached ontology context. Attach the declaring ontology to the owning or consuming feature, or move the declaration into reachable feature ontology context.",
+                        reference.element_identifier,
+                        reference.kind,
+                        reference.iri,
+                        declaring_contract,
+                        owner_requirement_id
+                    )));
+                continue;
+            }
+
+            let removed_source = removed_declaration_source
+                .map(|source| format!(" Removed declaration source: {}.", source))
+                .unwrap_or_default();
+            errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "Semantic reference not found: semantic contract '{}' references {} <{}>, but no ontology element declares this IRI.{} Update or remove the SHACL reference before deleting or editing the declaring ontology.",
+                    reference.element_identifier, reference.kind, reference.iri, removed_source
+                )));
+        }
+
+        errors
+            .extend(self.validate_concept_references(&semantic_index, removed_declaration_source));
+
+        for (iri, declarations) in semantic_index.ontology_declarations {
+            let owners: BTreeSet<String> = declarations
+                .iter()
+                .map(|declaration| declaration.element_identifier.clone())
+                .collect();
+            if owners.len() > 1 {
+                let owner_list = owners.iter().cloned().collect::<Vec<_>>().join(", ");
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "Duplicate ontology term declaration: <{}> is declared by multiple ontology elements: {}.",
+                    iri, owner_list
+                )));
+            }
+
+            let mut conflicting_roles = BTreeSet::new();
+            for left in &declarations {
+                for right in &declarations {
+                    if left.role.conflicts_with(right.role) {
+                        conflicting_roles.insert(left.role);
+                        conflicting_roles.insert(right.role);
+                    }
+                }
+            }
+
+            if !conflicting_roles.is_empty() {
+                let roles = conflicting_roles
+                    .iter()
+                    .map(ToString::to_string)
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                let owner_list = owners.iter().cloned().collect::<Vec<_>>().join(", ");
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "Conflicting ontology term declaration: <{}> is declared with incompatible roles ({}) across ontology elements: {}.",
+                    iri, roles, owner_list
+                )));
+            }
+        }
+
+        Ok(errors)
+    }
+
+    fn validate_concept_references(
+        &self,
+        semantic_index: &semantic_contract::SemanticIndex,
+        removed_declaration_source: Option<&str>,
+    ) -> Vec<ReqvireError> {
+        let mut errors = Vec::new();
+
+        for node in self.nodes.values() {
+            let element = &node.element;
+            let (references, diagnostics) =
+                crate::element::extract_concept_references(&element.content);
+
+            if element.element_type.is_ontology()
+                && crate::element::has_subsection(&element.content, "Concept References")
+            {
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "File {}: Ontology element '{}' must not contain a #### Concept References section. Ontology elements declare terms in #### Ontology.",
+                    element.file_path, element.name
+                )));
+            }
+
+            for diagnostic in diagnostics {
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "File {}: Element '{}' {}",
+                    element.file_path, element.name, diagnostic
+                )));
+            }
+
+            if references.is_empty() {
+                continue;
+            }
+
+            let context = self.build_concept_reference_context(&element.identifier);
+            let context_set: BTreeSet<String> = context.iter().cloned().collect();
+            let prefixes = self.build_ontology_prefix_map(&context, semantic_index);
+
+            for reference in references {
+                let resolved_iri = match resolve_concept_reference_iri(&reference.iri, &prefixes) {
+                    Ok(iri) => iri,
+                    Err(message) => {
+                        errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                            "Concept reference syntax error: element '{}' label '{}' at line {} references '{}': {}",
+                            element.identifier,
+                            reference.label,
+                            reference.line_number,
+                            reference.iri,
+                            message
+                        )));
+                        continue;
+                    }
+                };
+
+                let Some(declarations) = semantic_index.ontology_declarations.get(&resolved_iri)
+                else {
+                    let removed_source = removed_declaration_source
+                        .map(|source| format!(" Removed declaration source: {}.", source))
+                        .unwrap_or_default();
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Concept reference not found: element '{}' label '{}' references <{}>, but no ontology element declares this IRI.{} Update or remove the Concept References entry before deleting or editing the declaring ontology.",
+                        element.identifier,
+                        reference.label,
+                        resolved_iri,
+                        removed_source
+                    )));
+                    continue;
+                };
+
+                let declaration_sources: BTreeSet<String> = declarations
+                    .iter()
+                    .map(|declaration| declaration.element_identifier.clone())
+                    .collect();
+                if declaration_sources
+                    .iter()
+                    .any(|declaration_source| context_set.contains(declaration_source))
+                {
+                    continue;
+                }
+
+                let declaring_ontology = declaration_sources
+                    .iter()
+                    .next()
+                    .cloned()
+                    .unwrap_or_else(|| "unknown ontology".to_string());
+                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                    "Concept reference outside context: element '{}' label '{}' references <{}>, declared by ontology '{}', but that ontology is not reachable from the element's feature-attached ontology context. Attach the declaring ontology to the owning or consuming feature, or move the reference to an element with reachable feature ontology context.",
+                    element.identifier,
+                    reference.label,
+                    resolved_iri,
+                    declaring_ontology
+                )));
+            }
+        }
+
+        errors
+    }
+
+    fn build_concept_reference_context(&self, element_id: &str) -> Vec<String> {
+        let Some(node) = self.nodes.get(element_id) else {
+            return Vec::new();
+        };
+        let element = &node.element;
+
+        if element.element_type.is_feature() {
+            return self.build_feature_ontology_context(element_id);
+        }
+        if element.element_type.is_requirement() {
+            return self.build_requirement_ontology_context(element_id);
+        }
+        if element.element_type.is_refinement() {
+            let owners = self.get_refinement_owners(element_id);
+            if owners.len() == 1 {
+                let owner_id = &owners[0];
+                if let Some(owner) = self.nodes.get(owner_id) {
+                    if owner.element.element_type.is_feature() {
+                        return self.build_feature_ontology_context(owner_id);
+                    }
+                    if owner.element.element_type.is_requirement() {
+                        return self.build_requirement_ontology_context(owner_id);
+                    }
+                }
+            }
+            return Vec::new();
+        }
+
+        if element.element_type.is_ontology() {
+            return Vec::new();
+        }
+
+        let mut context = BTreeSet::new();
+        for relation in &element.relations {
+            if relation.relation_type.name != "verify" {
+                continue;
+            }
+            let LinkType::Identifier(requirement_id) = &relation.target.link else {
+                continue;
+            };
+            if self
+                .nodes
+                .get(requirement_id)
+                .is_some_and(|target| target.element.element_type.is_requirement())
+            {
+                for ontology_id in self.build_requirement_ontology_context(requirement_id) {
+                    context.insert(ontology_id);
+                }
+            }
+        }
+
+        context.into_iter().collect()
+    }
+
+    fn build_ontology_prefix_map(
+        &self,
+        ontology_context: &[String],
+        semantic_index: &semantic_contract::SemanticIndex,
+    ) -> HashMap<String, String> {
+        let context: BTreeSet<&str> = ontology_context.iter().map(String::as_str).collect();
+        let mut prefixes = HashMap::new();
+
+        for block in &semantic_index.blocks {
+            if !matches!(block.kind, semantic_contract::SemanticBlockKind::Ontology)
+                || !context.contains(block.source.as_str())
+            {
+                continue;
+            }
+
+            for (prefix, iri) in parse_turtle_prefixes(&block.content) {
+                prefixes.entry(prefix).or_insert(iri);
+            }
+        }
+
+        prefixes
+    }
+
+    fn semantic_contract_owner_requirement(&self, contract_id: &str) -> Option<String> {
+        let owners = self.get_refinement_owners(contract_id);
+        if owners.len() != 1 {
+            return None;
+        }
+        let owner = self.nodes.get(&owners[0])?;
+        if owner.element.element_type.is_requirement() {
+            Some(owners[0].clone())
+        } else {
+            None
+        }
+    }
+
+    /// Validates that each refinement is owned by at most one feature or requirement via refinedBy.
+    /// A refinement element or file can only appear as a target of refinedBy from one owner.
     fn validate_refinement_ownership_uniqueness(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating refinement ownership uniqueness...");
         let mut errors = Vec::new();
-        // Map from refinement target (identifier or file path) to owning requirement identifier
+        // Map from refinement target (identifier or file path) to owning element identifier
         let mut ownership_map: std::collections::HashMap<String, String> =
             std::collections::HashMap::new();
 
@@ -1559,7 +2258,7 @@ impl GraphRegistry {
                         };
                         errors.push(ReqvireError::InvalidMarkdownStructure(
                             format!(
-                                "Refinement '{}' is owned by multiple requirements: '{}' and '{}'. Each refinement can only be owned by one requirement via refinedBy.",
+                                "Refinement '{}' is owned by multiple elements: '{}' and '{}'. Each refinement can only be owned by one feature or requirement via refinedBy.",
                                 target_name,
                                 first,
                                 second
@@ -2003,7 +2702,7 @@ impl GraphRegistry {
         &self,
         element: &Element,
     ) -> Option<RequirementGovernanceMetadata> {
-        if !element.element_type.is_requirement() {
+        if !element.element_type.is_governance_bearing() {
             return None;
         }
 
@@ -2029,7 +2728,7 @@ impl GraphRegistry {
             };
         }
 
-        for ancestor_id in self.requirement_ancestors_nearest_first(&element.identifier) {
+        for ancestor_id in self.governance_ancestors_nearest_first(&element.identifier) {
             if let Some(ancestor) = self.nodes.get(&ancestor_id).map(|node| &node.element) {
                 if let Some(value) = ancestor.metadata.get(key) {
                     return GovernanceMetadataEntry {
@@ -2048,7 +2747,7 @@ impl GraphRegistry {
         }
     }
 
-    fn requirement_ancestors_nearest_first(&self, element_id: &str) -> Vec<String> {
+    fn governance_ancestors_nearest_first(&self, element_id: &str) -> Vec<String> {
         let mut result = Vec::new();
         let mut visited = HashSet::new();
         let mut current_level = vec![element_id.to_string()];
@@ -2059,7 +2758,7 @@ impl GraphRegistry {
             let mut next_level = Vec::new();
 
             for current_id in &current_level {
-                let mut parents = self.requirement_parent_ids(current_id);
+                let mut parents = self.governance_parent_ids(current_id);
                 parents.sort();
 
                 for parent_id in parents {
@@ -2076,18 +2775,16 @@ impl GraphRegistry {
         result
     }
 
-    fn requirement_parent_ids(&self, element_id: &str) -> Vec<String> {
+    fn governance_parent_ids(&self, element_id: &str) -> Vec<String> {
         let mut parents = BTreeSet::new();
 
         if let Some(node) = self.nodes.get(element_id) {
             for relation in &node.element.relations {
-                if relation.relation_type.name == "derivedFrom" {
+                if matches!(relation.relation_type.name, "derivedFrom" | "specify") {
                     if let LinkType::Identifier(parent_id) = &relation.target.link {
-                        if self
-                            .nodes
-                            .get(parent_id)
-                            .is_some_and(|parent| parent.element.element_type.is_requirement())
-                        {
+                        if self.nodes.get(parent_id).is_some_and(|parent| {
+                            parent.element.element_type.is_governance_bearing()
+                        }) {
                             parents.insert(parent_id.clone());
                         }
                     }
@@ -2099,7 +2796,7 @@ impl GraphRegistry {
             if candidate.element.relations.iter().any(|relation| {
                 relation.relation_type.name == "derive"
                     && matches!(&relation.target.link, LinkType::Identifier(target_id) if target_id == element_id)
-            }) && candidate.element.element_type.is_requirement()
+            }) && candidate.element.element_type.is_governance_bearing()
             {
                 parents.insert(candidate_id.clone());
             }
@@ -2108,8 +2805,8 @@ impl GraphRegistry {
         parents.into_iter().collect()
     }
 
-    /// Find all requirements without hierarchical parent relations (root requirements)
-    pub fn find_root_requirements(&self) -> Vec<String> {
+    /// Find all features without hierarchical parent relations (feature roots)
+    pub fn find_root_features(&self) -> Vec<String> {
         let hierarchical_relations = relation::get_hierarchical_relation_types();
 
         let mut roots: Vec<String> = self
@@ -2117,12 +2814,10 @@ impl GraphRegistry {
             .values()
             .map(|node| &node.element)
             .filter(|element| {
-                // Only consider requirements
-                if !matches!(element.element_type, ElementType::Requirement(_)) {
+                if !matches!(element.element_type, ElementType::Feature) {
                     return false;
                 }
 
-                // Check if has any hierarchical parent relation
                 let has_parent = element
                     .relations
                     .iter()
@@ -2133,7 +2828,6 @@ impl GraphRegistry {
             .map(|e| e.identifier.clone())
             .collect();
 
-        // Sort for deterministic output
         roots.sort();
         roots
     }
@@ -4121,7 +4815,6 @@ impl GraphRegistry {
         // Populate element_id for all relations (including the newly added element)
         // This is necessary for hierarchical ordering to recognize parent-child relationships
         self.populate_relation_element_ids();
-
         // CRITICAL: Maintain bidirectional consistency for in-memory model
         // Use helper to create opposite relations for all relations in the newly added element
         let new_element_id = new_element.identifier.clone();
@@ -4543,7 +5236,7 @@ impl GraphRegistry {
                         .unwrap_or(att_id);
                     return Err(ReqvireError::InvalidAttachmentTarget(
                         format!(
-                            "'{}' has no refine relation. Refinements must refine a requirement before they can be attached.",
+                            "'{}' has no refine relation. Refinements must refine a feature or requirement before they can be attached.",
                             att_name
                         ),
                     ));
@@ -4560,7 +5253,7 @@ impl GraphRegistry {
                             .unwrap_or(att_id);
                         return Err(ReqvireError::InvalidAttachmentScope(
                             format!(
-                                "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from requirements outside the refinedBy chain.",
+                                "'{}' cannot be attached to '{}' because it is within the refinement's defining hierarchy. Attachments are only allowed from elements outside the refinedBy chain.",
                                 att_name,
                                 target_name
                             ),
@@ -4838,6 +5531,77 @@ fn merge_content_into_details(target_content: &str, additional: &str) -> String 
             additional
         )
     }
+}
+
+fn parse_turtle_prefixes(content: &str) -> Vec<(String, String)> {
+    let mut prefixes = Vec::new();
+    for line in content.lines() {
+        let trimmed = line.trim();
+        let lower = trimmed.to_ascii_lowercase();
+        let Some(rest) = lower
+            .strip_prefix("@prefix ")
+            .map(|_| &trimmed["@prefix ".len()..])
+            .or_else(|| {
+                lower
+                    .strip_prefix("prefix ")
+                    .map(|_| &trimmed["prefix ".len()..])
+            })
+        else {
+            continue;
+        };
+
+        let mut parts = rest.split_whitespace();
+        let Some(prefix_token) = parts.next() else {
+            continue;
+        };
+        let Some(iri_token) = parts.next() else {
+            continue;
+        };
+        let Some(prefix) = prefix_token.strip_suffix(':') else {
+            continue;
+        };
+        let Some(iri) = iri_token
+            .strip_prefix('<')
+            .and_then(|value| value.strip_suffix('>'))
+        else {
+            continue;
+        };
+        prefixes.push((prefix.to_string(), iri.to_string()));
+    }
+    prefixes
+}
+
+fn resolve_concept_reference_iri(
+    value: &str,
+    prefixes: &HashMap<String, String>,
+) -> Result<String, String> {
+    let trimmed = value.trim();
+    if let Some(iri) = trimmed
+        .strip_prefix('<')
+        .and_then(|value| value.strip_suffix('>'))
+    {
+        return Ok(iri.to_string());
+    }
+    if trimmed.starts_with("urn:")
+        || trimmed.starts_with("http://")
+        || trimmed.starts_with("https://")
+    {
+        return Ok(trimmed.to_string());
+    }
+
+    let Some((prefix, local)) = trimmed.split_once(':') else {
+        return Err("expected absolute IRI, <IRI>, or CURIE".to_string());
+    };
+    let Some(base) = prefixes.get(prefix) else {
+        return Err(format!(
+            "prefix '{}' is not declared by a reachable ontology",
+            prefix
+        ));
+    };
+    if local.is_empty() {
+        return Err("CURIE local name is empty".to_string());
+    }
+    Ok(format!("{}{}", base, local))
 }
 
 #[cfg(test)]

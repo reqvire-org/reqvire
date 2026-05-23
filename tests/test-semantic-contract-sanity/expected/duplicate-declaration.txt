@@ -1,0 +1,1 @@
+Duplicate ontology term declaration is rejected

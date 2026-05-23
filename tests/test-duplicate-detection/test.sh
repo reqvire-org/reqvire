@@ -153,9 +153,10 @@ cat > "$TEST_DIR/specifications/FormatTestDuplicateRelations.md" << 'EOF'
 This element has a single relation.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
+  * specify: [Test Feature Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-feature-test-duplicate-detection-specifications-requirements-md)
   * derivedFrom: [Base Requirement](Requirements.md#base-requirement)
   * trace: [Target Element](Requirements.md#target-element)
 ---
@@ -170,7 +171,10 @@ cat > "$TEST_DIR/specifications/FormatTestDuplicateAttachments.md" << 'EOF'
 This element has a single attachment.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-feature-test-duplicate-detection-specifications-requirements-md)
 
 #### Attachments
   * [Refinement Element](Requirements.md#refinement-element)

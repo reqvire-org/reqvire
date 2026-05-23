@@ -2,12 +2,12 @@
 
 This document contains correctly formatted relations to existing targets, to verify validation passes.
 
-### Root User Requirement
+### Root Feature
 
-Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+Top-level feature used as specification parent for system requirements in this fixture.
 
 #### Metadata
-* type: user-requirement
+* type: feature
 
 ---
 
@@ -19,7 +19,7 @@ This requirement has valid relations to existing files, using standard format.
 * type: requirement
 
 #### Relations
-* derivedFrom: #root-user-requirement
+* specify: #root-feature
 * satisfiedBy: DesignSpecifications/SampleDSD.md
 
 ---
@@ -32,7 +32,7 @@ This requirement has valid relations to existing files, using markdown link form
 * type: requirement
 
 #### Relations
-* derivedFrom: #root-user-requirement
+* specify: #root-feature
 * satisfiedBy: [./DesignSpecifications/SampleDSD.md](./DesignSpecifications/SampleDSD.md)
 * trace: [Design Specification](DesignSpecifications/SampleDSD.md)
 
@@ -56,7 +56,7 @@ This requirement specifically tests validation of relations to files in the Desi
 This requirement specifically tests validation of 'Other' subsections
 
 #### Metadata
-* type: user-requirement
+* type: feature
 
 #### Subsection 1
 

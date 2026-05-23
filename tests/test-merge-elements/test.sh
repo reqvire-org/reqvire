@@ -321,12 +321,12 @@ cp "${TEST_SCRIPT_DIR}/specifications/Verifications.md" "$TEST_DIR/specification
 
 cat >> "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 
-### External Root
+### External Feature
 
 External root branch for ownership violation scenario.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 ---
 
 ### External Source
@@ -337,7 +337,7 @@ Source requirement under a different root.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [External Root](#external-root)
+  * specify: [External Feature](#external-feature)
 ---
 EOF
 

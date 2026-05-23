@@ -4,19 +4,19 @@
   "configuration": "old_skill",
   "expectations": [
     {
-      "text": "Creates user-requirement before system requirement (MBSE order)",
+      "text": "Creates feature before requirement (MBSE order)",
       "passed": true,
-      "evidence": "Step 1 creates user-requirement 'Batch Export', Step 2 creates system requirement 'Batch Specification Export'. Correct MBSE order."
+      "evidence": "Step 1 creates feature 'Batch Export', Step 2 creates requirement 'Batch Specification Export'. Correct MBSE order."
     },
     {
-      "text": "System requirement has derivedFrom relation to user requirement",
+      "text": "Requirement has specify relation to feature",
       "passed": true,
-      "evidence": "Step 2 includes '* derivedFrom: [Batch Export](../UserRequirements.md#batch-export)' in Relations section."
+      "evidence": "Step 2 includes '* specify: [Batch Export](../../Features.md#batch-export)' in Relations section."
     },
     {
       "text": "Creates test-verification with verify relation to system requirement",
       "passed": true,
-      "evidence": "Step 3 creates 'Batch Export Verification' with type: test-verification and '* verify: [Batch Specification Export](../Requirements.md#batch-specification-export)'."
+      "evidence": "Step 3 creates 'Batch Export Verification' with type: test-verification and '* verify: [Batch Specification Export](../Specifications.md#batch-specification-export)'."
     },
     {
       "text": "Uses EARS pattern (shall statement) in requirement text",

@@ -1,0 +1,12 @@
+{
+  "ontology_name": "API Ontology",
+  "ontology_iri": "urn:reqvire:ontology:api-ontology",
+  "ontology_language": "turtle",
+  "ontology_contains_class": true,
+  "ontology_has_line_number": true,
+  "semantic_contract_name": "API Endpoint Shape Contract",
+  "semantic_contract_iri": "urn:reqvire:semantic-contract:api-endpoint-shape-contract",
+  "shapes_language": "turtle",
+  "shapes_contains_node_shape": true,
+  "semantic_contract_has_no_ontology": true
+}

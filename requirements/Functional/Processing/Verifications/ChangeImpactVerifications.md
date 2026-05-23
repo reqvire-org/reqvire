@@ -105,6 +105,35 @@ This test verifies that the system correctly handles different relation types wh
   * verify: [CLI Change Impact Report Command](../../../Interfaces/CLI/Commands.md#cli-change-impact-report-command)
 ---
 
+### Feature Ontology and Semantic Contract Change Impact Test
+
+This test verifies that feature, specified requirement, ontology, and semantic-contract changes propagate through the model.
+
+#### Details
+
+##### Acceptance Criteria
+- Feature content changes propagate to requirements through `specifiedBy`.
+- Requirement content changes continue to propagate to verifications through `verifiedBy`.
+- Requirement-owned semantic-contract content changes propagate to the owning requirement through `refine`.
+- Attached ontology content changes mark the attaching feature as changed and propagate through that feature context to descendant features and specified requirements.
+
+##### Test Criteria
+- Modify a feature, its specified requirement, its owned semantic contract, and an attached ontology.
+- Run `reqvire change-impact --json`; assert exit code 0 and valid JSON.
+- Assert the feature impact tree contains the specified requirement.
+- Assert the requirement impact tree contains the verification.
+- Assert the semantic-contract impact tree contains the owning requirement.
+- Assert the attaching feature reports the attached ontology in `changed_attachments`.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-feature-change-impact/test.sh)
+  * verify: [Requirements Change Propagation](../ChangeImpact.md#requirements-change-propagation)
+  * verify: [Change Impact Detection](../ChangeImpact.md#change-impact-detection)
+---
+
 ### Change Impact Smart Filtering Test
 
 This test verifies that the smart filtering correctly handles new elements in change impact reports, filtering child elements while showing parent elements.

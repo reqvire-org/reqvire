@@ -21,7 +21,7 @@ When filtering model output from a starting requirement:
 Coverage behavior for requirement implementation reporting.
 
 #### Details
-Implementation coverage classification shall follow:
+Implementation coverage source vocabulary is defined by the Reqvire report ontology. Implementation coverage classification shall follow:
 
 - **Directly satisfied**: requirement has one or more `satisfiedBy` relations.
 - **Refinement-contract via attachment**: requirement owns refinement elements via `refinedBy`, and at least one owned refinement is attached by a requirement that is directly satisfied.
@@ -29,7 +29,7 @@ Implementation coverage classification shall follow:
 - **Uncovered**: requirement has no coverage evidence from the above sources.
 
 Rules:
-- Scope includes only `requirement` elements (excludes `user-requirement`).
+- Scope includes only `requirement` elements. Feature elements are excluded from direct implementation coverage and receive implementation coverage through feature roll-up.
 - Refinement-contract attachment propagation uses only refinement element identifiers as contracts.
 - Generic derivation roll-up is not used for implementation coverage.
 - Coverage source and evidence identifiers shall be reported in text and JSON outputs.
@@ -62,7 +62,7 @@ Interactive behavior for Mermaid diagrams in HTML export.
 When reverse mode is enabled for model traversal:
 1. Follow backward relations (derivedFrom, satisfy, verify) instead of forward relations
 2. Start from leaf elements (elements with no outgoing forward relations) when no specific element is specified
-3. Build tree structure from leaves upward toward root requirements
+3. Build tree structure from leaves upward toward model roots
 4. When a specific starting element is provided, start from that element and traverse upward
 5. Report "Reverse" direction indicator in output metadata
 

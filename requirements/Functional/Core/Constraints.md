@@ -29,11 +29,11 @@ Only requirements in a separate branch of the hierarchy (no derivedFrom chain co
 Rules for keeping cross-subgraph attachment contracts one-directional.
 
 #### Details
-For cross-subgraph refinement attachments, flow is defined from the attaching requirement's top-root hierarchy to the defining requirement's top-root hierarchy.
+For cross-subgraph refinement attachments, flow is defined from the attaching element's feature-root hierarchy to the defining owner's feature-root hierarchy.
 
 **One-direction invariant:**
 - If subgraph `A` attaches a refinement owned by subgraph `B`, then subgraph `B` must not attach refinements owned by subgraph `A`
-- This rule applies at the top-root user-requirement hierarchy level, not only to directly involved requirements
+- This rule applies at the feature-root hierarchy level, not only to directly involved requirements or features
 
 **Rationale**: Attachment contracts are used to model waterfall-style dependency flow between subgraphs. Allowing reverse attachment flow between the same two subgraphs breaks boundary directionality and undermines attachment contracts as one-way dependency edges.
 
@@ -43,13 +43,19 @@ For cross-subgraph refinement attachments, flow is defined from the attaching re
 
 ### Attachment Satisfied Refinement Constraint
 
-Rules requiring refinements to have a refine relation before being attachable.
+Rules requiring attachment targets to have compatible ownership before being attachable.
 
-A refinement element can only be attached to requirements if:
-- The refinement has a `refine` relation to a requirement (establishing ownership)
-- Refinements without a refine relation cannot be attached anywhere
+An attachment target is valid only when it matches the attaching element family:
+- Feature attachments target ontology elements only.
+- Requirements must not attach ontology directly.
+- Requirement attachments target requirement-owned refinements only: `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output`.
+- Requirement-owned refinements must have a `refine` relation to exactly one compatible requirement owner before they can be attached.
+- Feature-owned `source` refinements are not cross-subgraph attachment contracts.
+- Refinements without a valid `refine` relation cannot be attached anywhere.
 
-**Rationale**: Enforces model hygiene by ensuring refinements are properly integrated into the model through an explicit refine relationship to an owning requirement before being referenced elsewhere.
+Attachment compatibility is defined by the Reqvire relation, feature, requirement, ontology, and semantic-contract model contracts.
+
+**Rationale**: Enforces model hygiene by making feature-level ontology context the single vocabulary inheritance path, while ensuring reusable requirement contracts are owned by exactly one requirement before being referenced elsewhere.
 
 #### Metadata
   * type: constraint
@@ -79,20 +85,14 @@ Rules for detecting duplicate link targets across subsections.
 Validation rules for element type and relation type combinations.
 
 #### Details
-**Relation Type Restrictions:**
-| Relation Type | Allowed Source Types | Allowed Target Types |
-|---------------|---------------------|---------------------|
-| derivedFrom/derive | requirement, user-requirement | requirement, user-requirement |
-| satisfiedBy/satisfy | requirement, test-verification, formal-proof-verification | InternalPath |
-| refinedBy/refine | requirement, user-requirement | refinement types, InternalPath |
-| verifiedBy/verify | requirement, user-requirement | All verification types |
-| trace | Any (except refinement types) | Any |
+Canonical relation compatibility is defined by the Reqvire relation ontology, core element type vocabulary, feature/requirement refinement vocabulary, and verification type vocabulary.
 
-**Key Constraints:**
-- derivedFrom/derive restricted to requirement types only
-- Refinement types (constraint, behavior, specification, state, input-output) can only have `refine` relations
-- Only evidence-backed verification types (`test-verification`, `formal-proof-verification`) can use satisfiedBy among verification types
-- Elements with type "other" can only use trace relations
+Validation shall enforce those model contracts so that:
+- hierarchy relations stay within feature, requirement, or ontology hierarchy families
+- `specify`/`specifiedBy` is the requirement-to-feature bridge
+- `refine`/`refinedBy` follows subtype-compatible refinement ownership
+- `satisfiedBy`/`satisfy` is limited to requirement and evidence-backed verification satisfaction
+- `trace` remains trace-only for custom element types
 
 #### Metadata
   * type: constraint
@@ -100,13 +100,14 @@ Validation rules for element type and relation type combinations.
 
 ### Single Root Hierarchy Ownership Constraint
 
-Rules for ensuring each hierarchy element belongs to exactly one top root user-requirement tree.
+Rules for ensuring each requirement hierarchy belongs to exactly one feature root.
 
 #### Details
-- Hierarchical relations are defined by `derivedFrom`/`derive`.
-- A top root is an element of type `user-requirement` with no hierarchical parent relation (`derivedFrom`).
-- Every hierarchy element shall resolve to exactly one top root `user-requirement` when traversing parent hierarchy relations.
-- Resolution count `0` is invalid (orphaned hierarchy from top user-requirement ownership perspective).
+- Feature hierarchy is defined by `derivedFrom`/`derive` between feature elements.
+- Requirement hierarchy is defined by `derivedFrom`/`derive` between requirement elements.
+- A top-level requirement must connect to its owning feature through `specify`/`specifiedBy`.
+- Every requirement hierarchy element shall resolve to exactly one feature root by traversing requirement parents and then the owning feature hierarchy.
+- Resolution count `0` is invalid (orphaned hierarchy from feature-root ownership perspective).
 - Resolution count `>1` is invalid (ambiguous multi-root ownership).
 
 This rule is a structural model invariant and shall be enforced as validation, not lint.

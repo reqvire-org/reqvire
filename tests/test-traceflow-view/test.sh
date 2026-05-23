@@ -21,26 +21,29 @@ git config user.name "Test"
 # Create test specifications
 mkdir -p "$TEMP_DIR/specifications"
 
-cat > "$TEMP_DIR/specifications/UserRequirements.md" << 'EOF'
-# User Requirements
-
-### User Login
-
-Users shall be able to log into the system.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [System Access](#system-access)
----
+cat > "$TEMP_DIR/specifications/Features.md" << 'EOF'
+# Features
 
 ### System Access
 
-Users shall have access to the system features.
+System access is the capability for authenticated use of protected system features.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+
+#### Relations
+  * specifiedBy: [User Login](#user-login)
+---
+
+### User Login
+
+The system shall allow users to log into protected system features.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [System Access](#system-access)
 ---
 EOF
 
@@ -52,7 +55,7 @@ cat > "$TEMP_DIR/specifications/SystemRequirements.md" << 'EOF'
 The system shall implement authentication.
 
 #### Relations
-  * derivedFrom: [User Login](UserRequirements.md#user-login)
+  * derivedFrom: [User Login](Features.md#user-login)
 ---
 
 ### Session Management
@@ -60,7 +63,7 @@ The system shall implement authentication.
 The system shall manage user sessions.
 
 #### Relations
-  * derivedFrom: [User Login](UserRequirements.md#user-login)
+  * derivedFrom: [User Login](Features.md#user-login)
 ---
 EOF
 

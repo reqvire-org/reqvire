@@ -1,0 +1,100 @@
+# Elements
+
+### Billing Feature
+
+Billing feature.
+
+#### Metadata
+  * type: feature
+
+#### Relations
+  * specifiedBy: [Billing Requirement](#billing-requirement)
+
+#### Attachments
+  * [Billing Ontology](#billing-ontology)
+---
+
+### Billing Ontology
+
+Billing ontology.
+
+#### Metadata
+  * type: ontology
+
+#### Ontology
+```turtle
+@prefix billing: <urn:reqvire:test:billing:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+billing:BillingPayload a owl:Class .
+```
+
+---
+
+### Billing Requirement
+
+The system shall validate billing payloads.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Billing Feature](#billing-feature)
+  * refinedBy: [Billing Shape Contract](#billing-shape-contract)
+---
+
+### Billing Shape Contract
+
+Billing shape contract.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * refine: [Billing Requirement](#billing-requirement)
+
+#### Shapes
+```turtle
+@prefix billing: <urn:reqvire:test:billing:> .
+@prefix tax: <urn:reqvire:test:tax:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+billing:BillingPayloadShape
+  a sh:NodeShape ;
+  sh:targetClass billing:BillingPayload ;
+  sh:property [
+    sh:path tax:VatRate ;
+    sh:minCount 1 ;
+  ] .
+```
+---
+
+### Tax Feature
+
+Tax feature.
+
+#### Metadata
+  * type: feature
+
+#### Relations
+  * trace: [Tax Ontology](#tax-ontology)
+---
+
+### Tax Ontology
+
+Tax ontology.
+
+#### Metadata
+  * type: ontology
+
+#### Relations
+  * derivedFrom: [Billing Ontology](#billing-ontology)
+
+#### Ontology
+```turtle
+@prefix tax: <urn:reqvire:test:tax:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+tax:VatRate a owl:DatatypeProperty .
+```
+---

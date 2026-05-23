@@ -50,7 +50,7 @@ For comprehensive command reference, see the Reqvire skills.
 
 ### Key File Locations
 - Core specifications structure: [SpecificationsRequirements.md](requirements/SpecificationsRequirements.md)
-- User requirements: [UserRequirements.md](requirements/UserRequirements.md)
+- Feature roots: [Features.md](requirements/Features.md)
 - Mission requirements: [MissionRequirements.md](requirements/MissionRequirements.md)
 - System requirements: [SystemRequirements/Requirements.md](requirements/SystemRequirements/Requirements.md)
 - Verification specifications: [Verifications folder](requirements/Verifications)

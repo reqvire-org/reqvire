@@ -207,7 +207,7 @@ System shall produce interactive visual representations.
 - Interactive highlighting on hover
 
 **Navigation and Filtering:**
-- Default shows root requirements
+- Default shows feature-rooted model structure
 - Filter from specific element using --from flag
 - Complete model structure generation
 ```
@@ -264,7 +264,7 @@ Rate limit will be 100 request per hour.
 The system shall implement operational constraints and rate limits.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 #### Relations
   * refinedBy: [Rate Limits](../Specifications/Constraints.md#rate-limits)
@@ -393,7 +393,10 @@ Use search to identify requirements that may need specification extraction:
 
 ```bash
 # Find all requirements (candidates for review)
-reqvire search --filter-type="requirement,user-requirement" --short
+reqvire search --filter-type="requirement" --short
+
+# Find all features that may own source refinements or attach ontology
+reqvire search --filter-type="feature" --short
 
 # Find requirements in specific subsystem
 reqvire search --filter-type="requirement" --filter-file="requirements/System/**" --short
@@ -401,8 +404,8 @@ reqvire search --filter-type="requirement" --filter-file="requirements/System/**
 # Find requirements with attachments (may need conversion to satisfiedBy)
 reqvire search --filter-type="requirement" --has-attachments --short
 
-# Find refinements without refine relations (orphaned specifications, constraints, behaviors)
-reqvire search --filter-type="specification,constraint,behavior" --not-have-relations="refine" --short
+# Find refinements without refine relations (orphaned specifications, constraints, behaviors, state, input-output, semantic contracts)
+reqvire search --filter-type="specification,constraint,behavior,state,input-output,semantic-contract,source" --not-have-relations="refine" --short
 ```
 
 ### Validation Commands (Phase 5)

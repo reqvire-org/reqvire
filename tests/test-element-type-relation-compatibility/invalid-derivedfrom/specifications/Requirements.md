@@ -1,12 +1,23 @@
 # Elements
 
-### Target User Requirement
 
-A user requirement to be used as derivedFrom target.
+### Test Feature Test Element Type Relation Compatibility Invalid Derivedfrom Specifications
+
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
 
+### Target Feature
+
+A feature to be used as derivedFrom target.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-derivedfrom-specifications)
 ---
 
 ### Target System Requirement
@@ -17,7 +28,7 @@ A system requirement to be used as derivedFrom target.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * derivedFrom: [Target Feature](#target-feature)
 
 ---
 
@@ -29,7 +40,7 @@ A test verification element.
   * type: test-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
 
 ---
 
@@ -41,8 +52,8 @@ INVALID: Test verification cannot use derivedFrom.
   * type: test-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
+  * derivedFrom: [Target Feature](#target-feature)
 
 ---
 
@@ -54,8 +65,8 @@ INVALID: Analysis verification cannot use derivedFrom.
   * type: analysis-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
+  * derivedFrom: [Target Feature](#target-feature)
 
 ---
 
@@ -67,8 +78,8 @@ INVALID: Inspection verification cannot use derivedFrom.
   * type: inspection-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
+  * derivedFrom: [Target Feature](#target-feature)
 
 ---
 
@@ -80,8 +91,8 @@ INVALID: Demonstration verification cannot use derivedFrom.
   * type: demonstration-verification
 
 #### Relations
-  * verify: [Target User Requirement](#target-user-requirement)
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * verify: [Target Feature](#target-feature)
+  * derivedFrom: [Target Feature](#target-feature)
 
 ---
 
@@ -102,9 +113,9 @@ INVALID: Requirement cannot derive from verification element.
 INVALID: Other type can only use trace relations.
 
 #### Metadata
-  * type: other
+  * type: other-other
 
 #### Relations
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * derivedFrom: [Target Feature](#target-feature)
 
 ---

@@ -95,21 +95,21 @@ graph TD
   * type: block
 
 #### Relations
-  * trace: [Managing System Models](UserStories.md#managing-system-models)
-  * trace: [AI-Assisted System Model Management](UserStories.md#ai-assisted-system-model-management)
+  * trace: [Operating on Model Elements](Features/BehaviorValidationOperations.md#operating-on-model-elements)
+  * trace: [AI-Assisted System Model Management](Features/Integration.md#ai-assisted-system-model-management)
   * trace: [CLI interface](Interfaces/Interfaces.md#cli-interface)
   * trace: [Web Interface](Interfaces/Interfaces.md#web-interface)
   * trace: [MCP Interface](Interfaces/Interfaces.md#mcp-interface)
-  * trace: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
-  * trace: [Model Reports](System/Reporting.md#model-reports)
-  * trace: [Validating Structures](UserStories.md#validating-structures)
+  * trace: [GitHub Workflow Automation](Features/Integration.md#github-workflow-automation)
+  * trace: [Model Reports](Functional/Output/Reporting.md#model-reports)
+  * trace: [Validating Structures](Features/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ## Logical Architecture
 
 ### Logical Architecture Block
 
-The Logical Architecture for Reqvire defines the high-level functional organization of the tool, focusing on the main components that deliver its core functionalities. This architecture serves as the foundation for further refinement into physical architecture and system requirements.
+The Logical Architecture for Reqvire defines the high-level functional organization of the tool, focusing on the main components that deliver its core functionalities. This architecture serves as the foundation for further refinement into physical architecture and implementation-facing requirements.
 
 ```mermaid
 classDiagram
@@ -234,14 +234,14 @@ classDiagram
   * type: block
 
 #### Relations
-  * trace: [Managing System Models](UserStories.md#managing-system-models)
-  * trace: [AI-Assisted System Model Management](UserStories.md#ai-assisted-system-model-management)
+  * trace: [Operating on Model Elements](Features/BehaviorValidationOperations.md#operating-on-model-elements)
+  * trace: [AI-Assisted System Model Management](Features/Integration.md#ai-assisted-system-model-management)
   * trace: [CLI interface](Interfaces/Interfaces.md#cli-interface)
   * trace: [Web Interface](Interfaces/Interfaces.md#web-interface)
   * trace: [MCP Interface](Interfaces/Interfaces.md#mcp-interface)
-  * trace: [Integrate with GitHub Workflows](UserStories.md#integrate-with-github-workflows)
-  * trace: [Model Reports](System/Reporting.md#model-reports)
-  * trace: [Validating Structures](UserStories.md#validating-structures)
+  * trace: [GitHub Workflow Automation](Features/Integration.md#github-workflow-automation)
+  * trace: [Model Reports](Functional/Output/Reporting.md#model-reports)
+  * trace: [Validating Structures](Features/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ## Implementation Architecture

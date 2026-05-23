@@ -40,6 +40,8 @@ pub enum SourceType {
     AttachmentFile,
     /// Content from an attached refinement element
     AttachmentElement,
+    /// Content from ontology context reachable through feature attachments
+    OntologyContext,
 }
 
 /// A single collected content item
@@ -62,6 +64,7 @@ pub struct CollectMetadata {
     pub element_count: usize,
     pub refinement_count: usize,
     pub attachment_count: usize,
+    pub ontology_count: usize,
     pub total_items: usize,
 }
 
@@ -74,7 +77,7 @@ pub struct CollectReport {
     pub metadata: CollectMetadata,
 }
 
-/// Generate a collect report for a requirement element
+/// Generate a collect report for a feature or requirement element
 pub fn generate_collect_report(
     registry: &GraphRegistry,
     element_name: &str,
@@ -104,12 +107,12 @@ pub fn generate_collect_report(
         ReqvireError::ElementError(format!("Element '{}' not found in registry", element_id))
     })?;
 
-    // Validate element type is a requirement
+    // Validate element type is a feature or requirement
     match &element.element_type {
-        ElementType::Requirement(_) => {}
+        ElementType::Feature | ElementType::Requirement(_) => {}
         _ => {
             return Err(ReqvireError::ElementError(format!(
-                "Element '{}' is not a requirement type (found: {}). Only requirement and user-requirement types are supported.",
+                "Element '{}' is not a feature or requirement type (found: {}). Only feature and requirement types are supported.",
                 element_name,
                 element.element_type.as_str()
             )));
@@ -118,8 +121,8 @@ pub fn generate_collect_report(
 
     // Collect chain based on direction
     let chain = match direction {
-        CollectDirection::Upstream => collect_ancestor_chain(registry, &element_id),
-        CollectDirection::Downstream => collect_descendant_chain(registry, &element_id),
+        CollectDirection::Upstream => collect_upstream_chain(registry, &element_id),
+        CollectDirection::Downstream => collect_downstream_chain(registry, &element_id),
     };
 
     // Build collected items
@@ -127,6 +130,8 @@ pub fn generate_collect_report(
     let mut element_count = 0;
     let mut refinement_count = 0;
     let mut attachment_count = 0;
+    let mut ontology_count = 0;
+    let mut collected_ontology_context: HashSet<String> = HashSet::new();
 
     // For upstream: chain is start→root, reverse to get root first (depth 0)
     // For downstream: chain is already start→leaves (start at depth 0)
@@ -175,8 +180,42 @@ pub fn generate_collect_report(
                     depth,
                     git_root,
                 ) {
-                    attachment_count += 1;
+                    if matches!(item.source_type, SourceType::OntologyContext) {
+                        if !collected_ontology_context.insert(item.identifier.clone()) {
+                            continue;
+                        }
+                        ontology_count += 1;
+                    } else {
+                        attachment_count += 1;
+                    }
                     items.push(item);
+                }
+            }
+
+            let ontology_context = if elem.element_type.is_feature() {
+                registry.build_feature_ontology_context(&elem.identifier)
+            } else if elem.element_type.is_requirement() {
+                registry.build_requirement_ontology_context(&elem.identifier)
+            } else {
+                Vec::new()
+            };
+
+            for ontology_id in ontology_context {
+                if !collected_ontology_context.insert(ontology_id.clone()) {
+                    continue;
+                }
+                if let Some(ontology) = registry.get_element(&ontology_id) {
+                    ontology_count += 1;
+                    items.push(CollectedItem {
+                        name: ontology.name.clone(),
+                        identifier: ontology.identifier.clone(),
+                        file_path: ontology.file_path.clone(),
+                        element_type: ontology.element_type.as_str().to_string(),
+                        content: ontology.content.clone(),
+                        depth: depth + 1,
+                        source_type: SourceType::OntologyContext,
+                        attached_to: Some(elem.identifier.clone()),
+                    });
                 }
             }
         }
@@ -190,7 +229,8 @@ pub fn generate_collect_report(
             element_count,
             refinement_count,
             attachment_count,
-            total_items: element_count + refinement_count + attachment_count,
+            ontology_count,
+            total_items: element_count + refinement_count + attachment_count + ontology_count,
         },
     };
 
@@ -202,8 +242,51 @@ pub fn generate_collect_report(
     }
 }
 
-/// Collect the ancestor chain following derivedFrom relations
-fn collect_ancestor_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+/// Collect upstream context.
+///
+/// Feature starts traverse feature parents only.
+/// Requirement starts traverse requirement parents, then cross to owning feature and feature parents.
+fn collect_upstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+    let Some(start) = registry.get_element(start_id) else {
+        return Vec::new();
+    };
+
+    match &start.element_type {
+        ElementType::Feature => {
+            collect_parent_chain_by_type(registry, start_id, ElementTypeKind::Feature)
+        }
+        ElementType::Requirement(_) => {
+            let mut chain =
+                collect_parent_chain_by_type(registry, start_id, ElementTypeKind::Requirement);
+            if let Some(owner_feature) = find_owning_feature(registry, start_id) {
+                let feature_chain = collect_parent_chain_by_type(
+                    registry,
+                    &owner_feature,
+                    ElementTypeKind::Feature,
+                );
+                for id in feature_chain {
+                    if !chain.contains(&id) {
+                        chain.push(id);
+                    }
+                }
+            }
+            chain
+        }
+        _ => Vec::new(),
+    }
+}
+
+#[derive(Clone, Copy)]
+enum ElementTypeKind {
+    Feature,
+    Requirement,
+}
+
+fn collect_parent_chain_by_type(
+    registry: &GraphRegistry,
+    start_id: &str,
+    kind: ElementTypeKind,
+) -> Vec<String> {
     let mut chain = Vec::new();
     let mut visited = HashSet::new();
     let mut current_level = vec![start_id.to_string()];
@@ -226,10 +309,11 @@ fn collect_ancestor_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Strin
         for elem_id in &sorted_level {
             if let Some(elem) = registry.get_element(elem_id) {
                 for rel in &elem.relations {
-                    // Only follow derivedFrom relations (backward/reverse direction)
                     if rel.relation_type.name == "derivedFrom" {
                         if let relation::LinkType::Identifier(target_id) = &rel.target.link {
-                            if !visited.contains(target_id) {
+                            if !visited.contains(target_id)
+                                && element_matches_kind(registry, target_id, kind)
+                            {
                                 next_level.push(target_id.clone());
                             }
                         }
@@ -244,8 +328,23 @@ fn collect_ancestor_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Strin
     chain
 }
 
-/// Collect the descendant chain following derive relations (parent to children)
-fn collect_descendant_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+/// Collect downstream context.
+///
+/// Feature starts traverse child features and requirements that specify each feature.
+/// Requirement starts traverse requirement descendants only.
+fn collect_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+    let Some(start) = registry.get_element(start_id) else {
+        return Vec::new();
+    };
+
+    match &start.element_type {
+        ElementType::Feature => collect_feature_downstream_chain(registry, start_id),
+        ElementType::Requirement(_) => collect_requirement_downstream_chain(registry, start_id),
+        _ => Vec::new(),
+    }
+}
+
+fn collect_requirement_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let mut chain = Vec::new();
     let mut visited = HashSet::new();
     let mut current_level = vec![start_id.to_string()];
@@ -270,7 +369,13 @@ fn collect_descendant_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Str
                 for rel in &elem.relations {
                     if rel.relation_type.name == "derive" {
                         if let relation::LinkType::Identifier(target_id) = &rel.target.link {
-                            if !visited.contains(target_id) {
+                            if !visited.contains(target_id)
+                                && element_matches_kind(
+                                    registry,
+                                    target_id,
+                                    ElementTypeKind::Requirement,
+                                )
+                            {
                                 next_level.push(target_id.clone());
                             }
                         }
@@ -283,6 +388,120 @@ fn collect_descendant_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Str
     }
 
     chain
+}
+
+fn collect_feature_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+    let mut chain = Vec::new();
+    let mut visited = HashSet::new();
+    let mut current_level = vec![start_id.to_string()];
+
+    while !current_level.is_empty() {
+        let mut sorted_level = current_level.clone();
+        sorted_level.sort();
+
+        for elem_id in &sorted_level {
+            if visited.contains(elem_id) {
+                continue;
+            }
+            visited.insert(elem_id.clone());
+            chain.push(elem_id.clone());
+        }
+
+        let mut next_level = Vec::new();
+        for elem_id in &sorted_level {
+            if let Some(elem) = registry.get_element(elem_id) {
+                match &elem.element_type {
+                    ElementType::Feature => {
+                        for rel in &elem.relations {
+                            if matches!(rel.relation_type.name, "derive" | "specifiedBy") {
+                                if let relation::LinkType::Identifier(target_id) = &rel.target.link
+                                {
+                                    if !visited.contains(target_id) {
+                                        next_level.push(target_id.clone());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    ElementType::Requirement(_) => {
+                        for rel in &elem.relations {
+                            if rel.relation_type.name == "derive" {
+                                if let relation::LinkType::Identifier(target_id) = &rel.target.link
+                                {
+                                    if !visited.contains(target_id)
+                                        && element_matches_kind(
+                                            registry,
+                                            target_id,
+                                            ElementTypeKind::Requirement,
+                                        )
+                                    {
+                                        next_level.push(target_id.clone());
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    _ => {}
+                }
+            }
+        }
+
+        current_level = next_level;
+    }
+
+    chain
+}
+
+fn element_matches_kind(registry: &GraphRegistry, element_id: &str, kind: ElementTypeKind) -> bool {
+    registry
+        .get_element(element_id)
+        .is_some_and(|element| match kind {
+            ElementTypeKind::Feature => matches!(element.element_type, ElementType::Feature),
+            ElementTypeKind::Requirement => {
+                matches!(element.element_type, ElementType::Requirement(_))
+            }
+        })
+}
+
+fn find_owning_feature(registry: &GraphRegistry, requirement_id: &str) -> Option<String> {
+    let mut visited = HashSet::new();
+    let mut current_level = vec![requirement_id.to_string()];
+
+    while !current_level.is_empty() {
+        let mut next_level = Vec::new();
+        for elem_id in &current_level {
+            if !visited.insert(elem_id.clone()) {
+                continue;
+            }
+            let Some(elem) = registry.get_element(elem_id) else {
+                continue;
+            };
+
+            for rel in &elem.relations {
+                if rel.relation_type.name == "specify" {
+                    if let relation::LinkType::Identifier(target_id) = &rel.target.link {
+                        if element_matches_kind(registry, target_id, ElementTypeKind::Feature) {
+                            return Some(target_id.clone());
+                        }
+                    }
+                }
+            }
+
+            for rel in &elem.relations {
+                if rel.relation_type.name == "derivedFrom" {
+                    if let relation::LinkType::Identifier(target_id) = &rel.target.link {
+                        if element_matches_kind(registry, target_id, ElementTypeKind::Requirement) {
+                            next_level.push(target_id.clone());
+                        }
+                    }
+                }
+            }
+        }
+
+        current_level = next_level;
+    }
+
+    None
 }
 
 /// Collect content from an attachment
@@ -351,15 +570,22 @@ fn collect_attachment_content(
         }
         AttachmentTarget::ElementIdentifier(elem_id) => {
             // Look up element content from registry
-            registry.get_element(elem_id).map(|elem| CollectedItem {
-                name: elem.name.clone(),
-                identifier: elem.identifier.clone(),
-                file_path: elem.file_path.clone(),
-                element_type: elem.element_type.as_str().to_string(),
-                content: elem.content.clone(),
-                depth,
-                source_type: SourceType::AttachmentElement,
-                attached_to: Some(parent_identifier.to_string()),
+            registry.get_element(elem_id).map(|elem| {
+                let source_type = if elem.element_type.is_ontology() {
+                    SourceType::OntologyContext
+                } else {
+                    SourceType::AttachmentElement
+                };
+                CollectedItem {
+                    name: elem.name.clone(),
+                    identifier: elem.identifier.clone(),
+                    file_path: elem.file_path.clone(),
+                    element_type: elem.element_type.as_str().to_string(),
+                    content: elem.content.clone(),
+                    depth,
+                    source_type,
+                    attached_to: Some(parent_identifier.to_string()),
+                }
             })
         }
     }
@@ -502,6 +728,19 @@ fn generate_text_output(report: &CollectReport) -> String {
                 if let Some(ref parent) = item.attached_to {
                     output.push_str(&format!(
                         "— Source: [{}]({}) attached to [{}]({})\n",
+                        item.name,
+                        item.identifier,
+                        extract_element_name(parent),
+                        parent
+                    ));
+                } else {
+                    output.push_str(&format!("— Source: [{}]({})\n", item.name, item.identifier));
+                }
+            }
+            SourceType::OntologyContext => {
+                if let Some(ref parent) = item.attached_to {
+                    output.push_str(&format!(
+                        "— Source: [{}]({}) ontology context for [{}]({})\n",
                         item.name,
                         item.identifier,
                         extract_element_name(parent),

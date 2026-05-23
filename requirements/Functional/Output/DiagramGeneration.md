@@ -5,12 +5,11 @@
 The system shall produce interactive visual representations of relationships within the System model in the form of Mermaid diagrams, enabling users to explore relations, navigate the model structure, and understand dependencies.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Diagram Generation](#diagram-generation)
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
-  * derivedFrom: [Generate Diagrams](../../UserStories.md#generate-diagrams)
   * refinedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
   * refinedBy: [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * refinedBy: [Mermaid Diagram Style Specification](Specifications.md#mermaid-diagram-style-specification)

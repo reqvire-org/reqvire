@@ -1,31 +1,31 @@
 # Eval: add-requirement (with old skill)
 
 ## Task
-"I need to add a new user requirement for 'Batch Export'..."
+"I need to add a new feature for 'Batch Export'..."
 
 ## Approach
 - Read skill-snapshot/SKILL.md (842 lines)
 - Read AddFeature reference
-- Analyzed existing model: UserStories.md, globbed requirements/**/*.md, grepped for export
-- Noted files requested by user don't exist (project uses UserStories.md and Functional/*/)
+- Analyzed existing model: Features.md, globbed requirements/**/*.md, grepped for export
+- Noted files requested by user are organized as feature roots and functional requirements
 
 ## Commands Produced
 
-### Step 1: User Requirement
+### Step 1: Feature
 ```bash
-reqvire add requirements/UserRequirements.md <<'EOF'
+reqvire add requirements/Features.md <<'EOF'
 ### Batch Export
 
 As a **System Engineer**, I want to export multiple specification files at once into a single archive, so that I can efficiently share and distribute complete model snapshots.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 EOF
 ```
 
 ### Step 2: System Requirement
 ```bash
-reqvire add requirements/SystemRequirements/Requirements.md <<'EOF'
+reqvire add requirements/Functional/Operations/Specifications.md <<'EOF'
 ### Batch Specification Export
 
 The system shall support exporting multiple specification files into a single archive file in a single operation.
@@ -42,13 +42,13 @@ When the user requests a batch export, the system shall:
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Batch Export](../UserRequirements.md#batch-export)
+  * specify: [Batch Export](../../Features.md#batch-export)
 EOF
 ```
 
 ### Step 3: Test Verification
 ```bash
-reqvire add requirements/SystemRequirements/Verifications/BatchExportVerifications.md <<'EOF'
+reqvire add requirements/Functional/Operations/Verifications/BatchExportVerifications.md <<'EOF'
 ### Batch Export Verification
 
 Test verifies batch export functionality:

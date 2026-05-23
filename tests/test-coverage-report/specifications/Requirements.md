@@ -27,6 +27,31 @@ This is a test verification that should appear as unsatisfied in the coverage re
 
 ---
 
+### Formal Proof Verification Satisfied
+
+This is a formal-proof verification that should appear as satisfied in the evidence-backed verification coverage report.
+
+#### Metadata
+* type: formal-proof-verification
+
+#### Relations
+* verify: [Leaf Requirement Verified By Formal Proof](#leaf-requirement-verified-by-formal-proof)
+* satisfiedBy: [proof-satisfied.txt](proof-satisfied.txt)
+
+---
+
+### Formal Proof Verification Unsatisfied
+
+This is a formal-proof verification that should appear as unsatisfied when no proof evidence is linked.
+
+#### Metadata
+* type: formal-proof-verification
+
+#### Relations
+* verify: [Leaf Requirement Formal Proof Unsatisfied](#leaf-requirement-formal-proof-unsatisfied)
+
+---
+
 ### Analysis Verification Test
 
 This is an analysis-type verification for testing verification type breakdown. Analysis verifications are considered satisfied by default. This one is orphaned (no verify relation).
@@ -54,14 +79,30 @@ This is a demonstration-type verification for testing verification type breakdow
 
 ---
 
+### Coverage Feature
+
+Feature for coverage roll-up testing.
+
+#### Metadata
+* type: feature
+
+#### Relations
+* specifiedBy: [Parent Requirement](#parent-requirement)
+* specifiedBy: [Another Leaf Requirement Verified](#another-leaf-requirement-verified)
+* specifiedBy: [Leaf Requirement Verified By Formal Proof](#leaf-requirement-verified-by-formal-proof)
+* specifiedBy: [Leaf Requirement Formal Proof Unsatisfied](#leaf-requirement-formal-proof-unsatisfied)
+
+---
+
 ### Parent Requirement
 
 This is a parent requirement that derives child requirements. It MAY be verified but it's not required.
 
 #### Metadata
-* type: user-requirement
+* type: requirement
 
 #### Relations
+* specify: [Coverage Feature](#coverage-feature)
 * derive: [Leaf Requirement Verified](#leaf-requirement-verified)
 * derive: [Leaf Requirement Unverified](#leaf-requirement-unverified)
 
@@ -91,9 +132,36 @@ This is a leaf requirement that is NOT verified. Should be flagged as missing ve
 This is another leaf requirement that is verified.
 
 #### Metadata
-* type: user-requirement
+* type: requirement
 
 #### Relations
+* specify: [Coverage Feature](#coverage-feature)
 * verifiedBy: [Test Verification Unsatisfied](#test-verification-unsatisfied)
+
+---
+
+### Leaf Requirement Verified By Formal Proof
+
+This leaf requirement is verified by a satisfied formal-proof verification.
+
+#### Metadata
+* type: requirement
+
+#### Relations
+* specify: [Coverage Feature](#coverage-feature)
+* verifiedBy: [Formal Proof Verification Satisfied](#formal-proof-verification-satisfied)
+
+---
+
+### Leaf Requirement Formal Proof Unsatisfied
+
+This leaf requirement is verified by a formal-proof verification that lacks proof evidence.
+
+#### Metadata
+* type: requirement
+
+#### Relations
+* specify: [Coverage Feature](#coverage-feature)
+* verifiedBy: [Formal Proof Verification Unsatisfied](#formal-proof-verification-unsatisfied)
 
 ---

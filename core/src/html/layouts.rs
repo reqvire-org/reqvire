@@ -34,6 +34,7 @@ pub fn base(title: &str, content: Markup, nav_prefix: &str) -> Markup {
                         a href={(nav_prefix)"traceflow.html"} class="nav-link" { "TraceFlow" }
                         a href={(nav_prefix)"coverage.html"} class="nav-link" { "Coverage" }
                         a href={(nav_prefix)"resources.html"} class="nav-link" { "Resources" }
+                        a href={(nav_prefix)"ontologies.html"} class="nav-link" { "Ontologies" }
                     }
 
                     // Mobile menu button (visible on mobile only)
@@ -59,6 +60,7 @@ pub fn base(title: &str, content: Markup, nav_prefix: &str) -> Markup {
                         a href={(nav_prefix)"traceflow.html"} class="mobile-nav-link" { "TraceFlow" }
                         a href={(nav_prefix)"coverage.html"} class="mobile-nav-link" { "Coverage" }
                         a href={(nav_prefix)"resources.html"} class="mobile-nav-link" { "Resources" }
+                        a href={(nav_prefix)"ontologies.html"} class="mobile-nav-link" { "Ontologies" }
                     }
                 }
 
@@ -127,6 +129,7 @@ pub fn diagram_layout(title: &str, diagram: Markup, nav_prefix: &str) -> Markup 
                         a href={(nav_prefix)"traceflow.html"} class="nav-link" { "TraceFlow" }
                         a href={(nav_prefix)"coverage.html"} class="nav-link" { "Coverage" }
                         a href={(nav_prefix)"resources.html"} class="nav-link" { "Resources" }
+                        a href={(nav_prefix)"ontologies.html"} class="nav-link" { "Ontologies" }
                     }
 
                     // Mobile menu button (visible on mobile only)
@@ -152,6 +155,7 @@ pub fn diagram_layout(title: &str, diagram: Markup, nav_prefix: &str) -> Markup 
                         a href={(nav_prefix)"traceflow.html"} class="mobile-nav-link" { "TraceFlow" }
                         a href={(nav_prefix)"coverage.html"} class="mobile-nav-link" { "Coverage" }
                         a href={(nav_prefix)"resources.html"} class="mobile-nav-link" { "Resources" }
+                        a href={(nav_prefix)"ontologies.html"} class="mobile-nav-link" { "Ontologies" }
                     }
                 }
 

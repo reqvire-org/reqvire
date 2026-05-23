@@ -18,7 +18,7 @@ Add a verification for an existing requirement following Reqvire's bottom roll-u
 ## User Request
 
 ${1:+Requirement ID: $1}
-${1:-The user will specify which requirement needs verification.}
+${1:-The user will specifiedBy which requirement needs verification.}
 
 ## Steps
 

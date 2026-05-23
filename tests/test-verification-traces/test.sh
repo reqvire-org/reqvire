@@ -16,7 +16,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - Command shall support `--json` flag for structured JSON output without diagrams
 # - Mermaid diagrams shall show verification element as root with arrows following relation semantics
 # - Directly verified requirements shall be marked/highlighted in diagrams using CSS classes
-# - System shall traverse all upward parent relations to reach root requirements
+# - System shall traverse all upward parent relations to reach feature-rooted requirement context
 # - System shall merge multiple verification paths into single tree per verification
 # - System shall support `--verification-id=<id>` filter for specific verification element
 # - System shall support `--filter-name=<regex>` for filtering by verification name pattern

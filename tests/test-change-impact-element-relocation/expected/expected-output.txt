@@ -19,12 +19,13 @@
 
 ### Changed Elements
 
-* [Battery Saver](specifications/SecondFile/Requirements.md#battery-saver)
-    * derive -> [Battery Monitoring](specifications/SecondFile/Requirements.md#battery-monitoring) ⚠️
-    * derive -> [Display Settings](specifications/SecondFile/Requirements.md#display-settings) ⚠️
-        * verifiedBy -> [display_test.py](specifications/SecondFile/display_test.py)
-        * satisfiedBy -> [display_impl.py](specifications/SecondFile/display_impl.py)
-    * derive -> [Power Efficiency](specifications/SecondFile/Requirements.md#power-efficiency) ⚠️
+* [Battery Monitoring](specifications/SecondFile/Requirements.md#battery-monitoring) ⚠️
+
+* [Display Settings](specifications/SecondFile/Requirements.md#display-settings)
+    * satisfiedBy -> [display_impl.py](specifications/SecondFile/display_impl.py)
+    * satisfiedBy -> [display_test.py](specifications/SecondFile/display_test.py)
+
+* [Power Efficiency](specifications/SecondFile/Requirements.md#power-efficiency) ⚠️
 
 
 ---

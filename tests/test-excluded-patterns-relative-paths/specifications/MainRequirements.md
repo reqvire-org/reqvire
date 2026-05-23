@@ -1,13 +1,24 @@
 # Elements
 
 
+
+### Test Feature Test Excluded Patterns Relative Paths Specifications Mainrequirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Test Root Requirement
 
 Root requirement for testing excluded patterns.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-excluded-patterns-relative-paths-specifications-mainrequirements-md)
 ---
 
 ### Main Test Requirement

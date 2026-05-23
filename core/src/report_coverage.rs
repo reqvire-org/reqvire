@@ -3,7 +3,7 @@ use crate::element::AttachmentTarget;
 use crate::graph_registry::GraphRegistry;
 use crate::relation;
 use serde::Serialize;
-use std::collections::HashMap;
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 #[derive(Serialize)]
 pub struct CoverageReport {
@@ -15,6 +15,7 @@ pub struct CoverageReport {
     orphaned_verifications: VerificationsByFile,
     covered_requirements: CoveredRequirementsByFile,
     uncovered_requirements: UncoveredRequirementsByFile,
+    feature_coverage: FeatureCoverageByFeature,
 }
 
 #[derive(Serialize)]
@@ -50,6 +51,7 @@ struct CoverageSummary {
 #[derive(Serialize)]
 struct VerificationTypeCounts {
     test: usize,
+    formal_proof: usize,
     analysis: usize,
     inspection: usize,
     demonstration: usize,
@@ -60,6 +62,28 @@ struct CoverageSourceCounts {
     direct_satisfied: usize,
     refinement_contract_satisfied_via_attachment: usize,
     refinement_contract_satisfied_via_child: usize,
+}
+
+#[derive(Serialize)]
+struct FeatureCoverageByFeature {
+    features: Vec<FeatureCoverageDetails>,
+}
+
+#[derive(Serialize, Clone)]
+struct FeatureCoverageDetails {
+    identifier: String,
+    name: String,
+    local_leaf_requirements: usize,
+    local_verified_leaf_requirements: usize,
+    aggregate_leaf_requirements: usize,
+    aggregate_verified_leaf_requirements: usize,
+    verification_coverage_percentage: f64,
+    local_requirements: usize,
+    local_covered_requirements: usize,
+    aggregate_requirements: usize,
+    aggregate_covered_requirements: usize,
+    implementation_coverage_percentage: f64,
+    mark: String,
 }
 
 #[derive(Serialize)]
@@ -215,6 +239,10 @@ impl CoverageReport {
         output.push_str(&format!(
             "- Test: {}\n",
             self.summary.verification_types.test
+        ));
+        output.push_str(&format!(
+            "- Formal Proof: {}\n",
+            self.summary.verification_types.formal_proof
         ));
         output.push_str(&format!(
             "- Analysis: {}\n",
@@ -425,6 +453,24 @@ impl CoverageReport {
             }
         }
 
+        if !self.feature_coverage.features.is_empty() {
+            output.push_str("\n## Feature Coverage\n\n");
+            for feature in &self.feature_coverage.features {
+                output.push_str(&format!(
+                    "- **[{}]({})**: {} verification {:.1}% ({}/{} leaf), implementation {:.1}% ({}/{} requirements)\n",
+                    feature.name,
+                    feature.identifier,
+                    feature.mark,
+                    feature.verification_coverage_percentage,
+                    feature.aggregate_verified_leaf_requirements,
+                    feature.aggregate_leaf_requirements,
+                    feature.implementation_coverage_percentage,
+                    feature.aggregate_covered_requirements,
+                    feature.aggregate_requirements
+                ));
+            }
+        }
+
         output
     }
 }
@@ -439,6 +485,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
     let mut orphaned_verifications_count = 0;
     let mut verification_types = VerificationTypeCounts {
         test: 0,
+        formal_proof: 0,
         analysis: 0,
         inspection: 0,
         demonstration: 0,
@@ -446,6 +493,8 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
     let mut verified_leaf_files: HashMap<String, Vec<RequirementDetails>> = HashMap::new();
     let mut unverified_leaf_files: HashMap<String, Vec<RequirementDetails>> = HashMap::new();
+    let mut verified_leaf_ids: HashSet<String> = HashSet::new();
+    let mut unverified_leaf_ids: HashSet<String> = HashSet::new();
     let mut satisfied_test_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
     let mut unsatisfied_test_files: HashMap<String, Vec<VerificationDetails>> = HashMap::new();
     let mut orphaned_verifications_files: HashMap<String, Vec<VerificationDetails>> =
@@ -478,8 +527,14 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
             // Count by verification type
             match verification_type {
-                element::VerificationType::Default | element::VerificationType::Test => {
-                    verification_types.test += 1;
+                element::VerificationType::Default
+                | element::VerificationType::Test
+                | element::VerificationType::FormalProof => {
+                    if matches!(verification_type, element::VerificationType::FormalProof) {
+                        verification_types.formal_proof += 1;
+                    } else {
+                        verification_types.test += 1;
+                    }
                     total_test_verifications += 1;
 
                     // For test verifications, check if they have satisfiedBy relations
@@ -623,12 +678,6 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
     for consumers in attached_refinement_consumers.values_mut() {
         consumers.sort();
         consumers.dedup();
-    }
-
-    #[derive(Clone)]
-    struct CoverageState {
-        source: String,
-        evidence: Vec<String>,
     }
 
     let mut impl_coverage: HashMap<String, CoverageState> = HashMap::new();
@@ -791,6 +840,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
 
                 if verified_by.is_empty() {
                     // Unverified leaf requirement
+                    unverified_leaf_ids.insert(element.identifier.clone());
                     unverified_leaf_files
                         .entry(element.file_path.clone())
                         .or_default()
@@ -798,6 +848,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
                 } else {
                     // Verified leaf requirement
                     verified_leaf_requirements += 1;
+                    verified_leaf_ids.insert(element.identifier.clone());
                     verified_leaf_files
                         .entry(element.file_path.clone())
                         .or_default()
@@ -831,6 +882,14 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
     } else {
         0.0
     };
+
+    let feature_coverage = build_feature_coverage(
+        registry,
+        &children_by_requirement,
+        &verified_leaf_ids,
+        &unverified_leaf_ids,
+        &impl_coverage,
+    );
 
     let leaf_requirements_coverage_percentage =
         round_to_two_decimals(leaf_requirements_coverage_percentage);
@@ -885,5 +944,224 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         uncovered_requirements: UncoveredRequirementsByFile {
             files: uncovered_requirements_files,
         },
+        feature_coverage: FeatureCoverageByFeature {
+            features: feature_coverage,
+        },
     }
+}
+
+fn build_feature_coverage(
+    registry: &GraphRegistry,
+    children_by_requirement: &HashMap<String, Vec<String>>,
+    verified_leaf_ids: &HashSet<String>,
+    unverified_leaf_ids: &HashSet<String>,
+    impl_coverage: &HashMap<String, CoverageState>,
+) -> Vec<FeatureCoverageDetails> {
+    let mut feature_children: HashMap<String, Vec<String>> = HashMap::new();
+    let mut feature_requirements: HashMap<String, Vec<String>> = HashMap::new();
+
+    for element in registry.get_all_elements() {
+        if !matches!(element.element_type, element::ElementType::Feature) {
+            continue;
+        }
+
+        let mut child_features = Vec::new();
+        let mut specified_requirements = Vec::new();
+
+        for relation in &element.relations {
+            let relation::LinkType::Identifier(target_id) = &relation.target.link else {
+                continue;
+            };
+
+            match relation.relation_type.name {
+                "derive" => {
+                    if registry.get_element(target_id).is_some_and(|target| {
+                        matches!(target.element_type, element::ElementType::Feature)
+                    }) {
+                        child_features.push(target_id.clone());
+                    }
+                }
+                "specifiedBy" => {
+                    if registry.get_element(target_id).is_some_and(|target| {
+                        matches!(target.element_type, element::ElementType::Requirement(_))
+                    }) {
+                        specified_requirements.push(target_id.clone());
+                    }
+                }
+                _ => {}
+            }
+        }
+
+        child_features.sort();
+        child_features.dedup();
+        specified_requirements.sort();
+        specified_requirements.dedup();
+
+        feature_children.insert(element.identifier.clone(), child_features);
+        feature_requirements.insert(element.identifier.clone(), specified_requirements);
+    }
+
+    let mut result = Vec::new();
+    for feature in registry.get_all_elements() {
+        if !matches!(feature.element_type, element::ElementType::Feature) {
+            continue;
+        }
+
+        let local_requirements = collect_requirement_subtree_ids(
+            feature_requirements.get(&feature.identifier),
+            children_by_requirement,
+        );
+        let aggregate_features =
+            collect_feature_subtree_ids(&feature.identifier, &feature_children);
+
+        let mut aggregate_requirements = BTreeSet::new();
+        for feature_id in &aggregate_features {
+            for req_id in collect_requirement_subtree_ids(
+                feature_requirements.get(feature_id),
+                children_by_requirement,
+            ) {
+                aggregate_requirements.insert(req_id);
+            }
+        }
+
+        let local_leaf_requirements = count_leaf_requirements(
+            local_requirements.iter(),
+            verified_leaf_ids,
+            unverified_leaf_ids,
+        );
+        let local_verified_leaf_requirements = local_requirements
+            .iter()
+            .filter(|id| verified_leaf_ids.contains(*id))
+            .count();
+        let aggregate_leaf_requirements = count_leaf_requirements(
+            aggregate_requirements.iter(),
+            verified_leaf_ids,
+            unverified_leaf_ids,
+        );
+        let aggregate_verified_leaf_requirements = aggregate_requirements
+            .iter()
+            .filter(|id| verified_leaf_ids.contains(*id))
+            .count();
+
+        let local_covered_requirements = local_requirements
+            .iter()
+            .filter(|id| impl_coverage.contains_key(*id))
+            .count();
+        let aggregate_covered_requirements = aggregate_requirements
+            .iter()
+            .filter(|id| impl_coverage.contains_key(*id))
+            .count();
+
+        let verification_coverage_percentage = if aggregate_leaf_requirements > 0 {
+            round_to_two_decimals(
+                (aggregate_verified_leaf_requirements as f64 / aggregate_leaf_requirements as f64)
+                    * 100.0,
+            )
+        } else {
+            0.0
+        };
+
+        let implementation_coverage_percentage = if !aggregate_requirements.is_empty() {
+            round_to_two_decimals(
+                (aggregate_covered_requirements as f64 / aggregate_requirements.len() as f64)
+                    * 100.0,
+            )
+        } else {
+            0.0
+        };
+
+        let mark = if aggregate_leaf_requirements == 0 && aggregate_requirements.is_empty() {
+            "not-applicable"
+        } else if aggregate_leaf_requirements > 0
+            && aggregate_verified_leaf_requirements == aggregate_leaf_requirements
+            && aggregate_covered_requirements == aggregate_requirements.len()
+        {
+            "covered"
+        } else if aggregate_verified_leaf_requirements > 0 || aggregate_covered_requirements > 0 {
+            "partial"
+        } else {
+            "uncovered"
+        };
+
+        result.push(FeatureCoverageDetails {
+            identifier: feature.identifier.clone(),
+            name: feature.name.clone(),
+            local_leaf_requirements,
+            local_verified_leaf_requirements,
+            aggregate_leaf_requirements,
+            aggregate_verified_leaf_requirements,
+            verification_coverage_percentage,
+            local_requirements: local_requirements.len(),
+            local_covered_requirements,
+            aggregate_requirements: aggregate_requirements.len(),
+            aggregate_covered_requirements,
+            implementation_coverage_percentage,
+            mark: mark.to_string(),
+        });
+    }
+
+    result.sort_by(|a, b| a.identifier.cmp(&b.identifier));
+    result
+}
+
+#[derive(Clone)]
+struct CoverageState {
+    source: String,
+    evidence: Vec<String>,
+}
+
+fn collect_requirement_subtree_ids(
+    roots: Option<&Vec<String>>,
+    children_by_requirement: &HashMap<String, Vec<String>>,
+) -> BTreeSet<String> {
+    let mut result = BTreeSet::new();
+    let mut stack = roots.cloned().unwrap_or_default();
+    stack.sort();
+
+    while let Some(current) = stack.pop() {
+        if !result.insert(current.clone()) {
+            continue;
+        }
+        if let Some(children) = children_by_requirement.get(&current) {
+            for child in children.iter().rev() {
+                stack.push(child.clone());
+            }
+        }
+    }
+
+    result
+}
+
+fn collect_feature_subtree_ids(
+    root: &str,
+    feature_children: &HashMap<String, Vec<String>>,
+) -> BTreeSet<String> {
+    let mut result = BTreeSet::new();
+    let mut stack = vec![root.to_string()];
+
+    while let Some(current) = stack.pop() {
+        if !result.insert(current.clone()) {
+            continue;
+        }
+        if let Some(children) = feature_children.get(&current) {
+            for child in children.iter().rev() {
+                stack.push(child.clone());
+            }
+        }
+    }
+
+    result
+}
+
+fn count_leaf_requirements<'a, I>(
+    requirement_ids: I,
+    verified_leaf_ids: &HashSet<String>,
+    unverified_leaf_ids: &HashSet<String>,
+) -> usize
+where
+    I: Iterator<Item = &'a String>,
+{
+    requirement_ids
+        .filter(|id| verified_leaf_ids.contains(*id) || unverified_leaf_ids.contains(*id))
+        .count()
 }

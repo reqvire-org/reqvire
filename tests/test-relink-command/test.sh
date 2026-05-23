@@ -93,16 +93,16 @@ assert_output_matches \
 cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 # Elements
 
-### Root A
+### Feature A
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 ---
 
-### Root B
+### Feature B
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 ---
 
 ### Parent A
@@ -111,7 +111,7 @@ cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root A](#root-a)
+  * specify: [Feature A](#feature-a)
 ---
 
 ### Parent B
@@ -120,7 +120,7 @@ cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root B](#root-b)
+  * specify: [Feature B](#feature-b)
 ---
 
 ### Parent A2
@@ -129,7 +129,7 @@ cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root A](#root-a)
+  * specify: [Feature A](#feature-a)
 ---
 
 ### Child
@@ -138,6 +138,7 @@ cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
   * type: requirement
 
 #### Relations
+  * specify: [Feature A](#feature-a)
   * derivedFrom: [Parent A](#parent-a)
   * derivedFrom: [Parent A2](#parent-a2)
 ---

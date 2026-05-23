@@ -6,7 +6,7 @@ use crate::graph_registry::GraphRegistry;
 use crate::relation;
 use crate::utils::hash_identifier;
 use serde::Serialize;
-use std::collections::HashSet;
+use std::collections::{BTreeMap, BTreeSet, HashSet};
 
 /// Model-centric report with nested element structure
 #[derive(Debug, Serialize)]
@@ -83,6 +83,39 @@ pub fn generate_model_report(
     json_output: bool,
     diagram_direction: &str, // "LR" or "TD"
 ) -> Result<String, ReqvireError> {
+    let report = build_model_report(registry, root_element_name, reverse, type_filter)?;
+
+    if json_output {
+        serde_json::to_string_pretty(&report)
+            .map_err(|e| ReqvireError::SerializationError(e.to_string()))
+    } else {
+        // Generate text with mermaid diagrams
+        Ok(generate_model_text(&report, diagram_direction))
+    }
+}
+
+/// Generate pure Mermaid output for the model-centric report.
+pub fn generate_model_mmd(
+    registry: &GraphRegistry,
+    root_element_name: Option<&str>,
+    reverse: bool,
+    type_filter: Option<Vec<&str>>,
+    diagram_direction: &str,
+) -> Result<String, ReqvireError> {
+    let report = build_model_report(registry, root_element_name, reverse, type_filter)?;
+    Ok(generate_model_mmd_text(
+        registry,
+        &report,
+        diagram_direction,
+    ))
+}
+
+fn build_model_report(
+    registry: &GraphRegistry,
+    root_element_name: Option<&str>,
+    reverse: bool,
+    type_filter: Option<Vec<&str>>,
+) -> Result<ModelCentricReport, ReqvireError> {
     use std::collections::HashSet;
 
     // Validate type filter if provided
@@ -153,12 +186,13 @@ pub fn generate_model_report(
         // Reverse without type filter: use leaf elements
         registry.find_leaf_elements(None)
     } else {
-        // No filter, use root requirements
-        registry.find_root_requirements()
+        // No filter: start from ontology roots and feature roots.
+        find_default_model_roots(registry)
     };
 
-    // Sort for deterministic output
-    starting_elements.sort();
+    if root_element_name.is_some() || type_filter.is_some() || reverse {
+        starting_elements.sort();
+    }
 
     // Build report
     let mut elements = Vec::new();
@@ -177,7 +211,7 @@ pub fn generate_model_report(
     let total_elements = starting_elements.len();
     let total_relations = count_relations(registry, &starting_elements, direction);
 
-    let report = ModelCentricReport {
+    Ok(ModelCentricReport {
         elements,
         metadata: ModelMetadata {
             total_elements,
@@ -190,15 +224,37 @@ pub fn generate_model_report(
             },
             type_filter: type_filter.map(|v| v.into_iter().map(|s| s.to_string()).collect()),
         },
-    };
+    })
+}
 
-    if json_output {
-        serde_json::to_string_pretty(&report)
-            .map_err(|e| ReqvireError::SerializationError(e.to_string()))
-    } else {
-        // Generate text with mermaid diagrams
-        Ok(generate_model_text(&report, diagram_direction))
+fn find_default_model_roots(registry: &GraphRegistry) -> Vec<String> {
+    let mut roots = find_root_elements_of_type(registry, "ontology");
+    let mut seen: HashSet<String> = roots.iter().cloned().collect();
+    for feature_id in registry.find_root_features() {
+        if seen.insert(feature_id.clone()) {
+            roots.push(feature_id);
+        }
     }
+    roots
+}
+
+fn find_root_elements_of_type(registry: &GraphRegistry, element_type: &str) -> Vec<String> {
+    let hierarchical_relations = relation::get_hierarchical_relation_types();
+    let mut roots: Vec<String> = registry
+        .nodes
+        .values()
+        .map(|node| &node.element)
+        .filter(|element| element.element_type.as_str() == element_type)
+        .filter(|element| {
+            !element
+                .relations
+                .iter()
+                .any(|r| hierarchical_relations.contains(&r.relation_type.name))
+        })
+        .map(|element| element.identifier.clone())
+        .collect();
+    roots.sort();
+    roots
 }
 
 /// Build element recursively with nested relations
@@ -381,6 +437,179 @@ fn generate_model_text(report: &ModelCentricReport, diagram_direction: &str) -> 
     output
 }
 
+#[derive(Clone)]
+struct MmdNode {
+    identifier: String,
+    name: String,
+    element_type: String,
+    attachments: Vec<String>,
+}
+
+fn generate_model_mmd_text(
+    registry: &GraphRegistry,
+    report: &ModelCentricReport,
+    diagram_direction: &str,
+) -> String {
+    let mut nodes: BTreeMap<String, MmdNode> = BTreeMap::new();
+    let mut node_order: Vec<String> = Vec::new();
+    let mut edges: BTreeSet<(String, String, String)> = BTreeSet::new();
+
+    for element in &report.elements {
+        collect_mmd_nodes_and_edges(element, &mut nodes, &mut node_order, &mut edges);
+    }
+
+    let discovered_nodes: Vec<MmdNode> = nodes.values().cloned().collect();
+    for node in discovered_nodes {
+        for attachment_id in &node.attachments {
+            if let Some(target) = registry.get_element(attachment_id) {
+                insert_mmd_node(
+                    &mut nodes,
+                    &mut node_order,
+                    MmdNode {
+                        identifier: target.identifier.clone(),
+                        name: target.name.clone(),
+                        element_type: target.element_type.as_str().to_string(),
+                        attachments: target
+                            .attachments
+                            .iter()
+                            .map(|attachment| attachment.target.as_str())
+                            .collect(),
+                    },
+                );
+                edges.insert((
+                    node.identifier.clone(),
+                    "attaches".to_string(),
+                    target.identifier.clone(),
+                ));
+            }
+        }
+    }
+
+    let mut output = String::new();
+    output.push_str(&format!("graph {}\n", diagram_direction));
+    output.push_str("  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n");
+    output
+        .push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
+    output.push_str("  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;\n");
+    output.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
+    output.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n\n");
+
+    for node_id_key in &node_order {
+        let Some(node) = nodes.get(node_id_key) else {
+            continue;
+        };
+        let node_id = hash_identifier(&node.identifier);
+        output.push_str(&format!(
+            "  {}[\"{}\"];\n",
+            node_id,
+            escape_label(&node.name)
+        ));
+        output.push_str(&format!(
+            "  class {} {};\n",
+            node_id,
+            get_element_class(&node.element_type)
+        ));
+        output.push_str(&format!(
+            "  click {} \"{}\";\n",
+            node_id,
+            escape_label(&node.identifier)
+        ));
+    }
+
+    if !edges.is_empty() {
+        output.push('\n');
+    }
+
+    for (source, relation, target) in edges {
+        output.push_str(&format!(
+            "  {} -->|{}| {};\n",
+            hash_identifier(&source),
+            escape_label(&relation),
+            hash_identifier(&target)
+        ));
+    }
+
+    output
+}
+
+fn collect_mmd_nodes_and_edges(
+    element: &ModelCentricElement,
+    nodes: &mut BTreeMap<String, MmdNode>,
+    node_order: &mut Vec<String>,
+    edges: &mut BTreeSet<(String, String, String)>,
+) {
+    insert_mmd_node(
+        nodes,
+        node_order,
+        MmdNode {
+            identifier: element.identifier.clone(),
+            name: element.name.clone(),
+            element_type: element.element_type.clone(),
+            attachments: element.attachments.clone(),
+        },
+    );
+
+    for (idx, relation) in element.relations.iter().enumerate() {
+        match &relation.target {
+            RelationTarget::Element { element: target } => {
+                edges.insert((
+                    element.identifier.clone(),
+                    relation.relation_type.clone(),
+                    target.identifier.clone(),
+                ));
+                collect_mmd_nodes_and_edges(target, nodes, node_order, edges);
+            }
+            RelationTarget::File { path, .. } => {
+                let target_id = format!("file:{}:{}", element.identifier, idx);
+                insert_mmd_node(
+                    nodes,
+                    node_order,
+                    MmdNode {
+                        identifier: target_id.clone(),
+                        name: path.clone(),
+                        element_type: "file".to_string(),
+                        attachments: Vec::new(),
+                    },
+                );
+                edges.insert((
+                    element.identifier.clone(),
+                    relation.relation_type.clone(),
+                    target_id,
+                ));
+            }
+            RelationTarget::External { url, .. } => {
+                let target_id = format!("external:{}:{}", element.identifier, idx);
+                insert_mmd_node(
+                    nodes,
+                    node_order,
+                    MmdNode {
+                        identifier: target_id.clone(),
+                        name: url.clone(),
+                        element_type: "external".to_string(),
+                        attachments: Vec::new(),
+                    },
+                );
+                edges.insert((
+                    element.identifier.clone(),
+                    relation.relation_type.clone(),
+                    target_id,
+                ));
+            }
+        }
+    }
+}
+
+fn insert_mmd_node(
+    nodes: &mut BTreeMap<String, MmdNode>,
+    node_order: &mut Vec<String>,
+    node: MmdNode,
+) {
+    let identifier = node.identifier.clone();
+    if nodes.insert(identifier.clone(), node).is_none() {
+        node_order.push(identifier);
+    }
+}
+
 /// Generate text for an element with mermaid diagram showing its relations
 fn generate_element_text(
     element: &ModelCentricElement,
@@ -413,11 +642,15 @@ fn generate_element_text(
 
         // Add CSS class definitions for colors (MBSE color scheme)
         output.push_str(&format!(
-            "{}  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n",
+            "{}  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n",
             indent
         ));
         output.push_str(&format!(
             "{}  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n",
+            indent
+        ));
+        output.push_str(&format!(
+            "{}  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;\n",
             indent
         ));
         output.push_str(&format!(
@@ -649,8 +882,10 @@ fn generate_relations_recursive(
 /// Determine CSS class name based on element type string
 fn get_element_class(element_type: &str) -> &'static str {
     let lower = element_type.to_lowercase();
-    if lower == "user-requirement" {
-        "userRequirement"
+    if lower == "feature" {
+        "feature"
+    } else if lower == "ontology" {
+        "ontology"
     } else if lower == "requirement" || lower.contains("system") && lower.contains("requirement") {
         "systemRequirement"
     } else if lower.contains("verification") {

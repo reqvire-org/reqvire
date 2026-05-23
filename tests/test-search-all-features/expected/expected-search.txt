@@ -1,14 +1,13 @@
 --- MBSE Search results ---
-📂 File: specifications/Requirements.md (elements: 8)
-  📄 Page content: "This document contains correctly formatted relations to existing targets, to verify validation passes.\n\nThis is page frontmatter content that should appear in the summary.\n\n```mermaid\ngraph TD;\n    A[Start] --> B[Process];\n    B --> C[End];\n```\n\nAdditional page content to test mermaid diagram inclusion in page summaries."
-
+📂 File: specifications/Requirements.md (elements: 9)
     🔹 Element: specifications/Requirements.md#complex-chars-elementname-example
       - Name: Complex chars, element/name example
       - File: specifications/Requirements.md
-      - Type: user-requirement
+      - Type: requirement
       - Content: "This requirement tests special characters in element names including commas and slashes."
       - Relations:
         ↪ derivedFrom: specifications/Requirements.md#requirement-with-valid-standard-relations (identifier)
+        ↪ specify: specifications/Requirements.md#test-feature-test-search-all-features-specifications-requirements-md (identifier)
 
     🔹 Element: specifications/Requirements.md#requirement-with-designspecifications-reference
       - Name: Requirement with DesignSpecifications Reference
@@ -22,9 +21,10 @@
     🔹 Element: specifications/Requirements.md#requirement-with-many-subsections
       - Name: Requirement with Many Subsections
       - File: specifications/Requirements.md
-      - Type: user-requirement
+      - Type: requirement
       - Content: "This requirement specifically tests validation of 'Other' subsections\n\n\n#### Subsection 1\n\nSome text of subsection 1\n\n\n#### Subsection 2\n\nSome text of subsection 2"
-      - No relations.
+      - Relations:
+        ↪ specify: specifications/Requirements.md#test-feature-test-search-all-features-specifications-requirements-md (identifier)
 
     🔹 Element: specifications/Requirements.md#requirement-with-valid-markdown-relations
       - Name: Requirement with Valid Markdown Relations
@@ -33,7 +33,7 @@
       - Content: "This requirement has valid relations to existing files, using markdown link format."
       - Relations:
         ↪ derive: specifications/Requirements.md#requirement-with-valid-standard-relations (identifier)
-        ↪ derivedFrom: specifications/Requirements.md#root-user-requirement (identifier)
+        ↪ derivedFrom: specifications/Requirements.md#root-feature (identifier)
         ↪ satisfiedBy: specifications/DesignSpecifications/SampleDSD.md (internal-path)
         ↪ trace: specifications/DesignSpecifications/SampleDSD.md (internal-path)
         ↪ verifiedBy: specifications/Requirements.md#search-command-verification (identifier)
@@ -52,22 +52,33 @@
         ↪ verifiedBy: specifications/Requirements.md#search-command-verification (identifier)
         ↪ verifiedBy: specifications/Requirements.md#verification-of-standard-relations (identifier)
 
-    🔹 Element: specifications/Requirements.md#root-user-requirement
-      - Name: Root User Requirement
+    🔹 Element: specifications/Requirements.md#root-feature
+      - Name: Root Feature
       - File: specifications/Requirements.md
-      - Type: user-requirement
-      - Content: "Top-level user requirement used as hierarchy parent for system requirements in this fixture."
+      - Type: requirement
+      - Content: "Top-level feature used as hierarchy parent for system requirements in this fixture."
       - Relations:
         ↪ derive: specifications/Requirements.md#requirement-with-valid-markdown-relations (identifier)
+        ↪ specify: specifications/Requirements.md#test-feature-test-search-all-features-specifications-requirements-md (identifier)
 
     🔹 Element: specifications/Requirements.md#search-command-verification
       - Name: Search Command Verification
       - File: specifications/Requirements.md
       - Type: test-verification
-      - Content: "This test verifies that the search command supports all filter types and combines them with AND logic.\n\n\n#### Details\n\n##### Acceptance Criteria\n- Search command accepts all documented filter flags\n- Multiple filters combine with AND logic (results must match ALL filters)\n- Invalid regex patterns produce clear error messages\n\n##### Test Criteria\n1. `reqvire search --json` returns valid JSON with all elements\n2. `reqvire search --filter-type=user-requirement` returns only user-requirements\n3. Element count with two filters is <= element count with one filter (additive behavior)"
+      - Content: "This test verifies that the search command supports all filter types and combines them with AND logic.\n\n\n#### Details\n\n##### Acceptance Criteria\n- Search command accepts all documented filter flags\n- Multiple filters combine with AND logic (results must match ALL filters)\n- Invalid regex patterns produce clear error messages\n\n##### Test Criteria\n1. `reqvire search --json` returns valid JSON with all elements\n2. `reqvire search --filter-type=feature` returns only features\n3. Element count with two filters is <= element count with one filter (additive behavior)"
       - Relations:
         ↪ verify: specifications/Requirements.md#requirement-with-valid-markdown-relations (identifier)
         ↪ verify: specifications/Requirements.md#requirement-with-valid-standard-relations (identifier)
+
+    🔹 Element: specifications/Requirements.md#test-feature-test-search-all-features-specifications-requirements-md
+      - Name: Test Feature Test Search All Features Specifications Requirements Md
+      - File: specifications/Requirements.md
+      - Type: feature
+      - Content: "Test feature root for migrated requirement fixtures.\n\n\nThis document contains correctly formatted relations to existing targets, to verify validation passes.\n\nThis is page frontmatter content that should appear in the summary.\n\n```mermaid\ngraph TD;\n    A[Start] --> B[Process];\n    B --> C[End];\n```\n\nAdditional page content to test mermaid diagram inclusion in page summaries."
+      - Relations:
+        ↪ specifiedBy: specifications/Requirements.md#complex-chars-elementname-example (identifier)
+        ↪ specifiedBy: specifications/Requirements.md#requirement-with-many-subsections (identifier)
+        ↪ specifiedBy: specifications/Requirements.md#root-feature (identifier)
 
     🔹 Element: specifications/Requirements.md#verification-of-standard-relations
       - Name: Verification of Standard Relations
@@ -81,37 +92,45 @@
 ------------------------------------
 📊 Summary Counts:
 Total files: 1
-Total elements: 8
+Total elements: 9
 
 📋 Requirement Types:
-  system-requirement: 3
-  user-requirement: 3
+  feature: 1
+  system-requirement: 6
+
+📋 Ontology Types:
+  ontology: 0
 
 📋 Requirement Governance Metadata:
   Status:
-    approved: 6
+    approved: 7
     draft: 0
     review: 0
   Priority:
     critical: 0
     high: 0
     low: 0
-    medium: 6
+    medium: 7
   Risk:
     critical: 0
     high: 0
-    low: 6
+    low: 7
     medium: 0
   Owner:
-    unassigned: 6
+    unassigned: 7
 
 📋 Verification Types:
   analysis-verification: 0
   demonstration-verification: 0
+  formal-proof-verification: 0
   inspection-verification: 0
   test-verification: 2
 
 📋 Refinement Types:
   behavior: 0
   constraint: 0
+  input-output: 0
+  semantic-contract: 0
+  source: 0
   specification: 0
+  state: 0

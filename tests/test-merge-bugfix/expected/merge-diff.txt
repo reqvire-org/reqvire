@@ -3,32 +3,32 @@ Merged element: Merged 1 element(s) into 'CLI Interface Structure' (specificatio
 📄 specifications/CLI.md
   01     # Elements
   02
-  03     ### Test Parent
+  03     ### Test Feature Test Merge Bugfix Specifications Cli Md
 
-  09
-  10     #### Relations
-  11       * derive: [CLI Interface Structure](#cli-interface-structure)
-  12 -     * derive: [CLI Search Command](#cli-search-command)
-  12     ---
-  13
-  14     ### CLI Interface Structure
+  17
+  18     #### Relations
+  19       * derive: [CLI Interface Structure](#cli-interface-structure)
+  20 -     * derive: [CLI Search Command](#cli-search-command)
+  20       * specify: [Test Feature Test Merge Bugfix Specifications Cli Md](#test-feature-test-merge-bugfix-specifications-cli-md)
+  21     ---
+  22
 
-  31       -h, --help               Print help
-  32       -V, --version            Print version
-  33     ```
-  34 -   ␤
-  34 -   #### Metadata
-  34 -     * type: requirement
-  34 -   ␤
-  34 -   #### Relations
-  34 -     * derivedFrom: [Test Parent](#test-parent)
-  34 -   ---
-  34 -   ␤
-  34 -   ### CLI Search Command
-  34 -   ␤
-  34     The system shall provide a `search` command to query and filter model elements with flexible output formats.
-  35 -   #### Details
-  35 +   #### Merged Details (CLI Search Command)
-  36     The `search` command shall:
-  37     - Support searching by element name, type, content, or relationships
-  38     - Support `--filter-name`, `--filter-type`, `--filter-content` options
+  40       -h, --help               Print help
+  41       -V, --version            Print version
+  42     ```
+  43 -   ␤
+  43 -   #### Metadata
+  43 -     * type: requirement
+  43 -   ␤
+  43 -   #### Relations
+  43 -     * derivedFrom: [Test Parent](#test-parent)
+  43 -   ---
+  43 -   ␤
+  43 -   ### CLI Search Command
+  43 -   ␤
+  43     The system shall provide a `search` command to query and filter model elements with flexible output formats.
+  44 -   #### Details
+  44 +   #### Merged Details (CLI Search Command)
+  45     The `search` command shall:
+  46     - Support searching by element name, type, content, or relationships
+  47     - Support `--filter-name`, `--filter-type`, `--filter-content` options

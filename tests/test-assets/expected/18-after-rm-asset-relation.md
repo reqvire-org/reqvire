@@ -5,10 +5,7 @@
 Top level container.
 
 #### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derive: [Verified Requirement](#verified-requirement)
+  * type: feature
 ---
 
 ### Verified Requirement
@@ -19,5 +16,5 @@ This requirement is satisfied by a script.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Relations Test System](#relations-test-system)
+  * specify: [Relations Test System](#relations-test-system)
 ---

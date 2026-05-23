@@ -41,6 +41,8 @@ This test verifies that the lint command analyzes model quality, detects issues 
 - Cross-submodel findings shall appear in `--auditable` and `--auditable --json`
 - Cross-submodel findings shall not be included in `--fixable` output and shall not be auto-removed by `--fix`
 
+- Semantic-contract reference context issues are validation errors and shall not be emitted as lint findings
+
 **Output Formatting:**
 - System shall categorize output into "Auto-fixable Issues" and "Needs Manual Review" sections
 - Each issue shall include element identifier, file path, specific relations, and rationale

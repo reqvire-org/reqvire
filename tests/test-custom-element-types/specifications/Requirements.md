@@ -1,88 +1,96 @@
 # Elements
 
+
+### Test Feature Test Custom Element Types Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 This file contains test requirements with various custom element types.
 
 ### Standard Requirement 1
 
-This is a standard requirement element derived from User Requirement 1.
+This is a standard requirement element specified by Feature 1.
 
 #### Metadata
 * type: requirement
 
 #### Relations
-* derivedFrom: #user-requirement-1
+* specify: #feature-1
 
 ### Standard Requirement 2
 
-This is another standard requirement element derived from User Requirement 2.
+This is another standard requirement element specified by Feature 2.
 
 #### Metadata
 * type: requirement
 
 #### Relations
-* derivedFrom: #user-requirement-2
+* specify: #feature-2
 
 
 ### Use Case Element 1
 
-This element uses a custom type: use-case.
+This element uses a custom type: other-use-case.
 
 #### Metadata
-* type: use-case
+* type: other-use-case
 
 ### Use Case Element 2
 
 This is another use case element.
 
 #### Metadata
-* type: use-case
+* type: other-use-case
 
 ### Use Case Element 3
 
 This is a third use case element.
 
 #### Metadata
-* type: use-case
+* type: other-use-case
 
 ### MOE Element 1
 
-This element uses a custom type: moe (Measure of Effectiveness).
+This element uses a custom type: other-moe (Measure of Effectiveness).
 
 #### Metadata
-* type: moe
+* type: other-moe
 
 ### MOE Element 2
 
 This is another MOE element.
 
 #### Metadata
-* type: moe
+* type: other-moe
 
 ### Actor Element
 
-This element uses a custom type: actor.
+This element uses a custom type: other-actor.
 
 #### Metadata
-* type: actor
+* type: other-actor
 
 ### Rule Element
 
-This element uses a custom type: rule.
+This element uses a custom type: other-rule.
 
 #### Metadata
-* type: rule
+* type: other-rule
 
 
-### User Requirement 1
+### Feature 1
 
-This is a standard user-requirement type.
-
-#### Metadata
-* type: user-requirement
-
-### User Requirement 2
-
-This is another standard user-requirement type.
+This is a standard feature type.
 
 #### Metadata
-* type: user-requirement
+* type: feature
+### Feature 2
+
+This is another standard feature type.
+
+#### Metadata
+* type: feature

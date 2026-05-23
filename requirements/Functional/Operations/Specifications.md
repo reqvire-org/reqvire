@@ -24,10 +24,80 @@ Output behavior:
 - Return non-zero status on any failed validation or unresolved target.
 
 #### Metadata
- * type: specification
+  * type: specification
 
 #### Relations
- * refine: [Atomic Relation Relink Operation](ElementManipulation.md#atomic-relation-relink-operation)
+  * refine: [Atomic Relation Relink Operation](ElementManipulation.md#atomic-relation-relink-operation)
+---
+
+### CRUD Semantic Contract Validation Specification
+
+Candidate semantic-contract validation for graph-backed CRUD mutations.
+
+#### Details
+Before any graph-backed CRUD mutation persists model files, the system is expected to validate the mutated in-memory model for dangling semantic-contract references.
+
+This pre-persistence validation applies to graph-backed mutation commands:
+- `add`
+- `add --override`
+- `rm`
+- `mv`
+- `rename`
+- `merge`
+- `mv-file`
+- `link`
+- `unlink`
+- `relink`
+
+When a mutation would leave a `Shapes` reference to an IRI that is not declared by any ontology `Ontology`, the command is expected to fail before flushing changes. The error is expected to include:
+- the referencing semantic-contract identifier
+- the reference kind, such as `sh:path`, `sh:targetClass`, or `sh:class`
+- the missing IRI
+- fix guidance to update/remove the SHACL reference or restore the declaration
+
+When the mutation removed the ontology element that previously declared the missing IRI, the error is expected to include the removed declaration source identifier.
+
+The command is expected not to persist source-file changes when this validation fails.
+
+When a mutation would leave a `Shapes` reference to an IRI that is declared by an ontology element outside reachable ontology context, the command is expected to fail before flushing changes. The error is expected to include:
+- the referencing semantic-contract identifier
+- the reference kind, such as `sh:path`, `sh:targetClass`, or `sh:class`
+- the referenced IRI
+- the declaring ontology identifier
+- guidance to attach the declaring ontology to the owning or consuming feature, move the declaration into reachable feature ontology context, or update/remove the reference
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [CRUD Semantic Contract Mutation Validation](ElementManipulation.md#crud-semantic-contract-mutation-validation)
+---
+
+### Operation Command Contract Specification
+
+Common contract fields for graph-backed model operations.
+
+#### Details
+Operation family vocabulary is defined by the Reqvire operation ontology. Operation specifications define command-facing behavior, not ontology vocabulary.
+
+Each graph-backed operation specification is expected to define:
+- command name or API entry point
+- operation family, such as mutation, report, validation, formatting, or relation maintenance
+- accepted inputs and path interpretation
+- output behavior for text, JSON, dry-run, and diff modes where supported
+- whether the operation requires a valid parsed model before execution
+- whether the operation can persist source-file changes
+- validation gates that must pass before persistence
+- rollback behavior and error reporting when a candidate mutation is rejected
+- relation, attachment, and semantic-contract consistency guarantees preserved by the operation
+
+Concrete command names, flags, output fields, file paths, workflow steps, and persistence behavior belong in these operation specifications or behavior refinements.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Element Manipulation Operations](../Core/ModelManagement.md#element-manipulation-operations)
 ---
 
 ### Create Element Workflow Specification
@@ -49,7 +119,7 @@ When creating a new element, the system is expected to:
 - The system is expected to support override mode to replace existing element with same name following rules defined in Create Element Override Behavior
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Cross-Submodel Hierarchical Relation Detection Specification
@@ -69,10 +139,10 @@ When creating a new element, the system is expected to:
 - Never auto-remove cross-submodel hierarchical relations; they require explicit model refactoring.
 
 #### Metadata
- * type: specification
+  * type: specification
 
 #### Relations
- * refine: [Cross-Submodel Hierarchical Relation Detection](Linting.md#cross-submodel-hierarchical-relation-detection)
+  * refine: [Cross-Submodel Hierarchical Relation Detection](Linting.md#cross-submodel-hierarchical-relation-detection)
 ---
 
 ### Delete Element Workflow Specification
@@ -83,6 +153,8 @@ Detailed workflow for deleting existing model elements.
 When deleting an element, the system is expected to:
 - Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)
 - Reject the operation if any child would become orphaned
+- Validate the candidate model before persistence and reject deletion when removing the element would leave semantic-contract SHACL references to ontology terms that are no longer declared anywhere
+- Report semantic deletion blockers with the referencing semantic-contract identifier, reference kind, missing IRI, and the deleted element/semantic contract that removed the declaration when known
 - Provide clear error message listing orphaned children with resolution guidance
 - Allow deletion if children have other parent hierarchical relations
 - Remove the element and all its content from the source file
@@ -106,7 +178,7 @@ When deleting an element, the system is expected to:
 - Relations from the deleted element are automatically removed with the element
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Document Structure Specification
@@ -131,7 +203,7 @@ Rules for normalizing document hierarchical structure during formatting.
 2. If document has `# Elements` and `##`: No header additions needed
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Element Manipulation File Persistence Refinement Specification
@@ -140,7 +212,7 @@ Rules for normalizing document hierarchical structure during formatting.
 The system is expected to persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Format Consistency Specification
@@ -171,7 +243,7 @@ Rules for detecting and fixing formatting inconsistencies in requirements docume
 - Provide context lines with proper line number continuity
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Full Relations Insertion Refinement Specification
@@ -184,7 +256,7 @@ When --with-full-relations is active:
 - Relations are sorted according to the Relation Ordering Normalization requirement
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Lint Auto-fix Capability Refinement Specification
@@ -199,10 +271,10 @@ Auto-fix behavior:
 - Skips issues categorized as needing manual review.
 
 #### Metadata
- * type: specification
+  * type: specification
 
 #### Relations
- * refine: [Lint Auto-fix Capability](Linting.md#lint-auto-fix-capability)
+  * refine: [Lint Auto-fix Capability](Linting.md#lint-auto-fix-capability)
 ---
 
 ### Lint Output Specification
@@ -227,9 +299,10 @@ Specification for lint command output format and content structure.
 - Specific relation details (type, target)
 - Rationale text explaining the redundancy
 - Intermediate paths that make the direct relation redundant
+- Semantic-contract references are validated before lint output; outside-context semantic references are validation errors and are not emitted as lint findings
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Merge Element Workflow Specification
@@ -263,7 +336,7 @@ For document-to-elements merge direction:
 - The error is expected to state that this conversion must be done manually to avoid breaking `# Elements` parsing rules.
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Move Element Workflow Specification
@@ -301,7 +374,7 @@ Document format rule:
 - All references to the old identifier is expected to be updated to the new identifier
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Move File Operation Refinement Specification
@@ -332,7 +405,7 @@ When the --squash flag is provided and the target file already exists, the syste
 - Reject squash if target is `# Documents` format (single-element document file)
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Multi-Branch Convergence Detection Specification
@@ -373,7 +446,7 @@ This enables the model author to review and decide:
 - Should there be a direct relation instead? (restructure the model)
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Orphaned Children Error Message Specification
@@ -386,7 +459,7 @@ The error message for orphaned children prevention is expected to include:
 - Resolution guidance: "Delete the child elements first, or update the child elements to link to a different parent element"
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Redundant Hierarchical Relations Specification
@@ -429,9 +502,9 @@ A redundant hierarchical derivation relation is expected to be considered safe t
 
 *Single-chain redundancy (auto-removable):*
 ```
-User Requirement A
- → System Requirement B
- → Implementation C
+Requirement A
+ → Requirement B
+ → Requirement C
 
 Redundant: A → C (can be safely auto-removed)
 Reason: C is reachable via A → B → C
@@ -460,7 +533,7 @@ When auto-fix mode is activated, the system is expected to:
 **Implementation Note**: The current implementation only detects cases where a direct redundant relation EXISTS. It does not detect or suggest whether converging paths without a direct relation should have one added - that remains a semantic modeling decision.
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Redundant Verify Relations Detection Refinement Specification
@@ -475,10 +548,10 @@ Redundant verify relation detection behavior:
 - Categorizes these findings as auto-fixable.
 
 #### Metadata
- * type: specification
+  * type: specification
 
 #### Relations
- * refine: [Redundant Verify Relations Detection](Linting.md#redundant-verify-relations-detection)
+  * refine: [Redundant Verify Relations Detection](Linting.md#redundant-verify-relations-detection)
 ---
 
 ### Relation Consistency Maintenance Refinement Specification
@@ -498,10 +571,10 @@ Validation behavior:
 - Blocks manipulations that would leave the model in inconsistent relation state.
 
 #### Metadata
- * type: specification
+  * type: specification
 
 #### Relations
- * refine: [Relation Consistency Maintenance](ElementManipulation.md#relation-consistency-maintenance)
+  * refine: [Relation Consistency Maintenance](ElementManipulation.md#relation-consistency-maintenance)
 ---
 
 ### Relation Operations Specification
@@ -531,7 +604,7 @@ Technical specification for relation link and unlink operations.
 - Report error if relation doesn't exist
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Relation Ordering Specification
@@ -549,7 +622,7 @@ Rules for sorting relations within elements for deterministic output.
 - Easier diff comparison between file versions
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Relation Validation Specification
@@ -575,7 +648,7 @@ Rules for validating and normalizing relation targets during element creation an
 - Provide clear error messages indicating which relation target was not found
 
 #### Metadata
- * type: specification
+  * type: specification
 ---
 
 ### Rename Element Operation Refinement Specification
@@ -595,5 +668,5 @@ The system is expected to reject the operation with a clear error message if:
 - The new name conflicts with an existing element
 
 #### Metadata
- * type: specification
+  * type: specification
 ---

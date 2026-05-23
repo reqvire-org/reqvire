@@ -1,9 +1,29 @@
 # Elements
 
+
+### Feature One
+
+First feature root for submodels command fixtures.
+
+#### Metadata
+  * type: feature
+---
+
+### Feature Two
+
+Second feature root for submodels command fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Root One
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Feature One](#feature-one)
 ---
 
 ### Payments Requirement
@@ -46,7 +66,10 @@
 ### Root Two
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Feature Two](#feature-two)
 ---
 
 ### Identity Requirement

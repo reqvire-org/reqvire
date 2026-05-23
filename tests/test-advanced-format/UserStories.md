@@ -1,5 +1,14 @@
 # Elements
 
+
+### Test Feature Test Advanced Format Userstories Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 Personas:
 1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
 2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
@@ -12,9 +21,9 @@ Personas:
 As an **System Engineer**, I want to manage MBSE models effectively, so that I can ensure they align with project requirements and deliverable goals.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
   * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
 * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
 
@@ -22,9 +31,9 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
 As a **System Engineer**, I want to generate diagrams for different system viewpoints, so that I can communicate system architecture effectively and understand dependencies and impacts across the system.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
   * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
 
 ---
@@ -32,8 +41,10 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
 ### Missing Blank Line Test
 This element has content but no blank line before metadata.
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
 ---
 
 ### Metadata Repositioning Test
@@ -68,8 +79,10 @@ Content inside details block.
 More content that should remain untouched.
 </details>
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
 ---
 
 ### Exact Blank Line Count Test
@@ -86,13 +99,15 @@ Detail content here.
 
 ---
 
-### Root User Requirement
+### Root Feature
 
-Top-level user requirement used as hierarchy parent for system requirements in this fixture.
+Top-level feature used as hierarchy parent for system requirements in this fixture.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
 ---
 
 ### External URL Preservation Test
@@ -103,7 +118,7 @@ This element tests that external URLs in relations are preserved exactly as writ
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root User Requirement](#root-user-requirement)
+  * derivedFrom: [Root Feature](#root-feature)
   * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
 
 ---

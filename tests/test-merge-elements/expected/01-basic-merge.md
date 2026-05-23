@@ -16,7 +16,10 @@ A child requirement derived from Source Requirement One.
 Top level container for requirements.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature Test Merge Elements Specifications Requirements Md](#test-feature-test-merge-elements-specifications-requirements-md)
 ---
 
 ### Another Link
@@ -83,6 +86,14 @@ Details from source one.
   * trace: [Another Link](#another-link)
   * trace: [Placeholder Requirement](#placeholder-requirement)
   * verifiedBy: [Target Test](Verifications.md#target-test)
+---
+
+### Test Feature Test Merge Elements Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
 ---
 
 ### Test Verification

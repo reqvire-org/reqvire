@@ -1,15 +1,27 @@
 # Elements
 
+
+### Test Feature Test Requirement Governance Metadata Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Root Requirement
 
 The system shall provide a parent requirement with explicit governance metadata.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
   * status: approved
   * priority: high
   * risk: medium
   * owner: Platform Team
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-requirement-governance-metadata-specifications-requirements-md)
 ---
 
 ### Child Inherits Governance
@@ -52,7 +64,10 @@ The system shall provide a requirement that uses governance metadata defaults.
 The system shall provide a root requirement without authored governance metadata.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature](#test-feature-test-requirement-governance-metadata-specifications-requirements-md)
 ---
 
 ### Refinement Contract

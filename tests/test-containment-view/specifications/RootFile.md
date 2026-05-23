@@ -1,12 +1,23 @@
 # Elements
 
-### Root User Requirement
+
+### Test Feature Test Containment View Specifications Rootfile Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
+### Root Feature
 
 The system shall provide comprehensive functionality.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-containment-view-specifications-rootfile-md)
 ### Root System Requirement
 
 The system shall implement core features.
@@ -15,7 +26,7 @@ The system shall implement core features.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root User Requirement](#root-user-requirement)
+  * derivedFrom: [Root Feature](#root-feature)
 
 ### Test Verification Element
 
@@ -62,4 +73,4 @@ This demonstration verifies usability.
 This is a custom element type for testing.
 
 #### Metadata
-  * type: design-document
+  * type: other-design-document

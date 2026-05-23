@@ -5,7 +5,7 @@
 Top-level container for test requirements.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 #### Relations
   * derive: [Performance Requirement](#performance-requirement)
@@ -63,7 +63,7 @@ This requirement has no attachments.
 A separate requirement that owns refinements (outside main hierarchy).
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 #### Relations
   * refinedBy: [Test Constraint Element](#test-constraint-element)

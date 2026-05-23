@@ -43,6 +43,28 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
             },
         );
 
+        // Feature specification bridge
+        m.insert(
+            "specifiedBy",
+            RelationTypeInfo {
+                name: "specifiedBy",
+                opposite: Some("specify"),
+                description: "Feature is specified by a requirement",
+                arrow: "-.->",
+                label: "specifiedBy",
+            },
+        );
+        m.insert(
+            "specify",
+            RelationTypeInfo {
+                name: "specify",
+                opposite: Some("specifiedBy"),
+                description: "Requirement specifies a feature",
+                arrow: "-.->",
+                label: "specify",
+            },
+        );
+
         // Satisfy relations (implementations only)
         m.insert(
             "satisfiedBy",
@@ -59,9 +81,9 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
             RelationTypeInfo {
                 name: "satisfy",
                 opposite: Some("satisfiedBy"),
-                description: "Implementation satisfies a requirement",
+                description: "Implementation satisfy a requirement",
                 arrow: "-->",
-                label: "satisfies",
+                label: "satisfy",
             },
         );
 
@@ -128,6 +150,7 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
 /// These are typically the "forward" relations from the old direction system
 pub const DIAGRAM_RELATIONS: &[&str] = &[
     "derive",      // Not derivedFrom
+    "specifiedBy", // Not specify
     "satisfiedBy", // Not satisfy
     "refinedBy",   // Not refine
     "verifiedBy",  // Not verify
@@ -138,7 +161,9 @@ pub const DIAGRAM_RELATIONS: &[&str] = &[
 /// When these relations exist, changes to the source affect the target
 pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
     "derive",      // Source changes affect derived elements
+    "specifiedBy", // Feature changes affect specifying requirements
     "satisfiedBy", // Requirement changes affect implementations
+    "refine",      // Refinement changes affect its owning requirement or feature
     "refinedBy",   // Requirement changes affect refinements
     "verifiedBy",  // Requirement changes invalidate verifications
 ];
@@ -147,6 +172,7 @@ pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
 /// These traverse from leaves upward to roots
 pub const BACKWARD_RELATIONS: &[&str] = &[
     "derivedFrom", // Opposite of derive
+    "specify",     // Opposite of specifiedBy
     "satisfy",     // Opposite of satisfiedBy
     "refine",      // Opposite of refinedBy
     "verify",      // Opposite of verifiedBy
@@ -158,12 +184,12 @@ pub const VERIFY_RELATION: &str = "verify";
 /// Relations for implementation satisfaction connections
 /// Used for linking requirements to code implementations
 pub const SATISFACTION_RELATIONS: &[&str] = &[
-    "satisfy",     // Implementation satisfies requirement (forward from implementation)
+    "satisfy",     // Implementation satisfy requirement (forward from implementation)
     "satisfiedBy", // Requirement satisfied by implementation (forward from requirement)
 ];
 
 /// Relations for refinement ownership connections
-/// Used to determine if refinements are connected and find defining requirements
+/// Used to determine if refinements are connected and find defining owners
 pub const REFINEMENT_RELATIONS: &[&str] = &[
     "refine",    // Refinement refines requirement (forward from refinement)
     "refinedBy", // Requirement refined by refinement (forward from requirement)
@@ -370,7 +396,7 @@ pub fn supported_relation_types_list() -> String {
 /// These are the "backward" pointing relations where an element refers to something it depends on.
 /// Includes hierarchical (derivedFrom), satisfaction (satisfy), and verification (verify) parents.
 pub fn get_parent_relation_types() -> Vec<&'static str> {
-    vec!["derivedFrom", "satisfy", "refine", "verify"]
+    vec!["derivedFrom", "specify", "satisfy", "refine", "verify"]
 }
 
 /// Get the list of hierarchical relation types only.
@@ -399,13 +425,13 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// Returns true if the types are compatible, false otherwise
 ///
 /// Element Type Relation Compatibility Matrix:
-/// - derivedFrom/derive: Only requirement types (requirement, user-requirement) can use these
+/// - derivedFrom/derive: Feature-to-feature, requirement-to-requirement, or ontology-to-ontology only
 /// - verifiedBy: Source must be requirement, target must be verification
 /// - verify: Source must be verification, target must be requirement
 /// - satisfiedBy: Source must be system requirement (requirement) or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
-/// - refinedBy: Source must be requirement, target must be refinement element
-/// - refine: Source must be refinement element, target must be requirement
+/// - refinedBy: Source must be feature or requirement, target must be compatible refinement element
+/// - refine: Source must be refinement element, target must be compatible feature or requirement owner
 /// - trace: Any non-refinement element type can use trace
 /// - Refinement types (constraint, behavior, specification): Can only have refine relations
 /// - Other type: Can only use trace relations
@@ -414,7 +440,7 @@ pub fn validate_relation_element_types(
     source_type: &crate::element::ElementType,
     target_type: &crate::element::ElementType,
 ) -> bool {
-    use crate::element::ElementType;
+    use crate::element::{ElementType, RefinementType};
 
     // First check: source element type restrictions based on relation type
     // Refinement types cannot have ANY relations (this is checked elsewhere in parser)
@@ -428,16 +454,28 @@ pub fn validate_relation_element_types(
 
     match relation_type {
         "derivedFrom" => {
-            // Only requirement types can use derivedFrom
-            // Source must be requirement, target must be requirement
-            matches!(source_type, ElementType::Requirement(_))
-                && matches!(target_type, ElementType::Requirement(_))
+            (matches!(source_type, ElementType::Feature)
+                && matches!(target_type, ElementType::Feature))
+                || (matches!(source_type, ElementType::Requirement(_))
+                    && matches!(target_type, ElementType::Requirement(_)))
+                || (matches!(source_type, ElementType::Ontology)
+                    && matches!(target_type, ElementType::Ontology))
         }
         "derive" => {
-            // Only requirement types can use derive
-            // Source must be requirement, target must be requirement
-            matches!(source_type, ElementType::Requirement(_))
+            (matches!(source_type, ElementType::Feature)
+                && matches!(target_type, ElementType::Feature))
+                || (matches!(source_type, ElementType::Requirement(_))
+                    && matches!(target_type, ElementType::Requirement(_)))
+                || (matches!(source_type, ElementType::Ontology)
+                    && matches!(target_type, ElementType::Ontology))
+        }
+        "specifiedBy" => {
+            matches!(source_type, ElementType::Feature)
                 && matches!(target_type, ElementType::Requirement(_))
+        }
+        "specify" => {
+            matches!(source_type, ElementType::Requirement(_))
+                && matches!(target_type, ElementType::Feature)
         }
         "verifiedBy" => {
             // Source must be a requirement and target must be a verification
@@ -460,6 +498,7 @@ pub fn validate_relation_element_types(
                         vtype,
                         crate::element::VerificationType::Default
                             | crate::element::VerificationType::Test
+                            | crate::element::VerificationType::FormalProof
                     )
                 }
                 _ => false,
@@ -479,25 +518,45 @@ pub fn validate_relation_element_types(
                         vtype,
                         crate::element::VerificationType::Default
                             | crate::element::VerificationType::Test
+                            | crate::element::VerificationType::FormalProof
                     )
                 }
                 _ => false,
             };
             source_valid && target_valid
         }
-        "refinedBy" => {
-            // Source must be a requirement type
-            // Target must be a refinement element
-            matches!(source_type, ElementType::Requirement(_))
-                && matches!(target_type, ElementType::Refinement(_))
-        }
-        "refine" => {
-            // Source must be a refinement element, target must be a requirement
-            matches!(source_type, ElementType::Refinement(_))
-                && matches!(target_type, ElementType::Requirement(_))
-        }
+        "refinedBy" => match (source_type, target_type) {
+            (ElementType::Feature, ElementType::Refinement(RefinementType::Source)) => true,
+            (
+                ElementType::Requirement(_),
+                ElementType::Refinement(
+                    RefinementType::SemanticContract
+                    | RefinementType::Constraint
+                    | RefinementType::Behavior
+                    | RefinementType::Specification
+                    | RefinementType::State
+                    | RefinementType::InputOutput,
+                ),
+            ) => true,
+            _ => false,
+        },
+        "refine" => match (source_type, target_type) {
+            (ElementType::Refinement(RefinementType::Source), ElementType::Feature) => true,
+            (
+                ElementType::Refinement(
+                    RefinementType::SemanticContract
+                    | RefinementType::Constraint
+                    | RefinementType::Behavior
+                    | RefinementType::Specification
+                    | RefinementType::State
+                    | RefinementType::InputOutput,
+                ),
+                ElementType::Requirement(_),
+            ) => true,
+            _ => false,
+        },
         "trace" => {
-            // Trace is allowed for any non-refinement element type
+            // Trace is allowed for any non-refinement element type, including ontology
             // Refinement types cannot have relations at all (checked in parser)
             !matches!(source_type, ElementType::Refinement(_))
         }
@@ -510,14 +569,16 @@ pub fn validate_relation_element_types(
 /// Returns None if the relation type has no specific type restrictions
 pub fn get_relation_element_type_description(relation_type: &str) -> Option<String> {
     match relation_type {
-        "derivedFrom" => Some("'derivedFrom' can only be used between requirement types (requirement, user-requirement)".to_string()),
-        "derive" => Some("'derive' can only be used between requirement types (requirement, user-requirement)".to_string()),
+        "derivedFrom" => Some("'derivedFrom' can only be used within the same hierarchy family: feature-to-feature, requirement-to-requirement, or ontology-to-ontology".to_string()),
+        "derive" => Some("'derive' can only be used within the same hierarchy family: feature-to-feature, requirement-to-requirement, or ontology-to-ontology".to_string()),
+        "specifiedBy" => Some("'specifiedBy' should connect a feature to a requirement".to_string()),
+        "specify" => Some("'specify' should connect a requirement to a feature".to_string()),
         "verifiedBy" => Some("'verifiedBy' should connect a requirement to a verification element".to_string()),
         "verify" => Some("'verify' should connect a verification element to a requirement".to_string()),
-        "satisfiedBy" => Some("'satisfiedBy' should connect a system requirement ('requirement') or test-verification to an implementation file; user-requirement is not allowed".to_string()),
-        "satisfy" => Some("'satisfy' should connect an implementation file to a system requirement ('requirement') or test-verification; user-requirement is not allowed".to_string()),
-        "refinedBy" => Some("'refinedBy' should connect a requirement to a refinement element (constraint, behavior, specification)".to_string()),
-        "refine" => Some("'refine' should connect a refinement element to a requirement".to_string()),
+        "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; feature is not allowed".to_string()),
+        "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; feature is not allowed".to_string()),
+        "refinedBy" => Some("'refinedBy' should connect a feature to source, or a requirement to semantic-contract/constraint/behavior/specification/state/input-output".to_string()),
+        "refine" => Some("'refine' should connect source to a feature, or semantic-contract/constraint/behavior/specification/state/input-output to a requirement".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }

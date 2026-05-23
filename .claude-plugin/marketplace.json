@@ -2,14 +2,14 @@
     "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
     "name": "reqvire-org-marketplace",
     "description": "Official marketplace for reqvire-org plugins.",
-    "version": "1.3.0",
+    "version": "1.4.0",
     "owner": {
         "name": "Ilija Ljubicic",
         "email": "ilijaljubicic@users.noreply.github.com"
     },
     "plugins": [
         {
-            "version": "1.8.0",
+            "version": "1.9.0",
             "name": "reqvire",
             "description": "Expert MBSE engineer for system models, specifications and architectures. Use when exploring, updating and refactoring requirements, specifications and system model, adding features, managing verifications and creating tasks from introduced changes in requirements and system model.",
             "author": {
@@ -36,6 +36,7 @@
                 "./commands/lint-model.md",
                 "./commands/add-requirement.md",
                 "./commands/consolidate.md",
+                "./commands/semantic-refactor.md",
                 "./commands/mv-file.md",
                 "./commands/add-verification.md",
                 "./commands/containment.md",

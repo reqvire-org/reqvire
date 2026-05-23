@@ -1,0 +1,71 @@
+# Elements
+
+### Access Feature
+
+Access feature.
+
+#### Metadata
+  * type: feature
+
+#### Relations
+  * specifiedBy: [Token Response Requirement](#token-response-requirement)
+
+#### Attachments
+  * [Access Ontology](#access-ontology)
+---
+
+### Access Ontology
+
+Access ontology.
+
+#### Metadata
+  * type: ontology
+
+#### Ontology
+```turtle
+@prefix access: <urn:reqvire:test:access:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+access:AccessToken a owl:Class .
+access:expiresAt a owl:DatatypeProperty .
+```
+---
+
+### Token Response Requirement
+
+The system shall produce token responses with expiry information.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Access Feature](#access-feature)
+  * refinedBy: [Token Response Shape Contract](#token-response-shape-contract)
+---
+
+### Token Response Shape Contract
+
+Token response shape.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * refine: [Token Response Requirement](#token-response-requirement)
+
+#### Shapes
+```turtle
+@prefix access: <urn:reqvire:test:access:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+access:AccessTokenShape
+  a sh:NodeShape ;
+  sh:targetClass access:AccessToken ;
+  sh:property [
+    sh:path access:expiresAt ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+```
+---

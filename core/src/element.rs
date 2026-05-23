@@ -31,18 +31,21 @@ pub fn is_valid_governance_risk(value: &str) -> bool {
 /// MAINTENANCE NOTE: If you add a new ElementType variant, add its string here too.
 /// The values must match exactly what ElementType::as_str() returns.
 pub const ELEMENT_TYPES: &[&str] = &[
-    // RequirementType variants (from ElementType::Requirement)
-    "user-requirement", // RequirementType::User
-    "requirement",      // RequirementType::System
-    // VerificationType variants (from ElementType::Verification)
+    "feature",
+    "requirement",
+    "ontology",
     "test-verification",          // VerificationType::Test/Default
+    "formal-proof-verification",  // VerificationType::FormalProof
     "analysis-verification",      // VerificationType::Analysis
     "inspection-verification",    // VerificationType::Inspection
     "demonstration-verification", // VerificationType::Demonstration
-    // RefinementType variants (from ElementType::Refinement)
-    "constraint",    // RefinementType::Constraint
-    "behavior",      // RefinementType::Behavior
-    "specification", // RefinementType::Specification
+    "source",                     // RefinementType::Source
+    "semantic-contract",          // RefinementType::SemanticContract
+    "constraint",                 // RefinementType::Constraint
+    "behavior",                   // RefinementType::Behavior
+    "specification",              // RefinementType::Specification
+    "state",                      // RefinementType::State
+    "input-output",               // RefinementType::InputOutput
 ];
 
 /// Element type aliases that are also accepted (mapped to canonical types)
@@ -54,7 +57,7 @@ pub const ELEMENT_TYPE_ALIASES: &[&str] = &[
 
 /// Returns true if the given type string is a valid element type
 /// Valid types are:
-/// - Standard types (requirement, user-requirement, test-verification, etc.)
+/// - Standard types (feature, requirement, test-verification, etc.)
 /// - Aliases (system-requirement, verification)
 /// - Custom types following the pattern "other-TYPENAME" (e.g., other-use-case, other-actor)
 pub fn is_valid_element_type(type_str: &str) -> bool {
@@ -128,6 +131,33 @@ pub struct SizeEstimate {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct FencedBlock {
+    pub language: String,
+    pub content: String,
+    pub line_number: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct SemanticContract {
+    pub iri: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shapes: Option<FencedBlock>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct Ontology {
+    pub iri: String,
+    pub ontology: Option<FencedBlock>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct ConceptReference {
+    pub label: String,
+    pub iri: String,
+    pub line_number: usize,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum GovernanceMetadataSource {
     Explicit,
@@ -160,6 +190,7 @@ pub enum SubSection {
     Details,
     Properties,
     Attachments,
+    ConceptReferences,
 }
 impl SubSection {
     pub fn name(&self) -> &str {
@@ -170,6 +201,7 @@ impl SubSection {
             SubSection::Details => "Details",
             SubSection::Properties => "Properties",
             SubSection::Attachments => "Attachments",
+            SubSection::ConceptReferences => "Concept References",
             SubSection::Other(name) => name.as_str(),
         }
     }
@@ -182,6 +214,7 @@ impl SubSection {
             "Details" => SubSection::Details,
             "Properties" => SubSection::Properties,
             "Attachments" => SubSection::Attachments,
+            "Concept References" => SubSection::ConceptReferences,
             other => SubSection::Other(other.to_string()),
         }
     }
@@ -190,13 +223,13 @@ impl SubSection {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum RequirementType {
     System,
-    User,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum VerificationType {
     Default,
     Test,
+    FormalProof,
     Analysis,
     Inspection,
     Demonstration,
@@ -204,14 +237,20 @@ pub enum VerificationType {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum RefinementType {
+    Source,
+    SemanticContract,
     Constraint,
     Behavior,
     Specification,
+    State,
+    InputOutput,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ElementType {
+    Feature,
     Requirement(RequirementType),
+    Ontology,
     Verification(VerificationType),
     Refinement(RefinementType),
     File,
@@ -220,25 +259,31 @@ pub enum ElementType {
 
 impl ElementType {
     /// Returns the metadata key corresponding to this ElementType,
-    /// e.g. "user_requirement", "analysis-verification", or the
+    /// e.g. "requirement", "analysis-verification", or the
     /// raw string for Other.
     pub fn as_str(&self) -> &str {
         match self {
+            ElementType::Feature => "feature",
             ElementType::Requirement(req) => match req {
-                RequirementType::User => "user-requirement",
                 RequirementType::System => "requirement",
             },
+            ElementType::Ontology => "ontology",
             ElementType::Verification(ver) => match ver {
                 VerificationType::Default => "test-verification",
                 VerificationType::Test => "test-verification",
+                VerificationType::FormalProof => "formal-proof-verification",
                 VerificationType::Analysis => "analysis-verification",
                 VerificationType::Inspection => "inspection-verification",
                 VerificationType::Demonstration => "demonstration-verification",
             },
             ElementType::Refinement(ref_type) => match ref_type {
+                RefinementType::Source => "source",
+                RefinementType::SemanticContract => "semantic-contract",
                 RefinementType::Constraint => "constraint",
                 RefinementType::Behavior => "behavior",
                 RefinementType::Specification => "specification",
+                RefinementType::State => "state",
+                RefinementType::InputOutput => "input-output",
             },
             ElementType::File => "file",
             ElementType::Other(s) => s.as_str(),
@@ -248,14 +293,16 @@ impl ElementType {
     /// Parses a string into an ElementType
     pub fn from_metadata(value: &str) -> Self {
         match value.to_lowercase().as_str() {
-            "user-requirement" => ElementType::Requirement(RequirementType::User),
+            "feature" => ElementType::Feature,
             "requirement" | "system-requirement" => {
                 ElementType::Requirement(RequirementType::System)
             }
+            "ontology" => ElementType::Ontology,
 
             // Different verification types
             "verification" => ElementType::Verification(VerificationType::Test),
             "test-verification" => ElementType::Verification(VerificationType::Test),
+            "formal-proof-verification" => ElementType::Verification(VerificationType::FormalProof),
             "analysis-verification" => ElementType::Verification(VerificationType::Analysis),
             "inspection-verification" => ElementType::Verification(VerificationType::Inspection),
             "demonstration-verification" => {
@@ -263,11 +310,18 @@ impl ElementType {
             }
 
             // Refinement types
+            "source" => ElementType::Refinement(RefinementType::Source),
+            "semantic-contract" => ElementType::Refinement(RefinementType::SemanticContract),
             "constraint" => ElementType::Refinement(RefinementType::Constraint),
             "behavior" => ElementType::Refinement(RefinementType::Behavior),
             "specification" => ElementType::Refinement(RefinementType::Specification),
+            "state" => ElementType::Refinement(RefinementType::State),
+            "input-output" => ElementType::Refinement(RefinementType::InputOutput),
 
             "file" => ElementType::File,
+            other if other.starts_with("other-") && other.len() > 6 => {
+                ElementType::Other(other[6..].to_string())
+            }
             other => ElementType::Other(other.to_string()),
         }
     }
@@ -277,14 +331,53 @@ impl ElementType {
         matches!(self, ElementType::Refinement(_))
     }
 
+    pub fn is_feature(&self) -> bool {
+        matches!(self, ElementType::Feature)
+    }
+
     pub fn is_requirement(&self) -> bool {
         matches!(self, ElementType::Requirement(_))
+    }
+
+    pub fn is_ontology(&self) -> bool {
+        matches!(self, ElementType::Ontology)
+    }
+
+    pub fn is_governance_bearing(&self) -> bool {
+        self.is_feature() || self.is_requirement()
+    }
+
+    pub fn is_feature_refinement(&self) -> bool {
+        matches!(self, ElementType::Refinement(RefinementType::Source))
+    }
+
+    pub fn is_requirement_refinement(&self) -> bool {
+        matches!(
+            self,
+            ElementType::Refinement(
+                RefinementType::Constraint
+                    | RefinementType::SemanticContract
+                    | RefinementType::Behavior
+                    | RefinementType::Specification
+                    | RefinementType::State
+                    | RefinementType::InputOutput
+            )
+        )
+    }
+
+    pub fn is_semantic_contract(&self) -> bool {
+        matches!(
+            self,
+            ElementType::Refinement(RefinementType::SemanticContract)
+        )
     }
 
     /// Returns the main type category for merge compatibility
     pub fn main_category(&self) -> &'static str {
         match self {
+            ElementType::Feature => "feature",
             ElementType::Requirement(_) => "requirement",
+            ElementType::Ontology => "ontology",
             ElementType::Verification(_) => "verification",
             ElementType::Refinement(_) => "refinement",
             ElementType::File => "file",
@@ -328,6 +421,15 @@ pub struct Element {
     // Optional model-build metadata for JSON evidence consumers.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size_estimate: Option<SizeEstimate>,
+    // Parsed ADT for semantic-contract refinements.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub semantic_contract: Option<SemanticContract>,
+    // Parsed ADT for ontology elements.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ontology: Option<Ontology>,
+    // Parsed concept references from human-readable labels to ontology terms.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub concept_references: Vec<ConceptReference>,
 }
 
 impl Element {
@@ -359,6 +461,9 @@ impl Element {
             file_order_index: 0, // Will be set during parsing
             attachments: vec![],
             size_estimate: None,
+            semantic_contract: None,
+            ontology: None,
+            concept_references: Vec::new(),
         }
     }
 
@@ -379,6 +484,9 @@ impl Element {
 
         self.content = trimmed.to_string();
         self.hash_impact_content = utils::hash_content(&normalized);
+        self.populate_ontology();
+        self.populate_semantic_contract();
+        self.populate_concept_references();
     }
 
     pub fn set_type_from_metadata(&mut self) {
@@ -393,4 +501,174 @@ impl Element {
             None => "".to_string(),
         }
     }
+
+    pub fn semantic_contract_iri(&self) -> String {
+        format!("urn:reqvire:semantic-contract:{}", self.id)
+    }
+
+    pub fn ontology_iri(&self) -> String {
+        format!("urn:reqvire:ontology:{}", self.id)
+    }
+
+    fn populate_ontology(&mut self) {
+        self.ontology = None;
+        if !self.element_type.is_ontology() {
+            return;
+        }
+
+        let ontology = extract_single_fenced_subsection(&self.content, "Ontology");
+        if ontology.len() <= 1 && !ontology.is_empty() {
+            self.ontology = Some(Ontology {
+                iri: self.ontology_iri(),
+                ontology: ontology.into_iter().next(),
+            });
+        }
+    }
+
+    fn populate_semantic_contract(&mut self) {
+        self.semantic_contract = None;
+        if !self.element_type.is_semantic_contract() {
+            return;
+        }
+
+        let shapes = extract_single_fenced_subsection(&self.content, "Shapes");
+        if shapes.len() <= 1 && !shapes.is_empty() {
+            self.semantic_contract = Some(SemanticContract {
+                iri: self.semantic_contract_iri(),
+                shapes: shapes.into_iter().next(),
+            });
+        }
+    }
+
+    fn populate_concept_references(&mut self) {
+        self.concept_references = extract_concept_references(&self.content).0;
+    }
+}
+
+pub fn extract_single_fenced_subsection(content: &str, subsection: &str) -> Vec<FencedBlock> {
+    let header = format!("#### {}", subsection);
+    let mut blocks = Vec::new();
+    let mut in_section = false;
+    let mut in_fence = false;
+    let mut language = String::new();
+    let mut block_content = String::new();
+    let mut fence_line_number = 0;
+
+    for (line_index, line) in content.lines().enumerate() {
+        let trimmed = line.trim();
+
+        if trimmed.starts_with("#### ") {
+            if in_fence {
+                blocks.push(FencedBlock {
+                    language: language.clone(),
+                    content: block_content.trim_end().to_string(),
+                    line_number: fence_line_number,
+                });
+                in_fence = false;
+                language.clear();
+                block_content.clear();
+                fence_line_number = 0;
+            }
+            in_section = trimmed == header;
+            continue;
+        }
+
+        if !in_section {
+            continue;
+        }
+
+        if trimmed.starts_with("```") {
+            if in_fence {
+                blocks.push(FencedBlock {
+                    language: language.clone(),
+                    content: block_content.trim_end().to_string(),
+                    line_number: fence_line_number,
+                });
+                in_fence = false;
+                language.clear();
+                block_content.clear();
+                fence_line_number = 0;
+            } else {
+                in_fence = true;
+                language = trimmed.trim_start_matches("```").trim().to_string();
+                fence_line_number = line_index + 1;
+            }
+            continue;
+        }
+
+        if in_fence {
+            block_content.push_str(line);
+            block_content.push('\n');
+        }
+    }
+
+    if in_fence {
+        blocks.push(FencedBlock {
+            language,
+            content: block_content.trim_end().to_string(),
+            line_number: fence_line_number,
+        });
+    }
+
+    blocks
+}
+
+pub fn has_subsection(content: &str, subsection: &str) -> bool {
+    let header = format!("#### {}", subsection);
+    content
+        .lines()
+        .any(|line| line.trim() == header || line.trim().starts_with(&(header.clone() + " ")))
+}
+
+pub fn extract_concept_references(content: &str) -> (Vec<ConceptReference>, Vec<String>) {
+    let mut references = Vec::new();
+    let mut diagnostics = Vec::new();
+    let mut in_section = false;
+
+    for (line_index, line) in content.lines().enumerate() {
+        let trimmed = line.trim();
+
+        if trimmed.starts_with("#### ") {
+            in_section = trimmed == "#### Concept References";
+            continue;
+        }
+
+        if !in_section || trimmed.is_empty() {
+            continue;
+        }
+
+        let Some(entry) = trimmed.strip_prefix("* ") else {
+            diagnostics.push(format!(
+                "Concept References line {} must use '* Label: IRI_OR_CURIE' syntax.",
+                line_index + 1
+            ));
+            continue;
+        };
+
+        let Some((label, iri)) = entry.split_once(':') else {
+            diagnostics.push(format!(
+                "Concept References line {} must contain a label and IRI separated by ':'.",
+                line_index + 1
+            ));
+            continue;
+        };
+
+        let label = label.trim();
+        let iri = iri.trim();
+        if label.is_empty() || iri.is_empty() {
+            diagnostics.push(format!(
+                "Concept References line {} must contain a non-empty label and IRI.",
+                line_index + 1
+            ));
+            continue;
+        }
+
+        references.push(ConceptReference {
+            label: label.to_string(),
+            iri: iri.to_string(),
+            line_number: line_index + 1,
+        });
+    }
+
+    (references, diagnostics)
 }

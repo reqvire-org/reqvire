@@ -1,8 +1,8 @@
 ### Requirement Implementation Coverage
 
-- **Total Requirements in Scope:** 7
-- **Covered Requirements:** 5 (71.4%)
-- **Uncovered Requirements:** 2
+- **Total Requirements in Scope:** 8
+- **Covered Requirements:** 5 (62.5%)
+- **Uncovered Requirements:** 3
 
 #### Coverage Sources
 
@@ -35,4 +35,9 @@
 ### [specifications/Requirements.md](specifications/Requirements.md)
 
 - ❌ **[Derived Intermediate](specifications/Requirements.md#derived-intermediate)**
+- ❌ **[Root Requirement](specifications/Requirements.md#root-requirement)**
 - ❌ **[Uncovered Requirement](specifications/Requirements.md#uncovered-requirement)**
+
+## Feature Coverage
+
+- **[Test Feature Test Implementation Coverage Report Specifications Requirements Md](specifications/Requirements.md#test-feature-test-implementation-coverage-report-specifications-requirements-md)**: partial verification 0.0% (0/4 leaf), implementation 62.5% (5/8 requirements)

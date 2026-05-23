@@ -83,7 +83,7 @@ The unlink operation will fail with a clear error if:
 
 **Remove a relation (auto-detected):**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "Feature Requirement" "User Story"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" unlink "Password Login Requirement" "Authentication Requirement"
 ```
 
 **Remove an attachment file:**

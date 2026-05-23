@@ -5,7 +5,7 @@
 The system shall provide mobile-friendly HTML documentation accessible on smartphones and tablets.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Responsive HTML Generation](#responsive-html-generation)

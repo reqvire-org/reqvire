@@ -9,7 +9,7 @@ System shall provide CLI command to generate model structure diagrams.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Model Structure Exploration](UserRequirements.md#model-structure-exploration)
+  * derivedFrom: [Model Structure Exploration](Features.md#model-structure-exploration)
 
 ---
 
@@ -18,7 +18,7 @@ System shall provide CLI command to generate model structure diagrams.
 System shall support filtering model diagrams from a specific root element using element name.
 
 #### Details
-- Use --from <NAME> flag to specify starting element
+- Use --from <NAME> flag to specifiedBy starting element
 - Match by element name (not identifier)
 - Build nested structure from that element
 
@@ -42,11 +42,11 @@ System shall traverse only forward relations when filtering from a root element.
 
 ---
 
-### Default Root Filtering
+### Default Model Roots
 
-System shall filter to root requirements when no --from filter specified.
+System shall filter to ontology roots and feature roots when no --from filter is specified.
 
-Root requirements are those without hierarchical parent relations.
+Ontology roots and feature roots are ontology and feature elements without hierarchical parent relations.
 
 #### Metadata
   * type: requirement
@@ -65,7 +65,19 @@ System shall generate markdown output with embedded Mermaid diagrams.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Model Structure Exploration](UserRequirements.md#model-structure-exploration)
+  * derivedFrom: [Model Structure Exploration](Features.md#model-structure-exploration)
+
+---
+
+### Pure Mermaid Output Format
+
+System shall generate pure Mermaid output without Markdown wrapper text.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Model Structure Exploration](Features.md#model-structure-exploration)
 
 ---
 

@@ -1,13 +1,24 @@
 # Elements
 
 
+
+### Test Feature Test Mv Cross File Relation Integrity Specifications Requirements
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Root Requirement
 
 The system SHALL provide core functionality.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Test Feature](#test-feature-test-mv-cross-file-relation-integrity-specifications-requirements)
 ### Feature A
 
 The system SHALL implement Feature A.

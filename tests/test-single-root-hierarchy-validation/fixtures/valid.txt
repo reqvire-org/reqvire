@@ -1,11 +1,11 @@
 # Elements
 
-### Root User Requirement
+### Root Feature
 
-Top-level root user-requirement.
+Top-level root feature.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 ---
 
 ### Child Requirement
@@ -16,5 +16,5 @@ Child requirement with exactly one root.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root User Requirement](#root-user-requirement)
+  * specify: [Root Feature](#root-feature)
 ---

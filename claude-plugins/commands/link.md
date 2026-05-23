@@ -59,16 +59,16 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 
 | Relation Type | Description | Usage |
 |---------------|-------------|-------|
-| `derivedFrom` | Source derives from target | Child to parent requirement |
-| `derive` | Source has derived target | Parent to child requirement |
+| `derivedFrom` | Source derives from target | Child to parent inside the same family: feature, requirement, or ontology |
+| `derive` | Source has derived target | Parent to child inside the same family: feature, requirement, or ontology |
 | `verifiedBy` | Source is verified by target | Requirement to verification |
 | `verify` | Source verifies target | Verification to requirement |
 | `satisfiedBy` | Source is satisfied by target | Requirement to implementation |
 | `satisfy` | Source satisfies target | Implementation to requirement |
-| `refinedBy` | Source owns target as refinement | Requirement to refinement element |
-| `refine` | Source refines target | Refinement element to requirement (auto-generated) |
+| `refinedBy` | Source owns target as refinement | Feature to `source`, or requirement to requirement-owned refinement |
+| `refine` | Source refines target | Refinement element to compatible owner (auto-generated) |
 | `trace` | General traceability link | Any traceability relationship |
-| `attaching` | Attach file or element | Attach documents or refinements |
+| `attaching` | Attach file or element | Attach ontology to features, or compatible requirement-owned refinements to requirements |
 
 ## Target Types
 
@@ -82,8 +82,8 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 - Plain file-path targets are invalid for `refinedBy` (including `DesignDocuments/*.md` without `#fragment`).
 
 `satisfiedBy` / `satisfy` rule:
-- Allowed source/target model element types are `requirement` and `test-verification`.
-- `user-requirement` is not allowed to use `satisfiedBy`/`satisfy`.
+- Allowed source/target model element types are `requirement`, `test-verification`, and `formal-proof-verification`.
+- `feature` is not allowed to use `satisfiedBy`/`satisfy`.
 
 **For attaching:**
 - Internal file path (e.g., "docs/SLA.pdf")
@@ -121,7 +121,7 @@ The link operation will fail with a clear error if:
 
 **Link requirement to parent:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Feature Requirement" derivedFrom "User Story"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Password Login Requirement" derivedFrom "Authentication Requirement"
 ```
 
 **Link requirement to implementation file:**
@@ -142,6 +142,11 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 **Attach a refinement element:**
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" attaching "Performance Constraint"
+```
+
+**Attach ontology to a feature:**
+```bash
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Authentication Feature" attaching "Access Token Ontology"
 ```
 
 **Preview before linking:**

@@ -5,11 +5,11 @@
 The system shall support code traceability by using structured comments to link code implementations to corresponding requirements in the System model.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Traceability Format](#traceability-format)
-  * derivedFrom: [Aligning Design with Code](../../UserStories.md#aligning-design-with-code)
+  * specify: [Aligning Design with Code](../../Features/Integration.md#aligning-design-with-code)
 ---
 
 ### Traceability Format
@@ -34,7 +34,7 @@ Implementation details shall follow the associated refinement specifications.
 The system shall use different comment style based of file extension of the code source file.
 
 #### Details
-The system shall define comment style specification for each file extension.
+Comment style kinds and traceability relation kinds are defined by the Reqvire code traceability ontology. The implementation requirements define which source file extensions use each comment style.
 
 #### Metadata
   * type: requirement
@@ -99,7 +99,7 @@ def process_sensor_data():
 ```
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Comment Style by File Extension](#comment-style-by-file-extension)

@@ -8,7 +8,7 @@ This document contains requirements with intentional relation errors for testing
 This is a valid requirement with proper relation types.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
   * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
@@ -69,7 +69,7 @@ This system requirement is missing parent relation.
 This requirement has an invalid relation type with a typo.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
   * satisfiedBBy: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
@@ -80,7 +80,7 @@ This requirement has an invalid relation type with a typo.
 This requirement has duplicate relations.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
   * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
   * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
 
@@ -91,7 +91,7 @@ This requirement has duplicate relations.
 This requirement has a relation to a non-existent element.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
   * satisfiedBy: [NonExistentElement.md/Missing Element](NonExistentElement.md#missing-element)
 ---
 
@@ -100,7 +100,7 @@ This requirement has a relation to a non-existent element.
 This requirement has incompactible element in relation, satisfiedBy cannot point to other requiremet.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
   * satisfiedBy: #Requirement with invalid relation type
 
 ---
@@ -146,10 +146,10 @@ This should be validated as invalid target because # is missing.
 This requirement has duplicate subsection.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
 
 ---
 
@@ -171,7 +171,7 @@ This verification has a satisfiedBy relation pointing to a non-existing file.
 This requirement has a verifiedBy relation pointing to a non-existing verification element.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
   * verifiedBy: [NonExistentVerification.md#missing-verification](NonExistentVerification.md#missing-verification)
 
 ---
@@ -181,7 +181,7 @@ This requirement has a verifiedBy relation pointing to a non-existing verificati
 This requirement correctly uses satisfiedBy pointing to an existing implementation file.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
   * satisfiedBy: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
@@ -204,7 +204,7 @@ This verification correctly uses satisfiedBy pointing to an existing test script
 This requirement incorrectly uses satisfiedBy pointing to another requirement (should fail).
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
   * satisfiedBy: [Valid Requirement](#valid-requirement)
 
 ---
@@ -227,7 +227,7 @@ This verification incorrectly uses satisfiedBy pointing to another verification 
 This requirement has a satisfiedBy relation pointing to a non-existing file.
 
 #### Relations
-  * derivedFrom: [../UserRequirements.md/Valid User Requirement](../UserRequirements.md#valid-user-requirement)
+  * derivedFrom: [../Features.md/Valid Feature](../Features.md#valid-feature)
   * satisfiedBy: [non-existing-implementation.py](non-existing-implementation.py)
 
 ---

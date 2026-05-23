@@ -62,7 +62,7 @@ This file is in build/ folder and should be excluded by .gitignore.
   * type: requirement
 
 #### Relations
-  * derivedFrom: ../ValidRequirements.md#test-root
+  * specify: ../ValidRequirements.md#test-root
 EOF
 
 cat > "${TEST_DIR}/specifications/temp-draft.md" << 'EOF'
@@ -76,7 +76,7 @@ This is a temporary file matching temp-*.md pattern.
   * type: requirement
 
 #### Relations
-  * derivedFrom: ValidRequirements.md#test-root
+  * specify: ValidRequirements.md#test-root
 EOF
 
 mkdir -p "${TEST_DIR}/specifications/cache"
@@ -91,7 +91,7 @@ This file is in cache/ folder and should be excluded.
   * type: requirement
 
 #### Relations
-  * derivedFrom: ../ValidRequirements.md#test-root
+  * specify: ../ValidRequirements.md#test-root
 EOF
 
 # Create a file that SHOULD be processed (not matching .gitignore)
@@ -103,14 +103,14 @@ cat > "${TEST_DIR}/specifications/ValidRequirements.md" << 'EOF'
 Root requirement for gitignore test.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 ### Valid Requirement 001
 
 This file should be processed - not matching .gitignore patterns.
 
 #### Relations
-  * derivedFrom: #test-root
+  * specify: #test-root
 EOF
 
 # Run reqvire search and capture output
@@ -186,14 +186,14 @@ cat > "${TEST_DIR}/specifications/ActiveRequirements.md" << 'EOF'
 Root requirement for gitignore test scenario 2.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 ### Active Requirement 001
 
 This file should be processed.
 
 #### Relations
-  * derivedFrom: #test-root
+  * specify: #test-root
 EOF
 
 # Create files matching .gitignore pattern
@@ -205,7 +205,7 @@ cat > "${TEST_DIR}/specifications/DRAFT-Feature.md" << 'EOF'
 This file matches DRAFT*.md pattern in .gitignore.
 
 #### Relations
-  * derivedFrom: ActiveRequirements.md#test-root
+  * specify: ActiveRequirements.md#test-root
 EOF
 
 # Create files matching .reqvireignore pattern
@@ -218,7 +218,7 @@ cat > "${TEST_DIR}/specifications/archive/OldRequirements.md" << 'EOF'
 This file is in archive/ folder excluded by .reqvireignore.
 
 #### Relations
-  * derivedFrom: ../ActiveRequirements.md#test-root
+  * specify: ../ActiveRequirements.md#test-root
 EOF
 
 cat > "${TEST_DIR}/specifications/README.md" << 'EOF'
@@ -229,7 +229,7 @@ cat > "${TEST_DIR}/specifications/README.md" << 'EOF'
 This README.md is excluded by .reqvireignore pattern.
 
 #### Relations
-  * derivedFrom: ActiveRequirements.md#test-root
+  * specify: ActiveRequirements.md#test-root
 EOF
 
 # Run reqvire search
@@ -301,7 +301,7 @@ cat > "${TEST_DIR}/specifications/NormalRequirements.md" << 'EOF'
 Root requirement for gitignore test scenario 3.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 ### Normal Requirement 001
 
@@ -311,7 +311,7 @@ This file should be processed.
   * type: requirement
 
 #### Relations
-  * derivedFrom: #test-root
+  * specify: #test-root
 EOF
 
 cat > "${TEST_DIR}/specifications/excluded-test.md" << 'EOF'
@@ -325,7 +325,7 @@ This file matches excluded-*.md pattern in .gitignore.
   * type: requirement
 
 #### Relations
-  * derivedFrom: NormalRequirements.md#test-root
+  * specify: NormalRequirements.md#test-root
 EOF
 
 # Run reqvire search without .reqvireignore
@@ -402,7 +402,7 @@ cat > "${TEST_DIR}/specifications/subsystem/normal-file.md" << 'EOF'
 Root requirement for gitignore test scenario 4.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 ### Normal Subsystem Requirement
 
@@ -412,7 +412,7 @@ This file should be processed normally.
   * type: requirement
 
 #### Relations
-  * derivedFrom: #test-root
+  * specify: #test-root
 EOF
 
 # Create files matching root .gitignore pattern
@@ -427,7 +427,7 @@ This matches root .gitignore pattern and should be excluded.
   * type: requirement
 
 #### Relations
-  * derivedFrom: subsystem/normal-file.md#test-root
+  * specify: subsystem/normal-file.md#test-root
 EOF
 
 # Create files matching root .reqvireignore pattern
@@ -442,7 +442,7 @@ This matches root .reqvireignore pattern and should be excluded.
   * type: requirement
 
 #### Relations
-  * derivedFrom: subsystem/normal-file.md#test-root
+  * specify: subsystem/normal-file.md#test-root
 EOF
 
 # Create file matching nested .gitignore pattern (should NOT be excluded)
@@ -458,7 +458,7 @@ This file SHOULD be processed.
   * type: requirement
 
 #### Relations
-  * derivedFrom: normal-file.md#test-root
+  * specify: normal-file.md#test-root
 EOF
 
 # Create file matching nested .reqvireignore pattern (should NOT be excluded)
@@ -474,7 +474,7 @@ This file SHOULD be processed.
   * type: requirement
 
 #### Relations
-  * derivedFrom: normal-file.md#test-root
+  * specify: normal-file.md#test-root
 EOF
 
 # Run reqvire search
@@ -553,7 +553,7 @@ cat > "${TEST_DIR}/specifications/ProcessedRequirements.md" << 'EOF'
 Root requirement for gitignore test scenario 5.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 ### Processed Requirement 001
 
@@ -563,7 +563,7 @@ This file should be processed.
   * type: requirement
 
 #### Relations
-  * derivedFrom: #test-root
+  * specify: #test-root
 EOF
 
 cat > "${TEST_DIR}/specifications/reqvire-only-excluded-test.md" << 'EOF'
@@ -577,7 +577,7 @@ This file matches reqvire-only-excluded-*.md pattern in .reqvireignore.
   * type: requirement
 
 #### Relations
-  * derivedFrom: ProcessedRequirements.md#test-root
+  * specify: ProcessedRequirements.md#test-root
 EOF
 
 # Run reqvire search without .gitignore
@@ -633,7 +633,7 @@ cat > "${TEST_DIR}/specifications/AllRequirements.md" << 'EOF'
 Root requirement for gitignore test scenario 6.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 
 ### All Requirements 001
 
@@ -643,7 +643,7 @@ This file should be processed.
   * type: requirement
 
 #### Relations
-  * derivedFrom: #test-root
+  * specify: #test-root
 EOF
 
 cat > "${TEST_DIR}/specifications/README.md" << 'EOF'
@@ -657,7 +657,7 @@ This file should be processed when no ignore-file pattern excludes it.
   * type: requirement
 
 #### Relations
-  * derivedFrom: AllRequirements.md#test-root
+  * specify: AllRequirements.md#test-root
 EOF
 
 cat > "${TEST_DIR}/specifications/DRAFT-test.md" << 'EOF'
@@ -671,7 +671,7 @@ This file should be processed when no ignore-file pattern excludes it.
   * type: requirement
 
 #### Relations
-  * derivedFrom: AllRequirements.md#test-root
+  * specify: AllRequirements.md#test-root
 EOF
 
 # Run reqvire search without any ignore files

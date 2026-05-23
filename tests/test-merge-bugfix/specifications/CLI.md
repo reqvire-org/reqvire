@@ -1,13 +1,22 @@
 # Elements
 
+
+### Test Feature Test Merge Bugfix Specifications Cli Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
+---
+
 ### Test Parent
 
 Parent element for testing.
 
 #### Metadata
-  * type: user-requirement
-
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-merge-bugfix-specifications-cli-md)
   * derive: [CLI Interface Structure](#cli-interface-structure)
   * derive: [CLI Search Command](#cli-search-command)
 ---

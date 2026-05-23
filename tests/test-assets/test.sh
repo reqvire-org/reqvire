@@ -174,7 +174,7 @@ if [ $ATTACH_PATH_EXIT -eq 0 ]; then
   exit 1
 fi
 
-if ! echo "$ATTACH_PATH_OUTPUT" | grep -qi "must use refinement element identifiers"; then
+if ! echo "$ATTACH_PATH_OUTPUT" | grep -qi "must use attachable element identifiers"; then
   echo "❌ FAILED: Error should explain identifier-only attachment targets"
   echo "$ATTACH_PATH_OUTPUT"
   exit 1
@@ -253,8 +253,8 @@ if [ $ATTACH_NON_REFINEMENT_EXIT -eq 0 ]; then
   exit 1
 fi
 
-if ! echo "$ATTACH_NON_REFINEMENT_OUTPUT" | grep -qi "not a Refinement type"; then
-  echo "❌ FAILED: Error should mention Refinement type constraint"
+if ! echo "$ATTACH_NON_REFINEMENT_OUTPUT" | grep -qi "not an attachable type"; then
+  echo "❌ FAILED: Error should mention attachable type constraint"
   echo "$ATTACH_NON_REFINEMENT_OUTPUT"
   exit 1
 fi
@@ -298,10 +298,7 @@ cat > "$TEST_DIR/specifications/RelationsTest.md" << 'EOF'
 Top level container.
 
 #### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derive: [Verified Requirement](#verified-requirement)
+  * type: feature
 ---
 
 ### Verified Requirement
@@ -312,7 +309,7 @@ This requirement is satisfied by a script.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Relations Test System](#relations-test-system)
+  * specify: [Relations Test System](#relations-test-system)
   * satisfiedBy: [test_script.sh](../scripts/test_script.sh)
 ---
 EOF

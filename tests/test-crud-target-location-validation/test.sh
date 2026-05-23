@@ -49,7 +49,18 @@ cat > "${TEST_DIR}/specifications/Base.md" << 'EOF'
 This is the base requirement.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
+
+### Base System Requirement
+
+This is the base system requirement.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Base Requirement](#base-requirement)
 EOF
 
 # ==================================
@@ -66,7 +77,7 @@ This should be rejected.
   * type: requirement
 
 #### Relations
-  * derivedFrom: Base.md#base-requirement
+  * derivedFrom: Base.md#base-system-requirement
 '
 
 set +e
@@ -119,13 +130,12 @@ fi
 echo "" >> "${TEST_DIR}/test_results.log"
 echo "Test 3: Path depth limit (11 levels)..." >> "${TEST_DIR}/test_results.log"
 
-# Use user-requirement for depth tests (no parent needed)
 DEPTH_TEST_ELEMENT='### Depth Test
 
 Testing path depth validation.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
 '
 
 DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/j/DeepFile.md"
@@ -228,7 +238,7 @@ if [ $EXIT_CODE -ne 0 ]; then
 elif ! grep -q "^### Test Requirement" "${TEST_DIR}/specifications/Base.md"; then
   echo "❌ FAILED: Element was not added to existing file"
   OVERALL_RESULT=1
-elif ! grep -q "^### Base Requirement" "${TEST_DIR}/specifications/Base.md"; then
+elif ! grep -q "^### Base System Requirement" "${TEST_DIR}/specifications/Base.md"; then
   echo "❌ FAILED: Original element was removed"
   OVERALL_RESULT=1
 else

@@ -17,16 +17,35 @@ Implementation details shall follow the associated refinement specifications.
   * verifiedBy: [Unstructured Documents Test](Verifications/ValidationVerifications.md#unstructured-documents-test)
 ---
 
+### Semantic Contract Reference Context Validation
+
+The system shall reject semantic-contract shape references that cannot be resolved within the owner ontology context.
+
+#### Details
+When validating semantic contracts, the system shall require each SHACL reference to resolve to an ontology term declared by an ontology element reachable through the owning requirement's feature context, including ontology attached to that feature or inherited from ancestor features.
+
+The system shall reject references to terms declared outside the reachable feature ontology context because such references bypass the feature-level attachment path required for change-impact traceability.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
+  * refinedBy: [Semantic Contract Reference Context Validation Specification](Specifications.md#semantic-contract-reference-context-validation-specification)
+  * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
+  * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](Verifications/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
+---
+
 ### Validate Cross-Component Dependencies
 
 The system shall validate dependencies across different components of the System model to identify mismatches or gaps.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Cross-Component Dependency Validator](#cross-component-dependency-validator)
-  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Cross-Component Dependency Validator
@@ -48,10 +67,10 @@ The system shall implement a specialized validator that analyzes dependencies ac
 The system shall validate the organization of files and folders in the repository to ensure consistency with the MBSE methodology.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
-  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Validate Internal Consistency
@@ -59,12 +78,12 @@ The system shall validate the organization of files and folders in the repositor
 The system shall check the internal consistency of the system model, ensuring that relationships and elements align correctly.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Internal Consistency Validator](#internal-consistency-validator)
   * derive: [Two-Pass Validation Strategy](#two-pass-validation-strategy)
-  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Attachment Target Validation
@@ -209,7 +228,7 @@ The system shall validate relation types against a defined vocabulary and provid
 
 ### Single Root Hierarchy Ownership
 
-The system shall enforce that each hierarchy element resolves to exactly one top root `user-requirement` through hierarchical relations.
+The system shall enforce that each requirement hierarchy resolves to exactly one owning feature root through `specify`/`specifiedBy` and requirement/feature hierarchy relations.
 
 #### Details
 Validation details shall follow the associated hierarchy ownership constraint.
@@ -292,11 +311,11 @@ This ensures users see all relevant errors at once rather than fixing issues one
 The system shall validate the Markdown structure of system model to ensure compliance with formatting standards.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Markdown Structure Validator](#markdown-structure-validator)
-  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Markdown Structure Validator
@@ -319,11 +338,11 @@ The system shall implement a markdown structure validator that enforces Reqvire'
 The system shall validate relation types and allow only supported types.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Relation Element Type Validator](#relation-element-type-validator)
-  * derivedFrom: [Validating Structures](../../UserStories.md#validating-structures)
+  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Relation Element Type Validator

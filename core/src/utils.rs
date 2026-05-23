@@ -703,7 +703,7 @@ mod tests {
     }
 
     struct MockPaths {
-        pub user_requirements_root_folder: String,
+        pub requirements_root_folder: String,
         pub excluded_filename_patterns: Vec<String>,
     }
 
@@ -711,7 +711,7 @@ mod tests {
         fn default() -> Self {
             Self {
                 paths: MockPaths {
-                    user_requirements_root_folder: "specifications".to_string(),
+                    requirements_root_folder: "specifications".to_string(),
                     excluded_filename_patterns: Vec::new(),
                 },
             }
@@ -896,7 +896,7 @@ mod tests {
     fn test_is_to_be_ignored() {
         // Configure excluded patterns for these tests
         let mut config_with_externals = MockConfig::default();
-        config_with_externals.paths.user_requirements_root_folder = "specifications".to_string();
+        config_with_externals.paths.requirements_root_folder = "specifications".to_string();
 
         config_with_externals.paths.excluded_filename_patterns = vec![
             "**/README*.md".to_string(),
@@ -908,7 +908,7 @@ mod tests {
         // Test cases for files that should NOT be ignored (will be processed)
         let not_ignored_cases = vec![
             // Requirements files in specifications root
-            "requirements/UserRequirements.md",
+            "requirements/Features.md",
             "requirements/SystemRequirements.md",
             "requirements/MissionRequirements.md",
             // Requirements files in system requirements folder
@@ -969,7 +969,7 @@ mod tests {
 
         // Configure external folders for these tests
         let mut config_with_externals = MockConfig::default();
-        config_with_externals.paths.user_requirements_root_folder = "specifications".to_string();
+        config_with_externals.paths.requirements_root_folder = "specifications".to_string();
 
         config_with_externals.paths.excluded_filename_patterns = vec![
             "**/README*.md".to_string(),
@@ -1005,7 +1005,7 @@ mod tests {
             // Standard requirement files - should never be excluded
             ("requirements/Requirements.md", false),
             ("requirements/SystemRequirements.md", false),
-            ("requirements/UserRequirements.md", false),
+            ("requirements/Features.md", false),
             ("requirements/subfolder/Requirements.md", false),
             ("external_repo/specs/Requirements.md", false),
         ];

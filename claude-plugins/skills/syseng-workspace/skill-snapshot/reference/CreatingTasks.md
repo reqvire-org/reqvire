@@ -76,6 +76,11 @@ reqvire collect "<requirement-name>" --direction DOWNSTREAM --json --output /tmp
 
 # Get direct requirement details
 reqvire search --filter-id="<requirement-id>" --json
+
+# Governance-focused views for routing and prioritization
+reqvire search --filter-owner="<owner-regex>" --json
+reqvire search --filter-priority="high,critical" --json
+reqvire search --filter-risk="high,critical" --json
 ```
 
 **Why use `reqvire collect` for task generation:**
@@ -93,6 +98,13 @@ reqvire search --filter-id="<requirement-id>" --json
 - Attached refinement elements (specifications, constraints, behaviors)
 - Source citations for traceability
 
+**Governance metadata in task planning:**
+- Carry effective `status`, `priority`, `risk`, and `owner` from search JSON into every task plan
+- `owner` is an accountability/routing label and may be a person, role, team, department, subsystem group, or task owner
+- Use owner to route work; do not treat it as proof of personal ownership unless the value names a person
+- If a governance value is inherited or defaulted, mention that source when it matters for assignment or risk review
+- Do not write inherited/default governance values into Markdown unless the user explicitly decides to author them
+
 ### Step 3: Identify Verification and Test Paths
 
 For each requirement, identify what needs to be tested:
@@ -109,6 +121,7 @@ Extract:
 - `verifiedBy` relations → which verifications to review
 - `satisfiedBy` relations on verifications → which test files to run
 - `satisfiedBy` relations on requirements → which code to update
+- `governance_metadata` values → which status, priority, risk, and owner routing apply
 
 ### Step 4: Generate Task Plan
 
@@ -121,6 +134,8 @@ Create a TodoWrite-formatted task plan with full traceability.
   Context: [2-3 sentence summary from collected chain]
   Purpose: [Why - from parent requirement]
   Implementation: [Key specs/API endpoints from collected data]
+  Governance: status={status}, priority={priority}, risk={risk}, owner={owner-or-unassigned}
+  Owner routing: [person/role/team/department/subsystem/task owner from governance owner]
   ⚠️ IMPORTANT: Read full requirement - this is only a summary!
 
   ☐ Review full requirement context: /tmp/req_context_<req-id>.md
@@ -137,6 +152,8 @@ Create a TodoWrite-formatted task plan with full traceability.
 ☐ Update "{Requirement Name}" ({REQ-ID})
   Context: [What changed - from collected chain]
   Impact: [Affected specs/constraints from collected data]
+  Governance: status={status}, priority={priority}, risk={risk}, owner={owner-or-unassigned}
+  Owner routing: [person/role/team/department/subsystem/task owner from governance owner]
   ⚠️ IMPORTANT: Read full requirement - this is only a summary!
 
   ☐ Review full requirement context: /tmp/req_context_<req-id>.md
@@ -176,6 +193,9 @@ A complete task plan follows this format:
 - New requirements: X
 - Modified requirements: Y
 - Tests to run: Z
+- Owners / routing groups: owner-1 (N), owner-2 (M), unassigned (K)
+- High/critical priorities: N
+- High/critical risks: M
 
 ## Phase 1: New Requirements
 
@@ -222,6 +242,10 @@ When analyzing requirements for task generation:
 | What requirements changed | `reqvire change-impact --git-commit=<hash> --json` |
 | **Full requirement context (ancestors)** | `reqvire collect "<name>" --json --output /tmp/req_<id>.json` |
 | Requirement direct content | `reqvire search --filter-id="<id>" --json` |
+| Requirement owner routing | `reqvire search --filter-owner="<owner-regex>" --json` |
+| High-priority work | `reqvire search --filter-priority="high,critical" --json` |
+| High-risk work | `reqvire search --filter-risk="high,critical" --json` |
+| Requirements by lifecycle status | `reqvire search --filter-status="draft,review,approved" --json` |
 | What verifies a requirement | `reqvire traces --filter-id="<id>" --json` |
 | Which tests to run | Extract `satisfiedBy` from verification via `reqvire search` |
 | Implementation status | Check `satisfiedBy` relations in requirement |
@@ -241,6 +265,7 @@ When analyzing requirements for task generation:
 - **Repository-Agnostic**: No assumptions about codebase unless specified in requirements
 - **Explicit Tasks**: One requirement = One top-level task with all sub-steps
 - **Test-Driven**: Always include tests in implementation workflow
+- **Governance-Aware**: Prioritize high/critical work, surface high/critical risk, and route by effective owner
 - **Read Requirements**: Summaries are context only - full requirements are mandatory reading
 - **Track Progress**: TodoWrite format enables real-time progress tracking
 - **Use Commands**: Always query model via reqvire commands, not file reading
@@ -252,6 +277,7 @@ When analyzing requirements for task generation:
 - **Maintain traceability**: Always add/update satisfiedBy relations after implementation
 - **One requirement = One task**: Don't combine multiple requirements
 - **Explicit tests**: List every test file that needs to run
+- **Explicit ownership**: Include effective owner/routing group; call out unassigned ownership when assignment matters
 - **Repository-agnostic**: Don't assume technology stack unless in requirements
 - **Link to source**: Every requirement needs a blob link
 - **Track progress**: Use TodoWrite checkboxes throughout implementation

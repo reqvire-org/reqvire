@@ -8,7 +8,7 @@ This is a parent requirement for the test.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Test User Requirement](UserRequirements.md#test-user-requirement)
+  * derivedFrom: [Test Feature](Features.md#test-feature)
 
 ---
 

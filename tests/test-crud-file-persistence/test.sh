@@ -35,13 +35,23 @@ mkdir -p "${TEST_DIR}/specifications"
 cat > "${TEST_DIR}/specifications/FileA.md" << 'EOF'
 # Elements
 
+### Persistence Feature
+
+Feature root for file persistence tests.
+
+#### Metadata
+  * type: feature
+---
 
 ### Root Requirement
 
 This is the root requirement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Persistence Feature](#persistence-feature)
 
 ### Requirement A1
 

@@ -24,9 +24,9 @@ assert_summary_counts() {
   local description="$5"
 
   local actual_submodels actual_requirements actual_couplings
-  actual_submodels=$(grep -F -- "- **Submodels:** " "$output_file" | awk '{print $3}' | head -n 1)
-  actual_requirements=$(grep -F -- "- **Requirements:** " "$output_file" | awk '{print $3}' | head -n 1)
-  actual_couplings=$(grep -F -- "- **Cross-Submodel Couplings:** " "$output_file" | awk '{print $3}' | head -n 1)
+  actual_submodels=$(grep -F -- "- **Submodels:** " "$output_file" | awk '{print $NF}' | head -n 1)
+  actual_requirements=$(grep -F -- "- **Requirements:** " "$output_file" | awk '{print $NF}' | head -n 1)
+  actual_couplings=$(grep -F -- "- **Cross-Submodel Couplings:** " "$output_file" | awk '{print $NF}' | head -n 1)
 
   if [ -z "$actual_submodels" ] || [ -z "$actual_requirements" ] || [ -z "$actual_couplings" ]; then
     echo "FAILED: $description"
@@ -162,7 +162,55 @@ if ! diff -u \
   exit 1
 fi
 
-# Test 4: --from text output
+# Test 4: --from feature text output
+set +e
+FEATURE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Feature One" 2>&1)
+FEATURE_EXIT=$?
+set -e
+
+if [ $FEATURE_EXIT -ne 0 ]; then
+  echo "FAILED: submodels --from Feature One command exited with code $FEATURE_EXIT"
+  echo "$FEATURE_OUTPUT"
+  exit 1
+fi
+
+printf "%s\n" "$FEATURE_OUTPUT" > "$TEST_DIR/output/submodels.from-feature-one.actual.md"
+assert_file_matches \
+  "$TEST_SCRIPT_DIR/expected/expected_from_feature_one_output.md" \
+  "$TEST_DIR/output/submodels.from-feature-one.actual.md" \
+  "Submodels --from Feature One text output mismatch"
+assert_summary_counts \
+  "$TEST_DIR/output/submodels.from-feature-one.actual.md" \
+  1 5 2 \
+  "Submodels --from Feature One summary counts mismatch"
+
+# Test 5: --from feature JSON output
+set +e
+FEATURE_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Feature One" --json 2>&1)
+FEATURE_JSON_EXIT=$?
+set -e
+
+if [ $FEATURE_JSON_EXIT -ne 0 ]; then
+  echo "FAILED: submodels --from Feature One --json command exited with code $FEATURE_JSON_EXIT"
+  echo "$FEATURE_JSON_OUTPUT"
+  exit 1
+fi
+
+printf "%s\n" "$FEATURE_JSON_OUTPUT" > "$TEST_DIR/output/submodels.from-feature-one.actual.json"
+if ! diff -u \
+  <(jq -S . "$TEST_SCRIPT_DIR/expected/expected_from_feature_one_output.json") \
+  <(jq -S . "$TEST_DIR/output/submodels.from-feature-one.actual.json"); then
+  echo "FAILED: Submodels --from Feature One JSON output mismatch"
+  echo ""
+  echo "If changes are intentional, update $TEST_SCRIPT_DIR/expected/expected_from_feature_one_output.json"
+  exit 1
+fi
+assert_json_summary_counts \
+  "$TEST_DIR/output/submodels.from-feature-one.actual.json" \
+  1 5 2 \
+  "Submodels --from Feature One JSON summary counts mismatch"
+
+# Test 6: --from requirement text output
 set +e
 FROM_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Root One" 2>&1)
 FROM_EXIT=$?
@@ -184,7 +232,7 @@ assert_summary_counts \
   2 4 2 \
   "Submodels --from summary counts mismatch"
 
-# Test 5: --from JSON output
+# Test 7: --from requirement JSON output
 set +e
 FROM_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Root One" --json 2>&1)
 FROM_JSON_EXIT=$?
@@ -210,7 +258,7 @@ assert_json_summary_counts \
   2 4 2 \
   "Submodels --from JSON summary counts mismatch"
 
-# Test 6: --from branch output should report only branch submodels
+# Test 8: --from branch output should report only branch submodels
 set +e
 BRANCH_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Billing Requirement" 2>&1)
 BRANCH_EXIT=$?
@@ -232,7 +280,7 @@ assert_summary_counts \
   1 1 0 \
   "Submodels --from Billing Requirement summary counts mismatch"
 
-# Test 7: --from branch JSON output should report branch subtree summary
+# Test 9: --from branch JSON output should report branch subtree summary
 set +e
 BRANCH_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Billing Requirement" --json 2>&1)
 BRANCH_JSON_EXIT=$?
@@ -258,7 +306,7 @@ assert_json_summary_counts \
   1 1 0 \
   "Submodels --from Billing Requirement JSON summary counts mismatch"
 
-# Test 8: --from leaf requirement should produce empty scoped result
+# Test 10: --from leaf requirement should produce empty scoped result
 set +e
 LEAF_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Invoice Requirement" 2>&1)
 LEAF_EXIT=$?
@@ -280,7 +328,7 @@ assert_summary_counts \
   0 0 0 \
   "Submodels --from Invoice Requirement summary counts mismatch"
 
-# Test 9: --from leaf requirement JSON output should be empty result
+# Test 11: --from leaf requirement JSON output should be empty result
 set +e
 LEAF_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Invoice Requirement" --json 2>&1)
 LEAF_JSON_EXIT=$?
@@ -306,7 +354,7 @@ assert_json_summary_counts \
   0 0 0 \
   "Submodels --from Invoice Requirement JSON summary counts mismatch"
 
-# Test 10: --from missing root should fail
+# Test 12: --from missing root should fail
 set +e
 MISSING_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Missing Root" 2>&1)
 MISSING_EXIT=$?

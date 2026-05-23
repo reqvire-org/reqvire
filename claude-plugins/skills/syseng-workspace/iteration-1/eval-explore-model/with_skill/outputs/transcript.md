@@ -17,7 +17,7 @@
 6. `reqvire model` - BLOCKED by permission
 
 ## Findings
-- 444 elements: 136 specifications, 127 requirements, 102 test-verifications, 49 user-requirements, 21 behaviors, 8 constraints, 1 analysis-verification
+- 444 elements: 136 specifications, 127 requirements, 102 test-verifications, 49 features, 21 behaviors, 8 constraints, 1 analysis-verification
 - Validation clean - no issues
 - Well-structured domain-driven hierarchy
 

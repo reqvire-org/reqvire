@@ -13,6 +13,7 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * derive: [Diagram Attachment Display](#diagram-attachment-display)
   * derive: [Local Linked File Export](#local-linked-file-export)
   * derive: [Model-Centric View Generation](#model-centric-view-generation)
+  * derive: [Ontologies View Generation](#ontologies-view-generation)
   * derive: [Web Interface Color Scheme](#web-interface-color-scheme)
   * derivedFrom: [Web Interface](../Interfaces.md#web-interface)
   * refinedBy: [Web Interface Navigation Behavior](Behaviors.md#web-interface-navigation-behavior)
@@ -25,10 +26,34 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [layouts.rs](../../../core/src/html/layouts.rs)
   * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
+  * satisfiedBy: [ontologies.rs](../../../core/src/html/pages/ontologies.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
   * verifiedBy: [CLI Help Structure Verification](../CLI/Verifications/CLIVerifications.md#cli-help-structure-verification)
   * verifiedBy: [HTML Export Verification](Verifications/WebInterfaceVerifications.md#html-export-verification)
+---
+
+### Ontologies View Generation
+
+The system shall generate an Ontologies HTML page during export and serve workflows to present collected ontology and SHACL content.
+
+#### Details
+Implementation details shall follow the associated refinement specifications.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Ontology Collection Output Specification](../../Functional/Output/Specifications.md#ontology-collection-output-specification)
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * refinedBy: [Ontologies View Generation Refinement Specification](Specifications.md#ontologies-view-generation-refinement-specification)
+  * satisfiedBy: [export.rs](../../../core/src/export.rs)
+  * satisfiedBy: [layouts.rs](../../../core/src/html/layouts.rs)
+  * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
+  * satisfiedBy: [ontologies.rs](../../../core/src/html/pages/ontologies.rs)
+  * verifiedBy: [CLI Ontologies Command Verification](../CLI/Verifications/CLIVerifications.md#cli-ontologies-command-verification)
 ---
 
 ### Local Linked File Export
@@ -105,7 +130,7 @@ Implementation details shall follow the associated refinement specifications.
 
 ### Model-Centric View Generation
 
-The system shall generate a model-centric visualization during HTML export showing root requirements with nested relations containing full element details.
+The system shall generate a model-centric visualization during HTML export showing model roots with nested relations containing full element details.
 
 #### Details
 Implementation details shall follow the associated refinement specifications.
@@ -180,6 +205,8 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Attachments
+  * [Two-Pass Validation Behavior](../../Functional/Core/Behaviors.md#two-pass-validation-behavior)
+  * [Validation Error Reporting Behavior](../../Functional/Core/Behaviors.md#validation-error-reporting-behavior)
   * [HTML Export Pipeline Specification](Specifications.md#html-export-pipeline-specification)
 
 #### Relations
@@ -187,6 +214,5 @@ Implementation details shall follow the associated refinement specifications.
   * refinedBy: [Serve Command Refinement Specification](Specifications.md#serve-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [serve.rs](../../../cli/src/serve.rs)
-  * trace: [Validate Command](../CLI/Commands.md#validate-command)
   * verifiedBy: [Serve Command Verification](Verifications/WebInterfaceVerifications.md#serve-command-verification)
 ---

@@ -15,7 +15,7 @@ Unsupported first H1 headings shall be ignored by element parsing.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
+  * specify: [Defining Model Structure](../../Features.md#defining-model-structure)
   * refinedBy: [Specification File Identification Refinement Specification](Specifications.md#specification-file-identification-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
@@ -33,7 +33,7 @@ The system shall implement semi-structured markdown format specifications that d
 #### Relations
   * derive: [Element Identity Model](#element-identity-model)
   * derive: [Reserved Subsections Support](#reserved-subsections-support)
-  * derivedFrom: [Defining Model Structure](../../UserStories.md#defining-model-structure)
+  * specify: [Defining Model Structure](../../Features.md#defining-model-structure)
   * refinedBy: [MarkdownStructure](DesignDocuments/MarkdownStructure.md#markdownstructure)
   * refinedBy: [Structure and Addressing in Markdown Documents Refinement Specification](Specifications.md#structure-and-addressing-in-markdown-documents-refinement-specification)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
@@ -54,8 +54,6 @@ The system shall distinguish between element identity (ID) and element addressin
 
 #### Relations
   * derive: [Identifiers and Relations](#identifiers-and-relations)
-  * derive: [Internal Consistency Validator](Validation.md#internal-consistency-validator)
-  * derive: [Change Impact Detection](../Processing/ChangeImpact.md#change-impact-detection)
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * refinedBy: [ElementIdentity](DesignDocuments/ElementIdentity.md#elementidentity)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
@@ -80,15 +78,17 @@ The system shall implement  **Identifiers** and **Relations** following clearly 
 
 ### Reserved Subsections Support
 
-The system shall support the following reserved subsections with predefined structure and behavior: Relations, Details, Metadata, and Attachments.
+The system shall support reserved subsections with predefined structure and behavior.
 
 #### Details
-The system shall support following reserved subsections:
- * **Relations**: Define relationships between elements
- * **Details**: Extend requirement text with additional information
- * **Metadata**: Define element type, requirement governance metadata, and classification
- * **Attachments**: Link Refinement elements
-   - Can contain element identifiers only (markdown links to Refinement elements ONLY)
+Reserved subsection vocabulary is defined by the Reqvire core element ontology. Parser-facing support includes:
+ * **Relations**: authored relation edges
+ * **Details**: narrative element context
+ * **Metadata**: element metadata, element type, and governance metadata where valid
+ * **Attachments**: explicit attached ontology or requirement-owned contract dependencies
+ * **Concept References**: readable bindings to reachable ontology terms
+ * **Ontology**: ontology-element Turtle content
+ * **Shapes**: semantic-contract SHACL content
 
 Each reserved subsection has specific parsing rules, validation requirements, and behaviors.
 
@@ -97,7 +97,6 @@ Each reserved subsection has specific parsing rules, validation requirements, an
 
 #### Relations
   * derive: [Verification Type Categories](ModelManagement.md#verification-type-categories)
-  * derive: [Attachment Target Validation](Validation.md#attachment-target-validation)
   * derivedFrom: [Structure and Addressing in Markdown Documents](#structure-and-addressing-in-markdown-documents)
   * refinedBy: [ReservedSubsections](DesignDocuments/ReservedSubsections.md#reservedsubsections)
   * refinedBy: [Element Type Metadata Specification](Specifications.md#element-type-metadata-specification)

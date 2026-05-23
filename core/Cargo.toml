@@ -38,6 +38,7 @@ serde_json = { workspace = true }
 # Performance
 rayon = { workspace = true }
 rustc-hash = { workspace = true }
+oxigraph = { workspace = true }
 
 # Terminal output
 termcolor = { workspace = true }

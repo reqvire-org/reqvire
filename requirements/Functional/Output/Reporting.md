@@ -5,25 +5,24 @@
 When requested the system shall provide human readable and machine readable System model reports with deterministic output and consistent ordering.
 
 #### Metadata
-  * type: user-requirement
-
-#### Attachments
-  * [Traceability Reporting Specification](../../Refinements.md#traceability-reporting-specification)
+  * type: requirement
 
 #### Relations
   * derive: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
-  * derive: [Collect Content from Requirement Chain](#collect-content-from-requirement-chain)
+  * derive: [Collect Feature and Requirement Context](#collect-feature-and-requirement-context)
   * derive: [JSON Element Size Estimate Exposure](#json-element-size-estimate-exposure)
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
   * derive: [Provide Validation Reports](#provide-validation-reports)
   * derive: [Requirement Implementation Coverage Report](#requirement-implementation-coverage-report)
   * derive: [Resources Report](#resources-report)
   * derive: [Verification Coverage Report](#verification-coverage-report)
-  * derivedFrom: [Provide Reports](../../UserStories.md#provide-reports)
+  * specify: [Provide Reports](../../Features/ReportsAndQuery.md#provide-reports)
   * refinedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
   * refinedBy: [JSON Output Structure](Specifications.md#json-output-structure)
   * refinedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
+  * refinedBy: [Report Command Catalog Specification](Specifications.md#report-command-catalog-specification)
   * refinedBy: [Text Output Formatting](Specifications.md#text-output-formatting)
+  * refinedBy: [Traceability Reporting Specification](../../Refinements.md#traceability-reporting-specification)
 ---
 
 ### JSON Element Size Estimate Exposure
@@ -47,15 +46,15 @@ The system shall expose element-level `size_estimate` records in JSON model evid
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
 ---
 
-### Collect Content from Requirement Chain
+### Collect Feature and Requirement Context
 
-The system shall collect and consolidate all content from a requirement element and its related requirements via derivedFrom relations (upstream to ancestors) or derive relations (downstream to descendants), including refinedBy targets (refinement elements) and attachment contents, and output with source citations in text or JSON format.
+The system shall collect and consolidate context from a feature or requirement element, including directional feature and requirement traversal, inherited feature ontology context, refinedBy targets, attached requirement contract contents, and source citations in text or JSON format.
 
 #### Details
 The system shall define:
 - Content collection rules for elements, refinedBy targets, and attachments
 - Output format specifications for text and JSON modes
-- Direction-based traversal: upstream (ancestors via derivedFrom) or downstream (descendants via derive)
+- Direction-based traversal over feature hierarchy, requirement hierarchy, and the `specify`/`specifiedBy` bridge where defined by the collect traversal specification
 
 #### Metadata
   * type: requirement
@@ -69,10 +68,10 @@ The system shall define:
 
 ### Model Structure and Summaries
 
-When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections also supporting json output.
+When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections, ontology-root and feature-root starting contexts, and JSON output.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Containment View Report](#containment-view-report)
@@ -90,7 +89,7 @@ The system shall generate containment view reports showing the physical hierarch
 Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Attachments
   * [Containment Specification](../../Refinements.md#containment-specification)
@@ -106,7 +105,7 @@ Implementation details shall follow the associated refinement specifications.
 
 ### Model Diagram Output Formats
 
-System shall support markdown and JSON output formats.
+System shall support Markdown, pure Mermaid, and JSON output formats.
 
 #### Details
 Implementation details shall follow the associated refinement specifications.
@@ -173,15 +172,16 @@ The system shall support filtering starting elements by type for model traversal
 
 ### Requirement Submodels Report
 
-The system shall provide a submodels report that identifies independent requirement hierarchies (by top roots) and cross-submodel requirement couplings.
+The system shall provide a submodels report that identifies independent feature-root subgraphs and cross-submodel requirement couplings.
 
 #### Details
 The report shall support:
-- Full model view listing all discovered submodels and cross-submodel couplings
-- Filtered view scoped to one requirement subtree by requirement name
-- Scope filtering follows transitive descendants via hierarchical edges in downstream direction, so the selected requirement defines a boundary subtree.
-- When a selected subtree has no child sub-requirements, the filtered report contains zero scoped submodels.
-- In filtered view, the selected requirement is a scope boundary and is not counted as a reported submodel entry
+- Full model view listing all discovered feature-rooted submodels and cross-submodel couplings
+- Filtered view scoped to one feature or requirement subtree by element name
+- Scope filtering follows transitive descendants via feature hierarchy, `specifiedBy`, and requirement hierarchy in downstream direction.
+- When filtered from a feature, the selected feature is reported as the scoped feature submodel and requirement counts include requirements in that feature subtree.
+- When filtered from a requirement, the selected requirement is a boundary and is not counted as a reported submodel entry; first-level child requirement branches are reported as scoped requirement submodels.
+- When a selected requirement subtree has no child submodels, the filtered report contains zero scoped submodels.
 - The report summary includes deterministic counts for total submodels, total requirements represented in scope, and total cross-submodel couplings; in scoped mode, counts are computed from the scoped submodels and couplings only.
 - Summary content follows the report paragraph: `Submodels`, `Requirements`, and `Cross-Submodel Couplings`.
 
@@ -198,6 +198,31 @@ Implementation details shall follow the associated refinement specifications.
   * refinedBy: [Requirement Submodels Report Specification](Specifications.md#requirement-submodels-report-specification)
   * satisfiedBy: [report_submodels.rs](../../../core/src/report_submodels.rs)
   * verifiedBy: [Submodels Report Verification](Verifications/ReportingVerifications.md#submodels-report-verification)
+---
+
+### Ontology and Shapes Collection
+
+The system shall collect ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry into a reusable semantic export context, and shall optionally project Reqvire model context into the same RDF export.
+
+#### Details
+The default collection shall expose authored ontology RDF content and semantic-contract SHACL RDF content without changing the Markdown model as the source of truth.
+
+When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, feature-to-ontology attachments, requirement-to-feature specification relations, requirement-to-semantic-contract refinement relations, ontology hierarchy relations, concept references, ontology term declarations, and semantic-contract shape references.
+
+The collection shall preserve source element identifiers, source file paths, section kind, and line numbers so CLI, HTML export, and downstream semantic tooling can cite the model source of each RDF block.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Semantic Contract Structure Specification](../Core/Specifications.md#semantic-contract-structure-specification)
+
+#### Relations
+  * specify: [Semantic Model Export](../../Features/ReportsAndQuery.md#semantic-model-export)
+  * refinedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
+  * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
+  * satisfiedBy: [export.rs](../../../core/src/export.rs)
+  * verifiedBy: [CLI Ontologies Command Verification](../../Interfaces/CLI/Verifications/CLIVerifications.md#cli-ontologies-command-verification)
 ---
 
 ### Search Report Generator
@@ -217,11 +242,13 @@ The system shall define comprehensive search filtering capabilities:
 - By presence/absence of attachments
 
 Search result element evidence shall include effective requirement governance metadata when applicable.
-Search result summaries shall include effective requirement governance metadata counts for matched requirement-family elements.
+Search result summaries shall include effective governance metadata counts for matched governance-bearing elements.
 
 The system shall define custom element type tracking:
 - Identify types not in standard categories
 - Report custom types with counts
+
+Search report kinds, search filter kinds, collect source types, coverage source types, and submodel concepts are defined by the Reqvire report ontology.
 
 #### Metadata
   * type: requirement
@@ -248,7 +275,7 @@ The system shall support filtering search results by multiple element types simu
 Implementation details shall follow the associated refinement specifications.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Search Report Generator](#search-report-generator)
@@ -280,7 +307,7 @@ The system shall generate detailed validation reports, highlighting any inconsis
 Validation shall be performed automatically when any command requires the parsed model, eliminating the need for a separate validation command. Commands that operate on raw files shall skip validation to allow operation on potentially invalid documents.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Validation Report Generator](#validation-report-generator)
@@ -305,7 +332,7 @@ The system shall generate requirement implementation coverage reports that ident
 
 #### Details
 The implementation coverage report shall provide:
-- Total count of requirements in scope (`requirement` only; excludes `user-requirement`)
+- Total count of requirements in scope (`requirement` only; excludes direct feature rows)
 - Count and percentage of implementation-covered requirements
 - Count and percentage of implementation-uncovered requirements
 - Coverage source classification for covered requirements:
@@ -332,7 +359,7 @@ The implementation coverage report shall provide:
 The system shall provide a resources report showing all files referenced by the model through relations and attachments in text, JSON, and HTML formats.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
@@ -358,21 +385,21 @@ The verification coverage report shall provide:
 The report helps track verification completeness and identify gaps in requirement verification coverage.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Attachments
-  * [Verification Coverage Specification](../../Refinements.md#verification-coverage-specification)
   * [Verification Roll-up Specification](../Processing/Specifications.md#verification-roll-up-specification)
   * [Verification Type Selection Guidelines](../Core/Specifications.md#verification-type-selection-guidelines)
 
 #### Relations
   * derivedFrom: [Model Reports](#model-reports)
   * refinedBy: [Verification Coverage Philosophy Behavior](Behaviors.md#verification-coverage-philosophy-behavior)
+  * refinedBy: [Verification Coverage Specification](../../Refinements.md#verification-coverage-specification)
 ---
 
 ### TraceFlow View Report Generation
 
-The system shall generate a TraceFlow view page showing the verification traceability flow using an interactive D3.js Sankey diagram visualization. The view displays how requirements flow from user requirements through system requirements to verifications.
+The system shall generate a TraceFlow view page showing the verification traceability flow using an interactive D3.js Sankey diagram visualization. The view displays how features are specified by requirements and how requirements flow to verifications.
 
 #### Metadata
   * type: requirement
@@ -393,13 +420,13 @@ The system shall generate a TraceFlow view page showing the verification traceab
 When tracing structural changes, the system shall analyze the System model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Attachments
   * [Traceability Reporting Specification](../../Refinements.md#traceability-reporting-specification)
 
 #### Relations
   * derive: [Change Impact Detection](../Processing/ChangeImpact.md#change-impact-detection)
-  * derivedFrom: [Trace Changes in System Model](../../UserStories.md#trace-changes-in-system-model)
+  * specify: [Trace Changes in System Model](../../Features/RelationsAndImpact.md#trace-changes-in-system-model)
   * verifiedBy: [Structural Change Reports Verification](../Processing/Verifications/ChangeImpactVerifications.md#structural-change-reports-verification)
 ---

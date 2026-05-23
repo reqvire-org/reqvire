@@ -1,5 +1,47 @@
 # Elements
 
+### Product Feature
+
+The top product feature for collect traversal.
+
+#### Metadata
+  * type: feature
+
+#### Relations
+  * derive: [Child Feature](#child-feature)
+---
+
+### Child Feature
+
+The child product feature that specifies the root requirement.
+
+#### Metadata
+  * type: feature
+
+#### Relations
+  * derivedFrom: [Product Feature](#product-feature)
+  * specifiedBy: [Root Requirement](#root-requirement)
+
+#### Attachments
+  * [Collect Ontology](#collect-ontology)
+---
+
+### Collect Ontology
+
+Ontology content for collect traversal.
+
+#### Metadata
+  * type: ontology
+
+#### Ontology
+```turtle
+@prefix ex: <urn:reqvire:test:collect:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+ex:CollectContract a owl:Class .
+```
+---
+
 ### Root Requirement
 
 The root requirement for testing content collection.
@@ -8,7 +50,10 @@ The root requirement for testing content collection.
 This is the top-level requirement that has no derivedFrom relations.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Child Feature](#child-feature)
 ---
 
 ### Mid-Level Requirement
@@ -47,10 +92,22 @@ This is the leaf requirement that derives from the mid-level.
 Owner requirement for design refinement specification.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
+  * specify: [Design Feature](#design-feature)
   * refinedBy: [Design Doc Specification](DesignDoc.md#design-doc-specification)
+---
+
+### Design Feature
+
+Feature that owns reusable design documentation.
+
+#### Metadata
+  * type: feature
+
+#### Relations
+  * specifiedBy: [Design Owner Requirement](#design-owner-requirement)
 ---
 
 ### Test Verification

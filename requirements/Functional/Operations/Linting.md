@@ -16,7 +16,7 @@ When running the lint command, the system shall support both reporting mode and 
 When filtering lint results, the system shall allow focusing on specific categories of issues.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derive: [Cross-Submodel Hierarchical Relation Detection](#cross-submodel-hierarchical-relation-detection)
@@ -24,8 +24,8 @@ When filtering lint results, the system shall allow focusing on specific categor
   * derive: [Multi-Branch Convergence Detection](#multi-branch-convergence-detection)
   * derive: [Redundant Hierarchical Relations Detection and Auto-Removal](#redundant-hierarchical-relations-detection-and-auto-removal)
   * derive: [Redundant Verify Relations Detection](#redundant-verify-relations-detection)
-  * derivedFrom: [Linting Model Quality](../../UserStories.md#linting-model-quality)
   * refinedBy: [Lint Output Specification](Specifications.md#lint-output-specification)
+  * specify: [Linting Model Quality](../../Features/BehaviorValidationOperations.md#linting-model-quality)
 ---
 
 ### Cross-Submodel Hierarchical Relation Detection

@@ -13,21 +13,6 @@ The system shall respect configured excluded filename patterns when performing f
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
 ---
 
-### Model Formatting
-
-The system shall provide formatting capabilities to normalize and standardize System models for consistency and readability.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derive: [Format Consistency Enforcement](#format-consistency-enforcement)
-  * derive: [Formatting Output](#formatting-output)
-  * derive: [Full Relations Insertion](#full-relations-insertion)
-  * derive: [Replace Absolute Links with Relative Links](#replace-absolute-links-with-relative-links)
-  * derivedFrom: [Formatting Model Documents](../../UserStories.md#formatting-model-documents)
----
-
 ### Format Consistency Enforcement
 
 The system shall provide formatting capability to ensure consistent formatting in requirements documents.
@@ -43,7 +28,7 @@ The system shall provide formatting capability to ensure consistent formatting i
   * derive: [Document Structure Normalization](#document-structure-normalization)
   * derive: [Element Ordering Normalization](#element-ordering-normalization)
   * derive: [Relation Ordering Normalization](#relation-ordering-normalization)
-  * derivedFrom: [Model Formatting](#model-formatting)
+  * specify: [Formatting Model Documents](../../Features/BehaviorValidationOperations.md#formatting-model-documents)
   * refinedBy: [Format Consistency Specification](Specifications.md#format-consistency-specification)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
@@ -144,7 +129,7 @@ The system shall display formatting changes suggestion in similar manner as git 
 
 #### Relations
   * derive: [Git-Style Diff Output for Format](#git-style-diff-output-for-format)
-  * derivedFrom: [Model Formatting](#model-formatting)
+  * specify: [Formatting Model Documents](../../Features/BehaviorValidationOperations.md#formatting-model-documents)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
 ---
@@ -154,7 +139,7 @@ The system shall display formatting changes suggestion in similar manner as git 
 The system shall display formatting change suggestions in a git-style diff format, color-coded when possible, to clearly show what modifications will be or have been made to the documents.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
   * derivedFrom: [Formatting Output](#formatting-output)
@@ -175,7 +160,7 @@ Implementation details shall follow the associated refinement specifications.
   * [RelationTypes.md](../Core/DesignDocuments/RelationTypes.md#relationtypes)
 
 #### Relations
-  * derivedFrom: [Model Formatting](#model-formatting)
+  * specify: [Formatting Model Documents](../../Features/BehaviorValidationOperations.md#formatting-model-documents)
   * refinedBy: [Full Relations Insertion Refinement Specification](Specifications.md#full-relations-insertion-refinement-specification)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
@@ -190,7 +175,7 @@ The system shall replace absolute links with relative links, where applicable an
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Model Formatting](#model-formatting)
+  * specify: [Formatting Model Documents](../../Features/BehaviorValidationOperations.md#formatting-model-documents)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)

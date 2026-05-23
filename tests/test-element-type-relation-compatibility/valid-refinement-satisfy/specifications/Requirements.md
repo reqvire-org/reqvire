@@ -1,13 +1,22 @@
 # Elements
 
-### Target User Requirement
 
-A user requirement that refinements can refine.
+### Test Feature Test Element Type Relation Compatibility Valid Refinement Satisfy
+
+Test feature root for migrated requirement fixtures.
 
 #### Metadata
-  * type: user-requirement
+  * type: feature
+---
 
+### Target Feature
+
+A feature that refinements can refine.
+
+#### Metadata
+  * type: requirement
 #### Relations
+  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-refinement-satisfy)
   * refinedBy: [Specification with Satisfy](#specification-with-satisfy)
 
 ---
@@ -20,7 +29,7 @@ A system requirement that refinements can refine.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target User Requirement](#target-user-requirement)
+  * derivedFrom: [Target Feature](#target-feature)
   * refinedBy: [Constraint with Satisfy](#constraint-with-satisfy)
   * refinedBy: [Behavior with Satisfy](#behavior-with-satisfy)
 

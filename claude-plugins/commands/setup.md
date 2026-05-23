@@ -82,7 +82,7 @@ If the user approves, add the following content to the repository's CLAUDE.md fi
 ## CRITICAL: Requirements & Specifications & System Model Work
 
 **FOR ANY CONVERSATION, WORK, REQUEST, OR TASK RELATED TO:**
-- Requirements (user requirements, system requirements)
+- Features, requirements, semantic contracts, and system model elements
 - Specifications
 - System model (MBSE model)
 - Verifications

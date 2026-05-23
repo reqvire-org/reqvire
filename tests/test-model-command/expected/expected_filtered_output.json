@@ -14,7 +14,7 @@
             "name": "JSON Output Format",
             "element_type": "requirement",
             "file_path": "specifications/SystemRequirements.md",
-            "file_order_index": 5,
+            "file_order_index": 6,
             "relations": [
               {
                 "relation_type": "verifiedBy",
@@ -44,8 +44,8 @@
               {
                 "relation_type": "derive",
                 "element": {
-                  "identifier": "specifications/SystemRequirements.md#default-root-filtering",
-                  "name": "Default Root Filtering",
+                  "identifier": "specifications/SystemRequirements.md#default-model-roots",
+                  "name": "Default Model Roots",
                   "element_type": "requirement",
                   "file_path": "specifications/SystemRequirements.md",
                   "file_order_index": 3,

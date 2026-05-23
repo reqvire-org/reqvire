@@ -5,7 +5,10 @@
 This is the root requirement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature Test Lint Command Specifications Requirements Md](#test-feature-test-lint-command-specifications-requirements-md)
 ---
 
 ### Alternative Parent Requirement
@@ -82,7 +85,10 @@ This requirement has derivedFrom to both parent and root through a SINGLE chain 
 This is an independent root for cross-submodel boundary checks.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Feature Test Lint Command Specifications Requirements Md](#test-feature-test-lint-command-specifications-requirements-md)
 ---
 
 ### Standalone Child
@@ -94,4 +100,12 @@ This requirement is owned by `Standalone Submodel Root`.
 
 #### Relations
   * derivedFrom: [Standalone Submodel Root](#standalone-submodel-root)
+---
+
+### Test Feature Test Lint Command Specifications Requirements Md
+
+Test feature root for migrated requirement fixtures.
+
+#### Metadata
+  * type: feature
 ---

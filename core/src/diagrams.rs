@@ -246,11 +246,11 @@ impl<'a> ModelDiagramGenerator<'a> {
 
         // Define Mermaid graph styles with MBSE color scheme
         diagram.push_str("  %% Graph styling\n");
-        diagram
-            .push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
+        diagram.push_str("  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n");
         diagram.push_str(
             "  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n",
         );
+        diagram.push_str("  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;\n");
         diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
         diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
         diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
@@ -287,7 +287,8 @@ impl<'a> ModelDiagramGenerator<'a> {
 
                     // Determine element class based on type
                     let class = match element.element_type.as_str() {
-                        "user-requirement" => "userRequirement",
+                        "feature" => "feature",
+                        "ontology" => "ontology",
                         "requirement" | "system-requirement" => "systemRequirement",
                         t if t.contains("verification") => "verification",
                         _ => "default",
@@ -504,9 +505,10 @@ fn generate_file_diagram(
 
     // Define Mermaid graph styles
     diagram.push_str("  %% Graph styling\n");
-    diagram.push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
+    diagram.push_str("  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n");
     diagram
         .push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
+    diagram.push_str("  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;\n");
     diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
     diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
     diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
@@ -567,7 +569,8 @@ fn generate_file_diagram(
                 }
 
                 let class = match &elem.element_type {
-                    ElementType::Requirement(RequirementType::User) => "userRequirement",
+                    ElementType::Feature => "feature",
+                    ElementType::Ontology => "ontology",
                     ElementType::Requirement(RequirementType::System) => "systemRequirement",
                     ElementType::Verification(_) => "verification",
                     _ => "default",
@@ -1117,10 +1120,11 @@ pub fn generate_containment_diagram(
 
     // CSS class definitions
     output.push_str("  %% Graph styling\n");
-    output.push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
+    output.push_str("  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n");
     output
         .push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
     output.push_str("  classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;\n");
+    output.push_str("  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;\n");
     output.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
     output.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n");
     output.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:2px;\n");
@@ -1296,7 +1300,8 @@ fn generate_element_hash(identifier: &str) -> String {
 
 fn get_element_class_from_type(element_type: &ElementType) -> &'static str {
     match element_type {
-        ElementType::Requirement(RequirementType::User) => "userRequirement",
+        ElementType::Feature => "feature",
+        ElementType::Ontology => "ontology",
         ElementType::Requirement(RequirementType::System) => "systemRequirement",
         ElementType::Verification(_) => "verification",
         _ => "default",

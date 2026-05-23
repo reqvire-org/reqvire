@@ -43,7 +43,7 @@ The containment view shows the physical organization of the model—how requirem
 
 const PAGE_DESCRIPTION_MODEL: &str = r#"# Model
 
-The model view displays the logical structure starting from root requirements—requirements without parent derivations. Each element shows its complete relation tree: derived child requirements, verifications, and implementations. This follows MBSE principles where stakeholder needs flow down through requirement hierarchies to verifiable, implementable specifications."#;
+The model view displays the logical structure starting from ontology roots and feature roots. Ontology roots show reusable vocabulary context, and each feature shows its complete relation tree: specified requirements, derived child requirements, refinements, verifications, and implementations. This follows MBSE principles where product capabilities own requirement obligations and trace down to verifiable, implementable specifications."#;
 
 // NOTE: Whole model generation is currently disabled but the functionality is preserved
 // for potential future use. The generate_model_diagram function in diagrams.rs can still
@@ -63,7 +63,7 @@ Coverage analysis focuses on **leaf requirements**—the lowest-level requiremen
 
 const PAGE_DESCRIPTION_TRACEFLOW: &str = r#"# TraceFlow
 
-The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from stakeholder needs (user requirements) through system specifications (system requirements) to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.
+The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from feature-level product capabilities through system requirements to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.
 
 **Instructions:** Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control."#;
 
@@ -355,6 +355,7 @@ fn post_process_html_files(temp_dir: &Path) -> Result<(), ReqvireError> {
         "traceflow.html",
         "coverage.html",
         "containment.html",
+        "ontologies.html",
     ];
 
     // Only convert .md to .html in heading id attributes and heading text content
@@ -472,11 +473,11 @@ pub fn generate_artifacts_in_temp(
     info!("Generating diagrams...");
     crate::diagrams::process_diagrams(&temp_model_manager.graph_registry, diagrams_with_blobs)?;
 
-    // Generate model-centric view (root requirements with nested relations)
+    // Generate model-centric view (feature roots with nested relations)
     info!("Generating model.md...");
     let model_report = crate::report_model::generate_model_report(
         &temp_model_manager.graph_registry,
-        None,  // No filtering - use root requirements
+        None,  // No filtering - use feature roots
         false, // Not reverse - forward traversal
         None,  // No type filter
         false, // Markdown output
@@ -618,6 +619,18 @@ function showView(view) {{
     let resources_text = resources_report.format_text();
     let resources_content = format!("{}\n\n{}", PAGE_DESCRIPTION_RESOURCES, resources_text);
     filesystem::write_file("resources.md", resources_content.as_bytes())?;
+
+    // Generate ontology artifacts from the same graph-registry collector used by the CLI.
+    info!("Generating ontologies.ttl and ontologies.html...");
+    let ontologies_report =
+        crate::semantic_contract::build_semantic_index(&temp_model_manager.graph_registry);
+    filesystem::write_file(
+        "ontologies.ttl",
+        ontologies_report.to_turtle_string().as_bytes(),
+    )?;
+    let ontologies_page = crate::html::generate_ontologies_page(&ontologies_report, "");
+    fs::write(temp_dir.join("ontologies.html"), ontologies_page)?;
+    info!("✅ Generated ontologies.html and ontologies.ttl");
 
     // Step 6: Convert markdown to HTML
     info!("Converting remaining markdown to HTML...");

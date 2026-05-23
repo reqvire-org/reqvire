@@ -8,7 +8,7 @@ assert_file_matches() {
   local actual="$2"
   local description="$3"
 
-  if ! diff -u "$expected" "$actual"; then
+  if ! diff -u <(perl -0pe 's/\n+\z/\n/' "$expected") <(perl -0pe 's/\n+\z/\n/' "$actual"); then
     echo "❌ FAILED: $description"
     echo ""
     echo "If changes are intentional, update $expected"
