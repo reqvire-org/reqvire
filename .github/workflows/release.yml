@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -85,7 +85,7 @@ jobs:
           done
 
       - name: Upload Archives
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: binaries-${{ matrix.os }}
           path: |
@@ -99,16 +99,16 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
       - name: Download All Archives
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
           pattern: binaries-*         # fetch every per-OS artifact
           merge-multiple: true        # put them all into one folder :contentReference[oaicite:1]{index=1}
@@ -118,7 +118,7 @@ jobs:
         run: ls -R artifacts
 
       - name: Create GitHub Release and Upload Archives
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
           name: "Release ${{ github.ref_name }}"

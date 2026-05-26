@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -29,7 +29,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         
       - name: Install Reqvire
         run: curl -fsSL https://raw.githubusercontent.com/ilijaljubicic/Reqvire/main/scripts/install.sh | bash
@@ -43,7 +43,7 @@ jobs:
 
       - name: Upload Validation Report if validation failed
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: reqvire-validation-report
           path: reports/validation_report.txt          
