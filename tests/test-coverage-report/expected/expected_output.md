@@ -97,6 +97,6 @@
 - ❌ **[Leaf Requirement Verified By Formal Proof](specifications/Requirements.md#leaf-requirement-verified-by-formal-proof)**
 - ❌ **[Parent Requirement](specifications/Requirements.md#parent-requirement)**
 
-## Feature Coverage
+## Capability Coverage
 
-- **[Coverage Feature](specifications/Requirements.md#coverage-feature)**: partial verification 80.0% (4/5 leaf), implementation 0.0% (0/6 requirements)
+- **[Coverage Capability](specifications/Requirements.md#coverage-capability)**: partial verification 80.0% (4/5 leaf), implementation 0.0% (0/6 requirements)

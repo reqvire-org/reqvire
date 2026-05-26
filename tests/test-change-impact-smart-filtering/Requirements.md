@@ -1,11 +1,11 @@
 # Elements
 
-### Existing Feature
+### Existing Capability
 
-Existing feature scope.
+Existing capability scope.
 
 #### Metadata
-* type: feature
+* type: capability
 
 ---
 
@@ -17,7 +17,7 @@ This is an existing requirement.
 * type: requirement
 
 #### Relations
-  * specify: [Existing Feature](#existing-feature)
+  * specify: [Existing Capability](#existing-capability)
   * verifiedBy: [Existing Verification](#existing-verification)
 
 ---
@@ -30,7 +30,7 @@ This is another existing requirement.
 * type: requirement
 
 #### Relations
-  * specify: [Existing Feature](#existing-feature)
+  * specify: [Existing Capability](#existing-capability)
 
 ---
 

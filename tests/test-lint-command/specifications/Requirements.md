@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Lint Command Specifications Requirements Md
+### Test Capability Test Lint Command Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Root Requirement
@@ -17,7 +17,7 @@ This is the root requirement.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-lint-command-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-lint-command-specifications-requirements-md)
 ---
 
 ### Parent Requirement
@@ -92,7 +92,7 @@ This is an independent root for cross-submodel boundary checks.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-lint-command-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-lint-command-specifications-requirements-md)
 ---
 
 ### Standalone Child

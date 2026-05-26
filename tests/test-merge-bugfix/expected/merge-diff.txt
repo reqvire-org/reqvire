@@ -3,13 +3,13 @@ Merged element: Merged 1 element(s) into 'CLI Interface Structure' (specificatio
 📄 specifications/CLI.md
   01     # Elements
   02
-  03     ### Test Feature Test Merge Bugfix Specifications Cli Md
+  03     ### Test Capability Test Merge Bugfix Specifications Cli Md
 
   17
   18     #### Relations
   19       * derive: [CLI Interface Structure](#cli-interface-structure)
   20 -     * derive: [CLI Search Command](#cli-search-command)
-  20       * specify: [Test Feature Test Merge Bugfix Specifications Cli Md](#test-feature-test-merge-bugfix-specifications-cli-md)
+  20       * specify: [Test Capability Test Merge Bugfix Specifications Cli Md](#test-capability-test-merge-bugfix-specifications-cli-md)
   21     ---
   22
 

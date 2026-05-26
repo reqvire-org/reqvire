@@ -3,7 +3,7 @@
 This file should be excluded from processing.
 
 
-This document describes the design of a feature.
+This document describes the design of a capability.
 
 ### DSD-001 Design Element
 

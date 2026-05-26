@@ -1,12 +1,12 @@
 # Elements
 
-### Test for Feature C
+### Test for Capability C
 
-This test verifies Feature C functionality.
+This test verifies Capability C functionality.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Feature C](../Requirements.md#feature-c)
+  * verify: [Capability C](../Requirements.md#capability-c)
 ---

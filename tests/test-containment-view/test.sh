@@ -16,7 +16,7 @@ set -uo pipefail
 # - Element nodes with proper styling based on type
 # - Clickable links to element locations
 # - JSON output provides valid structured data with correct schema
-# - HTML export includes containment view page with interactive features
+# - HTML export includes containment view page with interactive capabilities
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -129,8 +129,8 @@ echo ""
 echo "Test 4: Element type styling..."
 
 # Verify CSS class definitions exist
-if ! echo "$MERMAID_DIAGRAM" | grep -q "classDef feature"; then
-  echo "❌ FAILED: Missing feature class definition"
+if ! echo "$MERMAID_DIAGRAM" | grep -q "classDef capability"; then
+  echo "❌ FAILED: Missing capability class definition"
   exit 1
 fi
 
@@ -145,8 +145,8 @@ if ! echo "$MERMAID_DIAGRAM" | grep -q "classDef verification"; then
 fi
 
 # Verify class assignments exist
-if ! echo "$MERMAID_DIAGRAM" | grep -q "class .* feature"; then
-  echo "❌ FAILED: No elements assigned feature class"
+if ! echo "$MERMAID_DIAGRAM" | grep -q "class .* capability"; then
+  echo "❌ FAILED: No elements assigned capability class"
   exit 1
 fi
 
@@ -223,7 +223,7 @@ REQUIRED_ELEMENTS=(
   "User Authentication"
   "Export to CSV"
   "High Performance"
-  "Root Feature"
+  "Root Capability"
   "Test Verification Element"
   "Analysis Verification Element"
   "Inspection Verification Element"

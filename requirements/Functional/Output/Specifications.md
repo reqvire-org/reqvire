@@ -8,19 +8,19 @@ Technical specification for content collection from requirement chains.
 **Input Validation:**
 - Element name is required positional argument
 - Element must exist in the model
-- Element must be a feature or requirement element
+- Element must be a capability or requirement element
 - Error with non-zero exit if element not found or invalid type
 
 **Traversal Rules:**
-- Start from specified feature or requirement element
+- Start from specified capability or requirement element
 - When direction is UPSTREAM from a requirement:
- - Traverse requirement `derivedFrom` parents, cross to the owning feature through `specify` or inherited ownership, then traverse feature `derivedFrom` parents
-- When direction is UPSTREAM from a feature:
- - Traverse feature `derivedFrom` parents only
+ - Traverse requirement `derivedFrom` parents, cross to the owning capability through `specify` or inherited ownership, then traverse capability `derivedFrom` parents
+- When direction is UPSTREAM from a capability:
+ - Traverse capability `derivedFrom` parents only
 - When direction is DOWNSTREAM from a requirement:
  - Traverse child requirements through `derive` only
-- When direction is DOWNSTREAM from a feature:
- - Traverse child features through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`
+- When direction is DOWNSTREAM from a capability:
+ - Traverse child capabilities through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`
 - Include the starting element in output
 
 **Content Collection:**
@@ -43,7 +43,7 @@ Technical specification for content collection from requirement chains.
 
 **Error Handling:**
 - Element not found: Error with message
-- Element not a feature or requirement type: Error with message
+- Element not a capability or requirement type: Error with message
 - Attachment file not found: Warning, continue with other content
 - Circular reference: Detect and break cycle
 
@@ -51,36 +51,36 @@ Technical specification for content collection from requirement chains.
  * type: specification
 
 #### Relations
- * refine: [Collect Feature and Requirement Context](Reporting.md#collect-feature-and-requirement-context)
+ * refine: [Collect Capability and Requirement Context](Reporting.md#collect-capability-and-requirement-context)
 ---
 
-### Feature Collect Traversal Specification
+### Capability Collect Traversal Specification
 
 #### Details
-Collect supports `feature` and `requirement` start elements.
+Collect supports `capability` and `requirement` start elements.
 
 Default collection excludes implementation/evidence relations (`satisfiedBy`, `verify`, `verifiedBy`) and generic `trace` relations.
 
 When starting from a `requirement`:
-- UPSTREAM traverses requirement parents through `derivedFrom`, then crosses to the owning feature through `specify` or inherited feature ownership, then traverses parent features through `derivedFrom`.
-- DOWNSTREAM traverses child requirements through `derive` only and does not cross to features.
-- The collected content includes ontology context inherited from the owning feature path, plus each traversed requirement's requirement-detail refinements and requirement-owned contract attachments.
+- UPSTREAM traverses requirement parents through `derivedFrom`, then crosses to the owning capability through `specify` or inherited capability ownership, then traverses parent capabilities through `derivedFrom`.
+- DOWNSTREAM traverses child requirements through `derive` only and does not cross to capabilities.
+- The collected content includes ontology context inherited from the owning capability path, plus each traversed requirement's requirement-detail refinements and requirement-owned contract attachments.
 
-When starting from a `feature`:
-- UPSTREAM traverses parent features through `derivedFrom` only and does not include requirements that specify those features.
-- DOWNSTREAM traverses child features through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`.
-- The collected content includes attached ontology context for feature elements, inherited ontology context for descendant feature and requirement elements, and requirement-owned semantic contracts, requirement-detail refinements, and attachments for requirement elements.
+When starting from a `capability`:
+- UPSTREAM traverses parent capabilities through `derivedFrom` only and does not include requirements that specify those capabilities.
+- DOWNSTREAM traverses child capabilities through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`.
+- The collected content includes attached ontology context for capability elements, inherited ontology context for descendant capability and requirement elements, and requirement-owned semantic contracts, requirement-detail refinements, and attachments for requirement elements.
 
 The `specifiedBy`/`specify` bridge is therefore directional:
-- Requirement UPSTREAM uses the bridge to add feature context.
-- Feature DOWNSTREAM uses the bridge to add specified requirement context.
-- Feature UPSTREAM and requirement DOWNSTREAM do not use the bridge.
+- Requirement UPSTREAM uses the bridge to add capability context.
+- Capability DOWNSTREAM uses the bridge to add specified requirement context.
+- Capability UPSTREAM and requirement DOWNSTREAM do not use the bridge.
 
 #### Metadata
  * type: specification
 
 #### Relations
- * refine: [Feature Collect Traversal](../Core/ModelManagement.md#feature-collect-traversal)
+ * refine: [Capability Collect Traversal](../Core/ModelManagement.md#capability-collect-traversal)
 ---
 
 ### JSON Element Size Estimate Output Specification
@@ -107,7 +107,7 @@ JSON report outputs are expected to preserve element size-estimate metadata when
 Structured model evidence outputs are expected to expose effective requirement governance metadata with stable source information.
 
 #### Details
-- Full search JSON output and equivalent MCP structured search results shall include `governance_metadata` for governance-bearing element payloads (`feature` and `requirement`).
+- Full search JSON output and equivalent MCP structured search results shall include `governance_metadata` for governance-bearing element payloads (`capability` and `requirement`).
 - Non-governance-bearing element payloads shall omit `governance_metadata`.
 - The `governance_metadata` object shall contain `status`, `priority`, `risk`, and `owner` entries.
 - Each entry shall contain:
@@ -249,7 +249,7 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 **Element Type Colors:**
 | Element Type | Color Name | Hex Code | Usage |
 |--------------|------------|----------|-------|
-| Feature | Feature Blue | #BBDEFB | Product/capability feature roots |
+| Capability | Capability Blue | #BBDEFB | Capability roots |
 | Ontology | Muted Sunflower | #F4E3A1 | First-class ontology vocabulary/model terms |
 | Requirement | Deep Purple | #673AB7 | Core requirements, goals |
 | Verification | Emerald Green | #4CAF50 | Validation criteria, testing |
@@ -275,7 +275,7 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 |-----------|----------|------|
 | folder | #9E9E9E | 📁 |
 | file | #FFCA28 | 📄 |
-| feature | #BBDEFB | ◆ |
+| capability | #BBDEFB | ◆ |
 | requirement | #673AB7 | 📐 |
 | verification | #4CAF50 | ✅ |
 | refinement | #FF9800 | 🔧 |
@@ -422,7 +422,7 @@ Label format example:
 Users is expected to be able to specify multiple element types in a single search operation using comma-separated values (e.g., `requirement,test-verification,behavior`).
 
 This capability enables:
-- Searching across related type categories (features, requirements, verification types, and refinement types)
+- Searching across related type categories (capabilities, requirements, verification types, and refinement types)
 - Building complex queries without multiple search invocations
 - Improved workflow efficiency for model analysis and reporting
 
@@ -532,11 +532,11 @@ Report command catalog for model reporting capabilities.
 
 #### Details
 Report commands:
-- `collect`: feature-or-requirement context collection, with upstream or downstream traversal and source citations.
-- `coverage`: requirement verification coverage, evidence-backed verification satisfaction, implementation coverage, and feature coverage rollup.
-- `traces`: verification-to-feature-root traceability trees.
+- `collect`: capability-or-requirement context collection, with upstream or downstream traversal and source citations.
+- `coverage`: requirement verification coverage, evidence-backed verification satisfaction, implementation coverage, and capability coverage rollup.
+- `traces`: verification-to-capability-root traceability trees.
 - `search`: model element search with relations, attachments, semantic-contract fields, and effective governance metadata.
-- `submodels`: independent feature-rooted subgraphs, cross-submodel couplings, and summary totals.
+- `submodels`: independent capability-rooted subgraphs, cross-submodel couplings, and summary totals.
 - `resources`: relation file targets and attachment identifier targets grouped by resource.
 - `ontologies`: collected ontology `Ontology` and semantic-contract `Shapes` Turtle blocks.
 - `model`: logical model graph traversal with optional direction and type filtering.
@@ -643,7 +643,7 @@ Styling conventions for Mermaid diagrams in CLI output and HTML export.
 **Diagram Node Classes (CSS):**
 | Class Name | Fill Color | Stroke Color | Usage |
 |------------|------------|--------------|-------|
-| feature | #BBDEFB | #1976D2 | Product/stakeholder feature elements |
+| capability | #BBDEFB | #1976D2 | Product/stakeholder capability elements |
 | ontology | #F4E3A1 | #B08A00 | First-class ontology elements |
 | systemRequirement | #E1D8EE | #673AB7 | System-level requirements |
 | requirement | #ECEFF1 | #673AB7 | Generic requirements |
@@ -656,14 +656,14 @@ Styling conventions for Mermaid diagrams in CLI output and HTML export.
 | changed | #FFDD57 | - | Changed nodes |
 
 **Color Scheme Contract:**
-- Mermaid diagrams that render feature elements shall emit `classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px`.
+- Mermaid diagrams that render capability elements shall emit `classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px`.
 - Mermaid diagrams that render ontology elements shall emit `classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px`.
 - Mermaid diagrams that render requirements shall emit `classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px`.
 - Mermaid diagrams that render generic requirements shall emit `classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px` when the diagram format uses a generic requirement class.
 - Mermaid diagrams that render verification elements shall emit `classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px`.
-- Feature styling shall be visually distinct from requirement styling; feature elements shall not reuse the purple requirement color family.
-- Ontology styling shall be visually distinct from feature, requirement, verification, and refinement styling; ontology elements use a muted sunflower color family.
-- The same feature and ontology color contracts apply to containment diagrams, model diagrams, verification trace diagrams, generated Markdown, and HTML export Mermaid blocks.
+- Capability styling shall be visually distinct from requirement styling; capability elements shall not reuse the purple requirement color family.
+- Ontology styling shall be visually distinct from capability, requirement, verification, and refinement styling; ontology elements use a muted sunflower color family.
+- The same capability and ontology color contracts apply to containment diagrams, model diagrams, verification trace diagrams, generated Markdown, and HTML export Mermaid blocks.
 
 **Relation Line Styles:**
 | Relation Type | Color | Line Style |
@@ -687,14 +687,14 @@ Styling conventions for Mermaid diagrams in CLI output and HTML export.
  * type: specification
 ---
 
-### Mermaid Interactive Features Specification
+### Mermaid Interactive Capabilities Specification
 
 Technical specification for interactive Mermaid diagram navigation and filtering capabilities.
 
 #### Details
 **Model Navigation and Filtering:**
 Users is expected to be able to generate and view model structure diagrams from any starting point:
-- Default view shows ontology roots and feature roots according to model hierarchy traversal rules
+- Default view shows ontology roots and capability roots according to model hierarchy traversal rules
 - Filter from specific element using --from flag
 - Generate complete model structure with nested relations showing element details recursively
 - Mermaid diagrams display all nested relations recursively
@@ -739,7 +739,7 @@ Technical specification for requirement implementation coverage classification l
 #### Details
 Implementation coverage source vocabulary is defined by the Reqvire report ontology.
 
-Implementation coverage scope includes only elements of type `requirement`. Elements of type `feature` are excluded from direct implementation coverage and receive implementation coverage through feature roll-up.
+Implementation coverage scope includes only elements of type `requirement`. Elements of type `capability` are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.
 
 The report shall classify each requirement using the semantic coverage source vocabulary and the available `satisfiedBy`, `refinedBy`, attachment, and child requirement evidence.
 
@@ -756,7 +756,7 @@ Technical specification for submodels report structure and deterministic orderin
 
 #### Details
 **Submodel Boundary Principle:**
-Canonical submodel, feature-root submodel, scoped submodel, and cross-submodel coupling concepts are defined by the Reqvire report ontology.
+Canonical submodel, capability-root submodel, scoped submodel, and cross-submodel coupling concepts are defined by the Reqvire report ontology.
 
 **Refactor Rule:**
 When a relation crosses intended submodel boundaries, either:
@@ -765,7 +765,7 @@ When a relation crosses intended submodel boundaries, either:
 
 **Refactor Procedure:**
 Apply boundary refactoring recursively, top-down:
-1. Start from each feature root and inspect its first-level feature and requirement children.
+1. Start from each capability root and inspect its first-level capability and requirement children.
 2. For each first-level child, inspect all direct children and relation edges.
 3. Continue recursively for each descendant branch until leaf requirements.
 4. At each level, enforce:
@@ -781,12 +781,12 @@ A submodel may contain internal sub-boundaries (nested domains) with separate ow
 Cross-internal-boundary dependencies should be modeled as explicit attachment contracts when they represent contractual dependency, not hierarchical ownership.
 
 **Submodel Resolution Rules:**
-- A submodel root is a feature element with no feature parent relation.
-- Feature submodel membership is resolved through feature `derivedFrom`/`derive` hierarchy.
+- A submodel root is a capability element with no capability parent relation.
+- Capability submodel membership is resolved through capability `derivedFrom`/`derive` hierarchy.
 - Requirement membership is resolved through `specify`/`specifiedBy` and requirement hierarchy.
-- Each requirement is expected to be assigned to one resolved feature root for report grouping.
-- For full report generation, submodel entries are feature roots, not requirement roots.
-- For feature-scoped report generation, the selected feature is reported as the scoped submodel and its requirement count includes requirements that specify the selected feature or descendant features, including descendant requirements.
+- Each requirement is expected to be assigned to one resolved capability root for report grouping.
+- For full report generation, submodel entries are capability roots, not requirement roots.
+- For capability-scoped report generation, the selected capability is reported as the scoped submodel and its requirement count includes requirements that specify the selected capability or descendant capabilities, including descendant requirements.
 - For requirement-scoped report generation, the selected requirement defines a scope boundary; it is not itself reported as a submodel entry.
 
 **Report Content:**
@@ -801,25 +801,25 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
  - source and target root context
 
 **Cross-Submodel Coupling Scope:**
-- Include requirement-to-requirement relations where source and target belong to different feature roots.
+- Include requirement-to-requirement relations where source and target belong to different capability roots.
 - Use explicit relation targets only (no inferred transitive links).
 - For scope-scoped report generation, include only couplings where the source or target requirement is inside the selected scope.
 
 **Scope Resolution Rules:**
-- In scope mode, select a feature or requirement by name.
-- Feature scope computes the selected feature subtree through feature hierarchy, then includes requirements that specify those features and their requirement descendants. The selected feature appears as the scoped submodel entry.
+- In scope mode, select a capability or requirement by name.
+- Capability scope computes the selected capability subtree through capability hierarchy, then includes requirements that specify those capabilities and their requirement descendants. The selected capability appears as the scoped submodel entry.
 - Requirement scope computes the selected requirement subtree through requirement hierarchy. The selected requirement is excluded from the `submodels` output, and first-level child requirement branches are reported as scoped requirement submodels.
 - If a selected requirement boundary has no children in the induced subtree, `submodels` output is empty.
 
 **Output Formats:**
 *Text/Markdown Format:*
 - Human-readable sectioned report with deterministic ordering
-- Introductory text states that submodels are independent feature-rooted subgraphs resolved through feature ownership relations.
+- Introductory text states that submodels are independent capability-rooted subgraphs resolved through capability ownership relations.
 - Markdown links for source/target/root identifiers
 - Summary section with totals
 - When filtered by scope:
  - output submodels discovered within selected scope
- - output the selected feature when filtering by feature
+ - output the selected capability when filtering by capability
  - do not output the selected requirement when filtering by requirement
  - summary counts are computed from filtered output only
 
@@ -829,7 +829,7 @@ Cross-internal-boundary dependencies should be modeled as explicit attachment co
 - Stable sort order for reproducible automation output
 - When filtered by scope:
  - JSON includes only filtered-scope submodel data and relevant couplings
- - selected feature scope appears in `submodels` array
+ - selected capability scope appears in `submodels` array
  - selected requirement scope is excluded from `submodels` array
 
 **Summary Section Semantics:**
@@ -901,10 +901,10 @@ The output shall:
 - Emit JSON-LD when requested by the CLI `--jsonld` option.
 - Support full semantic model export when requested by the CLI `--full` option or MCP `full: true` argument.
 - In full semantic model export mode, append RDF triples for Reqvire model context:
-  - all parsed feature, requirement, ontology, semantic-contract, verification, and refinement elements
+  - all parsed capability, requirement, ontology, semantic-contract, verification, and refinement elements
   - element id, identifier, name, type, file path, and source line
   - internal model relations, including `derive`, `derivedFrom`, `specify`, `specifiedBy`, `refine`, `refinedBy`, `verify`, `verifiedBy`, `satisfy`, `satisfiedBy`, and `trace`
-  - element attachments, including feature-to-ontology attachments and requirement-to-contract attachments
+  - element attachments, including capability-to-ontology attachments and requirement-to-contract attachments
   - concept references from model elements to ontology terms
   - ontology term declaration edges from ontology elements to declared terms
   - semantic-contract shape reference edges from semantic contracts to referenced ontology terms
@@ -1033,8 +1033,8 @@ Visual styling rules for verification trace diagrams.
 **Diagram Output:**
 Verification trace diagrams is expected to use the same visual styling as other mermaid diagrams:
 - Containment structure with folder and file subgraphs showing physical location of elements
-- Element type-based CSS classes (feature, ontology, systemRequirement, verification) for consistent coloring
-- Feature nodes use the canonical feature color contract from Mermaid Diagram Style Specification
+- Element type-based CSS classes (capability, ontology, systemRequirement, verification) for consistent coloring
+- Capability nodes use the canonical capability color contract from Mermaid Diagram Style Specification
 - Ontology nodes use the canonical muted sunflower ontology color contract from Mermaid Diagram Style Specification
 - Directly verified requirements highlighted with appropriate styling
 

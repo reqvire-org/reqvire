@@ -9,8 +9,8 @@ set -uo pipefail
 # derivedFrom relation to A), the relation identifier is not updated.
 # Part 1 of update_relation_identifiers detects that both elements are
 # now in the same file and does "keep as-is" - but "as-is" means the
-# OLD cross-file path (e.g. ../Requirements.md#feature-a) which is now
-# stale. The relation should become a same-file fragment (#feature-a).
+# OLD cross-file path (e.g. ../Requirements.md#capability-a) which is now
+# stale. The relation should become a same-file fragment (#capability-a).
 #
 # Additionally, Part 2 of update_relation_identifiers fails to update
 # the moved element's own outgoing relations because it looks up bare
@@ -46,20 +46,20 @@ assert_file_matches() {
 # Test 1: Move element into same file as referring element
 # ==================================
 # Setup:
-#   - Feature A is in specifications/Requirements.md
-#   - Sub Feature is in specifications/SubDir/SubRequirements.md
-#   - Sub Feature has derivedFrom: ../Requirements.md#feature-a (cross-file)
+#   - Capability A is in specifications/Requirements.md
+#   - Sub Capability is in specifications/SubDir/SubRequirements.md
+#   - Sub Capability has derivedFrom: ../Requirements.md#capability-a (cross-file)
 #
-# Action: Move Feature A to specifications/SubDir/SubRequirements.md
+# Action: Move Capability A to specifications/SubDir/SubRequirements.md
 #
-# Expected: Sub Feature's derivedFrom should become #feature-a (same-file)
+# Expected: Sub Capability's derivedFrom should become #capability-a (same-file)
 #           because both elements are now in the same file.
 #
-# BUG: The relation stays as ../Requirements.md#feature-a (stale cross-file ref)
+# BUG: The relation stays as ../Requirements.md#capability-a (stale cross-file ref)
 #      causing "Missing relation target" validation error.
 
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Feature A" "specifications/SubDir/SubRequirements.md" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Capability A" "specifications/SubDir/SubRequirements.md" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -72,11 +72,11 @@ fi
 # Check file contents match expected
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-move-requirements.md" \
   "$TEST_DIR/specifications/Requirements.md" \
-  "Requirements.md after moving Feature A out"
+  "Requirements.md after moving Capability A out"
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-move-subrequirements.md" \
   "$TEST_DIR/specifications/SubDir/SubRequirements.md" \
-  "SubRequirements.md after Feature A moved in (cross-file ref should become same-file)"
+  "SubRequirements.md after Capability A moved in (cross-file ref should become same-file)"
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-move-tests.md" \
   "$TEST_DIR/specifications/Verifications/Tests.md" \

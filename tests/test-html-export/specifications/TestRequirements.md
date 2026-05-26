@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Html Export Specifications Testrequirements Md
+### Test Capability Test Html Export Specifications Testrequirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This document contains test requirements for HTML export testing.
@@ -20,7 +20,7 @@ The system SHALL support HTML export functionality with proper link handling.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-html-export-specifications-testrequirements-md)
+  * specify: [Test Capability](#test-capability-test-html-export-specifications-testrequirements-md)
 ---
 
 ### Test Requirement 1

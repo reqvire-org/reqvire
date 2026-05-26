@@ -1,24 +1,24 @@
 # Elements
 
-### Test Feature A
+### Test Capability A
 
-Verify Feature A implementation.
+Verify Capability A implementation.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Feature A](../SubDir/SubRequirements.md#feature-a)
+  * verify: [Capability A](../SubDir/SubRequirements.md#capability-a)
 ---
 
-### Test Feature B
+### Test Capability B
 
-Verify Feature B implementation.
+Verify Capability B implementation.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Feature B](../Requirements.md#feature-b)
+  * verify: [Capability B](../Requirements.md#capability-b)
 ---
 

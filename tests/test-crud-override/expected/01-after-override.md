@@ -1,8 +1,8 @@
 # Elements
 
-### Feature A
+### Capability A
 
-This is the UPDATED feature A with new content.
+This is the UPDATED capability A with new content.
 
 #### Details
 New details section added.
@@ -11,14 +11,14 @@ New details section added.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Crud Override Specifications Requirements Md](#test-feature-test-crud-override-specifications-requirements-md)
+  * specify: [Test Capability Test Crud Override Specifications Requirements Md](#test-capability-test-crud-override-specifications-requirements-md)
 ---
 
-### Test Feature Test Crud Override Specifications Requirements Md
+### Test Capability Test Crud Override Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 

@@ -64,8 +64,8 @@ echo "" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 echo "$DISPLAY_SETTINGS_CONTENT" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 sed -i '/satisfiedBy: display_impl.py/a\  * satisfiedBy: display_test.py' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 
-# Relocated root requirements still belong to the feature that remains in FirstFile.md.
-sed -i 's@(#test-feature-test-change-impact-element-relocation-specifications-firstfile-md)@(../FirstFile.md#test-feature-test-change-impact-element-relocation-specifications-firstfile-md)@g' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+# Relocated root requirements still belong to the capability that remains in FirstFile.md.
+sed -i 's@(#test-capability-test-change-impact-element-relocation-specifications-firstfile-md)@(../FirstFile.md#test-capability-test-change-impact-element-relocation-specifications-firstfile-md)@g' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 
 # Run change impact detection
 echo "Running: reqvire change-impact" >> "${TEST_DIR}/test_results.log"

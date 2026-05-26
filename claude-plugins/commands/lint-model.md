@@ -62,10 +62,10 @@ Lint the Reqvire model to fix quality issues and identify items needing manual r
 
 ## Best Practices
 
-- Run `reqvire lint --fix` after adding features
+- Run `reqvire lint --fix` after adding capabilities
 - Review manual items carefully before removing
 - Validate model after manual changes
-- Use after `/reqvire:add-feature` or `/reqvire:add-verification` to clean up
+- Use after `/reqvire:add-capability` or `/reqvire:add-verification` to clean up
 
 ## Notes
 

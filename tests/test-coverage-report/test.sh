@@ -250,40 +250,40 @@ if ! echo "$OUTPUT" | jq '.uncovered_requirements | has("files")' | grep -q true
     exit 1
 fi
 
-if ! echo "$OUTPUT" | jq 'has("feature_coverage")' | grep -q true; then
-    echo "❌ FAILED: JSON missing 'feature_coverage' field"
+if ! echo "$OUTPUT" | jq 'has("capability_coverage")' | grep -q true; then
+    echo "❌ FAILED: JSON missing 'capability_coverage' field"
     exit 1
 fi
 
-if ! echo "$OUTPUT" | jq '.feature_coverage | has("features")' | grep -q true; then
-    echo "❌ FAILED: JSON feature_coverage missing 'features'"
+if ! echo "$OUTPUT" | jq '.capability_coverage | has("capabilities")' | grep -q true; then
+    echo "❌ FAILED: JSON capability_coverage missing 'capabilities'"
     exit 1
 fi
 
-FEATURE_COUNT=$(echo "$OUTPUT" | jq '.feature_coverage.features | length')
-if [ "$FEATURE_COUNT" -ne 1 ]; then
-    echo "❌ FAILED: Expected 1 feature coverage entry, got $FEATURE_COUNT"
+CAPABILITY_COUNT=$(echo "$OUTPUT" | jq '.capability_coverage.capabilities | length')
+if [ "$CAPABILITY_COUNT" -ne 1 ]; then
+    echo "❌ FAILED: Expected 1 capability coverage entry, got $CAPABILITY_COUNT"
     exit 1
 fi
 
-COVERAGE_FEATURE=$(echo "$OUTPUT" | jq '.feature_coverage.features[] | select(.name == "Coverage Feature")')
-if [ -z "$COVERAGE_FEATURE" ]; then
-    echo "❌ FAILED: Missing Coverage Feature roll-up"
+COVERAGE_CAPABILITY=$(echo "$OUTPUT" | jq '.capability_coverage.capabilities[] | select(.name == "Coverage Capability")')
+if [ -z "$COVERAGE_CAPABILITY" ]; then
+    echo "❌ FAILED: Missing Coverage Capability roll-up"
     exit 1
 fi
 
-if [ "$(echo "$COVERAGE_FEATURE" | jq '.aggregate_leaf_requirements')" -ne 5 ]; then
-    echo "❌ FAILED: Coverage Feature should roll up 5 leaf requirements"
+if [ "$(echo "$COVERAGE_CAPABILITY" | jq '.aggregate_leaf_requirements')" -ne 5 ]; then
+    echo "❌ FAILED: Coverage Capability should roll up 5 leaf requirements"
     exit 1
 fi
 
-if [ "$(echo "$COVERAGE_FEATURE" | jq '.aggregate_verified_leaf_requirements')" -ne 4 ]; then
-    echo "❌ FAILED: Coverage Feature should roll up 4 verified leaf requirements"
+if [ "$(echo "$COVERAGE_CAPABILITY" | jq '.aggregate_verified_leaf_requirements')" -ne 4 ]; then
+    echo "❌ FAILED: Coverage Capability should roll up 4 verified leaf requirements"
     exit 1
 fi
 
-if [ "$(echo "$COVERAGE_FEATURE" | jq -r '.mark')" != "partial" ]; then
-    echo "❌ FAILED: Coverage Feature mark should be partial"
+if [ "$(echo "$COVERAGE_CAPABILITY" | jq -r '.mark')" != "partial" ]; then
+    echo "❌ FAILED: Coverage Capability mark should be partial"
     exit 1
 fi
 

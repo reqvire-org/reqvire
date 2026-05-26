@@ -1,24 +1,24 @@
-Removed element: Feature B (specifications/Requirements.md#feature-b)
+Removed element: Capability B (specifications/Requirements.md#capability-b)
 
 📄 specifications/Requirements.md
   [37m001     # Elements[0m
   [37m002[0m
-  [37m003     ### Feature D Constraint[0m
+  [37m003     ### Capability D Constraint[0m
 
-  [37m040     #### Relations[0m
-  [37m041       * derivedFrom: [Feature A](#feature-a)[0m
-  [37m042     ---[0m
-  [31m043 -   ### Feature B[0m
-  [31m043 -   ␤[0m
-  [31m043 -   This is a test requirement for feature B.[0m
-  [31m043 -   ␤[0m
-  [31m043 -   #### Metadata[0m
-  [31m043 -     * type: requirement[0m
-  [31m043 -   ␤[0m
-  [31m043 -   #### Relations[0m
-  [31m043 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [31m043 -   ---[0m
-  [31m043 -   ␤[0m
-  [37m043     ### Feature C[0m
-  [37m044[0m
-  [37m045     This is a test requirement for feature C with relations.[0m
+  [37m029     #### Relations[0m
+  [37m030       * derivedFrom: [Parent Capability](#parent-capability)[0m
+  [37m031     ---[0m
+  [31m032 -   ### Capability B[0m
+  [31m032 -   ␤[0m
+  [31m032 -   This is a test requirement for capability B.[0m
+  [31m032 -   ␤[0m
+  [31m032 -   #### Metadata[0m
+  [31m032 -     * type: requirement[0m
+  [31m032 -   ␤[0m
+  [31m032 -   #### Relations[0m
+  [31m032 -     * derivedFrom: [Capability A](#capability-a)[0m
+  [31m032 -   ---[0m
+  [31m032 -   ␤[0m
+  [37m032     ### Capability C[0m
+  [37m033[0m
+  [37m034     This is a test requirement for capability C with relations.[0m

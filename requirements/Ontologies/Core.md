@@ -14,31 +14,31 @@ This is the foundation ontology used by the rest of the Reqvire ontology set. Ot
 
 reqvire:Element a owl:Class ;
   rdfs:comment "Base class for addressable Reqvire model elements and related model artifacts." .
-reqvire:Feature a owl:Class ;
+reqvire:Capability a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
-  rdfs:comment "Capability, stakeholder, regulatory, product-area, or domain anchor specified by requirements." .
+  rdfs:comment "Coherent operational, product, business, regulatory, or system ability that bridges ontology, requirements, and verification." .
 reqvire:Requirement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "Implementation-facing obligation that can be verified and satisfied by implementation or evidence." .
 reqvire:Refinement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
-  rdfs:comment "Detail element that refines a feature or requirement with source, semantic, behavioral, structural, or contract information." .
+  rdfs:comment "Detail element that refines a capability or requirement with source, semantic, behavioral, structural, or contract information." .
 reqvire:Verification a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
-  rdfs:comment "Evidence or method used to verify a requirement." .
+  rdfs:comment "Evidence or method used to verify a capability or requirement." .
 reqvire:Artifact a owl:Class ;
   rdfs:comment "Referenced implementation, evidence, document, or external resource artifact." .
 reqvire:ElementType a owl:Class ;
   rdfs:comment "Canonical metadata type value used to classify Reqvire elements." .
-reqvire:FeatureElementType a owl:Class ;
+reqvire:CapabilityElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
-  rdfs:comment "Element type category for feature anchors." .
+  rdfs:comment "Element type category for capability elements." .
 reqvire:RequirementElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for requirement obligations." .
 reqvire:RefinementElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
-  rdfs:comment "Element type category for feature-owned source refinements and requirement-owned refinements." .
+  rdfs:comment "Element type category for capability-owned and requirement-owned refinements." .
 reqvire:VerificationElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for verification methods and evidence records." .
@@ -84,7 +84,7 @@ reqvire:fragment a owl:DatatypeProperty ;
 reqvire:content a owl:DatatypeProperty ;
   rdfs:comment "Collected textual content for the element." .
 reqvire:elementTypeName a owl:DatatypeProperty ;
-  rdfs:comment "Metadata type token used in Markdown, such as feature, requirement, or semantic-contract." .
+  rdfs:comment "Metadata type token used in Markdown, such as capability, requirement, or semantic-contract." .
 reqvire:elementTypeCategory a owl:DatatypeProperty ;
   rdfs:comment "Broad family for a Reqvire element type." .
 reqvire:elementTypeDescription a owl:DatatypeProperty ;
@@ -106,10 +106,10 @@ reqvire:referenceTargetKindName a owl:DatatypeProperty ;
 reqvire:referenceTargetKindMeaning a owl:DatatypeProperty ;
   rdfs:comment "Stable meaning of a reference target category." .
 
-reqvire:featureType a reqvire:FeatureElementType ;
-  reqvire:elementTypeName "feature" ;
-  reqvire:elementTypeCategory "feature" ;
-  reqvire:elementTypeDescription "Product, capability, stakeholder, regulatory, external, or domain anchor specified by requirements." ;
+reqvire:capabilityType a reqvire:CapabilityElementType ;
+  reqvire:elementTypeName "capability" ;
+  reqvire:elementTypeCategory "capability" ;
+  reqvire:elementTypeDescription "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, refined by contracts, and verified by evidence." ;
   reqvire:defaultElementType false .
 
 reqvire:requirementType a reqvire:RequirementElementType ;

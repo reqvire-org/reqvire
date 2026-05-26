@@ -1,34 +1,34 @@
 # Elements
 
 
-### Test Feature Test Multi Type Search Specifications Requirements Md
+### Test Capability Test Multi Type Search Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Test Feature One
+### Test Capability One
 
-This is a test feature.
+This is a test capability.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-multi-type-search-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-multi-type-search-specifications-requirements-md)
 ---
 
-### Test Feature Two
+### Test Capability Two
 
-This is another test feature.
+This is another test capability.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-multi-type-search-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-multi-type-search-specifications-requirements-md)
 ---
 
 ### Test Requirement One
@@ -39,7 +39,7 @@ This is a test system requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Test Feature One](#test-feature-one)
+  * derivedFrom: [Test Capability One](#test-capability-one)
 
 ---
 
@@ -51,7 +51,7 @@ This is another test system requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Test Feature Two](#test-feature-two)
+  * derivedFrom: [Test Capability Two](#test-capability-two)
 
 ---
 

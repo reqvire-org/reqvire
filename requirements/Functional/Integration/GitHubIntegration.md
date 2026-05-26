@@ -8,7 +8,7 @@ The system shall automate export of HTML documentation in the GitHub workflow on
   * type: requirement
 
 #### Relations
-  * specify: [GitHub Workflow Automation](../../Features/Integration.md#github-workflow-automation)
+  * specify: [GitHub Workflow Automation](../../Capabilities/Integration.md#github-workflow-automation)
 ---
 
 ### Automated Documentation Export on PR Merge
@@ -37,7 +37,7 @@ The system shall automate validations of pull requests in the GitHub workflow to
 
 #### Relations
   * refinedBy: [Pull Request Validation Workflow Specification](Specifications.md#pull-request-validation-workflow-specification)
-  * specify: [GitHub Workflow Automation](../../Features/Integration.md#github-workflow-automation)
+  * specify: [GitHub Workflow Automation](../../Capabilities/Integration.md#github-workflow-automation)
 ---
 
 ### Generate Change Logs for Pull Requests
@@ -49,5 +49,5 @@ The system shall generate detailed change logs for pull requests, summarizing mo
 
 #### Relations
   * refinedBy: [Pull Request Change Log Workflow Specification](Specifications.md#pull-request-change-log-workflow-specification)
-  * specify: [GitHub Workflow Automation](../../Features/Integration.md#github-workflow-automation)
+  * specify: [GitHub Workflow Automation](../../Capabilities/Integration.md#github-workflow-automation)
 ---

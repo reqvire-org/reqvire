@@ -16,7 +16,7 @@ The system shall define a dedicated AI-assistant skills submodel that provides i
 #### Relations
  * derive: [AI Skills Instruction Contracts](#ai-skills-instruction-contracts)
  * derive: [AI Skills Markdown Implementation Artifacts](#ai-skills-markdown-implementation-artifacts)
- * specify: [AI-Assisted System Model Management](../../Features/Integration.md#ai-assisted-system-model-management)
+ * specify: [AI-Assisted System Model Management](../../Capabilities/Integration.md#ai-assisted-system-model-management)
 ---
 
 ### AI Skills Instruction Contracts
@@ -58,7 +58,7 @@ AI skill instruction contracts define MBSE-first Reqvire modeling workflows, bou
 
 #### Details
 Instruction contract rules:
-- Skill workflows start from feature and requirement context.
+- Skill workflows start from capability and requirement context.
 - Skill workflows separate semantic contracts from obligations.
 - Skill workflows align verifications before implementation changes.
 - Skill workflows run validation and lint after meaningful model updates.

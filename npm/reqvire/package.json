@@ -1,7 +1,7 @@
 {
   "name": "@reqvire-org/reqvire",
   "version": "0.0.0",
-  "description": "Reqvire requirements and traceability management CLI",
+  "description": "Semantic engineering graph for building verifiable and traceable systems.",
   "license": "Apache-2.0",
   "homepage": "https://www.reqvire.org",
   "repository": {

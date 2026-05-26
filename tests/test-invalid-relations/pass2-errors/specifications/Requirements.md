@@ -1,25 +1,25 @@
 # Elements
 
 
-### Test Feature Test Invalid Relations Pass2 Errors Specifications Requirements Md
+### Test Capability Test Invalid Relations Pass2 Errors Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This document contains requirements with Pass 2 validation errors (relation validation issues).
 
 
-### Valid Feature
+### Valid Capability
 
-This is a valid feature that serves as a parent.
+This is a valid capability that serves as a parent.
 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-invalid-relations-pass2-errors-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-invalid-relations-pass2-errors-specifications-requirements-md)
   * trace: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
@@ -41,7 +41,7 @@ This requirement has a relation to a non-existent element.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Valid Feature](#valid-feature)
+  * derivedFrom: [Valid Capability](#valid-capability)
   * satisfiedBy: [NonExistentElement.md#missing-element](NonExistentElement.md#missing-element)
 
 ---
@@ -54,8 +54,8 @@ This requirement has incompatible element in relation - satisfiedBy cannot point
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Valid Feature](#valid-feature)
-  * satisfiedBy: [Valid Feature](#valid-feature)
+  * derivedFrom: [Valid Capability](#valid-capability)
+  * satisfiedBy: [Valid Capability](#valid-capability)
 
 ---
 
@@ -67,7 +67,7 @@ This requirement has circular dependency.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Valid Feature](#valid-feature)
+  * derivedFrom: [Valid Capability](#valid-capability)
   * derivedFrom: [Requirement with Circular Dependencies C](#requirement-with-circular-dependencies-c)
 
 ---
@@ -80,7 +80,7 @@ This requirement has circular dependency.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Valid Feature](#valid-feature)
+  * derivedFrom: [Valid Capability](#valid-capability)
   * derivedFrom: [Requirement with Circular Dependencies A](#requirement-with-circular-dependencies-a)
 
 ---
@@ -93,7 +93,7 @@ This requirement has circular dependency.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Valid Feature](#valid-feature)
+  * derivedFrom: [Valid Capability](#valid-capability)
   * derivedFrom: [Requirement with Circular Dependencies B](#requirement-with-circular-dependencies-b)
 
 ---
@@ -106,7 +106,7 @@ This verification has a satisfiedBy relation pointing to a non-existing file.
   * type: verification
 
 #### Relations
-  * verify: [Valid Feature](#valid-feature)
+  * verify: [Valid Capability](#valid-capability)
   * satisfiedBy: [non-existing-test-script.sh](non-existing-test-script.sh)
 
 ---
@@ -119,7 +119,7 @@ This requirement has a verifiedBy relation pointing to a non-existing verificati
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Valid Feature](#valid-feature)
+  * derivedFrom: [Valid Capability](#valid-capability)
   * verifiedBy: [NonExistentVerification.md#missing-verification](NonExistentVerification.md#missing-verification)
 
 ---
@@ -132,7 +132,7 @@ This verification correctly uses satisfiedBy pointing to an existing test script
   * type: test-verification
 
 #### Relations
-  * verify: [Valid Feature](#valid-feature)
+  * verify: [Valid Capability](#valid-capability)
   * satisfiedBy: [test.sh](test.sh)
 
 ---
@@ -145,8 +145,8 @@ This requirement incorrectly uses satisfiedBy pointing to another requirement (s
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Valid Feature](#valid-feature)
-  * satisfiedBy: [Valid Feature](#valid-feature)
+  * derivedFrom: [Valid Capability](#valid-capability)
+  * satisfiedBy: [Valid Capability](#valid-capability)
 
 ---
 
@@ -158,7 +158,7 @@ This verification incorrectly uses satisfiedBy pointing to another verification 
   * type: test-verification
 
 #### Relations
-  * verify: [Valid Feature](#valid-feature)
+  * verify: [Valid Capability](#valid-capability)
   * satisfiedBy: [Valid Verification with Correct SatisfiedBy](#valid-verification-with-correct-satisfiedby)
 
 ---
@@ -171,7 +171,7 @@ This requirement has a satisfiedBy relation pointing to a non-existing file.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Valid Feature](#valid-feature)
+  * derivedFrom: [Valid Capability](#valid-capability)
   * satisfiedBy: [non-existing-implementation.py](non-existing-implementation.py)
 
 ---
@@ -184,7 +184,7 @@ This analysis verification incorrectly has a satisfiedBy relation (should fail -
   * type: analysis-verification
 
 #### Relations
-  * verify: [Valid Feature](#valid-feature)
+  * verify: [Valid Capability](#valid-capability)
   * satisfiedBy: [analysis-document.md](analysis-document.md)
 
 ---
@@ -197,7 +197,7 @@ This inspection verification incorrectly has a satisfiedBy relation (should fail
   * type: inspection-verification
 
 #### Relations
-  * verify: [Valid Feature](#valid-feature)
+  * verify: [Valid Capability](#valid-capability)
   * satisfiedBy: [inspection-checklist.md](inspection-checklist.md)
 
 ---
@@ -210,7 +210,7 @@ This demonstration verification incorrectly has a satisfiedBy relation (should f
   * type: demonstration-verification
 
 #### Relations
-  * verify: [Valid Feature](#valid-feature)
+  * verify: [Valid Capability](#valid-capability)
   * satisfiedBy: [demo-script.sh](demo-script.sh)
 
 ---

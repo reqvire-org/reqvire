@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Crud Empty File Cleanup Specifications Parent Md
+### Test Capability Test Crud Empty File Cleanup Specifications Parent Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Parent Requirement
@@ -17,4 +17,4 @@ This is a parent requirement that will stay in this file.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-crud-empty-file-cleanup-specifications-parent-md)
+  * specify: [Test Capability](#test-capability-test-crud-empty-file-cleanup-specifications-parent-md)

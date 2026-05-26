@@ -394,7 +394,7 @@ impl Default for GlobalSearchCounters {
     fn default() -> Self {
         // Initialize with all standard types at 0
         let mut requirements = BTreeMap::new();
-        requirements.insert("feature".to_string(), 0);
+        requirements.insert("capability".to_string(), 0);
         requirements.insert("system-requirement".to_string(), 0);
 
         let mut ontology = BTreeMap::new();
@@ -493,9 +493,9 @@ fn build_search_result(
 
             // Count by element type category
             match &elem.element_type {
-                element::ElementType::Feature => {
+                element::ElementType::Capability => {
                     *c.total_requirements_types
-                        .entry("feature".to_string())
+                        .entry("capability".to_string())
                         .or_insert(0) += 1;
 
                     if let Some(governance) = registry.resolve_governance_metadata(elem) {

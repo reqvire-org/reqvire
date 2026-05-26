@@ -14,11 +14,11 @@ Based on the Element Type Relation Compatibility specification, the following te
 | Source Type | Target Type | Expected | Test Case |
 |-------------|-------------|----------|-----------|
 | requirement | requirement | ✅ PASS | valid-cases/derivedfrom-req-to-req |
-| requirement | feature | ✅ PASS | valid-cases/derivedfrom-req-to-user-req |
-| feature | requirement | ✅ PASS | valid-cases/derivedfrom-user-req-to-req |
-| feature | feature | ✅ PASS | valid-cases/derivedfrom-user-req-to-user-req |
+| requirement | capability | ✅ PASS | valid-cases/derivedfrom-req-to-user-req |
+| capability | requirement | ✅ PASS | valid-cases/derivedfrom-user-req-to-req |
+| capability | capability | ✅ PASS | valid-cases/derivedfrom-user-req-to-user-req |
 | test-verification | requirement | ❌ FAIL | invalid-derivedfrom/verification-to-req |
-| test-verification | feature | ❌ FAIL | invalid-derivedfrom/verification-to-user-req |
+| test-verification | capability | ❌ FAIL | invalid-derivedfrom/verification-to-user-req |
 | analysis-verification | requirement | ❌ FAIL | invalid-derivedfrom/analysis-to-req |
 | requirement | test-verification | ❌ FAIL | invalid-derivedfrom/req-to-verification |
 | other | requirement | ❌ FAIL | invalid-derivedfrom/other-to-req |
@@ -31,7 +31,7 @@ Based on the Element Type Relation Compatibility specification, the following te
 | Source Type | Target Type | Expected | Test Case |
 |-------------|-------------|----------|-----------|
 | requirement | InternalPath (file) | ✅ PASS | valid-cases/satisfiedby-req-to-file |
-| feature | InternalPath (file) | ❌ FAIL | invalid-satisfiedby/user-req-to-file |
+| capability | InternalPath (file) | ❌ FAIL | invalid-satisfiedby/user-req-to-file |
 | test-verification | InternalPath (file) | ✅ PASS | valid-cases/satisfiedby-test-verif-to-file |
 | requirement | behavior | ✅ PASS | valid-cases/satisfiedby-req-to-behavior |
 | requirement | specification | ✅ PASS | valid-cases/satisfiedby-req-to-specification |
@@ -49,7 +49,7 @@ Based on the Element Type Relation Compatibility specification, the following te
 |-------------|-------------|----------|-----------|
 | requirement | test-verification | ✅ PASS | valid-cases/verifiedby-req-to-test-verif |
 | requirement | analysis-verification | ✅ PASS | valid-cases/verifiedby-req-to-analysis |
-| feature | test-verification | ✅ PASS | valid-cases/verifiedby-user-req-to-verif |
+| capability | verification | ✅ PASS | valid-cases/verifiedby-capability-to-verif |
 | test-verification | test-verification | ❌ FAIL | invalid-verifiedby/verif-to-verif |
 | test-verification | requirement | ❌ FAIL | invalid-verifiedby/verif-to-req |
 | other | test-verification | ❌ FAIL | invalid-verifiedby/other-to-verif |
@@ -60,6 +60,7 @@ Based on the Element Type Relation Compatibility specification, the following te
 |-------------|-------------|----------|-----------|
 | test-verification | requirement | ✅ PASS | valid-cases/verify-test-verif-to-req |
 | analysis-verification | requirement | ✅ PASS | valid-cases/verify-analysis-to-req |
+| analysis-verification | capability | ✅ PASS | valid-cases/verify-analysis-to-capability |
 | test-verification | test-verification | ❌ FAIL | (covered by verifiedBy inverse) |
 | requirement | requirement | ❌ FAIL | invalid-verifiedby/req-using-verify |
 
@@ -83,9 +84,10 @@ Based on the Element Type Relation Compatibility specification, the following te
 
 | Element Type | Relation | Target Type | Expected | Test Case |
 |--------------|----------|-------------|----------|-----------|
-| source | refine | feature | ✅ PASS | valid-refinement/source-refine-feature |
+| source | refine | capability | ✅ PASS | valid-refinement/source-refine-capability |
 | ontology | derivedFrom | ontology | ✅ PASS | valid-hierarchy/ontology-derived-from-ontology |
-| semantic-contract | refine | feature | ❌ FAIL | invalid-refinement/semantic-contract-refine-feature |
+| semantic-contract | refine | capability | ✅ PASS | valid-refinement/semantic-contract-refine-capability |
+| behavior | refine | capability | ✅ PASS | valid-refinement/behavior-refine-capability |
 | semantic-contract | refine | requirement | ✅ PASS | valid-refinement/semantic-contract-refine-requirement |
 | constraint | refine | requirement | ✅ PASS | valid-refinement/constraint-refine-requirement |
 | behavior | refine | requirement | ✅ PASS | valid-refinement/behavior-refine-requirement |

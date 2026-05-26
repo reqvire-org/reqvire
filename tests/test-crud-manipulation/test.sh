@@ -29,15 +29,15 @@ echo ""
 # ==================================
 echo "Test 1: Add element operation..."
 
-NEW_ELEMENT='### Feature D
+NEW_ELEMENT='### Capability D
 
-This is a newly added feature.
+This is a newly added capability.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
+  * derivedFrom: [Capability A](#capability-a)
 '
 
 set +e
@@ -60,7 +60,7 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-add-diff.txt" <(echo "$ADD_OU
 fi
 
 # Verify element was added
-if ! grep -q "### Feature D" "$TEST_DIR/specifications/Requirements.md"; then
+if ! grep -q "### Capability D" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Element was not added to file"
   exit 1
 fi
@@ -85,15 +85,15 @@ echo ""
 # ==================================
 echo "Test 1a: Add element via --content flag..."
 
-CONTENT_ELEMENT='### Feature F
+CONTENT_ELEMENT='### Capability F
 
-This feature was added via --content flag.
+This capability was added via --content flag.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
+  * derivedFrom: [Capability A](#capability-a)
 '
 
 set +e
@@ -107,7 +107,7 @@ if [ $ADD_CONTENT_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! grep -q "### Feature F" "$TEST_DIR/specifications/Requirements.md"; then
+if ! grep -q "### Capability F" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Element was not added via --content flag"
   exit 1
 fi
@@ -125,12 +125,12 @@ fi
 
 # Clean up: remove the element to keep file state consistent for subsequent tests
 set +e
-RM_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Feature F" 2>&1)
+RM_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Capability F" 2>&1)
 RM_CONTENT_EXIT=$?
 set -e
 
 if [ $RM_CONTENT_EXIT -ne 0 ]; then
-  echo "❌ FAILED: Cleanup rm of Feature F failed with exit code $RM_CONTENT_EXIT"
+  echo "❌ FAILED: Cleanup rm of Capability F failed with exit code $RM_CONTENT_EXIT"
   echo "$RM_CONTENT_OUTPUT"
   exit 1
 fi
@@ -144,10 +144,10 @@ echo ""
 echo "Test 1b: Add element with attachments..."
 
 # First add a refinement element (constraint) that will be attached
-# The constraint must be owned by a requirement (via refinedBy), and Feature E must be outside that hierarchy
-CONSTRAINT_ELEMENT='### Feature D Constraint
+# The constraint must be owned by a requirement (via refinedBy), and Capability E must be outside that hierarchy
+CONSTRAINT_ELEMENT='### Capability D Constraint
 
-Rate limiting constraint for Feature D.
+Rate limiting constraint for Capability D.
 
 #### Metadata
   * type: constraint
@@ -166,7 +166,7 @@ fi
 
 # Link the constraint to its owning requirement via refinedBy
 set +e
-LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Separate Requirement Branch" refinedBy "Feature D Constraint" 2>&1)
+LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Separate Requirement Branch" refinedBy "Capability D Constraint" 2>&1)
 LINK_EXIT=$?
 set -e
 
@@ -177,18 +177,18 @@ if [ $LINK_EXIT -ne 0 ]; then
 fi
 
 # Now add a requirement with attachment to the constraint
-ELEMENT_WITH_ATTACHMENT='### Feature E
+ELEMENT_WITH_ATTACHMENT='### Capability E
 
-This feature has an attachment to a refinement element.
+This capability has an attachment to a refinement element.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
+  * derivedFrom: [Capability A](#capability-a)
 
 #### Attachments
-  * [Feature D Constraint](#feature-d-constraint)
+  * [Capability D Constraint](#capability-d-constraint)
 '
 
 set +e
@@ -209,7 +209,7 @@ if ! grep -q "#### Attachments" "$TEST_DIR/specifications/Requirements.md"; then
 fi
 
 # Verify attachment link exists
-if ! grep -q "Feature D Constraint" "$TEST_DIR/specifications/Requirements.md"; then
+if ! grep -q "Capability D Constraint" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Attachment link not found in file"
   exit 1
 fi
@@ -238,7 +238,7 @@ echo "Test 2: Delete element operation..."
 cp "$TEST_DIR/specifications/Requirements.md" "$TEST_DIR/requirements_backup.bak"
 
 set +e
-DELETE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Feature B" 2>&1)
+DELETE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Capability B" 2>&1)
 DELETE_EXIT=$?
 set -e
 
@@ -257,7 +257,7 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-rm-diff.txt" <(echo "$DELETE_
 fi
 
 # Verify element was removed
-if grep -q "### Feature B" "$TEST_DIR/specifications/Requirements.md"; then
+if grep -q "### Capability B" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Element was not removed from file"
   exit 1
 fi
@@ -292,7 +292,7 @@ echo "Test 3: Move element operation..."
 cp "${TEST_SCRIPT_DIR}/fixtures/specifications/OtherRequirements.md" "$TEST_DIR/specifications/OtherRequirements.md"
 
 set +e
-MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Feature C" "specifications/OtherRequirements.md" 2>&1)
+MOVE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Capability C" "specifications/OtherRequirements.md" 2>&1)
 MOVE_EXIT=$?
 set -e
 
@@ -311,19 +311,19 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-mv-diff.txt" <(echo "$MOVE_OU
 fi
 
 # Verify element was removed from source
-if grep -q "### Feature C" "$TEST_DIR/specifications/Requirements.md"; then
+if grep -q "### Capability C" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Element was not removed from source file"
   exit 1
 fi
 
 # Verify element was added to target
-if ! grep -q "### Feature C" "$TEST_DIR/specifications/OtherRequirements.md"; then
+if ! grep -q "### Capability C" "$TEST_DIR/specifications/OtherRequirements.md"; then
   echo "❌ FAILED: Element was not added to target file"
   exit 1
 fi
 
 # Verify relation was updated in verification file (check for relative path)
-if ! grep -q "OtherRequirements.md#feature-c" "$TEST_DIR/specifications/Verifications/Tests.md"; then
+if ! grep -q "OtherRequirements.md#capability-c" "$TEST_DIR/specifications/Verifications/Tests.md"; then
   echo "❌ FAILED: Relation was not updated to new location"
   exit 1
 fi
@@ -349,7 +349,7 @@ echo ""
 echo "Test 4: Rename element operation..."
 
 set +e
-RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Feature A" "Feature Alpha" 2>&1)
+RENAME_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Capability A" "Capability Alpha" 2>&1)
 RENAME_EXIT=$?
 set -e
 
@@ -368,19 +368,19 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-rename-diff.txt" <(echo "$REN
 fi
 
 # Verify element heading was updated
-if ! grep -q "### Feature Alpha" "$TEST_DIR/specifications/Requirements.md"; then
+if ! grep -q "### Capability Alpha" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Element heading was not renamed"
   exit 1
 fi
 
 # Verify old heading is gone
-if grep -q "### Feature A$" "$TEST_DIR/specifications/Requirements.md"; then
+if grep -q "### Capability A$" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Old element heading still exists"
   exit 1
 fi
 
-# Verify relations were updated (Feature D should now reference feature-alpha)
-if ! grep -q "#feature-alpha" "$TEST_DIR/specifications/Requirements.md"; then
+# Verify relations were updated (Capability D should now reference capability-alpha)
+if ! grep -q "#capability-alpha" "$TEST_DIR/specifications/Requirements.md"; then
   echo "❌ FAILED: Relations were not updated with new identifier"
   exit 1
 fi
@@ -517,8 +517,8 @@ if grep -q "ToMove.md#element-one" "$TEST_DIR/specifications/OtherRequirements.m
   exit 1
 fi
 
-# Verify outgoing relation was preserved (Element Two -> Feature Alpha)
-if ! grep -q "Requirements.md#feature-alpha" "$TEST_DIR/specifications/Moved.md"; then
+# Verify outgoing relation was preserved (Element Two -> Capability Alpha)
+if ! grep -q "Requirements.md#capability-alpha" "$TEST_DIR/specifications/Moved.md"; then
   echo "❌ FAILED: Outgoing relation was not preserved"
   exit 1
 fi
@@ -585,7 +585,7 @@ echo "  ✓ Non-existent element delete error handled"
 
 # Test 4c: Add element with duplicate name
 echo "  4c: Add element with duplicate name..."
-DUPLICATE_ELEMENT='### Feature Alpha
+DUPLICATE_ELEMENT='### Capability Alpha
 
 This is a duplicate.
 
@@ -638,7 +638,7 @@ echo "  ✓ Invalid element error handled"
 
 # Test 4e: Add element with non-existent relation target
 echo "  4e: Add element with non-existent relation target..."
-INVALID_RELATION_ELEMENT='### Feature With Bad Relation
+INVALID_RELATION_ELEMENT='### Capability With Bad Relation
 
 This element has a relation to a non-existent target.
 
@@ -690,7 +690,7 @@ echo "  ✓ Non-existent element rename error handled"
 # Test 5g: Rename to duplicate name
 echo "  5g: Rename to duplicate name..."
 set +e
-ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Feature D" "Parent Feature" 2>&1)
+ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rename "Capability D" "Parent Capability" 2>&1)
 ERROR_EXIT=$?
 set -e
 

@@ -25,7 +25,7 @@ reqvire coverage
 For a deeper understanding of how requirements connect, use the model-centric view:
 
 ```bash
-# Show all feature-rooted model structures with nested relations
+# Show all capability-rooted model structures with nested relations
 reqvire model [--json]
 
 # Start from specific element to see its subtree
@@ -35,7 +35,7 @@ reqvire model --from "Element Name"
 reqvire model --reverse
 
 # Filter by element type
-reqvire model --filter-type="feature"
+reqvire model --filter-type="capability"
 reqvire model --filter-type="requirement"
 reqvire model --filter-type="test-verification"
 
@@ -43,7 +43,7 @@ reqvire model --filter-type="test-verification"
 reqvire model --reverse --filter-type="test-verification"
 ```
 
-**Element types for `--filter-type`:** feature, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
+**Element types for `--filter-type`:** capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
 ## Searching Elements
 
@@ -62,7 +62,7 @@ Use `--short` when analyzing model structure without needing full content. Use `
 | `--filter-file` | Filter by file glob | `--filter-file="requirements/**/*.md"` |
 | `--filter-name` | Filter by element name (regex) | `--filter-name=".*Auth.*"` |
 | `--filter-id` | Filter by exact identifier | `--filter-id="requirements/File.md#element"` |
-| `--filter-type` | Filter by element type (comma-separated, OR logic) | `--filter-type="feature"` or `--filter-type="requirement,behavior"` |
+| `--filter-type` | Filter by element type (comma-separated, OR logic) | `--filter-type="capability"` or `--filter-type="requirement,behavior"` |
 | `--filter-content` | Filter by content (regex) | `--filter-content="SHALL.*validate"` |
 | `--filter-page-content` | Filter by file frontmatter | `--filter-page-content="security"` |
 | `--have-relations` | Elements with ALL relations | `--have-relations="verifiedBy,satisfiedBy"` |
@@ -70,12 +70,12 @@ Use `--short` when analyzing model structure without needing full content. Use `
 | `--has-attachments` | Elements with attachments | `--has-attachments` |
 | `--filter-attachment` | Filter by attachment pattern | `--filter-attachment="*.pdf"` |
 
-**Element types for --filter-type (supports comma-separated list):** feature, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
+**Element types for --filter-type (supports comma-separated list):** capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
 ### By Type
 ```bash
-# Find all features
-reqvire search --filter-type="feature" --short
+# Find all capabilities
+reqvire search --filter-type="capability" --short
 
 # Find all requirements
 reqvire search --filter-type="requirement" --short
@@ -95,7 +95,7 @@ reqvire search --filter-type="semantic-contract" --short
 reqvire search --filter-file="requirements/System/**" --short
 
 # Elements in specific file
-reqvire search --filter-file="**/Features.md" --short
+reqvire search --filter-file="**/Capabilities.md" --short
 ```
 
 ### By Name or Content
@@ -137,7 +137,7 @@ reqvire search --filter-attachment="**/DesignDocuments/**" --short
 To understand how verifications trace to requirements, use the traces command:
 
 ```bash
-# Show verification traces (upward from verifications to owning feature roots)
+# Show verification traces (upward from verifications to owning capability roots)
 reqvire traces [--json] [--filter-*]
 
 # Filter by specific element patterns
@@ -173,8 +173,8 @@ To gather complete context for a requirement, use the collect command:
 # Get full requirement chain with all ancestor content and attachments
 reqvire collect "<requirement-name>" [--json]
 
-# Example: collect all context for a feature
-reqvire collect "Feature Requirement"
+# Example: collect all context for a capability
+reqvire collect "Capability Requirement"
 
 # JSON format for programmatic use
 reqvire collect "System Requirement" --json
@@ -233,13 +233,13 @@ reqvire search --filter-type="verification" --not-have-relations="verify" --shor
 reqvire search --filter-type="test-verification" --not-have-relations="satisfiedBy" --short
 ```
 
-### Understand a feature area
+### Understand a capability area
 ```bash
-# Start from a feature or requirement and follow model relations
-reqvire model --from "Feature Name"
+# Start from a capability or requirement and follow model relations
+reqvire model --from "Capability Name"
 
-# See all elements in feature's folder
-reqvire search --filter-file="**/FeatureName/**" --short
+# See all elements in capability's folder
+reqvire search --filter-file="**/CapabilityName/**" --short
 ```
 
 ### Quick model health check

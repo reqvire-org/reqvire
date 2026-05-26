@@ -201,14 +201,14 @@ Reqvire interacts with external systems to enhance functionality and support dev
 
 ### CI/CD System
 
-Reqvire provides tools and features that CI/CD systems, such as GitHub Actions, can utilize to perform tasks like validation and diagram generation. 
+Reqvire provides tools and capabilities that CI/CD systems, such as GitHub Actions, can utilize to perform tasks like validation and diagram generation. 
 
 These tools enable CI/CD systems to enforce PR merge rules, validate changes, and automate feedback processes, such as adding comments, creating issues, or reporting statuses. 
 
 ### GitHub or Similar
 
 Reqvire integrates into existing agile and collaborative workflows by providing the necessary tools and scripts to support version control, change management, and traceability. 
-These features allow teams to seamlessly integrate System practices into their development processes, enabling effective collaboration through GitHub or similar platforms.
+These capabilities allow teams to seamlessly integrate System practices into their development processes, enabling effective collaboration through GitHub or similar platforms.
 
 ### Human Interaction
 

@@ -1,11 +1,11 @@
 # Elements
 
-### Root Feature
+### Root Capability
 
-Top-level root feature.
+Top-level root capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Child Requirement
@@ -16,5 +16,5 @@ Child requirement with exactly one root.
   * type: requirement
 
 #### Relations
-  * specify: [Root Feature](#root-feature)
+  * specify: [Root Capability](#root-capability)
 ---

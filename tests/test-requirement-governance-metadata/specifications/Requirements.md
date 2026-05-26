@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Requirement Governance Metadata Specifications Requirements Md
+### Test Capability Test Requirement Governance Metadata Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Root Requirement
@@ -21,7 +21,7 @@ The system shall provide a parent requirement with explicit governance metadata.
   * owner: Platform Team
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-requirement-governance-metadata-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-requirement-governance-metadata-specifications-requirements-md)
 ---
 
 ### Child Inherits Governance
@@ -67,7 +67,7 @@ The system shall provide a root requirement without authored governance metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-requirement-governance-metadata-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-requirement-governance-metadata-specifications-requirements-md)
 ---
 
 ### Refinement Contract

@@ -132,7 +132,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 Use mv-file when:
 - Reorganizing specification file structure
-- Moving all requirements for a feature to a different location
+- Moving all requirements for a capability to a different location
 - Consolidating or splitting specification files
 - Refactoring the model directory structure
 

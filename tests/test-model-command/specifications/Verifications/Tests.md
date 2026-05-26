@@ -40,13 +40,13 @@ Expected files:
 
 ### Default Filtering Test
 
-Test verifies default behavior filters to ontology roots and feature roots when --from flag is NOT specified.
+Test verifies default behavior filters to ontology roots and capability roots when --from flag is NOT specified.
 
 #### Details
 Test procedure:
 1. Run model command WITHOUT --from flag with --json
 2. Compare output against expected_output.json
-3. Verify only ontology roots and feature roots (without hierarchical parent relations) appear at top level
+3. Verify only ontology roots and capability roots (without hierarchical parent relations) appear at top level
 4. Verify ontology hierarchy, specified requirements, and derived children appear nested in relations
 5. Verify output is model-centric (not folder-centric)
 
@@ -104,7 +104,7 @@ Test procedure:
 2. Verify output starts from leaf elements
 3. Verify metadata.direction shows "Reverse"
 4. Verify relations use backward relation types (derivedFrom, satisfy, verify)
-5. Verify traversal goes from verification/leaf toward feature roots
+5. Verify traversal goes from verification/leaf toward capability roots
 
 #### Metadata
   * type: test-verification

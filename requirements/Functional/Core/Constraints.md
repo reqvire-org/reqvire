@@ -29,11 +29,11 @@ Only requirements in a separate branch of the hierarchy (no derivedFrom chain co
 Rules for keeping cross-subgraph attachment contracts one-directional.
 
 #### Details
-For cross-subgraph refinement attachments, flow is defined from the attaching element's feature-root hierarchy to the defining owner's feature-root hierarchy.
+For cross-subgraph refinement attachments, flow is defined from the attaching element's capability-root hierarchy to the defining owner's capability-root hierarchy.
 
 **One-direction invariant:**
 - If subgraph `A` attaches a refinement owned by subgraph `B`, then subgraph `B` must not attach refinements owned by subgraph `A`
-- This rule applies at the feature-root hierarchy level, not only to directly involved requirements or features
+- This rule applies at the capability-root hierarchy level, not only to directly involved requirements or capabilities
 
 **Rationale**: Attachment contracts are used to model waterfall-style dependency flow between subgraphs. Allowing reverse attachment flow between the same two subgraphs breaks boundary directionality and undermines attachment contracts as one-way dependency edges.
 
@@ -46,16 +46,16 @@ For cross-subgraph refinement attachments, flow is defined from the attaching el
 Rules requiring attachment targets to have compatible ownership before being attachable.
 
 An attachment target is valid only when it matches the attaching element family:
-- Feature attachments target ontology elements only.
+- Capability attachments target ontology elements only.
 - Requirements must not attach ontology directly.
 - Requirement attachments target requirement-owned refinements only: `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output`.
 - Requirement-owned refinements must have a `refine` relation to exactly one compatible requirement owner before they can be attached.
-- Feature-owned `source` refinements are not cross-subgraph attachment contracts.
+- Capability-owned refinements are not cross-subgraph attachment contracts.
 - Refinements without a valid `refine` relation cannot be attached anywhere.
 
-Attachment compatibility is defined by the Reqvire relation, feature, requirement, ontology, and semantic-contract model contracts.
+Attachment compatibility is defined by the Reqvire relation, capability, requirement, ontology, and semantic-contract model contracts.
 
-**Rationale**: Enforces model hygiene by making feature-level ontology context the single vocabulary inheritance path, while ensuring reusable requirement contracts are owned by exactly one requirement before being referenced elsewhere.
+**Rationale**: Enforces model hygiene by making capability-level ontology context the single vocabulary inheritance path, while ensuring reusable requirement contracts are owned by exactly one requirement before being referenced elsewhere.
 
 #### Metadata
   * type: constraint
@@ -85,11 +85,11 @@ Rules for detecting duplicate link targets across subsections.
 Validation rules for element type and relation type combinations.
 
 #### Details
-Canonical relation compatibility is defined by the Reqvire relation ontology, core element type vocabulary, feature/requirement refinement vocabulary, and verification type vocabulary.
+Canonical relation compatibility is defined by the Reqvire relation ontology, core element type vocabulary, capability/requirement refinement vocabulary, and verification type vocabulary.
 
 Validation shall enforce those model contracts so that:
-- hierarchy relations stay within feature, requirement, or ontology hierarchy families
-- `specify`/`specifiedBy` is the requirement-to-feature bridge
+- hierarchy relations stay within capability, requirement, or ontology hierarchy families
+- `specify`/`specifiedBy` is the requirement-to-capability bridge
 - `refine`/`refinedBy` follows subtype-compatible refinement ownership
 - `satisfiedBy`/`satisfy` is limited to requirement and evidence-backed verification satisfaction
 - `trace` remains trace-only for custom element types
@@ -100,14 +100,14 @@ Validation shall enforce those model contracts so that:
 
 ### Single Root Hierarchy Ownership Constraint
 
-Rules for ensuring each requirement hierarchy belongs to exactly one feature root.
+Rules for ensuring each requirement hierarchy belongs to exactly one capability root.
 
 #### Details
-- Feature hierarchy is defined by `derivedFrom`/`derive` between feature elements.
+- Capability hierarchy is defined by `derivedFrom`/`derive` between capability elements.
 - Requirement hierarchy is defined by `derivedFrom`/`derive` between requirement elements.
-- A top-level requirement must connect to its owning feature through `specify`/`specifiedBy`.
-- Every requirement hierarchy element shall resolve to exactly one feature root by traversing requirement parents and then the owning feature hierarchy.
-- Resolution count `0` is invalid (orphaned hierarchy from feature-root ownership perspective).
+- A top-level requirement must connect to its owning capability through `specify`/`specifiedBy`.
+- Every requirement hierarchy element shall resolve to exactly one capability root by traversing requirement parents and then the owning capability hierarchy.
+- Resolution count `0` is invalid (orphaned hierarchy from capability-root ownership perspective).
 - Resolution count `>1` is invalid (ambiguous multi-root ownership).
 
 This rule is a structural model invariant and shall be enforced as validation, not lint.

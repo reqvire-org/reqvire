@@ -74,12 +74,12 @@ Reqvire implements relation semantics for ownership, hierarchy, verification, im
 Element types supported by the system for classification and behavior determination.
 
 #### Details
-The canonical type vocabulary is defined by the Reqvire core element, feature, requirement, ontology, semantic-contract, and verification model contracts.
+The canonical type vocabulary is defined by the Reqvire core element, capability, requirement, ontology, semantic-contract, and verification model contracts.
 
 The implementation shall use those contracts as the authoritative source for:
-- feature, requirement, refinement, verification, and custom type categories
+- capability, requirement, refinement, verification, and custom type categories
 - default element type semantics
-- feature-owned and requirement-owned refinement type semantics
+- capability-owned and requirement-owned refinement type semantics
 - evidence-backed verification type semantics
 
 Parser-facing behavior remains:
@@ -98,12 +98,12 @@ Parser-facing behavior remains:
 
 ### Traceability Reporting Specification
 
-Reqvire provides traceability reports over the Reqvire feature, requirement, verification, refinement, attachment, and implementation graph.
+Reqvire provides traceability reports over the Reqvire capability, requirement, verification, refinement, attachment, and implementation graph.
 
 #### Details
 - Traceability reports shall use Reqvire relation semantics for traversal direction, ownership, and evidence links.
-- Upward reports shall trace implementation and verification evidence to requirements and owning feature roots where applicable.
-- Downstream reports shall trace feature roots to specified requirements and requirement descendants.
+- Upward reports shall trace implementation and verification evidence to requirements and owning capability roots where applicable.
+- Downstream reports shall trace capability roots to specified requirements and requirement descendants.
 - Change-impact reports shall use propagation relations, attachments, semantic dependencies, and impact scope rules to identify affected elements.
 
 #### Metadata
@@ -115,13 +115,13 @@ Reqvire provides traceability reports over the Reqvire feature, requirement, ver
 
 ### Verification Coverage Specification
 
-Reqvire supports verification coverage analysis for requirement verification and feature roll-up.
+Reqvire supports verification coverage analysis for requirement verification and capability roll-up.
 
 #### Details
-- Verification type vocabulary, evidence-backed verification semantics, and feature coverage vocabulary are defined by the Reqvire verification and verification rollup ontologies.
+- Verification type vocabulary, evidence-backed verification semantics, and capability coverage vocabulary are defined by the Reqvire verification and verification rollup ontologies.
 - Coverage reports shall classify verified and unverified requirements from `verifiedBy`/`verify` relations.
 - Coverage reports shall use the ontology-defined evidence-backed flag to decide whether a verification requires `satisfiedBy` evidence for coverage satisfaction.
-- Feature coverage shall be reported by rolling up coverage from requirements that specify each feature and from descendant feature subgraphs.
+- Capability coverage shall be reported by rolling up coverage from requirements that specify each capability and from descendant capability subgraphs.
 
 #### Metadata
   * type: specification

@@ -1,23 +1,23 @@
 # Elements
 
 
-### Test Feature Test Element Type Relation Compatibility Invalid Satisfiedby Specifications
+### Test Capability Test Element Type Relation Compatibility Invalid Satisfiedby Specifications
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Target Feature
+### Target Capability
 
-A feature for testing.
+A capability for testing.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-satisfiedby-specifications)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-invalid-satisfiedby-specifications)
 ---
 
 ### Target Test Verification
@@ -28,7 +28,7 @@ A test verification element.
   * type: test-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
 
 ---
 
@@ -40,7 +40,7 @@ INVALID: Analysis verification cannot use satisfiedBy (only test-verification ca
   * type: analysis-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
   * satisfiedBy: [analysis-doc.txt](analysis-doc.txt)
 
 ---
@@ -53,7 +53,7 @@ INVALID: Inspection verification cannot use satisfiedBy.
   * type: inspection-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
   * satisfiedBy: [inspection-checklist.txt](inspection-checklist.txt)
 
 ---
@@ -66,19 +66,19 @@ INVALID: Demonstration verification cannot use satisfiedBy.
   * type: demonstration-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
   * satisfiedBy: [demo-script.sh](demo-script.sh)
 
 ---
 
-### Feature with SatisfiedBy
+### Capability with SatisfiedBy
 
 INVALID: User requirements cannot use satisfiedBy.
 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-satisfiedby-specifications)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-invalid-satisfiedby-specifications)
   * satisfiedBy: [impl.txt](impl.txt)
 
 ---
@@ -91,8 +91,8 @@ INVALID: satisfiedBy must point to implementation file, not another requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target Feature](#target-feature)
-  * satisfiedBy: [Target Feature](#target-feature)
+  * derivedFrom: [Target Capability](#target-capability)
+  * satisfiedBy: [Target Capability](#target-capability)
 
 ---
 
@@ -104,7 +104,7 @@ INVALID: satisfiedBy must point to implementation file, not another verification
   * type: test-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
   * satisfiedBy: [Target Test Verification](#target-test-verification)
 
 ---

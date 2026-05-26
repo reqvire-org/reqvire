@@ -43,13 +43,13 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
             },
         );
 
-        // Feature specification bridge
+        // Capability specification bridge
         m.insert(
             "specifiedBy",
             RelationTypeInfo {
                 name: "specifiedBy",
                 opposite: Some("specify"),
-                description: "Feature is specified by a requirement",
+                description: "Capability is specified by a requirement",
                 arrow: "-.->",
                 label: "specifiedBy",
             },
@@ -59,7 +59,7 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
             RelationTypeInfo {
                 name: "specify",
                 opposite: Some("specifiedBy"),
-                description: "Requirement specifies a feature",
+                description: "Requirement specifies a capability",
                 arrow: "-.->",
                 label: "specify",
             },
@@ -161,9 +161,9 @@ pub const DIAGRAM_RELATIONS: &[&str] = &[
 /// When these relations exist, changes to the source affect the target
 pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
     "derive",      // Source changes affect derived elements
-    "specifiedBy", // Feature changes affect specifying requirements
+    "specifiedBy", // Capability changes affect specifying requirements
     "satisfiedBy", // Requirement changes affect implementations
-    "refine",      // Refinement changes affect its owning requirement or feature
+    "refine",      // Refinement changes affect its owning requirement or capability
     "refinedBy",   // Requirement changes affect refinements
     "verifiedBy",  // Requirement changes invalidate verifications
 ];
@@ -425,13 +425,13 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// Returns true if the types are compatible, false otherwise
 ///
 /// Element Type Relation Compatibility Matrix:
-/// - derivedFrom/derive: Feature-to-feature, requirement-to-requirement, or ontology-to-ontology only
-/// - verifiedBy: Source must be requirement, target must be verification
-/// - verify: Source must be verification, target must be requirement
+/// - derivedFrom/derive: Capability-to-capability, requirement-to-requirement, or ontology-to-ontology only
+/// - verifiedBy: Source must be capability or requirement, target must be verification
+/// - verify: Source must be verification, target must be capability or requirement
 /// - satisfiedBy: Source must be system requirement (requirement) or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
-/// - refinedBy: Source must be feature or requirement, target must be compatible refinement element
-/// - refine: Source must be refinement element, target must be compatible feature or requirement owner
+/// - refinedBy: Source must be capability or requirement, target must be compatible refinement element
+/// - refine: Source must be refinement element, target must be compatible capability or requirement owner
 /// - trace: Any non-refinement element type can use trace
 /// - Refinement types (constraint, behavior, specification): Can only have refine relations
 /// - Other type: Can only use trace relations
@@ -454,38 +454,43 @@ pub fn validate_relation_element_types(
 
     match relation_type {
         "derivedFrom" => {
-            (matches!(source_type, ElementType::Feature)
-                && matches!(target_type, ElementType::Feature))
+            (matches!(source_type, ElementType::Capability)
+                && matches!(target_type, ElementType::Capability))
                 || (matches!(source_type, ElementType::Requirement(_))
                     && matches!(target_type, ElementType::Requirement(_)))
                 || (matches!(source_type, ElementType::Ontology)
                     && matches!(target_type, ElementType::Ontology))
         }
         "derive" => {
-            (matches!(source_type, ElementType::Feature)
-                && matches!(target_type, ElementType::Feature))
+            (matches!(source_type, ElementType::Capability)
+                && matches!(target_type, ElementType::Capability))
                 || (matches!(source_type, ElementType::Requirement(_))
                     && matches!(target_type, ElementType::Requirement(_)))
                 || (matches!(source_type, ElementType::Ontology)
                     && matches!(target_type, ElementType::Ontology))
         }
         "specifiedBy" => {
-            matches!(source_type, ElementType::Feature)
+            matches!(source_type, ElementType::Capability)
                 && matches!(target_type, ElementType::Requirement(_))
         }
         "specify" => {
             matches!(source_type, ElementType::Requirement(_))
-                && matches!(target_type, ElementType::Feature)
+                && matches!(target_type, ElementType::Capability)
         }
         "verifiedBy" => {
-            // Source must be a requirement and target must be a verification
-            matches!(source_type, ElementType::Requirement(_))
-                && matches!(target_type, ElementType::Verification(_))
+            // Source must be a capability or requirement and target must be a verification.
+            (matches!(
+                source_type,
+                ElementType::Capability | ElementType::Requirement(_)
+            )) && matches!(target_type, ElementType::Verification(_))
         }
         "verify" => {
-            // Source must be a verification and target must be a requirement
+            // Source must be a verification and target must be a capability or requirement.
             matches!(source_type, ElementType::Verification(_))
-                && matches!(target_type, ElementType::Requirement(_))
+                && (matches!(
+                    target_type,
+                    ElementType::Capability | ElementType::Requirement(_)
+                ))
         }
         "satisfiedBy" => {
             // Source must be system requirement or test-verification
@@ -526,7 +531,7 @@ pub fn validate_relation_element_types(
             source_valid && target_valid
         }
         "refinedBy" => match (source_type, target_type) {
-            (ElementType::Feature, ElementType::Refinement(RefinementType::Source)) => true,
+            (ElementType::Capability, refinement) if refinement.is_capability_refinement() => true,
             (
                 ElementType::Requirement(_),
                 ElementType::Refinement(
@@ -541,7 +546,7 @@ pub fn validate_relation_element_types(
             _ => false,
         },
         "refine" => match (source_type, target_type) {
-            (ElementType::Refinement(RefinementType::Source), ElementType::Feature) => true,
+            (refinement, ElementType::Capability) if refinement.is_capability_refinement() => true,
             (
                 ElementType::Refinement(
                     RefinementType::SemanticContract
@@ -569,16 +574,16 @@ pub fn validate_relation_element_types(
 /// Returns None if the relation type has no specific type restrictions
 pub fn get_relation_element_type_description(relation_type: &str) -> Option<String> {
     match relation_type {
-        "derivedFrom" => Some("'derivedFrom' can only be used within the same hierarchy family: feature-to-feature, requirement-to-requirement, or ontology-to-ontology".to_string()),
-        "derive" => Some("'derive' can only be used within the same hierarchy family: feature-to-feature, requirement-to-requirement, or ontology-to-ontology".to_string()),
-        "specifiedBy" => Some("'specifiedBy' should connect a feature to a requirement".to_string()),
-        "specify" => Some("'specify' should connect a requirement to a feature".to_string()),
-        "verifiedBy" => Some("'verifiedBy' should connect a requirement to a verification element".to_string()),
-        "verify" => Some("'verify' should connect a verification element to a requirement".to_string()),
-        "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; feature is not allowed".to_string()),
-        "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; feature is not allowed".to_string()),
-        "refinedBy" => Some("'refinedBy' should connect a feature to source, or a requirement to semantic-contract/constraint/behavior/specification/state/input-output".to_string()),
-        "refine" => Some("'refine' should connect source to a feature, or semantic-contract/constraint/behavior/specification/state/input-output to a requirement".to_string()),
+        "derivedFrom" => Some("'derivedFrom' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, or ontology-to-ontology".to_string()),
+        "derive" => Some("'derive' can only be used within the same hierarchy family: capability-to-capability, requirement-to-requirement, or ontology-to-ontology".to_string()),
+        "specifiedBy" => Some("'specifiedBy' should connect a capability to a requirement".to_string()),
+        "specify" => Some("'specify' should connect a requirement to a capability".to_string()),
+        "verifiedBy" => Some("'verifiedBy' should connect a capability or requirement to a verification element".to_string()),
+        "verify" => Some("'verify' should connect a verification element to a capability or requirement".to_string()),
+        "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; capability is not allowed".to_string()),
+        "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; capability is not allowed".to_string()),
+        "refinedBy" => Some("'refinedBy' should connect a capability to source, or a requirement to semantic-contract/constraint/behavior/specification/state/input-output".to_string()),
+        "refine" => Some("'refine' should connect source to a capability, or semantic-contract/constraint/behavior/specification/state/input-output to a requirement".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }

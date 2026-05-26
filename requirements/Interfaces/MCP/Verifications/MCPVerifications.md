@@ -10,7 +10,7 @@ Expected checks:
 - Send a request with an unsupported `Mcp-Protocol-Version` HTTP header and verify RMCP rejects it before tool execution.
 - Verify the server declares MCP `tools` capability when tool calls are available.
 - Verify the server declares MCP `resources` capability only when resources are available.
-- Verify MVP capability objects do not advertise prompts, logging, completions, or tasks unless those features are implemented.
+- Verify MVP capability objects do not advertise prompts, logging, completions, or tasks unless those capabilities are implemented.
 - Verify `tools.listChanged`, `resources.listChanged`, and `resources.subscribe` are omitted or false in MVP.
 - Verify Reqvire-specific fields such as workspace status, model revision, Reqvire tool contract version, and mutation mode are returned through Reqvire tools/resources, not custom top-level MCP capabilities.
 - Verify `tools/list` returns concrete tool definitions with valid `inputSchema` and expected annotations.
@@ -251,7 +251,7 @@ Expected checks:
 - Search, read element, model, containment, collect, and submodels tools return data matching Reqvire core reports.
 - Search supports `filter_type=ontology` and returns parsed ontology ADT content.
 - Read element returns `concept_references` for elements that author `#### Concept References`.
-- Collect returns reachable ontology context for feature and requirement elements using Reqvire core feature-attached ontology inheritance traversal.
+- Collect returns reachable ontology context for capability and requirement elements using Reqvire core capability-attached ontology inheritance traversal.
 - Results include evidence references for relevant files, elements, relations, and attachments.
 - Read tools are allowed on dirty worktrees only when the result marks dirty state.
 - Read tools do not mutate the filesystem.
@@ -317,7 +317,7 @@ Expected checks:
 - Mutation tools are present in MCP `tools/list` and accept execution requests only when the server was started with `--enable-mutations`.
 - Operation-specific preview mutation requests, such as `dry_run: true`, return changed files and diffs or equivalent change descriptions without filesystem changes.
 - Non-dry-run requests use Reqvire core mutation logic and flush filesystem changes before reporting success.
-- Non-dry-run mutation requests that would break feature-only ontology attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
+- Non-dry-run mutation requests that would break capability-only ontology attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.
 - After successful mutation, subsequent MCP reads observe the refreshed internal graph state.
 - Post-mutation results include validation summary, refreshed model revision, and affected element/submodel metadata.
 

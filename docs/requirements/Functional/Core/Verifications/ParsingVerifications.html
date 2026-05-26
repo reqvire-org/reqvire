@@ -389,7 +389,7 @@
   49c372fbdf0ebe68 -->|satisfiedBy| 5f9cbc6f907e8045;
   ea6a90c3d551dae4["test.sh"];
   class ea6a90c3d551dae4 default;
-  click ea6a90c3d551dae4 "../../../../tests/test-search-all-features/test.sh";
+  click ea6a90c3d551dae4 "../../../../tests/test-search-all-capabilities/test.sh";
   55d54f4d3853a23b -->|satisfiedBy| ea6a90c3d551dae4;
   94d34e73992ff9ac["test.sh"];
   class 94d34e73992ff9ac default;
@@ -512,7 +512,7 @@
 </ul>
 <p><strong>Normalization Examples:</strong></p>
 <ul>
-<li><code>"My Feature Name"</code> → <code>"my-feature-name"</code></li>
+<li><code>"My Capability Name"</code> → <code>"my-capability-name"</code></li>
 <li><code>"Version 1.2.3"</code> → <code>"version-123"</code> (dots removed)</li>
 <li><code>"Installation (Windows)"</code> → <code>"installation-windows"</code> (parentheses removed)</li>
 <li><code>"C++ API Reference"</code> → <code>"c-api-reference"</code> (plus signs removed)</li>
@@ -546,7 +546,7 @@
 <li>
 <p><strong>Special character handling:</strong></p>
 <ul>
-<li>Test elements with punctuation: <code>"Feature (v2.0)"</code></li>
+<li>Test elements with punctuation: <code>"Capability (v2.0)"</code></li>
 <li>Test elements with symbols: <code>"C++ API"</code></li>
 <li>Test elements with dots: <code>"Version 1.2.3"</code></li>
 <li>Verify all punctuation is removed correctly</li>
@@ -572,8 +572,8 @@
 <li>
 <p><strong>Cross-reference resolution:</strong></p>
 <ul>
-<li>Create element <code>"My Feature Name"</code></li>
-<li>Reference it as <code>"My Feature Name"</code>, <code>"my feature name"</code>, <code>"MY FEATURE NAME"</code></li>
+<li>Create element <code>"My Capability Name"</code></li>
+<li>Reference it as <code>"My Capability Name"</code>, <code>"my capability name"</code>, <code>"MY CAPABILITY NAME"</code></li>
 <li>Verify all variants resolve to same element</li>
 <li>Verify relations are established correctly</li>
 </ul>
@@ -653,7 +653,7 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfiedBy: <a href="../../../../tests/test-search-all-features/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-search-all-capabilities/test.sh">test.sh</a></li>
 <li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
 </ul>
 <hr />

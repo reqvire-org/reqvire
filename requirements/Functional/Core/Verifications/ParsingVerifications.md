@@ -16,7 +16,7 @@ This test verifies that the system correctly extracts and parses element subsect
 
 **Metadata Parsing:**
 - System shall extract element type from `* type:` metadata entry
-- System shall support all element types: feature, requirement, ontology, verification, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output, other
+- System shall support all element types: capability, requirement, ontology, verification, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output, other
 - System shall assign default type 'requirement' when no type metadata present
 
 **Relations Parsing:**
@@ -116,7 +116,7 @@ Expected checks:
 - Verify `owner` accepts a free-form string.
 - Verify inherited or default `status: approved` is not treated as explicit approval evidence.
 - Verify non-governance-bearing elements that declare `status`, `priority`, `risk`, or `owner` metadata are rejected with clear diagnostics.
-- Verify governance context for a refinement element is resolved from its owning feature or requirement through `refine` / `refinedBy`, not from metadata authored on the refinement.
+- Verify governance context for a refinement element is resolved from its owning capability or requirement through `refine` / `refinedBy`, not from metadata authored on the refinement.
 
 #### Metadata
   * type: test-verification
@@ -143,7 +143,7 @@ This test verifies that the system correctly normalizes element name fragments a
 - System shall preserve alphanumeric characters, hyphens, and underscores
 
 **Normalization Examples:**
-- `"My Feature Name"` → `"my-feature-name"`
+- `"My Capability Name"` → `"my-capability-name"`
 - `"Version 1.2.3"` → `"version-123"` (dots removed)
 - `"Installation (Windows)"` → `"installation-windows"` (parentheses removed)
 - `"C++ API Reference"` → `"c-api-reference"` (plus signs removed)
@@ -169,7 +169,7 @@ This test verifies that the system correctly normalizes element name fragments a
    - Test punctuation removal
 
 2. **Special character handling:**
-   - Test elements with punctuation: `"Feature (v2.0)"`
+   - Test elements with punctuation: `"Capability (v2.0)"`
    - Test elements with symbols: `"C++ API"`
    - Test elements with dots: `"Version 1.2.3"`
    - Verify all punctuation is removed correctly
@@ -186,8 +186,8 @@ This test verifies that the system correctly normalizes element name fragments a
    - Verify trim operation works correctly
 
 5. **Cross-reference resolution:**
-   - Create element `"My Feature Name"`
-   - Reference it as `"My Feature Name"`, `"my feature name"`, `"MY FEATURE NAME"`
+   - Create element `"My Capability Name"`
+   - Reference it as `"My Capability Name"`, `"my capability name"`, `"MY CAPABILITY NAME"`
    - Verify all variants resolve to same element
    - Verify relations are established correctly
 
@@ -247,7 +247,7 @@ This test verifies that non-reserved subsections (subsections other than Relatio
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-search-all-features/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-search-all-capabilities/test.sh)
   * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
 ---
 

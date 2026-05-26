@@ -242,7 +242,7 @@ The system shall expose MCP read tools that return model evidence needed by exte
 #### Details
 - The MCP interface shall expose read tools for authoritative Reqvire model evidence.
 - Model evidence tools shall support element lookup, model structure, containment, collection, submodel analysis, and ontology/SHACL semantic collection.
-- Model evidence tools shall expose the canonical feature/requirement/ontology model, including `ontology` elements, `#### Concept References`, and requirement-owned `semantic-contract` shape profiles where the underlying Reqvire operation returns them.
+- Model evidence tools shall expose the canonical capability/requirement/ontology model, including `ontology` elements, `#### Concept References`, and capability-owned or requirement-owned `semantic-contract` shape profiles where the underlying Reqvire operation returns them.
 - Model evidence tools shall include revision metadata when model state affects interpretation.
 - Model evidence tools shall not mutate the model or filesystem.
 

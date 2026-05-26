@@ -1,12 +1,12 @@
 # Elements
 
-### Feature A Test
+### Capability A Test
 
-Test for Feature A.
+Test for Capability A.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Feature A](../Requirements.md#feature-a)
+  * verify: [Capability A](../Requirements.md#capability-a)
 ---

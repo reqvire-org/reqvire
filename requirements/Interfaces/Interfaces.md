@@ -9,7 +9,7 @@ The system shall provide command line interface (CLI) to faciliate model managem
 
 #### Relations
   * derive: [CLI Interface Structure](CLI/Commands.md#cli-interface-structure)
-  * specify: [Command-Line Interface](../Features/Interfaces.md#command-line-interface)
+  * specify: [Command-Line Interface](../Capabilities/Interfaces.md#command-line-interface)
 ---
 
 ### Web Interface
@@ -23,9 +23,9 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
-  * derive: [HTML Export](WebInterface/Features.md#html-export)
-  * derive: [Serve Command](WebInterface/Features.md#serve-command)
-  * specify: [Web Documentation Interface](../Features/Interfaces.md#web-documentation-interface)
+  * derive: [HTML Export](WebInterface/Capabilities.md#html-export)
+  * derive: [Serve Command](WebInterface/Capabilities.md#serve-command)
+  * specify: [Web Documentation Interface](../Capabilities/Interfaces.md#web-documentation-interface)
   * refinedBy: [Web Interface Refinement Specification](WebInterface/Specifications.md#web-interface-refinement-specification)
 ---
 
@@ -62,6 +62,6 @@ The system shall provide a Model Context Protocol interface for external tools, 
   * derive: [MCP Resource Interface](MCP/Tools.md#mcp-resource-interface)
   * derive: [MCP Compatibility Versioning](MCP/Tools.md#mcp-compatibility-versioning)
   * derive: [MCP Access Control Baseline](MCP/Tools.md#mcp-access-control-baseline)
-  * specify: [MCP Tool Interface](../Features/Interfaces.md#mcp-tool-interface)
+  * specify: [MCP Tool Interface](../Capabilities/Interfaces.md#mcp-tool-interface)
   * refinedBy: [MCP Interface Boundary Specification](MCP/Specifications.md#mcp-interface-boundary-specification)
 ---

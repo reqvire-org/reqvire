@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Merge Elements Specifications Requirements Md
+### Test Capability Test Merge Elements Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### System Requirements
@@ -17,7 +17,7 @@ Top level container for requirements.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-merge-elements-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-merge-elements-specifications-requirements-md)
 ---
 
 ### Target Requirement

@@ -11,7 +11,7 @@ set -uo pipefail
 # - Defining requirement (has refinedBy) cannot also attach the refinement
 # - Descendant of defining requirement cannot attach the refinement
 # - Ancestor of defining requirement cannot attach the refinement
-# - Cross-subgraph attachment flow is one-directional at feature-root hierarchy level
+# - Cross-subgraph attachment flow is one-directional at capability-root hierarchy level
 # - Requirements in separate hierarchies can attach the refinement
 # - Link command enforces same constraints
 #
@@ -87,7 +87,7 @@ A requirement that tries to attach an orphan refinement.
   * [Orphan-Spec](Refinements.md#orphan-spec)
 
 #### Relations
-  * specify: [User Req X Feature](Requirements.md#user-req-x-feature)
+  * specify: [User Req X Capability](Requirements.md#user-req-x-capability)
 ---
 
 EOF
@@ -130,7 +130,7 @@ User requirement that has refinedBy AND attachment to same refinement.
   * [Spec-1](Refinements.md#spec-1)
 
 #### Relations
-  * specify: [User Req A Feature](Requirements.md#user-req-a-feature)
+  * specify: [User Req A Capability](Requirements.md#user-req-a-capability)
   * refinedBy: [Spec-1](Refinements.md#spec-1)
 ---
 
@@ -257,7 +257,7 @@ Ancestor of defining requirement tries to attach the refinement.
   * [Spec-2](Refinements.md#spec-2)
 
 #### Relations
-  * specify: [Ancestor Req Feature](Requirements.md#ancestor-req-feature)
+  * specify: [Ancestor Req Capability](Requirements.md#ancestor-req-capability)
   * derive: [Ancestor Req](Requirements.md#ancestor-req)
 ---
 

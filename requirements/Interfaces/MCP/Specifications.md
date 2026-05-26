@@ -9,7 +9,7 @@ Protocol conformance rules:
 - The server implements MCP lifecycle initialization and version negotiation for protocol revision `2025-11-25`.
 - The server rejects unsupported MCP protocol revisions using standard MCP initialization error handling.
 - The server `initialize` result includes `protocolVersion`, standard `capabilities`, and `serverInfo`.
-- The server declares standard MCP server capabilities using MCP capability objects. MVP server capabilities are `tools` and `resources` only unless another MCP feature is implemented.
+- The server declares standard MCP server capabilities using MCP capability objects. MVP server capabilities are `tools` and `resources` only unless another MCP capability is implemented.
 - The `tools` capability is declared as a standard MCP tools capability object. Because Reqvire tool availability is fixed for a server process after startup flags are parsed, `tools.listChanged` is omitted or false in MVP.
 - The `resources` capability is declared as a standard MCP resources capability object only when resource listing/reading is implemented. Resource `subscribe` and `listChanged` are omitted or false in MVP.
 - The server does not advertise Reqvire domain capabilities as a custom top-level capability array.
@@ -421,15 +421,15 @@ Model evidence tool behavior is inherited from attached Reqvire search, model, c
 - `has_attachments`: optional boolean requiring at least one attachment.
 - `filter_attachment`: optional attachment target glob.
 
-Governance metadata filters apply to effective governance metadata values and exclude non-governance-bearing elements when active. Successful `reqvire.search` structured results include effective governance metadata for feature and requirement element evidence.
+Governance metadata filters apply to effective governance metadata values and exclude non-governance-bearing elements when active. Successful `reqvire.search` structured results include effective governance metadata for capability and requirement element evidence.
 
 Semantic model evidence rules:
-- `filter_type` accepts all canonical element type tokens supported by Reqvire core, including `feature`, `requirement`, `ontology`, `semantic-contract`, `source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, and verification types.
+- `filter_type` accepts all canonical element type tokens supported by Reqvire core, including `capability`, `requirement`, `ontology`, `semantic-contract`, `source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, and verification types.
 - `reqvire.search --filter-type=ontology` through MCP returns ontology elements with parsed ontology ADT content when full results are requested.
-- `reqvire.search --filter-type=semantic-contract` through MCP returns requirement-owned shape contracts with parsed semantic-contract ADT content when full results are requested.
+- `reqvire.search --filter-type=semantic-contract` through MCP returns capability-owned and requirement-owned shape contracts with parsed semantic-contract ADT content when full results are requested.
 - `reqvire.read_element` returns `concept_references` for elements that author `#### Concept References`.
-- `reqvire.collect` includes reachable ontology context using the same feature-attached ontology inheritance traversal as Reqvire core.
-- `reqvire.model` and `reqvire.submodels` preserve feature roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and attachment edges needed for semantic dependency traceability.
+- `reqvire.collect` includes reachable ontology context using the same capability-attached ontology inheritance traversal as Reqvire core.
+- `reqvire.model` and `reqvire.submodels` preserve capability roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and attachment edges needed for semantic dependency traceability.
 - `reqvire.ontologies` exposes the same semantic collection as the CLI `ontologies` command.
 - `reqvire.ontologies` accepts optional `format` with values `turtle` or `jsonld`; omitted format defaults to `turtle`.
 - `reqvire.ontologies` accepts optional `full` boolean; omitted or false returns authored ontology and SHACL artifacts only, while true includes generated Reqvire model context triples.

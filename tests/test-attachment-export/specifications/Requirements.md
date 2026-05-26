@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Attachment Export Specifications Requirements Md
+### Test Capability Test Attachment Export Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Root Requirement
@@ -17,19 +17,19 @@ The system shall provide core functionality.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-attachment-export-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-attachment-export-specifications-requirements-md)
 ---
 
-### System Feature Requirement
+### System Capability Requirement
 
-The system shall implement the feature as specified in the attached design document.
+The system shall implement the capability as specified in the attached design document.
 
 #### Attachments
   * [Design Spec Contract](../docs/DesignSpec.md#design-spec-contract)
 
 #### Relations
   * derivedFrom: [Root Requirement](#root-requirement)
-  * verifiedBy: [Feature Test](#feature-test)
+  * verifiedBy: [Capability Test](#capability-test)
 ---
 
 ### Design Spec Owner
@@ -39,17 +39,17 @@ Owner requirement for the design specification contract.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-attachment-export-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-attachment-export-specifications-requirements-md)
   * refinedBy: [Design Spec Contract](../docs/DesignSpec.md#design-spec-contract)
 ---
 
-### Feature Test
+### Capability Test
 
-Verify that the feature works correctly.
+Verify that the capability works correctly.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [System Feature Requirement](#system-feature-requirement)
+  * verify: [System Capability Requirement](#system-capability-requirement)
 ---

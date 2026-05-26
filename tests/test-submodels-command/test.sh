@@ -162,53 +162,53 @@ if ! diff -u \
   exit 1
 fi
 
-# Test 4: --from feature text output
+# Test 4: --from capability text output
 set +e
-FEATURE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Feature One" 2>&1)
-FEATURE_EXIT=$?
+CAPABILITY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Capability One" 2>&1)
+CAPABILITY_EXIT=$?
 set -e
 
-if [ $FEATURE_EXIT -ne 0 ]; then
-  echo "FAILED: submodels --from Feature One command exited with code $FEATURE_EXIT"
-  echo "$FEATURE_OUTPUT"
+if [ $CAPABILITY_EXIT -ne 0 ]; then
+  echo "FAILED: submodels --from Capability One command exited with code $CAPABILITY_EXIT"
+  echo "$CAPABILITY_OUTPUT"
   exit 1
 fi
 
-printf "%s\n" "$FEATURE_OUTPUT" > "$TEST_DIR/output/submodels.from-feature-one.actual.md"
+printf "%s\n" "$CAPABILITY_OUTPUT" > "$TEST_DIR/output/submodels.from-capability-one.actual.md"
 assert_file_matches \
-  "$TEST_SCRIPT_DIR/expected/expected_from_feature_one_output.md" \
-  "$TEST_DIR/output/submodels.from-feature-one.actual.md" \
-  "Submodels --from Feature One text output mismatch"
+  "$TEST_SCRIPT_DIR/expected/expected_from_capability_one_output.md" \
+  "$TEST_DIR/output/submodels.from-capability-one.actual.md" \
+  "Submodels --from Capability One text output mismatch"
 assert_summary_counts \
-  "$TEST_DIR/output/submodels.from-feature-one.actual.md" \
+  "$TEST_DIR/output/submodels.from-capability-one.actual.md" \
   1 5 2 \
-  "Submodels --from Feature One summary counts mismatch"
+  "Submodels --from Capability One summary counts mismatch"
 
-# Test 5: --from feature JSON output
+# Test 5: --from capability JSON output
 set +e
-FEATURE_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Feature One" --json 2>&1)
-FEATURE_JSON_EXIT=$?
+CAPABILITY_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" submodels --from "Capability One" --json 2>&1)
+CAPABILITY_JSON_EXIT=$?
 set -e
 
-if [ $FEATURE_JSON_EXIT -ne 0 ]; then
-  echo "FAILED: submodels --from Feature One --json command exited with code $FEATURE_JSON_EXIT"
-  echo "$FEATURE_JSON_OUTPUT"
+if [ $CAPABILITY_JSON_EXIT -ne 0 ]; then
+  echo "FAILED: submodels --from Capability One --json command exited with code $CAPABILITY_JSON_EXIT"
+  echo "$CAPABILITY_JSON_OUTPUT"
   exit 1
 fi
 
-printf "%s\n" "$FEATURE_JSON_OUTPUT" > "$TEST_DIR/output/submodels.from-feature-one.actual.json"
+printf "%s\n" "$CAPABILITY_JSON_OUTPUT" > "$TEST_DIR/output/submodels.from-capability-one.actual.json"
 if ! diff -u \
-  <(jq -S . "$TEST_SCRIPT_DIR/expected/expected_from_feature_one_output.json") \
-  <(jq -S . "$TEST_DIR/output/submodels.from-feature-one.actual.json"); then
-  echo "FAILED: Submodels --from Feature One JSON output mismatch"
+  <(jq -S . "$TEST_SCRIPT_DIR/expected/expected_from_capability_one_output.json") \
+  <(jq -S . "$TEST_DIR/output/submodels.from-capability-one.actual.json"); then
+  echo "FAILED: Submodels --from Capability One JSON output mismatch"
   echo ""
-  echo "If changes are intentional, update $TEST_SCRIPT_DIR/expected/expected_from_feature_one_output.json"
+  echo "If changes are intentional, update $TEST_SCRIPT_DIR/expected/expected_from_capability_one_output.json"
   exit 1
 fi
 assert_json_summary_counts \
-  "$TEST_DIR/output/submodels.from-feature-one.actual.json" \
+  "$TEST_DIR/output/submodels.from-capability-one.actual.json" \
   1 5 2 \
-  "Submodels --from Feature One JSON summary counts mismatch"
+  "Submodels --from Capability One JSON summary counts mismatch"
 
 # Test 6: --from requirement text output
 set +e

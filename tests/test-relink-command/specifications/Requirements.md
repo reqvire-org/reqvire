@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Relink Command Specifications Requirements Md
+### Test Capability Test Relink Command Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Root Requirement
@@ -15,7 +15,7 @@ Test feature root for migrated requirement fixtures.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-relink-command-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-relink-command-specifications-requirements-md)
 ---
 
 ### Old Parent

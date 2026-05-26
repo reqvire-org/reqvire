@@ -2,7 +2,7 @@
 
 ### New Elements
 
-* [New Feature](Requirements.md#new-feature)
+* [New Capability](Requirements.md#new-capability)
     * specifiedBy -> [New Parent Requirement](Requirements.md#new-parent-requirement) (new)
         * verifiedBy -> [New Verification](Requirements.md#new-verification) (new)
         * derive -> [New Child Requirement](Requirements.md#new-child-requirement) (new)
@@ -13,8 +13,8 @@
 
 ### Impact Scope
 
+* [New Capability](Requirements.md#new-capability)
 * [New Child Requirement](Requirements.md#new-child-requirement)
-* [New Feature](Requirements.md#new-feature)
 * [New Parent Requirement](Requirements.md#new-parent-requirement)
 
 ---

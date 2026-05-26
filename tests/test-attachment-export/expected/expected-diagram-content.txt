@@ -1,1 +1,1 @@
-System Feature Requirement<br/>📎 docs/DesignSpec.md#design-spec-contract
+System Capability Requirement<br/>📎 docs/DesignSpec.md#design-spec-contract

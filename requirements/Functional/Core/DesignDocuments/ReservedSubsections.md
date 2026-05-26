@@ -73,7 +73,7 @@ The Metadata subsection stores element properties including type, requirement go
 The following properties have special meaning:
 
 - `type`: Defines the element type (supported types are defined in [Supported Element Types Specification](../Specifications.md#supported-element-types-specification))
-- `status`, `priority`, `risk`, `owner`: Define governance metadata for feature and requirement elements only (defined in [Requirement Governance Metadata Specification](../Specifications.md#requirement-governance-metadata-specification))
+- `status`, `priority`, `risk`, `owner`: Define governance metadata for capability and requirement elements only (defined in [Requirement Governance Metadata Specification](../Specifications.md#requirement-governance-metadata-specification))
 - Additional reserved properties may be defined in future releases
 
 **Examples:**
@@ -112,7 +112,7 @@ Some details.
 
 Must be defined with a level 4 header: `#### Attachments`.
 
-The Attachments subsection links an element to explicit dependency elements. Feature attachments consume ontology context. Requirement attachments consume reusable requirement-owned contracts.
+The Attachments subsection links an element to explicit dependency elements. Capability attachments consume ontology context. Requirement attachments consume reusable requirement-owned contracts.
 
 ### Element Identifier Attachments
 
@@ -127,7 +127,7 @@ Element identifier attachments link to model elements that are attachable under 
 
 **Validation Rules:**
 - Target element must exist in the model
-- Feature attachment targets must be ontology elements.
+- Capability attachment targets must be ontology elements.
 - Requirement attachment targets must be requirement-owned `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` elements.
 - Requirement-owned refinement targets must have exactly one compatible `refine` relation before they are attachable.
 - Non-attachable element identifiers are rejected with a validation error.
@@ -135,9 +135,9 @@ Element identifier attachments link to model elements that are attachable under 
 
 **Examples:**
 ```markdown
-### API Feature
+### API Capability
 
-Feature context.
+Capability context.
 
 #### Attachments
 * [API Ontology](../Ontologies/Interfaces.md#api-ontology)

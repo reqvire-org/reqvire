@@ -64,7 +64,7 @@ When a mutation would leave a `Shapes` reference to an IRI that is declared by a
 - the reference kind, such as `sh:path`, `sh:targetClass`, or `sh:class`
 - the referenced IRI
 - the declaring ontology identifier
-- guidance to attach the declaring ontology to the owning or consuming feature, move the declaration into reachable feature ontology context, or update/remove the reference
+- guidance to attach the declaring ontology to the owning or consuming capability, move the declaration into reachable capability ontology context, or update/remove the reference
 
 #### Metadata
   * type: specification

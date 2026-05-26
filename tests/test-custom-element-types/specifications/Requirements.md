@@ -1,35 +1,35 @@
 # Elements
 
 
-### Test Feature Test Custom Element Types Specifications Requirements Md
+### Test Capability Test Custom Element Types Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This file contains test requirements with various custom element types.
 
 ### Standard Requirement 1
 
-This is a standard requirement element specified by Feature 1.
+This is a standard requirement element specified by Capability 1.
 
 #### Metadata
 * type: requirement
 
 #### Relations
-* specify: #feature-1
+* specify: #capability-1
 
 ### Standard Requirement 2
 
-This is another standard requirement element specified by Feature 2.
+This is another standard requirement element specified by Capability 2.
 
 #### Metadata
 * type: requirement
 
 #### Relations
-* specify: #feature-2
+* specify: #capability-2
 
 
 ### Use Case Element 1
@@ -82,15 +82,15 @@ This element uses a custom type: other-rule.
 * type: other-rule
 
 
-### Feature 1
+### Capability 1
 
-This is a standard feature type.
-
-#### Metadata
-* type: feature
-### Feature 2
-
-This is another standard feature type.
+This is a standard capability type.
 
 #### Metadata
-* type: feature
+* type: capability
+### Capability 2
+
+This is another standard capability type.
+
+#### Metadata
+* type: capability

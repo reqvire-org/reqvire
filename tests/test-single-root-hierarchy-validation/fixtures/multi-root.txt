@@ -5,7 +5,7 @@
 First top-level root.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Root Two
@@ -13,12 +13,12 @@ First top-level root.
 Second top-level root.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Shared Child Requirement
 
-Invalid: resolves to two owning features.
+Invalid: resolves to two owning capabilities.
 
 #### Metadata
   * type: requirement

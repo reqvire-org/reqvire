@@ -4,7 +4,7 @@
 
 The Reqvire behavior rule ontology defines behavior rules, state transitions, and input-output mappings used by requirement refinements.
 
-Behavior rules, state transitions, and input-output mappings are semantic model terms owned by this feature. Requirements state the system obligations that apply those rules.
+Behavior rules, state transitions, and input-output mappings are semantic model terms owned by this capability. Requirements state the system obligations that apply those rules.
 
 #### Ontology
 ```turtle
@@ -87,8 +87,8 @@ reqvire:lintRepairMode a owl:DatatypeProperty .
 
 reqvire:crossSubmodelHierarchyLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "cross-submodel-hierarchy" ;
-  reqvire:lintScope "feature-rooted subgraphs" ;
-  reqvire:lintCondition "A hierarchical relation crosses feature-root boundaries where an attachment or specify relation would preserve ownership more clearly." ;
+  reqvire:lintScope "capability-rooted subgraphs" ;
+  reqvire:lintCondition "A hierarchical relation crosses capability-root boundaries where an attachment or specify relation would preserve ownership more clearly." ;
   reqvire:lintFindingKind "cross-submodel-coupling" ;
   reqvire:lintRepairMode "auditable-user-action" .
 
@@ -149,10 +149,10 @@ reqvire:relationMaintenanceOperationFamily a reqvire:OperationFamily ;
   reqvire:operationFamilyName "relation-maintenance" ;
   reqvire:operationFamilyMeaning "Operation family that links, unlinks, relinks, or rewires relation and attachment edges while preserving graph validity." .
 
-reqvire:featureMergeCategory a reqvire:MergeCompatibilityCategory ;
-  reqvire:mergeCategoryName "feature" ;
-  reqvire:mergeCategoryElementType "feature" ;
-  reqvire:mergeCategoryMeaning "Feature elements merge only with feature elements." ;
+reqvire:capabilityMergeCategory a reqvire:MergeCompatibilityCategory ;
+  reqvire:mergeCategoryName "capability" ;
+  reqvire:mergeCategoryElementType "capability" ;
+  reqvire:mergeCategoryMeaning "Capability elements merge only with capability elements." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:requirementMergeCategory a reqvire:MergeCompatibilityCategory ;
   reqvire:mergeCategoryName "requirement" ;
@@ -164,10 +164,10 @@ reqvire:verificationMergeCategory a reqvire:MergeCompatibilityCategory ;
   reqvire:mergeCategoryElementType "verification", "test-verification", "analysis-verification", "inspection-verification", "demonstration-verification", "formal-proof-verification" ;
   reqvire:mergeCategoryMeaning "Verification elements merge only within the verification element family." ;
   reqvire:mergeRequiresSameCategory true .
-reqvire:featureRefinementMergeCategory a reqvire:MergeCompatibilityCategory ;
-  reqvire:mergeCategoryName "feature-refinement" ;
-  reqvire:mergeCategoryElementType "source" ;
-  reqvire:mergeCategoryMeaning "Feature-owned source refinements merge only with compatible feature-owned source refinements." ;
+reqvire:capabilityRefinementMergeCategory a reqvire:MergeCompatibilityCategory ;
+  reqvire:mergeCategoryName "capability-refinement" ;
+  reqvire:mergeCategoryElementType "source", "semantic-contract", "constraint", "behavior", "specification", "state", "input-output" ;
+  reqvire:mergeCategoryMeaning "Capability-owned refinements merge only with compatible capability-owned refinements." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:requirementRefinementMergeCategory a reqvire:MergeCompatibilityCategory ;
   reqvire:mergeCategoryName "requirement-refinement" ;
@@ -222,7 +222,7 @@ reqvire:semanticReferenceNotFoundIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindMeaning "A semantic-contract SHACL reference points to an IRI that no Reqvire ontology element declares." .
 reqvire:semanticReferenceOutsideContextIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindName "semantic-reference-found-outside-context" ;
-  reqvire:validationIssueKindMeaning "A semantic-contract SHACL reference points to an IRI declared by an ontology element that is outside the owning requirement's reachable feature ontology context." .
+  reqvire:validationIssueKindMeaning "A semantic-contract SHACL reference points to an IRI declared by an ontology element that is outside the owning requirement's reachable capability ontology context." .
 reqvire:semanticDuplicateDeclarationIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindName "semantic-duplicate-declaration" ;
   reqvire:validationIssueKindMeaning "The same ontology term IRI is declared by multiple ontology elements." .
@@ -240,11 +240,11 @@ reqvire:globalElementNameUniquenessRule a reqvire:ValidationRule ;
 
 reqvire:singleRootHierarchyOwnershipRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "single-root-hierarchy-ownership" ;
-  reqvire:validationScope "feature-requirement-graph" ;
+  reqvire:validationScope "capability-requirement-graph" ;
   reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "A requirement hierarchy resolves to zero or more than one owning feature root." ;
-  reqvire:validationOutcome "Validation fails because each requirement hierarchy must belong to exactly one feature root." ;
-  reqvire:validationRepair "Add or repair specify/derivedFrom relations so the hierarchy resolves to one feature root." .
+  reqvire:validationCondition "A requirement hierarchy resolves to zero or more than one owning capability root." ;
+  reqvire:validationOutcome "Validation fails because each requirement hierarchy must belong to exactly one capability root." ;
+  reqvire:validationRepair "Add or repair specify/derivedFrom relations so the hierarchy resolves to one capability root." .
 
 reqvire:relationTypeCompatibilityRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "relation-type-compatibility" ;
@@ -264,9 +264,9 @@ reqvire:attachmentHierarchyIndependenceRule a reqvire:ValidationRule ;
 
 reqvire:attachmentSubgraphDirectionRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "attachment-subgraph-direction" ;
-  reqvire:validationScope "feature-root-subgraphs" ;
+  reqvire:validationScope "capability-root-subgraphs" ;
   reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "Two feature-root subgraphs attach refinements to each other in both directions." ;
+  reqvire:validationCondition "Two capability-root subgraphs attach refinements to each other in both directions." ;
   reqvire:validationOutcome "Validation fails because cross-subgraph attachment contracts must be one-directional." ;
   reqvire:validationRepair "Keep one dependency direction and move shared contracts into a common attached source if needed." .
 
@@ -282,9 +282,9 @@ reqvire:semanticReferenceReachabilityValidationRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "semantic-reference-reachability-validation" ;
   reqvire:validationScope "reachable-ontology-context" ;
   reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "A SHACL reference points to an ontology term that is not declared or is declared outside reachable feature-root context." ;
+  reqvire:validationCondition "A SHACL reference points to an ontology term that is not declared or is declared outside reachable capability-root context." ;
   reqvire:validationOutcome "Validation fails because semantic dependencies must remain visible to change impact." ;
-  reqvire:validationRepair "Declare the term in reachable ontology context, attach the declaring ontology to the owning or consuming feature, or remove/update the reference." .
+  reqvire:validationRepair "Declare the term in reachable ontology context, attach the declaring ontology to the owning or consuming capability, or remove/update the reference." .
 
 reqvire:lintManualReviewRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-manual-review" ;
@@ -298,9 +298,9 @@ reqvire:crossSubmodelHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-cross-submodel-hierarchical-relation" ;
   reqvire:validationScope "lint" ;
   reqvire:validationSeverity "warning" ;
-  reqvire:validationCondition "A user-authored hierarchical relation crosses feature-root submodel ownership boundaries." ;
+  reqvire:validationCondition "A user-authored hierarchical relation crosses capability-root submodel ownership boundaries." ;
   reqvire:validationOutcome "Report as manual review because ownership boundary intent is ambiguous." ;
-  reqvire:validationRepair "Replace with attachment/trace or remodel hierarchy under one feature root." .
+  reqvire:validationRepair "Replace with attachment/trace or remodel hierarchy under one capability root." .
 
 reqvire:redundantHierarchicalLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-redundant-hierarchical-relation" ;
@@ -314,9 +314,9 @@ reqvire:redundantVerifyLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-redundant-verify-relation" ;
   reqvire:validationScope "lint" ;
   reqvire:validationSeverity "warning" ;
-  reqvire:validationCondition "A verification directly verifies both a requirement and an ancestor covered by that requirement's verification path." ;
+  reqvire:validationCondition "A verification directly verifies both an element and an ancestor covered by that element's verification path." ;
   reqvire:validationOutcome "Report as manual review or auto-fixable depending on whether removing the ancestor verify relation preserves intended evidence scope." ;
-  reqvire:validationRepair "Keep verification at the most precise requirement scope or document why broader verification is intended." .
+  reqvire:validationRepair "Keep verification at the most precise capability or requirement scope, or document why broader verification is intended." .
 
 reqvire:multiBranchConvergenceLintRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "lint-multi-branch-convergence" ;

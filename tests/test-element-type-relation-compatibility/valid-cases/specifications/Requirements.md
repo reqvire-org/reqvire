@@ -1,46 +1,50 @@
 # Elements
 
 
-### Test Feature Test Element Type Relation Compatibility Valid Cases Specifications
+### Test Capability Test Element Type Relation Compatibility Valid Cases Specifications
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
+
+#### Relations
+  * refinedBy: [Capability Behavior Element](#capability-behavior-element)
+  * verifiedBy: [Capability Level Verification](#capability-level-verification)
 ---
 
-### Feature Parent
+### Capability Parent
 
-A top-level feature.
+A top-level capability.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-cases-specifications)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-valid-cases-specifications)
 ---
 
-### Feature Child
+### Capability Child
 
-User requirement deriving from another feature.
+User requirement deriving from another capability.
 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-cases-specifications)
-  * derivedFrom: [Feature Parent](#feature-parent)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-valid-cases-specifications)
+  * derivedFrom: [Capability Parent](#capability-parent)
 
 ---
 
 ### System Requirement from User Req
 
-System requirement deriving from feature.
+System requirement deriving from capability.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Parent](#feature-parent)
+  * derivedFrom: [Capability Parent](#capability-parent)
 
 ---
 
@@ -64,7 +68,7 @@ Requirement satisfied by implementation file.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Parent](#feature-parent)
+  * derivedFrom: [Capability Parent](#capability-parent)
   * satisfiedBy: [impl.rs](impl.rs)
 
 ---
@@ -77,7 +81,7 @@ Test verification can use satisfiedBy.
   * type: test-verification
 
 #### Relations
-  * verify: [Feature Parent](#feature-parent)
+  * verify: [Capability Parent](#capability-parent)
   * satisfiedBy: [test.sh](test.sh)
 
 ---
@@ -90,7 +94,7 @@ Requirement verified by test verification.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Parent](#feature-parent)
+  * derivedFrom: [Capability Parent](#capability-parent)
   * verifiedBy: [Test Verification with SatisfiedBy](#test-verification-with-satisfiedby)
 
 ---
@@ -103,7 +107,7 @@ Requirement verified by analysis verification.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Parent](#feature-parent)
+  * derivedFrom: [Capability Parent](#capability-parent)
   * verifiedBy: [Analysis Verification](#analysis-verification)
 
 ---
@@ -116,7 +120,7 @@ Analysis verification verifying a requirement.
   * type: analysis-verification
 
 #### Relations
-  * verify: [Feature Parent](#feature-parent)
+  * verify: [Capability Parent](#capability-parent)
 
 ---
 
@@ -128,7 +132,7 @@ Inspection verification verifying a requirement.
   * type: inspection-verification
 
 #### Relations
-  * verify: [Feature Parent](#feature-parent)
+  * verify: [Capability Parent](#capability-parent)
 
 ---
 
@@ -140,13 +144,34 @@ Demonstration verification verifying a requirement.
   * type: demonstration-verification
 
 #### Relations
-  * verify: [Feature Parent](#feature-parent)
+  * verify: [Capability Parent](#capability-parent)
+
+---
+
+### Capability Level Verification
+
+Analysis verification directly verifying a capability.
+
+#### Metadata
+  * type: analysis-verification
+
+#### Relations
+  * verify: [Test Capability](#test-capability-test-element-type-relation-compatibility-valid-cases-specifications)
 
 ---
 
 ### Behavior Element
 
 A behavior element describing system behavior.
+
+#### Metadata
+  * type: behavior
+
+---
+
+### Capability Behavior Element
+
+A behavior refinement owned by a capability.
 
 #### Metadata
   * type: behavior
@@ -179,7 +204,7 @@ Requirement that asks for behavior definition, refined by a behavior element.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Parent](#feature-parent)
+  * derivedFrom: [Capability Parent](#capability-parent)
   * refinedBy: [Behavior Element](#behavior-element)
 
 ---
@@ -192,7 +217,7 @@ Requirement that asks for specification, refined by a specification element.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Parent](#feature-parent)
+  * derivedFrom: [Capability Parent](#capability-parent)
   * refinedBy: [Specification Element](#specification-element)
 
 ---
@@ -205,7 +230,7 @@ Requirement that asks for constraint definition, refined by a constraint element
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Parent](#feature-parent)
+  * derivedFrom: [Capability Parent](#capability-parent)
   * refinedBy: [Constraint Element](#constraint-element)
 
 ---

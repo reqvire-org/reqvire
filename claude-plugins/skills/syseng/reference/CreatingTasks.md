@@ -1,15 +1,15 @@
-# Creating Implementation Tasks from Requirements
+# Creating Implementation Tasks from Capability-Scoped Changes
 
-This workflow bridges the gap between requirements and implementation by analyzing what changed and generating comprehensive task lists.
+This workflow bridges the gap between Reqvire's semantic engineering graph and implementation by analyzing what changed and generating comprehensive task lists.
 
-**Key principle**: Every implementation task maintains traceability to requirements, implementations, and tests.
+**Key principle**: Every implementation task maintains traceability from capability meaning to requirement obligations, implementation, and verification evidence.
 
 **For common commands** (change-impact, collect, search, validate), see [SKILL.md Command Reference](../SKILL.md#command-reference). For validation workflow, see [SKILL.md Validation & Quality Checklist](../SKILL.md#validation--quality-checklist).
 
 ## When to Use This Workflow
 
-- Generating implementation plans from requirement changes
-- Understanding what requirements changed on a feature branch
+- Generating implementation plans from capability-scoped requirement changes
+- Understanding what capabilities, requirements, refinements, or verifications changed on a capability branch
 - Creating task breakdowns for developers
 - Planning implementation work with full traceability
 - Analyzing change impact before implementing
@@ -36,15 +36,16 @@ reqvire change-impact --git-commit=HEAD~1
 ```
 
 The change-impact command identifies:
-- `added[]` - New requirements/verifications
-- `changed[]` - Changed requirements/verifications
+- `added[]` - New capabilities/requirements/refinements/verifications
+- `changed[]` - Changed capabilities/requirements/refinements/verifications
 - `removed[]` - Removed elements
 - `relocated[]` - Relocated elements (same name, different path)
-- `impact_scope[]` - Per-branch scope roots: common parent requirements covering all impacted elements. Use this for a high-level summary of affected model areas
+- `impact_scope[]` - Per-branch scope roots: common parent capabilities or requirements covering all impacted elements. Use this for a high-level summary of affected model areas
 - `invalidated_verifications[]` - Verifications that need re-review
 
 **Change Propagation Rules:**
-- **Parent → Child**: Parent changes propagate to all derived children
+- **Parent → Child**: Parent capability or requirement changes propagate to derived children
+- **Capability → Requirement**: Capability changes may require review of specifying requirements and direct capability verification
 - **Requirement → Verification**: Requirement changes invalidate verifications
 - **Requirement → Implementation**: May need implementation updates
 - **Verification changes**: Generally don't propagate upward
@@ -60,22 +61,22 @@ reqvire collect "<scope-root-name>" --direction DOWNSTREAM --json --output /tmp/
 
 This ensures no elements are missed — `impact_scope` entries are common parents that may cover multiple added/changed children.
 
-### Step 2: Gather Full Requirement Context
+### Step 2: Gather Full Capability and Requirement Context
 
-For each changed requirement (from `added[]`, `changed[]`, or enumerated via downstream collect), gather upstream context:
+For each changed capability or requirement (from `added[]`, `changed[]`, or enumerated via downstream collect), gather upstream context:
 
 ```bash
 # Get full ancestor chain with attachments (upstream - default)
-reqvire collect "<requirement-name>" --json --output /tmp/req_<requirement-id>.json
+reqvire collect "<element-name>" --json --output /tmp/context_<element-id>.json
 
 # Also save human-readable format for reference
-reqvire collect "<requirement-name>" > /tmp/req_context_<requirement-id>.md
+reqvire collect "<element-name>" > /tmp/trace_context_<element-id>.md
 
-# Get all descendants under a requirement (downstream)
-reqvire collect "<requirement-name>" --direction DOWNSTREAM --json --output /tmp/req_<requirement-id>_tree.json
+# Get all descendants under a capability or requirement (downstream)
+reqvire collect "<element-name>" --direction DOWNSTREAM --json --output /tmp/context_<element-id>_tree.json
 
-# Get direct requirement details
-reqvire search --filter-id="<requirement-id>" --json
+# Get direct element details
+reqvire search --filter-id="<element-id>" --json
 
 # Governance-focused views for routing and prioritization
 reqvire search --filter-owner="<owner-regex>" --json
@@ -84,9 +85,9 @@ reqvire search --filter-risk="high,critical" --json
 ```
 
 **Why use `reqvire collect` for task generation:**
-- **Upstream (default)**: Gathers ancestor chain via `derivedFrom` — the "why" context
+- **Upstream (default)**: Gathers capability and requirement trace context — the "why" context
 - **Downstream**: Enumerates all children via `derive` — find everything under a scope root
-- Includes all specifications and design documents
+- Includes all refinements, specifications, and design documents
 - Captures constraints and validation rules
 - Provides full implementation context in one command
 - Saves to `/tmp` for developer reference during implementation
@@ -138,7 +139,7 @@ Create a TodoWrite-formatted task plan with full traceability.
   Owner routing: [person/role/team/department/subsystem/task owner from governance owner]
   ⚠️ IMPORTANT: Read full requirement - this is only a summary!
 
-  ☐ Review full requirement context: /tmp/req_context_<req-id>.md
+  ☐ Review full capability and requirement context: /tmp/trace_context_<element-id>.md
   ☐ Review requirement: [link to git blob]
   ☐ Implement functionality per specifications
   ☐ Run tests: {test paths from verifiedBy → satisfiedBy}
@@ -156,7 +157,7 @@ Create a TodoWrite-formatted task plan with full traceability.
   Owner routing: [person/role/team/department/subsystem/task owner from governance owner]
   ⚠️ IMPORTANT: Read full requirement - this is only a summary!
 
-  ☐ Review full requirement context: /tmp/req_context_<req-id>.md
+  ☐ Review full capability and requirement context: /tmp/trace_context_<element-id>.md
   ☐ Review changes: [link to git blob]
   ☐ Review code: {satisfiedBy paths from requirement}
   ☐ Update implementation
@@ -187,7 +188,7 @@ A complete task plan follows this format:
 # Implementation Task Plan
 
 **Base**: {base_branch}@{base_commit}
-**Feature**: {current_branch}
+**Capability**: {current_branch}
 
 ## Summary
 - New requirements: X
@@ -219,38 +220,38 @@ A complete task plan follows this format:
 
 ## Reference Documents
 
-Full requirement context available in `/tmp/`:
-- `/tmp/req_context_req-id-1.md` - Full context for {Requirement Name 1}
-- `/tmp/req_context_req-id-2.md` - Full context for {Requirement Name 2}
+Full trace context available in `/tmp/`:
+- `/tmp/trace_context_element-id-1.md` - Full context for {Element Name 1}
+- `/tmp/trace_context_element-id-2.md` - Full context for {Element Name 2}
 
 Each context document shows:
-- Complete requirement chain (derivedFrom)
-- Parent requirements and purpose
-- Specifications and implementation details
+- Complete capability and requirement trace chain
+- Capability purpose and parent requirement obligations
+- Refinements, specifications, and implementation details
 - Attached design documents
 - Constraints and validation rules
 ```
 
 ## Model Exploration Commands
 
-**CRITICAL: Use reqvire commands to understand requirements - DO NOT read specification files directly!**
+**CRITICAL: Use reqvire commands to understand the semantic engineering graph - DO NOT read specification files directly!**
 
-When analyzing requirements for task generation:
+When analyzing capability-scoped changes for task generation:
 
 | To Understand This | Use This Command |
 |--------------------|------------------|
-| What requirements changed | `reqvire change-impact --git-commit=<hash> --json` |
-| **Full requirement context (ancestors)** | `reqvire collect "<name>" --json --output /tmp/req_<id>.json` |
-| Requirement direct content | `reqvire search --filter-id="<id>" --json` |
-| Requirement owner routing | `reqvire search --filter-owner="<owner-regex>" --json` |
+| What capabilities, requirements, refinements, or verifications changed | `reqvire change-impact --git-commit=<hash> --json` |
+| **Full capability and requirement context (ancestors)** | `reqvire collect "<name>" --json --output /tmp/context_<id>.json` |
+| Element direct content | `reqvire search --filter-id="<id>" --json` |
+| Owner routing | `reqvire search --filter-owner="<owner-regex>" --json` |
 | High-priority work | `reqvire search --filter-priority="high,critical" --json` |
 | High-risk work | `reqvire search --filter-risk="high,critical" --json` |
-| Requirements by lifecycle status | `reqvire search --filter-status="draft,review,approved" --json` |
-| What verifies a requirement | `reqvire traces --filter-id="<id>" --json` |
+| Elements by lifecycle status | `reqvire search --filter-status="draft,review,approved" --json` |
+| What verifies a capability or requirement | `reqvire traces --filter-id="<id>" --json` |
 | Which tests to run | Extract `satisfiedBy` from verification via `reqvire search` |
-| Implementation status | Check `satisfiedBy` relations in requirement |
-| Requirement hierarchy (up) | `reqvire collect "<name>"` shows derivedFrom ancestor chain |
-| Requirement hierarchy (down) | `reqvire collect "<name>" --direction DOWNSTREAM` shows all descendants |
+| Implementation status | Check `satisfiedBy` relations on specifying requirements |
+| Trace hierarchy (up) | `reqvire collect "<name>"` shows upstream capability and requirement context |
+| Trace hierarchy (down) | `reqvire collect "<name>" --direction DOWNSTREAM` shows all descendants |
 
 **Why use commands instead of reading files:**
 - Automatic relation following
@@ -279,9 +280,9 @@ When analyzing requirements for task generation:
 - **Explicit tests**: List every test file that needs to run
 - **Explicit ownership**: Include effective owner/routing group; call out unassigned ownership when assignment matters
 - **Repository-agnostic**: Don't assume technology stack unless in requirements
-- **Link to source**: Every requirement needs a blob link
+- **Link to source**: Every changed capability or requirement needs a blob link
 - **Track progress**: Use TodoWrite checkboxes throughout implementation
-- **Save context**: Keep `/tmp/req_context_*.md` files for developer reference
+- **Save context**: Keep `/tmp/trace_context_*.md` files for developer reference
 
 ## Complete Example
 
@@ -294,20 +295,20 @@ BASE_COMMIT=$(git merge-base $BASE_BRANCH HEAD)
 # 2. Run change impact analysis
 reqvire change-impact --git-commit=$BASE_COMMIT --json --output /tmp/impact.json
 
-# 3. For each changed requirement, gather context
-reqvire collect "Authentication Feature" --json --output /tmp/req_auth_feature.json
-reqvire collect "Authentication Feature" > /tmp/req_context_auth_feature.md
+# 3. For each changed capability or requirement, gather context
+reqvire collect "Authentication Capability" --json --output /tmp/context_auth_capability.json
+reqvire collect "Authentication Capability" > /tmp/trace_context_auth_capability.md
 
-# 4. Get requirement details
-reqvire search --filter-id="requirements/Auth.md#authentication-feature" --json
+# 4. Get element details
+reqvire search --filter-id="requirements/Auth.md#authentication-capability" --json
 
 # 5. Get verification and test paths
-reqvire traces --filter-id="requirements/Auth.md#authentication-feature" --json
+reqvire traces --filter-id="requirements/Auth.md#authentication-capability" --json
 reqvire search --filter-id="requirements/Verifications/AuthTests.md#auth-test" --json
 
 # 6. Generate git blob URL
 REPO_URL=$(git remote get-url origin | sed 's/\.git$//' | sed 's/git@github.com:/https:\/\/github.com\//')
-BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/requirements/Auth.md#authentication-feature"
+BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/requirements/Auth.md#authentication-capability"
 
 # 7. Create task plan (manual or automated)
 ```
@@ -315,22 +316,22 @@ BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/requirements/Auth.md#authentication-fe
 **Resulting task:**
 
 ```markdown
-☐ Implement "Authentication Feature" (requirements/Auth.md#authentication-feature)
-  Context: System shall authenticate users using JWT tokens with refresh
-  capabilities. Derived from "User Security" requirement to protect sensitive
-  user data. Includes password hashing specification and session constraints.
+☐ Implement requirements under "Authentication Capability" (requirements/Auth.md#authentication-capability)
+  Context: The capability enables secure authentication for protected
+  resources. Its specifying requirements define JWT token handling, refresh
+  behavior, password hashing, and session constraints.
   Purpose: Enable secure user authentication for protected resources
   Implementation: JWT token generation, password bcrypt hashing, session management
-  ⚠️ IMPORTANT: Read full requirement - this is only a summary!
+  ⚠️ IMPORTANT: Read full capability and requirement context - this is only a summary!
 
-  ☐ Review full requirement context: /tmp/req_context_auth_feature.md
-  ☐ Review requirement: https://github.com/org/repo/blob/abc123/requirements/Auth.md#authentication-feature
+  ☐ Review full capability and requirement context: /tmp/trace_context_auth_capability.md
+  ☐ Review capability and specifying requirements: https://github.com/org/repo/blob/abc123/requirements/Auth.md#authentication-capability
   ☐ Implement JWT token generation per specification
   ☐ Implement password hashing using bcrypt
   ☐ Implement session management with timeout constraints
   ☐ Run tests: tests/auth/test_authentication.rs
   ☐ Run tests: tests/auth/test_session.rs
-  ☐ Add satisfiedBy relation: reqvire link "Authentication Feature" "satisfiedBy" "src/auth/jwt.rs"
+  ☐ Add satisfiedBy relation to the relevant requirement: reqvire link "JWT Authentication Requirement" "satisfiedBy" "src/auth/jwt.rs"
   ☐ Validate model: reqvire validate
 ```
 
@@ -339,7 +340,7 @@ BLOB_URL="${REPO_URL}/blob/${BASE_COMMIT}/requirements/Auth.md#authentication-fe
 After creating the task plan:
 - **For implementation**: Follow the task plan with TodoWrite tracking
 - **For requirement clarification**: See [Explore](explore.md) for model exploration
-- **For adding new requirements**: See [Add Feature](AddFeature.md)
+- **For adding new requirements**: See [Add Capability](AddCapability.md)
 - **For refactoring requirements**: See [Consolidate Requirements](ConsolidateRequirements.md)
 - **For verification**: Run tests and validate model after each implementation
 
@@ -347,17 +348,17 @@ After creating the task plan:
 
 The syseng skill provides slash commands that automate this workflow:
 
-- `/reqvire:analyze-impact [commit-hash]` - Analyze requirement changes and their impact
+- `/reqvire:analyze-impact [commit-hash]` - Analyze capability and requirement changes and their impact
 - `/reqvire:generate-tasks [base-commit]` - Generate complete task plan from changes
 
 These commands follow the workflow described above and automatically:
 1. Detect base branch
 2. Run change-impact analysis
-3. Collect requirement context
+3. Collect capability and requirement context
 4. Generate TodoWrite task plan
 5. Save reference documents to `/tmp`
 6. Create git blob links
 
 **When to use slash commands vs manual workflow:**
-- **Use slash commands**: Quick task generation for feature branches
+- **Use slash commands**: Quick task generation for capability branches
 - **Use manual workflow**: Custom analysis, learning the process, non-standard cases

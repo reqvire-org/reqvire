@@ -1,25 +1,25 @@
 # Elements
 
-### Feature A
+### Capability A
 
-The system SHALL implement Feature A.
+The system SHALL implement Capability A.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Root Requirement](../Requirements.md#root-requirement)
-  * verifiedBy: [Test Feature A](../Verifications/Tests.md#test-feature-a)
+  * verifiedBy: [Test Capability A](../Verifications/Tests.md#test-capability-a)
 ---
 
-### Sub Feature
+### Sub Capability
 
-The system SHALL implement a sub-feature of Feature A.
+The system SHALL implement a sub-capability of Capability A.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
+  * derivedFrom: [Capability A](#capability-a)
 ---
 

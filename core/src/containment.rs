@@ -420,7 +420,7 @@ fn folder_to_d3_node(folder: &ContainmentFolder) -> D3TreeNode {
         // Add elements as children of file
         for element in &file.elements {
             let element_type = match &element.element_type {
-                ElementType::Feature => "feature",
+                ElementType::Capability => "capability",
                 ElementType::Requirement(crate::element::RequirementType::System) => {
                     "system-requirement"
                 }

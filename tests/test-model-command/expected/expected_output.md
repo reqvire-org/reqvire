@@ -7,14 +7,14 @@
 **Type**: ontology
 **File**: [specifications/Ontologies.md](specifications/Ontologies.md)
 
-## [Test Feature Test Model Command Specifications Features Md](specifications/Features.md#test-feature-test-model-command-specifications-features-md)
+## [Test Capability Test Model Command Specifications Capabilities Md](specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md)
 
-**Type**: feature
-**File**: [specifications/Features.md](specifications/Features.md)
+**Type**: capability
+**File**: [specifications/Capabilities.md](specifications/Capabilities.md)
 
 ```mermaid
 graph TD
-  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
@@ -24,13 +24,13 @@ graph TD
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
-    subgraph 52b96646352f3ec7["📄 Features.md"]
-      1ef18bbc2a9e2de["Model Structure Exploration"];
-      class 1ef18bbc2a9e2de systemRequirement;
-      click 1ef18bbc2a9e2de "specifications/Features.md#model-structure-exploration";
-      cc4f0d848ef4201f["Test Feature Test Model Command Specifications Features Md<br/>📎 specifications/Ontologies.md#model-command-ontology"];
-      class cc4f0d848ef4201f feature;
-      click cc4f0d848ef4201f "specifications/Features.md#test-feature-test-model-command-specifications-features-md";
+    subgraph afe26fd45621e6a["📄 Capabilities.md"]
+      458b8fd2c32e6014["Model Structure Exploration"];
+      class 458b8fd2c32e6014 systemRequirement;
+      click 458b8fd2c32e6014 "specifications/Capabilities.md#model-structure-exploration";
+      8c7466173ee6b05d["Test Capability Test Model Command Specifications Capabilities Md<br/>📎 specifications/Ontologies.md#model-command-ontology"];
+      class 8c7466173ee6b05d capability;
+      click 8c7466173ee6b05d "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md";
     end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       f352ca56d3ce0fdd["Default Model Roots"];
@@ -78,10 +78,10 @@ graph TD
       click fb891ab92c9824aa "specifications/Verifications/Tests.md#reverse-traversal-test";
     end
   end
-  cc4f0d848ef4201f -->|specifiedBy| 1ef18bbc2a9e2de;
-  1ef18bbc2a9e2de -->|derive| 25879bdc5e196bec;
+  8c7466173ee6b05d -->|specifiedBy| 458b8fd2c32e6014;
+  458b8fd2c32e6014 -->|derive| 25879bdc5e196bec;
   25879bdc5e196bec -->|verifiedBy| 2f7b3b3deb29891d;
-  1ef18bbc2a9e2de -->|derive| b7ec4bb3813f1dea;
+  458b8fd2c32e6014 -->|derive| b7ec4bb3813f1dea;
   b7ec4bb3813f1dea -->|derive| 5abb4a3caae293d9;
   b7ec4bb3813f1dea -->|derive| 836c732a54d7f48f;
   836c732a54d7f48f -->|derive| f352ca56d3ce0fdd;
@@ -91,5 +91,5 @@ graph TD
   f7eb2f9d9cd7bb11 -->|verifiedBy| fb891ab92c9824aa;
   836c732a54d7f48f -->|verifiedBy| bbd610799ac8e00f;
   b7ec4bb3813f1dea -->|verifiedBy| 6e0e2613c4bfcfcb;
-  1ef18bbc2a9e2de -->|derive| 28d69f5dca868721;
+  458b8fd2c32e6014 -->|derive| 28d69f5dca868721;
 ```

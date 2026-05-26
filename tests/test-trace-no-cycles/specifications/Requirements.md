@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Trace No Cycles Specifications Requirements Md
+### Test Capability Test Trace No Cycles Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This document contains requirements with trace relations that form cycles to verify they don't cause circular dependency errors.
@@ -19,7 +19,7 @@ This requirement has trace relations that would form a cycle if trace relations 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-trace-no-cycles-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-trace-no-cycles-specifications-requirements-md)
   * trace: [Requirement Beta](#requirement-beta)
   * derive: [Child Requirement Alpha](#child-requirement-alpha)
 
@@ -32,7 +32,7 @@ This requirement traces back to Alpha, forming a trace cycle that should not be 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-trace-no-cycles-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-trace-no-cycles-specifications-requirements-md)
   * trace: [Requirement Gamma](#requirement-gamma)
   * derive: [Child Requirement Beta](#child-requirement-beta)
 
@@ -45,7 +45,7 @@ This requirement completes the trace cycle back to Alpha, which should be allowe
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-trace-no-cycles-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-trace-no-cycles-specifications-requirements-md)
   * trace: [Requirement Alpha](#requirement-alpha)
   * derive: [Child Requirement Gamma](#child-requirement-gamma)
 
@@ -94,7 +94,7 @@ This requirement has multiple trace relations forming complex patterns that shou
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-trace-no-cycles-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-trace-no-cycles-specifications-requirements-md)
   * trace: [Requirement Alpha](#requirement-alpha)
   * trace: [Requirement Beta](#requirement-beta)
   * trace: [Requirement Gamma](#requirement-gamma)

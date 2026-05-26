@@ -8,7 +8,7 @@ This file has section header but no page header.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Advanced Format Testnopageheader Md](#test-feature-test-advanced-format-testnopageheader-md)
+  * specify: [Test Capability Test Advanced Format Testnopageheader Md](#test-capability-test-advanced-format-testnopageheader-md)
 ---
 
 ### Element Beta
@@ -19,13 +19,13 @@ More content here.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Advanced Format Testnopageheader Md](#test-feature-test-advanced-format-testnopageheader-md)
+  * specify: [Test Capability Test Advanced Format Testnopageheader Md](#test-capability-test-advanced-format-testnopageheader-md)
 ---
 
-### Test Feature Test Advanced Format Testnopageheader Md
+### Test Capability Test Advanced Format Testnopageheader Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---

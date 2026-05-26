@@ -12,7 +12,7 @@ The system shall allow structured markdown and unstructured. (eg., markdown, PDF
 
 #### Relations
   * derive: [Ignoring Unstructured Documents](#ignoring-unstructured-documents)
-  * specify: [Defining Model Structure](../../Features.md#defining-model-structure)
+  * specify: [Defining Model Structure](../../Capabilities.md#defining-model-structure)
 ---
 
 ### Ignoring Unstructured Documents

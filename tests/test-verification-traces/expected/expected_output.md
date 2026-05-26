@@ -8,7 +8,7 @@
 
 ```mermaid
 graph TD
-  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
@@ -17,9 +17,9 @@ graph TD
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
-    subgraph 52b96646352f3ec7["📄 Features.md"]
-      dd5e1b9d53160cae["User Authentication"]:::systemRequirement
-      click dd5e1b9d53160cae "specifications/Features.md#user-authentication";
+    subgraph afe26fd45621e6a["📄 Capabilities.md"]
+      89e6986f717d1015["User Authentication"]:::systemRequirement
+      click 89e6986f717d1015 "specifications/Capabilities.md#user-authentication";
     end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       ffaaccb9d15d971b["OAuth Implementation"]:::systemRequirement
@@ -36,7 +36,7 @@ graph TD
   end
   b4db26cf905cd9cb -.->|verifies| ffaaccb9d15d971b;
   b4db26cf905cd9cb -.->|verifies| 91839b1de28f4dab;
-  ffaaccb9d15d971b -.->|derivedFrom| dd5e1b9d53160cae;
+  ffaaccb9d15d971b -.->|derivedFrom| 89e6986f717d1015;
 ```
 
 
@@ -48,7 +48,7 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
@@ -57,9 +57,9 @@ graph TD
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
-    subgraph 52b96646352f3ec7["📄 Features.md"]
-      dd5e1b9d53160cae["User Authentication"]:::systemRequirement
-      click dd5e1b9d53160cae "specifications/Features.md#user-authentication";
+    subgraph afe26fd45621e6a["📄 Capabilities.md"]
+      89e6986f717d1015["User Authentication"]:::systemRequirement
+      click 89e6986f717d1015 "specifications/Capabilities.md#user-authentication";
     end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       ffaaccb9d15d971b["OAuth Implementation"]:::systemRequirement
@@ -76,7 +76,7 @@ graph TD
   end
   76409d98e05d75e4 -.->|verifies| 91839b1de28f4dab;
   91839b1de28f4dab -.->|derivedFrom| ffaaccb9d15d971b;
-  ffaaccb9d15d971b -.->|derivedFrom| dd5e1b9d53160cae;
+  ffaaccb9d15d971b -.->|derivedFrom| 89e6986f717d1015;
 ```
 
 
@@ -88,7 +88,7 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
@@ -97,9 +97,9 @@ graph TD
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
-    subgraph 52b96646352f3ec7["📄 Features.md"]
-      2964ce5888d0c623["Data Protection"]:::systemRequirement
-      click 2964ce5888d0c623 "specifications/Features.md#data-protection";
+    subgraph afe26fd45621e6a["📄 Capabilities.md"]
+      346630c146f4c190["Data Protection"]:::systemRequirement
+      click 346630c146f4c190 "specifications/Capabilities.md#data-protection";
     end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       3fd7be966f178672["Encryption Implementation"]:::systemRequirement
@@ -113,7 +113,7 @@ graph TD
     end
   end
   82679469251afa07 -.->|verifies| 3fd7be966f178672;
-  3fd7be966f178672 -.->|derivedFrom| 2964ce5888d0c623;
+  3fd7be966f178672 -.->|derivedFrom| 346630c146f4c190;
 ```
 
 
@@ -125,7 +125,7 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
@@ -134,9 +134,9 @@ graph TD
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
-    subgraph 52b96646352f3ec7["📄 Features.md"]
-      81ebeaf8af789f94["Coverage Reports"]:::systemRequirement
-      click 81ebeaf8af789f94 "specifications/Features.md#coverage-reports";
+    subgraph afe26fd45621e6a["📄 Capabilities.md"]
+      50087044746c8442["Coverage Reports"]:::systemRequirement
+      click 50087044746c8442 "specifications/Capabilities.md#coverage-reports";
     end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       1dec177646fd03e3["Coverage Calculator"]:::systemRequirement
@@ -153,7 +153,7 @@ graph TD
   end
   b99504832fc8e0f1 -.->|verifies| 1dec177646fd03e3;
   b99504832fc8e0f1 -.->|verifies| 43a94f9f7d2eef41;
-  1dec177646fd03e3 -.->|derivedFrom| 81ebeaf8af789f94;
+  1dec177646fd03e3 -.->|derivedFrom| 50087044746c8442;
 ```
 
 
@@ -165,7 +165,7 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
@@ -174,9 +174,9 @@ graph TD
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
-    subgraph 52b96646352f3ec7["📄 Features.md"]
-      2964ce5888d0c623["Data Protection"]:::systemRequirement
-      click 2964ce5888d0c623 "specifications/Features.md#data-protection";
+    subgraph afe26fd45621e6a["📄 Capabilities.md"]
+      346630c146f4c190["Data Protection"]:::systemRequirement
+      click 346630c146f4c190 "specifications/Capabilities.md#data-protection";
     end
   end
   subgraph 9f0649e759bd2822["📁 specifications/Verifications"]
@@ -185,7 +185,7 @@ graph TD
       click c7c891cbfd4a225d "specifications/Verifications/Tests.md#security-analysis";
     end
   end
-  c7c891cbfd4a225d -.->|verifies| 2964ce5888d0c623;
+  c7c891cbfd4a225d -.->|verifies| 346630c146f4c190;
 ```
 
 
@@ -197,7 +197,7 @@ graph TD
 
 ```mermaid
 graph TD
-  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
   classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
@@ -206,9 +206,9 @@ graph TD
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
   subgraph 9d68b769fcbc79d0["📁 specifications"]
-    subgraph 52b96646352f3ec7["📄 Features.md"]
-      dd5e1b9d53160cae["User Authentication"]:::systemRequirement
-      click dd5e1b9d53160cae "specifications/Features.md#user-authentication";
+    subgraph afe26fd45621e6a["📄 Capabilities.md"]
+      89e6986f717d1015["User Authentication"]:::systemRequirement
+      click 89e6986f717d1015 "specifications/Capabilities.md#user-authentication";
     end
     subgraph 77808752d543f615["📄 SystemRequirements.md"]
       ffaaccb9d15d971b["OAuth Implementation"]:::systemRequirement
@@ -222,5 +222,5 @@ graph TD
     end
   end
   5a0f790448aa5dda -.->|verifies| ffaaccb9d15d971b;
-  ffaaccb9d15d971b -.->|derivedFrom| dd5e1b9d53160cae;
+  ffaaccb9d15d971b -.->|derivedFrom| 89e6986f717d1015;
 ```

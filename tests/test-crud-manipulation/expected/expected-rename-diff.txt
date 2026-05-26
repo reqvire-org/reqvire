@@ -1,16 +1,16 @@
-Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#feature-alpha)
+Renamed element: Capability A → Capability Alpha (specifications/Requirements.md#capability-alpha)
 
 📄 specifications/OtherRequirements.md
   [37m01     # Elements[0m
   [37m02[0m
-  [37m03     ### Feature C[0m
+  [37m03     ### Capability C[0m
 
   [37m08       * type: requirement[0m
   [37m09[0m
   [37m10     #### Relations[0m
-  [31m11 -     * derivedFrom: [Feature A](Requirements.md#feature-a)[0m
-  [32m11 +     * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)[0m
-  [37m12       * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [31m11 -     * derivedFrom: [Capability A](Requirements.md#capability-a)[0m
+  [32m11 +     * derivedFrom: [Capability Alpha](Requirements.md#capability-alpha)[0m
+  [37m12       * verifiedBy: [Test for Capability C](Verifications/Tests.md#test-for-capability-c)[0m
   [37m13     ---[0m
   [37m14[0m
 
@@ -18,87 +18,87 @@ Renamed element: Feature A → Feature Alpha (specifications/Requirements.md#fea
 
 📄 specifications/Requirements.md
   [37m01     # Elements[0m
-  [31m02 -   ### Feature D Constraint[0m
-  [32m02 +   ### Complex chars, element/name example[0m
+  [31m02 -   ### Capability D Constraint[0m
+  [32m02 +   ### Capability D[0m
   [37m03[0m
-  [31m04 -   Rate limiting constraint for Feature D.[0m
-  [32m04 +   This feature has special characters in its name including commas and slashes.[0m
+  [31m04 -   Rate limiting constraint for Capability D.[0m
+  [32m04 +   This is a newly added capability.[0m
   [37m05[0m
   [37m06     #### Metadata[0m
   [31m07 -     * type: constraint[0m
   [32m07 +     * type: requirement[0m
   [32m08 +   ␤[0m
   [32m09 +   #### Relations[0m
-  [32m10 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [32m10 +     * derivedFrom: [Capability Alpha](#capability-alpha)[0m
   [37m11     ---[0m
-  [31m12 -   ### Parent Feature[0m
-  [32m12 +   ### Feature D[0m
+  [31m12 -   ### Parent Capability[0m
+  [32m12 +   ### Capability D Constraint[0m
   [37m13[0m
   [31m14 -   This is a parent requirement.[0m
-  [32m14 +   This is a newly added feature.[0m
+  [32m14 +   Rate limiting constraint for Capability D.[0m
   [37m15[0m
   [37m16     #### Metadata[0m
-  [37m17       * type: requirement[0m
-  [37m18[0m
-  [37m19     #### Relations[0m
-  [31m20 -     * specify: [Test Feature Test Crud Manipulation Specifications Requirements Md](#test-feature-test-crud-manipulation-specifications-requirements-md)[0m
-  [32m20 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
-  [37m21     ---[0m
-  [31m22 -   ### Feature A[0m
-  [32m22 +   ### Feature D Constraint[0m
-  [37m23[0m
-  [31m24 -   This is a test requirement for feature A.[0m
-  [32m24 +   Rate limiting constraint for Feature D.[0m
-  [37m25[0m
-  [37m26     #### Metadata[0m
-  [31m27 -     * type: requirement[0m
-  [31m27 -   ␤[0m
-  [31m27 -   #### Relations[0m
-  [31m27 -     * derivedFrom: [Parent Feature](#parent-feature)[0m
-  [32m27 +     * type: constraint[0m
-  [37m28     ---[0m
-  [31m29 -   ### Complex chars, element/name example[0m
-  [32m29 +   ### Feature E[0m
-  [37m30[0m
-  [31m31 -   This feature has special characters in its name including commas and slashes.[0m
-  [32m31 +   This feature has an attachment to a refinement element.[0m
+  [31m17 -     * type: requirement[0m
+  [31m17 -   ␤[0m
+  [31m17 -   #### Relations[0m
+  [31m17 -     * specify: [Test Capability Test Crud Manipulation Specifications Requirements Md](#test-capability-test-crud-manipulation-specifications-requirements-md)[0m
+  [32m17 +     * type: constraint[0m
+  [37m18     ---[0m
+  [31m19 -   ### Capability A[0m
+  [32m19 +   ### Capability E[0m
+  [37m20[0m
+  [31m21 -   This is a test requirement for capability A.[0m
+  [32m21 +   This capability has an attachment to a refinement element.[0m
+  [37m22[0m
+  [37m23     #### Metadata[0m
+  [37m24       * type: requirement[0m
+  [32m25 +   #### Attachments[0m
+  [32m26 +     * [Capability D Constraint](Requirements.md#capability-d-constraint)[0m
+  [32m27 +   ␤[0m
+  [37m28     #### Relations[0m
+  [31m29 -     * derivedFrom: [Parent Capability](#parent-capability)[0m
+  [32m29 +     * derivedFrom: [Capability Alpha](#capability-alpha)[0m
+  [37m30     ---[0m
+  [31m31 -   ### Capability D[0m
+  [32m31 +   ### Complex chars, element/name example[0m
   [37m32[0m
-  [37m33     #### Metadata[0m
-  [37m34       * type: requirement[0m
-  [32m35 +   #### Attachments[0m
-  [32m36 +     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
-  [32m37 +   ␤[0m
+  [31m33 -   This is a newly added capability.[0m
+  [32m33 +   This capability has special characters in its name including commas and slashes.[0m
+  [37m34[0m
+  [37m35     #### Metadata[0m
+  [37m36       * type: requirement[0m
+  [37m37[0m
   [37m38     #### Relations[0m
-  [31m39 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m39 +     * derivedFrom: [Feature Alpha](#feature-alpha)[0m
+  [31m39 -     * derivedFrom: [Capability A](#capability-a)[0m
+  [32m39 +     * derivedFrom: [Capability Alpha](#capability-alpha)[0m
   [37m40     ---[0m
-  [31m41 -   ### Feature D[0m
-  [32m41 +   ### Parent Feature[0m
+  [31m41 -   ### Capability E[0m
+  [32m41 +   ### Parent Capability[0m
   [37m42[0m
-  [31m43 -   This is a newly added feature.[0m
+  [31m43 -   This capability has an attachment to a refinement element.[0m
   [32m43 +   This is a parent requirement.[0m
   [37m44[0m
   [37m45     #### Metadata[0m
   [37m46       * type: requirement[0m
-  [37m47[0m
-  [37m48     #### Relations[0m
-  [31m49 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m49 +     * specify: [Test Feature Test Crud Manipulation Specifications Requirements Md](#test-feature-test-crud-manipulation-specifications-requirements-md)[0m
-  [37m50     ---[0m
-  [31m51 -   ### Feature E[0m
-  [32m51 +   ### Feature Alpha[0m
-  [37m52[0m
-  [31m53 -   This feature has an attachment to a refinement element.[0m
-  [32m53 +   This is a test requirement for feature A.[0m
-  [37m54[0m
-  [37m55     #### Metadata[0m
-  [37m56       * type: requirement[0m
-  [31m57 -   #### Attachments[0m
-  [31m57 -     * [Feature D Constraint](Requirements.md#feature-d-constraint)[0m
-  [31m57 -   ␤[0m
+  [31m47 -   #### Attachments[0m
+  [31m47 -     * [Capability D Constraint](Requirements.md#capability-d-constraint)[0m
+  [31m47 -   ␤[0m
+  [37m47     #### Relations[0m
+  [31m48 -     * derivedFrom: [Capability A](#capability-a)[0m
+  [32m48 +     * specify: [Test Capability Test Crud Manipulation Specifications Requirements Md](#test-capability-test-crud-manipulation-specifications-requirements-md)[0m
+  [37m49     ---[0m
+  [31m50 -   ### Complex chars, element/name example[0m
+  [32m50 +   ### Capability Alpha[0m
+  [37m51[0m
+  [31m52 -   This capability has special characters in its name including commas and slashes.[0m
+  [32m52 +   This is a test requirement for capability A.[0m
+  [37m53[0m
+  [37m54     #### Metadata[0m
+  [37m55       * type: requirement[0m
+  [37m56[0m
   [37m57     #### Relations[0m
-  [31m58 -     * derivedFrom: [Feature A](#feature-a)[0m
-  [32m58 +     * derivedFrom: [Parent Feature](#parent-feature)[0m
+  [31m58 -     * derivedFrom: [Capability A](#capability-a)[0m
+  [32m58 +     * derivedFrom: [Parent Capability](#parent-capability)[0m
   [37m59     ---[0m
   [37m60[0m
   [37m61     ### Separate Requirement Branch[0m

@@ -13,7 +13,7 @@ model: claude-sonnet-4-5
 
 ### Step 1: Update Plugin
 
-First, update the Reqvire plugin itself to ensure you have the latest commands and features.
+First, update the Reqvire plugin itself to ensure you have the latest commands and capabilities.
 
 **Detect OS and plugin path:**
 - **Linux/macOS**: `$HOME/.claude/plugins/marketplaces/reqvire-org-marketplace`
@@ -82,7 +82,7 @@ If the user approves, add the following content to the repository's CLAUDE.md fi
 ## CRITICAL: Requirements & Specifications & System Model Work
 
 **FOR ANY CONVERSATION, WORK, REQUEST, OR TASK RELATED TO:**
-- Features, requirements, semantic contracts, and system model elements
+- Capabilities, requirements, semantic contracts, and system model elements
 - Specifications
 - System model (MBSE model)
 - Verifications

@@ -2,7 +2,7 @@
 set -uo pipefail
 
 # Test: Format Command Requirements Verification
-# This test verifies the format command requirements from SystemRequirements and Features
+# This test verifies the format command requirements from SystemRequirements and Capabilities
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

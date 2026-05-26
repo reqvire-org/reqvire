@@ -50,7 +50,7 @@ if echo "$OUTPUT" | grep -q "Circular dependency"; then
 fi
 
 # Verify expected number of elements were processed using jq.
-# The migrated fixture has 8 requirements plus 1 feature root.
+# The migrated fixture has 8 requirements plus 1 capability root.
 TOTAL_ELEMENTS=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
 
 if [ "$TOTAL_ELEMENTS" != "9" ]; then

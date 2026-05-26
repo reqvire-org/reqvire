@@ -12,7 +12,7 @@ Add a new requirement to the Reqvire model following MBSE best practices.
 ## Current Model Context
 
 - Total requirements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-type="requirement" --json | jq -r '.global_counters.total_elements'`
-- Total features: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-type="feature" --json | jq -r '.global_counters.total_elements'`
+- Total capabilities: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-type="capability" --json | jq -r '.global_counters.total_elements'`
 - Verification coverage: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.leaf_requirements_coverage_percentage'`%
 - Unverified leaf requirements: !`npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --json | jq -r '.summary.unverified_leaf_requirements'`
 
@@ -25,7 +25,7 @@ ${1:-The user will provide requirement details.}
 
 1. **Understand the context:**
    - Ask user for requirement details (name, description) if not provided
-   - Identify the feature this requirement specifies
+   - Identify the capability this requirement specifies
    - Identify parent requirement only if this is a child requirement inside a requirement hierarchy
    - Identify target file (user specifies or follows project conventions)
 
@@ -36,7 +36,7 @@ ${1:-The user will provide requirement details.}
    - **Event-driven**: "when [trigger] the system shall [response]"
    - **State-driven**: "while [state] the system shall [capability]"
    - **Unwanted**: "if [condition] then the system shall [response]"
-   - **Optional**: "where [feature] the system shall [capability]"
+   - **Optional**: "where [capability] the system shall [capability]"
 
    Template:
    ```markdown
@@ -48,14 +48,14 @@ ${1:-The user will provide requirement details.}
      * type: requirement
 
    #### Relations
-     * specify: [Owning Feature](path/to/features.md#owning-feature)
+     * specify: [Owning Capability](path/to/capabilities.md#owning-capability)
    ```
 
    Add `derivedFrom` only when this requirement is a child of another requirement:
 
    ```markdown
    #### Relations
-     * specify: [Owning Feature](path/to/features.md#owning-feature)
+     * specify: [Owning Capability](path/to/capabilities.md#owning-capability)
      * derivedFrom: [Parent Requirement](path/to/parent.md#parent-requirement)
    ```
 
@@ -84,7 +84,7 @@ ${1:-The user will provide requirement details.}
      * type: requirement
 
    #### Relations
-     * specify: [Owning Feature](path.md#owning-feature)
+     * specify: [Owning Capability](path.md#owning-capability)
    EOF
    ```
 
@@ -109,7 +109,7 @@ ${1:-The user will provide requirement details.}
 4. **Check if verification is needed:**
    - **Leaf requirement** (no derived children): Needs verification
    - **Parent requirement** (has derived children): Verification rolls up from children
-   - **Feature**: Not directly verified; coverage rolls up from requirements that specify it
+   - **Capability**: May be directly verified when there is capability-level evidence; coverage also rolls up from requirements that specify it
 
    Run traces to check hierarchy:
    ```bash
@@ -148,11 +148,11 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 - **Atomic requirements**: One capability per requirement
 - **Refinement in Details**: Clarifications go in `#### Details`, not new requirements
-- **Feature ownership**: Every requirement should specify exactly one owning feature
-- **Leaf verification**: Only leaf requirements need direct verification
+- **Capability ownership**: Every requirement should specify exactly one owning capability
+- **Leaf verification**: Leaf requirements need direct verification; capabilities may also be directly verified when evidence is capability-level
 - **Roll-up coverage**: Parent requirements inherit verification from children
 - **Clear**: Use ears patterns for consistency
-- **Traceable**: Always link to the owning feature via `specify`; use `derivedFrom` only between requirements
+- **Traceable**: Always link to the owning capability via `specify`; use `derivedFrom` only between requirements
 - **Unique names**: Element names must be unique within each file
 
 ## Verification Philosophy
@@ -160,7 +160,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 Reqvire uses **bottom roll-up verification coverage**:
 - **Leaf requirements** must be verified directly
 - **Parent requirements** inherit verification from their children
-- **Features** inherit coverage from requirements that specify them
+- **Capabilities** may be directly verified and also inherit coverage from requirements that specify them
 - High-level requirements are rarely verified directly
 - Run `reqvire traces` to see verification roll-up structure
 
@@ -169,6 +169,6 @@ Reqvire uses **bottom roll-up verification coverage**:
 - Element names become URL fragments (spaces → hyphens, lowercase)
 - Use two-space indentation for Relations entries
 - Use `#### Details` for refinements that don't add capabilities
-- Use `ontology` for shared ontology meaning and requirement-owned `semantic-contract` for local SHACL shape profiles
-- Keep exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior in requirement-owned `specification`, `behavior`, `state`, `input-output`, or shape-only `semantic-contract` refinements, not in ontology
-- For complete feature (requirement + verification + test), use `/reqvire:add-feature`
+- Use `ontology` for shared ontology meaning and capability-owned or requirement-owned `semantic-contract` for local SHACL shape profiles
+- Keep exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior in capability-owned or requirement-owned `specification`, `behavior`, `state`, `input-output`, or shape-only `semantic-contract` refinements, not in ontology
+- For complete capability (requirement + verification + test), use `/reqvire:add-capability`

@@ -49,7 +49,7 @@ cat > "${TEST_DIR}/specifications/Base.md" << 'EOF'
 This is the base requirement.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Base System Requirement
@@ -135,7 +135,7 @@ DEPTH_TEST_ELEMENT='### Depth Test
 Testing path depth validation.
 
 #### Metadata
-  * type: feature
+  * type: capability
 '
 
 DEEP_PATH="specifications/a/b/c/d/e/f/g/h/i/j/DeepFile.md"

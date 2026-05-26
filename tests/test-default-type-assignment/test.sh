@@ -47,12 +47,12 @@ mkdir -p "${TEST_DIR}/specifications/nested/deeper"
 cat > "${TEST_DIR}/specifications/RootRequirements.md" << 'EOF'
 # Elements
 
-### Root Feature
+### Root Capability
 
-This is a root feature that specifies root requirements.
+This is a root capability that specifies root requirements.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
   * specifiedBy: #root-requirement-without-type
@@ -62,14 +62,14 @@ This is a root feature that specifies root requirements.
 This element has NO type metadata and is in the specifications root.
 
 #### Relations
-  * specify: #root-feature
+  * specify: #root-capability
 
-### Root Feature With Explicit Type
+### Root Capability With Explicit Type
 
-This element has explicit feature type metadata.
+This element has explicit capability type metadata.
 
 #### Metadata
-  * type: feature
+  * type: capability
 EOF
 
 # 2. Subdirectory specifications/root/
@@ -81,7 +81,7 @@ cat > "${TEST_DIR}/specifications/root/SubfolderRequirements.md" << 'EOF'
 This element has NO type metadata and is in a subfolder.
 
 #### Relations
-  * specify: ../RootRequirements.md#root-feature
+  * specify: ../RootRequirements.md#root-capability
 
 ### Subfolder Requirement With Verification Type
 
@@ -103,7 +103,7 @@ cat > "${TEST_DIR}/specifications/nested/deeper/NestedRequirements.md" << 'EOF'
 This element has NO type metadata and is deeply nested.
 
 #### Relations
-  * specify: ../../RootRequirements.md#root-feature
+  * specify: ../../RootRequirements.md#root-capability
 
 ### Nested Requirement With Test Type
 
@@ -160,12 +160,12 @@ else
 fi
 
 # Verify elements WITH explicit type metadata use the specified type
-ROOT_FEATURE_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/RootRequirements.md"].elements[] | select(.name == "Root Feature With Explicit Type") | .type')
-if [ "$ROOT_FEATURE_TYPE" != "feature" ]; then
-    echo "FAILED: Element with explicit feature type should be 'feature', got '$ROOT_FEATURE_TYPE'" >> "${TEST_DIR}/test_results.log"
+ROOT_CAPABILITY_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/RootRequirements.md"].elements[] | select(.name == "Root Capability With Explicit Type") | .type')
+if [ "$ROOT_CAPABILITY_TYPE" != "capability" ]; then
+    echo "FAILED: Element with explicit capability type should be 'capability', got '$ROOT_CAPABILITY_TYPE'" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
 else
-    echo "PASSED: Element with explicit type metadata has type 'feature'" >> "${TEST_DIR}/test_results.log"
+    echo "PASSED: Element with explicit type metadata has type 'capability'" >> "${TEST_DIR}/test_results.log"
 fi
 
 SUBFOLDER_VERIF_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/root/SubfolderRequirements.md"].elements[] | select(.name == "Subfolder Requirement With Verification Type") | .type')
@@ -202,12 +202,12 @@ mkdir -p "${TEST_DIR}/specifications"
 cat > "${TEST_DIR}/specifications/AllTypes.md" << 'EOF'
 # Elements
 
-### Root Feature
+### Root Capability
 
 This is the root requirement for testing all types.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [Ontology Element](#ontology-element)
@@ -217,7 +217,7 @@ This is the root requirement for testing all types.
 No type metadata - should default to requirement.
 
 #### Relations
-  * specify: #root-feature
+  * specify: #root-capability
 
 ### Explicit Requirement
 
@@ -225,15 +225,15 @@ No type metadata - should default to requirement.
   * type: requirement
 
 #### Relations
-  * specify: #root-feature
+  * specify: #root-capability
   * refinedBy: [State Refinement](#state-refinement)
   * refinedBy: [Input Output Refinement](#input-output-refinement)
   * refinedBy: [Semantic Contract Refinement](#semantic-contract-refinement)
 
-### Feature
+### Capability
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [Ontology Element](#ontology-element)
@@ -244,7 +244,7 @@ No type metadata - should default to requirement.
   * type: source
 
 #### Relations
-  * refine: #root-feature
+  * refine: #root-capability
 
 ### Semantic Contract Refinement
 
@@ -371,7 +371,7 @@ fi
 TYPES_TO_CHECK=(
     "Default Requirement:requirement"
     "Explicit Requirement:requirement"
-    "Feature:feature"
+    "Capability:capability"
     "Ontology Element:ontology"
     "Source Refinement:source"
     "Semantic Contract Refinement:semantic-contract"

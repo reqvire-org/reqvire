@@ -13,7 +13,7 @@ The system shall produce interactive visual representations of relationships wit
   * refinedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
   * refinedBy: [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
   * refinedBy: [Mermaid Diagram Style Specification](Specifications.md#mermaid-diagram-style-specification)
-  * refinedBy: [Mermaid Interactive Features Specification](Specifications.md#mermaid-interactive-features-specification)
+  * refinedBy: [Mermaid Interactive Capabilities Specification](Specifications.md#mermaid-interactive-capabilities-specification)
 ---
 
 ### Diagram Generation

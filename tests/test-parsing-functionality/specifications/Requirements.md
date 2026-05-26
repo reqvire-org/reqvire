@@ -2,12 +2,12 @@
 
 
 
-### Test Feature Test Parsing Functionality Specifications Requirements Md
+### Test Capability Test Parsing Functionality Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Base Requirement
@@ -18,4 +18,4 @@ This is a base requirement for testing.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-parsing-functionality-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-parsing-functionality-specifications-requirements-md)

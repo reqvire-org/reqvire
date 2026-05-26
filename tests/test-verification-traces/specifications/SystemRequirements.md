@@ -8,7 +8,7 @@ The system SHALL implement OAuth 2.0 authentication flow.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [User Authentication](Features.md#user-authentication)
+  * derivedFrom: [User Authentication](Capabilities.md#user-authentication)
 
 ---
 
@@ -32,7 +32,7 @@ The system SHALL encrypt sensitive data using AES-256.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Data Protection](Features.md#data-protection)
+  * derivedFrom: [Data Protection](Capabilities.md#data-protection)
 
 ---
 
@@ -44,7 +44,7 @@ The system SHALL calculate verification coverage percentages for leaf requiremen
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Coverage Reports](Features.md#coverage-reports)
+  * derivedFrom: [Coverage Reports](Capabilities.md#coverage-reports)
 
 ---
 

@@ -52,12 +52,12 @@ EOF
 cat > "$TEST_DIR/specifications/Requirements.md" <<'EOF'
 # Elements
 
-### Workspace Flag Feature
+### Workspace Flag Capability
 
-Feature root for workspace flag tests.
+Capability root for workspace flag tests.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ---
 
@@ -71,7 +71,7 @@ Root requirement for explicit workspace selection.
 #### Relations
   * derive: [Workspace Flag Child](#workspace-flag-child)
   * derive: [Workspace Flag Sibling](#workspace-flag-sibling)
-  * specify: [Workspace Flag Feature](#workspace-flag-feature)
+  * specify: [Workspace Flag Capability](#workspace-flag-capability)
 
 ---
 

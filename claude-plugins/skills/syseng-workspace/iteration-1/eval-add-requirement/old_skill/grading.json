@@ -4,14 +4,14 @@
   "configuration": "old_skill",
   "expectations": [
     {
-      "text": "Creates feature before requirement (MBSE order)",
+      "text": "Creates capability before requirement (MBSE order)",
       "passed": true,
-      "evidence": "Step 1 creates feature 'Batch Export', Step 2 creates requirement 'Batch Specification Export'. Correct MBSE order."
+      "evidence": "Step 1 creates capability 'Batch Export', Step 2 creates requirement 'Batch Specification Export'. Correct MBSE order."
     },
     {
-      "text": "Requirement has specify relation to feature",
+      "text": "Requirement has specify relation to capability",
       "passed": true,
-      "evidence": "Step 2 includes '* specify: [Batch Export](../../Features.md#batch-export)' in Relations section."
+      "evidence": "Step 2 includes '* specify: [Batch Export](../../Capabilities.md#batch-export)' in Relations section."
     },
     {
       "text": "Creates test-verification with verify relation to system requirement",

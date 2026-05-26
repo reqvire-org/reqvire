@@ -1,13 +1,13 @@
 ---
 allowed-tools: Read, Edit, Bash(npx:*)
-argument-hint: [requirement-id]
-description: Add a verification for an existing requirement, checking if verification is needed based on requirement hierarchy
+argument-hint: [capability-or-requirement-id]
+description: Add a verification for an existing capability or requirement, checking scope against capability and requirement hierarchy
 model: claude-sonnet-4-5
 ---
 
 # Add Verification
 
-Add a verification for an existing requirement following Reqvire's bottom roll-up verification philosophy.
+Add a verification for an existing capability or requirement following Reqvire's direct capability verification and requirement roll-up philosophy.
 
 ## Current Model Context
 
@@ -17,14 +17,14 @@ Add a verification for an existing requirement following Reqvire's bottom roll-u
 
 ## User Request
 
-${1:+Requirement ID: $1}
-${1:-The user will specifiedBy which requirement needs verification.}
+${1:+Capability or requirement ID: $1}
+${1:-The user will specify which capability or requirement needs verification.}
 
 ## Steps
 
-1. **Identify the requirement:**
-   - Ask user which requirement needs verification if not provided
-   - Get the requirement identifier or name
+1. **Identify the capability or requirement:**
+   - Ask user which capability or requirement needs verification if not provided
+   - Get the element identifier or name
 
 2. **Check if verification is needed:**
    ```bash
@@ -32,6 +32,7 @@ ${1:-The user will specifiedBy which requirement needs verification.}
    ```
 
    Analyze the trace tree:
+   - **Capability**: May be directly verified when evidence is capability-level
    - **Leaf requirement** (no children): Needs direct verification
    - **Parent requirement** (has children): Verification rolls up from children - usually no direct verification needed
 
@@ -40,7 +41,7 @@ ${1:-The user will specifiedBy which requirement needs verification.}
    npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" coverage --filter-name="<requirement-name>"
    ```
 
-4. **If leaf requirement needs verification:**
+4. **If capability or leaf requirement needs verification:**
 
    Choose verification type:
    - **verification** (or test-verification): Automated testing
@@ -48,16 +49,17 @@ ${1:-The user will specifiedBy which requirement needs verification.}
    - **inspection-verification**: Manual inspection/review
    - **demonstration-verification**: Operational demonstration
 
-5. **Read all requirements in trace chain:**
+5. **Read all capability and requirement context in trace chain:**
 
-   For each requirement this verification will verify:
+   For each capability or requirement this verification will verify:
    ```bash
    npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-id="<requirement-id>"
    ```
 
    Extract:
-   - Requirement content (capabilities and constraints)
-   - All requirements in derivedFrom chain up to root
+   - Capability or requirement content
+   - Ontology/refinement context reachable from the capability or requirement
+   - All requirements in derivedFrom chain up to capability context
    - Build complete understanding of what needs verification
 
 6. **Draft verification content:**
@@ -66,14 +68,14 @@ ${1:-The user will specifiedBy which requirement needs verification.}
    ```markdown
    ### Verification Name
 
-   [Description of how ALL requirements in the trace chain will be verified]
+   [Description of how the capability or all requirements in the trace chain will be verified]
 
    #### Details
 
    ##### Acceptance Criteria
    - [Criterion for leaf requirement 1]
    - [Criterion for leaf requirement 2]
-   - [Criterion that verifies parent capabilities through leaf tests]
+   - [Criterion that verifies capability expectations or parent requirements through leaf tests]
 
    ##### Test Criteria
    - [How to test criterion 1]
@@ -84,8 +86,7 @@ ${1:-The user will specifiedBy which requirement needs verification.}
      * type: test-verification
 
    #### Relations
-     * verify: [Leaf Requirement 1](../path/to/req1.md#leaf-requirement-1)
-     * verify: [Leaf Requirement 2](../path/to/req2.md#leaf-requirement-2)
+     * verify: [Capability Or Leaf Requirement](../path/to/element.md#capability-or-leaf-requirement)
      * satisfiedBy: [test.sh](../../tests/test-name/test.sh)
    ```
 
@@ -135,11 +136,10 @@ ${1:-The user will specifiedBy which requirement needs verification.}
    - Validates relation format
    - Updates the file
 
-8. **Update the requirements with verifiedBy relations:**
-   Add `verifiedBy` relation to each verified requirement:
+8. **Update the verified elements with verifiedBy relations:**
+   Add `verifiedBy` relation to each verified capability or requirement:
    ```markdown
    #### Relations
-     * derivedFrom: [Parent](...)
      * verifiedBy: [Verification Name](../Verifications/file.md#verification-name)
    ```
 
@@ -154,7 +154,7 @@ ${1:-The user will specifiedBy which requirement needs verification.}
     npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" lint --json --output /tmp/lint.json
     ```
 
-    Check if verification creates redundant verify relations (verifying both leaf and parent).
+    Check if verification creates redundant verify relations (verifying both an element and an ancestor already covered through the trace path).
 
 ## Element Manipulation
 
@@ -177,6 +177,10 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 ## Decision Logic
 
+**If capability target:**
+- Verify directly only when evidence is about the capability itself, not just one implementation obligation
+- Otherwise verify leaf requirements and let capability coverage roll up
+
 **If parent requirement with children:**
 - Explain verification rolls up from children
 - Show trace tree demonstrating coverage
@@ -189,15 +193,16 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 - Add test linkage ONLY if type is test-verification AND test exists
 
 **If existing verification needs update:**
-- Read all requirements currently verified
-- Read all requirements in their trace chains
-- Update test criteria to cover all requirements comprehensively
+- Read all capabilities or requirements currently verified
+- Read all relevant trace chains
+- Update test criteria to cover all verified scope comprehensively
 
 ## Best Practices
 
-- **Read trace chain**: Always read full requirement hierarchy to understand scope
-- **Comprehensive criteria**: Test criteria must cover all verified requirements
-- **Verify leaf requirements**: Focus on leaf-level verification
+- **Read trace chain**: Always read full capability/requirement hierarchy to understand scope
+- **Comprehensive criteria**: Test criteria must cover all verified capabilities or requirements
+- **Verify leaf requirements by default**: Focus on leaf-level requirement verification unless evidence is capability-level
+- **Direct capability verification**: Use when verification evidence proves a capability expectation directly
 - **Roll-up coverage**: Parent requirements inherit from children
 - **Avoid redundancy**: Don't verify both leaf and parent directly
 - **Use traces**: Run `reqvire traces` to understand verification structure
@@ -213,11 +218,12 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 ## Verification Philosophy
 
 Reqvire uses **bottom roll-up verification**:
-1. Verify leaf requirements directly
-2. Parent requirements inherit coverage from children
-3. One verification can verify multiple leaf requirements
-4. Verification traces automatically propagate upward
-5. Test criteria must cover ALL requirements in the trace chain
+1. Verify capabilities directly when evidence is capability-level
+2. Verify leaf requirements directly for requirement roll-up
+3. Parent requirements inherit coverage from children
+4. One verification can verify multiple capabilities or leaf requirements
+5. Verification traces automatically propagate upward
+6. Test criteria must cover all verified scope in the trace chain
 
 ## Notes
 

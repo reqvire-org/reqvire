@@ -1,20 +1,20 @@
 # Elements
 
 
-### Feature One
+### Capability One
 
-First feature root for submodels command fixtures.
+First capability root for submodels command fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Feature Two
+### Capability Two
 
-Second feature root for submodels command fixtures.
+Second capability root for submodels command fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Root One
@@ -23,7 +23,7 @@ Second feature root for submodels command fixtures.
   * type: requirement
 
 #### Relations
-  * specify: [Feature One](#feature-one)
+  * specify: [Capability One](#capability-one)
 ---
 
 ### Payments Requirement
@@ -69,7 +69,7 @@ Second feature root for submodels command fixtures.
   * type: requirement
 
 #### Relations
-  * specify: [Feature Two](#feature-two)
+  * specify: [Capability Two](#capability-two)
 ---
 
 ### Identity Requirement

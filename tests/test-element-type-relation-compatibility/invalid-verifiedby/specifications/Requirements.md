@@ -1,23 +1,23 @@
 # Elements
 
 
-### Test Feature Test Element Type Relation Compatibility Invalid Verifiedby Specifications
+### Test Capability Test Element Type Relation Compatibility Invalid Verifiedby Specifications
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Target Feature
+### Target Capability
 
-A feature for testing.
+A capability for testing.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-verifiedby-specifications)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-invalid-verifiedby-specifications)
 ---
 
 ### Target Test Verification
@@ -28,7 +28,7 @@ A test verification element.
   * type: test-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
 
 ---
 
@@ -40,7 +40,7 @@ INVALID: Verification elements cannot use verifiedBy (they use verify instead).
   * type: test-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
   * verifiedBy: [Target Test Verification](#target-test-verification)
 
 ---
@@ -53,8 +53,8 @@ INVALID: verifiedBy must point to verification element, not requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target Feature](#target-feature)
-  * verifiedBy: [Target Feature](#target-feature)
+  * derivedFrom: [Target Capability](#target-capability)
+  * verifiedBy: [Target Capability](#target-capability)
 
 ---
 
@@ -78,7 +78,7 @@ INVALID: Requirements should use verifiedBy, not verify.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target Feature](#target-feature)
-  * verify: [Target Feature](#target-feature)
+  * derivedFrom: [Target Capability](#target-capability)
+  * verify: [Target Capability](#target-capability)
 
 ---

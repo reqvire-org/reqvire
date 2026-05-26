@@ -225,7 +225,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.collect",
-            "Collect feature or requirement context upstream or downstream.",
+            "Collect element trace context upstream or downstream.",
             required_object_schema(
                 vec![
                     ("element_name", json!({ "type": "string" })),
@@ -239,7 +239,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.submodels",
-            "Analyze independent requirement submodels.",
+            "Analyze independent capability and requirement submodels.",
             object_schema(vec![("from", json!({ "type": "string" }))]),
         ),
         read_tool(

@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Invalid Relations Pass1 Errors Specifications Requirements Md
+### Test Capability Test Invalid Relations Pass1 Errors Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This document contains requirements with Pass 1 validation errors (parsing/format issues).
@@ -19,7 +19,7 @@ This is a valid requirement.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * trace: [ValidImplementation.txt](ValidImplementation.txt)
 
 ---
@@ -31,7 +31,7 @@ Duplicate element name - should trigger duplicate element error.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * derivedFrom: [Valid Requirement](#valid-requirement)
 
 ---
@@ -65,7 +65,7 @@ This requirement has an invalid relation type with a typo.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * derivedFrom: [Valid Requirement](#valid-requirement)
   * satisfiedBBy: [ValidImplementation.txt](ValidImplementation.txt)
 
@@ -78,7 +78,7 @@ This requirement has duplicate subsection.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * derivedFrom: [Valid Requirement](#valid-requirement)
 
 #### Relations
@@ -97,7 +97,7 @@ Level 5+ headers can only appear inside Details subsection.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-invalid-relations-pass1-errors-specifications-requirements-md)
   * derivedFrom: [Valid Requirement](#valid-requirement)
 
 ---

@@ -7,7 +7,7 @@ This document outlines the simplified release process for Reqvire, including ver
 The release process is streamlined into a simple Git workflow:
 
 ```
-Feature Branch → Main Branch (via PR) → Tag from Main → GitHub Actions Release
+Capability Branch → Main Branch (via PR) → Tag from Main → GitHub Actions Release
 ```
 
 ## Step-by-Step Release Process
@@ -77,7 +77,7 @@ When a tag is pushed, GitHub Actions automatically:
 | `make update-patch` | Increment patch version only (0.3.0 → 0.3.1) |
 | `make update-minor` | Increment minor version only (0.3.0 → 0.4.0) |
 | `make update-major` | Increment major version only (0.3.0 → 1.0.0) |
-| `make version-commit` | Commit version changes on feature branch |
+| `make version-commit` | Commit version changes on capability branch |
 | `make prepare-release` | Update Cargo.lock, build, test (standalone) |
 | `make create_tag` | Manual tag creation (backup method) |
 

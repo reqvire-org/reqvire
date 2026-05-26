@@ -6,7 +6,7 @@
       "name": "Root Requirement",
       "identifier": "specifications/Requirements.md#root-requirement",
       "file_path": "specifications/Requirements.md",
-      "element_type": "feature",
+      "element_type": "capability",
       "content": "The root requirement for testing content collection.\n\n\n#### Details\nThis is the top-level requirement that has no derivedFrom relations.",
       "depth": 0,
       "source_type": "element"

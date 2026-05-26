@@ -15,7 +15,7 @@ This keeps exported documentation complete with navigable refinement attachment 
  * type: specification
 
 #### Relations
- * refine: [Attachment Export](Features.md#attachment-export)
+ * refine: [Attachment Export](Capabilities.md#attachment-export)
 ---
 
 ### CSS Framework Integration Refinement Specification
@@ -81,7 +81,7 @@ Containment view attachment rendering behavior:
  * type: specification
 
 #### Relations
- * refine: [Containment View Attachment Links](Features.md#containment-view-attachment-links)
+ * refine: [Containment View Attachment Links](Capabilities.md#containment-view-attachment-links)
 ---
 
 ### D3.js Containment Tree Specification
@@ -123,7 +123,7 @@ elementId["Element Name<br/>📎 Deterministic Output Specification"]
  * type: specification
 
 #### Relations
- * refine: [Diagram Attachment Display](Features.md#diagram-attachment-display)
+ * refine: [Diagram Attachment Display](Capabilities.md#diagram-attachment-display)
 ---
 
 ### HTML Branding Specification
@@ -207,7 +207,7 @@ This keeps exported HTML self-contained enough for local linked assets without c
  * type: specification
 
 #### Relations
- * refine: [Local Linked File Export](Features.md#local-linked-file-export)
+ * refine: [Local Linked File Export](Capabilities.md#local-linked-file-export)
 ---
 
 ### HTML Navigation Bar Specification
@@ -255,7 +255,7 @@ Ontologies view generation behavior:
  * type: specification
 
 #### Relations
- * refine: [Ontologies View Generation](Features.md#ontologies-view-generation)
+ * refine: [Ontologies View Generation](Capabilities.md#ontologies-view-generation)
 ---
 
 ### Model View Element Navigation Refinement Specification
@@ -271,7 +271,7 @@ Model-view element navigation behavior:
  * type: specification
 
 #### Relations
- * refine: [Model View Element Navigation](Features.md#model-view-element-navigation)
+ * refine: [Model View Element Navigation](Capabilities.md#model-view-element-navigation)
 ---
 
 ### Model-Centric View Generation Refinement Specification
@@ -288,7 +288,7 @@ Model-centric view generation behavior:
  * type: specification
 
 #### Relations
- * refine: [Model-Centric View Generation](Features.md#model-centric-view-generation)
+ * refine: [Model-Centric View Generation](Capabilities.md#model-centric-view-generation)
 ---
 
 ### Responsive HTML Generation Refinement Specification
@@ -330,7 +330,7 @@ Serve command behavior:
  * type: specification
 
 #### Relations
- * refine: [Serve Command](Features.md#serve-command)
+ * refine: [Serve Command](Capabilities.md#serve-command)
 ---
 
 ### Type-Safe HTML Generation Refinement Specification

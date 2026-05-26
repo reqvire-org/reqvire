@@ -456,7 +456,7 @@ Test cases:
 5. Run `--override` for a non-existent element and assert operation succeeds (acts as add).
 6. Attempt override that would orphan children and assert failure:
    - error mentions orphaning
-   - error names `Feature B`
+   - error names `Capability B`
    - error includes remediation guidance
 7. Override an element without children and assert success with `Updated` output.
 
@@ -610,9 +610,9 @@ The test shall verify that existing model elements can be deleted, all relations
 **Test Steps - Centralized Semantic Mutation Validation:**
 1. Attempt to add a semantic contract with a Shapes reference to an undeclared IRI.
 2. Verify `add` is rejected before persistence and reports the referencing contract, reference kind, missing IRI, and fix guidance.
-3. Attempt to add a semantic contract with a Shapes reference to an IRI declared outside reachable feature ontology context.
-4. Verify `add` is rejected before persistence and reports the referencing contract, reference kind, referenced IRI, declaring ontology, owner context, and guidance to attach the ontology to the owning or consuming feature.
-5. Attempt to unlink a feature ontology attachment that is required to make a semantic reference reachable.
+3. Attempt to add a semantic contract with a Shapes reference to an IRI declared outside reachable capability ontology context.
+4. Verify `add` is rejected before persistence and reports the referencing contract, reference kind, referenced IRI, declaring ontology, owner context, and guidance to attach the ontology to the owning or consuming capability.
+5. Attempt to unlink a capability ontology attachment that is required to make a semantic reference reachable.
 6. Verify `unlink` is rejected before persistence and the attachment remains in the source file.
 7. Attempt to override an ontology element that declares an ontology term referenced elsewhere with replacement content that no longer declares that term.
 8. Verify `add --override` is rejected before persistence and reports the removed declaration source.
@@ -647,7 +647,7 @@ The test shall verify that existing model elements can be deleted, all relations
 - Delete ontology that would leave dangling semantic references (rejected)
 - Add semantic contract with dangling semantic references (rejected)
 - Add semantic contract with outside-context semantic references (rejected)
-- Unlink feature ontology attachment required for ontology context reachability (rejected)
+- Unlink capability ontology attachment required for ontology context reachability (rejected)
 - Override ontology declaration source with replacement that drops the declaration (rejected)
 
 #### Metadata

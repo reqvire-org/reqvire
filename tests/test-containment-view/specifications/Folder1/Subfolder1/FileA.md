@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Containment View Specifications Folder1 Subfolder1 Filea Md
+### Test Capability Test Containment View Specifications Folder1 Subfolder1 Filea Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### User Authentication
@@ -17,7 +17,7 @@ The system shall provide user authentication capabilities.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-containment-view-specifications-folder1-subfolder1-filea-md)
+  * specify: [Test Capability](#test-capability-test-containment-view-specifications-folder1-subfolder1-filea-md)
 ### Data Validation
 
 The system shall validate all input data.

@@ -22,9 +22,9 @@ Implementation details shall follow the associated refinement specifications.
 The system shall reject semantic-contract shape references that cannot be resolved within the owner ontology context.
 
 #### Details
-When validating semantic contracts, the system shall require each SHACL reference to resolve to an ontology term declared by an ontology element reachable through the owning requirement's feature context, including ontology attached to that feature or inherited from ancestor features.
+When validating semantic contracts, the system shall require each SHACL reference to resolve to an ontology term declared by an ontology element reachable through the owning requirement's capability context, including ontology attached to that capability or inherited from ancestor capabilities.
 
-The system shall reject references to terms declared outside the reachable feature ontology context because such references bypass the feature-level attachment path required for change-impact traceability.
+The system shall reject references to terms declared outside the reachable capability ontology context because such references bypass the capability-level attachment path required for change-impact traceability.
 
 #### Metadata
   * type: requirement
@@ -45,7 +45,7 @@ The system shall validate dependencies across different components of the System
 
 #### Relations
   * derive: [Cross-Component Dependency Validator](#cross-component-dependency-validator)
-  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
+  * specify: [Validating Structures](../../Capabilities/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Cross-Component Dependency Validator
@@ -70,7 +70,7 @@ The system shall validate the organization of files and folders in the repositor
   * type: requirement
 
 #### Relations
-  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
+  * specify: [Validating Structures](../../Capabilities/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Validate Internal Consistency
@@ -83,7 +83,7 @@ The system shall check the internal consistency of the system model, ensuring th
 #### Relations
   * derive: [Internal Consistency Validator](#internal-consistency-validator)
   * derive: [Two-Pass Validation Strategy](#two-pass-validation-strategy)
-  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
+  * specify: [Validating Structures](../../Capabilities/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Attachment Target Validation
@@ -228,7 +228,7 @@ The system shall validate relation types against a defined vocabulary and provid
 
 ### Single Root Hierarchy Ownership
 
-The system shall enforce that each requirement hierarchy resolves to exactly one owning feature root through `specify`/`specifiedBy` and requirement/feature hierarchy relations.
+The system shall enforce that each requirement hierarchy resolves to exactly one owning capability root through `specify`/`specifiedBy` and requirement/capability hierarchy relations.
 
 #### Details
 Validation details shall follow the associated hierarchy ownership constraint.
@@ -315,7 +315,7 @@ The system shall validate the Markdown structure of system model to ensure compl
 
 #### Relations
   * derive: [Markdown Structure Validator](#markdown-structure-validator)
-  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
+  * specify: [Validating Structures](../../Capabilities/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Markdown Structure Validator
@@ -342,7 +342,7 @@ The system shall validate relation types and allow only supported types.
 
 #### Relations
   * derive: [Relation Element Type Validator](#relation-element-type-validator)
-  * specify: [Validating Structures](../../Features/BehaviorValidationOperations.md#validating-structures)
+  * specify: [Validating Structures](../../Capabilities/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ### Relation Element Type Validator

@@ -20,7 +20,7 @@
                 "is_directly_verified": true,
                 "children": [
                   {
-                    "id": "specifications/Features.md#user-authentication",
+                    "id": "specifications/Capabilities.md#user-authentication",
                     "name": "User Authentication",
                     "type": "requirement",
                     "is_directly_verified": false,
@@ -63,7 +63,7 @@
                     "is_directly_verified": false,
                     "children": [
                       {
-                        "id": "specifications/Features.md#user-authentication",
+                        "id": "specifications/Capabilities.md#user-authentication",
                         "name": "User Authentication",
                         "type": "requirement",
                         "is_directly_verified": false,
@@ -95,7 +95,7 @@
                 "is_directly_verified": true,
                 "children": [
                   {
-                    "id": "specifications/Features.md#data-protection",
+                    "id": "specifications/Capabilities.md#data-protection",
                     "name": "Data Protection",
                     "type": "requirement",
                     "is_directly_verified": false,
@@ -126,7 +126,7 @@
                 "is_directly_verified": true,
                 "children": [
                   {
-                    "id": "specifications/Features.md#coverage-reports",
+                    "id": "specifications/Capabilities.md#coverage-reports",
                     "name": "Coverage Reports",
                     "type": "requirement",
                     "is_directly_verified": false,
@@ -152,12 +152,12 @@
           "file": "specifications/Verifications/Tests.md",
           "type": "analysis-verification",
           "directly_verified_requirements": [
-            "specifications/Features.md#data-protection"
+            "specifications/Capabilities.md#data-protection"
           ],
           "trace_tree": {
             "requirements": [
               {
-                "id": "specifications/Features.md#data-protection",
+                "id": "specifications/Capabilities.md#data-protection",
                 "name": "Data Protection",
                 "type": "requirement",
                 "is_directly_verified": true,
@@ -185,7 +185,7 @@
                 "is_directly_verified": true,
                 "children": [
                   {
-                    "id": "specifications/Features.md#user-authentication",
+                    "id": "specifications/Capabilities.md#user-authentication",
                     "name": "User Authentication",
                     "type": "requirement",
                     "is_directly_verified": false,

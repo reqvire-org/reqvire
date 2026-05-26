@@ -37,7 +37,7 @@ Users shall be able to log into the system.
 
 ### System Access
 
-Users shall have access to the system features.
+Users shall have access to the system capabilities.
 
 #### Metadata
   * type: user-requirement

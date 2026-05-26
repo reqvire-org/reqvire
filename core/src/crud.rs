@@ -722,7 +722,7 @@ pub fn attach_element_identifier(
     }
 
     let target_is_ontology = attachment_element.element_type.is_ontology();
-    let attachment_type_valid = if target_element.element_type.is_feature() {
+    let attachment_type_valid = if target_element.element_type.is_capability() {
         target_is_ontology
     } else if target_element.element_type.is_requirement() {
         attachment_element.element_type.is_requirement_refinement()
@@ -732,7 +732,7 @@ pub fn attach_element_identifier(
 
     if !attachment_type_valid {
         return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Element '{}' (type: {}) cannot attach '{}' (type: {}). Feature attachments may target ontology only; requirement attachments may target requirement-owned semantic-contract, constraint, behavior, specification, state, or input-output.",
+            "Element '{}' (type: {}) cannot attach '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned semantic-contract, constraint, behavior, specification, state, or input-output.",
             element_name,
             target_element.element_type.as_str(),
             attachment_element.name,
@@ -747,7 +747,7 @@ pub fn attach_element_identifier(
     {
         return Err(ReqvireError::InvalidAttachmentTarget(
             format!(
-                "'{}' has no refine relation. Refinements must refine a feature or requirement before they can be attached.",
+                "'{}' has no refine relation. Refinements must refine a capability or requirement before they can be attached.",
                 attachment_element.name
             )
         ));

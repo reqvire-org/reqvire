@@ -1,23 +1,23 @@
 # Elements
 
 
-### Test Feature Test Element Type Relation Compatibility Invalid Refinement Specifications
+### Test Capability Test Element Type Relation Compatibility Invalid Refinement Specifications
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Target Feature
+### Target Capability
 
-A feature for testing.
+A capability for testing.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-refinement-specifications)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-invalid-refinement-specifications)
 ---
 
 ### Constraint with DerivedFrom
@@ -28,7 +28,7 @@ INVALID: Constraint (refinement type) cannot have Relations subsection.
   * type: constraint
 
 #### Relations
-  * derivedFrom: [Target Feature](#target-feature)
+  * derivedFrom: [Target Capability](#target-capability)
 
 ---
 
@@ -40,7 +40,7 @@ INVALID: Constraint (refinement type) cannot have Relations subsection.
   * type: constraint
 
 #### Relations
-  * trace: [Target Feature](#target-feature)
+  * trace: [Target Capability](#target-capability)
 
 ---
 
@@ -52,7 +52,7 @@ INVALID: Behavior (refinement type) cannot have Relations subsection.
   * type: behavior
 
 #### Relations
-  * derivedFrom: [Target Feature](#target-feature)
+  * derivedFrom: [Target Capability](#target-capability)
 
 ---
 
@@ -64,7 +64,7 @@ INVALID: Behavior (refinement type) cannot have Relations subsection.
   * type: behavior
 
 #### Relations
-  * trace: [Target Feature](#target-feature)
+  * trace: [Target Capability](#target-capability)
 
 ---
 
@@ -76,7 +76,7 @@ INVALID: Specification (refinement type) cannot have Relations subsection.
   * type: specification
 
 #### Relations
-  * derivedFrom: [Target Feature](#target-feature)
+  * derivedFrom: [Target Capability](#target-capability)
 
 ---
 
@@ -88,6 +88,6 @@ INVALID: Specification (refinement type) cannot have Relations subsection.
   * type: specification
 
 #### Relations
-  * trace: [Target Feature](#target-feature)
+  * trace: [Target Capability](#target-capability)
 
 ---

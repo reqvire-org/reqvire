@@ -156,7 +156,7 @@ This element has a single relation.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-feature-test-duplicate-detection-specifications-requirements-md)
+  * specify: [Test Capability Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-capability-test-duplicate-detection-specifications-requirements-md)
   * derivedFrom: [Base Requirement](Requirements.md#base-requirement)
   * trace: [Target Element](Requirements.md#target-element)
 ---
@@ -174,7 +174,7 @@ This element has a single attachment.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-feature-test-duplicate-detection-specifications-requirements-md)
+  * specify: [Test Capability Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-capability-test-duplicate-detection-specifications-requirements-md)
 
 #### Attachments
   * [Refinement Element](Requirements.md#refinement-element)

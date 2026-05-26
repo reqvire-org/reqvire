@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Link Unlink Specifications Requirements Md
+### Test Capability Test Link Unlink Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### System Requirements
@@ -16,11 +16,11 @@ Top-level container for test requirements.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-link-unlink-specifications-requirements-md)
-  * derive: [Feature Requirement](#feature-requirement)
+  * specify: [Test Capability](#test-capability-test-link-unlink-specifications-requirements-md)
+  * derive: [Capability Requirement](#capability-requirement)
 ---
 
-### Feature Requirement
+### Capability Requirement
 
 A requirement to be linked/unlinked.
 

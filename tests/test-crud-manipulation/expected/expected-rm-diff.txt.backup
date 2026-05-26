@@ -1,52 +1,52 @@
-Removed element: Feature B (specifications/Requirements.md#feature-b)
+Removed element: Capability B (specifications/Requirements.md#capability-b)
 
 📄 specifications/Requirements.md
   [31m01 -   # Elements[0m
   [32m01 +   # Elements[0m
   [37m02[0m
-  [31m03 -   ### Feature D[0m
+  [31m03 -   ### Capability D[0m
   [31m03 -   ␤[0m
-  [31m03 -   This is a newly added feature.[0m
+  [31m03 -   This is a newly added capability.[0m
   [31m03 -   ␤[0m
   [31m03 -   #### Metadata[0m
   [31m03 -     * type: requirement[0m
   [31m03 -   ␤[0m
   [31m03 -   #### Relations[0m
-  [31m03 -     * derivedFrom: [Feature A](#feature-a)[0m
+  [31m03 -     * derivedFrom: [Capability A](#capability-a)[0m
   [31m03 -   ---[0m
   [31m03 -   ␤[0m
-  [37m03     ### Parent Feature[0m
+  [37m03     ### Parent Capability[0m
   [37m04[0m
   [37m05     This is a parent requirement.[0m
 
   [37m29     #### Relations[0m
-  [37m30       * derivedFrom: [Feature A](#feature-a)[0m
+  [37m30       * derivedFrom: [Capability A](#capability-a)[0m
   [37m31     ---[0m
-  [31m32 -   ### Feature B[0m
-  [32m32 +   ### Feature C[0m
+  [31m32 -   ### Capability B[0m
+  [32m32 +   ### Capability C[0m
   [37m33[0m
-  [31m34 -   This is a test requirement for feature B.[0m
-  [32m34 +   This is a test requirement for feature C with relations.[0m
+  [31m34 -   This is a test requirement for capability B.[0m
+  [32m34 +   This is a test requirement for capability C with relations.[0m
   [37m35[0m
   [37m36     #### Metadata[0m
   [37m37       * type: requirement[0m
   [37m38[0m
   [37m39     #### Relations[0m
-  [37m40       * derivedFrom: [Feature A](#feature-a)[0m
-  [32m41 +     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m40       * derivedFrom: [Capability A](#capability-a)[0m
+  [32m41 +     * verifiedBy: [Test for Capability C](Verifications/Tests.md#test-for-capability-c)[0m
   [37m42     ---[0m
-  [31m43 -   ### Feature C[0m
-  [32m43 +   ### Feature D[0m
+  [31m43 -   ### Capability C[0m
+  [32m43 +   ### Capability D[0m
   [37m44[0m
-  [31m45 -   This is a test requirement for feature C with relations.[0m
-  [32m45 +   This is a newly added feature.[0m
+  [31m45 -   This is a test requirement for capability C with relations.[0m
+  [32m45 +   This is a newly added capability.[0m
   [37m46[0m
   [37m47     #### Metadata[0m
   [37m48       * type: requirement[0m
   [37m49[0m
   [37m50     #### Relations[0m
-  [37m51       * derivedFrom: [Feature A](#feature-a)[0m
-  [31m52 -     * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)[0m
+  [37m51       * derivedFrom: [Capability A](#capability-a)[0m
+  [31m52 -     * verifiedBy: [Test for Capability C](Verifications/Tests.md#test-for-capability-c)[0m
   [37m52     ---[0m
   [37m53[0m
 

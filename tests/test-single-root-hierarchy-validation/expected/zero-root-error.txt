@@ -3,7 +3,7 @@
 
   1. Circular dependency error: Circular dependency error: Requirements.md#requirement-a -> Requirements.md#requirement-b -> Requirements.md#requirement-a
 
-  2. Mixed hierarchical relations in chain: Element 'Requirement A' (Requirements.md#requirement-a) must resolve to exactly one owning feature via feature/requirement relations, but resolved to 0 features
+  2. Mixed hierarchical relations in chain: Element 'Requirement A' (Requirements.md#requirement-a) must resolve to exactly one owning capability via capability/requirement relations, but resolved to 0 capabilities
 
-  3. Mixed hierarchical relations in chain: Element 'Requirement B' (Requirements.md#requirement-b) must resolve to exactly one owning feature via feature/requirement relations, but resolved to 0 features
+  3. Mixed hierarchical relations in chain: Element 'Requirement B' (Requirements.md#requirement-b) must resolve to exactly one owning capability via capability/requirement relations, but resolved to 0 capabilities
 

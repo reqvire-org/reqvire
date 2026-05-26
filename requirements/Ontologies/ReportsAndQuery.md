@@ -23,7 +23,7 @@ reqvire:JsonOutputContract a owl:Class ;
 reqvire:CollectSourceType a owl:Class .
 reqvire:ImplementationCoverageSource a owl:Class .
 reqvire:Submodel a owl:Class .
-reqvire:FeatureRootSubmodel a owl:Class ;
+reqvire:CapabilityRootSubmodel a owl:Class ;
   rdfs:subClassOf reqvire:Submodel .
 reqvire:ScopedSubmodel a owl:Class ;
   rdfs:subClassOf reqvire:Submodel .
@@ -50,10 +50,10 @@ reqvire:collectReportKind a reqvire:ReportKind ;
   reqvire:reportKindMeaning "Report kind that gathers element context, refinements, attachments, and reachable semantic context." .
 reqvire:coverageReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "coverage" ;
-  reqvire:reportKindMeaning "Report kind that classifies implementation or verification coverage for requirements and feature roll-up." .
+  reqvire:reportKindMeaning "Report kind that classifies implementation or verification coverage for requirements and capability roll-up." .
 reqvire:submodelsReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "submodels" ;
-  reqvire:reportKindMeaning "Report kind that exposes independent feature-rooted subgraphs and cross-submodel couplings." .
+  reqvire:reportKindMeaning "Report kind that exposes independent capability-rooted subgraphs and cross-submodel couplings." .
 reqvire:resourcesReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "resources" ;
   reqvire:reportKindMeaning "Report kind that lists files and external resources referenced by model relations and attachments." .
@@ -115,8 +115,8 @@ reqvire:uncoveredCoverageSource a reqvire:ImplementationCoverageSource ;
   reqvire:coverageSourceName "uncovered" ;
   reqvire:coverageSourceMeaning "A requirement has no implementation coverage evidence through direct satisfaction, attachment coverage, or child coverage." .
 
-reqvire:featureRootSubmodelRule a reqvire:FeatureRootSubmodel ;
-  reqvire:submodelBoundaryRule "A feature with no feature parent relation is a feature-root submodel boundary." .
+reqvire:capabilityRootSubmodelRule a reqvire:CapabilityRootSubmodel ;
+  reqvire:submodelBoundaryRule "A capability with no capability parent relation is a capability-root submodel boundary." .
 reqvire:crossSubmodelAttachmentDependencyRule a reqvire:CrossSubmodelCoupling ;
   reqvire:submodelBoundaryRule "Cross-submodel dependencies are explicit attachment contracts rather than hierarchy relations." .
 

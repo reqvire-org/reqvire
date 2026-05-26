@@ -5,7 +5,7 @@
 Top level container.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Verified Requirement

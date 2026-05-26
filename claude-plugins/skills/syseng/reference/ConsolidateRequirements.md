@@ -31,7 +31,7 @@ reqvire search --filter-type='constraint' --not-have-relations='refine' --short
 reqvire search --has-attachments --short
 
 # Find duplicate or similar requirement names
-reqvire search --filter-name=".*Feature.*" --short
+reqvire search --filter-name=".*Capability.*" --short
 
 # Find elements in specific files that might need reorganization
 reqvire search --filter-file="requirements/System/**" --short
@@ -141,7 +141,7 @@ reqvire merge "Primary Requirement" "Duplicate Requirement" --dry-run
 reqvire merge "Primary Requirement" "Duplicate Requirement"
 
 # Merge multiple sources at once
-reqvire merge "Main Feature" "Feature Part A" "Feature Part B"
+reqvire merge "Main Capability" "Capability Part A" "Capability Part B"
 ```
 
 The merge command:
@@ -178,9 +178,9 @@ When merge is acceptable:
 ## When to Split Requirements (using derivedFrom)
 
 **1. Type separation** - Don't mix requirement types:
-- Features should capture product/stakeholder/regulatory scope, not detailed system obligations
+- Capabilities should capture product/stakeholder/regulatory scope, not detailed system obligations
 - Requirements should capture what the system shall do, not reusable domain vocabulary or ontology structure
-- Split when a feature mixes capability scope with implementable obligations, or when a requirement mixes obligations with reusable semantic definitions
+- Split when a capability mixes capability scope with implementable obligations, or when a requirement mixes obligations with reusable semantic definitions
 
 **2. Change impact & containment:**
 - Scope isolation - Changes shouldn't require re-verification of unrelated aspects
@@ -202,7 +202,7 @@ When merge is acceptable:
 The system shall implement API Access Authorization following clearly defined specifications.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)
@@ -215,7 +215,7 @@ The system shall implement API Access Authorization following clearly defined sp
 The system shall implement API Access Authorization following clearly defined specifications.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
   * refinedBy: [Authorization System Specification](../Specifications/AuthSpecifications.md#authorization-system-specification)

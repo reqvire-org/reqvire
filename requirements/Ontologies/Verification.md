@@ -2,9 +2,9 @@
 
 ### Reqvire Verification Ontology
 
-The Reqvire verification ontology defines verification element categories and their relationship to requirements.
+The Reqvire verification ontology defines verification element categories and their relationship to capabilities and requirements.
 
-Verification elements verify requirements. Evidence-backed verification types can also be satisfied by evidence artifacts such as test runs, proof reports, generated fixtures, or theorem/model-checking artifacts.
+Verification elements verify capabilities or requirements. Evidence-backed verification types can also be satisfied by evidence artifacts such as test runs, proof reports, generated fixtures, or theorem/model-checking artifacts.
 
 #### Ontology
 ```turtle
@@ -68,9 +68,9 @@ reqvire:demonstrationVerificationType a reqvire:VerificationType, reqvire:Verifi
 
 ### Reqvire Verification Rollup Ontology
 
-The Reqvire verification rollup ontology defines requirement verification state and feature coverage.
+The Reqvire verification rollup ontology defines requirement verification state and capability coverage.
 
-Rollup is calculated through feature and requirement graph structure. This ontology defines verification rollup rule categories and coverage semantics.
+Rollup is calculated through capability and requirement graph structure. This ontology defines verification rollup rule categories and coverage semantics.
 
 #### Ontology
 ```turtle
@@ -78,12 +78,12 @@ Rollup is calculated through feature and requirement graph structure. This ontol
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 reqvire:VerificationRollup a owl:Class .
-reqvire:FeatureCoverage a owl:Class .
+reqvire:CapabilityCoverage a owl:Class .
 reqvire:RequirementCoverage a owl:Class .
 reqvire:CoverageState a owl:Class .
 reqvire:VerificationRollupRule a owl:Class .
 
-reqvire:rollupFeature a owl:ObjectProperty .
+reqvire:rollupCapability a owl:ObjectProperty .
 reqvire:rollupRequirement a owl:ObjectProperty .
 reqvire:coveredByVerification a owl:ObjectProperty .
 reqvire:blockedByRequirement a owl:ObjectProperty .
@@ -104,10 +104,15 @@ reqvire:parentRequirementRollupRule a reqvire:VerificationRollupRule ;
   reqvire:rollupCondition "A requirement has one or more child requirements through derive." ;
   reqvire:rollupOutcome "The requirement is verified only when all child requirements are verified; direct parent verification does not override an unverified child." .
 
-reqvire:featureCoverageRollupRule a reqvire:VerificationRollupRule ;
-  reqvire:rollupRuleName "feature-coverage-rollup" ;
-  reqvire:rollupCondition "A feature has requirements through specifiedBy or descendant features through derive." ;
-  reqvire:rollupOutcome "The feature coverage state is derived from requirements that specify the feature, child requirements, and child feature coverage." .
+reqvire:capabilityCoverageRollupRule a reqvire:VerificationRollupRule ;
+  reqvire:rollupRuleName "capability-coverage-rollup" ;
+  reqvire:rollupCondition "A capability has requirements through specifiedBy or descendant capabilities through derive." ;
+  reqvire:rollupOutcome "The capability coverage state is derived from requirements that specify the capability, child requirements, and child capability coverage." .
+
+reqvire:directCapabilityVerificationRule a reqvire:VerificationRollupRule ;
+  reqvire:rollupRuleName "direct-capability-verification" ;
+  reqvire:rollupCondition "A capability has a direct verifiedBy relation to a verification element." ;
+  reqvire:rollupOutcome "The capability may be directly verified; requirement-derived capability coverage remains a separate rollup state." .
 
 reqvire:evidenceBackedVerificationRule a reqvire:VerificationRollupRule ;
   reqvire:rollupRuleName "evidence-backed-verification-satisfaction" ;
@@ -128,4 +133,3 @@ reqvire:nonEvidenceBackedVerificationRule a reqvire:VerificationRollupRule ;
 #### Relations
   * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
 ---
-

@@ -22,7 +22,7 @@ Use this command when:
 - You want to reduce model clutter while preserving all information
 - Requirements are split via derivedFrom relations but don't add new capabilities
 
-Use `/reqvire:semantic-refactor` instead when the model needs to split feature scope, reusable ontology meaning, and requirement obligations.
+Use `/reqvire:semantic-refactor` instead when the model needs to split capability scope, reusable ontology meaning, and requirement obligations.
 
 **When to use consolidate vs direct merge:**
 - **Direct merge** (`reqvire merge`): Quick merge when raw output is acceptable, or when merging duplicates
@@ -264,7 +264,7 @@ The system shall implement traces subcommand for generating verification trace r
 
 #### Details
 
-The traces command outputs verification traces showing upward paths from verifications to owning feature roots.
+The traces command outputs verification traces showing upward paths from verifications to owning capability roots.
 
 **Filter Options:**
 The system shall support filtering verification traces by:
@@ -282,7 +282,7 @@ Support `--from-folder` option that specifies relative path for portable links:
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Verification Trace Builder](../Features.md#verification-trace-builder)
+  * derivedFrom: [Verification Trace Builder](../Capabilities.md#verification-trace-builder)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 EOF
@@ -298,7 +298,7 @@ Do NOT consolidate if:
 - Child has **extensive content** (>300 words) that would overwhelm parent Details
 - Child has **many verifications** (3+) indicating significant independent functionality
 - Child is referenced by **many other elements** as a key concept
-- Child represents a **distinct abstraction level** (e.g., feature scope vs requirement obligation)
+- Child represents a **distinct abstraction level** (e.g., capability scope vs requirement obligation)
 - There's **uncertainty** about whether child is truly refinement-only
 
 ## Expected Benefits

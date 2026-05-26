@@ -29,7 +29,7 @@ Implementation coverage source vocabulary is defined by the Reqvire report ontol
 - **Uncovered**: requirement has no coverage evidence from the above sources.
 
 Rules:
-- Scope includes only `requirement` elements. Feature elements are excluded from direct implementation coverage and receive implementation coverage through feature roll-up.
+- Scope includes only `requirement` elements. Capability elements are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.
 - Refinement-contract attachment propagation uses only refinement element identifiers as contracts.
 - Generic derivation roll-up is not used for implementation coverage.
 - Coverage source and evidence identifiers shall be reported in text and JSON outputs.

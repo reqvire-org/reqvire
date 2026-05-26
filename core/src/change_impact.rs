@@ -997,7 +997,7 @@ fn normalize_relation_for_comparison(rel: &Relation) -> (String, String) {
 fn is_scope_element(elem: &element::Element) -> bool {
     matches!(
         elem.element_type,
-        element::ElementType::Feature | element::ElementType::Requirement(_)
+        element::ElementType::Capability | element::ElementType::Requirement(_)
     )
 }
 
@@ -1027,14 +1027,14 @@ fn find_scope_parent_id(
     let elem = registry.get_element(element_id)?;
 
     let allowed_parent_type = match elem.element_type {
-        element::ElementType::Feature => Some(element::ElementType::Feature),
+        element::ElementType::Capability => Some(element::ElementType::Capability),
         element::ElementType::Requirement(_) => None,
         _ => return None,
     };
 
     if matches!(
         elem.element_type,
-        element::ElementType::Feature | element::ElementType::Requirement(_)
+        element::ElementType::Capability | element::ElementType::Requirement(_)
     ) {
         if let Some(parent_id) = elem
             .relations
@@ -1044,7 +1044,7 @@ fn find_scope_parent_id(
         {
             if let Some(parent) = registry.get_element(&parent_id) {
                 match (&allowed_parent_type, &parent.element_type) {
-                    (Some(element::ElementType::Feature), element::ElementType::Feature)
+                    (Some(element::ElementType::Capability), element::ElementType::Capability)
                     | (None, element::ElementType::Requirement(_)) => return Some(parent_id),
                     _ => {}
                 }
@@ -1060,7 +1060,7 @@ fn find_scope_parent_id(
             .and_then(|r| resolve_scope_relation_target_id(registry, r))
             .filter(|parent_id| {
                 registry.get_element(parent_id).is_some_and(|parent| {
-                    matches!(parent.element_type, element::ElementType::Feature)
+                    matches!(parent.element_type, element::ElementType::Capability)
                 })
             });
     }
@@ -1069,9 +1069,9 @@ fn find_scope_parent_id(
 }
 
 /// Compute the impact scope: the per-branch lowest common ancestors of all
-/// impacted feature/requirement elements. Requirement scope walks
+/// impacted capability/requirement elements. Requirement scope walks
 /// `derivedFrom` requirement parents first, then crosses to the specifying
-/// feature through `specify`; feature scope walks only feature
+/// capability through `specify`; capability scope walks only capability
 /// `derivedFrom` parents.
 ///
 /// Algorithm:
@@ -1086,7 +1086,7 @@ pub fn compute_impact_scope(
     reference: &graph_registry::GraphRegistry,
     report: &ChangeImpactReport,
 ) -> Vec<ImpactScopeRoot> {
-    // Step 1: Collect feature/requirement element IDs from changed + added
+    // Step 1: Collect capability/requirement element IDs from changed + added
     // Use all_changed/all_added IDs (pre-smart-filtering) for complete scope
     let mut scope_set: HashSet<String> = HashSet::new();
 

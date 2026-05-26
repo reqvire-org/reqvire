@@ -123,7 +123,7 @@ Concise EARS-style statement (1 sentence).
 ```markdown
 # In the plan
 **Deterministic Output Specification** - Owned by `Model Reports`, attach to:
-- `Some Other Feature` - *not in Model Reports hierarchy* ✓
+- `Some Other Capability` - *not in Model Reports hierarchy* ✓
   - MUST NOT ATTACH TO (in owner's hierarchy):
      - `Model Structure and Summaries` - *child of Model Reports* ✗
      - `Validation Report Generator` - *grandchild of Model Reports* ✗
@@ -207,7 +207,7 @@ System shall produce interactive visual representations.
 - Interactive highlighting on hover
 
 **Navigation and Filtering:**
-- Default shows feature-rooted model structure
+- Default shows capability-rooted model structure
 - Filter from specific element using --from flag
 - Complete model structure generation
 ```
@@ -220,7 +220,7 @@ System shall produce interactive visual representations enabling users to explor
 
 #### Relations
   * refinedBy: [Mermaid Diagram Generation Specification](...)
-  * refinedBy: [Mermaid Interactive Features Specification](...)
+  * refinedBy: [Mermaid Interactive Capabilities Specification](...)
 
 ---
 
@@ -233,7 +233,7 @@ System shall produce interactive visual representations enabling users to explor
 
 ---
 
-### Mermaid Interactive Features Specification
+### Mermaid Interactive Capabilities Specification
 [Navigation and filtering content]
 
 #### Metadata
@@ -264,7 +264,7 @@ Rate limit will be 100 request per hour.
 The system shall implement operational constraints and rate limits.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
   * refinedBy: [Rate Limits](../Specifications/Constraints.md#rate-limits)
@@ -395,8 +395,8 @@ Use search to identify requirements that may need specification extraction:
 # Find all requirements (candidates for review)
 reqvire search --filter-type="requirement" --short
 
-# Find all features that may own source refinements or attach ontology
-reqvire search --filter-type="feature" --short
+# Find all capabilities that may own source refinements or attach ontology
+reqvire search --filter-type="capability" --short
 
 # Find requirements in specific subsystem
 reqvire search --filter-type="requirement" --filter-file="requirements/System/**" --short

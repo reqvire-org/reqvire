@@ -1,11 +1,11 @@
 # Elements
 
-### Test Feature
+### Test Capability
 
-A feature for type validation error tests.
+A capability for type validation error tests.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
   * specifiedBy: [Test System Requirement](#test-system-requirement)
@@ -17,13 +17,13 @@ A feature for type validation error tests.
 
 ### Test System Requirement
 
-A system requirement specified by the feature.
+A system requirement specified by the capability.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature)
+  * specify: [Test Capability](#test-capability)
   * refinedBy: [Test Semantic Contract](#test-semantic-contract)
 ---
 
@@ -69,7 +69,7 @@ A source refinement for positive type validation.
   * type: source
 
 #### Relations
-  * refine: [Test Feature](#test-feature)
+  * refine: [Test Capability](#test-capability)
 ---
 
 ### Test Semantic Contract

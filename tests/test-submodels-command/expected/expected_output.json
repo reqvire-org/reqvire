@@ -1,15 +1,15 @@
 {
   "submodels": [
     {
-      "root_id": "specifications/Requirements.md#feature-one",
-      "root_name": "Feature One",
-      "root_type": "feature",
+      "root_id": "specifications/Requirements.md#capability-one",
+      "root_name": "Capability One",
+      "root_type": "capability",
       "requirement_count": 5
     },
     {
-      "root_id": "specifications/Requirements.md#feature-two",
-      "root_name": "Feature Two",
-      "root_type": "feature",
+      "root_id": "specifications/Requirements.md#capability-two",
+      "root_name": "Capability Two",
+      "root_type": "capability",
       "requirement_count": 3
     }
   ],
@@ -17,24 +17,24 @@
     {
       "source_id": "specifications/Requirements.md#invoice-requirement",
       "source_name": "Invoice Requirement",
-      "source_root_id": "specifications/Requirements.md#feature-one",
-      "source_root_name": "Feature One",
+      "source_root_id": "specifications/Requirements.md#capability-one",
+      "source_root_name": "Capability One",
       "relation_type": "trace",
       "target_id": "specifications/Requirements.md#identity-requirement",
       "target_name": "Identity Requirement",
-      "target_root_id": "specifications/Requirements.md#feature-two",
-      "target_root_name": "Feature Two"
+      "target_root_id": "specifications/Requirements.md#capability-two",
+      "target_root_name": "Capability Two"
     },
     {
       "source_id": "specifications/Requirements.md#session-requirement",
       "source_name": "Session Requirement",
-      "source_root_id": "specifications/Requirements.md#feature-two",
-      "source_root_name": "Feature Two",
+      "source_root_id": "specifications/Requirements.md#capability-two",
+      "source_root_name": "Capability Two",
       "relation_type": "trace",
       "target_id": "specifications/Requirements.md#payments-requirement",
       "target_name": "Payments Requirement",
-      "target_root_id": "specifications/Requirements.md#feature-one",
-      "target_root_name": "Feature One"
+      "target_root_id": "specifications/Requirements.md#capability-one",
+      "target_root_name": "Capability One"
     }
   ],
   "summary": {

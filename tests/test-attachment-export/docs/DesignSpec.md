@@ -2,10 +2,10 @@
 
 ### Design Spec Contract
 
-This document describes the design for the system feature.
+This document describes the design for the system capability.
 
 #### Details
-The feature shall:
+The capability shall:
 - Accept input from users
 - Process data according to rules
 - Output results in specified format

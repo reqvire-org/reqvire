@@ -1,14 +1,14 @@
 # Elements
 
-### Feature Test
+### Capability Test
 
-Test for feature requirement.
+Test for capability requirement.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: [Feature Requirement](Requirements.md#feature-requirement)
+  * verify: [Capability Requirement](Requirements.md#capability-requirement)
 ---
 
 ### Orphan Test

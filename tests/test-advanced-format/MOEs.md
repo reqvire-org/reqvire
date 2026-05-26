@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Advanced Format Moes Md
+### Test Capability Test Advanced Format Moes Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### MOE_UA
@@ -16,7 +16,7 @@ User adoption measure.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-advanced-format-moes-md)
+  * specify: [Test Capability](#test-capability-test-advanced-format-moes-md)
 ### MOE_CE
 Cost effectiveness measure.
 
@@ -24,4 +24,4 @@ Cost effectiveness measure.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-advanced-format-moes-md)
+  * specify: [Test Capability](#test-capability-test-advanced-format-moes-md)

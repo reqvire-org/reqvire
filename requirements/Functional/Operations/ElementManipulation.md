@@ -70,7 +70,7 @@ The system shall provide the capability to delete existing model elements while 
 The system shall validate semantic-contract reference integrity before persisting graph-backed CRUD mutations.
 
 #### Details
-When a CRUD mutation changes model elements or relations, the system shall reject the candidate model before persistence if any semantic-contract Shapes reference becomes undeclared by all ontology elements or is declared only outside reachable feature ontology context.
+When a CRUD mutation changes model elements or relations, the system shall reject the candidate model before persistence if any semantic-contract Shapes reference becomes undeclared by all ontology elements or is declared only outside reachable capability ontology context.
 
 #### Metadata
   * type: requirement

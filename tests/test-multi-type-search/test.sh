@@ -48,7 +48,7 @@ fi
 # Test 2: Two comma-separated types
 echo "Test 2: Two comma-separated types" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type requirement,feature --short 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type requirement,capability --short 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -59,13 +59,13 @@ if [ $EXIT_CODE -ne 0 ]; then
     exit 1
 fi
 
-# Should find 5 elements (4 requirements + 1 feature)
+# Should find 5 elements (4 requirements + 1 capability)
 REQ_COUNT=$(echo "$OUTPUT" | grep -c "^\[requirement\]" || true)
-FEATURE_COUNT=$(echo "$OUTPUT" | grep -c "^\[feature\]" || true)
-TOTAL=$((REQ_COUNT + FEATURE_COUNT))
+CAPABILITY_COUNT=$(echo "$OUTPUT" | grep -c "^\[capability\]" || true)
+TOTAL=$((REQ_COUNT + CAPABILITY_COUNT))
 
 if [ "$TOTAL" -ne 5 ]; then
-    echo "❌ FAILED: Expected 5 elements (4 req + 1 feature), found $TOTAL"
+    echo "❌ FAILED: Expected 5 elements (4 req + 1 capability), found $TOTAL"
     exit 1
 fi
 
@@ -158,7 +158,7 @@ fi
 # Test 7: JSON output with multiple types
 echo "Test 7: JSON output with multiple types" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type requirement,feature --json 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type requirement,capability --json 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -192,7 +192,7 @@ fi
 # Test 8: Whitespace handling
 echo "Test 8: Whitespace handling in comma-separated types" >> "${TEST_DIR}/test_results.log"
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type "requirement ,  feature , behavior" --short 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-type "requirement ,  capability , behavior" --short 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -205,9 +205,9 @@ fi
 
 # Should find 6 elements despite extra whitespace
 REQ_COUNT=$(echo "$OUTPUT" | grep -c "^\[requirement\]" || true)
-FEATURE_COUNT=$(echo "$OUTPUT" | grep -c "^\[feature\]" || true)
+CAPABILITY_COUNT=$(echo "$OUTPUT" | grep -c "^\[capability\]" || true)
 BEH_COUNT=$(echo "$OUTPUT" | grep -c "^\[behavior\]" || true)
-TOTAL=$((REQ_COUNT + FEATURE_COUNT + BEH_COUNT))
+TOTAL=$((REQ_COUNT + CAPABILITY_COUNT + BEH_COUNT))
 
 if [ "$TOTAL" -ne 6 ]; then
     echo "❌ FAILED: Expected 6 elements with whitespace handling, found $TOTAL"

@@ -1,21 +1,21 @@
 # Elements
 
 
-### Test Feature Test Crud Override Specifications Requirements Md
+### Test Capability Test Crud Override Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Feature A
+### Capability A
 
-This is feature A with original content.
+This is capability A with original content.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-crud-override-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-crud-override-specifications-requirements-md)
 ---

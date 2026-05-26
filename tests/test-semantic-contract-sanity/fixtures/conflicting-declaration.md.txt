@@ -1,11 +1,11 @@
 # Elements
 
-### Billing Feature
+### Billing Capability
 
-Billing feature.
+Billing capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [Billing Ontology](#billing-ontology)
@@ -27,12 +27,12 @@ billing:Invoice a owl:Class .
 ```
 ---
 
-### Broken Feature
+### Broken Capability
 
-Broken feature.
+Broken capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [Broken Ontology](#broken-ontology)

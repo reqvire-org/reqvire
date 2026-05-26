@@ -1,5 +1,5 @@
 
 ❌ 1 validation failed with error(s):
 
-  1. Mixed hierarchical relations in chain: Element 'Shared Child Requirement' (Requirements.md#shared-child-requirement) must resolve to exactly one owning feature via feature/requirement relations, but resolved to 2 features: Requirements.md#root-one, Requirements.md#root-two
+  1. Mixed hierarchical relations in chain: Element 'Shared Child Requirement' (Requirements.md#shared-child-requirement) must resolve to exactly one owning capability via capability/requirement relations, but resolved to 2 capabilities: Requirements.md#root-one, Requirements.md#root-two
 

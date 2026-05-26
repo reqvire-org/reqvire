@@ -78,7 +78,7 @@ if [[ "$ELEMENTS_ROOT" -le "$ELEMENTS_SUB" ]]; then
     exit 1
 fi
 
-# Subfolder should process the local feature plus its two requirements.
+# Subfolder should process the local capability plus its two requirements.
 if [[ "$ELEMENTS_SUB" -ne 3 ]]; then
     echo "❌ FAILED: Expected exactly 3 elements from subfolder, got $ELEMENTS_SUB"
     exit 1

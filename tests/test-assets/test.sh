@@ -32,7 +32,7 @@ assert_file_matches() {
 }
 
 echo "===================================="
-echo "Identifier Attachments Feature Tests"
+echo "Identifier Attachments Capability Tests"
 echo "===================================="
 echo ""
 
@@ -298,7 +298,7 @@ cat > "$TEST_DIR/specifications/RelationsTest.md" << 'EOF'
 Top level container.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Verified Requirement

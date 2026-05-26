@@ -1858,9 +1858,9 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
                     },
                     {
-                      "name": "Mermaid Interactive Features Specification",
+                      "name": "Mermaid Interactive Capabilities Specification",
                       "type": "refinement",
-                      "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                      "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-capabilities-specification"
                     },
                     {
                       "name": "Resources Report Format Specification",
@@ -2811,24 +2811,24 @@ The containment view shows the physical organization of the model—how requirem
                   ]
                 },
                 {
-                  "name": "Features.md",
+                  "name": "Capabilities.md",
                   "type": "file",
-                  "link": "requirements/Interfaces/WebInterface/Features.html",
+                  "link": "requirements/Interfaces/WebInterface/Capabilities.html",
                   "children": [
                     {
                       "name": "Attachment Export",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#attachment-export"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#attachment-export"
                     },
                     {
                       "name": "Containment View Attachment Links",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#containment-view-attachment-links"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#containment-view-attachment-links"
                     },
                     {
                       "name": "Diagram Attachment Display",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#diagram-attachment-display",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#diagram-attachment-display",
                       "children": [
                         {
                           "name": "Mermaid Diagram Style Specification",
@@ -2840,12 +2840,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "HTML Export",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#html-export"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#html-export"
                     },
                     {
                       "name": "Model-Centric View Generation",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#model-centric-view-generation",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#model-centric-view-generation",
                       "children": [
                         {
                           "name": "Mermaid Diagram Style Specification",
@@ -2857,12 +2857,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Model View Element Navigation",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#model-view-element-navigation"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#model-view-element-navigation"
                     },
                     {
                       "name": "Serve Command",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#serve-command",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#serve-command",
                       "children": [
                         {
                           "name": "HTML Export Pipeline Specification",
@@ -2874,7 +2874,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Web Interface Color Scheme",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#web-interface-color-scheme"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#web-interface-color-scheme"
                     }
                   ]
                 },
@@ -4947,9 +4947,9 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
                     },
                     {
-                      "name": "Mermaid Interactive Features Specification",
+                      "name": "Mermaid Interactive Capabilities Specification",
                       "type": "refinement",
-                      "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-features-specification"
+                      "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-capabilities-specification"
                     },
                     {
                       "name": "Resources Report Format Specification",
@@ -5900,24 +5900,24 @@ The containment view shows the physical organization of the model—how requirem
                   ]
                 },
                 {
-                  "name": "Features.md",
+                  "name": "Capabilities.md",
                   "type": "file",
-                  "link": "requirements/Interfaces/WebInterface/Features.html",
+                  "link": "requirements/Interfaces/WebInterface/Capabilities.html",
                   "children": [
                     {
                       "name": "Attachment Export",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#attachment-export"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#attachment-export"
                     },
                     {
                       "name": "Containment View Attachment Links",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#containment-view-attachment-links"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#containment-view-attachment-links"
                     },
                     {
                       "name": "Diagram Attachment Display",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#diagram-attachment-display",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#diagram-attachment-display",
                       "children": [
                         {
                           "name": "Mermaid Diagram Style Specification",
@@ -5929,12 +5929,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "HTML Export",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#html-export"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#html-export"
                     },
                     {
                       "name": "Model-Centric View Generation",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#model-centric-view-generation",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#model-centric-view-generation",
                       "children": [
                         {
                           "name": "Mermaid Diagram Style Specification",
@@ -5946,12 +5946,12 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Model View Element Navigation",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#model-view-element-navigation"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#model-view-element-navigation"
                     },
                     {
                       "name": "Serve Command",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#serve-command",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#serve-command",
                       "children": [
                         {
                           "name": "HTML Export Pipeline Specification",
@@ -5963,7 +5963,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Web Interface Color Scheme",
                       "type": "system-requirement",
-                      "link": "requirements/Interfaces/WebInterface/Features.html#web-interface-color-scheme"
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#web-interface-color-scheme"
                     }
                   ]
                 },

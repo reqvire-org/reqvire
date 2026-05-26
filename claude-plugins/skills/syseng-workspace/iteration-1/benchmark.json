@@ -90,8 +90,8 @@
       "time_seconds": 109.7,
       "tokens": 31071,
       "assertions": [
-        {"text": "Creates feature before requirement (MBSE order)", "passed": true, "type": "must_pass"},
-        {"text": "Requirement has specify relation to feature", "passed": true, "type": "must_pass"},
+        {"text": "Creates capability before requirement (MBSE order)", "passed": true, "type": "must_pass"},
+        {"text": "Requirement has specify relation to capability", "passed": true, "type": "must_pass"},
         {"text": "Creates test-verification with verify relation to system requirement", "passed": true, "type": "must_pass"},
         {"text": "Uses EARS pattern (shall statement) in requirement text", "passed": true, "type": "should_pass"},
         {"text": "Uses reqvire add with heredoc or --content syntax", "passed": true, "type": "should_pass"},
@@ -109,8 +109,8 @@
       "time_seconds": 170.3,
       "tokens": 38181,
       "assertions": [
-        {"text": "Creates feature before requirement (MBSE order)", "passed": true, "type": "must_pass"},
-        {"text": "Requirement has specify relation to feature", "passed": true, "type": "must_pass"},
+        {"text": "Creates capability before requirement (MBSE order)", "passed": true, "type": "must_pass"},
+        {"text": "Requirement has specify relation to capability", "passed": true, "type": "must_pass"},
         {"text": "Creates test-verification with verify relation to system requirement", "passed": true, "type": "must_pass"},
         {"text": "Uses EARS pattern (shall statement) in requirement text", "passed": true, "type": "should_pass"},
         {"text": "Uses reqvire add with heredoc or --content syntax", "passed": true, "type": "should_pass"},

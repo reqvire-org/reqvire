@@ -31,7 +31,7 @@ pub fn is_valid_governance_risk(value: &str) -> bool {
 /// MAINTENANCE NOTE: If you add a new ElementType variant, add its string here too.
 /// The values must match exactly what ElementType::as_str() returns.
 pub const ELEMENT_TYPES: &[&str] = &[
-    "feature",
+    "capability",
     "requirement",
     "ontology",
     "test-verification",          // VerificationType::Test/Default
@@ -57,7 +57,7 @@ pub const ELEMENT_TYPE_ALIASES: &[&str] = &[
 
 /// Returns true if the given type string is a valid element type
 /// Valid types are:
-/// - Standard types (feature, requirement, test-verification, etc.)
+/// - Standard types (capability, requirement, test-verification, etc.)
 /// - Aliases (system-requirement, verification)
 /// - Custom types following the pattern "other-TYPENAME" (e.g., other-use-case, other-actor)
 pub fn is_valid_element_type(type_str: &str) -> bool {
@@ -248,7 +248,7 @@ pub enum RefinementType {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum ElementType {
-    Feature,
+    Capability,
     Requirement(RequirementType),
     Ontology,
     Verification(VerificationType),
@@ -263,7 +263,7 @@ impl ElementType {
     /// raw string for Other.
     pub fn as_str(&self) -> &str {
         match self {
-            ElementType::Feature => "feature",
+            ElementType::Capability => "capability",
             ElementType::Requirement(req) => match req {
                 RequirementType::System => "requirement",
             },
@@ -293,7 +293,7 @@ impl ElementType {
     /// Parses a string into an ElementType
     pub fn from_metadata(value: &str) -> Self {
         match value.to_lowercase().as_str() {
-            "feature" => ElementType::Feature,
+            "capability" => ElementType::Capability,
             "requirement" | "system-requirement" => {
                 ElementType::Requirement(RequirementType::System)
             }
@@ -331,8 +331,8 @@ impl ElementType {
         matches!(self, ElementType::Refinement(_))
     }
 
-    pub fn is_feature(&self) -> bool {
-        matches!(self, ElementType::Feature)
+    pub fn is_capability(&self) -> bool {
+        matches!(self, ElementType::Capability)
     }
 
     pub fn is_requirement(&self) -> bool {
@@ -344,11 +344,22 @@ impl ElementType {
     }
 
     pub fn is_governance_bearing(&self) -> bool {
-        self.is_feature() || self.is_requirement()
+        self.is_capability() || self.is_requirement()
     }
 
-    pub fn is_feature_refinement(&self) -> bool {
-        matches!(self, ElementType::Refinement(RefinementType::Source))
+    pub fn is_capability_refinement(&self) -> bool {
+        matches!(
+            self,
+            ElementType::Refinement(
+                RefinementType::Source
+                    | RefinementType::SemanticContract
+                    | RefinementType::Constraint
+                    | RefinementType::Behavior
+                    | RefinementType::Specification
+                    | RefinementType::State
+                    | RefinementType::InputOutput
+            )
+        )
     }
 
     pub fn is_requirement_refinement(&self) -> bool {
@@ -375,7 +386,7 @@ impl ElementType {
     /// Returns the main type category for merge compatibility
     pub fn main_category(&self) -> &'static str {
         match self {
-            ElementType::Feature => "feature",
+            ElementType::Capability => "capability",
             ElementType::Requirement(_) => "requirement",
             ElementType::Ontology => "ontology",
             ElementType::Verification(_) => "verification",

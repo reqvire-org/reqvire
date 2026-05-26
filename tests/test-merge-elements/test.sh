@@ -1,7 +1,7 @@
 #!/bin/bash
 set -uo pipefail
 
-# Test: Merge Elements Feature
+# Test: Merge Elements Capability
 #
 # Satisfies: specifications/System/Operations/Verifications/ElementManipulationVerifications.md#merge-elements-test
 #
@@ -321,12 +321,12 @@ cp "${TEST_SCRIPT_DIR}/specifications/Verifications.md" "$TEST_DIR/specification
 
 cat >> "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 
-### External Feature
+### External Capability
 
 External root branch for ownership violation scenario.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### External Source
@@ -337,7 +337,7 @@ Source requirement under a different root.
   * type: requirement
 
 #### Relations
-  * specify: [External Feature](#external-feature)
+  * specify: [External Capability](#external-capability)
 ---
 EOF
 

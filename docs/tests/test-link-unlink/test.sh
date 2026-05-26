@@ -34,7 +34,7 @@ echo ""
 # ==================================
 echo "Test 1: Link relation by element name..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "derivedFrom" "Another Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "derivedFrom" "Another Requirement" > /dev/null 2>&1
 
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/01-after-link.md" "$TEST_DIR/specifications/Requirements.md" "File content after link does not match expected"
 
@@ -47,7 +47,7 @@ echo ""
 echo "Test 2: Link duplicate returns error..."
 
 set +e
-LINK_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "derivedFrom" "Another Requirement" 2>&1)
+LINK_DUP_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "derivedFrom" "Another Requirement" 2>&1)
 LINK_DUP_EXIT=$?
 set -e
 
@@ -97,11 +97,11 @@ echo ""
 # ==================================
 echo "Test 5: Unlink command..."
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Feature Requirement" "Another Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Capability Requirement" "Another Requirement" > /dev/null 2>&1
 
 # Add another parent to "No Relations Requirement" so it won't be orphaned in Test 6
-# Link creates derive on Feature Requirement (in file) and derivedFrom on No Relations (in-memory only)
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "derive" "No Relations Requirement" > /dev/null 2>&1
+# Link creates derive on Capability Requirement (in file) and derivedFrom on No Relations (in-memory only)
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "derive" "No Relations Requirement" > /dev/null 2>&1
 
 # Format with --with-full-relations to write the opposite derivedFrom to file
 # This ensures No Relations has a parent in file after Test 6 unlinks System Requirements
@@ -133,7 +133,7 @@ echo "Test 7: Link to non-existent target fails..."
 cp "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md"
 
 set +e
-LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "derivedFrom" "Nonexistent Element" 2>&1)
+LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "derivedFrom" "Nonexistent Element" 2>&1)
 LINK_EXIT=$?
 set -e
 
@@ -157,7 +157,7 @@ echo ""
 echo "Test 8: Link with invalid relation type fails..."
 
 set +e
-LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "invalidRelation" "Another Requirement" 2>&1)
+LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "invalidRelation" "Another Requirement" 2>&1)
 LINK_EXIT=$?
 set -e
 
@@ -181,7 +181,7 @@ echo ""
 echo "Test 9: Unlink non-existent relation fails..."
 
 set +e
-UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Feature Requirement" "Nonexistent Element XYZ" 2>&1)
+UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Capability Requirement" "Nonexistent Element XYZ" 2>&1)
 UNLINK_EXIT=$?
 set -e
 
@@ -207,7 +207,7 @@ echo "Test 10: Dry-run mode..."
 # Reset to valid state for dry-run test
 cp "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md"
 
-cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "trace" "Another Requirement" --dry-run > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "trace" "Another Requirement" --dry-run > /dev/null 2>&1
 
 # File should be unchanged
 assert_file_matches "${TEST_SCRIPT_DIR}/expected/05-after-unlink.md" "$TEST_DIR/specifications/Requirements.md" "Dry-run mode should not modify the file"
@@ -221,7 +221,7 @@ echo ""
 echo "Test 11: Link trace to external URL succeeds..."
 
 set +e
-LINK_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" "trace" "https://example.com/spec.html" 2>&1)
+LINK_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" "trace" "https://example.com/spec.html" 2>&1)
 LINK_URL_EXIT=$?
 set -e
 
@@ -242,7 +242,7 @@ echo ""
 echo "Test 12: Attaching external URL fails with helpful message..."
 
 set +e
-ATTACH_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Feature Requirement" attaching "https://example.com/doc.pdf" 2>&1)
+ATTACH_URL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Capability Requirement" attaching "https://example.com/doc.pdf" 2>&1)
 ATTACH_URL_EXIT=$?
 set -e
 

@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Document Operation Constraints Specifications Requirements Md
+### Test Capability Test Document Operation Constraints Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Target Requirement
@@ -17,7 +17,7 @@ Merge target in # Elements format.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-document-operation-constraints-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-document-operation-constraints-specifications-requirements-md)
 ---
 
 ### Move Source Requirement
@@ -28,5 +28,5 @@ Source element for mv rejection test.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-document-operation-constraints-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-document-operation-constraints-specifications-requirements-md)
 ---

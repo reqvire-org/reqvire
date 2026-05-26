@@ -15,7 +15,7 @@ pub struct CoverageReport {
     orphaned_verifications: VerificationsByFile,
     covered_requirements: CoveredRequirementsByFile,
     uncovered_requirements: UncoveredRequirementsByFile,
-    feature_coverage: FeatureCoverageByFeature,
+    capability_coverage: CapabilityCoverageByCapability,
 }
 
 #[derive(Serialize)]
@@ -65,12 +65,12 @@ struct CoverageSourceCounts {
 }
 
 #[derive(Serialize)]
-struct FeatureCoverageByFeature {
-    features: Vec<FeatureCoverageDetails>,
+struct CapabilityCoverageByCapability {
+    capabilities: Vec<CapabilityCoverageDetails>,
 }
 
 #[derive(Serialize, Clone)]
-struct FeatureCoverageDetails {
+struct CapabilityCoverageDetails {
     identifier: String,
     name: String,
     local_leaf_requirements: usize,
@@ -453,20 +453,20 @@ impl CoverageReport {
             }
         }
 
-        if !self.feature_coverage.features.is_empty() {
-            output.push_str("\n## Feature Coverage\n\n");
-            for feature in &self.feature_coverage.features {
+        if !self.capability_coverage.capabilities.is_empty() {
+            output.push_str("\n## Capability Coverage\n\n");
+            for capability in &self.capability_coverage.capabilities {
                 output.push_str(&format!(
                     "- **[{}]({})**: {} verification {:.1}% ({}/{} leaf), implementation {:.1}% ({}/{} requirements)\n",
-                    feature.name,
-                    feature.identifier,
-                    feature.mark,
-                    feature.verification_coverage_percentage,
-                    feature.aggregate_verified_leaf_requirements,
-                    feature.aggregate_leaf_requirements,
-                    feature.implementation_coverage_percentage,
-                    feature.aggregate_covered_requirements,
-                    feature.aggregate_requirements
+                    capability.name,
+                    capability.identifier,
+                    capability.mark,
+                    capability.verification_coverage_percentage,
+                    capability.aggregate_verified_leaf_requirements,
+                    capability.aggregate_leaf_requirements,
+                    capability.implementation_coverage_percentage,
+                    capability.aggregate_covered_requirements,
+                    capability.aggregate_requirements
                 ));
             }
         }
@@ -883,7 +883,7 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         0.0
     };
 
-    let feature_coverage = build_feature_coverage(
+    let capability_coverage = build_capability_coverage(
         registry,
         &children_by_requirement,
         &verified_leaf_ids,
@@ -944,28 +944,28 @@ pub fn generate_coverage_report(registry: &GraphRegistry) -> CoverageReport {
         uncovered_requirements: UncoveredRequirementsByFile {
             files: uncovered_requirements_files,
         },
-        feature_coverage: FeatureCoverageByFeature {
-            features: feature_coverage,
+        capability_coverage: CapabilityCoverageByCapability {
+            capabilities: capability_coverage,
         },
     }
 }
 
-fn build_feature_coverage(
+fn build_capability_coverage(
     registry: &GraphRegistry,
     children_by_requirement: &HashMap<String, Vec<String>>,
     verified_leaf_ids: &HashSet<String>,
     unverified_leaf_ids: &HashSet<String>,
     impl_coverage: &HashMap<String, CoverageState>,
-) -> Vec<FeatureCoverageDetails> {
-    let mut feature_children: HashMap<String, Vec<String>> = HashMap::new();
-    let mut feature_requirements: HashMap<String, Vec<String>> = HashMap::new();
+) -> Vec<CapabilityCoverageDetails> {
+    let mut capability_children: HashMap<String, Vec<String>> = HashMap::new();
+    let mut capability_requirements: HashMap<String, Vec<String>> = HashMap::new();
 
     for element in registry.get_all_elements() {
-        if !matches!(element.element_type, element::ElementType::Feature) {
+        if !matches!(element.element_type, element::ElementType::Capability) {
             continue;
         }
 
-        let mut child_features = Vec::new();
+        let mut child_capabilities = Vec::new();
         let mut specified_requirements = Vec::new();
 
         for relation in &element.relations {
@@ -976,9 +976,9 @@ fn build_feature_coverage(
             match relation.relation_type.name {
                 "derive" => {
                     if registry.get_element(target_id).is_some_and(|target| {
-                        matches!(target.element_type, element::ElementType::Feature)
+                        matches!(target.element_type, element::ElementType::Capability)
                     }) {
-                        child_features.push(target_id.clone());
+                        child_capabilities.push(target_id.clone());
                     }
                 }
                 "specifiedBy" => {
@@ -992,32 +992,32 @@ fn build_feature_coverage(
             }
         }
 
-        child_features.sort();
-        child_features.dedup();
+        child_capabilities.sort();
+        child_capabilities.dedup();
         specified_requirements.sort();
         specified_requirements.dedup();
 
-        feature_children.insert(element.identifier.clone(), child_features);
-        feature_requirements.insert(element.identifier.clone(), specified_requirements);
+        capability_children.insert(element.identifier.clone(), child_capabilities);
+        capability_requirements.insert(element.identifier.clone(), specified_requirements);
     }
 
     let mut result = Vec::new();
-    for feature in registry.get_all_elements() {
-        if !matches!(feature.element_type, element::ElementType::Feature) {
+    for capability in registry.get_all_elements() {
+        if !matches!(capability.element_type, element::ElementType::Capability) {
             continue;
         }
 
         let local_requirements = collect_requirement_subtree_ids(
-            feature_requirements.get(&feature.identifier),
+            capability_requirements.get(&capability.identifier),
             children_by_requirement,
         );
-        let aggregate_features =
-            collect_feature_subtree_ids(&feature.identifier, &feature_children);
+        let aggregate_capabilities =
+            collect_capability_subtree_ids(&capability.identifier, &capability_children);
 
         let mut aggregate_requirements = BTreeSet::new();
-        for feature_id in &aggregate_features {
+        for capability_id in &aggregate_capabilities {
             for req_id in collect_requirement_subtree_ids(
-                feature_requirements.get(feature_id),
+                capability_requirements.get(capability_id),
                 children_by_requirement,
             ) {
                 aggregate_requirements.insert(req_id);
@@ -1083,9 +1083,9 @@ fn build_feature_coverage(
             "uncovered"
         };
 
-        result.push(FeatureCoverageDetails {
-            identifier: feature.identifier.clone(),
-            name: feature.name.clone(),
+        result.push(CapabilityCoverageDetails {
+            identifier: capability.identifier.clone(),
+            name: capability.name.clone(),
             local_leaf_requirements,
             local_verified_leaf_requirements,
             aggregate_leaf_requirements,
@@ -1132,9 +1132,9 @@ fn collect_requirement_subtree_ids(
     result
 }
 
-fn collect_feature_subtree_ids(
+fn collect_capability_subtree_ids(
     root: &str,
-    feature_children: &HashMap<String, Vec<String>>,
+    capability_children: &HashMap<String, Vec<String>>,
 ) -> BTreeSet<String> {
     let mut result = BTreeSet::new();
     let mut stack = vec![root.to_string()];
@@ -1143,7 +1143,7 @@ fn collect_feature_subtree_ids(
         if !result.insert(current.clone()) {
             continue;
         }
-        if let Some(children) = feature_children.get(&current) {
+        if let Some(children) = capability_children.get(&current) {
             for child in children.iter().rev() {
                 stack.push(child.clone());
             }

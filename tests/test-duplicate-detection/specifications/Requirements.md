@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Duplicate Detection Specifications Requirements Md
+### Test Capability Test Duplicate Detection Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Base Requirement
@@ -17,7 +17,7 @@ This is the base requirement.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-duplicate-detection-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-duplicate-detection-specifications-requirements-md)
 ---
 
 ### Target Element
@@ -28,7 +28,7 @@ This is the target element that will be linked to.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-duplicate-detection-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-duplicate-detection-specifications-requirements-md)
 ---
 
 ### Refinement Target
@@ -38,7 +38,7 @@ A separate requirement for refinement ownership.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-duplicate-detection-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-duplicate-detection-specifications-requirements-md)
   * refinedBy: [Refinement Element](#refinement-element)
 ---
 

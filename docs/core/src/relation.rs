@@ -348,9 +348,9 @@ pub fn is_satisfaction_relation(rtype: &RelationTypeInfo) -> bool {
 /// Returns true if the types are compatible, false otherwise
 ///
 /// Element Type Relation Compatibility Matrix:
-/// - derivedFrom/derive: Only requirement types (requirement, user-requirement) can use these
-/// - verifiedBy: Source must be requirement, target must be verification
-/// - verify: Source must be verification, target must be requirement
+/// - derivedFrom/derive: Capability, requirement, and ontology hierarchies can use these within the same family
+/// - verifiedBy: Source must be capability or requirement, target must be verification
+/// - verify: Source must be verification, target must be capability or requirement
 /// - satisfiedBy: Source must be requirement or test-verification, target must be file
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
 /// - trace: Any non-refinement element type can use trace
@@ -375,14 +375,14 @@ pub fn validate_relation_element_types(
 
     match relation_type {
         "derivedFrom" => {
-            // Only requirement types can use derivedFrom
-            // Source must be requirement, target must be requirement
+            // Capability, requirement, or ontology hierarchy families can use derivedFrom
+            // Source must be requirement, target must be capability or requirement
             matches!(source_type, ElementType::Requirement(_)) &&
             matches!(target_type, ElementType::Requirement(_))
         },
         "derive" => {
-            // Only requirement types can use derive
-            // Source must be requirement, target must be requirement
+            // Capability, requirement, or ontology hierarchy families can use derive
+            // Source must be requirement, target must be capability or requirement
             matches!(source_type, ElementType::Requirement(_)) &&
             matches!(target_type, ElementType::Requirement(_))
         },
@@ -438,10 +438,10 @@ pub fn validate_relation_element_types(
 /// Returns None if the relation type has no specific type restrictions
 pub fn get_relation_element_type_description(relation_type: &str) -> Option<String> {
     match relation_type {
-        "derivedFrom" => Some("'derivedFrom' can only be used between requirement types (requirement, user-requirement)".to_string()),
-        "derive" => Some("'derive' can only be used between requirement types (requirement, user-requirement)".to_string()),
-        "verifiedBy" => Some("'verifiedBy' should connect a requirement to a verification element".to_string()),
-        "verify" => Some("'verify' should connect a verification element to a requirement".to_string()),
+        "derivedFrom" => Some("'derivedFrom' can only be used within capability, requirement, or ontology hierarchy families".to_string()),
+        "derive" => Some("'derive' can only be used within capability, requirement, or ontology hierarchy families".to_string()),
+        "verifiedBy" => Some("'verifiedBy' should connect a capability or requirement to a verification element".to_string()),
+        "verify" => Some("'verify' should connect a verification element to a capability or requirement".to_string()),
         "satisfiedBy" => Some("'satisfiedBy' should connect a requirement or test-verification to an implementation file or refinement element".to_string()),
         "satisfy" => Some("'satisfy' should connect an implementation file or refinement element to a requirement or test-verification".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),

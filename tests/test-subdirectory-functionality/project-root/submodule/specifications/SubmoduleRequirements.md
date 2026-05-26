@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Subdirectory Functionality Project Root Submodule Specifications Submoduler
+### Test Capability Test Subdirectory Functionality Project Root Submodule Specifications Submoduler
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This file contains submodule requirements that SHOULD be processed when run from the submodule directory.
@@ -28,7 +28,7 @@ This is the submodule system requirement.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-subdirectory-functionality-project-root-submodule-specifications-submoduler)
+  * specify: [Test Capability](#test-capability-test-subdirectory-functionality-project-root-submodule-specifications-submoduler)
     * derive: [Submodule Requirement One](#submodule-requirement-one)
 
 ---

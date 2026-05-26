@@ -52,20 +52,20 @@ if [ $FULL_TTL_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! echo "$FULL_TTL_OUTPUT" | grep -q "urn:reqvire:element:api-feature"; then
-  echo "FAILED: full Turtle output missing feature element IRI"
+if ! echo "$FULL_TTL_OUTPUT" | grep -q "urn:reqvire:element:api-capability"; then
+  echo "FAILED: full Turtle output missing capability element IRI"
   echo "$FULL_TTL_OUTPUT"
   exit 1
 fi
 
 if ! echo "$FULL_TTL_OUTPUT" | grep -q "reqvire:attaches <urn:reqvire:element:api-ontology>"; then
-  echo "FAILED: full Turtle output missing feature ontology attachment edge"
+  echo "FAILED: full Turtle output missing capability ontology attachment edge"
   echo "$FULL_TTL_OUTPUT"
   exit 1
 fi
 
 if ! echo "$FULL_TTL_OUTPUT" | grep -q "reqvire:specifiedBy <urn:reqvire:element:api-endpoint-requirement>"; then
-  echo "FAILED: full Turtle output missing feature requirement specifiedBy edge"
+  echo "FAILED: full Turtle output missing capability requirement specifiedBy edge"
   echo "$FULL_TTL_OUTPUT"
   exit 1
 fi
@@ -99,7 +99,7 @@ if ! echo "$FULL_JSONLD_OUTPUT" | jq . >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! echo "$FULL_JSONLD_OUTPUT" | grep -q "urn:reqvire:element:api-feature"; then
+if ! echo "$FULL_JSONLD_OUTPUT" | grep -q "urn:reqvire:element:api-capability"; then
   echo "FAILED: full JSON-LD output missing model context element"
   echo "$FULL_JSONLD_OUTPUT"
   exit 1

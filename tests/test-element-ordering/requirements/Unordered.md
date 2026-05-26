@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Element Ordering Requirements Unordered Md
+### Test Capability Test Element Ordering Requirements Unordered Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Child B
@@ -39,7 +39,7 @@ Parent A is a root element with children.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-ordering-requirements-unordered-md)
+  * specify: [Test Capability](#test-capability-test-element-ordering-requirements-unordered-md)
 ---
 
 ### Grandchild M
@@ -72,5 +72,5 @@ Standalone element with no file-local parents.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-ordering-requirements-unordered-md)
+  * specify: [Test Capability](#test-capability-test-element-ordering-requirements-unordered-md)
 ---

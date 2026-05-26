@@ -28,7 +28,7 @@ The system shall provide formatting capability to ensure consistent formatting i
   * derive: [Document Structure Normalization](#document-structure-normalization)
   * derive: [Element Ordering Normalization](#element-ordering-normalization)
   * derive: [Relation Ordering Normalization](#relation-ordering-normalization)
-  * specify: [Formatting Model Documents](../../Features/BehaviorValidationOperations.md#formatting-model-documents)
+  * specify: [Formatting Model Documents](../../Capabilities/BehaviorValidationOperations.md#formatting-model-documents)
   * refinedBy: [Format Consistency Specification](Specifications.md#format-consistency-specification)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)
@@ -129,7 +129,7 @@ The system shall display formatting changes suggestion in similar manner as git 
 
 #### Relations
   * derive: [Git-Style Diff Output for Format](#git-style-diff-output-for-format)
-  * specify: [Formatting Model Documents](../../Features/BehaviorValidationOperations.md#formatting-model-documents)
+  * specify: [Formatting Model Documents](../../Capabilities/BehaviorValidationOperations.md#formatting-model-documents)
   * satisfiedBy: [diff.rs](../../../core/src/diff.rs)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
 ---
@@ -160,7 +160,7 @@ Implementation details shall follow the associated refinement specifications.
   * [RelationTypes.md](../Core/DesignDocuments/RelationTypes.md#relationtypes)
 
 #### Relations
-  * specify: [Formatting Model Documents](../../Features/BehaviorValidationOperations.md#formatting-model-documents)
+  * specify: [Formatting Model Documents](../../Capabilities/BehaviorValidationOperations.md#formatting-model-documents)
   * refinedBy: [Full Relations Insertion Refinement Specification](Specifications.md#full-relations-insertion-refinement-specification)
   * satisfiedBy: [format.rs](../../../core/src/format.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
@@ -175,7 +175,7 @@ The system shall replace absolute links with relative links, where applicable an
   * type: requirement
 
 #### Relations
-  * specify: [Formatting Model Documents](../../Features/BehaviorValidationOperations.md#formatting-model-documents)
+  * specify: [Formatting Model Documents](../../Capabilities/BehaviorValidationOperations.md#formatting-model-documents)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
   * verifiedBy: [Format Command Requirements Verification](Verifications/FormattingVerifications.md#format-command-requirements-verification)

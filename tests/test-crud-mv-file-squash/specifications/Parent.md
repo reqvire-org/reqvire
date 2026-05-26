@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Crud Mv File Squash Specifications Parent Md
+### Test Capability Test Crud Mv File Squash Specifications Parent Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Parent Requirement
@@ -17,4 +17,4 @@ This is a parent requirement referenced by source elements.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-crud-mv-file-squash-specifications-parent-md)
+  * specify: [Test Capability](#test-capability-test-crud-mv-file-squash-specifications-parent-md)

@@ -8,7 +8,7 @@ This is a parent requirement for the test.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Test Feature](Features.md#test-feature)
+  * derivedFrom: [Test Capability](Capabilities.md#test-capability)
 
 ---
 

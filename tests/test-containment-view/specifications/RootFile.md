@@ -1,15 +1,15 @@
 # Elements
 
 
-### Test Feature Test Containment View Specifications Rootfile Md
+### Test Capability Test Containment View Specifications Rootfile Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Root Feature
+### Root Capability
 
 The system shall provide comprehensive functionality.
 
@@ -17,16 +17,16 @@ The system shall provide comprehensive functionality.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-containment-view-specifications-rootfile-md)
+  * specify: [Test Capability](#test-capability-test-containment-view-specifications-rootfile-md)
 ### Root System Requirement
 
-The system shall implement core features.
+The system shall implement core capabilities.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root Feature](#root-feature)
+  * derivedFrom: [Root Capability](#root-capability)
 
 ### Test Verification Element
 

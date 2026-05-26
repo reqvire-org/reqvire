@@ -199,7 +199,7 @@ This file should be processed.
 EOF
 
 # Create files matching .gitignore pattern
-cat > "${TEST_DIR}/specifications/DRAFT-Feature.md" << 'EOF'
+cat > "${TEST_DIR}/specifications/DRAFT-Capability.md" << 'EOF'
 # Elements
 
 ### Draft Requirement 001

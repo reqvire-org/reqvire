@@ -25,12 +25,12 @@ Found 9 file(s) with formatting changes:
   01 +   # Elements
   02
   03 -   ␤
-  03 -   ### Test Feature Test Advanced Format Behaviors Md
+  03 -   ### Test Capability Test Advanced Format Behaviors Md
   03 -   ␤
-  03 -   Test feature root for migrated requirement fixtures.
+  03 -   Test capability root for migrated requirement fixtures.
   03 -   ␤
   03 -   #### Metadata
-  03 -     * type: feature
+  03 -     * type: capability
   03 -   ---
   03 -   ␤
   03     ### Behavior Owner
@@ -41,9 +41,9 @@ Found 9 file(s) with formatting changes:
   08       * type: requirement
   09 +   ␤
   10     #### Relations
-  11 -     * specify: [Test Feature](#test-feature-test-advanced-format-behaviors-md)
+  11 -     * specify: [Test Capability](#test-capability-test-advanced-format-behaviors-md)
   11       * refinedBy: [My Test Behavior](#my-test-behavior)
-  12 +     * specify: [Test Feature Test Advanced Format Behaviors Md](#test-feature-test-advanced-format-behaviors-md)
+  12 +     * specify: [Test Capability Test Advanced Format Behaviors Md](#test-capability-test-advanced-format-behaviors-md)
   13     ---
   14
   15     ### My Test Behavior
@@ -53,12 +53,12 @@ Found 9 file(s) with formatting changes:
   20       * type: behavior
   21 +   ---
   22
-  23 +   ### Test Feature Test Advanced Format Behaviors Md
+  23 +   ### Test Capability Test Advanced Format Behaviors Md
   24 +   ␤
-  25 +   Test feature root for migrated requirement fixtures.
+  25 +   Test capability root for migrated requirement fixtures.
   26 +   ␤
   27 +   #### Metadata
-  28 +     * type: feature
+  28 +     * type: capability
   29     ---
 
 
@@ -67,17 +67,17 @@ Found 9 file(s) with formatting changes:
   01     # Elements
   02 +   ### MOE_CE
   03
-  04 -   ### Test Feature Test Advanced Format Moes Md
+  04 -   ### Test Capability Test Advanced Format Moes Md
   04 +   Cost effectiveness measure.
   05
-  06 -   Test feature root for migrated requirement fixtures.
+  06 -   Test capability root for migrated requirement fixtures.
   06 +   #### Metadata
   07 +     * type: requirement
   08
   09 -   #### Metadata
-  09 -     * type: feature
+  09 -     * type: capability
   09 +   #### Relations
-  10 +     * specify: [Test Feature Test Advanced Format Moes Md](#test-feature-test-advanced-format-moes-md)
+  10 +     * specify: [Test Capability Test Advanced Format Moes Md](#test-capability-test-advanced-format-moes-md)
   11     ---
   12
   13     ### MOE_UA
@@ -88,23 +88,23 @@ Found 9 file(s) with formatting changes:
   18       * type: requirement
   19
   20     #### Relations
-  21 -     * specify: [Test Feature](#test-feature-test-advanced-format-moes-md)
+  21 -     * specify: [Test Capability](#test-capability-test-advanced-format-moes-md)
   21 -   ### MOE_CE
   21 -   Cost effectiveness measure.
-  21 +     * specify: [Test Feature Test Advanced Format Moes Md](#test-feature-test-advanced-format-moes-md)
+  21 +     * specify: [Test Capability Test Advanced Format Moes Md](#test-capability-test-advanced-format-moes-md)
   22 +   ---
   23
-  24 +   ### Test Feature Test Advanced Format Moes Md
+  24 +   ### Test Capability Test Advanced Format Moes Md
   25 +   ␤
-  26 +   Test feature root for migrated requirement fixtures.
+  26 +   Test capability root for migrated requirement fixtures.
   27 +   ␤
   28     #### Metadata
   29 -     * type: requirement
-  29 +     * type: feature
+  29 +     * type: capability
   30 +   ---
   31
   32 -   #### Relations
-  32 -     * specify: [Test Feature](#test-feature-test-advanced-format-moes-md)
+  32 -     * specify: [Test Capability](#test-capability-test-advanced-format-moes-md)
   32 -   ␤
 
 
@@ -170,17 +170,17 @@ Found 9 file(s) with formatting changes:
   01     # Elements
   02 +   ### Another Element
   03
-  04 -   ### Test Feature Test Advanced Format Testnoheaders Md
+  04 -   ### Test Capability Test Advanced Format Testnoheaders Md
   04 +   Content here.
   05
-  06 -   Test feature root for migrated requirement fixtures.
+  06 -   Test capability root for migrated requirement fixtures.
   06 +   #### Metadata
   07 +     * type: requirement
   08
   09 -   #### Metadata
-  09 -     * type: feature
+  09 -     * type: capability
   09 +   #### Relations
-  10 +     * specify: [Test Feature Test Advanced Format Testnoheaders Md](#test-feature-test-advanced-format-testnoheaders-md)
+  10 +     * specify: [Test Capability Test Advanced Format Testnoheaders Md](#test-capability-test-advanced-format-testnoheaders-md)
   11     ---
   12
   13     ### Element Without Section
@@ -188,22 +188,22 @@ Found 9 file(s) with formatting changes:
   18       * type: requirement
   19
   20     #### Relations
-  21 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnoheaders-md)
-  21 +     * specify: [Test Feature Test Advanced Format Testnoheaders Md](#test-feature-test-advanced-format-testnoheaders-md)
+  21 -     * specify: [Test Capability](#test-capability-test-advanced-format-testnoheaders-md)
+  21 +     * specify: [Test Capability Test Advanced Format Testnoheaders Md](#test-capability-test-advanced-format-testnoheaders-md)
   22     ---
   23 -   ### Another Element
-  23 +   ### Test Feature Test Advanced Format Testnoheaders Md
+  23 +   ### Test Capability Test Advanced Format Testnoheaders Md
   24
   25 -   Content here.
-  25 +   Test feature root for migrated requirement fixtures.
+  25 +   Test capability root for migrated requirement fixtures.
   26
   27     #### Metadata
   28 -     * type: requirement
-  28 +     * type: feature
+  28 +     * type: capability
   29 +   ---
   30
   31 -   #### Relations
-  31 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnoheaders-md)
+  31 -     * specify: [Test Capability](#test-capability-test-advanced-format-testnoheaders-md)
   31 -   ---
 
 
@@ -213,12 +213,12 @@ Found 9 file(s) with formatting changes:
   01 +   # Elements
   02
   03 -   ␤
-  03 -   ### Test Feature Test Advanced Format Testnopageheader Md
+  03 -   ### Test Capability Test Advanced Format Testnopageheader Md
   03 -   ␤
-  03 -   Test feature root for migrated requirement fixtures.
+  03 -   Test capability root for migrated requirement fixtures.
   03 -   ␤
   03 -   #### Metadata
-  03 -     * type: feature
+  03 -     * type: capability
   03 -   ---
   03 -   ␤
   03     ### Element Alpha
@@ -228,8 +228,8 @@ Found 9 file(s) with formatting changes:
   08       * type: requirement
   09
   10     #### Relations
-  11 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnopageheader-md)
-  11 +     * specify: [Test Feature Test Advanced Format Testnopageheader Md](#test-feature-test-advanced-format-testnopageheader-md)
+  11 -     * specify: [Test Capability](#test-capability-test-advanced-format-testnopageheader-md)
+  11 +     * specify: [Test Capability Test Advanced Format Testnopageheader Md](#test-capability-test-advanced-format-testnopageheader-md)
   12     ---
   13
   14     ### Element Beta
@@ -237,16 +237,16 @@ Found 9 file(s) with formatting changes:
   19       * type: requirement
   20
   21     #### Relations
-  22 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnopageheader-md)
-  22 +     * specify: [Test Feature Test Advanced Format Testnopageheader Md](#test-feature-test-advanced-format-testnopageheader-md)
+  22 -     * specify: [Test Capability](#test-capability-test-advanced-format-testnopageheader-md)
+  22 +     * specify: [Test Capability Test Advanced Format Testnopageheader Md](#test-capability-test-advanced-format-testnopageheader-md)
   23     ---
   24 +   ␤
-  25 +   ### Test Feature Test Advanced Format Testnopageheader Md
+  25 +   ### Test Capability Test Advanced Format Testnopageheader Md
   26 +   ␤
-  27 +   Test feature root for migrated requirement fixtures.
+  27 +   Test capability root for migrated requirement fixtures.
   28 +   ␤
   29 +   #### Metadata
-  30 +     * type: feature
+  30 +     * type: capability
   31 +   ---
   32 +   ␤
 
@@ -257,12 +257,12 @@ Found 9 file(s) with formatting changes:
   01 +   # Elements
   02
   03 -   ␤
-  03 -   ### Test Feature Test Advanced Format Testnosectionheader Md
+  03 -   ### Test Capability Test Advanced Format Testnosectionheader Md
   03 -   ␤
-  03 -   Test feature root for migrated requirement fixtures.
+  03 -   Test capability root for migrated requirement fixtures.
   03 -   ␤
   03 -   #### Metadata
-  03 -     * type: feature
+  03 -     * type: capability
   03 -   ---
   03 -   ␤
   03     ### Element One
@@ -272,8 +272,8 @@ Found 9 file(s) with formatting changes:
   08       * type: requirement
   09
   10     #### Relations
-  11 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnosectionheader-md)
-  11 +     * specify: [Test Feature Test Advanced Format Testnosectionheader Md](#test-feature-test-advanced-format-testnosectionheader-md)
+  11 -     * specify: [Test Capability](#test-capability-test-advanced-format-testnosectionheader-md)
+  11 +     * specify: [Test Capability Test Advanced Format Testnosectionheader Md](#test-capability-test-advanced-format-testnosectionheader-md)
   12     ---
   13
   14     ### Element Two
@@ -281,16 +281,16 @@ Found 9 file(s) with formatting changes:
   19       * type: requirement
   20
   21     #### Relations
-  22 -     * specify: [Test Feature](#test-feature-test-advanced-format-testnosectionheader-md)
-  22 +     * specify: [Test Feature Test Advanced Format Testnosectionheader Md](#test-feature-test-advanced-format-testnosectionheader-md)
+  22 -     * specify: [Test Capability](#test-capability-test-advanced-format-testnosectionheader-md)
+  22 +     * specify: [Test Capability Test Advanced Format Testnosectionheader Md](#test-capability-test-advanced-format-testnosectionheader-md)
   23     ---
   24 +   ␤
-  25 +   ### Test Feature Test Advanced Format Testnosectionheader Md
+  25 +   ### Test Capability Test Advanced Format Testnosectionheader Md
   26 +   ␤
-  27 +   Test feature root for migrated requirement fixtures.
+  27 +   Test capability root for migrated requirement fixtures.
   28 +   ␤
   29 +   #### Metadata
-  30 +     * type: feature
+  30 +     * type: capability
   31 +   ---
   32 +   ␤
 
@@ -300,12 +300,12 @@ Found 9 file(s) with formatting changes:
   001     # Elements
   002 +   ### Details Block Formatting Test
   003
-  004 -   ### Test Feature Test Advanced Format Userstories Md
+  004 -   ### Test Capability Test Advanced Format Userstories Md
   004 +   Element with details block that should not be formatted.
   005 +   <details>
   006 +   <summary>Click to expand</summary>
   007
-  008 -   Test feature root for migrated requirement fixtures.
+  008 -   Test capability root for migrated requirement fixtures.
   008 +   #### This Should Not Get Blank Line
   009 +   Content inside details block.
   010 +   ####Another Header Without Space
@@ -313,16 +313,16 @@ Found 9 file(s) with formatting changes:
   012 +   </details>
   013
   014     #### Metadata
-  015 -     * type: feature
+  015 -     * type: capability
   015 +     * type: requirement
   016 +   ␤
   017 +   #### Relations
-  018 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  018 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
   019     ---
   020 -   Personas:
   020 -   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
-  020 -   2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
-  020 -   3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
+  020 -   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
+  020 -   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
   020 -   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
   020 +   ### Exact Blank Line Count Test
   021
@@ -340,7 +340,7 @@ Found 9 file(s) with formatting changes:
   030     #### Metadata
   031 -     * type: requirement
   031 -   #### Relations
-  031 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
+  031 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
   031 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
   031 -   * derive: [SystemRequirements/Requirements.md#requirements-processing](/SystemRequirements/Requirements.md#requirements-processing)
   031 +     * type: test-verification
@@ -355,9 +355,9 @@ Found 9 file(s) with formatting changes:
   040       * type: requirement
   041 +   ␤
   042     #### Relations
-  043 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
+  043 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
   043 -     * trace: [MOEs.md#moe_ua](/MOEs.md#moe_ua)
-  043 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  043 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
   044 +     * trace: [MOE_UA](MOEs.md#moe_ua)
   045 +   ---
   046
@@ -372,9 +372,9 @@ Found 9 file(s) with formatting changes:
   052       * type: requirement
   053
   054     #### Relations
-  055 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
+  055 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
   055 +     * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
-  056 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  056 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
   057 +     * trace: [MOE_UA](MOEs.md#moe_ua)
   058     ---
   059
@@ -415,8 +415,8 @@ Found 9 file(s) with formatting changes:
   079       * type: requirement
   080
   081     #### Relations
-  082 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
-  082 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  082 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  082 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
   083     ---
   084 -   ### Exact Blank Line Count Test
   084 -   ␤
@@ -432,37 +432,37 @@ Found 9 file(s) with formatting changes:
   084 -   ␤
   084 -   ---
   084 -   ␤
-  084     ### Root Feature
+  084     ### Root Capability
   085
-  086     Top-level feature used as hierarchy parent for system requirements in this fixture.
+  086     Top-level capability used as hierarchy parent for system requirements in this fixture.
 
   089       * type: requirement
   090
   091     #### Relations
-  092 -     * specify: [Test Feature](#test-feature-test-advanced-format-userstories-md)
-  092 +     * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  092 -     * specify: [Test Capability](#test-capability-test-advanced-format-userstories-md)
+  092 +     * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
   093     ---
   094
   095     ### External URL Preservation Test
 
   102     #### Relations
-  103       * derivedFrom: [Root Feature](#root-feature)
+  103       * derivedFrom: [Root Capability](#root-capability)
   104       * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
   105 +   ---
   106
-  107 +   ### Test Feature Test Advanced Format Userstories Md
+  107 +   ### Test Capability Test Advanced Format Userstories Md
   108 +   ␤
-  109 +   Test feature root for migrated requirement fixtures.
+  109 +   Test capability root for migrated requirement fixtures.
   110 +   ␤
   111 +   ␤
   112 +   Personas:
   113 +   1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
-  114 +   2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
-  115 +   3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
+  114 +   2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
+  115 +   3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
   116 +   4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
   117 +   ␤
   118 +   #### Metadata
-  119 +     * type: feature
+  119 +     * type: capability
   120     ---
 
 

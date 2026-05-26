@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Assets Specifications Requirements Md
+### Test Capability Test Assets Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### System Requirements
@@ -16,7 +16,7 @@ Top-level container for test requirements.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-assets-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-assets-specifications-requirements-md)
   * derive: [Performance Requirement](#performance-requirement)
   * derive: [No Attachments Requirement](#no-attachments-requirement)
 ---
@@ -66,7 +66,7 @@ A separate requirement that owns refinements (outside main hierarchy).
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-assets-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-assets-specifications-requirements-md)
   * refinedBy: [Test Constraint Element](#test-constraint-element)
   * refinedBy: [Test Behavior Element](#test-behavior-element)
 ---

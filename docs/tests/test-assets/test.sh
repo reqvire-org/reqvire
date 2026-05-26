@@ -1,7 +1,7 @@
 #!/bin/bash
 set -uo pipefail
 
-# Test: Attachments Feature
+# Test: Attachments Capability
 #
 # Satisfies: specifications/System/AttachmentsVerifications.md
 #
@@ -25,7 +25,7 @@ assert_file_matches() {
 }
 
 echo "===================================="
-echo "Attachments Feature Tests"
+echo "Attachments Capability Tests"
 echo "===================================="
 echo ""
 

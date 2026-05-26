@@ -1,12 +1,12 @@
 # Elements
 
 
-### Sub Feature
+### Sub Capability
 
-The system SHALL implement a sub-feature of Feature A.
+The system SHALL implement a sub-capability of Capability A.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: ../Requirements.md#feature-a
+  * derivedFrom: ../Requirements.md#capability-a

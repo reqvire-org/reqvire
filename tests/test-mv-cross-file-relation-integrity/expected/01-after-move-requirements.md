@@ -8,26 +8,26 @@ The system SHALL provide core functionality.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Mv Cross File Relation Integrity Specifications Requirements](#test-feature-test-mv-cross-file-relation-integrity-specifications-requirements)
+  * specify: [Test Capability Test Mv Cross File Relation Integrity Specifications Requirements](#test-capability-test-mv-cross-file-relation-integrity-specifications-requirements)
 ---
 
-### Feature B
+### Capability B
 
-The system SHALL implement Feature B.
+The system SHALL implement Capability B.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Root Requirement](#root-requirement)
-  * verifiedBy: [Test Feature B](Verifications/Tests.md#test-feature-b)
+  * verifiedBy: [Test Capability B](Verifications/Tests.md#test-capability-b)
 ---
 
-### Test Feature Test Mv Cross File Relation Integrity Specifications Requirements
+### Test Capability Test Mv Cross File Relation Integrity Specifications Requirements
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 

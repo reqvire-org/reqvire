@@ -1,23 +1,23 @@
 # Elements
 
 
-### Test Feature Test Element Type Relation Compatibility Invalid Derivedfrom Specifications
+### Test Capability Test Element Type Relation Compatibility Invalid Derivedfrom Specifications
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Target Feature
+### Target Capability
 
-A feature to be used as derivedFrom target.
+A capability to be used as derivedFrom target.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-derivedfrom-specifications)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-invalid-derivedfrom-specifications)
 ---
 
 ### Target System Requirement
@@ -28,7 +28,7 @@ A system requirement to be used as derivedFrom target.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target Feature](#target-feature)
+  * derivedFrom: [Target Capability](#target-capability)
 
 ---
 
@@ -40,7 +40,7 @@ A test verification element.
   * type: test-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
 
 ---
 
@@ -52,8 +52,8 @@ INVALID: Test verification cannot use derivedFrom.
   * type: test-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
-  * derivedFrom: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
+  * derivedFrom: [Target Capability](#target-capability)
 
 ---
 
@@ -65,8 +65,8 @@ INVALID: Analysis verification cannot use derivedFrom.
   * type: analysis-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
-  * derivedFrom: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
+  * derivedFrom: [Target Capability](#target-capability)
 
 ---
 
@@ -78,8 +78,8 @@ INVALID: Inspection verification cannot use derivedFrom.
   * type: inspection-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
-  * derivedFrom: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
+  * derivedFrom: [Target Capability](#target-capability)
 
 ---
 
@@ -91,8 +91,8 @@ INVALID: Demonstration verification cannot use derivedFrom.
   * type: demonstration-verification
 
 #### Relations
-  * verify: [Target Feature](#target-feature)
-  * derivedFrom: [Target Feature](#target-feature)
+  * verify: [Target Capability](#target-capability)
+  * derivedFrom: [Target Capability](#target-capability)
 
 ---
 
@@ -116,6 +116,6 @@ INVALID: Other type can only use trace relations.
   * type: other-other
 
 #### Relations
-  * derivedFrom: [Target Feature](#target-feature)
+  * derivedFrom: [Target Capability](#target-capability)
 
 ---

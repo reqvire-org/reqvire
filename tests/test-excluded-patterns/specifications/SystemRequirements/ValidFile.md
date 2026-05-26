@@ -1,25 +1,25 @@
 # Elements
 
 
-### Test Feature Test Excluded Patterns Specifications Systemrequirements Validfile Md
+### Test Capability Test Excluded Patterns Specifications Systemrequirements Validfile Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This file should be processed.
 
-### Root Feature
+### Root Capability
 
-Top-level feature used as hierarchy parent for system requirements in this fixture.
+Top-level capability used as hierarchy parent for system requirements in this fixture.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-excluded-patterns-specifications-systemrequirements-validfile-md)
+  * specify: [Test Capability](#test-capability-test-excluded-patterns-specifications-systemrequirements-validfile-md)
 ---
 
 ### SYS 001 System Requirement
@@ -30,7 +30,7 @@ This is a system requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root Feature](#root-feature)
+  * derivedFrom: [Root Capability](#root-capability)
   * satisfiedBy: [../DesignSpecifications/ExcludedFile.md](../DesignSpecifications/ExcludedFile.md)
   
 ---
@@ -44,5 +44,5 @@ Users must be able to send direct messages to other users.
 * priority: high
 
 #### Relations
-* derivedFrom: [Root Feature](#root-feature)
+* derivedFrom: [Root Capability](#root-capability)
 * satisfiedBy: [../DesignSpecifications/DirectMessages.md](../DesignSpecifications/DirectMessages.md)  

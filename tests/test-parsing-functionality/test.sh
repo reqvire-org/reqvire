@@ -35,13 +35,13 @@ echo ""
 echo "Test 1: Basic normalization (spaces, case, punctuation)..."
 
 # Create test elements with various naming patterns
-cat > "$TEST_DIR/specifications/Features.md" <<'EOF'
+cat > "$TEST_DIR/specifications/Capabilities.md" <<'EOF'
 # Elements
 
 
-### My Feature Name
+### My Capability Name
 
-Simple feature with spaces.
+Simple capability with spaces.
 
 #### Metadata
   * type: requirement
@@ -51,7 +51,7 @@ Simple feature with spaces.
 
 ### Version 1.2.3
 
-Feature with dots in name.
+Capability with dots in name.
 
 #### Metadata
   * type: requirement
@@ -61,7 +61,7 @@ Feature with dots in name.
 
 ### Installation (Windows)
 
-Feature with parentheses.
+Capability with parentheses.
 
 #### Metadata
   * type: requirement
@@ -71,7 +71,7 @@ Feature with parentheses.
 
 ### C++ API Reference
 
-Feature with special characters.
+Capability with special characters.
 
 #### Metadata
   * type: requirement
@@ -81,7 +81,7 @@ Feature with special characters.
 
 ### my_variable_name
 
-Feature with underscores.
+Capability with underscores.
 
 #### Metadata
   * type: requirement
@@ -91,7 +91,7 @@ Feature with underscores.
 
 ### Multiple    Spaces
 
-Feature with multiple consecutive spaces.
+Capability with multiple consecutive spaces.
 
 #### Metadata
   * type: requirement
@@ -144,7 +144,7 @@ EXPECTED_FRAGMENTS=(
   "c-api-reference"
   "installation-windows"
   "multiple----spaces"
-  "my-feature-name"
+  "my-capability-name"
   "my_variable_name"
   "version-123"
 )
@@ -180,7 +180,7 @@ References with exact case.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [My Feature Name](Features.md#my-feature-name)
+  * derivedFrom: [My Capability Name](Capabilities.md#my-capability-name)
 
 ### Referencer B
 
@@ -190,7 +190,7 @@ References with different case.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [my feature name](Features.md#my-feature-name)
+  * derivedFrom: [my capability name](Capabilities.md#my-capability-name)
 
 ### Referencer C
 
@@ -200,7 +200,7 @@ References with all caps.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [MY FEATURE NAME](Features.md#my-feature-name)
+  * derivedFrom: [MY CAPABILITY NAME](Capabilities.md#my-capability-name)
 EOF
 
 # Validate - all three should resolve correctly
@@ -224,16 +224,16 @@ echo ""
 echo "Test 4: Element ID remains stable after file relocation..."
 
 # Get initial fragment identifier
-INITIAL_FRAGMENT=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "My Feature Name") | .identifier | split("#")[1]')
+INITIAL_FRAGMENT=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "My Capability Name") | .identifier | split("#")[1]')
 
-if [ "$INITIAL_FRAGMENT" != "my-feature-name" ]; then
+if [ "$INITIAL_FRAGMENT" != "my-capability-name" ]; then
   echo "❌ FAILED: Initial fragment ID is incorrect: $INITIAL_FRAGMENT"
   exit 1
 fi
 
 # Move element to different file using mv command
 set +e
-MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "My Feature Name" "specifications/Requirements.md" 2>&1)
+MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "My Capability Name" "specifications/Requirements.md" 2>&1)
 MV_EXIT=$?
 set -e
 
@@ -245,9 +245,9 @@ fi
 
 # Get fragment identifier after relocation
 AFTER_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
-AFTER_FRAGMENT=$(echo "$AFTER_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "My Feature Name") | .identifier | split("#")[1]')
+AFTER_FRAGMENT=$(echo "$AFTER_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "My Capability Name") | .identifier | split("#")[1]')
 
-if [ "$AFTER_FRAGMENT" != "my-feature-name" ]; then
+if [ "$AFTER_FRAGMENT" != "my-capability-name" ]; then
   echo "❌ FAILED: Fragment ID changed after relocation: $AFTER_FRAGMENT"
   exit 1
 fi
@@ -310,11 +310,11 @@ echo "Test 6: Verify parsing extracts subsections and relations correctly..."
 
 # Get full model JSON
 # Use the existing FULL_JSON from Test 2
-# Find "My Feature Name" element using correct JSON structure
-MY_FEATURE=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "My Feature Name")')
+# Find "My Capability Name" element using correct JSON structure
+MY_CAPABILITY=$(echo "$FULL_JSON" | jq -r '.files | to_entries[] | .value.elements[] | select(.name == "My Capability Name")')
 
 # Test 6a: Verify Metadata subsection is parsed
-ELEMENT_TYPE=$(echo "$MY_FEATURE" | jq -r '.type')
+ELEMENT_TYPE=$(echo "$MY_CAPABILITY" | jq -r '.type')
 if [ "$ELEMENT_TYPE" != "requirement" ]; then
   echo "❌ FAILED: Metadata subsection not parsed correctly"
   echo "  Expected type: requirement"
@@ -324,7 +324,7 @@ fi
 echo "✓ Metadata subsection parsed correctly"
 
 # Test 6b: Verify Relations subsection is parsed
-RELATIONS_COUNT=$(echo "$MY_FEATURE" | jq -r '.relations | length')
+RELATIONS_COUNT=$(echo "$MY_CAPABILITY" | jq -r '.relations | length')
 if [ "$RELATIONS_COUNT" -lt 1 ]; then
   echo "❌ FAILED: Relations subsection not parsed"
   echo "  Expected at least 1 relation"
@@ -334,8 +334,8 @@ fi
 echo "✓ Relations subsection parsed correctly"
 
 # Test 6c: Verify relation target is extracted correctly
-RELATION_TYPE=$(echo "$MY_FEATURE" | jq -r '.relations[0].relation_type')
-RELATION_TARGET=$(echo "$MY_FEATURE" | jq -r '.relations[0].target.target')
+RELATION_TYPE=$(echo "$MY_CAPABILITY" | jq -r '.relations[0].relation_type')
+RELATION_TARGET=$(echo "$MY_CAPABILITY" | jq -r '.relations[0].target.target')
 
 if [ "$RELATION_TYPE" != "derivedFrom" ]; then
   echo "❌ FAILED: Relation type not extracted correctly"
@@ -353,7 +353,7 @@ fi
 echo "✓ Relation type and target extracted correctly"
 
 # Test 6d: Verify content is extracted (not in subsections)
-CONTENT=$(echo "$MY_FEATURE" | jq -r '.content')
+CONTENT=$(echo "$MY_CAPABILITY" | jq -r '.content')
 if [ -z "$CONTENT" ] || [ "$CONTENT" == "null" ]; then
   echo "❌ FAILED: Element content not extracted"
   exit 1
@@ -378,7 +378,7 @@ cat > "$TEST_DIR/specifications/Detailed.md" <<'EOF'
 Parent for testing.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Parent System Req
@@ -392,7 +392,7 @@ Parent system requirement for testing.
   * specify: [Parent Req](#parent-req)
 ---
 
-### Feature With Details
+### Capability With Details
 
 Main description here.
 
@@ -401,7 +401,7 @@ Main description here.
 
 #### Details
 
-This is additional detail about the feature.
+This is additional detail about the capability.
 
 It can span multiple paragraphs.
 
@@ -423,11 +423,11 @@ fi
 
 # Search for the element with Details
 DETAILED_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json 2>&1)
-DETAILED_ELEM=$(echo "$DETAILED_JSON" | jq -r '.files."specifications/Detailed.md".elements[] | select(.name == "Feature With Details")')
+DETAILED_ELEM=$(echo "$DETAILED_JSON" | jq -r '.files."specifications/Detailed.md".elements[] | select(.name == "Capability With Details")')
 
 # Check if element was found
 if [ -z "$DETAILED_ELEM" ] || [ "$DETAILED_ELEM" == "null" ]; then
-  echo "❌ FAILED: Could not find 'Feature With Details' element"
+  echo "❌ FAILED: Could not find 'Capability With Details' element"
   echo "Full JSON:"
   echo "$DETAILED_JSON" | jq .
   exit 1

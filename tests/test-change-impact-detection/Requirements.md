@@ -7,28 +7,28 @@ This file should be processed.
 Power control.
 
 #### Metadata
-* type: feature
+* type: capability
 
 ### CPU Manager
 
 CPU Manager.
 
 #### Metadata
-* type: feature
+* type: capability
 
 ### Battery Manager
 
 Battery manager.
 
 #### Metadata
-* type: feature
+* type: capability
 
 ### Network Manager
 
 Network manager.
 
 #### Metadata
-* type: feature
+* type: capability
 
 
 ### Power Saving
@@ -68,7 +68,7 @@ Battery Saving.
 The system shall implement power-saving mechanisms to optimize battery usage.
 
 #### Metadata
-* type: feature
+* type: capability
 
 ---
 

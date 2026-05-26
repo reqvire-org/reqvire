@@ -2,7 +2,7 @@
 
 ### Parent Requirement
 
-A parent feature.
+A parent capability.
 
 #### Metadata
   * type: requirement
@@ -10,7 +10,7 @@ A parent feature.
 #### Relations
   * derive: [Child Requirement](#child-requirement)
   * derive: [Target Requirement](#target-requirement)
-  * specify: [Test Feature Test Format Full Relations Specifications Requirements Md](#test-feature-test-format-full-relations-specifications-requirements-md)
+  * specify: [Test Capability Test Format Full Relations Specifications Requirements Md](#test-capability-test-format-full-relations-specifications-requirements-md)
 ---
 
 ### Child Requirement
@@ -37,6 +37,17 @@ A requirement that is refined by a constraint.
   * refinedBy: [Test Constraint](#test-constraint)
 ---
 
+### Test Capability Test Format Full Relations Specifications Requirements Md
+
+Test capability root for migrated requirement fixtures.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * specifiedBy: [Parent Requirement](#parent-requirement)
+---
+
 ### Test Constraint
 
 A constraint that refines the target requirement.
@@ -46,15 +57,4 @@ A constraint that refines the target requirement.
 
 #### Relations
   * refine: [Target Requirement](#target-requirement)
----
-
-### Test Feature Test Format Full Relations Specifications Requirements Md
-
-Test feature root for migrated requirement fixtures.
-
-#### Metadata
-  * type: feature
-
-#### Relations
-  * specifiedBy: [Parent Requirement](#parent-requirement)
 ---

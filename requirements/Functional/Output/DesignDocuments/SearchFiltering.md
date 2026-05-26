@@ -12,11 +12,11 @@
 
 ## Summary
 
-This specification defines the functional requirements for a filtering subsystem used within the `search` reporting feature. The system must allow clients to selectively include or exclude elements from the search output based on metadata, content, and traceability properties.
+This specification defines the functional requirements for a filtering subsystem used within the `search` reporting capability. The system must allow clients to selectively include or exclude elements from the search output based on metadata, content, and traceability properties.
 
 The filters shall be composable and applied conjunctively (i.e., all active filters must match for an element to be included). The filtering system must support both human-readable text output and structured machine-readable output (e.g., JSON), as well as abbreviated short mode output.
 
-Full search summaries include governance metadata counters for matched governance-bearing elements (`feature` and `requirement`). The counters use effective metadata after explicit, inherited, and default resolution.
+Full search summaries include governance metadata counters for matched governance-bearing elements (`capability` and `requirement`). The counters use effective metadata after explicit, inherited, and default resolution.
 
 ---
 
@@ -68,14 +68,14 @@ The filtering system **must support the following filters**, which may be active
 
 **Input:** One of the following valid string identifiers:
 
-- `"feature"` - Product/capability feature
+- `"capability"` - Capability element
 - `"requirement"` - System requirement (default type)
 - `"verification"` / `"test-verification"` - Test verification
 - `"analysis-verification"` - Analysis verification
 - `"inspection-verification"` - Inspection verification
 - `"demonstration-verification"` - Demonstration verification
 - `"formal-proof-verification"` - Formal proof/model-checking/theorem verification
-- `"source"` - Feature-owned source/context refinement
+- `"source"` - Capability-owned source/context refinement
 - `"semantic-contract"` - Requirement-owned SHACL semantic contract refinement
 - `"constraint"` - Refinement documenting constraints
 - `"behavior"` - Refinement documenting behavior details
@@ -191,10 +191,10 @@ The filtering system must evaluate filters with minimal passes over element data
 | `type = constraint` | Only constraint refinement elements |
 | `type = behavior` | Only behavior refinement elements |
 | `type = specification` | Only specification refinement elements |
-| `status = approved` | Feature and requirement elements whose effective status is approved |
-| `priority = high,critical` | Feature and requirement elements whose effective priority is high or critical |
-| `risk = critical` | Feature and requirement elements whose effective risk is critical |
-| `owner = "Platform.*"` | Feature and requirement elements whose effective owner matches the regex |
+| `status = approved` | Capability and requirement elements whose effective status is approved |
+| `priority = high,critical` | Capability and requirement elements whose effective priority is high or critical |
+| `risk = critical` | Capability and requirement elements whose effective risk is critical |
+| `owner = "Platform.*"` | Capability and requirement elements whose effective owner matches the regex |
 | `filter-file = "System*"` + `name = ".*GPS.*"` | Elements in System files with GPS in name |
 | `have-relations = verifiedBy,satisfiedBy` | Elements that have both verifiedBy AND satisfiedBy relations |
 | `not-have-relations = verifiedBy` | Elements that do NOT have any verifiedBy relations |

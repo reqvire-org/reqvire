@@ -9,7 +9,7 @@ Content for element one.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)
+  * derivedFrom: [Capability Alpha](Requirements.md#capability-alpha)
 
 ### Element Two
 

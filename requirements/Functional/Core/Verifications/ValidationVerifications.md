@@ -34,7 +34,7 @@ This test verifies that the system assigns the default type 'requirement' to all
 **Explicit Type Metadata Overrides:**
 - System shall allow explicit type specification via Metadata subsection
 - System shall respect explicit type metadata when present
-- System shall support all standard element types: feature, requirement, ontology, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification, source, semantic-contract, state, input-output, constraint, behavior, specification, other
+- System shall support all standard element types: capability, requirement, ontology, verification, test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification, source, semantic-contract, state, input-output, constraint, behavior, specification, other
 
 ##### Test Criteria
 1. **Default type assignment verification:**
@@ -46,7 +46,7 @@ This test verifies that the system assigns the default type 'requirement' to all
    - Test elements in various file locations
 
 2. **Explicit type metadata verification:**
-   - Create elements with explicit type metadata (feature, verification, semantic-contract, etc.)
+   - Create elements with explicit type metadata (capability, verification, semantic-contract, etc.)
    - Run reqvire summary --json
    - Verify elements have the explicitly specified types
    - Verify explicit types override default behavior
@@ -106,39 +106,39 @@ This test verifies that the system correctly validates relation types based on e
 
 ##### Acceptance Criteria
 **derivedFrom/derive Validation:**
-- System shall allow `derivedFrom` relations between elements in the same hierarchy family only (`feature` to `feature`, `requirement` to `requirement`, or `ontology` to `ontology`)
+- System shall allow `derivedFrom` relations between elements in the same hierarchy family only (`capability` to `capability`, `requirement` to `requirement`, or `ontology` to `ontology`)
 - System shall reject `derivedFrom` relations where source is a verification element
 - System shall reject `derivedFrom` relations where target is a verification element
 - System shall reject `derivedFrom` relations where source is `other` type
 - System shall provide clear error message indicating element type incompatibility
 
 **specifiedBy/specify Validation:**
-- System shall allow `specifiedBy` from `feature` to `requirement`
-- System shall allow `specify` from `requirement` to `feature`
-- System shall reject cross-family hierarchy through `derive`/`derivedFrom`, including `feature` to `requirement`, `feature` to `ontology`, and `requirement` to `ontology`
-- System shall reject `feature` to `feature` specification through `specifiedBy`
+- System shall allow `specifiedBy` from `capability` to `requirement`
+- System shall allow `specify` from `requirement` to `capability`
+- System shall reject cross-family hierarchy through `derive`/`derivedFrom`, including `capability` to `requirement`, `capability` to `ontology`, and `requirement` to `ontology`
+- System shall reject `capability` to `capability` specification through `specifiedBy`
 
 **satisfiedBy/satisfy Validation:**
 - System shall allow `satisfiedBy` relations from `requirement` elements to implementation files
-- System shall reject `satisfiedBy` relations from `feature` elements
+- System shall reject `satisfiedBy` relations from `capability` elements
 - System shall allow `satisfiedBy` relations from `test-verification` to test implementation files
 - System shall allow `satisfiedBy` relations from `formal-proof-verification` to proof evidence files
 - System shall reject `satisfiedBy` relations from `analysis-verification`, `inspection-verification`, `demonstration-verification` elements
 - System shall provide clear error message for invalid element types using satisfiedBy
 
 **verifiedBy/verify Validation:**
-- System shall allow `verifiedBy` relations from `requirement` elements to any verification type
-- System shall allow `verify` relations from any verification type to `requirement` elements
-- System shall reject `verifiedBy` relations from `feature` elements
+- System shall allow `verifiedBy` relations from `capability` and `requirement` elements to any verification type
+- System shall allow `verify` relations from any verification type to `capability` or `requirement` elements
+- System shall reject `verifiedBy` relations from non-capability and non-requirement elements
 - System shall reject `verifiedBy` relations from verification elements
-- System shall reject `verify` relations to non-requirement elements
+- System shall reject `verify` relations to non-capability and non-requirement elements
 
 **Refinement Type Validation:**
 - System shall allow `refine` relations on `constraint` type elements pointing to requirements
 - System shall allow `refine` relations on `behavior` type elements pointing to requirements
 - System shall allow `refine` relations on `specification` type elements pointing to requirements
 - System shall allow `refine` relations on `state` and `input-output` elements pointing to requirements
-- System shall allow `refine` relations on `source` elements pointing to features
+- System shall allow `refine` relations on `source` elements pointing to capabilities
 - System shall allow `refine` relations on `semantic-contract` elements pointing to requirements
 - System shall reject all other relation types on refinement elements (derivedFrom, verifiedBy, trace, satisfiedBy)
 - System shall provide clear error message indicating refinement types can only have refine relations
@@ -156,11 +156,11 @@ This test verifies that the system correctly validates relation types based on e
 
 2. **satisfiedBy type constraint tests:**
    - Create requirement with `satisfiedBy` to implementation file - PASS
-   - Create feature with `satisfiedBy` to implementation file - FAIL with type error
+   - Create capability with `satisfiedBy` to implementation file - FAIL with type error
    - Create test-verification with `satisfiedBy` to test file - PASS
    - Create formal-proof-verification with `satisfiedBy` to proof report file - PASS
    - Create analysis-verification with `satisfiedBy` to file - FAIL with type error
-   - Verify error message indicates `feature` is not allowed for satisfiedBy
+   - Verify error message indicates `capability` is not allowed for satisfiedBy
 
 3. **Refinement type relation tests:**
    - Create constraint element with `refine` relation to requirement - PASS
@@ -188,28 +188,28 @@ This test verifies that the system correctly validates relation types based on e
   * verify: [Relation Element Type Validator](../Validation.md#relation-element-type-validator)
 ---
 
-### Feature Element Relation Compatibility Test
+### Capability Element Relation Compatibility Test
 
-This test verifies feature hierarchy, requirement-to-feature specification, and rejection of unsupported stakeholder requirement typing.
+This test verifies capability hierarchy, requirement-to-capability specification, and rejection of unsupported stakeholder requirement typing.
 
 #### Details
 Test cases:
-1. Valid top-level requirement with `specify` to a feature validates successfully.
-2. Valid feature root with `specifiedBy` to a top-level requirement validates successfully.
-3. Valid child requirement with `derivedFrom` to another requirement inherits the same owning feature.
-4. Feature `derivedFrom` feature validates successfully.
-5. Requirement `derivedFrom` feature fails.
-6. Feature `specifiedBy` feature fails.
-7. Feature `verifiedBy` and `satisfiedBy` fail.
+1. Valid top-level requirement with `specify` to a capability validates successfully.
+2. Valid capability root with `specifiedBy` to a top-level requirement validates successfully.
+3. Valid child requirement with `derivedFrom` to another requirement inherits the same owning capability.
+4. Capability `derivedFrom` capability validates successfully.
+5. Requirement `derivedFrom` capability fails.
+6. Capability `specifiedBy` capability fails.
+7. Capability `satisfiedBy` fails, while capability `verifiedBy` is valid.
 8. Unsupported stakeholder requirement type metadata fails as an invalid type.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-feature-model/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-capability-model/test.sh)
   * verify: [Element Type Relation Compatibility](../ModelManagement.md#element-type-relation-compatibility)
-  * verify: [Feature Model Structure](../ModelManagement.md#feature-model-structure)
+  * verify: [Capability Model Structure](../ModelManagement.md#capability-model-structure)
 ---
 
 ### File Exclusion Test
@@ -347,7 +347,7 @@ This verification test checks that Reqvire correctly identifies and reports inva
 - System should detect and report requirement elements with satisfiedBy relations pointing to other requirement elements (incompatible types)
 - System should detect and report verification elements with satisfiedBy relations pointing to other verification elements (incompatible types)
 - System should detect and report non-evidence-backed verification elements with satisfiedBy relations (only test-verification and formal-proof-verification may use satisfiedBy, trace is always allowed)
-- System should detect and report if a requirement is missing required feature or parent requirement ownership
+- System should detect and report if a requirement is missing required capability or parent requirement ownership
 - System should detect and report if there is circular dependency in requirements
 - Pass 2 validation should only execute when Pass 1 completes without errors
 
@@ -449,21 +449,21 @@ This test verifies that ontology and semantic-contract ownership rules are enfor
 
 #### Details
 Test cases:
-1. `source` refining `feature` validates successfully.
+1. `source` refining `capability` validates successfully.
 2. `ontology` validates as an independent ontology element when semantic sections are well formed.
 3. `semantic-contract` refining `requirement` validates as a shape contract when it contains Shapes and no Ontology.
 4. `source` refining `requirement` fails.
-5. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `feature` fails.
-6. Feature attachment to `ontology` validates.
+5. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
+6. Capability attachment to `ontology` validates.
 7. Requirement attachment to requirement-owned `semantic-contract` validates.
-8. Requirement attachment to `ontology` fails because ontology context is inherited through the owning feature path.
-9. Feature attachment to `semantic-contract` fails.
+8. Requirement attachment to `ontology` fails because ontology context is inherited through the owning capability path.
+9. Capability attachment to `semantic-contract` fails.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-feature-refinements/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-capability-refinements/test.sh)
   * verify: [Ontology and Semantic Contract Model](../ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
@@ -478,10 +478,10 @@ Test cases:
 3. A referenced property shape without exactly one `sh:path` fails validation.
 4. A referenced property shape whose `sh:path` is not declared by any ontology element fails validation.
 5. A referenced property shape whose `sh:class` is not declared by any ontology element fails validation.
-6. A SHACL reference to a term declared by ontology attached to the owning feature context validates successfully.
-7. A SHACL reference to a term declared by ontology attached to an ancestor feature validates successfully for child feature and child requirement contexts.
+6. A SHACL reference to a term declared by ontology attached to the owning capability context validates successfully.
+7. A SHACL reference to a term declared by ontology attached to an ancestor capability validates successfully for child capability and child requirement contexts.
 8. A SHACL reference from a requirement-owned semantic contract to a term declared outside the reachable owner ontology context fails validation.
-9. An outside-context semantic reference validation error includes the referencing semantic-contract identifier, reference kind, referenced IRI, declaring ontology identifier, owning requirement, owning feature context, and guidance to attach the ontology to the owning or consuming feature.
+9. An outside-context semantic reference validation error includes the referencing semantic-contract identifier, reference kind, referenced IRI, declaring ontology identifier, owning requirement, owning capability context, and guidance to attach the ontology to the owning or consuming capability.
 10. A property shape with `sh:maxCount` lower than `sh:minCount` fails validation.
 11. A property shape with malformed `sh:in` RDF list structure fails validation.
 12. A missing semantic declaration validation error includes the referencing semantic-contract identifier, reference kind, referenced IRI, and fix guidance.
@@ -514,39 +514,39 @@ Test cases:
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-feature-refinements/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-capability-refinements/test.sh)
   * verify: [Ontology and Semantic Contract Model](../ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
 ### Single Root Hierarchy Ownership Validation Test
 
-This test verifies that each requirement hierarchy element resolves to exactly one owning feature root.
+This test verifies that each requirement hierarchy element resolves to exactly one owning capability root.
 
 #### Details
 
 ##### Acceptance Criteria
-- Validation passes when all requirement hierarchy elements resolve to exactly one owning feature root.
-- Validation fails when a hierarchy element resolves to more than one owning feature root.
-- Validation fails when a hierarchy element resolves to zero owning feature roots.
+- Validation passes when all requirement hierarchy elements resolve to exactly one owning capability root.
+- Validation fails when a hierarchy element resolves to more than one owning capability root.
+- Validation fails when a hierarchy element resolves to zero owning capability roots.
 - Validation error identifies the violating element and the resolved root set/count.
 
 ##### Test Criteria
 1. **Valid single-root hierarchy:**
-   - Create a hierarchy with one feature root, a specified top-level requirement, and descendants.
+   - Create a hierarchy with one capability root, a specified top-level requirement, and descendants.
    - Run `reqvire validate`.
    - Assert success exit code.
 
 2. **Invalid multi-root hierarchy ownership:**
-   - Create one descendant requirement with ancestry or `specify` relations that resolve to two different feature roots.
+   - Create one descendant requirement with ancestry or `specify` relations that resolve to two different capability roots.
    - Run `reqvire validate`.
    - Assert non-zero exit code.
-   - Assert error contains "must resolve to exactly one owning feature".
+   - Assert error contains "must resolve to exactly one owning capability".
 
 3. **Invalid zero-root hierarchy ownership:**
-   - Create a descendant chain containing only `requirement` elements and no owning feature.
+   - Create a descendant chain containing only `requirement` elements and no owning capability.
    - Run `reqvire validate`.
    - Assert non-zero exit code.
-   - Assert error contains "must resolve to exactly one owning feature".
+   - Assert error contains "must resolve to exactly one owning capability".
 
 #### Metadata
   * type: test-verification

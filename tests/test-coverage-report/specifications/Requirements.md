@@ -79,12 +79,12 @@ This is a demonstration-type verification for testing verification type breakdow
 
 ---
 
-### Coverage Feature
+### Coverage Capability
 
-Feature for coverage roll-up testing.
+Capability for coverage roll-up testing.
 
 #### Metadata
-* type: feature
+* type: capability
 
 #### Relations
 * specifiedBy: [Parent Requirement](#parent-requirement)
@@ -102,7 +102,7 @@ This is a parent requirement that derives child requirements. It MAY be verified
 * type: requirement
 
 #### Relations
-* specify: [Coverage Feature](#coverage-feature)
+* specify: [Coverage Capability](#coverage-capability)
 * derive: [Leaf Requirement Verified](#leaf-requirement-verified)
 * derive: [Leaf Requirement Unverified](#leaf-requirement-unverified)
 
@@ -135,7 +135,7 @@ This is another leaf requirement that is verified.
 * type: requirement
 
 #### Relations
-* specify: [Coverage Feature](#coverage-feature)
+* specify: [Coverage Capability](#coverage-capability)
 * verifiedBy: [Test Verification Unsatisfied](#test-verification-unsatisfied)
 
 ---
@@ -148,7 +148,7 @@ This leaf requirement is verified by a satisfied formal-proof verification.
 * type: requirement
 
 #### Relations
-* specify: [Coverage Feature](#coverage-feature)
+* specify: [Coverage Capability](#coverage-capability)
 * verifiedBy: [Formal Proof Verification Satisfied](#formal-proof-verification-satisfied)
 
 ---
@@ -161,7 +161,7 @@ This leaf requirement is verified by a formal-proof verification that lacks proo
 * type: requirement
 
 #### Relations
-* specify: [Coverage Feature](#coverage-feature)
+* specify: [Coverage Capability](#coverage-capability)
 * verifiedBy: [Formal Proof Verification Unsatisfied](#formal-proof-verification-unsatisfied)
 
 ---

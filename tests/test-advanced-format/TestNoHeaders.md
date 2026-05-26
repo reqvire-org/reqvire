@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Advanced Format Testnoheaders Md
+### Test Capability Test Advanced Format Testnoheaders Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Element Without Section
@@ -17,7 +17,7 @@ This element has no page header and no section header.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-advanced-format-testnoheaders-md)
+  * specify: [Test Capability](#test-capability-test-advanced-format-testnoheaders-md)
 ---
 
 ### Another Element
@@ -28,5 +28,5 @@ Content here.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-advanced-format-testnoheaders-md)
+  * specify: [Test Capability](#test-capability-test-advanced-format-testnoheaders-md)
 ---

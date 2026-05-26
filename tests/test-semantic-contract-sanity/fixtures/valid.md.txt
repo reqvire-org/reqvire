@@ -1,11 +1,11 @@
 # Elements
 
-### Billing Feature
+### Billing Capability
 
-Billing feature.
+Billing capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
   * specifiedBy: [Billing Requirement](#billing-requirement)
@@ -42,7 +42,7 @@ The system shall validate billing payloads against the billing shape contract.
   * type: requirement
 
 #### Relations
-  * specify: [Billing Feature](#billing-feature)
+  * specify: [Billing Capability](#billing-capability)
   * refinedBy: [Billing Shape Contract](#billing-shape-contract)
 ---
 

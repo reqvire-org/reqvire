@@ -6,7 +6,7 @@
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Relink Command Specifications Requirements Md](#test-feature-test-relink-command-specifications-requirements-md)
+  * specify: [Test Capability Test Relink Command Specifications Requirements Md](#test-capability-test-relink-command-specifications-requirements-md)
 ---
 
 ### New Parent
@@ -36,11 +36,11 @@
   * derivedFrom: [Root Requirement](#root-requirement)
 ---
 
-### Test Feature Test Relink Command Specifications Requirements Md
+### Test Capability Test Relink Command Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 

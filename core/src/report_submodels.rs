@@ -51,11 +51,11 @@ impl SubmodelsReport {
 
         output.push_str("## Submodels\n\n");
         output.push_str(
-            "Independent feature-rooted subgraphs resolved via feature ownership relations.\n\n",
+            "Independent capability-rooted subgraphs resolved via capability ownership relations.\n\n",
         );
 
         if self.submodels.is_empty() {
-            output.push_str("*No feature-rooted submodels found.*\n\n");
+            output.push_str("*No capability-rooted submodels found.*\n\n");
         } else {
             for submodel in &self.submodels {
                 output.push_str(&format!(
@@ -73,7 +73,7 @@ impl SubmodelsReport {
 
         output.push_str("## Cross-Submodel Couplings\n\n");
         output.push_str(
-            "Requirement-to-requirement relations where source and target belong to different feature roots.\n\n",
+            "Requirement-to-requirement relations where source and target belong to different capability roots.\n\n",
         );
 
         if self.cross_submodel_couplings.is_empty() {
@@ -126,8 +126,8 @@ fn is_requirement_element(element_type: &ElementType) -> bool {
     matches!(element_type, ElementType::Requirement(_))
 }
 
-fn is_feature_element(element_type: &ElementType) -> bool {
-    matches!(element_type, ElementType::Feature)
+fn is_capability_element(element_type: &ElementType) -> bool {
+    matches!(element_type, ElementType::Capability)
 }
 
 fn resolve_target_identifier(
@@ -245,50 +245,50 @@ fn resolve_requirement_subtree_roots(
     result
 }
 
-fn resolve_feature_roots(
-    feature_id: &str,
-    feature_parent_map: &HashMap<String, Vec<String>>,
+fn resolve_capability_roots(
+    capability_id: &str,
+    capability_parent_map: &HashMap<String, Vec<String>>,
     memo: &mut HashMap<String, BTreeSet<String>>,
     visiting: &mut HashSet<String>,
 ) -> BTreeSet<String> {
-    if let Some(cached) = memo.get(feature_id) {
+    if let Some(cached) = memo.get(capability_id) {
         return cached.clone();
     }
 
-    if visiting.contains(feature_id) {
+    if visiting.contains(capability_id) {
         return BTreeSet::new();
     }
-    visiting.insert(feature_id.to_string());
+    visiting.insert(capability_id.to_string());
 
     let mut result = BTreeSet::new();
-    let parent_ids = feature_parent_map
-        .get(feature_id)
+    let parent_ids = capability_parent_map
+        .get(capability_id)
         .cloned()
         .unwrap_or_default();
 
     if parent_ids.is_empty() {
-        result.insert(feature_id.to_string());
+        result.insert(capability_id.to_string());
     } else {
         for parent_id in parent_ids {
             let parent_roots =
-                resolve_feature_roots(&parent_id, feature_parent_map, memo, visiting);
+                resolve_capability_roots(&parent_id, capability_parent_map, memo, visiting);
             for root in parent_roots {
                 result.insert(root);
             }
         }
     }
 
-    visiting.remove(feature_id);
-    memo.insert(feature_id.to_string(), result.clone());
+    visiting.remove(capability_id);
+    memo.insert(capability_id.to_string(), result.clone());
     result
 }
 
-fn resolve_requirement_feature_roots(
+fn resolve_requirement_capability_roots(
     requirement_id: &str,
     requirement_parent_map: &HashMap<String, Vec<String>>,
     requirement_specify_map: &HashMap<String, Vec<String>>,
-    feature_parent_map: &HashMap<String, Vec<String>>,
-    feature_memo: &mut HashMap<String, BTreeSet<String>>,
+    capability_parent_map: &HashMap<String, Vec<String>>,
+    capability_memo: &mut HashMap<String, BTreeSet<String>>,
     requirement_memo: &mut HashMap<String, BTreeSet<String>>,
     visiting: &mut HashSet<String>,
 ) -> BTreeSet<String> {
@@ -303,18 +303,18 @@ fn resolve_requirement_feature_roots(
 
     let mut result = BTreeSet::new();
 
-    for feature_id in requirement_specify_map
+    for capability_id in requirement_specify_map
         .get(requirement_id)
         .cloned()
         .unwrap_or_default()
     {
-        let feature_roots = resolve_feature_roots(
-            &feature_id,
-            feature_parent_map,
-            feature_memo,
+        let capability_roots = resolve_capability_roots(
+            &capability_id,
+            capability_parent_map,
+            capability_memo,
             &mut HashSet::new(),
         );
-        for root in feature_roots {
+        for root in capability_roots {
             result.insert(root);
         }
     }
@@ -324,12 +324,12 @@ fn resolve_requirement_feature_roots(
         .cloned()
         .unwrap_or_default()
     {
-        let parent_roots = resolve_requirement_feature_roots(
+        let parent_roots = resolve_requirement_capability_roots(
             &parent_requirement_id,
             requirement_parent_map,
             requirement_specify_map,
-            feature_parent_map,
-            feature_memo,
+            capability_parent_map,
+            capability_memo,
             requirement_memo,
             visiting,
         );
@@ -364,20 +364,20 @@ fn collect_requirement_descendants(
     result
 }
 
-fn collect_feature_subtree_requirements(
-    feature_id: &str,
-    feature_child_map: &HashMap<String, Vec<String>>,
-    feature_to_requirements_map: &HashMap<String, Vec<String>>,
+fn collect_capability_subtree_requirements(
+    capability_id: &str,
+    capability_child_map: &HashMap<String, Vec<String>>,
+    capability_to_requirements_map: &HashMap<String, Vec<String>>,
     requirement_child_map: &HashMap<String, Vec<String>>,
 ) -> BTreeSet<String> {
-    let mut feature_ids = BTreeSet::new();
-    let mut stack = vec![feature_id.to_string()];
+    let mut capability_ids = BTreeSet::new();
+    let mut stack = vec![capability_id.to_string()];
 
     while let Some(current) = stack.pop() {
-        if !feature_ids.insert(current.clone()) {
+        if !capability_ids.insert(current.clone()) {
             continue;
         }
-        if let Some(children) = feature_child_map.get(&current) {
+        if let Some(children) = capability_child_map.get(&current) {
             for child in children {
                 stack.push(child.clone());
             }
@@ -385,9 +385,9 @@ fn collect_feature_subtree_requirements(
     }
 
     let mut requirements = BTreeSet::new();
-    for current_feature_id in feature_ids {
-        for requirement_id in feature_to_requirements_map
-            .get(&current_feature_id)
+    for current_capability_id in capability_ids {
+        for requirement_id in capability_to_requirements_map
+            .get(&current_capability_id)
             .cloned()
             .unwrap_or_default()
         {
@@ -406,10 +406,10 @@ pub fn generate_submodels_report(
     registry: &GraphRegistry,
     from_name: Option<&str>,
 ) -> Result<SubmodelsReport, ReqvireError> {
-    let feature_ids: Vec<String> = registry
+    let capability_ids: Vec<String> = registry
         .get_all_elements()
         .into_iter()
-        .filter(|e| is_feature_element(&e.element_type))
+        .filter(|e| is_capability_element(&e.element_type))
         .map(|e| e.identifier.clone())
         .collect();
     let requirement_ids: Vec<String> = registry
@@ -421,23 +421,23 @@ pub fn generate_submodels_report(
 
     let requirement_set: HashSet<String> = requirement_ids.iter().cloned().collect();
 
-    let mut feature_parent_map: HashMap<String, Vec<String>> = HashMap::new();
-    for feature_id in &feature_ids {
-        feature_parent_map.insert(
-            feature_id.clone(),
+    let mut capability_parent_map: HashMap<String, Vec<String>> = HashMap::new();
+    for capability_id in &capability_ids {
+        capability_parent_map.insert(
+            capability_id.clone(),
             parent_ids_by_relation_and_type(
                 registry,
-                feature_id,
+                capability_id,
                 "derivedFrom",
-                is_feature_element,
+                is_capability_element,
             ),
         );
     }
-    let feature_child_map = build_child_map(&feature_parent_map);
+    let capability_child_map = build_child_map(&capability_parent_map);
 
     let mut requirement_parent_map: HashMap<String, Vec<String>> = HashMap::new();
     let mut requirement_specify_map: HashMap<String, Vec<String>> = HashMap::new();
-    let mut feature_to_requirements_map: HashMap<String, Vec<String>> = HashMap::new();
+    let mut capability_to_requirements_map: HashMap<String, Vec<String>> = HashMap::new();
 
     for requirement_id in &requirement_ids {
         requirement_parent_map.insert(
@@ -450,37 +450,37 @@ pub fn generate_submodels_report(
             ),
         );
 
-        let specified_features = parent_ids_by_relation_and_type(
+        let specified_capabilities = parent_ids_by_relation_and_type(
             registry,
             requirement_id,
             "specify",
-            is_feature_element,
+            is_capability_element,
         );
-        for feature_id in &specified_features {
-            feature_to_requirements_map
-                .entry(feature_id.clone())
+        for capability_id in &specified_capabilities {
+            capability_to_requirements_map
+                .entry(capability_id.clone())
                 .or_default()
                 .push(requirement_id.clone());
         }
-        requirement_specify_map.insert(requirement_id.clone(), specified_features);
+        requirement_specify_map.insert(requirement_id.clone(), specified_capabilities);
     }
 
-    for requirements in feature_to_requirements_map.values_mut() {
+    for requirements in capability_to_requirements_map.values_mut() {
         requirements.sort();
     }
     let requirement_child_map = build_child_map(&requirement_parent_map);
 
-    let mut feature_memo: HashMap<String, BTreeSet<String>> = HashMap::new();
-    let mut root_features = BTreeSet::new();
-    for feature_id in &feature_ids {
-        let roots = resolve_feature_roots(
-            feature_id,
-            &feature_parent_map,
-            &mut feature_memo,
+    let mut capability_memo: HashMap<String, BTreeSet<String>> = HashMap::new();
+    let mut root_capabilities = BTreeSet::new();
+    for capability_id in &capability_ids {
+        let roots = resolve_capability_roots(
+            capability_id,
+            &capability_parent_map,
+            &mut capability_memo,
             &mut HashSet::new(),
         );
         for root in roots {
-            root_features.insert(root);
+            root_capabilities.insert(root);
         }
     }
 
@@ -488,17 +488,17 @@ pub fn generate_submodels_report(
     let mut root_assignment: HashMap<String, String> = HashMap::new();
     let mut root_counts: BTreeMap<String, usize> = BTreeMap::new();
 
-    for root_id in &root_features {
+    for root_id in &root_capabilities {
         root_counts.insert(root_id.clone(), 0);
     }
 
     for requirement_id in &requirement_ids {
-        let roots = resolve_requirement_feature_roots(
+        let roots = resolve_requirement_capability_roots(
             requirement_id,
             &requirement_parent_map,
             &requirement_specify_map,
-            &feature_parent_map,
-            &mut feature_memo,
+            &capability_parent_map,
+            &mut capability_memo,
             &mut requirement_memo,
             &mut HashSet::new(),
         );
@@ -612,11 +612,11 @@ pub fn generate_submodels_report(
             .get_element(&from_id)
             .ok_or_else(|| ReqvireError::ElementNotFound(from_id.clone()))?;
 
-        if matches!(from_element.element_type, ElementType::Feature) {
-            let scoped_requirements = collect_feature_subtree_requirements(
+        if matches!(from_element.element_type, ElementType::Capability) {
+            let scoped_requirements = collect_capability_subtree_requirements(
                 &from_id,
-                &feature_child_map,
-                &feature_to_requirements_map,
+                &capability_child_map,
+                &capability_to_requirements_map,
                 &requirement_child_map,
             );
 
@@ -710,7 +710,7 @@ pub fn generate_submodels_report(
             };
         } else {
             return Err(ReqvireError::InvalidOperation(format!(
-                "Submodel scope source '{}' must be a feature or requirement",
+                "Submodel scope source '{}' must be a capability or requirement",
                 from_name
             )));
         }

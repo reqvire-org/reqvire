@@ -908,7 +908,7 @@ mod tests {
         // Test cases for files that should NOT be ignored (will be processed)
         let not_ignored_cases = vec![
             // Requirements files in specifications root
-            "requirements/Features.md",
+            "requirements/Capabilities.md",
             "requirements/SystemRequirements.md",
             "requirements/MissionRequirements.md",
             // Requirements files in system requirements folder
@@ -1005,7 +1005,7 @@ mod tests {
             // Standard requirement files - should never be excluded
             ("requirements/Requirements.md", false),
             ("requirements/SystemRequirements.md", false),
-            ("requirements/Features.md", false),
+            ("requirements/Capabilities.md", false),
             ("requirements/subfolder/Requirements.md", false),
             ("external_repo/specs/Requirements.md", false),
         ];

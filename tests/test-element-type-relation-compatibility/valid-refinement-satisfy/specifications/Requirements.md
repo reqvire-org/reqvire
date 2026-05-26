@@ -1,22 +1,22 @@
 # Elements
 
 
-### Test Feature Test Element Type Relation Compatibility Valid Refinement Satisfy
+### Test Capability Test Element Type Relation Compatibility Valid Refinement Satisfy
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Target Feature
+### Target Capability
 
-A feature that refinements can refine.
+A capability that refinements can refine.
 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-refinement-satisfy)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-valid-refinement-satisfy)
   * refinedBy: [Specification with Satisfy](#specification-with-satisfy)
 
 ---
@@ -29,7 +29,7 @@ A system requirement that refinements can refine.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Target Feature](#target-feature)
+  * derivedFrom: [Target Capability](#target-capability)
   * refinedBy: [Constraint with Satisfy](#constraint-with-satisfy)
   * refinedBy: [Behavior with Satisfy](#behavior-with-satisfy)
 

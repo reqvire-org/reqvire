@@ -16,7 +16,7 @@ set -uo pipefail
 # - Element nodes with proper styling based on type
 # - Clickable links to element locations
 # - JSON output provides valid structured data with correct schema
-# - HTML export includes containment view page with interactive features
+# - HTML export includes containment view page with interactive capabilities
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 

@@ -1,11 +1,11 @@
 # Elements
 
-### Root Feature
+### Root Capability
 
-This is the feature root.
+This is the capability root.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Root Requirement
@@ -16,7 +16,7 @@ This is the root requirement.
   * type: requirement
 
 #### Relations
-  * specify: [Root Feature](#root-feature)
+  * specify: [Root Capability](#root-capability)
 ---
 
 ### Derived Requirement 1

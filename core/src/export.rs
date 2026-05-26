@@ -43,7 +43,7 @@ The containment view shows the physical organization of the model—how requirem
 
 const PAGE_DESCRIPTION_MODEL: &str = r#"# Model
 
-The model view displays the logical structure starting from ontology roots and feature roots. Ontology roots show reusable vocabulary context, and each feature shows its complete relation tree: specified requirements, derived child requirements, refinements, verifications, and implementations. This follows MBSE principles where product capabilities own requirement obligations and trace down to verifiable, implementable specifications."#;
+The model view displays the logical structure starting from ontology roots and capability roots. Ontology roots show reusable vocabulary context, and each capability shows its complete relation tree: specified requirements, derived child requirements, refinements, verifications, and implementations. This follows MBSE principles where product capabilities own requirement obligations and trace down to verifiable, implementable specifications."#;
 
 // NOTE: Whole model generation is currently disabled but the functionality is preserved
 // for potential future use. The generate_model_diagram function in diagrams.rs can still
@@ -63,7 +63,7 @@ Coverage analysis focuses on **leaf requirements**—the lowest-level requiremen
 
 const PAGE_DESCRIPTION_TRACEFLOW: &str = r#"# TraceFlow
 
-The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from feature-level product capabilities through system requirements to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.
+The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from capability-level product capabilities through system requirements to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.
 
 **Instructions:** Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control."#;
 
@@ -473,11 +473,11 @@ pub fn generate_artifacts_in_temp(
     info!("Generating diagrams...");
     crate::diagrams::process_diagrams(&temp_model_manager.graph_registry, diagrams_with_blobs)?;
 
-    // Generate model-centric view (feature roots with nested relations)
+    // Generate model-centric view (capability roots with nested relations)
     info!("Generating model.md...");
     let model_report = crate::report_model::generate_model_report(
         &temp_model_manager.graph_registry,
-        None,  // No filtering - use feature roots
+        None,  // No filtering - use capability roots
         false, // Not reverse - forward traversal
         None,  // No type filter
         false, // Markdown output

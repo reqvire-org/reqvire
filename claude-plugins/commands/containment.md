@@ -88,7 +88,7 @@ Use containment analysis when:
 
 1. **Are files too large?**
    - Files with >20 elements are hard to navigate
-   - Consider splitting by feature, subsystem, or level
+   - Consider splitting by capability, subsystem, or level
 
 2. **Are files too small?**
    - Files with 1-2 elements may indicate over-fragmentation
@@ -134,8 +134,8 @@ Provide clear, actionable recommendations:
 
 **Files to Split:**
 - `requirements/LargeFile.md` (45 elements) → Consider splitting into:
-  - `requirements/Feature1.md` (requirements for Feature 1)
-  - `requirements/Feature2.md` (requirements for Feature 2)
+  - `requirements/Capability1.md` (requirements for Capability 1)
+  - `requirements/Capability2.md` (requirements for Capability 2)
 
 **Files to Consolidate:**
 - `temp/A.md` (2 elements) + `temp/B.md` (3 elements) → Use:

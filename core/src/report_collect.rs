@@ -40,7 +40,7 @@ pub enum SourceType {
     AttachmentFile,
     /// Content from an attached refinement element
     AttachmentElement,
-    /// Content from ontology context reachable through feature attachments
+    /// Content from ontology context reachable through capability attachments
     OntologyContext,
 }
 
@@ -77,7 +77,7 @@ pub struct CollectReport {
     pub metadata: CollectMetadata,
 }
 
-/// Generate a collect report for a feature or requirement element
+/// Generate a collect report for a capability or requirement element
 pub fn generate_collect_report(
     registry: &GraphRegistry,
     element_name: &str,
@@ -107,12 +107,12 @@ pub fn generate_collect_report(
         ReqvireError::ElementError(format!("Element '{}' not found in registry", element_id))
     })?;
 
-    // Validate element type is a feature or requirement
+    // Validate element type is a capability or requirement
     match &element.element_type {
-        ElementType::Feature | ElementType::Requirement(_) => {}
+        ElementType::Capability | ElementType::Requirement(_) => {}
         _ => {
             return Err(ReqvireError::ElementError(format!(
-                "Element '{}' is not a feature or requirement type (found: {}). Only feature and requirement types are supported.",
+                "Element '{}' is not a capability or requirement type (found: {}). Only capability and requirement types are supported.",
                 element_name,
                 element.element_type.as_str()
             )));
@@ -192,8 +192,8 @@ pub fn generate_collect_report(
                 }
             }
 
-            let ontology_context = if elem.element_type.is_feature() {
-                registry.build_feature_ontology_context(&elem.identifier)
+            let ontology_context = if elem.element_type.is_capability() {
+                registry.build_capability_ontology_context(&elem.identifier)
             } else if elem.element_type.is_requirement() {
                 registry.build_requirement_ontology_context(&elem.identifier)
             } else {
@@ -244,27 +244,27 @@ pub fn generate_collect_report(
 
 /// Collect upstream context.
 ///
-/// Feature starts traverse feature parents only.
-/// Requirement starts traverse requirement parents, then cross to owning feature and feature parents.
+/// Capability starts traverse capability parents only.
+/// Requirement starts traverse requirement parents, then cross to owning capability and capability parents.
 fn collect_upstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let Some(start) = registry.get_element(start_id) else {
         return Vec::new();
     };
 
     match &start.element_type {
-        ElementType::Feature => {
-            collect_parent_chain_by_type(registry, start_id, ElementTypeKind::Feature)
+        ElementType::Capability => {
+            collect_parent_chain_by_type(registry, start_id, ElementTypeKind::Capability)
         }
         ElementType::Requirement(_) => {
             let mut chain =
                 collect_parent_chain_by_type(registry, start_id, ElementTypeKind::Requirement);
-            if let Some(owner_feature) = find_owning_feature(registry, start_id) {
-                let feature_chain = collect_parent_chain_by_type(
+            if let Some(owner_capability) = find_owning_capability(registry, start_id) {
+                let capability_chain = collect_parent_chain_by_type(
                     registry,
-                    &owner_feature,
-                    ElementTypeKind::Feature,
+                    &owner_capability,
+                    ElementTypeKind::Capability,
                 );
-                for id in feature_chain {
+                for id in capability_chain {
                     if !chain.contains(&id) {
                         chain.push(id);
                     }
@@ -278,7 +278,7 @@ fn collect_upstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Strin
 
 #[derive(Clone, Copy)]
 enum ElementTypeKind {
-    Feature,
+    Capability,
     Requirement,
 }
 
@@ -330,7 +330,7 @@ fn collect_parent_chain_by_type(
 
 /// Collect downstream context.
 ///
-/// Feature starts traverse child features and requirements that specify each feature.
+/// Capability starts traverse child capabilities and requirements that specify each capability.
 /// Requirement starts traverse requirement descendants only.
 fn collect_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let Some(start) = registry.get_element(start_id) else {
@@ -338,7 +338,7 @@ fn collect_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Str
     };
 
     match &start.element_type {
-        ElementType::Feature => collect_feature_downstream_chain(registry, start_id),
+        ElementType::Capability => collect_capability_downstream_chain(registry, start_id),
         ElementType::Requirement(_) => collect_requirement_downstream_chain(registry, start_id),
         _ => Vec::new(),
     }
@@ -390,7 +390,7 @@ fn collect_requirement_downstream_chain(registry: &GraphRegistry, start_id: &str
     chain
 }
 
-fn collect_feature_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+fn collect_capability_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let mut chain = Vec::new();
     let mut visited = HashSet::new();
     let mut current_level = vec![start_id.to_string()];
@@ -411,7 +411,7 @@ fn collect_feature_downstream_chain(registry: &GraphRegistry, start_id: &str) ->
         for elem_id in &sorted_level {
             if let Some(elem) = registry.get_element(elem_id) {
                 match &elem.element_type {
-                    ElementType::Feature => {
+                    ElementType::Capability => {
                         for rel in &elem.relations {
                             if matches!(rel.relation_type.name, "derive" | "specifiedBy") {
                                 if let relation::LinkType::Identifier(target_id) = &rel.target.link
@@ -456,14 +456,14 @@ fn element_matches_kind(registry: &GraphRegistry, element_id: &str, kind: Elemen
     registry
         .get_element(element_id)
         .is_some_and(|element| match kind {
-            ElementTypeKind::Feature => matches!(element.element_type, ElementType::Feature),
+            ElementTypeKind::Capability => matches!(element.element_type, ElementType::Capability),
             ElementTypeKind::Requirement => {
                 matches!(element.element_type, ElementType::Requirement(_))
             }
         })
 }
 
-fn find_owning_feature(registry: &GraphRegistry, requirement_id: &str) -> Option<String> {
+fn find_owning_capability(registry: &GraphRegistry, requirement_id: &str) -> Option<String> {
     let mut visited = HashSet::new();
     let mut current_level = vec![requirement_id.to_string()];
 
@@ -480,7 +480,7 @@ fn find_owning_feature(registry: &GraphRegistry, requirement_id: &str) -> Option
             for rel in &elem.relations {
                 if rel.relation_type.name == "specify" {
                     if let relation::LinkType::Identifier(target_id) = &rel.target.link {
-                        if element_matches_kind(registry, target_id, ElementTypeKind::Feature) {
+                        if element_matches_kind(registry, target_id, ElementTypeKind::Capability) {
                             return Some(target_id.clone());
                         }
                     }

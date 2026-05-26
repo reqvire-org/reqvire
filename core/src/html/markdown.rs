@@ -216,7 +216,7 @@ fn generate_d3_tree_html(json_data: &str) -> String {
     const colors = {{
         "folder": "#9E9E9E",
         "file": "#B8860B",
-        "feature": "#BBDEFB",
+        "capability": "#BBDEFB",
         "ontology": "#B08A00",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",
@@ -231,7 +231,7 @@ fn generate_d3_tree_html(json_data: &str) -> String {
     const icons = {{
         "folder": "📁",
         "file": "📄",
-        "feature": "👤",
+        "capability": "👤",
         "ontology": "◉",
         "system-requirement": "📐",
         "requirement": "📐",
@@ -555,7 +555,7 @@ fn generate_d3_sankey_html(json_data: &str) -> String {
 
     // Colors matching Reqvire theme
     const colors = {{
-        "feature": "#BBDEFB",
+        "capability": "#BBDEFB",
         "ontology": "#B08A00",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",
@@ -732,7 +732,7 @@ fn generate_d3_sunburst_html(json_data: &str) -> String {
         "folder": "#9E9E9E",
         "file": "#B8860B",
         "design-document": "#607D8B",
-        "feature": "#BBDEFB",
+        "capability": "#BBDEFB",
         "ontology": "#B08A00",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",
@@ -747,7 +747,7 @@ fn generate_d3_sunburst_html(json_data: &str) -> String {
     const icons = {{
         "folder": "📁",
         "file": "📄",
-        "feature": "👤",
+        "capability": "👤",
         "ontology": "◉",
         "system-requirement": "📐",
         "requirement": "📐",
@@ -1071,7 +1071,7 @@ fn generate_d3_icicle_html(json_data: &str) -> String {
         "folder": "#9E9E9E",
         "file": "#B8860B",
         "design-document": "#607D8B",
-        "feature": "#BBDEFB",
+        "capability": "#BBDEFB",
         "ontology": "#B08A00",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",

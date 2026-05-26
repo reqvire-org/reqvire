@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Element Type Relation Compatibility Invalid Refinement Attachment
+### Test Capability Test Element Type Relation Compatibility Invalid Refinement Attachment
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Constraint With Attachment
@@ -27,7 +27,7 @@ Owner requirement for Attachment Spec.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-invalid-refinement-attachment)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-invalid-refinement-attachment)
   * refinedBy: [Attachment Spec](#attachment-spec)
 ---
 

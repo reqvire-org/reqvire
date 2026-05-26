@@ -9,14 +9,14 @@ When requested the system shall provide human readable and machine readable Syst
 
 #### Relations
   * derive: [Interactive Mermaid Diagrams](DiagramGeneration.md#interactive-mermaid-diagrams)
-  * derive: [Collect Feature and Requirement Context](#collect-feature-and-requirement-context)
+  * derive: [Collect Capability and Requirement Context](#collect-capability-and-requirement-context)
   * derive: [JSON Element Size Estimate Exposure](#json-element-size-estimate-exposure)
   * derive: [Model Structure and Summaries](#model-structure-and-summaries)
   * derive: [Provide Validation Reports](#provide-validation-reports)
   * derive: [Requirement Implementation Coverage Report](#requirement-implementation-coverage-report)
   * derive: [Resources Report](#resources-report)
   * derive: [Verification Coverage Report](#verification-coverage-report)
-  * specify: [Provide Reports](../../Features/ReportsAndQuery.md#provide-reports)
+  * specify: [Provide Reports](../../Capabilities/ReportsAndQuery.md#provide-reports)
   * refinedBy: [Deterministic Output Specification](Specifications.md#deterministic-output-specification)
   * refinedBy: [JSON Output Structure](Specifications.md#json-output-structure)
   * refinedBy: [Markdown Report Style Specification](Specifications.md#markdown-report-style-specification)
@@ -46,15 +46,15 @@ The system shall expose element-level `size_estimate` records in JSON model evid
   * satisfiedBy: [report_model.rs](../../../core/src/report_model.rs)
 ---
 
-### Collect Feature and Requirement Context
+### Collect Capability and Requirement Context
 
-The system shall collect and consolidate context from a feature or requirement element, including directional feature and requirement traversal, inherited feature ontology context, refinedBy targets, attached requirement contract contents, and source citations in text or JSON format.
+The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, inherited capability ontology context, refinedBy targets, attached requirement contract contents, and source citations in text or JSON format.
 
 #### Details
 The system shall define:
 - Content collection rules for elements, refinedBy targets, and attachments
 - Output format specifications for text and JSON modes
-- Direction-based traversal over feature hierarchy, requirement hierarchy, and the `specify`/`specifiedBy` bridge where defined by the collect traversal specification
+- Direction-based traversal over capability hierarchy, requirement hierarchy, and the `specify`/`specifiedBy` bridge where defined by the collect traversal specification
 
 #### Metadata
   * type: requirement
@@ -68,7 +68,7 @@ The system shall define:
 
 ### Model Structure and Summaries
 
-When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections, ontology-root and feature-root starting contexts, and JSON output.
+When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections, ontology-root and capability-root starting contexts, and JSON output.
 
 #### Metadata
   * type: requirement
@@ -172,14 +172,14 @@ The system shall support filtering starting elements by type for model traversal
 
 ### Requirement Submodels Report
 
-The system shall provide a submodels report that identifies independent feature-root subgraphs and cross-submodel requirement couplings.
+The system shall provide a submodels report that identifies independent capability-root subgraphs and cross-submodel requirement couplings.
 
 #### Details
 The report shall support:
-- Full model view listing all discovered feature-rooted submodels and cross-submodel couplings
-- Filtered view scoped to one feature or requirement subtree by element name
-- Scope filtering follows transitive descendants via feature hierarchy, `specifiedBy`, and requirement hierarchy in downstream direction.
-- When filtered from a feature, the selected feature is reported as the scoped feature submodel and requirement counts include requirements in that feature subtree.
+- Full model view listing all discovered capability-rooted submodels and cross-submodel couplings
+- Filtered view scoped to one capability or requirement subtree by element name
+- Scope filtering follows transitive descendants via capability hierarchy, `specifiedBy`, and requirement hierarchy in downstream direction.
+- When filtered from a capability, the selected capability is reported as the scoped capability submodel and requirement counts include requirements in that capability subtree.
 - When filtered from a requirement, the selected requirement is a boundary and is not counted as a reported submodel entry; first-level child requirement branches are reported as scoped requirement submodels.
 - When a selected requirement subtree has no child submodels, the filtered report contains zero scoped submodels.
 - The report summary includes deterministic counts for total submodels, total requirements represented in scope, and total cross-submodel couplings; in scoped mode, counts are computed from the scoped submodels and couplings only.
@@ -207,7 +207,7 @@ The system shall collect ontology `#### Ontology` and semantic-contract `#### Sh
 #### Details
 The default collection shall expose authored ontology RDF content and semantic-contract SHACL RDF content without changing the Markdown model as the source of truth.
 
-When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, feature-to-ontology attachments, requirement-to-feature specification relations, requirement-to-semantic-contract refinement relations, ontology hierarchy relations, concept references, ontology term declarations, and semantic-contract shape references.
+When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, capability-to-ontology attachments, requirement-to-capability specification relations, requirement-to-semantic-contract refinement relations, ontology hierarchy relations, concept references, ontology term declarations, and semantic-contract shape references.
 
 The collection shall preserve source element identifiers, source file paths, section kind, and line numbers so CLI, HTML export, and downstream semantic tooling can cite the model source of each RDF block.
 
@@ -218,7 +218,7 @@ The collection shall preserve source element identifiers, source file paths, sec
   * [Semantic Contract Structure Specification](../Core/Specifications.md#semantic-contract-structure-specification)
 
 #### Relations
-  * specify: [Semantic Model Export](../../Features/ReportsAndQuery.md#semantic-model-export)
+  * specify: [Semantic Model Export](../../Capabilities/ReportsAndQuery.md#semantic-model-export)
   * refinedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
   * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
@@ -332,7 +332,7 @@ The system shall generate requirement implementation coverage reports that ident
 
 #### Details
 The implementation coverage report shall provide:
-- Total count of requirements in scope (`requirement` only; excludes direct feature rows)
+- Total count of requirements in scope (`requirement` only; excludes direct capability rows)
 - Count and percentage of implementation-covered requirements
 - Count and percentage of implementation-uncovered requirements
 - Coverage source classification for covered requirements:
@@ -399,7 +399,7 @@ The report helps track verification completeness and identify gaps in requiremen
 
 ### TraceFlow View Report Generation
 
-The system shall generate a TraceFlow view page showing the verification traceability flow using an interactive D3.js Sankey diagram visualization. The view displays how features are specified by requirements and how requirements flow to verifications.
+The system shall generate a TraceFlow view page showing the verification traceability flow using an interactive D3.js Sankey diagram visualization. The view displays how capabilities are specified by requirements, how requirements flow to verifications, and how capabilities may be directly verified.
 
 #### Metadata
   * type: requirement
@@ -427,6 +427,6 @@ When tracing structural changes, the system shall analyze the System model and d
 
 #### Relations
   * derive: [Change Impact Detection](../Processing/ChangeImpact.md#change-impact-detection)
-  * specify: [Trace Changes in System Model](../../Features/RelationsAndImpact.md#trace-changes-in-system-model)
+  * specify: [Trace Changes in System Model](../../Capabilities/RelationsAndImpact.md#trace-changes-in-system-model)
   * verifiedBy: [Structural Change Reports Verification](../Processing/Verifications/ChangeImpactVerifications.md#structural-change-reports-verification)
 ---

@@ -698,12 +698,12 @@ impl GraphRegistry {
                 && !self.has_requirement_parent(element)
             {
                 errors.push(ReqvireError::MissingParentRelation(
-                    format!("File {}: Element '{}' has no requirement parent relation (needs derivedFrom to a requirement or specify to a feature)", element_file, element.name),
+                    format!("File {}: Element '{}' has no requirement parent relation (needs derivedFrom to a requirement or specify to a capability)", element_file, element.name),
                 ));
             }
         }
 
-        // Enforce single feature ownership for feature/requirement graph elements.
+        // Enforce single capability ownership for capability/requirement graph elements.
         errors.extend(self.validate_single_root_hierarchy_ownership()?);
 
         if errors.is_empty() {
@@ -730,7 +730,7 @@ impl GraphRegistry {
             let element = &element_node.element;
             let is_hierarchy_element = matches!(
                 element.element_type,
-                ElementType::Feature | ElementType::Requirement(_)
+                ElementType::Capability | ElementType::Requirement(_)
             );
             if !is_hierarchy_element {
                 continue;
@@ -742,18 +742,18 @@ impl GraphRegistry {
                 continue;
             }
 
-            let roots = self.resolve_owning_features(element_id, &mut memo, &mut visiting);
+            let roots = self.resolve_owning_capabilities(element_id, &mut memo, &mut visiting);
             if roots.len() != 1 {
                 if roots.is_empty() {
                     errors.push(ReqvireError::MixedHierarchicalRelations(format!(
-                        "Element '{}' ({}) must resolve to exactly one owning feature via feature/requirement relations, but resolved to 0 features",
+                        "Element '{}' ({}) must resolve to exactly one owning capability via capability/requirement relations, but resolved to 0 capabilities",
                         element.name, element.identifier
                     )));
                 } else {
                     let roots_count = roots.len();
                     let roots_list = roots.into_iter().collect::<Vec<_>>().join(", ");
                     errors.push(ReqvireError::MixedHierarchicalRelations(format!(
-                        "Element '{}' ({}) must resolve to exactly one owning feature via feature/requirement relations, but resolved to {} features: {}",
+                        "Element '{}' ({}) must resolve to exactly one owning capability via capability/requirement relations, but resolved to {} capabilities: {}",
                         element.name,
                         element.identifier,
                         roots_count,
@@ -781,7 +781,7 @@ impl GraphRegistry {
         })
     }
 
-    fn resolve_owning_features(
+    fn resolve_owning_capabilities(
         &self,
         element_id: &str,
         memo: &mut HashMap<String, BTreeSet<String>>,
@@ -803,13 +803,13 @@ impl GraphRegistry {
             return result;
         };
 
-        let parent_ids = self.get_feature_ownership_parent_ids(element);
-        if matches!(element.element_type, ElementType::Feature) && parent_ids.is_empty() {
+        let parent_ids = self.get_capability_ownership_parent_ids(element);
+        if matches!(element.element_type, ElementType::Capability) && parent_ids.is_empty() {
             result.insert(element.identifier.clone());
         }
 
         for parent_id in parent_ids {
-            let parent_roots = self.resolve_owning_features(&parent_id, memo, visiting);
+            let parent_roots = self.resolve_owning_capabilities(&parent_id, memo, visiting);
             for root in parent_roots {
                 result.insert(root);
             }
@@ -820,10 +820,10 @@ impl GraphRegistry {
         result
     }
 
-    fn resolve_single_owning_feature(&self, element_id: &str) -> Option<String> {
+    fn resolve_single_owning_capability(&self, element_id: &str) -> Option<String> {
         let mut memo: HashMap<String, BTreeSet<String>> = HashMap::new();
         let mut visiting: HashSet<String> = HashSet::new();
-        let roots = self.resolve_owning_features(element_id, &mut memo, &mut visiting);
+        let roots = self.resolve_owning_capabilities(element_id, &mut memo, &mut visiting);
         if roots.len() == 1 {
             roots.into_iter().next()
         } else {
@@ -847,7 +847,7 @@ impl GraphRegistry {
         sorted_ids.sort();
 
         for element_id in sorted_ids {
-            let Some(attacher_root_id) = self.resolve_single_owning_feature(element_id) else {
+            let Some(attacher_root_id) = self.resolve_single_owning_capability(element_id) else {
                 continue;
             };
 
@@ -872,7 +872,7 @@ impl GraphRegistry {
 
                 for defining_req_id in self.get_defining_requirements(refinement_id) {
                     let Some(defining_root_id) =
-                        self.resolve_single_owning_feature(&defining_req_id)
+                        self.resolve_single_owning_capability(&defining_req_id)
                     else {
                         continue;
                     };
@@ -894,11 +894,11 @@ impl GraphRegistry {
         element_name: &str,
         file_path: Option<&str>,
     ) -> Option<String> {
-        let source_root_id = self.resolve_single_owning_feature(element_id)?;
+        let source_root_id = self.resolve_single_owning_capability(element_id)?;
 
         let mut cross_subgraph_target = false;
         for defining_req_id in self.get_defining_requirements(attachment_identifier) {
-            let Some(defining_root_id) = self.resolve_single_owning_feature(&defining_req_id)
+            let Some(defining_root_id) = self.resolve_single_owning_capability(&defining_req_id)
             else {
                 continue;
             };
@@ -916,7 +916,7 @@ impl GraphRegistry {
         let conflicting_root_id = self
             .get_defining_requirements(attachment_identifier)
             .into_iter()
-            .filter_map(|defining_req_id| self.resolve_single_owning_feature(&defining_req_id))
+            .filter_map(|defining_req_id| self.resolve_single_owning_capability(&defining_req_id))
             .find(|target_root_id| {
                 target_root_id != &source_root_id
                     && self.has_attachment_flow_between_roots(target_root_id, &source_root_id)
@@ -943,14 +943,14 @@ impl GraphRegistry {
         Some(msg)
     }
 
-    fn get_feature_ownership_parent_ids(&self, element: &Element) -> Vec<String> {
+    fn get_capability_ownership_parent_ids(&self, element: &Element) -> Vec<String> {
         let mut parent_ids: BTreeSet<String> = BTreeSet::new();
 
         for relation in &element.relations {
             let expected_parent_type = match (&element.element_type, relation.relation_type.name) {
-                (ElementType::Feature, "derivedFrom") => "feature",
+                (ElementType::Capability, "derivedFrom") => "capability",
                 (ElementType::Requirement(_), "derivedFrom") => "requirement",
-                (ElementType::Requirement(_), "specify") => "feature",
+                (ElementType::Requirement(_), "specify") => "capability",
                 _ => continue,
             };
 
@@ -960,7 +960,7 @@ impl GraphRegistry {
                 {
                     if let Some(parent) = self.get_element(&parent_identifier) {
                         let parent_matches = match expected_parent_type {
-                            "feature" => matches!(parent.element_type, ElementType::Feature),
+                            "capability" => matches!(parent.element_type, ElementType::Capability),
                             "requirement" => {
                                 matches!(parent.element_type, ElementType::Requirement(_))
                             }
@@ -1048,7 +1048,7 @@ impl GraphRegistry {
                             }
 
                             let target_is_ontology = target_node.element.element_type.is_ontology();
-                            let attachment_type_valid = if element.element_type.is_feature() {
+                            let attachment_type_valid = if element.element_type.is_capability() {
                                 target_is_ontology
                             } else if element.element_type.is_requirement() {
                                 target_node.element.element_type.is_requirement_refinement()
@@ -1059,7 +1059,7 @@ impl GraphRegistry {
                             if !attachment_type_valid {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Feature attachments may target ontology only; requirement attachments may target requirement-owned semantic-contract, constraint, behavior, specification, state, or input-output.",
+                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned semantic-contract, constraint, behavior, specification, state, or input-output.",
                                         element.file_path,
                                         element.name,
                                         element.element_type.as_str(),
@@ -1076,7 +1076,7 @@ impl GraphRegistry {
                             {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "'{}' has no refine relation. Refinements must refine a feature or requirement before they can be attached. (file: {}, element: {})",
+                                        "'{}' has no refine relation. Refinements must refine a capability or requirement before they can be attached. (file: {}, element: {})",
                                         target_node.element.name,
                                         element.file_path,
                                         element.name
@@ -1214,20 +1214,20 @@ impl GraphRegistry {
 
     /// Get the defining owners for a refinement element.
     ///
-    /// Kept for existing callers; the returned IDs may now be feature or requirement
+    /// Kept for existing callers; the returned IDs may now be capability or requirement
     /// owners depending on the refinement subtype.
     pub fn get_defining_requirements(&self, refinement_id: &str) -> Vec<String> {
         self.get_refinement_owners(refinement_id)
     }
 
-    pub fn get_feature_refinement_owner(&self, refinement_id: &str) -> Option<String> {
+    pub fn get_capability_refinement_owner(&self, refinement_id: &str) -> Option<String> {
         let owners = self.get_refinement_owners(refinement_id);
         if owners.len() != 1 {
             return None;
         }
         let owner_id = owners[0].clone();
         let owner = self.nodes.get(&owner_id)?;
-        if owner.element.element_type.is_feature() {
+        if owner.element.element_type.is_capability() {
             Some(owner_id)
         } else {
             None
@@ -1248,13 +1248,13 @@ impl GraphRegistry {
         }
     }
 
-    pub fn get_feature_attached_ontologies(&self, feature_id: &str) -> Vec<String> {
-        let Some(feature_node) = self.nodes.get(feature_id) else {
+    pub fn get_capability_attached_ontologies(&self, capability_id: &str) -> Vec<String> {
+        let Some(capability_node) = self.nodes.get(capability_id) else {
             return Vec::new();
         };
 
         let mut ontologies = Vec::new();
-        for attachment in &feature_node.element.attachments {
+        for attachment in &capability_node.element.attachments {
             let crate::element::AttachmentTarget::ElementIdentifier(target_id) = &attachment.target
             else {
                 continue;
@@ -1272,10 +1272,10 @@ impl GraphRegistry {
         ontologies
     }
 
-    pub fn get_feature_ancestor_ids(&self, feature_id: &str) -> Vec<String> {
+    pub fn get_capability_ancestor_ids(&self, capability_id: &str) -> Vec<String> {
         let mut ancestors = Vec::new();
         let mut visited = HashSet::new();
-        let mut stack = vec![feature_id.to_string()];
+        let mut stack = vec![capability_id.to_string()];
 
         while let Some(current_id) = stack.pop() {
             let Some(node) = self.nodes.get(&current_id) else {
@@ -1293,7 +1293,7 @@ impl GraphRegistry {
                 if self
                     .nodes
                     .get(parent_id)
-                    .is_some_and(|parent| parent.element.element_type.is_feature())
+                    .is_some_and(|parent| parent.element.element_type.is_capability())
                 {
                     parents.push(parent_id.clone());
                 }
@@ -1310,13 +1310,13 @@ impl GraphRegistry {
         ancestors
     }
 
-    pub fn build_feature_ontology_context(&self, feature_id: &str) -> Vec<String> {
+    pub fn build_capability_ontology_context(&self, capability_id: &str) -> Vec<String> {
         let mut context = BTreeSet::new();
-        let mut feature_ids = self.get_feature_ancestor_ids(feature_id);
-        feature_ids.push(feature_id.to_string());
+        let mut capability_ids = self.get_capability_ancestor_ids(capability_id);
+        capability_ids.push(capability_id.to_string());
 
-        for current_feature_id in feature_ids {
-            for ontology_id in self.get_feature_attached_ontologies(&current_feature_id) {
+        for current_capability_id in capability_ids {
+            for ontology_id in self.get_capability_attached_ontologies(&current_capability_id) {
                 context.insert(ontology_id);
             }
         }
@@ -1365,8 +1365,8 @@ impl GraphRegistry {
     pub fn build_requirement_ontology_context(&self, requirement_id: &str) -> Vec<String> {
         let mut context = BTreeSet::new();
 
-        if let Some(feature_id) = self.resolve_single_owning_feature(requirement_id) {
-            for ontology_id in self.build_feature_ontology_context(&feature_id) {
+        if let Some(capability_id) = self.resolve_single_owning_capability(requirement_id) {
+            for ontology_id in self.build_capability_ontology_context(&capability_id) {
                 context.insert(ontology_id);
             }
         }
@@ -1748,7 +1748,7 @@ impl GraphRegistry {
 
             if !element.attachments.is_empty() {
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "File {}: Ontology element '{}' cannot have attachments. Features attach ontology elements as semantic context consumers.",
+                    "File {}: Ontology element '{}' cannot have attachments. Capabilities attach ontology elements as semantic context consumers.",
                     element.file_path, element.name
                 )));
             }
@@ -1844,7 +1844,7 @@ impl GraphRegistry {
 
             if !element.element_type.is_governance_bearing() {
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "File {}: Element '{}' (type: {}) declares requirement governance metadata keys {:?}. Governance metadata is only valid on feature and requirement elements.",
+                    "File {}: Element '{}' (type: {}) declares requirement governance metadata keys {:?}. Governance metadata is only valid on capability and requirement elements.",
                     element.file_path,
                     element.name,
                     element.element_type.as_str(),
@@ -1979,7 +1979,7 @@ impl GraphRegistry {
                     .cloned()
                     .unwrap_or_else(|| "unknown semantic contract".to_string());
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable from owning requirement '{}' through feature-attached ontology context. Attach the declaring ontology to the owning or consuming feature, or move the declaration into reachable feature ontology context.",
+                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable from owning requirement '{}' through capability-attached ontology context. Attach the declaring ontology to the owning or consuming capability, or move the declaration into reachable capability ontology context.",
                         reference.element_identifier,
                         reference.kind,
                         reference.iri,
@@ -2125,7 +2125,7 @@ impl GraphRegistry {
                     .cloned()
                     .unwrap_or_else(|| "unknown ontology".to_string());
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "Concept reference outside context: element '{}' label '{}' references <{}>, declared by ontology '{}', but that ontology is not reachable from the element's feature-attached ontology context. Attach the declaring ontology to the owning or consuming feature, or move the reference to an element with reachable feature ontology context.",
+                    "Concept reference outside context: element '{}' label '{}' references <{}>, declared by ontology '{}', but that ontology is not reachable from the element's capability-attached ontology context. Attach the declaring ontology to the owning or consuming capability, or move the reference to an element with reachable capability ontology context.",
                     element.identifier,
                     reference.label,
                     resolved_iri,
@@ -2143,8 +2143,8 @@ impl GraphRegistry {
         };
         let element = &node.element;
 
-        if element.element_type.is_feature() {
-            return self.build_feature_ontology_context(element_id);
+        if element.element_type.is_capability() {
+            return self.build_capability_ontology_context(element_id);
         }
         if element.element_type.is_requirement() {
             return self.build_requirement_ontology_context(element_id);
@@ -2154,8 +2154,8 @@ impl GraphRegistry {
             if owners.len() == 1 {
                 let owner_id = &owners[0];
                 if let Some(owner) = self.nodes.get(owner_id) {
-                    if owner.element.element_type.is_feature() {
-                        return self.build_feature_ontology_context(owner_id);
+                    if owner.element.element_type.is_capability() {
+                        return self.build_capability_ontology_context(owner_id);
                     }
                     if owner.element.element_type.is_requirement() {
                         return self.build_requirement_ontology_context(owner_id);
@@ -2227,7 +2227,7 @@ impl GraphRegistry {
         }
     }
 
-    /// Validates that each refinement is owned by at most one feature or requirement via refinedBy.
+    /// Validates that each refinement is owned by at most one capability or requirement via refinedBy.
     /// A refinement element or file can only appear as a target of refinedBy from one owner.
     fn validate_refinement_ownership_uniqueness(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating refinement ownership uniqueness...");
@@ -2258,7 +2258,7 @@ impl GraphRegistry {
                         };
                         errors.push(ReqvireError::InvalidMarkdownStructure(
                             format!(
-                                "Refinement '{}' is owned by multiple elements: '{}' and '{}'. Each refinement can only be owned by one feature or requirement via refinedBy.",
+                                "Refinement '{}' is owned by multiple elements: '{}' and '{}'. Each refinement can only be owned by one capability or requirement via refinedBy.",
                                 target_name,
                                 first,
                                 second
@@ -2805,8 +2805,8 @@ impl GraphRegistry {
         parents.into_iter().collect()
     }
 
-    /// Find all features without hierarchical parent relations (feature roots)
-    pub fn find_root_features(&self) -> Vec<String> {
+    /// Find all capabilities without hierarchical parent relations (capability roots)
+    pub fn find_root_capabilities(&self) -> Vec<String> {
         let hierarchical_relations = relation::get_hierarchical_relation_types();
 
         let mut roots: Vec<String> = self
@@ -2814,7 +2814,7 @@ impl GraphRegistry {
             .values()
             .map(|node| &node.element)
             .filter(|element| {
-                if !matches!(element.element_type, ElementType::Feature) {
+                if !matches!(element.element_type, ElementType::Capability) {
                     return false;
                 }
 
@@ -5236,7 +5236,7 @@ impl GraphRegistry {
                         .unwrap_or(att_id);
                     return Err(ReqvireError::InvalidAttachmentTarget(
                         format!(
-                            "'{}' has no refine relation. Refinements must refine a feature or requirement before they can be attached.",
+                            "'{}' has no refine relation. Refinements must refine a capability or requirement before they can be attached.",
                             att_name
                         ),
                     ));

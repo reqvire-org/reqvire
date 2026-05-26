@@ -8,7 +8,7 @@ When validating attachments, the system is expected to enforce attachment scope 
 Attachment scope validation is expected to enforce:
 - Hierarchical independence from the refinement's defining hierarchy
 - Upstream propagation within a hierarchy branch
-- One-direction attachment flow between feature-root subgraphs
+- One-direction attachment flow between capability-root subgraphs
 
 #### Metadata
   * type: specification
@@ -20,15 +20,15 @@ Attachment scope validation is expected to enforce:
 Attachment targets support model element identifier references with family-specific compatibility rules.
 
 **Identifier Targets:**
-- Feature attachments must point to `ontology` elements only
+- Capability attachments must point to `ontology` elements only
 - Requirement attachments must point to requirement-owned refinement element types only (`semantic-contract`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
-- Requirement attachment to `ontology` is invalid; requirements inherit ontology context from their owning feature path
+- Requirement attachment to `ontology` is invalid; requirements inherit ontology context from their owning capability path
 - Normalized like relation targets (resolved to full identifier path)
 - Validation is expected to reject identifiers pointing to non-attachable element types
 - Validation is expected to reject unresolved identifiers
 - Provides clear error message indicating the expected element type
 
-This validation ensures that ontology context is owned by features and that requirement attachments reference reusable requirement-owned contracts.
+This validation ensures that ontology context is owned by capabilities and that requirement attachments reference reusable requirement-owned contracts.
 
 #### Metadata
   * type: specification
@@ -41,7 +41,7 @@ When an element does not have a `#### Metadata` subsection with a `type` propert
 
 This behavior is location-independent: all elements default to type `requirement` regardless of their folder location within the Git repository.
 
-To use other element types, users must explicitly specify the type in the element's Metadata subsection, for example: `type: feature`.
+To use other element types, users must explicitly specify the type in the element's Metadata subsection, for example: `type: capability`.
 
 Supported element types, type categories, refinement ownership semantics, and evidence-backed verification semantics are defined by the Reqvire ontology and semantic-contract model plus the Supported Element Types Specification.
 
@@ -104,26 +104,26 @@ Excluded-file relation validation behavior:
   * refine: [Excluded File Relation Validation](Validation.md#excluded-file-relation-validation)
 ---
 
-### Feature Model Structure Specification
+### Capability Model Structure Specification
 
 #### Details
-Feature and requirement meanings are defined by the Reqvire core element, feature, requirement, relation, governance, and verification ontologies.
+Capability and requirement meanings are defined by the Reqvire core element, capability, requirement, relation, governance, and verification ontologies.
 
 The validator shall enforce the structural rules derived from those contracts:
-- Feature hierarchy may use `derive`/`derivedFrom` only between feature elements.
+- Capability hierarchy may use `derive`/`derivedFrom` only between capability elements.
 - Requirement hierarchy may use `derive`/`derivedFrom` only between requirement elements.
-- Requirements specify features through `specify`; the inverse relation is `specifiedBy`.
-- A top-level requirement must have `specify` pointing to exactly one feature.
-- A child requirement may omit `specify` when it has `derivedFrom` pointing to another requirement; the owning feature is inherited through the requirement hierarchy.
-- If a requirement has both `derivedFrom` and `specify`, the explicit `specify` feature must match the inherited feature.
-- Features are not directly satisfied or verified; implementation and verification status roll up from requirements that specify them.
-- Governance metadata is valid on feature and requirement elements only and inherits through the nearest parent in the same family or through the owning feature when a top-level requirement specifies a feature.
+- Requirements specify capabilities through `specify`; the inverse relation is `specifiedBy`.
+- A top-level requirement must have `specify` pointing to exactly one capability.
+- A child requirement may omit `specify` when it has `derivedFrom` pointing to another requirement; the owning capability is inherited through the requirement hierarchy.
+- If a requirement has both `derivedFrom` and `specify`, the explicit `specify` capability must match the inherited capability.
+- Capabilities are not directly satisfied or verified; implementation and verification status roll up from requirements that specify them.
+- Governance metadata is valid on capability and requirement elements only and inherits through the nearest parent in the same family or through the owning capability when a top-level requirement specifies a capability.
 
 #### Metadata
   * type: specification
 
 #### Relations
-  * refine: [Feature Model Structure](ModelManagement.md#feature-model-structure)
+  * refine: [Capability Model Structure](ModelManagement.md#capability-model-structure)
 ---
 
 ### Git Repository Scope Specification
@@ -253,16 +253,16 @@ Rationale: Element names serve as stable IDs for element identity, independent o
 ### Refinement Element Structure Constraints Refinement Specification
 
 #### Details
-Refinement elements serve as detailed documentation that augments requirements and drives implementation. Their relation usage is restricted because:
-- They represent atomic pieces of information focused on documenting requirements
+Refinement elements serve as detailed documentation that augments capabilities or requirements and drives implementation. Their relation usage is restricted because:
+- They represent atomic pieces of information focused on documenting capabilities or requirements
 - They are primarily referenced through the Attachments subsection of other elements
-- Their `refine` relation links back to the feature or requirement they refine, establishing ownership
-- Each refinement can only be owned by one feature or requirement according to its subtype
-- They do not define requirement governance metadata; governance context for a refinement is obtained from its owning feature or requirement
+- Their `refine` relation links back to the capability or requirement they refine, establishing ownership
+- Each refinement can only be owned by one capability or requirement according to its subtype
+- They do not define requirement governance metadata; governance context for a refinement is obtained from its owning capability or requirement
 
 When a Refinement element contains relations other than `refine`, the validator is expected to report an error indicating that only `refine` relations are allowed for refinement types.
 
-When a Refinement element declares requirement governance metadata keys (`status`, `priority`, `risk`, or `owner`), the validator is expected to report an error indicating that governance metadata is only valid on feature and requirement elements.
+When a Refinement element declares requirement governance metadata keys (`status`, `priority`, `risk`, or `owner`), the validator is expected to report an error indicating that governance metadata is only valid on capability and requirement elements.
 
 #### Metadata
   * type: specification
@@ -275,7 +275,7 @@ The validator enforces the Reqvire relation ontology together with the canonical
 
 Validation shall check:
 - relation endpoint families and inverse relation compatibility from the relation ontology
-- ontology, feature, requirement, and requirement-owned refinement compatibility from the ontology, feature, requirement, and semantic-contract contracts
+- ontology, capability, requirement, and refinement compatibility from the ontology, capability, requirement, and semantic-contract contracts
 - evidence-backed verification compatibility from the verification contracts
 - trace-only behavior for custom `other` and `other-TYPENAME` element types
 - refinement restrictions: refinement elements use only `refine` relations and cannot have Attachments subsections
@@ -303,13 +303,13 @@ The system is expected to implement relations following clearly defined specific
 Specification for declaring requirement governance metadata keys and values through the Metadata subsection.
 
 #### Details
-Requirement governance metadata is declared in the `#### Metadata` subsection of governance-bearing elements (`feature` and `requirement`).
+Requirement governance metadata is declared in the `#### Metadata` subsection of governance-bearing elements (`capability` and `requirement`).
 
 Requirement governance metadata covers requirement management accountability and decision context: `status` represents the requirement lifecycle state, `priority` represents planning importance, `risk` represents realization risk, and `owner` represents maintenance accountability.
 
-Elements outside the governance-bearing family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Refinement elements (`source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output`) obtain governance context from their owning feature or requirement instead of authored metadata.
+Elements outside the governance-bearing family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Refinement elements (`source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output`) obtain governance context from their owning capability or requirement instead of authored metadata.
 
-When any non-governance-bearing element declares requirement governance metadata keys, the validator is expected to report an error indicating that governance metadata is only valid on feature and requirement elements.
+When any non-governance-bearing element declares requirement governance metadata keys, the validator is expected to report an error indicating that governance metadata is only valid on capability and requirement elements.
 
 Allowed values, default values, value meanings, inheritance source order, and persistence semantics are defined by the Reqvire governance ontology.
 
@@ -369,10 +369,10 @@ Semantic-contract SHACL references must resolve through reachable ontology conte
 
 The validation rule is scoped through the semantic-contract owner:
 - A semantic-contract must refine exactly one requirement.
-- The owning requirement resolves exactly one owning feature through `specify`/`specifiedBy` and requirement hierarchy inheritance.
-- The requirement ontology context is inherited from the owning feature and ancestor features in the feature hierarchy.
-- Ontology hierarchy reachable from feature-attached ontology is part of the inherited context.
-- Ontology elements outside inherited feature context or reachable ontology hierarchy are not considered reachable.
+- The owning requirement resolves exactly one owning capability through `specify`/`specifiedBy` and requirement hierarchy inheritance.
+- The requirement ontology context is inherited from the owning capability and ancestor capabilities in the capability hierarchy.
+- Ontology hierarchy reachable from capability-attached ontology is part of the inherited context.
+- Ontology elements outside inherited capability context or reachable ontology hierarchy are not considered reachable.
 
 The validation rule inspects semantic-contract `#### Shapes` sections and checks these SHACL IRI references:
 - `sh:targetClass`
@@ -382,12 +382,12 @@ The validation rule inspects semantic-contract `#### Shapes` sections and checks
 For each referenced IRI, validation determines whether the IRI is declared by an ontology element and reachable from the semantic-contract owner context:
 - If the IRI is not declared anywhere in Reqvire ontology elements, validation reports a missing semantic declaration and CRUD operations that would create that condition are blocked.
 - If the IRI is declared by an ontology element outside the reachable owner context, validation reports an outside-context semantic reference and CRUD operations that would create that condition are blocked.
-- Outside-context errors include the declaring ontology identifier and guidance to attach the declaring ontology to the owning or consuming feature when that dependency is intentional.
+- Outside-context errors include the declaring ontology identifier and guidance to attach the declaring ontology to the owning or consuming capability when that dependency is intentional.
 
 The rule is intentionally strict:
 - It does not infer or create attachments.
 - It does not rewrite Turtle.
-- It enforces ontology hierarchy and feature-level ontology attachments as the only valid semantic dependency paths.
+- It enforces ontology hierarchy and capability-level ontology attachments as the only valid semantic dependency paths.
 - It prevents model changes that would bypass change-impact traceability.
 
 #### Metadata
@@ -404,7 +404,7 @@ Semantic vocabulary and shape profile meaning are defined by the Reqvire ontolog
 
 The implementation shall enforce the ontology and semantic-contract structure:
 - Ontology elements define reusable vocabulary and model meaning.
-- `semantic-contract` must not refine a feature.
+- `semantic-contract` must not refine a capability.
 - `semantic-contract` refining a requirement means a SHACL profile.
 - Requirement-owned shape contracts define closed-world SHACL profiles over terms reachable from the owning requirement context and must not define local ontology terms.
 - Ontology and semantic-contract elements use reserved type-specific subsections:
@@ -432,10 +432,10 @@ The implementation shall enforce the ontology and semantic-contract structure:
   - Missing declarations are validation errors because they create dangling semantic references.
   - Validation errors for missing semantic declarations must include the referencing semantic-contract identifier, reference kind, referenced IRI, and guidance to define the term or update/remove the SHACL reference before deleting or editing the declaring contract.
   - Declared references must also be reachable from the referencing semantic contract's owner context.
-  - A feature context contains ontology elements attached by the feature and inherited through valid feature hierarchy traversal, plus ontology hierarchy reachable from those ontology elements.
-  - A requirement-owned shape contract resolves its owner context through the owning requirement's feature context. Child requirements inherit the same feature context through requirement hierarchy.
+  - A capability context contains ontology elements attached by the capability and inherited through valid capability hierarchy traversal, plus ontology hierarchy reachable from those ontology elements.
+  - A requirement-owned shape contract resolves its owner context through the owning requirement's capability context. Child requirements inherit the same capability context through requirement hierarchy.
   - A SHACL reference to a term declared outside reachable ontology context is a validation error, not a lint issue.
-  - Validation errors for outside-context semantic references must include the referencing semantic-contract identifier, reference kind, referenced IRI, declaring ontology identifier, owning requirement, owning feature context, and guidance to attach the declaring ontology to the owning or consuming feature or move the declaration into reachable ontology context.
+  - Validation errors for outside-context semantic references must include the referencing semantic-contract identifier, reference kind, referenced IRI, declaring ontology identifier, owning requirement, owning capability context, and guidance to attach the declaring ontology to the owning or consuming capability or move the declaration into reachable ontology context.
   - Supported constraint terms are checked for basic shape validity: `sh:minCount`, `sh:maxCount`, `sh:datatype`, `sh:class`, `sh:nodeKind`, `sh:pattern`, and `sh:in`.
   - `sh:maxCount` must be greater than or equal to `sh:minCount` when both are present.
   - `sh:in` must point to a valid RDF list.
@@ -500,7 +500,7 @@ Usage guidelines for selecting appropriate verification types.
 - **Test-verification**: Quantitative requirements, functional behavior, performance criteria
 - **Analysis-verification**: Design constraints, architectural requirements, compliance with standards
 - **Inspection-verification**: Documentation requirements, labeling, configuration settings
-- **Demonstration-verification**: User-facing features, workflow requirements, integration scenarios
+- **Demonstration-verification**: User-facing capabilities, workflow requirements, integration scenarios
 
 #### Metadata
   * type: specification

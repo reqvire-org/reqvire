@@ -4,7 +4,7 @@
 
 At this time, the Reqvire maintainers do not accept unsolicited pull requests.
 
-If you would like to propose a feature or behavior change, please open an issue (or upvote an existing one). If you find a bug, please open a bug report and include detailed analysis, reproduction steps, and root-cause hypotheses when possible.
+If you would like to propose a capability or behavior change, please open an issue (or upvote an existing one). If you find a bug, please open a bug report and include detailed analysis, reproduction steps, and root-cause hypotheses when possible.
 
 Pull requests that have not been explicitly invited by a maintainer may be closed without review.
 

@@ -1,22 +1,22 @@
 # Elements
 
 
-### Test Feature Test Json File Output Specifications Requirements Md
+### Test Capability Test Json File Output Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Test Requirement Alpha
 
-A root feature for JSON file output testing.
+A root capability for JSON file output testing.
 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-json-file-output-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-json-file-output-specifications-requirements-md)
   * verifiedBy: [Test Verification Alpha](#test-verification-alpha)
 
 ---

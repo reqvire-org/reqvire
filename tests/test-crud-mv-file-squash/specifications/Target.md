@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Crud Mv File Squash Specifications Target Md
+### Test Capability Test Crud Mv File Squash Specifications Target Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This file already exists with its own elements.
@@ -19,7 +19,7 @@ This element already exists in the target file and should remain unchanged.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-crud-mv-file-squash-specifications-target-md)
+  * specify: [Test Capability](#test-capability-test-crud-mv-file-squash-specifications-target-md)
 ---
 
 ### Another Existing Element
@@ -30,5 +30,5 @@ This is another element in the target file.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-crud-mv-file-squash-specifications-target-md)
+  * specify: [Test Capability](#test-capability-test-crud-mv-file-squash-specifications-target-md)
 ---

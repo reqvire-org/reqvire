@@ -28,7 +28,7 @@ cargo build
 ### Test Directory Layout
 Each test is a directory containing:
 ```
-test-feature-name/
+test-capability-name/
 ├── test.sh                    # Test execution script (REQUIRED)
 └── specifications/           # Test markdown files
     ├── Requirements.md      # Test requirements
@@ -44,7 +44,7 @@ Use `ls tests/` to see all available test directories. Each `test-*` directory c
 ```bash
 #!/bin/bash
 
-# Test: Feature Description
+# Test: Capability Description
 # Acceptance Criteria:
 # - List specific behaviors to test
 # - Define success conditions
@@ -100,7 +100,7 @@ The test runner (`run_tests.sh`):
 
 #### Directory Structure
 ```
-test-feature-name/
+test-capability-name/
 ├── test.sh                    # Test execution script
 ├── .reqvireignore             # Excludes expected/ from reqvire parsing
 ├── expected/                  # Expected output files (committed to git)
@@ -171,12 +171,12 @@ echo "✅ Test passed"
 When creating a new test or updating expected outputs:
 ```bash
 # Set up test environment
-cd /tmp && mkdir test-gen && cp -r tests/test-feature/* test-gen/
+cd /tmp && mkdir test-gen && cp -r tests/test-capability/* test-gen/
 cd test-gen && git init && git add -A && git commit -m "init"
 
 # Run commands and capture expected outputs
 reqvire some-command
-cp specifications/Requirements.md /path/to/tests/test-feature/expected/01-after-command.md
+cp specifications/Requirements.md /path/to/tests/test-capability/expected/01-after-command.md
 ```
 
 #### Why NOT to Use Inline Grep Checks
@@ -278,7 +278,7 @@ fi
 ### Test Requirements Format
 Create testable requirements in `specifications/Requirements.md`:
 ```markdown
-### Test Feature Requirement
+### Test Capability Requirement
 
 The system SHALL generate diagrams when requested.
 
@@ -305,7 +305,7 @@ Expected: Files contain valid mermaid diagrams with proper markers
   * type: test-verification
 
 #### Relations
-  * verify: ../Requirements.md#test-feature-requirement
+  * verify: ../Requirements.md#test-capability-requirement
 ```
 
 ## Testing Specific Commands
@@ -378,7 +378,7 @@ cat /path/to/test/directory/test_results.log
 ### Run Test Manually
 ```bash
 # Navigate to test directory
-cd tests/test-feature-name
+cd tests/test-capability-name
 
 # Set environment variables
 export TEST_DIR=$(pwd)
@@ -391,10 +391,10 @@ export REQVIRE_BIN="../../target/debug/reqvire"
 ### Inspect Test Files
 ```bash
 # Check test specifications
-ls tests/test-feature-name/specifications/
+ls tests/test-capability-name/specifications/
 
 # Review test logic
-cat tests/test-feature-name/test.sh
+cat tests/test-capability-name/test.sh
 ```
 
 ## Best Practices
@@ -403,7 +403,7 @@ cat tests/test-feature-name/test.sh
 2. **Focused Tests**: Each test should validate specific functionality
 3. **Comprehensive Checks**: Validate both success and error conditions
 4. **Deterministic Results**: Tests should produce consistent outputs
-5. **Clean Specifications**: Use minimal test data that demonstrates features
+5. **Clean Specifications**: Use minimal test data that demonstrates capabilities
 6. **Error Messages**: Provide clear failure messages with context
 7. **Documentation**: Include acceptance criteria in test scripts
 8. **Git Setup**: Tests run in temporary git repositories
@@ -415,24 +415,24 @@ cat tests/test-feature-name/test.sh
 
 1. Create test directory:
 ```bash
-mkdir tests/test-new-feature
+mkdir tests/test-new-capability
 ```
 
 2. Create test script:
 ```bash
-touch tests/test-new-feature/test.sh
-chmod +x tests/test-new-feature/test.sh
+touch tests/test-new-capability/test.sh
+chmod +x tests/test-new-capability/test.sh
 ```
 
 3. Add test specifications:
 ```bash
-mkdir -p tests/test-new-feature/specifications/Verifications
+mkdir -p tests/test-new-capability/specifications/Verifications
 # Create markdown files with test requirements and verifications
 ```
 
 4. Run test:
 ```bash
-./tests/run_tests.sh test-new-feature
+./tests/run_tests.sh test-new-capability
 ```
 
 5. Add to test suite (automatic - any `test-*` directory is included)

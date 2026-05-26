@@ -8,7 +8,7 @@ This is the root requirement.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Lint Command Specifications Requirements Md](#test-feature-test-lint-command-specifications-requirements-md)
+  * specify: [Test Capability Test Lint Command Specifications Requirements Md](#test-capability-test-lint-command-specifications-requirements-md)
 ---
 
 ### Alternative Parent Requirement
@@ -88,7 +88,7 @@ This is an independent root for cross-submodel boundary checks.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Lint Command Specifications Requirements Md](#test-feature-test-lint-command-specifications-requirements-md)
+  * specify: [Test Capability Test Lint Command Specifications Requirements Md](#test-capability-test-lint-command-specifications-requirements-md)
 ---
 
 ### Standalone Child
@@ -102,10 +102,10 @@ This requirement is owned by `Standalone Submodel Root`.
   * derivedFrom: [Standalone Submodel Root](#standalone-submodel-root)
 ---
 
-### Test Feature Test Lint Command Specifications Requirements Md
+### Test Capability Test Lint Command Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---

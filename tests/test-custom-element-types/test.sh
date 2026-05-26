@@ -10,7 +10,7 @@ set -euo pipefail
 # - Text output displays custom types under "📋 Other Types:" section
 # - JSON output includes "total_other_types" object with correct counts
 # - Multiple custom types are sorted alphabetically in output
-# - Standard types (feature, requirement, verification) are NOT counted as custom
+# - Standard types (capability, requirement, verification) are NOT counted as custom
 # - Different custom types are tracked separately
 # - When no custom types exist, the other types section is not displayed
 #
@@ -94,8 +94,8 @@ if echo "$OUTPUT_JSON" | jq -e '.global_counters.total_other_types.requirement' 
     exit 1
 fi
 
-if echo "$OUTPUT_JSON" | jq -e '.global_counters.total_other_types.feature' >/dev/null 2>&1; then
-    echo "FAILED: Standard type 'feature' should not be in total_other_types"
+if echo "$OUTPUT_JSON" | jq -e '.global_counters.total_other_types.capability' >/dev/null 2>&1; then
+    echo "FAILED: Standard type 'capability' should not be in total_other_types"
     exit 1
 fi
 
@@ -154,9 +154,9 @@ if [ "$TOTAL_REQUIREMENTS" -ne 2 ]; then
     exit 1
 fi
 
-TOTAL_FEATURES=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_requirements_types.feature')
-if [ "$TOTAL_FEATURES" -ne 3 ]; then
-    echo "FAILED: Expected 3 features, got: $TOTAL_FEATURES"
+TOTAL_CAPABILITYS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_requirements_types.capability')
+if [ "$TOTAL_CAPABILITYS" -ne 3 ]; then
+    echo "FAILED: Expected 3 capabilities, got: $TOTAL_CAPABILITYS"
     exit 1
 fi
 
@@ -170,7 +170,7 @@ fi
 echo "Test 4: Verifying total elements count" >> "${TEST_DIR}/test_results.log"
 
 TOTAL_ELEMENTS=$(echo "$OUTPUT_JSON" | jq '.global_counters.total_elements')
-# 3 features + 2 requirements + 1 verification + 7 custom types = 13
+# 3 capabilities + 2 requirements + 1 verification + 7 custom types = 13
 if [ "$TOTAL_ELEMENTS" -ne 13 ]; then
     echo "FAILED: Expected 13 total elements (1+4+1+7), got: $TOTAL_ELEMENTS"
     exit 1
@@ -187,22 +187,22 @@ cat > "${TEMP_NO_CUSTOM}/specifications/StandardOnly.md" << 'EOF'
 # Elements
 
 
-### Feature
+### Capability
 
-This is a feature.
+This is a capability.
 
 #### Metadata
-* type: feature
+* type: capability
 
 ### Standard Requirement
 
-This is a standard requirement derived from Feature.
+This is a standard requirement derived from Capability.
 
 #### Metadata
 * type: requirement
 
 #### Relations
-* specify: #feature
+* specify: #capability
 EOF
 
 cat > "${TEMP_NO_CUSTOM}/reqvire.yaml" << 'EOF'

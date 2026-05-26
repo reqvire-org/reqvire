@@ -22,7 +22,7 @@
 
 ### Impact Scope
 
-* [Test Feature Test Change Impact Attachments Specifications Requirements Md](specifications/Requirements.md#test-feature-test-change-impact-attachments-specifications-requirements-md)
+* [Test Capability Test Change Impact Attachments Specifications Requirements Md](specifications/Requirements.md#test-capability-test-change-impact-attachments-specifications-requirements-md)
 
 ---
 

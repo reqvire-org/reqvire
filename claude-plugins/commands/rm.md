@@ -75,7 +75,7 @@ The rm operation will fail with a clear error if:
 
 **Remove a requirement:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rm "Deprecated Feature"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" rm "Deprecated Capability"
 ```
 
 **Preview before removing:**

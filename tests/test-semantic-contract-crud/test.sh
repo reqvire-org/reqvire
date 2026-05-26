@@ -82,7 +82,7 @@ fi
 
 OUTSIDE_CONTEXT_CONTRACT='### Outside Context Shape Contract
 
-Bad semantic contract with a reference declared outside the reachable feature-root context.
+Bad semantic contract with a reference declared outside the reachable capability-root context.
 
 #### Metadata
   * type: semantic-contract
@@ -143,7 +143,7 @@ assert_diff \
   "failed outside-context semantic add should not persist file changes"
 
 set +e
-UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Billing Feature" "Tax Ontology" 2>&1)
+UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Billing Capability" "Tax Ontology" 2>&1)
 UNLINK_EXIT=$?
 set -e
 

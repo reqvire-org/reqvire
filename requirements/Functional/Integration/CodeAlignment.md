@@ -9,7 +9,7 @@ The system shall support code traceability by using structured comments to link 
 
 #### Relations
   * derive: [Traceability Format](#traceability-format)
-  * specify: [Aligning Design with Code](../../Features/Integration.md#aligning-design-with-code)
+  * specify: [Aligning Design with Code](../../Capabilities/Integration.md#aligning-design-with-code)
 ---
 
 ### Traceability Format

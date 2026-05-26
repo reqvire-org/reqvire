@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Subdirectory Functionality Project Root Specifications Mainrequirements Md
+### Test Capability Test Subdirectory Functionality Project Root Specifications Mainrequirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This file contains main requirements that should NOT be processed when run from a subdirectory.
@@ -28,7 +28,7 @@ This is the main system requirement.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-subdirectory-functionality-project-root-specifications-mainrequirements-md)
+  * specify: [Test Capability](#test-capability-test-subdirectory-functionality-project-root-specifications-mainrequirements-md)
     * derive: [Main Requirement One](#main-requirement-one)
 
 ---

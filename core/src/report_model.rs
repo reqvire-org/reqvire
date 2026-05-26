@@ -186,7 +186,7 @@ fn build_model_report(
         // Reverse without type filter: use leaf elements
         registry.find_leaf_elements(None)
     } else {
-        // No filter: start from ontology roots and feature roots.
+        // No filter: start from ontology roots and capability roots.
         find_default_model_roots(registry)
     };
 
@@ -230,9 +230,9 @@ fn build_model_report(
 fn find_default_model_roots(registry: &GraphRegistry) -> Vec<String> {
     let mut roots = find_root_elements_of_type(registry, "ontology");
     let mut seen: HashSet<String> = roots.iter().cloned().collect();
-    for feature_id in registry.find_root_features() {
-        if seen.insert(feature_id.clone()) {
-            roots.push(feature_id);
+    for capability_id in registry.find_root_capabilities() {
+        if seen.insert(capability_id.clone()) {
+            roots.push(capability_id);
         }
     }
     roots
@@ -487,7 +487,7 @@ fn generate_model_mmd_text(
 
     let mut output = String::new();
     output.push_str(&format!("graph {}\n", diagram_direction));
-    output.push_str("  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n");
+    output.push_str("  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n");
     output
         .push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
     output.push_str("  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;\n");
@@ -642,7 +642,7 @@ fn generate_element_text(
 
         // Add CSS class definitions for colors (MBSE color scheme)
         output.push_str(&format!(
-            "{}  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n",
+            "{}  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n",
             indent
         ));
         output.push_str(&format!(
@@ -882,8 +882,8 @@ fn generate_relations_recursive(
 /// Determine CSS class name based on element type string
 fn get_element_class(element_type: &str) -> &'static str {
     let lower = element_type.to_lowercase();
-    if lower == "feature" {
-        "feature"
+    if lower == "capability" {
+        "capability"
     } else if lower == "ontology" {
         "ontology"
     } else if lower == "requirement" || lower.contains("system") && lower.contains("requirement") {

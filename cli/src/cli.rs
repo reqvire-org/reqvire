@@ -131,7 +131,7 @@ pub enum Commands {
 
     /// Search and filter model elements with comprehensive filtering options
     #[clap(
-        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: feature, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
+        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
     )]
     Search {
         /// Output results in JSON format
@@ -154,7 +154,7 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_name: Option<String>,
 
-        /// Only include elements of the given type(s). Supports comma-separated list. Valid: feature, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+        /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
         filter_type: Option<String>,
 
@@ -225,9 +225,9 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Generate verification traces showing upward paths from verifications to feature-rooted requirements
+    /// Generate verification traces showing upward paths from verifications to capability-rooted requirements
     #[clap(
-        override_help = "Generate verification traces showing upward paths from verifications to feature-rooted requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type. Valid types: test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification"
+        override_help = "Generate verification traces showing upward paths from verifications to capability-rooted requirements\n\nTRACES OPTIONS:\n      --json                      Output results in JSON format\n      --output <FILE>             Save JSON output to file (requires --json)\n      --from-folder <PATH>        Generate links relative to this folder path\n      --links-with-blobs          Use GitHub blob URLs in diagram links instead of relative paths\n      --filter-id <ID>            Only include verification with this specific identifier\n      --filter-name <REGEX>       Only include verifications whose name matches this regular expression\n      --filter-type <TYPE>        Only include verifications of the given type. Valid types: test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification"
     )]
     Traces {
         /// Output results in JSON format
@@ -275,7 +275,7 @@ pub enum Commands {
 
     /// Generate model-centric structure with nested relations
     ///
-    /// By default, shows ontology roots and feature roots.
+    /// By default, shows ontology roots and capability roots.
     /// Use --from <NAME> to start from specific element.
     /// Use --reverse for leaf-to-root traversal.
     ///
@@ -284,7 +284,7 @@ pub enum Commands {
     /// - Markdown: Mermaid diagrams with all nested relationships
     /// - Mermaid: pure Mermaid flowchart text with --mmd
     #[clap(
-        override_help = "Generate model-centric structure with nested relations\n\nBy default, shows ontology roots and feature roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n  - Mermaid: pure Mermaid flowchart text with --mmd\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: feature, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --mmd                       Output pure Mermaid flowchart text\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save output to file (requires --json or --mmd)"
+        override_help = "Generate model-centric structure with nested relations\n\nBy default, shows ontology roots and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n  - Mermaid: pure Mermaid flowchart text with --mmd\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --mmd                       Output pure Mermaid flowchart text\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save output to file (requires --json or --mmd)"
     )]
     Model {
         /// Start from specific element by name
@@ -295,7 +295,7 @@ pub enum Commands {
         #[clap(long, help_heading = "MODEL OPTIONS")]
         reverse: bool,
 
-        /// Filter starting elements by type (comma-separated). Valid: feature, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+        /// Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE", help_heading = "MODEL OPTIONS")]
         filter_type: Option<String>,
 
@@ -442,7 +442,7 @@ pub enum Commands {
 
     /// Merge multiple elements into target element
     #[clap(
-        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and attachments are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Verifications can merge into verifications (of any subtype)\n    - Refinements can merge into refinements (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Feature A\" \"Feature B\" --dry-run"
+        override_help = "Merge multiple elements into target element\n\nMERGE OPTIONS:\n       <TARGET>                 Target element name (receives merged content)\n       <SOURCES>...             One or more source element names to merge\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nMERGE BEHAVIOR:\n    - Source main content is appended to target's Details section\n    - Source Details sections become 'Merged Details (source name)' subsections\n    - Relations and attachments are merged with deduplication\n    - Source elements are deleted after successful merge\n    - Relations pointing to sources are redirected to target\n\nTYPE COMPATIBILITY:\n    - Requirements can merge into requirements (of any subtype)\n    - Verifications can merge into verifications (of any subtype)\n    - Refinements can merge into refinements (of any subtype)\n    - Other types can only merge into other types\n\nUSAGE:\n    reqvire merge \"Target Req\" \"Source Req 1\" \"Source Req 2\"\n    reqvire merge \"Combined Requirement\" \"Capability A\" \"Capability B\" --dry-run"
     )]
     Merge {
         /// Target element name (receives merged content)
@@ -497,7 +497,7 @@ pub enum Commands {
     /// Add relation or attachment between elements
     #[clap(
         name = "link",
-        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom  - Source is derived from target within its hierarchy family\n    derive       - Source derives target within its hierarchy family\n    specify      - Source requirement specifies a feature\n    specifiedBy  - Source feature is specified by a requirement\n    satisfiedBy  - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy      - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy   - Source requirement is verified by verification\n    verify       - Source verification verifies requirement\n    trace        - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach feature ontology context or compatible requirement-owned refinement contracts\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: feature may attach ontology; requirement may attach compatible requirement-owned refinement element identifiers (file.md#element-id or #element-id)\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Feature\"\n    reqvire link \"Billing Feature\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"Billing Feature\" attaching \"ontology.md#billing-ontology\"\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\""
+        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom  - Source is derived from target within its hierarchy family\n    derive       - Source derives target within its hierarchy family\n    specify      - Source requirement specifies a capability\n    specifiedBy  - Source capability is specified by a requirement\n    satisfiedBy  - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy      - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy   - Source requirement is verified by verification\n    verify       - Source verification verifies requirement\n    trace        - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach capability ontology context or compatible requirement-owned refinement contracts\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: capability may attach ontology; requirement may attach compatible requirement-owned refinement element identifiers (file.md#element-id or #element-id)\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"Billing Capability\" attaching \"ontology.md#billing-ontology\"\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\""
     )]
     Link {
         /// Source element name
@@ -505,10 +505,10 @@ pub enum Commands {
 
         /// Relation type OR 'attaching'.
         /// Relations: derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace.
-        /// Use 'attaching' to attach feature ontology context or compatible requirement-owned refinement contracts
+        /// Use 'attaching' to attach capability ontology context or compatible requirement-owned refinement contracts
         relation_type: String,
 
-        /// Target: element name, internal path, or external URL (for relations); ontology for feature attachments or compatible refinement element identifier for requirement attachments
+        /// Target: element name, internal path, or external URL (for relations); ontology for capability attachments or compatible refinement element identifier for requirement attachments
         target: String,
 
         /// Preview changes without applying
@@ -527,7 +527,7 @@ pub enum Commands {
     /// Remove relation or attachment between elements (auto-detects type)
     #[clap(
         name = "unlink",
-        override_help = "Remove relation or attachment between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Searches relations first, then attachments.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Feature Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
+        override_help = "Remove relation or attachment between elements (auto-detects type)\n\nUNLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <TARGET>                 Target element name OR file path\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nAUTO-DETECTION:\n    Searches relations first, then attachments.\n    Only one relation per source-target pair is allowed.\n\nUSAGE:\n    reqvire unlink \"Capability Requirement\" \"System Requirement\"\n    reqvire unlink \"System Requirement\" docs/SLO.pdf\n    reqvire unlink \"System Requirement\" \"My Constraint Element\""
     )]
     Unlink {
         /// Source element name
@@ -695,12 +695,12 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Collect content from feature or requirement context
+    /// Collect content from capability or requirement context
     #[clap(
-        override_help = "Collect content from feature or requirement context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the feature or requirement element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)"
+        override_help = "Collect content from capability or requirement context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the capability or requirement element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)"
     )]
     Collect {
-        /// Name of the feature or requirement element to collect from
+        /// Name of the capability or requirement element to collect from
         element_name: String,
 
         /// Traversal direction: UPSTREAM (ancestors) or DOWNSTREAM (descendants)

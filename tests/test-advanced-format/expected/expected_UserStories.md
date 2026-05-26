@@ -16,7 +16,7 @@ More content that should remain untouched.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
 ---
 
 ### Exact Blank Line Count Test
@@ -42,7 +42,7 @@ As a **System Engineer**, I want to generate diagrams for different system viewp
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
   * trace: [MOE_UA](MOEs.md#moe_ua)
 ---
 
@@ -55,7 +55,7 @@ As an **System Engineer**, I want to manage MBSE models effectively, so that I c
 
 #### Relations
   * derive: [Requirements Processing](SystemRequirements/Requirements.md#requirements-processing)
-  * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
   * trace: [MOE_UA](MOEs.md#moe_ua)
 ---
 
@@ -84,18 +84,18 @@ This element has content but no blank line before metadata.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
 ---
 
-### Root Feature
+### Root Capability
 
-Top-level feature used as hierarchy parent for system requirements in this fixture.
+Top-level capability used as hierarchy parent for system requirements in this fixture.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Advanced Format Userstories Md](#test-feature-test-advanced-format-userstories-md)
+  * specify: [Test Capability Test Advanced Format Userstories Md](#test-capability-test-advanced-format-userstories-md)
 ---
 
 ### External URL Preservation Test
@@ -106,21 +106,21 @@ This element tests that external URLs in relations are preserved exactly as writ
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Root Feature](#root-feature)
+  * derivedFrom: [Root Capability](#root-capability)
   * satisfiedBy: [PlansAndPricing](https://docs.google.com/spreadsheets/d/1YgO2THkvPQEtvoP2c4JU6q8Fx4K9rWJ9V5bhpGvo7DI/edit?gid=203583324#gid=203583324)
 ---
 
-### Test Feature Test Advanced Format Userstories Md
+### Test Capability Test Advanced Format Userstories Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 
 Personas:
 1. System Engineer: Focused on managing system models, ensuring alignment with project requirements, and validating structures.
-2. SOI Developer: Implements features and makes system changes based on MBSE models, ensuring consistency between design and code.
-3. Contributor: An external community member contributing to Reqvire by improving models, creating features, or providing feedback.
+2. SOI Developer: Implements capabilities and makes system changes based on MBSE models, ensuring consistency between design and code.
+3. Contributor: An external community member contributing to Reqvire by improving models, creating capabilities, or providing feedback.
 4. Manager: Oversees the MBSE processes, tracks progress, ensures alignment with objectives, and generates reports for decision-making.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---

@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Document Operation Constraints Specifications Squashsource Md
+### Test Capability Test Document Operation Constraints Specifications Squashsource Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Squash Source Requirement
@@ -17,5 +17,5 @@ Source file for mv-file --squash rejection test.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-document-operation-constraints-specifications-squashsource-md)
+  * specify: [Test Capability](#test-capability-test-document-operation-constraints-specifications-squashsource-md)
 ---

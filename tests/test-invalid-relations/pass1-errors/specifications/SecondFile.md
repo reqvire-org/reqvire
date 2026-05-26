@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Invalid Relations Pass1 Errors Specifications Secondfile Md
+### Test Capability Test Invalid Relations Pass1 Errors Specifications Secondfile Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This file contains an element with a name that already exists in Requirements.md, testing global uniqueness validation.
@@ -19,7 +19,7 @@ This element has the same name as an element in Requirements.md - should trigger
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-secondfile-md)
+  * specify: [Test Capability](#test-capability-test-invalid-relations-pass1-errors-specifications-secondfile-md)
   * derivedFrom: Requirements.md#valid-requirement
 
 ---
@@ -32,5 +32,5 @@ This is a unique element in this file.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-invalid-relations-pass1-errors-specifications-secondfile-md)
+  * specify: [Test Capability](#test-capability-test-invalid-relations-pass1-errors-specifications-secondfile-md)
 ---

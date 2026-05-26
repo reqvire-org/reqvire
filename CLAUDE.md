@@ -7,8 +7,8 @@ Reqvire is an AI-driven framework for system modeling and requirements managemen
 
 **CRITICAL**: This is a Model-Based Systems Engineering (MBSE) project. Always follow this workflow:
 
-1. **Requirements First**: Before implementing any new feature, add requirements to the specifications with proper traceability
-2. **Verifications**: Define how the feature will be verified before implementation
+1. **Requirements First**: Before implementing any new capability, add requirements to the specifications with proper traceability
+2. **Verifications**: Define how the capability will be verified before implementation
 3. **Tests**: Create tests to satisfy verifications (can be refined during implementation if needed)
 4. **Implementation**: Only after requirements and verifications are defined, implement the code
 5. **Satisfaction Links**: Link implementation to `requirement` elements (and test-verifications) via satisfiedBy relations
@@ -50,7 +50,7 @@ For comprehensive command reference, see the Reqvire skills.
 
 ### Key File Locations
 - Core specifications structure: [SpecificationsRequirements.md](requirements/SpecificationsRequirements.md)
-- Feature roots: [Features.md](requirements/Features.md)
+- Capability roots: [Capabilities.md](requirements/Capabilities.md)
 - Mission requirements: [MissionRequirements.md](requirements/MissionRequirements.md)
 - System requirements: [SystemRequirements/Requirements.md](requirements/SystemRequirements/Requirements.md)
 - Verification specifications: [Verifications folder](requirements/Verifications)
@@ -125,4 +125,4 @@ cli/src/
 - ALWAYS prefer editing existing files in the codebase over creating new ones
 - NEVER proactively create documentation files (*.md) or README files unless explicitly requested
 - Only use emojis if the user explicitly requests it
-- **CRITICAL**: always update www.reqvire.org/docs documentation when reqvire features and functionality changes.
+- **CRITICAL**: always update www.reqvire.org/docs documentation when reqvire capabilities and functionality changes.

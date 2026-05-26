@@ -71,21 +71,21 @@ reqvire:potentialImpactClassification a reqvire:ImpactClassification ;
 
 reqvire:parentToChildImpactRule a reqvire:ChangePropagationRule ;
   reqvire:changeRuleName "parent-to-child-impact" ;
-  reqvire:changedThing "feature-requirement-or-ontology-parent" ;
+  reqvire:changedThing "capability-requirement-or-ontology-parent" ;
   reqvire:impactRelation "derive" ;
   reqvire:impactDirection "downstream" ;
-  reqvire:propagationTarget "child-feature-requirement-or-ontology" ;
+  reqvire:propagationTarget "child-capability-requirement-or-ontology" ;
   reqvire:propagationMode "review-required" ;
   reqvire:impactReason "Parent changes can change the meaning or scope of derived child elements." .
 
-reqvire:featureToRequirementImpactRule a reqvire:ChangePropagationRule ;
-  reqvire:changeRuleName "feature-to-specified-requirement-impact" ;
-  reqvire:changedThing "feature" ;
+reqvire:capabilityToRequirementImpactRule a reqvire:ChangePropagationRule ;
+  reqvire:changeRuleName "capability-to-specified-requirement-impact" ;
+  reqvire:changedThing "capability" ;
   reqvire:impactRelation "specifiedBy" ;
   reqvire:impactDirection "downstream" ;
   reqvire:propagationTarget "requirement" ;
   reqvire:propagationMode "review-required" ;
-  reqvire:impactReason "Feature scope and attached ontology context changes can affect requirements that specify the feature." .
+  reqvire:impactReason "Capability scope and attached ontology context changes can affect requirements that specify the capability." .
 
 reqvire:requirementToImplementationImpactRule a reqvire:ChangePropagationRule ;
   reqvire:changeRuleName "requirement-to-implementation-impact" ;
@@ -107,7 +107,7 @@ reqvire:requirementToVerificationImpactRule a reqvire:ChangePropagationRule ;
 
 reqvire:ownerToRefinementImpactRule a reqvire:ChangePropagationRule ;
   reqvire:changeRuleName "owner-to-refinement-impact" ;
-  reqvire:changedThing "feature-or-requirement-owner" ;
+  reqvire:changedThing "capability-or-requirement-owner" ;
   reqvire:impactRelation "refinedBy" ;
   reqvire:impactDirection "downstream" ;
   reqvire:propagationTarget "owned-refinement" ;
@@ -126,11 +126,11 @@ reqvire:attachmentContentImpactRule a reqvire:ChangePropagationRule ;
 reqvire:semanticReferenceReachabilityRule a reqvire:ChangePropagationRule ;
   reqvire:changeRuleName "semantic-reference-reachability" ;
   reqvire:changedThing "semantic-contract-reference" ;
-  reqvire:impactRelation "feature-hierarchy-or-attachment" ;
+  reqvire:impactRelation "capability-hierarchy-or-attachment" ;
   reqvire:impactDirection "downstream" ;
   reqvire:propagationTarget "referencing-semantic-contract" ;
   reqvire:propagationMode "validation-error-when-unreachable" ;
-  reqvire:impactReason "Semantic references must resolve through native feature-root context or explicit attachment so change impact remains auditable." .
+  reqvire:impactReason "Semantic references must resolve through native capability-root context or explicit attachment so change impact remains auditable." .
 
 reqvire:relocationNoPropagationRule a reqvire:ChangePropagationRule ;
   reqvire:changeRuleName "relocation-without-content-change" ;
@@ -153,7 +153,7 @@ reqvire:relocationNoPropagationRule a reqvire:ChangePropagationRule ;
 
 The Reqvire relation ontology defines Reqvire relation vocabulary.
 
-Relation contracts are separated from element-family contracts because relation behavior is reused across feature, requirement, refinement, verification, artifact, and attachment flows.
+Relation contracts are separated from element-family contracts because relation behavior is reused across capability, requirement, refinement, verification, artifact, and attachment flows.
 
 #### Ontology
 ```turtle
@@ -220,11 +220,11 @@ reqvire:verificationRollupRelationUsageCategory a reqvire:RelationUsageCategory 
 
 reqvire:hierarchyRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryName "hierarchy" ;
-  reqvire:semanticCategoryMeaning "Same-family feature, requirement, or ontology derivation hierarchy." ;
+  reqvire:semanticCategoryMeaning "Same-family capability, requirement, or ontology derivation hierarchy." ;
   reqvire:semanticCategoryRelationName "derive", "derivedFrom" .
-reqvire:featureSpecificationRelationCategory a reqvire:RelationSemanticCategory ;
-  reqvire:semanticCategoryName "feature-specification" ;
-  reqvire:semanticCategoryMeaning "Bridge between feature capability anchors and requirements that specify them." ;
+reqvire:capabilitySpecificationRelationCategory a reqvire:RelationSemanticCategory ;
+  reqvire:semanticCategoryName "capability-specification" ;
+  reqvire:semanticCategoryMeaning "Bridge between capability elements and requirements that specify them." ;
   reqvire:semanticCategoryRelationName "specify", "specifiedBy" .
 reqvire:satisfactionRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryName "satisfaction" ;
@@ -232,11 +232,11 @@ reqvire:satisfactionRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryRelationName "satisfy", "satisfiedBy" .
 reqvire:refinementRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryName "refinement-ownership" ;
-  reqvire:semanticCategoryMeaning "Ownership of feature source refinements and requirement-owned refinement contracts." ;
+  reqvire:semanticCategoryMeaning "Ownership of capability-owned and requirement-owned refinements." ;
   reqvire:semanticCategoryRelationName "refine", "refinedBy" .
 reqvire:verificationRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryName "verification" ;
-  reqvire:semanticCategoryMeaning "Links between requirements and verification elements that verify them." ;
+  reqvire:semanticCategoryMeaning "Links between capabilities or requirements and verification elements that verify them." ;
   reqvire:semanticCategoryRelationName "verify", "verifiedBy" .
 reqvire:traceabilityRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryName "traceability" ;
@@ -244,64 +244,64 @@ reqvire:traceabilityRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryRelationName "trace" .
 reqvire:attachmentRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryName "attachment-dependency" ;
-  reqvire:semanticCategoryMeaning "Explicit dependency from a feature to ontology context or from a requirement to a reusable requirement-owned contract." ;
+  reqvire:semanticCategoryMeaning "Explicit dependency from a capability to ontology context or from a requirement to a reusable requirement-owned contract." ;
   reqvire:semanticCategoryRelationName "attachment" .
 
 reqvire:deriveRelationRule a reqvire:RelationRule ;
   reqvire:relationName "derive" ;
   reqvire:inverseRelation reqvire:derivedFrom ;
-  reqvire:allowedSourceType "feature", "requirement", "ontology" ;
+  reqvire:allowedSourceType "capability", "requirement", "ontology" ;
   reqvire:allowedTargetType "same-hierarchy-family" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Parent feature, requirement, or ontology derives child elements only within the same hierarchy family." .
+  reqvire:relationRuleDescription "Parent capability, requirement, or ontology derives child elements only within the same hierarchy family." .
 
 reqvire:derivedFromRelationRule a reqvire:RelationRule ;
   reqvire:relationName "derivedFrom" ;
   reqvire:inverseRelation reqvire:derive ;
-  reqvire:allowedSourceType "feature", "requirement", "ontology" ;
+  reqvire:allowedSourceType "capability", "requirement", "ontology" ;
   reqvire:allowedTargetType "same-hierarchy-family" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact false ;
-  reqvire:relationRuleDescription "Child feature, requirement, or ontology points to its parent in the same hierarchy family." .
+  reqvire:relationRuleDescription "Child capability, requirement, or ontology points to its parent in the same hierarchy family." .
 
 reqvire:specifiedByRelationRule a reqvire:RelationRule ;
   reqvire:relationName "specifiedBy" ;
   reqvire:inverseRelation reqvire:specify ;
-  reqvire:allowedSourceType "feature" ;
+  reqvire:allowedSourceType "capability" ;
   reqvire:allowedTargetType "requirement" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Feature points to a requirement that specifies the feature." .
+  reqvire:relationRuleDescription "Capability points to a requirement that specifies the capability." .
 
 reqvire:specifyRelationRule a reqvire:RelationRule ;
   reqvire:relationName "specify" ;
   reqvire:inverseRelation reqvire:specifiedBy ;
   reqvire:allowedSourceType "requirement" ;
-  reqvire:allowedTargetType "feature" ;
+  reqvire:allowedTargetType "capability" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact false ;
-  reqvire:relationRuleDescription "Requirement points to the feature it specifies." .
+  reqvire:relationRuleDescription "Requirement points to the capability it specifies." .
 
 reqvire:refinedByRelationRule a reqvire:RelationRule ;
   reqvire:relationName "refinedBy" ;
   reqvire:inverseRelation reqvire:refine ;
-  reqvire:allowedSourceType "feature", "requirement" ;
+  reqvire:allowedSourceType "capability", "requirement" ;
   reqvire:allowedTargetType "subtype-compatible-refinement" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Feature or requirement owns a subtype-compatible refinement element." .
+  reqvire:relationRuleDescription "Capability or requirement owns a subtype-compatible refinement element." .
 
 reqvire:refineRelationRule a reqvire:RelationRule ;
   reqvire:relationName "refine" ;
   reqvire:inverseRelation reqvire:refinedBy ;
   reqvire:allowedSourceType "refinement" ;
-  reqvire:allowedTargetType "feature-or-requirement-owner" ;
+  reqvire:allowedTargetType "capability-or-requirement-owner" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact false ;
@@ -310,22 +310,22 @@ reqvire:refineRelationRule a reqvire:RelationRule ;
 reqvire:verifiedByRelationRule a reqvire:RelationRule ;
   reqvire:relationName "verifiedBy" ;
   reqvire:inverseRelation reqvire:verify ;
-  reqvire:allowedSourceType "requirement" ;
+  reqvire:allowedSourceType "capability", "requirement" ;
   reqvire:allowedTargetType "verification" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Requirement points to verification evidence that verifies it." .
+  reqvire:relationRuleDescription "Capability or requirement points to verification evidence that verifies it." .
 
 reqvire:verifyRelationRule a reqvire:RelationRule ;
   reqvire:relationName "verify" ;
   reqvire:inverseRelation reqvire:verifiedBy ;
   reqvire:allowedSourceType "verification" ;
-  reqvire:allowedTargetType "requirement" ;
+  reqvire:allowedTargetType "capability", "requirement" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact false ;
-  reqvire:relationRuleDescription "Verification element points to the requirement it verifies." .
+  reqvire:relationRuleDescription "Verification element points to the capability or requirement it verifies." .
 
 reqvire:satisfiedByRelationRule a reqvire:RelationRule ;
   reqvire:relationName "satisfiedBy" ;
@@ -358,18 +358,18 @@ reqvire:traceRelationRule a reqvire:RelationRule ;
 
 reqvire:attachmentRelationRule a reqvire:RelationRule ;
   reqvire:relationName "attachment" ;
-  reqvire:allowedSourceType "feature", "requirement" ;
-  reqvire:allowedTargetType "feature-attached-ontology-or-requirement-owned-refinement" ;
+  reqvire:allowedSourceType "capability", "requirement" ;
+  reqvire:allowedTargetType "capability-attached-ontology-or-requirement-owned-refinement" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Attachment references feature-owned ontology context or a compatible requirement-owned refinement contract across explicit subgraph boundaries." .
+  reqvire:relationRuleDescription "Attachment references capability-owned ontology context or a compatible requirement-owned refinement contract across explicit subgraph boundaries." .
 
-reqvire:featureAttachmentCompatibilityRule a reqvire:AttachmentCompatibilityRule ;
-  reqvire:attachmentSourceType "feature" ;
+reqvire:capabilityAttachmentCompatibilityRule a reqvire:AttachmentCompatibilityRule ;
+  reqvire:attachmentSourceType "capability" ;
   reqvire:attachmentTargetType "ontology" ;
-  reqvire:attachmentOwnerType "feature" ;
-  reqvire:attachmentRuleDescription "Feature attachments reference ontology elements from explicit feature-root dependency contexts." .
+  reqvire:attachmentOwnerType "capability" ;
+  reqvire:attachmentRuleDescription "Capability attachments reference ontology elements from explicit capability-root dependency contexts." .
 
 reqvire:requirementAttachmentCompatibilityRule a reqvire:AttachmentCompatibilityRule ;
   reqvire:attachmentSourceType "requirement" ;

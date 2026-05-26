@@ -1,11 +1,11 @@
 # Elements
 
-### Access Feature
+### Access Capability
 
-Access feature.
+Access capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
   * specifiedBy: [Token Response Requirement](#token-response-requirement)
@@ -39,7 +39,7 @@ The system shall produce token responses with expiry information.
   * type: requirement
 
 #### Relations
-  * specify: [Access Feature](#access-feature)
+  * specify: [Access Capability](#access-capability)
   * refinedBy: [Token Response Shape Contract](#token-response-shape-contract)
 ---
 

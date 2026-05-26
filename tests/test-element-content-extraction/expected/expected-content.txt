@@ -19,4 +19,4 @@ REQ 7:Requirement with main text and relations and metadata and details differen
 
 REQ 8:Requirement with main text and relations details with <details> element that should not break parsing and validation.    #### Details <details> ### REQ 8 Nested requirement which should not be processed as requirement. #### Relations   * derivedFrom: #req-0          </details>
 
-Test Feature Test Element Content Extraction Requirements Md:Test feature root for migrated requirement fixtures. This file should be processed.
+Test Capability Test Element Content Extraction Requirements Md:Test capability root for migrated requirement fixtures. This file should be processed.

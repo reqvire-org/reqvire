@@ -19,7 +19,7 @@ Top level container for requirements.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Merge Elements Specifications Requirements Md](#test-feature-test-merge-elements-specifications-requirements-md)
+  * specify: [Test Capability Test Merge Elements Specifications Requirements Md](#test-capability-test-merge-elements-specifications-requirements-md)
 ---
 
 ### Another Link
@@ -88,12 +88,12 @@ Details from source one.
   * verifiedBy: [Target Test](Verifications.md#target-test)
 ---
 
-### Test Feature Test Merge Elements Specifications Requirements Md
+### Test Capability Test Merge Elements Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Test Verification

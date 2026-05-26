@@ -1,11 +1,11 @@
 # Elements
 
-### API Feature
+### API Capability
 
-API feature.
+API capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [API Ontology](#api-ontology)
@@ -38,7 +38,7 @@ The system shall expose service endpoint contracts.
   * type: requirement
 
 #### Relations
-  * specify: [API Feature](#api-feature)
+  * specify: [API Capability](#api-capability)
   * refinedBy: [API Endpoint Shape Contract](#api-endpoint-shape-contract)
 ---
 

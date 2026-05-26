@@ -97,7 +97,7 @@ if ! grep -qF "$EXPECTED_PATTERN" "$SPEC_HTML"; then
   echo "Expected pattern: $EXPECTED_PATTERN"
   echo ""
   echo "Searching for related content in $SPEC_HTML..."
-  grep -o 'System Feature Requirement[^"]*' "$SPEC_HTML" | head -5 || true
+  grep -o 'System Capability Requirement[^"]*' "$SPEC_HTML" | head -5 || true
   exit 1
 fi
 

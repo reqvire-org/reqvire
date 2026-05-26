@@ -95,14 +95,14 @@ graph TD
   * type: block
 
 #### Relations
-  * trace: [Operating on Model Elements](Features/BehaviorValidationOperations.md#operating-on-model-elements)
-  * trace: [AI-Assisted System Model Management](Features/Integration.md#ai-assisted-system-model-management)
+  * trace: [Operating on Model Elements](Capabilities/BehaviorValidationOperations.md#operating-on-model-elements)
+  * trace: [AI-Assisted System Model Management](Capabilities/Integration.md#ai-assisted-system-model-management)
   * trace: [CLI interface](Interfaces/Interfaces.md#cli-interface)
   * trace: [Web Interface](Interfaces/Interfaces.md#web-interface)
   * trace: [MCP Interface](Interfaces/Interfaces.md#mcp-interface)
-  * trace: [GitHub Workflow Automation](Features/Integration.md#github-workflow-automation)
+  * trace: [GitHub Workflow Automation](Capabilities/Integration.md#github-workflow-automation)
   * trace: [Model Reports](Functional/Output/Reporting.md#model-reports)
-  * trace: [Validating Structures](Features/BehaviorValidationOperations.md#validating-structures)
+  * trace: [Validating Structures](Capabilities/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ## Logical Architecture
@@ -234,14 +234,14 @@ classDiagram
   * type: block
 
 #### Relations
-  * trace: [Operating on Model Elements](Features/BehaviorValidationOperations.md#operating-on-model-elements)
-  * trace: [AI-Assisted System Model Management](Features/Integration.md#ai-assisted-system-model-management)
+  * trace: [Operating on Model Elements](Capabilities/BehaviorValidationOperations.md#operating-on-model-elements)
+  * trace: [AI-Assisted System Model Management](Capabilities/Integration.md#ai-assisted-system-model-management)
   * trace: [CLI interface](Interfaces/Interfaces.md#cli-interface)
   * trace: [Web Interface](Interfaces/Interfaces.md#web-interface)
   * trace: [MCP Interface](Interfaces/Interfaces.md#mcp-interface)
-  * trace: [GitHub Workflow Automation](Features/Integration.md#github-workflow-automation)
+  * trace: [GitHub Workflow Automation](Capabilities/Integration.md#github-workflow-automation)
   * trace: [Model Reports](Functional/Output/Reporting.md#model-reports)
-  * trace: [Validating Structures](Features/BehaviorValidationOperations.md#validating-structures)
+  * trace: [Validating Structures](Capabilities/BehaviorValidationOperations.md#validating-structures)
 ---
 
 ## Implementation Architecture

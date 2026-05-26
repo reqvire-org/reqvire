@@ -64,7 +64,7 @@ The Sunburst visualization displays the hierarchy as concentric rings:
 - Segment size proportional to number of descendants
 - Color-coded by element type
 
-**Interactive Features:**
+**Interactive Capabilities:**
 - Click on any segment to zoom into that subtree
 - Click center circle to zoom out (navigate to parent)
 - Center text shows current focused node name
@@ -87,7 +87,7 @@ The Icicle/Partition visualization displays the hierarchy as horizontal rectangu
 - Bar height proportional to number of descendants
 - Color-coded by element type
 
-**Interactive Features:**
+**Interactive Capabilities:**
 - Click on any bar to zoom into that subtree
 - Click on breadcrumb items to navigate back up the hierarchy
 - Breadcrumb path is clickable for quick navigation
@@ -111,7 +111,7 @@ Both visualizations use consistent colors matching Mermaid diagrams:
 | folder | #9E9E9E | Gray for directories |
 | file | #B8860B | Dark goldenrod for files |
 | design-document | #607D8B | Blue-gray for design docs |
-| feature | #BBDEFB | Blue for product/capability features |
+| capability | #BBDEFB | Blue for product/capability capabilities |
 | requirement | #673AB7 | Deep purple for requirements |
 | verification | #4CAF50 | Green for verifications |
 | test-verification | #4CAF50 | Green for test verifications |
@@ -162,7 +162,7 @@ Both visualizations consume JSON data in this format:
           "children": [
             {
               "name": "Authentication",
-              "type": "feature",
+              "type": "capability",
               "link": "requirements/UserStories.html#authentication",
               "children": [
                 {

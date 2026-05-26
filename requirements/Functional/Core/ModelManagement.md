@@ -15,7 +15,7 @@ Type assignment behavior shall follow the associated refinement specifications.
 
 #### Relations
   * refinedBy: [Default Requirement Type Assignment Refinement Specification](Specifications.md#default-requirement-type-assignment-refinement-specification)
-  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
+  * specify: [Operating on Model Elements](../../Capabilities/BehaviorValidationOperations.md#operating-on-model-elements)
   * verifiedBy: [Element Subsection Parsing Test](Verifications/ParsingVerifications.md#element-subsection-parsing-test)
   * verifiedBy: [Default Element Type Assignment Test](Verifications/ValidationVerifications.md#default-element-type-assignment-test)
 ---
@@ -29,7 +29,7 @@ The system shall process structured documents and relations to extract model-rel
 
 #### Relations
   * derive: [Opt-In Element Size Estimate Model Build](#opt-in-element-size-estimate-model-build)
-  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
+  * specify: [Operating on Model Elements](../../Capabilities/BehaviorValidationOperations.md#operating-on-model-elements)
 ---
 
 ### Opt-In Element Size Estimate Model Build
@@ -81,7 +81,7 @@ All manipulation operations shall:
   * refinedBy: [Dry-Run Mode Behavior](../Operations/Behaviors.md#dry-run-mode-behavior)
   * refinedBy: [File Persistence Behavior](../Operations/Behaviors.md#file-persistence-behavior)
   * refinedBy: [Operation Command Contract Specification](../Operations/Specifications.md#operation-command-contract-specification)
-  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
+  * specify: [Operating on Model Elements](../../Capabilities/BehaviorValidationOperations.md#operating-on-model-elements)
 ---
 
 ### Attachment Identifier Updates
@@ -124,7 +124,7 @@ The system shall use the Git repository root as the project base for path resolu
   * refinedBy: [Subdirectory Auto-Detection Behavior](Behaviors.md#subdirectory-auto-detection-behavior)
   * refinedBy: [Git Repository Scope Specification](Specifications.md#git-repository-scope-specification)
   * refinedBy: [Containment Specification](../../Refinements.md#containment-specification)
-  * specify: [Defining Model Structure](../../Features.md#defining-model-structure)
+  * specify: [Defining Model Structure](../../Capabilities.md#defining-model-structure)
   * verifiedBy: [Subdirectory Processing Verification](Verifications/ValidationVerifications.md#subdirectory-processing-verification)
 ---
 
@@ -166,25 +166,25 @@ The system shall define element type relation compatibility constraints.
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 
-### Feature Model Structure
+### Capability Model Structure
 
-The system shall support `feature` elements as product/capability roots that are specified by requirements.
+The system shall support `capability` elements as product/capability roots that are specified by requirements.
 
 #### Details
-Feature model behavior shall follow the relation type and validation specifications.
+Capability model behavior shall follow the relation type and validation specifications.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Relation Types and behaviors](#relation-types-and-behaviors)
-  * refinedBy: [Feature Model Structure Specification](Specifications.md#feature-model-structure-specification)
-  * verifiedBy: [Feature Element Relation Compatibility Test](Verifications/ValidationVerifications.md#feature-element-relation-compatibility-test)
+  * refinedBy: [Capability Model Structure Specification](Specifications.md#capability-model-structure-specification)
+  * verifiedBy: [Capability Element Relation Compatibility Test](Verifications/ValidationVerifications.md#capability-element-relation-compatibility-test)
 ---
 
-### Feature Collect Traversal
+### Capability Collect Traversal
 
-The system shall collect feature and requirement context using separate feature and requirement hierarchy traversal with the `specifiedBy`/`specify` bridge only where directionally intended.
+The system shall collect capability and requirement context using separate capability and requirement hierarchy traversal with the `specifiedBy`/`specify` bridge only where directionally intended.
 
 #### Details
 Collect traversal behavior shall follow the associated output specification.
@@ -193,24 +193,24 @@ Collect traversal behavior shall follow the associated output specification.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Model Structure](#feature-model-structure)
-  * refinedBy: [Feature Collect Traversal Specification](../Output/Specifications.md#feature-collect-traversal-specification)
-  * verifiedBy: [Feature Collect Traversal Test](../Output/Verifications/ReportingVerifications.md#feature-collect-traversal-test)
+  * derivedFrom: [Capability Model Structure](#capability-model-structure)
+  * refinedBy: [Capability Collect Traversal Specification](../Output/Specifications.md#capability-collect-traversal-specification)
+  * verifiedBy: [Capability Collect Traversal Test](../Output/Verifications/ReportingVerifications.md#capability-collect-traversal-test)
 ---
 
-### Feature Coverage Rollup
+### Capability Coverage Rollup
 
-The system shall report feature verification and implementation coverage by rolling up coverage from requirements that specify each feature.
+The system shall report capability verification and implementation coverage by rolling up coverage from requirements that specify each capability.
 
 #### Details
-Feature coverage shall remain separate from feature validation. Feature elements are not directly verified or satisfied.
+Capability coverage shall remain separate from capability validation. Capability elements may be directly verified but are not directly satisfied.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Model Structure](#feature-model-structure)
-  * verifiedBy: [Feature Coverage Rollup Test](../Output/Verifications/ReportingVerifications.md#feature-coverage-rollup-test)
+  * derivedFrom: [Capability Model Structure](#capability-model-structure)
+  * verifiedBy: [Capability Coverage Rollup Test](../Output/Verifications/ReportingVerifications.md#capability-coverage-rollup-test)
 ---
 
 ### Ontology and Semantic Contract Model
@@ -218,15 +218,15 @@ Feature coverage shall remain separate from feature validation. Feature elements
 The system shall support first-class `ontology` elements for reusable semantic vocabulary and requirement-owned `semantic-contract` refinement elements for obligation-specific SHACL shape profiles.
 
 #### Details
-Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated `requirements/Ontologies` folder rather than nested in feature files. Requirement-owned semantic contracts shall define SHACL shape profiles for one obligation and must not define ontology vocabulary.
+Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated `requirements/Ontologies` folder rather than nested in capability files. Requirement-owned semantic contracts shall define SHACL shape profiles for one obligation and must not define ontology vocabulary.
 
-Feature elements attach ontology elements to make vocabulary reachable for the feature, descendant features, and requirements that specify that feature context. Requirement elements must not attach ontology directly; they inherit ontology context through their owning feature path. Requirement elements may refine to semantic contracts when an obligation needs a closed-world profile over reachable ontology terms.
+Capability elements attach ontology elements to make vocabulary reachable for the capability, descendant capabilities, and requirements that specify that capability context. Requirement elements must not attach ontology directly; they inherit ontology context through their owning capability path. Capability and requirement elements may refine to semantic contracts, behavior, state, specification, constraint, and input-output refinements when they need closed-world profiles or additional operational/contract detail over reachable ontology terms.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Model Structure](#feature-model-structure)
+  * derivedFrom: [Capability Model Structure](#capability-model-structure)
   * refinedBy: [Semantic Contract Structure Specification](Specifications.md#semantic-contract-structure-specification)
   * verifiedBy: [Semantic Contract Ontology Declaration Validation Test](Verifications/ValidationVerifications.md#semantic-contract-ontology-declaration-validation-test)
   * verifiedBy: [Semantic Contract Ownership Validation Test](Verifications/ValidationVerifications.md#semantic-contract-ownership-validation-test)
@@ -239,7 +239,7 @@ Feature elements attach ontology elements to make vocabulary reachable for the f
 The system shall restrict Refinement elements (`source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, `input-output`) to only allow `refine` relations.
 
 #### Details
-Refinement relation validation shall enforce the subtype-compatible refinement vocabulary defined by the Reqvire feature, requirement, ontology, and semantic-contract model contracts.
+Refinement relation validation shall enforce the subtype-compatible refinement vocabulary defined by the Reqvire capability, requirement, ontology, and semantic-contract model contracts.
 
 #### Metadata
   * type: requirement
@@ -318,7 +318,7 @@ Governance metadata behavior shall follow the associated refinement specificatio
   * satisfiedBy: [element.rs](../../../core/src/element.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [search.rs](../../../core/src/search.rs)
-  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
+  * specify: [Operating on Model Elements](../../Capabilities/BehaviorValidationOperations.md#operating-on-model-elements)
   * verifiedBy: [Requirement Governance Metadata Verification](Verifications/ParsingVerifications.md#requirement-governance-metadata-verification)
   * verifiedBy: [Requirement Governance Metadata Formatting Verification](../Operations/Verifications/FormattingVerifications.md#requirement-governance-metadata-formatting-verification)
 ---
@@ -348,7 +348,7 @@ The system discovers all available templates in the repository and allows the us
   * type: requirement
 
 #### Relations
-  * specify: [Operating on Model Elements](../../Features/BehaviorValidationOperations.md#operating-on-model-elements)
+  * specify: [Operating on Model Elements](../../Capabilities/BehaviorValidationOperations.md#operating-on-model-elements)
 ---
 
 ### Verification Type Categories

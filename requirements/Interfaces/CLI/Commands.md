@@ -637,13 +637,13 @@ Implementation details shall follow the associated refinement specifications.
 
 ### CLI Submodels Command
 
-The system shall provide a `submodels` command that reports independent feature-rooted hierarchies and cross-submodel requirement couplings.
+The system shall provide a `submodels` command that reports independent capability-rooted hierarchies and cross-submodel requirement couplings.
 
 #### Details
 The command shall support:
-- `--from <NAME>` to scope report output to one feature or requirement subtree by name
+- `--from <NAME>` to scope report output to one capability or requirement subtree by name
 - `--json` and `--output <FILE>` for machine-readable output
-- In `--from` mode, selected feature scopes are listed as the scoped feature submodel; selected requirement scopes are treated as boundaries and are not listed as submodel entries
+- In `--from` mode, selected capability scopes are listed as the scoped capability submodel; selected requirement scopes are treated as boundaries and are not listed as submodel entries
 
 Implementation details shall follow the associated refinement specifications.
 
@@ -664,7 +664,7 @@ Implementation details shall follow the associated refinement specifications.
 
 ### CLI Traces Command
 
-The system shall provide a `traces` command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy and owning feature context.
+The system shall provide a `traces` command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy and owning capability context.
 
 #### Details
 Implementation details shall follow the associated refinement specifications.

@@ -8,9 +8,9 @@ Top-level container for test requirements.
   * type: requirement
 
 #### Relations
-  * derive: [Feature Requirement](#feature-requirement)
+  * derive: [Capability Requirement](#capability-requirement)
   * derive: [No Relations Requirement](#no-relations-requirement)
-  * specify: [Test Feature Test Link Unlink Specifications Requirements Md](#test-feature-test-link-unlink-specifications-requirements-md)
+  * specify: [Test Capability Test Link Unlink Specifications Requirements Md](#test-capability-test-link-unlink-specifications-requirements-md)
 ---
 
 ### Another Requirement
@@ -25,7 +25,7 @@ Another requirement for testing.
   * verifiedBy: [Orphan Test](Verifications.md#orphan-test)
 ---
 
-### Feature Requirement
+### Capability Requirement
 
 A requirement to be linked/unlinked.
 
@@ -48,11 +48,11 @@ A requirement without initial relations that link/unlink commands will modify.
   * derivedFrom: [System Requirements](#system-requirements)
 ---
 
-### Test Feature Test Link Unlink Specifications Requirements Md
+### Test Capability Test Link Unlink Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 

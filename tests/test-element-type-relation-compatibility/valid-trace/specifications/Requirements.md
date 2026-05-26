@@ -1,47 +1,47 @@
 # Elements
 
 
-### Test Feature Test Element Type Relation Compatibility Valid Trace Specifications
+### Test Capability Test Element Type Relation Compatibility Valid Trace Specifications
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Feature A
+### Capability A
 
-A feature for testing trace relations.
+A capability for testing trace relations.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-trace-specifications)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-valid-trace-specifications)
 ---
 
-### Feature B
+### Capability B
 
-Another feature.
+Another capability.
 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-type-relation-compatibility-valid-trace-specifications)
-  * trace: [Feature A](#feature-a)
+  * specify: [Test Capability](#test-capability-test-element-type-relation-compatibility-valid-trace-specifications)
+  * trace: [Capability A](#capability-a)
 
 ---
 
 ### System Requirement A
 
-System requirement with trace to feature.
+System requirement with trace to capability.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
-  * trace: [Feature B](#feature-b)
+  * derivedFrom: [Capability A](#capability-a)
+  * trace: [Capability B](#capability-b)
 
 ---
 
@@ -53,7 +53,7 @@ Test verification with trace to requirement.
   * type: test-verification
 
 #### Relations
-  * verify: [Feature A](#feature-a)
+  * verify: [Capability A](#capability-a)
   * trace: [System Requirement A](#system-requirement-a)
 
 ---
@@ -66,7 +66,7 @@ Test verification with trace to another verification.
   * type: test-verification
 
 #### Relations
-  * verify: [Feature B](#feature-b)
+  * verify: [Capability B](#capability-b)
   * trace: [Test Verification A](#test-verification-a)
 
 ---
@@ -79,8 +79,8 @@ Analysis verification can use trace.
   * type: analysis-verification
 
 #### Relations
-  * verify: [Feature A](#feature-a)
-  * trace: [Feature B](#feature-b)
+  * verify: [Capability A](#capability-a)
+  * trace: [Capability B](#capability-b)
 
 ---
 
@@ -92,7 +92,7 @@ Inspection verification can use trace.
   * type: inspection-verification
 
 #### Relations
-  * verify: [Feature A](#feature-a)
+  * verify: [Capability A](#capability-a)
   * trace: [Test Verification A](#test-verification-a)
 
 ---
@@ -105,7 +105,7 @@ Demonstration verification can use trace.
   * type: demonstration-verification
 
 #### Relations
-  * verify: [Feature A](#feature-a)
+  * verify: [Capability A](#capability-a)
   * trace: [Analysis Verification with Trace](#analysis-verification-with-trace)
 
 ---
@@ -118,7 +118,7 @@ Other type can only use trace relations.
   * type: other-other
 
 #### Relations
-  * trace: [Feature A](#feature-a)
+  * trace: [Capability A](#capability-a)
 
 ---
 

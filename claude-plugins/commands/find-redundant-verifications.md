@@ -49,9 +49,9 @@ Analyze the verification traces to find redundant verify relations in the model.
 ## Background
 
 A verify relation is redundant when:
-- A verification directly verifies both a child requirement AND its parent
-- Since verification traces roll up automatically, verifying the child is sufficient
-- The direct verification of the parent adds noise to the model
+- A verification directly verifies both an element and an ancestor already covered through the capability or requirement trace path
+- Since verification traces roll up automatically, verifying the most precise element is usually sufficient
+- The direct verification of the ancestor adds noise to the model unless the broader capability or parent requirement has distinct verification evidence
 
 Example:
 ```
@@ -62,7 +62,7 @@ Verification "Password Test" verifies:
 → The verify relation to "Password Authentication" is REDUNDANT
 ```
 
-The system automatically detects this by building trace trees and checking if any ancestor requirements are also directly verified.
+The system automatically detects this by building trace trees and checking if any ancestor capabilities or requirements are also directly verified.
 
 ## Notes
 

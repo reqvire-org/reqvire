@@ -1,46 +1,46 @@
 # Elements
 
 
-### User Req A Feature
+### User Req A Capability
 
-Feature root for User Req A hierarchy.
+Capability root for User Req A hierarchy.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### User Req X Feature
+### User Req X Capability
 
-Feature root for User Req X hierarchy.
+Capability root for User Req X hierarchy.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### User Req Y Feature
+### User Req Y Capability
 
-Feature root for User Req Y hierarchy.
+Capability root for User Req Y hierarchy.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Ancestor Req Feature
+### Ancestor Req Capability
 
-Feature root for Ancestor Req hierarchy.
+Capability root for Ancestor Req hierarchy.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### User Req A
 
-Top-level feature that defines Spec-1 via refinedBy.
+Top-level capability that defines Spec-1 via refinedBy.
 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [User Req A Feature](#user-req-a-feature)
+  * specify: [User Req A Capability](#user-req-a-capability)
   * derive: [Req B](#req-b)
   * derive: [Req D](#req-d)
   * refinedBy: [Spec-1](Refinements.md#spec-1)
@@ -102,7 +102,7 @@ Separate branch requirement - can legitimately attach Spec-1 and defines Spec-X.
   * [Spec-1](Refinements.md#spec-1)
 
 #### Relations
-  * specify: [User Req X Feature](#user-req-x-feature)
+  * specify: [User Req X Capability](#user-req-x-capability)
   * refinedBy: [Spec-X](Refinements.md#spec-x)
 ---
 
@@ -113,7 +113,7 @@ Another separate branch with its own hierarchy.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [User Req Y Feature](#user-req-y-feature)
+  * specify: [User Req Y Capability](#user-req-y-capability)
   * derive: [Req Y1](#req-y1)
 ---
 
@@ -138,7 +138,7 @@ A requirement that has children with refinedBy to a refinement.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Ancestor Req Feature](#ancestor-req-feature)
+  * specify: [Ancestor Req Capability](#ancestor-req-capability)
   * derive: [Child With Refinement](#child-with-refinement)
 ---
 

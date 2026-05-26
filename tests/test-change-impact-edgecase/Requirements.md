@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Change Impact Edgecase Requirements Md
+### Test Capability Test Change Impact Edgecase Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Deployments
@@ -17,7 +17,7 @@ Root requiement.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-change-impact-edgecase-requirements-md)
+  * specify: [Test Capability](#test-capability-test-change-impact-edgecase-requirements-md)
 ---
 
 ### Deployment Plugins
@@ -27,7 +27,7 @@ The system shall allow authorized users in EnvironmentsArea to add, remove, and 
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-change-impact-edgecase-requirements-md)
+  * specify: [Test Capability](#test-capability-test-change-impact-edgecase-requirements-md)
   * derivedFrom: [Deployments](#deployments)
 ---
 
@@ -43,7 +43,7 @@ The system shall allow authorized users in EnvironmentsArea to add plugins to en
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-change-impact-edgecase-requirements-md)
+  * specify: [Test Capability](#test-capability-test-change-impact-edgecase-requirements-md)
   * verifiedBy: [Validate Plugin Management](Verifications.md#validate-plugin-management)
   * derivedFrom: [Deployment Plugins](#deployment-plugins)
 ---
@@ -59,6 +59,6 @@ The system shall provide users the ability to remove plugins from deployments wh
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-change-impact-edgecase-requirements-md)
+  * specify: [Test Capability](#test-capability-test-change-impact-edgecase-requirements-md)
   * verifiedBy: [Validate Plugin Removal](Verifications.md#validate-plugin-removal)
   * derivedFrom: [Deployment Plugins](#deployment-plugins)

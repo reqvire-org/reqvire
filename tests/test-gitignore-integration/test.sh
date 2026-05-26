@@ -103,7 +103,7 @@ cat > "${TEST_DIR}/specifications/ValidRequirements.md" << 'EOF'
 Root requirement for gitignore test.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ### Valid Requirement 001
 
@@ -186,7 +186,7 @@ cat > "${TEST_DIR}/specifications/ActiveRequirements.md" << 'EOF'
 Root requirement for gitignore test scenario 2.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ### Active Requirement 001
 
@@ -197,7 +197,7 @@ This file should be processed.
 EOF
 
 # Create files matching .gitignore pattern
-cat > "${TEST_DIR}/specifications/DRAFT-Feature.md" << 'EOF'
+cat > "${TEST_DIR}/specifications/DRAFT-Capability.md" << 'EOF'
 # Elements
 
 ### Draft Requirement 001
@@ -301,7 +301,7 @@ cat > "${TEST_DIR}/specifications/NormalRequirements.md" << 'EOF'
 Root requirement for gitignore test scenario 3.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ### Normal Requirement 001
 
@@ -402,7 +402,7 @@ cat > "${TEST_DIR}/specifications/subsystem/normal-file.md" << 'EOF'
 Root requirement for gitignore test scenario 4.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ### Normal Subsystem Requirement
 
@@ -553,7 +553,7 @@ cat > "${TEST_DIR}/specifications/ProcessedRequirements.md" << 'EOF'
 Root requirement for gitignore test scenario 5.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ### Processed Requirement 001
 
@@ -633,7 +633,7 @@ cat > "${TEST_DIR}/specifications/AllRequirements.md" << 'EOF'
 Root requirement for gitignore test scenario 6.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ### All Requirements 001
 

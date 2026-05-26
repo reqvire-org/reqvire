@@ -38,6 +38,6 @@
 - ❌ **[Root Requirement](specifications/Requirements.md#root-requirement)**
 - ❌ **[Uncovered Requirement](specifications/Requirements.md#uncovered-requirement)**
 
-## Feature Coverage
+## Capability Coverage
 
-- **[Test Feature Test Implementation Coverage Report Specifications Requirements Md](specifications/Requirements.md#test-feature-test-implementation-coverage-report-specifications-requirements-md)**: partial verification 0.0% (0/4 leaf), implementation 62.5% (5/8 requirements)
+- **[Test Capability Test Implementation Coverage Report Specifications Requirements Md](specifications/Requirements.md#test-capability-test-implementation-coverage-report-specifications-requirements-md)**: partial verification 0.0% (0/4 leaf), implementation 62.5% (5/8 requirements)

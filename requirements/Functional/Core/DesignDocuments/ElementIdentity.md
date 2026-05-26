@@ -36,7 +36,7 @@ An **Element ID** is a stable unique identifier for element identity:
 6. Keep alphanumeric characters, hyphens, and underscores only
 
 Example transformations:
-- `"My Feature Name"` -> `"my-feature-name"`
+- `"My Capability Name"` -> `"my-capability-name"`
 - `"Version 1.2.3"` -> `"version-123"` (dots removed)
 - `"Installation (Windows)"` -> `"installation-windows"` (parentheses removed)
 - `"C++ API Reference"` -> `"c-api-reference"` (++ removed)

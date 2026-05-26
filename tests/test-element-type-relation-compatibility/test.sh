@@ -83,9 +83,9 @@ if ! echo "$OUTPUT_SATISFIEDBY" | grep -qi "satisfiedBy\|non-test-verification\|
   exit 1
 fi
 
-# Check feature specific satisfiedBy restriction
-if ! echo "$OUTPUT_SATISFIEDBY" | grep -qi "feature"; then
-  echo "FAILED: Expected error message mentioning feature satisfiedBy restriction"
+# Check capability specific satisfiedBy restriction
+if ! echo "$OUTPUT_SATISFIEDBY" | grep -qi "capability"; then
+  echo "FAILED: Expected error message mentioning capability satisfiedBy restriction"
   echo "Output: $OUTPUT_SATISFIEDBY"
   exit 1
 fi

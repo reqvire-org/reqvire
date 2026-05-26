@@ -37,19 +37,19 @@
                           {
                             "relation_type": "derivedFrom",
                             "element": {
-                              "identifier": "specifications/Features.md#model-structure-exploration",
+                              "identifier": "specifications/Capabilities.md#model-structure-exploration",
                               "name": "Model Structure Exploration",
                               "element_type": "requirement",
-                              "file_path": "specifications/Features.md",
+                              "file_path": "specifications/Capabilities.md",
                               "file_order_index": 1,
                               "relations": [
                                 {
                                   "relation_type": "specify",
                                   "element": {
-                                    "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
-                                    "name": "Test Feature Test Model Command Specifications Features Md",
-                                    "element_type": "feature",
-                                    "file_path": "specifications/Features.md",
+                                    "identifier": "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md",
+                                    "name": "Test Capability Test Model Command Specifications Capabilities Md",
+                                    "element_type": "capability",
+                                    "file_path": "specifications/Capabilities.md",
                                     "file_order_index": 0,
                                     "relations": [],
                                     "attachments": [
@@ -104,19 +104,19 @@
                     {
                       "relation_type": "derivedFrom",
                       "element": {
-                        "identifier": "specifications/Features.md#model-structure-exploration",
+                        "identifier": "specifications/Capabilities.md#model-structure-exploration",
                         "name": "Model Structure Exploration",
                         "element_type": "requirement",
-                        "file_path": "specifications/Features.md",
+                        "file_path": "specifications/Capabilities.md",
                         "file_order_index": 1,
                         "relations": [
                           {
                             "relation_type": "specify",
                             "element": {
-                              "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
-                              "name": "Test Feature Test Model Command Specifications Features Md",
-                              "element_type": "feature",
-                              "file_path": "specifications/Features.md",
+                              "identifier": "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md",
+                              "name": "Test Capability Test Model Command Specifications Capabilities Md",
+                              "element_type": "capability",
+                              "file_path": "specifications/Capabilities.md",
                               "file_order_index": 0,
                               "relations": [],
                               "attachments": [
@@ -176,19 +176,19 @@
                           {
                             "relation_type": "derivedFrom",
                             "element": {
-                              "identifier": "specifications/Features.md#model-structure-exploration",
+                              "identifier": "specifications/Capabilities.md#model-structure-exploration",
                               "name": "Model Structure Exploration",
                               "element_type": "requirement",
-                              "file_path": "specifications/Features.md",
+                              "file_path": "specifications/Capabilities.md",
                               "file_order_index": 1,
                               "relations": [
                                 {
                                   "relation_type": "specify",
                                   "element": {
-                                    "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
-                                    "name": "Test Feature Test Model Command Specifications Features Md",
-                                    "element_type": "feature",
-                                    "file_path": "specifications/Features.md",
+                                    "identifier": "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md",
+                                    "name": "Test Capability Test Model Command Specifications Capabilities Md",
+                                    "element_type": "capability",
+                                    "file_path": "specifications/Capabilities.md",
                                     "file_order_index": 0,
                                     "relations": [],
                                     "attachments": [
@@ -234,19 +234,19 @@
               {
                 "relation_type": "derivedFrom",
                 "element": {
-                  "identifier": "specifications/Features.md#model-structure-exploration",
+                  "identifier": "specifications/Capabilities.md#model-structure-exploration",
                   "name": "Model Structure Exploration",
                   "element_type": "requirement",
-                  "file_path": "specifications/Features.md",
+                  "file_path": "specifications/Capabilities.md",
                   "file_order_index": 1,
                   "relations": [
                     {
                       "relation_type": "specify",
                       "element": {
-                        "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
-                        "name": "Test Feature Test Model Command Specifications Features Md",
-                        "element_type": "feature",
-                        "file_path": "specifications/Features.md",
+                        "identifier": "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md",
+                        "name": "Test Capability Test Model Command Specifications Capabilities Md",
+                        "element_type": "capability",
+                        "file_path": "specifications/Capabilities.md",
                         "file_order_index": 0,
                         "relations": [],
                         "attachments": [
@@ -293,19 +293,19 @@
                     {
                       "relation_type": "derivedFrom",
                       "element": {
-                        "identifier": "specifications/Features.md#model-structure-exploration",
+                        "identifier": "specifications/Capabilities.md#model-structure-exploration",
                         "name": "Model Structure Exploration",
                         "element_type": "requirement",
-                        "file_path": "specifications/Features.md",
+                        "file_path": "specifications/Capabilities.md",
                         "file_order_index": 1,
                         "relations": [
                           {
                             "relation_type": "specify",
                             "element": {
-                              "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
-                              "name": "Test Feature Test Model Command Specifications Features Md",
-                              "element_type": "feature",
-                              "file_path": "specifications/Features.md",
+                              "identifier": "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md",
+                              "name": "Test Capability Test Model Command Specifications Capabilities Md",
+                              "element_type": "capability",
+                              "file_path": "specifications/Capabilities.md",
                               "file_order_index": 0,
                               "relations": [],
                               "attachments": [
@@ -389,19 +389,19 @@
                           {
                             "relation_type": "derivedFrom",
                             "element": {
-                              "identifier": "specifications/Features.md#model-structure-exploration",
+                              "identifier": "specifications/Capabilities.md#model-structure-exploration",
                               "name": "Model Structure Exploration",
                               "element_type": "requirement",
-                              "file_path": "specifications/Features.md",
+                              "file_path": "specifications/Capabilities.md",
                               "file_order_index": 1,
                               "relations": [
                                 {
                                   "relation_type": "specify",
                                   "element": {
-                                    "identifier": "specifications/Features.md#test-feature-test-model-command-specifications-features-md",
-                                    "name": "Test Feature Test Model Command Specifications Features Md",
-                                    "element_type": "feature",
-                                    "file_path": "specifications/Features.md",
+                                    "identifier": "specifications/Capabilities.md#test-capability-test-model-command-specifications-capabilities-md",
+                                    "name": "Test Capability Test Model Command Specifications Capabilities Md",
+                                    "element_type": "capability",
+                                    "file_path": "specifications/Capabilities.md",
                                     "file_order_index": 0,
                                     "relations": [],
                                     "attachments": [

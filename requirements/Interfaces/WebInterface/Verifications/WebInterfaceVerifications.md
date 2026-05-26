@@ -22,7 +22,7 @@ This test verifies that HTML export preserves attachment identifier links to ref
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
-  * verify: [Attachment Export](../Features.md#attachment-export)
+  * verify: [Attachment Export](../Capabilities.md#attachment-export)
 ---
 
 ### Containment Attachment Links Verification
@@ -47,7 +47,7 @@ This test verifies that the D3.js containment tree view displays attachments as 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
-  * verify: [Containment View Attachment Links](../Features.md#containment-view-attachment-links)
+  * verify: [Containment View Attachment Links](../Capabilities.md#containment-view-attachment-links)
 ---
 
 ### Diagram Attachment Display Verification
@@ -74,7 +74,7 @@ This test verifies that diagrams display attachment links within element boxes.
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
-  * verify: [Diagram Attachment Display](../Features.md#diagram-attachment-display)
+  * verify: [Diagram Attachment Display](../Capabilities.md#diagram-attachment-display)
 ---
 
 ### HTML Export Verification
@@ -114,7 +114,7 @@ This test verifies that the system exports specifications into HTML format with 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-html-export/test.sh)
-  * verify: [HTML Export](../Features.md#html-export)
+  * verify: [HTML Export](../Capabilities.md#html-export)
 ---
 
 ### HTML Export Local Linked Files Verification
@@ -139,7 +139,7 @@ This test verifies that HTML export preserves local linked-file references used 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-html-export-local-images/test.sh)
-  * verify: [Local Linked File Export](../Features.md#local-linked-file-export)
+  * verify: [Local Linked File Export](../Capabilities.md#local-linked-file-export)
 ---
 
 ### Model View Element Navigation Test
@@ -160,7 +160,7 @@ Test verifies that element names in the model-centric view are clickable links.
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
-  * verify: [Model View Element Navigation](../Features.md#model-view-element-navigation)
+  * verify: [Model View Element Navigation](../Capabilities.md#model-view-element-navigation)
 ---
 
 ### Serve Command Verification
@@ -196,5 +196,5 @@ This test verifies that the serve command exports HTML to a temporary directory 
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
-  * verify: [Serve Command](../Features.md#serve-command)
+  * verify: [Serve Command](../Capabilities.md#serve-command)
 ---

@@ -9,12 +9,12 @@ write_valid_model() {
   cat > "${TEST_DIR}/specifications/ConceptReferences.md" << 'EOF'
 # Elements
 
-### API Feature
+### API Capability
 
 API capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [API Ontology](#api-ontology)
@@ -50,7 +50,7 @@ The system shall publish service endpoint contracts.
   * Service Endpoint: api:ServiceEndpoint
 
 #### Relations
-  * specify: [API Feature](#api-feature)
+  * specify: [API Capability](#api-capability)
 ---
 EOF
 }
@@ -133,12 +133,12 @@ mkdir -p "${TEST_DIR}/specifications"
 cat > "${TEST_DIR}/specifications/ConceptReferences.md" << 'EOF'
 # Elements
 
-### API Feature
+### API Capability
 
 API capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [API Ontology](#api-ontology)
@@ -174,7 +174,7 @@ The system shall publish service endpoint contracts.
   * Missing Term: api:MissingTerm
 
 #### Relations
-  * specify: [API Feature](#api-feature)
+  * specify: [API Capability](#api-capability)
 ---
 EOF
 assert_invalid_model "Concept reference not found"
@@ -184,12 +184,12 @@ mkdir -p "${TEST_DIR}/specifications"
 cat > "${TEST_DIR}/specifications/ConceptReferences.md" << 'EOF'
 # Elements
 
-### API Feature
+### API Capability
 
 API capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [API Ontology](#api-ontology)
@@ -244,7 +244,7 @@ The system shall publish service endpoint contracts.
   * Region: urn:reqvire:test:infra:Region
 
 #### Relations
-  * specify: [API Feature](#api-feature)
+  * specify: [API Capability](#api-capability)
 ---
 EOF
 assert_invalid_model "Concept reference outside context"

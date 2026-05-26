@@ -1,30 +1,30 @@
 # Eval: add-requirement (with new skill)
 
 ## Task
-"I need to add a new feature for 'Batch Export' - the system should support exporting multiple specification files at once into a single archive. Add the feature, add a requirement that specifies it, and add a test verification for that requirement. Use the MBSE workflow. Put features in requirements/Features.md and requirements in requirements/Functional/Operations/Specifications.md. Don't actually run the commands, just show me the exact reqvire commands you would run."
+"I need to add a new capability for 'Batch Export' - the system should support exporting multiple specification files at once into a single archive. Add the capability, add a requirement that specifies it, and add a test verification for that requirement. Use the MBSE workflow. Put capabilities in requirements/Capabilities.md and requirements in requirements/Functional/Operations/Specifications.md. Don't actually run the commands, just show me the exact reqvire commands you would run."
 
 ## Approach
 - Read the skill at `/mnt/Radni/reqvire/claude-plugins/skills/syseng/SKILL.md`
-- Read the AddFeature reference at `/mnt/Radni/reqvire/claude-plugins/skills/syseng/reference/AddFeature.md`
+- Read the AddCapability reference at `/mnt/Radni/reqvire/claude-plugins/skills/syseng/reference/AddCapability.md`
 - Analyzed existing model structure by reading:
-  - `requirements/Features.md` (existing feature model)
-  - `requirements/Interfaces/WebInterface/Features.md` (existing export-related system requirements)
+  - `requirements/Capabilities.md` (existing capability model)
+  - `requirements/Interfaces/WebInterface/Capabilities.md` (existing export-related system requirements)
   - `requirements/Interfaces/Interfaces.md` (parent hierarchy)
   - `requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md` (existing verification format)
 
-**Note:** The actual project organizes features in `requirements/Features.md` and requirements by functional area.
+**Note:** The actual project organizes capabilities in `requirements/Capabilities.md` and requirements by functional area.
 
 ## Commands
 
-### Command 1 -- Add Feature
+### Command 1 -- Add Capability
 
 ```bash
-reqvire add requirements/Features.md --content '### Batch Export
+reqvire add requirements/Capabilities.md --content '### Batch Export
 
 As a **System Engineer**, I want to export multiple specification files at once into a single archive, so that I can efficiently share and distribute complete sets of system documentation.
 
 #### Metadata
-  * type: feature
+  * type: capability
 '
 ```
 
@@ -46,7 +46,7 @@ The batch export shall:
   * type: requirement
 
 #### Relations
-  * specify: [Batch Export](../../Features.md#batch-export)
+  * specify: [Batch Export](../../Capabilities.md#batch-export)
 '
 ```
 
@@ -91,7 +91,7 @@ reqvire format --fix
 ### Traceability Chain
 
 ```
-Batch Export (feature)
+Batch Export (capability)
     |
     +-- derive --> Batch Specification Export (requirement)
                        |
@@ -101,6 +101,6 @@ Batch Export (feature)
 ### Key Design Decisions
 
 1. **EARS pattern**: The system requirement uses the event-driven pattern ("When the user requests...the system shall...").
-2. **No `satisfiedBy`** on the feature (forbidden per skill constraints) or on the system requirement (no implementation exists yet).
+2. **No `satisfiedBy`** on the capability (forbidden per skill constraints) or on the system requirement (no implementation exists yet).
 3. **Bottom roll-up verification**: The test verification is attached only to the leaf system requirement; parent coverage is inherited.
 4. **`derivedFrom` inline**: The derive link from user to system requirement is embedded in the system requirement's Relations section, so a separate `reqvire link` command is not needed.

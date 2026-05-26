@@ -388,7 +388,7 @@ fn element_iri(element: &Element) -> String {
 
 fn element_type_class(element_type: &ElementType) -> &'static str {
     match element_type {
-        ElementType::Feature => "reqvire:Feature",
+        ElementType::Capability => "reqvire:Capability",
         ElementType::Requirement(_) => "reqvire:Requirement",
         ElementType::Ontology => "reqvire:OntologyElement",
         ElementType::Verification(_) => "reqvire:Verification",

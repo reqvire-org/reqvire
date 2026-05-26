@@ -80,19 +80,19 @@ Verify attachment rules for ontology elements and requirement-owned semantic-con
 
 #### Details
 Test cases:
-- Feature attachment to an `ontology` element validates.
-- Feature attachment to a requirement-owned `semantic-contract` fails.
-- Feature attachment to a requirement-detail refinement such as `input-output` fails.
+- Capability attachment to an `ontology` element validates.
+- Capability attachment to a requirement-owned `semantic-contract` fails.
+- Capability attachment to a requirement-detail refinement such as `input-output` fails.
 - Requirement attachment to an `ontology` element fails.
 - Requirement attachment to a requirement-owned `semantic-contract` validates.
-- Requirement attachment to ontology is forbidden because ontology context is inherited from the owning feature path.
+- Requirement attachment to ontology is forbidden because ontology context is inherited from the owning capability path.
 - Requirement attachment to semantic contracts is limited to requirement-owned semantic contracts.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-feature-attachments/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-capability-attachments/test.sh)
   * verify: [Attachment Target Validation](../Validation.md#attachment-target-validation)
   * verify: [Attachment Scope Validation](../Validation.md#attachment-scope-validation)
   * verify: [Ontology and Semantic Contract Model](../ModelManagement.md#ontology-and-semantic-contract-model)
@@ -129,7 +129,7 @@ Verify that attachment scope constraints (hierarchical independence, refine requ
 
 **Test cases for refine owner requirement:**
 - Model with attachment to orphan refinement (no refine relations) causes `validate` to fail
-- Error message indicates refinement must refine a feature or requirement
+- Error message indicates refinement must refine a capability or requirement
 - Accept attachment to refinement with refine relations
 
 **Test cases for attach command:**
@@ -223,7 +223,7 @@ Verify the system validates attachment targets as refinement element identifiers
 #### Details
 Test cases for element identifiers:
 - Accept Refinement element identifiers (constraint, behavior, specification, state, input-output)
-- Reject non-Refinement element identifiers (feature, requirement, verification)
+- Reject non-Refinement element identifiers (capability, requirement, verification)
 - Reject file-path attachment syntax
 - Error message indicates expected Refinement type
 - Validation fails for non-existent element identifiers

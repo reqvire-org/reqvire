@@ -1,23 +1,23 @@
 # Elements
 
 
-### Test Feature Test Format Full Relations Specifications Requirements Md
+### Test Capability Test Format Full Relations Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Parent Requirement
 
-A parent feature.
+A parent capability.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-format-full-relations-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-format-full-relations-specifications-requirements-md)
 ---
 
 ### Child Requirement

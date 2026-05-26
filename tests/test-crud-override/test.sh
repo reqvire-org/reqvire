@@ -34,9 +34,9 @@ assert_file_matches() {
 # Test 1: Override existing element
 # ==================================
 
-OVERRIDE_ELEMENT='### Feature A
+OVERRIDE_ELEMENT='### Capability A
 
-This is the UPDATED feature A with new content.
+This is the UPDATED capability A with new content.
 
 #### Details
 New details section added.
@@ -45,7 +45,7 @@ New details section added.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Crud Override Specifications Requirements Md](#test-feature-test-crud-override-specifications-requirements-md)
+  * specify: [Test Capability Test Crud Override Specifications Requirements Md](#test-capability-test-crud-override-specifications-requirements-md)
 '
 
 set +e
@@ -86,7 +86,7 @@ fi
 # Test 2: Override without flag should fail
 # ==================================
 
-DUPLICATE_ELEMENT='### Feature A
+DUPLICATE_ELEMENT='### Capability A
 
 This is a duplicate.
 
@@ -94,7 +94,7 @@ This is a duplicate.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Crud Override Specifications Requirements Md](#test-feature-test-crud-override-specifications-requirements-md)
+  * specify: [Test Capability Test Crud Override Specifications Requirements Md](#test-capability-test-crud-override-specifications-requirements-md)
 '
 
 set +e
@@ -117,15 +117,15 @@ fi
 # Test 3: Override non-existent element (should add)
 # ==================================
 
-NEW_ELEMENT='### Feature B
+NEW_ELEMENT='### Capability B
 
-This is a brand new feature.
+This is a brand new capability.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
+  * derivedFrom: [Capability A](#capability-a)
 '
 
 set +e
@@ -139,9 +139,9 @@ if [ $ADD_EXIT -ne 0 ]; then
   exit 1
 fi
 
-assert_file_matches "${TEST_SCRIPT_DIR}/expected/02-after-add-feature-b.md" \
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/02-after-add-capability-b.md" \
   "$TEST_DIR/specifications/Requirements.md" \
-  "File content after adding Feature B does not match expected"
+  "File content after adding Capability B does not match expected"
 
 # Verify model still validates
 set +e
@@ -159,18 +159,18 @@ fi
 # Test 4: Override with orphaned children prevention (should fail)
 # ==================================
 
-# Feature A now has Feature B as a child (from Test 3)
-# Attempting to override Feature A should be rejected
+# Capability A now has Capability B as a child (from Test 3)
+# Attempting to override Capability A should be rejected
 
-DRYRUN_ELEMENT='### Feature A
+DRYRUN_ELEMENT='### Capability A
 
-Attempted override that would orphan Feature B.
+Attempted override that would orphan Capability B.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Crud Override Specifications Requirements Md](#test-feature-test-crud-override-specifications-requirements-md)
+  * specify: [Test Capability Test Crud Override Specifications Requirements Md](#test-capability-test-crud-override-specifications-requirements-md)
 '
 
 set +e
@@ -180,7 +180,7 @@ set -e
 
 # Override should FAIL due to orphaned children prevention
 if [ $DRYRUN_EXIT -eq 0 ]; then
-  echo "❌ FAILED: Override should be rejected (would orphan Feature B)"
+  echo "❌ FAILED: Override should be rejected (would orphan Capability B)"
   echo "$DRYRUN_OUTPUT"
   exit 1
 fi
@@ -192,9 +192,9 @@ if ! echo "$DRYRUN_OUTPUT" | grep -qi "orphan"; then
   exit 1
 fi
 
-# Verify error message lists Feature B
-if ! echo "$DRYRUN_OUTPUT" | grep -q "Feature B"; then
-  echo "❌ FAILED: Error message should list Feature B as orphaned child"
+# Verify error message lists Capability B
+if ! echo "$DRYRUN_OUTPUT" | grep -q "Capability B"; then
+  echo "❌ FAILED: Error message should list Capability B as orphaned child"
   echo "Got: $DRYRUN_OUTPUT"
   exit 1
 fi
@@ -210,17 +210,17 @@ fi
 # Test 5: Override element without children (should succeed)
 # ==================================
 
-# Feature B has no children, so override should succeed
+# Capability B has no children, so override should succeed
 
-OVERRIDE_B_ELEMENT='### Feature B
+OVERRIDE_B_ELEMENT='### Capability B
 
-This is UPDATED Feature B content.
+This is UPDATED Capability B content.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
+  * derivedFrom: [Capability A](#capability-a)
 '
 
 set +e

@@ -1,15 +1,15 @@
 # Elements
 
 
-### Test Feature Test Crud Manipulation Specifications Requirements Md
+### Test Capability Test Crud Manipulation Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
-### Parent Feature
+### Parent Capability
 
 This is a parent requirement.
 
@@ -17,52 +17,52 @@ This is a parent requirement.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-crud-manipulation-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-crud-manipulation-specifications-requirements-md)
 ---
 
-### Feature A
+### Capability A
 
-This is a test requirement for feature A.
+This is a test requirement for capability A.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Parent Feature](#parent-feature)
+  * derivedFrom: [Parent Capability](#parent-capability)
 ---
 
-### Feature B
+### Capability B
 
-This is a test requirement for feature B.
+This is a test requirement for capability B.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
+  * derivedFrom: [Capability A](#capability-a)
 ---
 
-### Feature C
+### Capability C
 
-This is a test requirement for feature C with relations.
+This is a test requirement for capability C with relations.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
-  * verifiedBy: [Test for Feature C](Verifications/Tests.md#test-for-feature-c)
+  * derivedFrom: [Capability A](#capability-a)
+  * verifiedBy: [Test for Capability C](Verifications/Tests.md#test-for-capability-c)
 ---
 
 ### Complex chars, element/name example
 
-This feature has special characters in its name including commas and slashes.
+This capability has special characters in its name including commas and slashes.
 
 #### Metadata
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature A](#feature-a)
+  * derivedFrom: [Capability A](#capability-a)
 ---
 
 ### Separate Requirement Branch
@@ -73,5 +73,5 @@ A separate requirement hierarchy for testing attachments.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-crud-manipulation-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-crud-manipulation-specifications-requirements-md)
 ---

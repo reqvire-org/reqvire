@@ -12,7 +12,7 @@
 
 ## Overview
 
-The TraceFlow view displays the verification traceability flow using an interactive D3.js Sankey diagram visualization. This view shows how product features are specified by requirements and how requirements flow to verifications, providing a clear visual representation of the traceability relationships.
+The TraceFlow view displays the verification traceability flow using an interactive D3.js Sankey diagram visualization. This view shows how capabilities are specified by requirements, how requirements flow to verifications, and how capabilities may be directly verified, providing a clear visual representation of the traceability relationships.
 
 The TraceFlow page is accessible via the "TraceFlow" link in the navigation bar, positioned after "Traces".
 
@@ -24,18 +24,18 @@ The TraceFlow visualization displays the traceability hierarchy as a Sankey flow
 
 **Structure:**
 - Left-to-right flow showing requirement hierarchy
-- Nodes represent elements (features, requirements, verifications)
-- Links represent relations (specifiedBy, derivedFrom, verifiedBy)
+- Nodes represent elements (capabilities, requirements, verifications)
+- Links represent relations (specifiedBy, derivedFrom, verifiedBy), including direct capability verification links
 - Link width proportional to the number of connections
 - Color-coded by element type
 
 **Node Types:**
-- Features (blue)
+- Capabilities (blue)
 - System requirements (deep purple)
 - Verifications (green)
 - Test verifications (green)
 
-**Interactive Features:**
+**Interactive Capabilities:**
 - Pan and zoom support with mouse wheel and buttons
 - Touch pinch-zoom for mobile devices
 - Hover shows element details
@@ -50,7 +50,7 @@ The visualization uses consistent colors matching other diagrams:
 
 | Type | Color | Description |
 |------|-------|-------------|
-| feature | #BBDEFB | Blue for product/capability features |
+| capability | #BBDEFB | Blue for product/capability capabilities |
 | requirement | #673AB7 | Deep purple for requirements |
 | verification | #4CAF50 | Green for verifications |
 | test-verification | #4CAF50 | Green for test verifications |

@@ -1,13 +1,13 @@
 ---
 allowed-tools: Read, Bash(npx:*)
 argument-hint: <element-name>
-description: Collect and summarize requirement context via derivedFrom chain (upstream) or derive chain (downstream)
+description: Collect and summarize element trace context via upstream or downstream relations
 model: claude-sonnet-4-5
 ---
 
-# Collect Requirement Context
+# Collect Element Trace Context
 
-Collect and present a comprehensive summary of requirement context via the derivedFrom chain (upstream, default) or derive chain (downstream).
+Collect and present a comprehensive summary of capability, requirement, refinement, verification, and implementation context via the upstream trace chain by default or the downstream trace chain when requested.
 
 ## Model Context
 
@@ -23,7 +23,7 @@ ${1:-The user will provide the element name.}
 
 ### 1. Collect Raw Content
 
-Run the `reqvire collect` command to gather the complete requirement context:
+Run the `reqvire collect` command to gather the complete trace context:
 
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" collect "${1}" --json --output /tmp/collect_output.json
@@ -31,11 +31,11 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 This command collects:
 - The target element's content and metadata
-- Full derivedFrom chain (all ancestor requirements)
-- Attached specifications, constraints, and behaviors
+- Full upstream trace chain, including owning capabilities and ancestor requirements
+- Attached/refining specifications, constraints, behaviors, states, input-output contracts, and semantic contracts
 - Related documentation files
 - Source citations and file paths
-- Verification and satisfaction relations
+- Verification, satisfaction, and refinement relations
 
 **Error Handling:**
 - If the command fails, check that the element name is correct
@@ -52,20 +52,20 @@ Read the collected JSON file:
 
 The JSON structure includes:
 - **`element`**: The target element's content, metadata, and type
-- **`ancestors`**: Array of parent elements in the derivedFrom chain (from root to target)
-- **`attachments`**: Specifications, constraints, and behaviors attached to requirements
+- **`ancestors`**: Array of upstream trace elements from root to target
+- **`attachments`**: Specifications, constraints, behaviors, states, input-output contracts, and semantic contracts refining the context
 - **`documents`**: Related markdown documentation files with content
 - **`citations`**: Source file paths and anchors for traceability
 - **`relations`**: verifiedBy, satisfiedBy, and refinedBy links to other elements
 
 Extract and organize:
 - **Target element details**: Name, type, full content
-- **Derivation hierarchy**: Parent requirements showing refinement path
-- **Attached specifications**: All specs, constraints, behaviors
+- **Trace hierarchy**: Owning capability path and requirement refinement path
+- **Attached refinements**: All specifications, constraints, behaviors, states, input-output contracts, and semantic contracts
 - **Documentation**: Content from attached markdown files
 - **Verification info**: verifiedBy relations and test criteria
 - **Implementation info**: satisfiedBy relations and code references
-- **Refinement info**: refinedBy relations to specifications, constraints, behaviors
+- **Refinement info**: refinedBy relations to compatible refinement elements
 - **Source locations**: File paths and anchors for all elements
 
 ### 3. Generate Comprehensive Context Document
@@ -82,21 +82,21 @@ Create a complete, readable markdown document that synthesizes all collected inf
 #### Document Structure
 
 ```markdown
-# Requirement Context: [Element Name]
+# Trace Context: [Element Name]
 
 ## Overview
 
-[Write a comprehensive description of what this requirement accomplishes, its purpose, and business value. Rephrase the requirement content to be narrative and readable, not just quoted. Explain what problem it solves and who benefits.]
+[Write a comprehensive description of what this element represents, its purpose, and its engineering value. For a capability, explain what the system is able to accomplish. For a requirement, explain the obligation or guarantee it imposes. Rephrase content into narrative form, not just quoted text.]
 
 ## Background
 
-[Explain the feature and requirement chain and why this requirement exists. Describe the owning feature context, the specify bridge, and the derivedFrom chain down to this element. For each level in the hierarchy, explain how each child adds specificity or detail to its parent. This section tells the "why" story.]
+[Explain the ontology, capability, requirement, and verification context around the target element. Describe the owning capability context, the specify bridge when present, and the derivedFrom chain down to this element. For each level in the hierarchy, explain how each child adds specificity or detail to its parent. This section tells the "why" story.]
 
 ## Detailed Specifications
 
 ### Core Requirements
 
-[Include ALL requirement content, rephrased as a coherent narrative. Break down into logical subsections if the requirement is complex. Don't just list - explain what the requirement means and implies. Include all details but make them readable.]
+[Include all relevant capability and requirement content, rephrased as a coherent narrative. Break down complex material into logical subsections. Explain what each capability means operationally and what each requirement guarantees.]
 
 ### Implementation Details
 
@@ -111,18 +111,18 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ### Constraints and Validation
 
-[Detail ALL constraints and validation rules from attached constraint elements. Don't just list - explain what each constraint means, why it exists, and what it prevents or ensures. Make the constraints understandable.]
+[Detail all constraints, state rules, semantic contracts, and validation rules from attached refinement elements. Explain what each rule means, why it exists, and what it prevents or ensures.]
 
 ### Attached Specifications
 
-[Include content from ALL attached specifications, constraints, and behaviors. Rephrase this content to flow naturally as part of the document narrative. Synthesize related specs together rather than treating them as separate items.]
+[Include content from all attached specifications, constraints, behaviors, states, input-output contracts, and semantic contracts. Rephrase this content to flow naturally as part of the document narrative. Synthesize related refinements together rather than treating them as separate items.]
 
 ## Verification
 
-[Describe how this requirement is verified, extracted from verifiedBy relations and attached verification elements:]
+[Describe how this element is verified, extracted from verifiedBy relations and attached verification elements:]
 
 - **Verification Methods**: [List and describe verifiedBy elements - what type of verification (test, inspection, analysis, demonstration)]
-- **Test Criteria**: [Explain what the tests validate and how they prove the requirement is satisfied]
+- **Test Criteria**: [Explain what the tests validate and how they prove the capability or requirement is satisfied]
 - **Acceptance Criteria**: [Detail what constitutes successful verification - what must pass]
 - **Coverage**: [If applicable, mention any unverified aspects or verification gaps]
 
@@ -138,13 +138,13 @@ Create a complete, readable markdown document that synthesizes all collected inf
 - File: [path/to/file.md#element-anchor]
 - Type: [requirement/specification/etc.]
 
-**Derived From:**
-[List all parent requirements in the derivedFrom chain with links]
-- [Parent Requirement 1](path/to/file.md#parent-1)
-- [Parent Requirement 2](path/to/file.md#parent-2)
+**Trace Chain:**
+[List all owning capabilities and parent requirements in the upstream chain with links]
+- [Parent Capability 1](path/to/file.md#parent-1)
+- [Parent Requirement 1](path/to/file.md#parent-2)
 
 **Verified By:**
-[List all verifications that verify this requirement]
+[List all verifications that verify this element]
 - [Verification 1](path/to/file.md#verification-1)
 - [Verification 2](path/to/file.md#verification-2)
 
@@ -154,7 +154,7 @@ Create a complete, readable markdown document that synthesizes all collected inf
 - [Implementation 2](path/to/file.md#impl-2)
 
 **Refined By:**
-[List all refinement elements owned by this requirement]
+[List all refinement elements owned by this element]
 - [Specification 1](path/to/file.md#spec-1)
 - [Constraint 1](path/to/file.md#constraint-1)
 
@@ -181,7 +181,7 @@ Create a complete, readable markdown document that synthesizes all collected inf
 - **Context**: Explain the "why" behind decisions and requirements
 - **Clarity**: Use clear language that new team members can understand
 - **Completeness**: Include ALL details - nothing should be omitted
-- **Length**: As long as needed - simple features might be 1-2 pages, complex features might be 5-10 pages
+- **Length**: As long as needed - simple capabilities might be 1-2 pages, complex capabilities might be 5-10 pages
 
 ### Organization
 

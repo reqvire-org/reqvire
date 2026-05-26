@@ -29,10 +29,10 @@ The `add` command is expected to:
 Command syntax: `reqvire collect <element-name> [--direction UPSTREAM|DOWNSTREAM] [--json]`
 
 **Arguments:**
-- `<element-name>` - Required. Name of the feature or requirement element to collect from.
+- `<element-name>` - Required. Name of the capability or requirement element to collect from.
 
 **Options:**
-- `--direction <DIRECTION>` - Traversal direction. Values: `UPSTREAM` (default) or `DOWNSTREAM`. Requirement UPSTREAM traverses requirement parents and crosses to the owning feature through `specify`; requirement DOWNSTREAM follows child requirements. Feature UPSTREAM follows feature parents only; feature DOWNSTREAM follows child features and requirements through `specifiedBy`.
+- `--direction <DIRECTION>` - Traversal direction. Values: `UPSTREAM` (default) or `DOWNSTREAM`. Requirement UPSTREAM traverses requirement parents and crosses to the owning capability through `specify`; requirement DOWNSTREAM follows child requirements. Capability UPSTREAM follows capability parents only; capability DOWNSTREAM follows child capabilities and requirements through `specifiedBy`.
 - `--json` - Output in JSON format instead of text
 
 **Exit codes:**
@@ -54,9 +54,9 @@ Coverage command behavior:
 - Show the percentage and details of verified and unverified leaf requirements
 - Include breakdowns by file, section, and verification type
 - Show satisfaction status of test-verification elements (those with `satisfiedBy` relations)
-- Show orphaned verifications (verification elements without any `verify` relations to requirements)
+- Show orphaned verifications (verification elements without any `verify` relations to capabilities or requirements)
 - Include requirement implementation coverage summary for `requirement` elements only
-- Include feature coverage roll-up from requirements connected through `specifiedBy` / `specify`
+- Include capability coverage roll-up from requirements connected through `specifiedBy` / `specify`
 - Classify covered requirements using the implementation coverage source vocabulary defined by the Reqvire report ontology
 - Show implementation-uncovered requirements with identifiers and names
 - Emit all coverage percentages with at most 2 decimal places in text and JSON output
@@ -333,7 +333,7 @@ Model command behavior:
 - Support `--reverse` for leaf-to-root traversal.
 - Support `--filter-type=<types>` with comma-separated element types to filter starting points.
 - Default to Markdown output with embedded Mermaid diagram.
-- When neither `--from` nor `--filter-type` is provided in forward mode, use ontology roots and feature roots as default starting elements.
+- When neither `--from` nor `--filter-type` is provided in forward mode, use ontology roots and capability roots as default starting elements.
 - Integrate with existing model diagram generation functionality.
 
 #### Metadata
@@ -525,7 +525,7 @@ Command output is written to stdout for easy redirection to files.
 ### CLI Search Command Refinement Specification
 
 #### Details
-Search command features:
+Search command capabilities:
 - `search`: Search model elements and output results to stdout
 - Support `--json` flag for structured JSON output
 - Support `--short` flag for abbreviated output (both text and JSON)
@@ -556,7 +556,7 @@ Error handling:
 Default output:
 - Human-readable text format when neither `--json` nor `--short` is specified
 - Full detail mode showing all element metadata and relations
-- Full JSON output includes effective governance metadata for governance-bearing elements (`feature` and `requirement`)
+- Full JSON output includes effective governance metadata for governance-bearing elements (`capability` and `requirement`)
 
 #### Metadata
  * type: specification
@@ -567,16 +567,16 @@ Default output:
 #### Details
 Submodels command behavior:
 - Be invoked as `reqvire submodels`.
-- Support `--from <NAME>` to scope report to one feature or requirement subtree by name.
+- Support `--from <NAME>` to scope report to one capability or requirement subtree by name.
 - Support `--json` for JSON output format.
 - Default to human-readable text output when `--json` is not present.
-- Report independent feature-rooted submodels using feature hierarchy, `specifiedBy`, and requirement hierarchy.
+- Report independent capability-rooted submodels using capability hierarchy, `specifiedBy`, and requirement hierarchy.
 - Report cross-submodel requirement couplings using explicit requirement-to-requirement relations.
-- In `--from` mode for a feature, report the selected feature as the scoped feature submodel and count requirements in the selected feature subtree.
+- In `--from` mode for a capability, report the selected capability as the scoped capability submodel and count requirements in the selected capability subtree.
 - In `--from` mode for a requirement, treat the selected requirement as a scope boundary and exclude it from reported `submodels` entries.
 - Provide deterministic ordering for submodels and couplings.
 - Include summary totals for submodels, requirements, and cross-submodel couplings.
-- Return a clear error when `--from <NAME>` does not match any feature or requirement scope source.
+- Return a clear error when `--from <NAME>` does not match any capability or requirement scope source.
 - Exit with status code 0 on success and non-zero on errors.
 
 Command output is written to stdout for easy redirection to files.
@@ -597,8 +597,8 @@ The command is expected to:
 - Support `--json` flag for structured JSON output without diagrams
 - Show verification elements as roots with arrows following relation semantics
 - Include clickable links on all nodes (verifications and requirements) in Mermaid diagrams
-- Highlight directly verified requirements using CSS classes in diagrams
-- Traverse all upward parent relations to reach feature-rooted requirements
+- Highlight directly verified capabilities or requirements using CSS classes in diagrams
+- Traverse all upward parent relations to reach capability-rooted requirements
 - Merge multiple verification paths into a single tree per verification
 - Exit with status code 0 on success
 - Exit with non-zero status code on errors

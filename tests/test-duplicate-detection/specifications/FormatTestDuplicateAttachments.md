@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Duplicate Detection Specifications Formattestduplicateattachments Md
+### Test Capability Test Duplicate Detection Specifications Formattestduplicateattachments Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Format Test With Duplicate Attachments
@@ -17,7 +17,7 @@ This element has duplicate attachments that format should remove.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-feature-test-duplicate-detection-specifications-requirements-md)
+  * specify: [Test Capability Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-capability-test-duplicate-detection-specifications-requirements-md)
 
 #### Attachments
   * [Refinement Element](Requirements.md#refinement-element)

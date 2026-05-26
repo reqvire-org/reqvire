@@ -9,5 +9,5 @@ This requirement is satisfied by implementation code.
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Feature Alpha](Requirements.md#feature-alpha)
+  * derivedFrom: [Capability Alpha](Requirements.md#capability-alpha)
   * satisfiedBy: [code1.rs](../src/code1.rs)

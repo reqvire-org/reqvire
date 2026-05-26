@@ -177,12 +177,12 @@ cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/specifications" "$TEST_DIR/"
 cp -a "$TEST_SCRIPT_DIR/../test-json-file-output/docs" "$TEST_DIR/"
 cat >> "$TEST_DIR/specifications/Requirements.md" <<'EOF'
 
-### MCP Semantic Feature
+### MCP Semantic Capability
 
-MCP semantic feature for readable Access Token model concepts.
+MCP semantic capability for readable Access Token model concepts.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [MCP Access Token Ontology](#mcp-access-token-ontology)
@@ -219,7 +219,7 @@ The system shall expose MCP semantic evidence for readable Access Token model co
   * Access Token: mcp:AccessToken
 
 #### Relations
-  * specify: [MCP Semantic Feature](#mcp-semantic-feature)
+  * specify: [MCP Semantic Capability](#mcp-semantic-capability)
   * refinedBy: [MCP Access Token Shape Contract](#mcp-access-token-shape-contract)
 ---
 
@@ -319,7 +319,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.format == "turtle
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.summary.ontology_blocks >= 1 and .result.structuredContent.summary.shape_blocks >= 1' "ontologies tool returns semantic index summary"
 assert_jq_line "$DEFAULT_OUTPUT" 13 '.result.structuredContent.blocks[] | select(.source_name=="MCP Access Token Ontology" and .kind=="ontology")' "ontologies tool returns ontology block metadata"
 assert_jq_line "$DEFAULT_OUTPUT" 14 '.result.structuredContent.format == "jsonld" and (.result.structuredContent.jsonld | type == "array") and (.result.structuredContent.jsonld | length) > 0' "ontologies tool returns JSON-LD semantic content"
-assert_jq_line "$DEFAULT_OUTPUT" 15 '.result.structuredContent.full == true and (.result.structuredContent.content | contains("reqvire:attaches")) and (.result.structuredContent.content | contains("urn:reqvire:element:mcp-semantic-feature"))' "ontologies tool returns full model context triples"
+assert_jq_line "$DEFAULT_OUTPUT" 15 '.result.structuredContent.full == true and (.result.structuredContent.content | contains("reqvire:attaches")) and (.result.structuredContent.content | contains("urn:reqvire:element:mcp-semantic-capability"))' "ontologies tool returns full model context triples"
 
 UNSUPPORTED_PORT="$(pick_port)"
 UNSUPPORTED_OUTPUT_PREFIX="$TEST_DIR/output/mcp-unsupported-protocol"

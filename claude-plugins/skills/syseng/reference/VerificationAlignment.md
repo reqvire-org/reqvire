@@ -16,7 +16,7 @@ Keep verification elements and test scripts synchronized so each critical claim 
 
 ## Workflow
 
-1. **Locate owning verification element(s)** for the affected command/feature
+1. **Locate owning verification element(s)** for the affected command/capability
 2. **Inspect existing e2e assertions** and expected fixtures
 3. **Rewrite verification criteria** to match explicit assertions
 4. **Extend existing command test suite** with missing critical negative/positive cases
@@ -27,4 +27,4 @@ Keep verification elements and test scripts synchronized so each critical claim 
 
 - Do not keep unverifiable claims in verification criteria
 - Do not add vague criteria without direct assertions
-- Do not create a separate test if the existing feature suite should own the new criterion
+- Do not create a separate test if the existing capability suite should own the new criterion

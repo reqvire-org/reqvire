@@ -177,7 +177,7 @@ assert_search_rejects() {
   fi
 }
 
-assert_search_names "--filter-status=approved" "Child Inherits Governance|Default Governance Root|Independent Requirement|Root Requirement|Test Feature Test Requirement Governance Metadata Specifications Requirements Md" "filter by inherited and default status"
+assert_search_names "--filter-status=approved" "Child Inherits Governance|Default Governance Root|Independent Requirement|Root Requirement|Test Capability Test Requirement Governance Metadata Specifications Requirements Md" "filter by inherited and default status"
 assert_search_names "--filter-status=review" "Child Overrides Governance" "filter by explicit review status"
 assert_search_names "--filter-priority=high" "Child Inherits Governance|Child Overrides Governance|Root Requirement" "filter by inherited priority"
 assert_search_names "--filter-risk=critical" "Child Overrides Governance" "filter by explicit critical risk"

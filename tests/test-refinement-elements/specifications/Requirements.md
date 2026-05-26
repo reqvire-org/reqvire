@@ -1,11 +1,11 @@
 # Elements
 
-### Parent Feature
+### Parent Capability
 
-This is a parent feature for testing requirement-owned refinement elements.
+This is a parent capability for testing requirement-owned refinement elements.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
   * specifiedBy: [Parent Requirement](#parent-requirement)
@@ -19,7 +19,7 @@ This is a parent requirement for testing Refinement elements.
   * type: requirement
 
 #### Relations
-  * specify: [Parent Feature](#parent-feature)
+  * specify: [Parent Capability](#parent-capability)
   * refinedBy: [Test Constraint Element](#test-constraint-element)
   * refinedBy: [Test Behavior Element](#test-behavior-element)
   * refinedBy: [Test Specification Element](#test-specification-element)
@@ -87,12 +87,12 @@ This is an input-output refinement that describes payload structure and data con
 
 ---
 
-### Separate Branch Feature
+### Separate Branch Capability
 
-A separate feature hierarchy for testing attachments.
+A separate capability hierarchy for testing attachments.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
   * specifiedBy: [Separate Branch Requirement](#separate-branch-requirement)
@@ -106,7 +106,7 @@ A separate requirement hierarchy for testing attachments.
   * type: requirement
 
 #### Relations
-  * specify: [Separate Branch Feature](#separate-branch-feature)
+  * specify: [Separate Branch Capability](#separate-branch-capability)
 ---
 
 ### Requirement With Refinement Attachment

@@ -15,7 +15,7 @@ Unsupported first H1 headings shall be ignored by element parsing.
   * type: requirement
 
 #### Relations
-  * specify: [Defining Model Structure](../../Features.md#defining-model-structure)
+  * specify: [Defining Model Structure](../../Capabilities.md#defining-model-structure)
   * refinedBy: [Specification File Identification Refinement Specification](Specifications.md#specification-file-identification-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
@@ -33,7 +33,7 @@ The system shall implement semi-structured markdown format specifications that d
 #### Relations
   * derive: [Element Identity Model](#element-identity-model)
   * derive: [Reserved Subsections Support](#reserved-subsections-support)
-  * specify: [Defining Model Structure](../../Features.md#defining-model-structure)
+  * specify: [Defining Model Structure](../../Capabilities.md#defining-model-structure)
   * refinedBy: [MarkdownStructure](DesignDocuments/MarkdownStructure.md#markdownstructure)
   * refinedBy: [Structure and Addressing in Markdown Documents Refinement Specification](Specifications.md#structure-and-addressing-in-markdown-documents-refinement-specification)
   * satisfiedBy: [element.rs](../../../core/src/element.rs)

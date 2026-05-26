@@ -35,12 +35,12 @@ write_model() {
 write_model << 'EOF'
 # Elements
 
-### API Feature
+### API Capability
 
-API feature.
+API capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [API Ontology](#api-ontology)
@@ -73,7 +73,7 @@ The system shall publish service endpoint contracts.
   * type: requirement
 
 #### Relations
-  * specify: [API Feature](#api-feature)
+  * specify: [API Capability](#api-capability)
 ---
 EOF
 

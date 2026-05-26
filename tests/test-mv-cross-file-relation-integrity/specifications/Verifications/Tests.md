@@ -1,22 +1,22 @@
 # Elements
 
 
-### Test Feature A
+### Test Capability A
 
-Verify Feature A implementation.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * verify: ../Requirements.md#feature-a
-
-### Test Feature B
-
-Verify Feature B implementation.
+Verify Capability A implementation.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * verify: ../Requirements.md#feature-b
+  * verify: ../Requirements.md#capability-a
+
+### Test Capability B
+
+Verify Capability B implementation.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: ../Requirements.md#capability-b

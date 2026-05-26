@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Implementation Coverage Report Specifications Requirements Md
+### Test Capability Test Implementation Coverage Report Specifications Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Root Requirement
@@ -16,7 +16,7 @@ Top-level requirement used to exercise implementation coverage roll-up.
 #### Metadata
   * type: requirement
 #### Relations
-  * specify: [Test Feature](#test-feature-test-implementation-coverage-report-specifications-requirements-md)
+  * specify: [Test Capability](#test-capability-test-implementation-coverage-report-specifications-requirements-md)
   * derive: [Direct Implemented](#direct-implemented)
   * derive: [Derived Parent](#derived-parent)
   * derive: [Contract Owner](#contract-owner)

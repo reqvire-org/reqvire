@@ -59,16 +59,16 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 
 | Relation Type | Description | Usage |
 |---------------|-------------|-------|
-| `derivedFrom` | Source derives from target | Child to parent inside the same family: feature, requirement, or ontology |
-| `derive` | Source has derived target | Parent to child inside the same family: feature, requirement, or ontology |
+| `derivedFrom` | Source derives from target | Child to parent inside the same family: capability, requirement, or ontology |
+| `derive` | Source has derived target | Parent to child inside the same family: capability, requirement, or ontology |
 | `verifiedBy` | Source is verified by target | Requirement to verification |
 | `verify` | Source verifies target | Verification to requirement |
 | `satisfiedBy` | Source is satisfied by target | Requirement to implementation |
 | `satisfy` | Source satisfies target | Implementation to requirement |
-| `refinedBy` | Source owns target as refinement | Feature to `source`, or requirement to requirement-owned refinement |
+| `refinedBy` | Source owns target as refinement | Capability to `source`, or requirement to requirement-owned refinement |
 | `refine` | Source refines target | Refinement element to compatible owner (auto-generated) |
 | `trace` | General traceability link | Any traceability relationship |
-| `attaching` | Attach file or element | Attach ontology to features, or compatible requirement-owned refinements to requirements |
+| `attaching` | Attach file or element | Attach ontology to capabilities, or compatible requirement-owned refinements to requirements |
 
 ## Target Types
 
@@ -83,7 +83,7 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 
 `satisfiedBy` / `satisfy` rule:
 - Allowed source/target model element types are `requirement`, `test-verification`, and `formal-proof-verification`.
-- `feature` is not allowed to use `satisfiedBy`/`satisfy`.
+- `capability` is not allowed to use `satisfiedBy`/`satisfy`.
 
 **For attaching:**
 - Internal file path (e.g., "docs/SLA.pdf")
@@ -144,14 +144,14 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "System Requirement" attaching "Performance Constraint"
 ```
 
-**Attach ontology to a feature:**
+**Attach ontology to a capability:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Authentication Feature" attaching "Access Token Ontology"
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Authentication Capability" attaching "Access Token Ontology"
 ```
 
 **Preview before linking:**
 ```bash
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Feature X" trace "Feature Y" --dry-run
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" link "Capability X" trace "Capability Y" --dry-run
 ```
 
 ## When to Use link

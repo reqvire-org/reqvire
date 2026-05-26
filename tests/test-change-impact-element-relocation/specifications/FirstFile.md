@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Change Impact Element Relocation Specifications Firstfile Md
+### Test Capability Test Change Impact Element Relocation Specifications Firstfile Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Battery Saver
@@ -17,7 +17,7 @@ The system shall disable non-essential background services when battery levels d
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature Test Change Impact Element Relocation Specifications Firstfile Md](#test-feature-test-change-impact-element-relocation-specifications-firstfile-md)
+  * specify: [Test Capability Test Change Impact Element Relocation Specifications Firstfile Md](#test-capability-test-change-impact-element-relocation-specifications-firstfile-md)
 ---
 
 ### Power Efficiency

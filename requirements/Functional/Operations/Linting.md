@@ -25,7 +25,7 @@ When filtering lint results, the system shall allow focusing on specific categor
   * derive: [Redundant Hierarchical Relations Detection and Auto-Removal](#redundant-hierarchical-relations-detection-and-auto-removal)
   * derive: [Redundant Verify Relations Detection](#redundant-verify-relations-detection)
   * refinedBy: [Lint Output Specification](Specifications.md#lint-output-specification)
-  * specify: [Linting Model Quality](../../Features/BehaviorValidationOperations.md#linting-model-quality)
+  * specify: [Linting Model Quality](../../Capabilities/BehaviorValidationOperations.md#linting-model-quality)
 ---
 
 ### Cross-Submodel Hierarchical Relation Detection
@@ -99,7 +99,7 @@ The system shall detect and auto-remove redundant derivedFrom relations where an
 
 ### Redundant Verify Relations Detection
 
-The system shall detect redundant verify relations where a verification directly verifies both a child requirement and its ancestor, leveraging the existing verification trace tree logic from the Verification Trace Builder.
+The system shall detect redundant verify relations where a verification directly verifies both a child element and its ancestor in the capability or requirement hierarchy, leveraging the existing verification trace tree logic from the Verification Trace Builder.
 
 #### Details
 Implementation details shall follow the associated refinement specifications.

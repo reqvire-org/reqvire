@@ -21,7 +21,7 @@ cat > "$TEST_MODEL_DIR/requirements/Requirements.md" << 'EOF'
 ### Root Requirement
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Root System Requirement

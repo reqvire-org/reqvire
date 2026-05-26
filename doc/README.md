@@ -84,7 +84,7 @@ reqvire/
 - **[Project Specifications](../requirements/README.md)** - Reqvire's own requirements model
 - **[Architecture](../requirements/Architecture.md)** - System architecture documentation
 - **[E2E Tests Guide](../tests/CLAUDE.md)** - How to write and run tests
-- **[GitHub Issues](https://github.com/reqvire-org/reqvire/issues)** - Report bugs and request features
+- **[GitHub Issues](https://github.com/reqvire-org/reqvire/issues)** - Report bugs and request capabilities
 - **[GitHub Discussions](https://github.com/reqvire-org/reqvire/discussions)** - Ask questions and share ideas
 
 ## Contribution Workflow

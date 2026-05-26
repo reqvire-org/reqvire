@@ -2,12 +2,12 @@
 
 
 
-### Test Feature Test Excluded Patterns Relative Paths Specifications Mainrequirements Md
+### Test Capability Test Excluded Patterns Relative Paths Specifications Mainrequirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Test Root Requirement
@@ -18,7 +18,7 @@ Root requirement for testing excluded patterns.
   * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-excluded-patterns-relative-paths-specifications-mainrequirements-md)
+  * specify: [Test Capability](#test-capability-test-excluded-patterns-relative-paths-specifications-mainrequirements-md)
 ---
 
 ### Main Test Requirement

@@ -334,7 +334,7 @@ impl<'a> VerificationTraceGenerator<'a> {
         // Header with CSS classes (MBSE color scheme - matching other diagrams)
         diagram.push_str("```mermaid\n");
         diagram.push_str("graph TD\n");
-        diagram.push_str("  classDef feature fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n");
+        diagram.push_str("  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n");
         diagram.push_str(
             "  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n",
         );
@@ -564,7 +564,7 @@ impl<'a> VerificationTraceGenerator<'a> {
 
         // Determine CSS class based on element type (matching other diagrams)
         let element_type = match &requirement.element_type {
-            ElementType::Feature => "feature",
+            ElementType::Capability => "capability",
             ElementType::Requirement(crate::element::RequirementType::System) => {
                 "systemRequirement"
             }

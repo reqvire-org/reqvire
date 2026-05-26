@@ -1,25 +1,25 @@
 # Eval: add-requirement (with old skill)
 
 ## Task
-"I need to add a new feature for 'Batch Export'..."
+"I need to add a new capability for 'Batch Export'..."
 
 ## Approach
 - Read skill-snapshot/SKILL.md (842 lines)
-- Read AddFeature reference
-- Analyzed existing model: Features.md, globbed requirements/**/*.md, grepped for export
-- Noted files requested by user are organized as feature roots and functional requirements
+- Read AddCapability reference
+- Analyzed existing model: Capabilities.md, globbed requirements/**/*.md, grepped for export
+- Noted files requested by user are organized as capability roots and functional requirements
 
 ## Commands Produced
 
-### Step 1: Feature
+### Step 1: Capability
 ```bash
-reqvire add requirements/Features.md <<'EOF'
+reqvire add requirements/Capabilities.md <<'EOF'
 ### Batch Export
 
 As a **System Engineer**, I want to export multiple specification files at once into a single archive, so that I can efficiently share and distribute complete model snapshots.
 
 #### Metadata
-  * type: feature
+  * type: capability
 EOF
 ```
 
@@ -42,7 +42,7 @@ When the user requests a batch export, the system shall:
   * type: requirement
 
 #### Relations
-  * specify: [Batch Export](../../Features.md#batch-export)
+  * specify: [Batch Export](../../Capabilities.md#batch-export)
 EOF
 ```
 

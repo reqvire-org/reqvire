@@ -1,11 +1,11 @@
 # Elements
 
-### Billing Feature
+### Billing Capability
 
-Billing feature.
+Billing capability.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Attachments
   * [Billing Ontology](#billing-ontology)
@@ -24,7 +24,7 @@ The system shall support billing payloads.
   * type: requirement
 
 #### Relations
-  * specify: [Billing Feature](#billing-feature)
+  * specify: [Billing Capability](#billing-capability)
   * refinedBy: [Billing Shape Contract](#billing-shape-contract)
 ---
 

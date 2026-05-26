@@ -1,12 +1,12 @@
 ## Submodels
 
-Independent feature-rooted subgraphs resolved via feature ownership relations.
+Independent capability-rooted subgraphs resolved via capability ownership relations.
 
-*No feature-rooted submodels found.*
+*No capability-rooted submodels found.*
 
 ## Cross-Submodel Couplings
 
-Requirement-to-requirement relations where source and target belong to different feature roots.
+Requirement-to-requirement relations where source and target belong to different capability roots.
 
 *No cross-submodel requirement couplings found.*
 

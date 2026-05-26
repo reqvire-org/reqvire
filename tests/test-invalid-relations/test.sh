@@ -96,12 +96,12 @@ mkdir -p "${TEST_DIR}/valid-test/specifications"
 cat > "${TEST_DIR}/valid-test/specifications/ValidRequirements.md" << 'EOF'
 # Elements
 
-### Valid Feature
+### Valid Capability
 
-Feature root for the valid model.
+Capability root for the valid model.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 ### Valid Requirement
@@ -112,7 +112,7 @@ This is a valid requirement.
   * type: requirement
 
 #### Relations
-  * specify: [Valid Feature](#valid-feature)
+  * specify: [Valid Capability](#valid-capability)
 ---
 
 ### Requirement with Valid Header Structure in Details
@@ -133,7 +133,7 @@ Content with multiple header levels.
   * type: requirement
 
 #### Relations
-  * specify: [Valid Feature](#valid-feature)
+  * specify: [Valid Capability](#valid-capability)
 EOF
 
 cd "${TEST_DIR}/valid-test"

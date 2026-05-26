@@ -1,12 +1,12 @@
 # Elements
 
 
-### Test Feature Test Element Content Extraction Requirements Md
+### Test Capability Test Element Content Extraction Requirements Md
 
-Test feature root for migrated requirement fixtures.
+Test capability root for migrated requirement fixtures.
 
 #### Metadata
-  * type: feature
+  * type: capability
 ---
 
 This file should be processed.
@@ -20,7 +20,7 @@ Root requirement for relations to work.
 * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-content-extraction-requirements-md)
+  * specify: [Test Capability](#test-capability-test-element-content-extraction-requirements-md)
 ### REQ 1
 
 This is simple requirement with main text only.
@@ -29,7 +29,7 @@ This is simple requirement with main text only.
 * type: requirement
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-content-extraction-requirements-md)
+  * specify: [Test Capability](#test-capability-test-element-content-extraction-requirements-md)
 ### REQ 1A
 
 This is simple requirement with main text and details.
@@ -41,7 +41,7 @@ This is simple requirement with main text and details.
 REQ 1A details.
 
 #### Relations
-  * specify: [Test Feature](#test-feature-test-element-content-extraction-requirements-md)
+  * specify: [Test Capability](#test-capability-test-element-content-extraction-requirements-md)
 ### REQ 2
 
 Requirement with main text and relations.

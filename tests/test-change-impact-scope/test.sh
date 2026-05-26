@@ -16,8 +16,8 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - Both text and JSON outputs include impact scope data
 
 # Modify both children of Branch A (siblings) -> should merge into Branch A
-sed -i 's/The system shall implement leaf A1 feature./The system shall implement leaf A1 feature with updates./' "${TEST_DIR}/Requirements.md"
-sed -i 's/The system shall implement leaf A2 feature./The system shall implement leaf A2 feature with updates./' "${TEST_DIR}/Requirements.md"
+sed -i 's/The system shall implement leaf A1 capability./The system shall implement leaf A1 capability with updates./' "${TEST_DIR}/Requirements.md"
+sed -i 's/The system shall implement leaf A2 capability./The system shall implement leaf A2 capability with updates./' "${TEST_DIR}/Requirements.md"
 
 # Delete Leaf B1 -> its parent Branch B should appear in scope
 sed -i '/^### Leaf B1$/,/^---$/d' "${TEST_DIR}/Requirements.md"

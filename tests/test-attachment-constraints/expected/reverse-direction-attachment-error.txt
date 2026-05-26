@@ -1,6 +1,6 @@
 
 ❌ 2 validation failed with error(s):
 
-  1. Invalid attachment scope: 'Spec-1' cannot be attached to 'User Req X' because subgraph 'User Req A Feature' already attaches refinements owned by subgraph 'User Req X Feature'. Attachment flow between subgraphs must remain one-directional. (file: specifications/Requirements.md, element: User Req X)
+  1. Invalid attachment scope: 'Spec-1' cannot be attached to 'User Req X' because subgraph 'User Req A Capability' already attaches refinements owned by subgraph 'User Req X Capability'. Attachment flow between subgraphs must remain one-directional. (file: specifications/Requirements.md, element: User Req X)
 
-  2. Invalid attachment scope: 'Spec-X' cannot be attached to 'Req D Reverse Flow Attachment' because subgraph 'User Req X Feature' already attaches refinements owned by subgraph 'User Req A Feature'. Attachment flow between subgraphs must remain one-directional. (file: specifications/TestReverseDirectionAttachment.md, element: Req D Reverse Flow Attachment)
+  2. Invalid attachment scope: 'Spec-X' cannot be attached to 'Req D Reverse Flow Attachment' because subgraph 'User Req X Capability' already attaches refinements owned by subgraph 'User Req A Capability'. Attachment flow between subgraphs must remain one-directional. (file: specifications/TestReverseDirectionAttachment.md, element: Req D Reverse Flow Attachment)

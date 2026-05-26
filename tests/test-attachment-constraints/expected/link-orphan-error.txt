@@ -1,1 +1,1 @@
-error: Invalid attachment target: 'Orphan-Spec' has no refine relation. Refinements must refine a feature or requirement before they can be attached.
+error: Invalid attachment target: 'Orphan-Spec' has no refine relation. Refinements must refine a capability or requirement before they can be attached.

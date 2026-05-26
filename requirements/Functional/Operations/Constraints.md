@@ -9,7 +9,7 @@ Validation rules for atomic relation relink operations.
 - Candidate relink state shall satisfy all model validation rules before commit.
 - For hierarchical relations (`derivedFrom`/`derive`), relink shall be rejected when it would:
   - create circular dependencies,
-  - orphan requirements without required feature or parent requirement ownership,
+  - orphan requirements without required capability or parent requirement ownership,
   - violate single-root hierarchy ownership.
 - Error output shall identify the failing validation constraints and impacted elements.
 
@@ -29,7 +29,7 @@ Canonical merge compatibility categories are defined by the Reqvire operation on
 
 **Compatibility Rules:**
 - Source and target must be in the same semantic merge compatibility category.
-- Merge categories must preserve ontology, feature, requirement, verification, and requirement-owned refinement ownership.
+- Merge categories must preserve ontology, capability, requirement, verification, and refinement ownership.
 - Merging across semantic categories is forbidden.
 
 **Error Messages:**

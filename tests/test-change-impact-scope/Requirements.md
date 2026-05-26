@@ -2,16 +2,16 @@
 
 ### Branch A
 
-Branch A feature scope.
+Branch A capability scope.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ---
 
 ### Leaf A1
 
-The system shall implement leaf A1 feature.
+The system shall implement leaf A1 capability.
 
 #### Relations
   * specify: [Branch A](#branch-a)
@@ -20,7 +20,7 @@ The system shall implement leaf A1 feature.
 
 ### Leaf A2
 
-The system shall implement leaf A2 feature.
+The system shall implement leaf A2 capability.
 
 #### Relations
   * specify: [Branch A](#branch-a)
@@ -29,28 +29,28 @@ The system shall implement leaf A2 feature.
 
 ### Branch B
 
-Branch B feature scope.
+Branch B capability scope.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ---
 
 ### Leaf B1
 
-The system shall implement leaf B1 feature.
+The system shall implement leaf B1 capability.
 
 #### Relations
   * specify: [Branch B](#branch-b)
 
 ---
 
-### Standalone Feature
+### Standalone Capability
 
-Standalone feature scope.
+Standalone capability scope.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 ---
 
@@ -59,6 +59,6 @@ Standalone feature scope.
 The system shall provide standalone functionality.
 
 #### Relations
-  * specify: [Standalone Feature](#standalone-feature)
+  * specify: [Standalone Capability](#standalone-capability)
 
 ---

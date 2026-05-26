@@ -1,25 +1,25 @@
 # Elements
 
-### Product Feature
+### Product Capability
 
-The top product feature for collect traversal.
+The top product capability for collect traversal.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
-  * derive: [Child Feature](#child-feature)
+  * derive: [Child Capability](#child-capability)
 ---
 
-### Child Feature
+### Child Capability
 
-The child product feature that specifies the root requirement.
+The child product capability that specifies the root requirement.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
-  * derivedFrom: [Product Feature](#product-feature)
+  * derivedFrom: [Product Capability](#product-capability)
   * specifiedBy: [Root Requirement](#root-requirement)
 
 #### Attachments
@@ -53,7 +53,7 @@ This is the top-level requirement that has no derivedFrom relations.
   * type: requirement
 
 #### Relations
-  * specify: [Child Feature](#child-feature)
+  * specify: [Child Capability](#child-capability)
 ---
 
 ### Mid-Level Requirement
@@ -95,16 +95,16 @@ Owner requirement for design refinement specification.
   * type: requirement
 
 #### Relations
-  * specify: [Design Feature](#design-feature)
+  * specify: [Design Capability](#design-capability)
   * refinedBy: [Design Doc Specification](DesignDoc.md#design-doc-specification)
 ---
 
-### Design Feature
+### Design Capability
 
-Feature that owns reusable design documentation.
+Capability that owns reusable design documentation.
 
 #### Metadata
-  * type: feature
+  * type: capability
 
 #### Relations
   * specifiedBy: [Design Owner Requirement](#design-owner-requirement)
