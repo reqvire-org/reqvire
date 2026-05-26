@@ -2,7 +2,7 @@
 
 ### Reqvire Verification Ontology Shape Profile
 
-SHACL profile split from Reqvire Verification Ontology so ontology vocabulary remains first-class and semantic contracts carry closed-world constraints.
+Defines SHACL constraints for verification elements and the capabilities or requirements they verify.
 
 #### Shapes
 ```turtle
@@ -15,7 +15,42 @@ reqvire:VerificationShape
   sh:property [
     sh:path reqvire:verify ;
     sh:minCount 1 ;
-    sh:class reqvire:Requirement ;
+    sh:or (
+      [ sh:class reqvire:Capability ]
+      [ sh:class reqvire:Requirement ]
+    ) ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:EvidenceBackedVerificationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:TestVerification, reqvire:FormalProofVerification ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:class reqvire:Artifact ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:NonEvidenceBackedVerificationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:AnalysisVerification, reqvire:InspectionVerification, reqvire:DemonstrationVerification ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
   ] .
 ```
 
@@ -23,12 +58,12 @@ reqvire:VerificationShape
   * type: semantic-contract
 
 #### Relations
-  * refine: [Verification Upward Traceability](../Functional/Processing/VerificationTraces.md#verification-upward-traceability)
+  * refine: [Verification Element Semantic Contract](../Functional/Processing/VerificationTraces.md#verification-element-semantic-contract)
 ---
 
 ### Reqvire Verification Rollup Ontology Shape Profile
 
-SHACL profile split from Reqvire Verification Rollup Ontology so ontology vocabulary remains first-class and semantic contracts carry closed-world constraints.
+Defines SHACL constraints for verification rollup and coverage state records.
 
 #### Shapes
 ```turtle
@@ -83,7 +118,7 @@ reqvire:RequirementCoverageShape
   * type: semantic-contract
 
 #### Relations
-  * refine: [Verification Upward Traceability](../Functional/Processing/VerificationTraces.md#verification-upward-traceability)
+  * refine: [Verification Rollup Semantic Contract](../Functional/Processing/VerificationTraces.md#verification-rollup-semantic-contract)
 ---
 
 ### Verification Traceability

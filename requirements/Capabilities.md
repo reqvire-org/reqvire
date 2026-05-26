@@ -22,6 +22,7 @@ This capability answers how Reqvire structures system models in Markdown, which 
   * [Reqvire Requirement Ontology](Ontologies/CapabilityRequirementModel.md#reqvire-requirement-ontology)
   * [Reqvire Semantic Contract Ontology](Ontologies/CapabilityRequirementModel.md#reqvire-semantic-contract-ontology)
   * [Reqvire Relation Ontology](Ontologies/RelationsAndImpact.md#reqvire-relation-ontology)
+  * [Reqvire Verification Ontology](Ontologies/Verification.md#reqvire-verification-ontology)
   * [Reqvire Governance Ontology](Ontologies/Governance.md#reqvire-governance-ontology)
 
 #### Relations
@@ -66,7 +67,7 @@ Shared terms come from explicit capability-level ontology attachments, not from 
 
 ### Reqvire Core Element Ontology Shape Profile
 
-SHACL profile split from Reqvire Core Element Ontology so ontology vocabulary remains first-class and semantic contracts carry closed-world constraints.
+Defines SHACL constraints for shared Reqvire element identity, type, file location, and structural metadata.
 
 #### Shapes
 ```turtle
@@ -101,5 +102,5 @@ reqvire:ElementShape
   * type: semantic-contract
 
 #### Relations
-  * refine: [Ontology and Semantic Contract Model](Functional/Core/ModelManagement.md#ontology-and-semantic-contract-model)
+  * refine: [Core Element Semantic Contract](Functional/Core/ModelManagement.md#core-element-semantic-contract)
 ---

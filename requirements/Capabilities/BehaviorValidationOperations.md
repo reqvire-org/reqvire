@@ -80,7 +80,7 @@ Operation requirements define concrete command inputs, validation gates, dry-run
 
 ### Reqvire Behavior Rule Ontology Shape Profile
 
-SHACL profile split from Reqvire Behavior Rule Ontology so ontology vocabulary remains first-class and semantic contracts carry closed-world constraints.
+Defines SHACL constraints for behavior rules, state transitions, and behavior refinements.
 
 #### Shapes
 ```turtle
@@ -144,12 +144,12 @@ reqvire:BehaviorShape
   * type: semantic-contract
 
 #### Relations
-  * refine: [Validate Cross-Component Dependencies](../Functional/Core/Validation.md#validate-cross-component-dependencies)
+  * refine: [Behavior Rule Semantic Contract](../Functional/Core/Validation.md#behavior-rule-semantic-contract)
 ---
 
 ### Reqvire Linting Ontology Shape Profile
 
-SHACL profile split from Reqvire Linting Ontology so ontology vocabulary remains first-class and semantic contracts carry closed-world constraints.
+Defines SHACL constraints for linting rule metadata and repair-mode semantics.
 
 #### Shapes
 ```turtle
@@ -182,12 +182,12 @@ reqvire:LintingRuleShape
   * type: semantic-contract
 
 #### Relations
-  * refine: [Model Linting](../Functional/Operations/Linting.md#model-linting)
+  * refine: [Lint Rule Semantic Contract](../Functional/Operations/Linting.md#lint-rule-semantic-contract)
 ---
 
 ### Reqvire Validation Ontology Shape Profile
 
-SHACL profile split from Reqvire Validation Ontology so ontology vocabulary remains first-class and semantic contracts carry closed-world constraints.
+Defines SHACL constraints for validation rule metadata and validation outcomes.
 
 #### Shapes
 ```turtle
@@ -233,7 +233,7 @@ reqvire:ValidationRuleShape
   * type: semantic-contract
 
 #### Relations
-  * refine: [Validate Cross-Component Dependencies](../Functional/Core/Validation.md#validate-cross-component-dependencies)
+  * refine: [Validation Rule Semantic Contract](../Functional/Core/Validation.md#validation-rule-semantic-contract)
 ---
 
 ### Validating Structures
@@ -267,4 +267,3 @@ Validation requirements define when model state is acceptable, when a mutation m
   * specifiedBy: [Validate Markdown Structure](../Functional/Core/Validation.md#validate-markdown-structure)
   * specifiedBy: [Validate Relation Types](../Functional/Core/Validation.md#validate-relation-types)
 ---
-

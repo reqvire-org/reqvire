@@ -234,6 +234,83 @@ Capability elements attach ontology elements to make vocabulary reachable for th
   * verifiedBy: [Semantic Contract SHACL Sanity Validation Test](Verifications/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test)
 ---
 
+### Core Element Semantic Contract
+
+The system shall define SHACL constraints for shared Reqvire element identity, type, file location, and structural metadata.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontology and Semantic Contract Model](#ontology-and-semantic-contract-model)
+---
+
+### Capability Element Semantic Contract
+
+The system shall define SHACL constraints for capability structure, capability hierarchy, capability refinements, capability specification, and forbidden capability satisfaction edges.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontology and Semantic Contract Model](#ontology-and-semantic-contract-model)
+---
+
+### Requirement Element Semantic Contract
+
+The system shall define SHACL constraints for requirement ownership, requirement hierarchy, capability specification, refinements, verification, and implementation satisfaction edges.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontology and Semantic Contract Model](#ontology-and-semantic-contract-model)
+---
+
+### Ontology Element Semantic Contract
+
+The system shall define SHACL constraints for ontology elements as vocabulary-bearing graph nodes that carry ontology text and do not own shapes, attachments, governance, verification, or satisfaction edges.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontology and Semantic Contract Model](#ontology-and-semantic-contract-model)
+---
+
+### Semantic Contract Element Semantic Contract
+
+The system shall define SHACL constraints for semantic-contract identity, shape content, and single capability or requirement ownership.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontology and Semantic Contract Model](#ontology-and-semantic-contract-model)
+---
+
+### Governance Metadata Semantic Contract
+
+The system shall define SHACL constraints for governance metadata on capability and requirement elements and forbid governance metadata on non-governance elements.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontology and Semantic Contract Model](#ontology-and-semantic-contract-model)
+---
+
+### Relation Model Semantic Contract
+
+The system shall define SHACL constraints for Reqvire relation usage, attachment usage, verification evidence relation usage, and relation-rule metadata.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontology and Semantic Contract Model](#ontology-and-semantic-contract-model)
+---
+
 ### Refinement Element Structure Constraints
 
 The system shall restrict Refinement elements (`source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, `input-output`) to only allow `refine` relations.
@@ -252,6 +329,28 @@ Refinement relation validation shall enforce the subtype-compatible refinement v
   * refinedBy: [Refinement Element Structure Constraints Refinement Specification](Specifications.md#refinement-element-structure-constraints-refinement-specification)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * verifiedBy: [Refinement Relations Rejection Test](Verifications/ParsingVerifications.md#refinement-relations-rejection-test)
+---
+
+### Refinement Subtype Semantic Contract
+
+The system shall define SHACL constraints for concrete refinement subtype ownership and allowed refinement traceability.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
+---
+
+### Custom Element Trace Semantic Contract
+
+The system shall define SHACL constraints for custom `other-*` element types as trace-only extension nodes.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Refinement Element Structure Constraints](#refinement-element-structure-constraints)
 ---
 
 ### Attachment Scope Constraints

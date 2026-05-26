@@ -160,7 +160,6 @@ reqvire:ModelContextProjection a owl:Class ;
 reqvire:registryElement a owl:ObjectProperty .
 reqvire:projectionTriple a owl:ObjectProperty .
 reqvire:exportSourceElement a owl:ObjectProperty .
-reqvire:attaches a owl:ObjectProperty .
 reqvire:declaresTerm a owl:ObjectProperty .
 reqvire:referencesTerm a owl:ObjectProperty .
 reqvire:relationTarget a owl:ObjectProperty .

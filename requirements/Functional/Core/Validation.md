@@ -62,6 +62,28 @@ The system shall implement a specialized validator that analyzes dependencies ac
   * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
 ---
 
+### Behavior Rule Semantic Contract
+
+The system shall define SHACL constraints for behavior rules, state transitions, and behavior refinement structure.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Validate Cross-Component Dependencies](#validate-cross-component-dependencies)
+---
+
+### Validation Rule Semantic Contract
+
+The system shall define SHACL constraints for validation rule metadata, validation scope, severity, condition, and outcome.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Validate Cross-Component Dependencies](#validate-cross-component-dependencies)
+---
+
 ### Validate Filesystem Structure
 
 The system shall validate the organization of files and folders in the repository to ensure consistency with the MBSE methodology.

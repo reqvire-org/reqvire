@@ -20,12 +20,24 @@ When filtering lint results, the system shall allow focusing on specific categor
 
 #### Relations
   * derive: [Cross-Submodel Hierarchical Relation Detection](#cross-submodel-hierarchical-relation-detection)
+  * derive: [Lint Rule Semantic Contract](#lint-rule-semantic-contract)
   * derive: [Lint Auto-fix Capability](#lint-auto-fix-capability)
   * derive: [Multi-Branch Convergence Detection](#multi-branch-convergence-detection)
   * derive: [Redundant Hierarchical Relations Detection and Auto-Removal](#redundant-hierarchical-relations-detection-and-auto-removal)
   * derive: [Redundant Verify Relations Detection](#redundant-verify-relations-detection)
   * refinedBy: [Lint Output Specification](Specifications.md#lint-output-specification)
   * specify: [Linting Model Quality](../../Capabilities/BehaviorValidationOperations.md#linting-model-quality)
+---
+
+### Lint Rule Semantic Contract
+
+The system shall define SHACL constraints for linting rule metadata, finding categories, and repair-mode semantics.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Model Linting](#model-linting)
 ---
 
 ### Cross-Submodel Hierarchical Relation Detection

@@ -2,7 +2,7 @@
 
 ### Reqvire Change Impact Ontology Shape Profile
 
-SHACL profile split from Reqvire Change Impact Ontology so ontology vocabulary remains first-class and semantic contracts carry closed-world constraints.
+Defines SHACL constraints for change-impact analysis records, impact edges, and semantic dependency resolution.
 
 #### Shapes
 ```turtle
@@ -73,12 +73,12 @@ reqvire:SemanticDependencyShape
   * type: semantic-contract
 
 #### Relations
-  * refine: [Tracing Structural Changes](../Functional/Output/Reporting.md#tracing-structural-changes)
+  * refine: [Change Impact Semantic Contract](../Functional/Output/Reporting.md#change-impact-semantic-contract)
 ---
 
 ### Reqvire Relation Ontology Shape Profile
 
-SHACL profile split from Reqvire Relation Ontology so ontology vocabulary remains first-class and semantic contracts carry closed-world constraints.
+Defines SHACL constraints for Reqvire relation usage across capabilities, requirements, verifications, and relation-rule metadata.
 
 #### Shapes
 ```turtle
@@ -94,15 +94,51 @@ reqvire:CapabilityRelationShape
     sh:class reqvire:Capability ;
   ] ;
   sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:class reqvire:Capability ;
+  ] ;
+  sh:property [
     sh:path reqvire:specifiedBy ;
     sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:class reqvire:Verification ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
   ] .
 
 reqvire:RequirementRelationShape
   a sh:NodeShape ;
   sh:targetClass reqvire:Requirement ;
+  sh:or (
+    [
+      sh:property [
+        sh:path reqvire:specify ;
+        sh:minCount 1 ;
+        sh:class reqvire:Capability ;
+      ]
+    ]
+    [
+      sh:property [
+        sh:path reqvire:derivedFrom ;
+        sh:minCount 1 ;
+        sh:class reqvire:Requirement ;
+      ]
+    ]
+  ) ;
   sh:property [
     sh:path reqvire:derive ;
+    sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
     sh:class reqvire:Requirement ;
   ] ;
   sh:property [
@@ -112,6 +148,14 @@ reqvire:RequirementRelationShape
   sh:property [
     sh:path reqvire:verifiedBy ;
     sh:class reqvire:Verification ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:class reqvire:Artifact ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
   ] .
 
 reqvire:VerificationRelationShape
@@ -119,7 +163,65 @@ reqvire:VerificationRelationShape
   sh:targetClass reqvire:Verification ;
   sh:property [
     sh:path reqvire:verify ;
-    sh:class reqvire:Requirement ;
+    sh:or (
+      [ sh:class reqvire:Capability ]
+      [ sh:class reqvire:Requirement ]
+    ) ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:EvidenceBackedVerificationRelationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:TestVerification, reqvire:FormalProofVerification ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:class reqvire:Artifact ;
+  ] .
+
+reqvire:NonEvidenceBackedVerificationRelationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:AnalysisVerification, reqvire:InspectionVerification, reqvire:DemonstrationVerification ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:CapabilityAttachmentShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Capability ;
+  sh:property [
+    sh:path reqvire:attaches ;
+    sh:class reqvire:Ontology ;
+  ] .
+
+reqvire:RequirementAttachmentShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Requirement ;
+  sh:property [
+    sh:path reqvire:attaches ;
+    sh:or (
+      [ sh:class reqvire:SemanticContract ]
+      [ sh:class reqvire:Constraint ]
+      [ sh:class reqvire:Behavior ]
+      [ sh:class reqvire:Specification ]
+      [ sh:class reqvire:State ]
+      [ sh:class reqvire:InputOutput ]
+    ) ;
+  ] .
+
+reqvire:NonAttachmentElementShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Refinement, reqvire:Verification, reqvire:Ontology, reqvire:CustomElement ;
+  sh:property [
+    sh:path reqvire:attaches ;
+    sh:maxCount 0 ;
   ] .
 
 reqvire:RelationRuleShape
@@ -158,7 +260,7 @@ reqvire:RelationRuleShape
   * type: semantic-contract
 
 #### Relations
-  * refine: [Ontology and Semantic Contract Model](../Functional/Core/ModelManagement.md#ontology-and-semantic-contract-model)
+  * refine: [Relation Model Semantic Contract](../Functional/Core/ModelManagement.md#relation-model-semantic-contract)
 ---
 
 ### Trace Changes in System Model
@@ -179,9 +281,11 @@ Change impact uses native Reqvire relations and explicit attachments. Semantic r
 
 #### Attachments
   * [Reqvire Core Element Ontology](../Ontologies/Core.md#reqvire-core-element-ontology)
+  * [Reqvire Requirement Ontology](../Ontologies/CapabilityRequirementModel.md#reqvire-requirement-ontology)
   * [Reqvire Semantic Contract Ontology](../Ontologies/CapabilityRequirementModel.md#reqvire-semantic-contract-ontology)
   * [Reqvire Change Impact Ontology](../Ontologies/RelationsAndImpact.md#reqvire-change-impact-ontology)
   * [Reqvire Relation Ontology](../Ontologies/RelationsAndImpact.md#reqvire-relation-ontology)
+  * [Reqvire Verification Ontology](../Ontologies/Verification.md#reqvire-verification-ontology)
 
 #### Relations
   * specifiedBy: [Tracing Structural Changes](../Functional/Output/Reporting.md#tracing-structural-changes)

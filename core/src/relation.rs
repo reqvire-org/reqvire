@@ -582,8 +582,8 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "verify" => Some("'verify' should connect a verification element to a capability or requirement".to_string()),
         "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; capability is not allowed".to_string()),
         "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; capability is not allowed".to_string()),
-        "refinedBy" => Some("'refinedBy' should connect a capability to source, or a requirement to semantic-contract/constraint/behavior/specification/state/input-output".to_string()),
-        "refine" => Some("'refine' should connect source to a capability, or semantic-contract/constraint/behavior/specification/state/input-output to a requirement".to_string()),
+        "refinedBy" => Some("'refinedBy' should connect a capability or requirement to a compatible refinement element".to_string()),
+        "refine" => Some("'refine' should connect a compatible refinement element to a capability or requirement owner".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }

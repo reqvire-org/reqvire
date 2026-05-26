@@ -1,4 +1,7 @@
-use crate::element::{self, AttachmentTarget, Element, ElementType, FencedBlock, RefinementType};
+use crate::element::{
+    self, AttachmentTarget, Element, ElementType, FencedBlock, RefinementType, VerificationType,
+    GOVERNANCE_METADATA_KEYS,
+};
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
 use crate::relation::LinkType;
@@ -248,6 +251,7 @@ impl SemanticIndex {
 
 fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -> String {
     let mut output = String::new();
+    let mut artifacts = BTreeSet::new();
     output.push_str(
         "# -----------------------------------------------------------------------------\n",
     );
@@ -263,7 +267,7 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
         output.push_str(&format!(
             "{} a {} ;\n",
             subject,
-            element_type_class(&element.element_type)
+            element_type_classes(&element.element_type).join(", ")
         ));
         output.push_str(&format!(
             "  reqvire:elementId {} ;\n",
@@ -279,7 +283,7 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
         ));
         output.push_str(&format!(
             "  reqvire:elementType {} ;\n",
-            turtle_string(element.element_type.as_str())
+            turtle_string(&element_type_token(&element.element_type))
         ));
         output.push_str(&format!(
             "  reqvire:filePath {} ;\n",
@@ -290,38 +294,68 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
             element.line_number
         ));
 
+        for key in GOVERNANCE_METADATA_KEYS {
+            if let Some(value) = element.metadata.get(*key) {
+                output.push_str(&format!(
+                    "{} reqvire:{} {} .\n",
+                    subject,
+                    key,
+                    turtle_string(value)
+                ));
+            }
+        }
+
+        if let Some(ontology) = &element.ontology {
+            if let Some(block) = &ontology.ontology {
+                output.push_str(&format!(
+                    "{} reqvire:ontologyText {} .\n",
+                    subject,
+                    turtle_string(&block.content)
+                ));
+            }
+        }
+        if let Some(contract) = &element.semantic_contract {
+            output.push_str(&format!(
+                "{} reqvire:semanticContractIri {} .\n",
+                subject,
+                turtle_string(&contract.iri)
+            ));
+            output.push_str(&format!(
+                "{} reqvire:semanticContractKind \"semantic-contract\" .\n",
+                subject
+            ));
+            if let Some(block) = &contract.shapes {
+                output.push_str(&format!(
+                    "{} reqvire:shapesText {} .\n",
+                    subject,
+                    turtle_string(&block.content)
+                ));
+            }
+        }
+
         for relation in &element.relations {
-            let LinkType::Identifier(target_identifier) = &relation.target.link else {
-                continue;
-            };
-            let Some(target) = registry.nodes.get(target_identifier) else {
+            let Some(target_iri) =
+                target_iri_for_link(&relation.target.link, registry, &mut artifacts)
+            else {
                 continue;
             };
             output.push_str(&format!(
                 "{} reqvire:{} {} .\n",
-                subject,
-                relation.relation_type.name,
-                element_iri(&target.element)
+                subject, relation.relation_type.name, target_iri
             ));
             output.push_str(&format!(
                 "{} reqvire:relationTarget {} .\n",
-                subject,
-                element_iri(&target.element)
+                subject, target_iri
             ));
         }
 
         for attachment in &element.attachments {
-            let AttachmentTarget::ElementIdentifier(target_identifier) = &attachment.target else {
+            let Some(target_iri) =
+                attachment_target_iri(&attachment.target, registry, &mut artifacts)
+            else {
                 continue;
             };
-            let Some(target) = registry.nodes.get(target_identifier) else {
-                continue;
-            };
-            output.push_str(&format!(
-                "{} reqvire:attaches {} .\n",
-                subject,
-                element_iri(&target.element)
-            ));
+            output.push_str(&format!("{} reqvire:attaches {} .\n", subject, target_iri));
         }
 
         for reference in &element.concept_references {
@@ -343,6 +377,10 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
         {
             output.push('\n');
         }
+    }
+
+    for artifact in artifacts {
+        output.push_str(&artifact);
     }
 
     let mut declarations: Vec<_> = index
@@ -386,17 +424,102 @@ fn element_iri(element: &Element) -> String {
     format!("<urn:reqvire:element:{}>", escape_iri(&element.id))
 }
 
-fn element_type_class(element_type: &ElementType) -> &'static str {
+fn element_type_classes(element_type: &ElementType) -> Vec<&'static str> {
     match element_type {
-        ElementType::Capability => "reqvire:Capability",
-        ElementType::Requirement(_) => "reqvire:Requirement",
-        ElementType::Ontology => "reqvire:OntologyElement",
-        ElementType::Verification(_) => "reqvire:Verification",
-        ElementType::Refinement(RefinementType::SemanticContract) => "reqvire:SemanticContract",
-        ElementType::Refinement(_) => "reqvire:Refinement",
-        ElementType::File => "reqvire:File",
-        ElementType::Other(_) => "reqvire:Element",
+        ElementType::Capability => vec!["reqvire:Element", "reqvire:Capability"],
+        ElementType::Requirement(_) => vec!["reqvire:Element", "reqvire:Requirement"],
+        ElementType::Ontology => vec!["reqvire:Element", "reqvire:Ontology"],
+        ElementType::Verification(verification_type) => {
+            let subtype = match verification_type {
+                VerificationType::Default | VerificationType::Test => "reqvire:TestVerification",
+                VerificationType::FormalProof => "reqvire:FormalProofVerification",
+                VerificationType::Analysis => "reqvire:AnalysisVerification",
+                VerificationType::Inspection => "reqvire:InspectionVerification",
+                VerificationType::Demonstration => "reqvire:DemonstrationVerification",
+            };
+            vec!["reqvire:Element", "reqvire:Verification", subtype]
+        }
+        ElementType::Refinement(refinement_type) => {
+            let subtype = match refinement_type {
+                RefinementType::Source => "reqvire:Source",
+                RefinementType::SemanticContract => "reqvire:SemanticContract",
+                RefinementType::Constraint => "reqvire:Constraint",
+                RefinementType::Behavior => "reqvire:Behavior",
+                RefinementType::Specification => "reqvire:Specification",
+                RefinementType::State => "reqvire:State",
+                RefinementType::InputOutput => "reqvire:InputOutput",
+            };
+            vec!["reqvire:Element", "reqvire:Refinement", subtype]
+        }
+        ElementType::File => vec!["reqvire:Artifact", "reqvire:File"],
+        ElementType::Other(_) => vec!["reqvire:Element", "reqvire:CustomElement"],
     }
+}
+
+fn element_type_token(element_type: &ElementType) -> String {
+    match element_type {
+        ElementType::Other(custom_type) => format!("other-{}", custom_type),
+        _ => element_type.as_str().to_string(),
+    }
+}
+
+fn target_iri_for_link(
+    link: &LinkType,
+    registry: &GraphRegistry,
+    artifacts: &mut BTreeSet<String>,
+) -> Option<String> {
+    match link {
+        LinkType::Identifier(target_identifier) => registry
+            .nodes
+            .get(target_identifier)
+            .map(|target| element_iri(&target.element)),
+        LinkType::InternalPath(path) => {
+            let value = path.to_string_lossy();
+            let iri = artifact_iri("path", &value);
+            artifacts.insert(format!(
+                "{} a reqvire:Artifact, reqvire:File ;\n  reqvire:filePath {} .\n\n",
+                iri,
+                turtle_string(&value)
+            ));
+            Some(iri)
+        }
+        LinkType::ExternalUrl(url) => {
+            let iri = artifact_iri("url", url);
+            artifacts.insert(format!(
+                "{} a reqvire:Artifact ;\n  reqvire:externalUrl {} .\n\n",
+                iri,
+                turtle_string(url)
+            ));
+            Some(iri)
+        }
+    }
+}
+
+fn attachment_target_iri(
+    target: &AttachmentTarget,
+    registry: &GraphRegistry,
+    artifacts: &mut BTreeSet<String>,
+) -> Option<String> {
+    match target {
+        AttachmentTarget::ElementIdentifier(target_identifier) => registry
+            .nodes
+            .get(target_identifier)
+            .map(|target| element_iri(&target.element)),
+        AttachmentTarget::FilePath(path) => {
+            let value = path.to_string_lossy();
+            let iri = artifact_iri("path", &value);
+            artifacts.insert(format!(
+                "{} a reqvire:Artifact, reqvire:File ;\n  reqvire:filePath {} .\n\n",
+                iri,
+                turtle_string(&value)
+            ));
+            Some(iri)
+        }
+    }
+}
+
+fn artifact_iri(kind: &str, value: &str) -> String {
+    format!("<urn:reqvire:artifact:{}:{}>", kind, escape_iri(value))
 }
 
 fn turtle_string(value: &str) -> String {
@@ -526,7 +649,7 @@ fn validate_semantic_sections(
                 file_path: element.file_path.clone(),
                 line_number: shapes[0].line_number,
                 message: format!(
-                    "Ontology element '{}' must not contain a #### Shapes section. SHACL profiles belong in requirement-owned semantic-contract elements.",
+                    "Ontology element '{}' must not contain a #### Shapes section. SHACL profiles belong in capability-owned or requirement-owned semantic-contract elements.",
                     element.name
                 ),
             });

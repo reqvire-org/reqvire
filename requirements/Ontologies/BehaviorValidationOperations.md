@@ -177,7 +177,7 @@ reqvire:requirementRefinementMergeCategory a reqvire:MergeCompatibilityCategory 
 reqvire:semanticContractMergeCategory a reqvire:MergeCompatibilityCategory ;
   reqvire:mergeCategoryName "semantic-contract" ;
   reqvire:mergeCategoryElementType "semantic-contract" ;
-  reqvire:mergeCategoryMeaning "Semantic-contract merge compatibility applies to requirement-owned SHACL profile refinements." ;
+  reqvire:mergeCategoryMeaning "Semantic-contract merge compatibility applies to capability-owned or requirement-owned SHACL profile refinements." ;
   reqvire:mergeRequiresSameCategory true .
 
 ```
@@ -222,7 +222,7 @@ reqvire:semanticReferenceNotFoundIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindMeaning "A semantic-contract SHACL reference points to an IRI that no Reqvire ontology element declares." .
 reqvire:semanticReferenceOutsideContextIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindName "semantic-reference-found-outside-context" ;
-  reqvire:validationIssueKindMeaning "A semantic-contract SHACL reference points to an IRI declared by an ontology element that is outside the owning requirement's reachable capability ontology context." .
+  reqvire:validationIssueKindMeaning "A semantic-contract SHACL reference points to an IRI declared by an ontology element that is outside the owning capability or requirement's reachable capability ontology context." .
 reqvire:semanticDuplicateDeclarationIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindName "semantic-duplicate-declaration" ;
   reqvire:validationIssueKindMeaning "The same ontology term IRI is declared by multiple ontology elements." .

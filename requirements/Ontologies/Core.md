@@ -28,6 +28,12 @@ reqvire:Verification a owl:Class ;
   rdfs:comment "Evidence or method used to verify a capability or requirement." .
 reqvire:Artifact a owl:Class ;
   rdfs:comment "Referenced implementation, evidence, document, or external resource artifact." .
+reqvire:File a owl:Class ;
+  rdfs:subClassOf reqvire:Artifact ;
+  rdfs:comment "Repository-internal file artifact referenced by Reqvire relations, attachments, or evidence links." .
+reqvire:CustomElement a owl:Class ;
+  rdfs:subClassOf reqvire:Element ;
+  rdfs:comment "Trace-only custom model element whose authored metadata type follows other-TYPENAME." .
 reqvire:ElementType a owl:Class ;
   rdfs:comment "Canonical metadata type value used to classify Reqvire elements." .
 reqvire:CapabilityElementType a owl:Class ;
@@ -79,6 +85,8 @@ reqvire:elementType a owl:DatatypeProperty ;
   rdfs:comment "Reqvire element type value declared in element metadata." .
 reqvire:filePath a owl:DatatypeProperty ;
   rdfs:comment "Repository-relative file path containing the element." .
+reqvire:externalUrl a owl:DatatypeProperty ;
+  rdfs:comment "External URL referenced by a Reqvire artifact relation target." .
 reqvire:fragment a owl:DatatypeProperty ;
   rdfs:comment "Markdown fragment used to address the element within its file." .
 reqvire:content a owl:DatatypeProperty ;
@@ -153,7 +161,7 @@ reqvire:detailsSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionPurpose "Narrative requirement context and clarification that remains part of the owning element." .
 reqvire:attachmentsSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Attachments" ;
-  reqvire:subsectionPurpose "Explicit attached ontology or requirement-owned contract dependencies." .
+  reqvire:subsectionPurpose "Explicit attached ontology or reusable refinement contract dependencies." .
 reqvire:conceptReferencesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Concept References" ;
   reqvire:subsectionPurpose "Human-readable bindings from element prose to reachable ontology terms." .
@@ -162,7 +170,7 @@ reqvire:ontologySubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionPurpose "Inline Turtle ontology content for ontology elements." .
 reqvire:shapesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Shapes" ;
-  reqvire:subsectionPurpose "Inline SHACL shape content for requirement-owned semantic contracts." .
+  reqvire:subsectionPurpose "Inline SHACL shape content for capability-owned or requirement-owned semantic contracts." .
 ```
 
 #### Metadata

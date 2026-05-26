@@ -15,9 +15,22 @@ When detecting model quality issues, the system shall identify redundant verific
   * type: requirement
 
 #### Relations
+  * derive: [Verification Element Semantic Contract](#verification-element-semantic-contract)
   * derive: [Verification Roll-up Strategy](#verification-roll-up-strategy)
+  * derive: [Verification Rollup Semantic Contract](#verification-rollup-semantic-contract)
   * derive: [Verification Trace Builder](#verification-trace-builder)
   * specify: [Verification Traceability](../../Capabilities/Verification.md#verification-traceability)
+---
+
+### Verification Element Semantic Contract
+
+The system shall define SHACL constraints for verification elements, verified capabilities or requirements, and evidence-backed verification satisfaction.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
 ---
 
 ### Verification Roll-up Strategy
@@ -31,6 +44,17 @@ The system shall implement a verification roll-up strategy where parent requirem
   * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
   * refinedBy: [Verification Roll-up Specification](Specifications.md#verification-roll-up-specification)
   * satisfiedBy: [report_coverage.rs](../../../core/src/report_coverage.rs)
+---
+
+### Verification Rollup Semantic Contract
+
+The system shall define SHACL constraints for verification rollup records, capability coverage records, requirement coverage records, and coverage state values.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
 ---
 
 ### Verification Trace Builder

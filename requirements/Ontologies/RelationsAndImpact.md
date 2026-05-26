@@ -179,6 +179,7 @@ reqvire:satisfy a owl:ObjectProperty .
 reqvire:satisfiedBy a owl:ObjectProperty .
 reqvire:trace a owl:ObjectProperty .
 reqvire:attach a owl:ObjectProperty .
+reqvire:attaches a owl:ObjectProperty .
 
 reqvire:inverseRelation a owl:ObjectProperty .
 reqvire:relationConstraint a owl:ObjectProperty .

@@ -1925,7 +1925,7 @@ impl GraphRegistry {
             let owners = self.get_refinement_owners(&element.identifier);
             if owners.len() != 1 {
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "Semantic contract '{}' must refine exactly one requirement.",
+                    "Semantic contract '{}' must refine exactly one capability or requirement.",
                     element.identifier
                 )));
                 continue;
@@ -1933,9 +1933,11 @@ impl GraphRegistry {
             let Some(owner) = self.nodes.get(&owners[0]) else {
                 continue;
             };
-            if !owner.element.element_type.is_requirement() {
+            if !owner.element.element_type.is_capability()
+                && !owner.element.element_type.is_requirement()
+            {
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "Semantic contract '{}' must refine a requirement, not '{}'.",
+                    "Semantic contract '{}' must refine a capability or requirement, not '{}'.",
                     element.identifier,
                     owner.element.element_type.as_str()
                 )));
@@ -1947,15 +1949,12 @@ impl GraphRegistry {
                 .ontology_declarations
                 .contains_key(&reference.iri)
             {
-                let Some(owner_requirement_id) =
-                    self.semantic_contract_owner_requirement(&reference.element_identifier)
+                let Some((owner_id, context)) =
+                    self.semantic_contract_owner_context(&reference.element_identifier)
                 else {
                     continue;
                 };
-                let context: BTreeSet<String> = self
-                    .build_requirement_ontology_context(&owner_requirement_id)
-                    .into_iter()
-                    .collect();
+                let context: BTreeSet<String> = context.into_iter().collect();
                 let declaration_sources: BTreeSet<String> = semantic_index
                     .ontology_declarations
                     .get(&reference.iri)
@@ -1979,12 +1978,12 @@ impl GraphRegistry {
                     .cloned()
                     .unwrap_or_else(|| "unknown semantic contract".to_string());
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable from owning requirement '{}' through capability-attached ontology context. Attach the declaring ontology to the owning or consuming capability, or move the declaration into reachable capability ontology context.",
+                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable from owning capability or requirement '{}' through capability-attached ontology context. Attach the declaring ontology to the owning or consuming capability, or move the declaration into reachable capability ontology context.",
                         reference.element_identifier,
                         reference.kind,
                         reference.iri,
                         declaring_contract,
-                        owner_requirement_id
+                        owner_id
                     )));
                 continue;
             }
@@ -2214,17 +2213,25 @@ impl GraphRegistry {
         prefixes
     }
 
-    fn semantic_contract_owner_requirement(&self, contract_id: &str) -> Option<String> {
+    fn semantic_contract_owner_context(&self, contract_id: &str) -> Option<(String, Vec<String>)> {
         let owners = self.get_refinement_owners(contract_id);
         if owners.len() != 1 {
             return None;
         }
         let owner = self.nodes.get(&owners[0])?;
-        if owner.element.element_type.is_requirement() {
-            Some(owners[0].clone())
-        } else {
-            None
+        if owner.element.element_type.is_capability() {
+            return Some((
+                owners[0].clone(),
+                self.build_capability_ontology_context(&owners[0]),
+            ));
         }
+        if owner.element.element_type.is_requirement() {
+            return Some((
+                owners[0].clone(),
+                self.build_requirement_ontology_context(&owners[0]),
+            ));
+        }
+        None
     }
 
     /// Validates that each refinement is owned by at most one capability or requirement via refinedBy.

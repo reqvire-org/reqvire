@@ -427,6 +427,18 @@ When tracing structural changes, the system shall analyze the System model and d
 
 #### Relations
   * derive: [Change Impact Detection](../Processing/ChangeImpact.md#change-impact-detection)
+  * derive: [Change Impact Semantic Contract](#change-impact-semantic-contract)
   * specify: [Trace Changes in System Model](../../Capabilities/RelationsAndImpact.md#trace-changes-in-system-model)
   * verifiedBy: [Structural Change Reports Verification](../Processing/Verifications/ChangeImpactVerifications.md#structural-change-reports-verification)
+---
+
+### Change Impact Semantic Contract
+
+The system shall define SHACL constraints for change-impact analysis records, impact edges, semantic dependencies, and review-routing metadata.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Tracing Structural Changes](#tracing-structural-changes)
 ---
