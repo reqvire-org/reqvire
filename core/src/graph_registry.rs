@@ -3087,7 +3087,10 @@ impl GraphRegistry {
         markdown.push_str("#### Metadata\n");
 
         // Add type metadata
-        markdown.push_str(&format!("  * type: {}\n", element.element_type.as_str()));
+        markdown.push_str(&format!(
+            "  * type: {}\n",
+            element.element_type.to_metadata_string()
+        ));
 
         // Add other metadata
         for (key, value) in custom_metadata {
@@ -3493,7 +3496,10 @@ impl GraphRegistry {
         markdown.push_str("# Documents\n\n");
 
         markdown.push_str("## Metadata\n");
-        markdown.push_str(&format!("  * type: {}\n", element.element_type.as_str()));
+        markdown.push_str(&format!(
+            "  * type: {}\n",
+            element.element_type.to_metadata_string()
+        ));
         let mut custom_metadata: Vec<_> = element
             .metadata
             .iter()

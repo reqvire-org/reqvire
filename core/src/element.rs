@@ -261,6 +261,10 @@ impl ElementType {
     /// Returns the metadata key corresponding to this ElementType,
     /// e.g. "requirement", "analysis-verification", or the
     /// raw string for Other.
+    ///
+    /// Note: for `Other`, this is the unprefixed name (e.g. "open-point").
+    /// Use `to_metadata_string` for the canonical form (with the `other-`
+    /// prefix) that is written back to Markdown.
     pub fn as_str(&self) -> &str {
         match self {
             ElementType::Capability => "capability",
@@ -287,6 +291,18 @@ impl ElementType {
             },
             ElementType::File => "file",
             ElementType::Other(s) => s.as_str(),
+        }
+    }
+
+    /// Returns the canonical `type:` metadata string for this element type.
+    ///
+    /// This is the inverse of `from_metadata`: unlike `as_str`, custom types
+    /// keep their `other-` prefix (e.g. "other-open-point"), so the value
+    /// round-trips when an element is re-serialized to Markdown and re-validated.
+    pub fn to_metadata_string(&self) -> String {
+        match self {
+            ElementType::Other(custom_type) => format!("other-{}", custom_type),
+            _ => self.as_str().to_string(),
         }
     }
 
