@@ -263,6 +263,7 @@ Load the right reference file for your task — don't work from memory on comple
 | **Explore model** | [explore.md](references/explore.md) | Understanding structure, browsing, traceability analysis |
 | **Add capabilities** | [AddCapability.md](references/AddCapability.md) | New functionality, MBSE workflow, requirements hierarchy |
 | **Refactor model** | [ConsolidateRequirements.md](references/ConsolidateRequirements.md) | Cluttered/duplicated model, fixing relations/ownership |
+| **Refactor containment structure** | [ContainmentStructureRefactor.md](references/ContainmentStructureRefactor.md) | Reorganize folders/files around capability, ontology, and verification planes without changing model intent |
 | **Refactor capability/semantic contracts** | [CapabilitySemanticContractRefactor.md](references/CapabilitySemanticContractRefactor.md) | Split capability scope, reusable ontology/semantic-contract meaning, and requirement obligations |
 | **Extract specs** | [SpecificationsExtractionLogic.md](references/SpecificationsExtractionLogic.md) | Embedded details in requirements, separating EARS from specs |
 | **Clean language** | [SpecificationLanguageCleanup.md](references/SpecificationLanguageCleanup.md) | Normative wording in refinements, language ownership |

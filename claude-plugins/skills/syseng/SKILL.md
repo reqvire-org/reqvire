@@ -260,16 +260,17 @@ Load the right reference file for your task — don't work from memory on comple
 
 | Task | Reference | When |
 |------|-----------|------|
-| **Explore model** | [explore.md](references/explore.md) | Understanding structure, browsing, traceability analysis |
-| **Add capabilities** | [AddCapability.md](references/AddCapability.md) | New functionality, MBSE workflow, requirements hierarchy |
-| **Refactor model** | [ConsolidateRequirements.md](references/ConsolidateRequirements.md) | Cluttered/duplicated model, fixing relations/ownership |
-| **Refactor capability/semantic contracts** | [CapabilitySemanticContractRefactor.md](references/CapabilitySemanticContractRefactor.md) | Split capability scope, reusable ontology/semantic-contract meaning, and requirement obligations |
-| **Extract specs** | [SpecificationsExtractionLogic.md](references/SpecificationsExtractionLogic.md) | Embedded details in requirements, separating EARS from specs |
-| **Clean language** | [SpecificationLanguageCleanup.md](references/SpecificationLanguageCleanup.md) | Normative wording in refinements, language ownership |
-| **Generate tasks** | [CreatingTasks.md](references/CreatingTasks.md) | Implementation plans from capability-scoped changes |
-| **Refactor submodel boundaries** | [SubmodelRefactor.md](references/SubmodelRefactor.md) | Split into independent submodels, attachment contracts |
-| **Align verifications** | [VerificationAlignment.md](references/VerificationAlignment.md) | Sync verification criteria with test assertions |
-| **Normalize design-doc ownership** | [DesignDocOwnership.md](references/DesignDocOwnership.md) | One owner per design document |
+| **Explore model** | [explore.md](reference/explore.md) | Understanding structure, browsing, traceability analysis |
+| **Add capabilities** | [AddCapability.md](reference/AddCapability.md) | New functionality, MBSE workflow, requirements hierarchy |
+| **Refactor model** | [ConsolidateRequirements.md](reference/ConsolidateRequirements.md) | Cluttered/duplicated model, fixing relations/ownership |
+| **Refactor containment structure** | [ContainmentStructureRefactor.md](reference/ContainmentStructureRefactor.md) | Reorganize folders/files around capability, ontology, and verification planes without changing model intent |
+| **Refactor capability/semantic contracts** | [CapabilitySemanticContractRefactor.md](reference/CapabilitySemanticContractRefactor.md) | Split capability scope, reusable ontology/semantic-contract meaning, and requirement obligations |
+| **Extract specs** | [SpecificationsExtractionLogic.md](reference/SpecificationsExtractionLogic.md) | Embedded details in requirements, separating EARS from specs |
+| **Clean language** | [SpecificationLanguageCleanup.md](reference/SpecificationLanguageCleanup.md) | Normative wording in refinements, language ownership |
+| **Generate tasks** | [CreatingTasks.md](reference/CreatingTasks.md) | Implementation plans from capability-scoped changes |
+| **Refactor submodel boundaries** | [SubmodelRefactor.md](reference/SubmodelRefactor.md) | Split into independent submodels, attachment contracts |
+| **Align verifications** | [VerificationAlignment.md](reference/VerificationAlignment.md) | Sync verification criteria with test assertions |
+| **Normalize design-doc ownership** | [DesignDocOwnership.md](reference/DesignDocOwnership.md) | One owner per design document |
 
 **Quick tasks** (no reference needed): search, validate, single link/unlink/move, collect context.
 
