@@ -122,7 +122,7 @@ for marker in \
   "sh:path" \
   "urn:reqvire:test:customer:customerId" \
   "specifications/SemanticContracts.md#customer-ontology" \
-  "owning capability or requirement 'specifications/SemanticContracts.md#billing-requirement'" \
+  "owning requirement 'specifications/SemanticContracts.md#billing-requirement'" \
   "Attach the declaring ontology"
 do
   if ! echo "$OUTSIDE_ADD_OUTPUT" | grep -Fq "$marker"; then
@@ -159,7 +159,7 @@ for marker in \
   "sh:path" \
   "urn:reqvire:test:tax:VatRate" \
   "specifications/SemanticContracts.md#tax-ontology" \
-  "owning capability or requirement 'specifications/SemanticContracts.md#billing-requirement'" \
+  "owning requirement 'specifications/SemanticContracts.md#billing-requirement'" \
   "Attach the declaring ontology"
 do
   if ! echo "$UNLINK_OUTPUT" | grep -Fq "$marker"; then

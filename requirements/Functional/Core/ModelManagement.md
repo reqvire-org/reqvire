@@ -215,19 +215,21 @@ Capability coverage shall remain separate from capability validation. Capability
 
 ### Ontology and Semantic Contract Model
 
-The system shall support first-class `ontology` elements for reusable semantic vocabulary and requirement-owned `semantic-contract` refinement elements for obligation-specific SHACL shape profiles.
+The system shall support first-class `ontology` elements for reusable semantic vocabulary, requirement-owned `semantic-contract` refinement elements for obligation-specific SHACL shape profiles, and requirement-owned `semantic-query-contract` refinement elements for declarative semantic queries.
 
 #### Details
-Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated `requirements/Ontologies` folder rather than nested in capability files. Requirement-owned semantic contracts shall define SHACL shape profiles for one obligation and must not define ontology vocabulary.
+Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated `requirements/Ontologies` folder rather than nested in capability files. Ontology-controlled vocabulary records shall carry formal semantics through IRI identity, typed class membership, hierarchy, and axioms; standard annotation properties such as `rdfs:label` and `rdfs:comment` may be used for optional presentation metadata, but canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable meanings shall remain declared domain properties. Deprecated presentation-only ontology properties shall not remain in authored Reqvire ontology source after refactoring. Requirement-owned semantic contracts shall define SHACL shape profiles for one obligation and must not define ontology vocabulary. Requirement-owned semantic query contracts shall define graph queries over reachable semantic model context without query-kind classification, ontology vocabulary, or SHACL shape profiles.
 
-Capability elements attach ontology elements to make vocabulary reachable for the capability, descendant capabilities, and requirements that specify that capability context. Requirement elements must not attach ontology directly; they inherit ontology context through their owning capability path. Capability and requirement elements may refine to semantic contracts, behavior, state, specification, constraint, and input-output refinements when they need closed-world profiles or additional operational/contract detail over reachable ontology terms.
+Capability elements attach ontology elements to make vocabulary reachable for the capability, descendant capabilities, and requirements that specify that capability context. Requirement elements must not attach ontology directly; they inherit ontology context through their owning capability path. Requirements may refine to semantic contracts and semantic query contracts when they need closed-world shape profiles or declarative semantic checks over reachable ontology terms. Capability and requirement elements may refine to behavior, state, specification, constraint, and input-output refinements when they need additional operational or contract detail.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Capability Model Structure](#capability-model-structure)
+  * refinedBy: [Ontology Annotation Convention Specification](Specifications.md#ontology-annotation-convention-specification)
   * refinedBy: [Semantic Contract Structure Specification](Specifications.md#semantic-contract-structure-specification)
+  * refinedBy: [Semantic Query Contract Structure Specification](Specifications.md#semantic-query-contract-structure-specification)
   * verifiedBy: [Semantic Contract Ontology Declaration Validation Test](Verifications/ValidationVerifications.md#semantic-contract-ontology-declaration-validation-test)
   * verifiedBy: [Semantic Contract Ownership Validation Test](Verifications/ValidationVerifications.md#semantic-contract-ownership-validation-test)
   * verifiedBy: [Semantic Contract Section Validation Test](Verifications/ValidationVerifications.md#semantic-contract-section-validation-test)
@@ -280,7 +282,18 @@ The system shall define SHACL constraints for ontology elements as vocabulary-be
 
 ### Semantic Contract Element Semantic Contract
 
-The system shall define SHACL constraints for semantic-contract identity, shape content, and single capability or requirement ownership.
+The system shall define SHACL constraints for semantic-contract identity, shape content, and single requirement ownership.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontology and Semantic Contract Model](#ontology-and-semantic-contract-model)
+---
+
+### Semantic Query Contract Element Semantic Contract
+
+The system shall define SHACL constraints for semantic-query-contract identity, query content, query language, and single requirement ownership.
 
 #### Metadata
   * type: requirement
@@ -313,7 +326,7 @@ The system shall define SHACL constraints for Reqvire relation usage, attachment
 
 ### Refinement Element Structure Constraints
 
-The system shall restrict Refinement elements (`source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, `input-output`) to only allow `refine` relations.
+The system shall restrict Refinement elements (`source`, `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, `input-output`) to only allow `refine` relations.
 
 #### Details
 Refinement relation validation shall enforce the subtype-compatible refinement vocabulary defined by the Reqvire capability, requirement, ontology, and semantic-contract model contracts.

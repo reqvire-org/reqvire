@@ -105,7 +105,7 @@ A capability subgraph may own:
 - requirements that specify the capability
 - capability-owned refinements
 - requirement-owned refinements
-- semantic contracts for specific capability or requirement obligations
+- requirement-owned semantic contracts for specific requirement obligations
 - local architecture or design specifications that refine elements in that subgraph
 - verification links to external verification elements
 
@@ -155,7 +155,7 @@ Refinement files usually use names like:
 
 Refinements are owned by exactly one compatible capability or requirement through `refine` / `refinedBy`. Use refinements when content is too detailed for a requirement statement but still needs traceability.
 
-Use semantic contracts when one capability or requirement needs a machine-readable SHACL profile over reachable ontology terms. Semantic contracts should refine the most specific capability or requirement that owns that semantic rule.
+Use semantic contracts when one requirement needs a machine-readable SHACL profile over reachable ontology terms. Semantic contracts must refine exactly one compatible requirement owner, contain `#### Shapes`, and not contain `#### Ontology`.
 
 ## Architecture Folders
 

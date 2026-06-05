@@ -348,6 +348,8 @@ struct ElementSearchResult {
     #[serde(skip_serializing_if = "Option::is_none")]
     semantic_contract: Option<element::SemanticContract>,
     #[serde(skip_serializing_if = "Option::is_none")]
+    semantic_query_contract: Option<element::SemanticQueryContract>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     ontology: Option<element::Ontology>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     concept_references: Vec<element::ConceptReference>,
@@ -410,6 +412,7 @@ impl Default for GlobalSearchCounters {
         let mut refinements = BTreeMap::new();
         refinements.insert("source".to_string(), 0);
         refinements.insert("semantic-contract".to_string(), 0);
+        refinements.insert("semantic-query-contract".to_string(), 0);
         refinements.insert("behavior".to_string(), 0);
         refinements.insert("constraint".to_string(), 0);
         refinements.insert("specification".to_string(), 0);
@@ -571,6 +574,7 @@ fn build_search_result(
                     let type_name = match ref_t {
                         element::RefinementType::Source => "source",
                         element::RefinementType::SemanticContract => "semantic-contract",
+                        element::RefinementType::SemanticQueryContract => "semantic-query-contract",
                         element::RefinementType::Constraint => "constraint",
                         element::RefinementType::Behavior => "behavior",
                         element::RefinementType::Specification => "specification",
@@ -647,6 +651,11 @@ fn build_search_result(
                 None
             } else {
                 elem.semantic_contract.clone()
+            },
+            semantic_query_contract: if short_mode {
+                None
+            } else {
+                elem.semantic_query_contract.clone()
             },
             ontology: if short_mode {
                 None

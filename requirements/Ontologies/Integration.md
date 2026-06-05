@@ -39,43 +39,58 @@ The Reqvire code traceability ontology defines the vocabulary for implementation
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:CodeTraceabilityContract a owl:Class .
-reqvire:TraceabilityMarkerContract a owl:Class .
-reqvire:CommentStyleContract a owl:Class .
-reqvire:TraceabilityRelationKind a owl:Class .
-reqvire:CommentStyleKind a owl:Class .
+reqvire:CodeTraceabilityContract a owl:Class ;
+  rdfs:comment "Contract vocabulary for source-level implementation evidence markers and supported marker parsing categories." .
+reqvire:TraceabilityMarkerContract a owl:Class ;
+  rdfs:subClassOf reqvire:CodeTraceabilityContract ;
+  rdfs:comment "Contract vocabulary for markers that connect source content to model requirements or trace evidence." .
+reqvire:CommentStyleContract a owl:Class ;
+  rdfs:subClassOf reqvire:CodeTraceabilityContract ;
+  rdfs:comment "Contract vocabulary for source comment styles that can carry traceability markers." .
+reqvire:TraceabilityRelationKind a owl:Class ;
+  rdfs:subClassOf reqvire:TraceabilityMarkerContract ;
+  rdfs:comment "Controlled vocabulary entry for a code marker relation token." .
+reqvire:CommentStyleKind a owl:Class ;
+  rdfs:subClassOf reqvire:CommentStyleContract ;
+  rdfs:comment "Controlled vocabulary entry for a supported source comment style token." .
 
-reqvire:traceabilityRelationKindName a owl:DatatypeProperty .
-reqvire:traceabilityRelationKindMeaning a owl:DatatypeProperty .
-reqvire:commentStyleName a owl:DatatypeProperty .
-reqvire:commentStyleMeaning a owl:DatatypeProperty .
+reqvire:traceabilityRelationKindName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:TraceabilityRelationKind ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical code marker relation token consumed by source marker parsing and reporting contracts." .
+reqvire:commentStyleName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:CommentStyleKind ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical supported comment style token consumed by source marker parsing contracts." .
 
 reqvire:satisfiesTraceabilityRelationKind a reqvire:TraceabilityRelationKind ;
   reqvire:traceabilityRelationKindName "satisfies" ;
-  reqvire:traceabilityRelationKindMeaning "Code marker relation kind that links implementation content to a requirement it satisfies." .
+  rdfs:comment "Code marker relation kind that links implementation content to a requirement it satisfies." .
 reqvire:traceTraceabilityRelationKind a reqvire:TraceabilityRelationKind ;
   reqvire:traceabilityRelationKindName "trace" ;
-  reqvire:traceabilityRelationKindMeaning "Code marker relation kind that creates documentation traceability without satisfaction semantics." .
+  rdfs:comment "Code marker relation kind that creates documentation traceability without satisfaction semantics." .
 
 reqvire:lineHashCommentStyle a reqvire:CommentStyleKind ;
   reqvire:commentStyleName "hash-line" ;
-  reqvire:commentStyleMeaning "Single-line hash comment style for traceability markers." .
+  rdfs:comment "Single-line hash comment style for traceability markers." .
 reqvire:lineSlashCommentStyle a reqvire:CommentStyleKind ;
   reqvire:commentStyleName "slash-line" ;
-  reqvire:commentStyleMeaning "Single-line slash comment style for traceability markers." .
+  rdfs:comment "Single-line slash comment style for traceability markers." .
 reqvire:lineDashCommentStyle a reqvire:CommentStyleKind ;
   reqvire:commentStyleName "dash-line" ;
-  reqvire:commentStyleMeaning "Single-line dash comment style for traceability markers." .
+  rdfs:comment "Single-line dash comment style for traceability markers." .
 reqvire:batchLineCommentStyle a reqvire:CommentStyleKind ;
   reqvire:commentStyleName "batch-line" ;
-  reqvire:commentStyleMeaning "Batch-style line comment category for traceability markers." .
+  rdfs:comment "Batch-style line comment category for traceability markers." .
 reqvire:blockCssCommentStyle a reqvire:CommentStyleKind ;
   reqvire:commentStyleName "css-block" ;
-  reqvire:commentStyleMeaning "CSS-style block comment wrapper for traceability markers." .
+  rdfs:comment "CSS-style block comment wrapper for traceability markers." .
 reqvire:blockXmlCommentStyle a reqvire:CommentStyleKind ;
   reqvire:commentStyleName "xml-block" ;
-  reqvire:commentStyleMeaning "XML/HTML-style block comment wrapper for traceability markers." .
+  rdfs:comment "XML/HTML-style block comment wrapper for traceability markers." .
 
 ```
 

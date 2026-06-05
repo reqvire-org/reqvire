@@ -8,18 +8,55 @@ use crate::relation::LinkType;
 use oxigraph::io::{JsonLdProfileSet, RdfFormat, RdfParser, RdfSerializer};
 use oxigraph::model::{NamedOrBlankNode, Quad, Term};
 use serde::Serialize;
-use std::collections::{BTreeSet, HashMap, HashSet};
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::fmt;
 
 const RDF_TYPE: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type";
 const RDF_FIRST: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#first";
 const RDF_REST: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#rest";
 const RDF_NIL: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#nil";
+const RDFS_SUBCLASS_OF: &str = "http://www.w3.org/2000/01/rdf-schema#subClassOf";
+const RDFS_DOMAIN: &str = "http://www.w3.org/2000/01/rdf-schema#domain";
+const RDFS_RANGE: &str = "http://www.w3.org/2000/01/rdf-schema#range";
+const RDFS_LABEL: &str = "http://www.w3.org/2000/01/rdf-schema#label";
+const RDFS_COMMENT: &str = "http://www.w3.org/2000/01/rdf-schema#comment";
 const RDFS_CLASS: &str = "http://www.w3.org/2000/01/rdf-schema#Class";
+const RDFS_DATATYPE: &str = "http://www.w3.org/2000/01/rdf-schema#Datatype";
 const OWL_CLASS: &str = "http://www.w3.org/2002/07/owl#Class";
+const OWL_NAMED_INDIVIDUAL: &str = "http://www.w3.org/2002/07/owl#NamedIndividual";
 const RDF_PROPERTY: &str = "http://www.w3.org/1999/02/22-rdf-syntax-ns#Property";
 const OWL_OBJECT_PROPERTY: &str = "http://www.w3.org/2002/07/owl#ObjectProperty";
 const OWL_DATATYPE_PROPERTY: &str = "http://www.w3.org/2002/07/owl#DatatypeProperty";
+const OWL_RESTRICTION: &str = "http://www.w3.org/2002/07/owl#Restriction";
+const OWL_DISJOINT_WITH: &str = "http://www.w3.org/2002/07/owl#disjointWith";
+const OWL_EQUIVALENT_CLASS: &str = "http://www.w3.org/2002/07/owl#equivalentClass";
+const OWL_EQUIVALENT_PROPERTY: &str = "http://www.w3.org/2002/07/owl#equivalentProperty";
+const OWL_SAME_AS: &str = "http://www.w3.org/2002/07/owl#sameAs";
+const OWL_INVERSE_OF: &str = "http://www.w3.org/2002/07/owl#inverseOf";
+const OWL_PROPERTY_CHAIN_AXIOM: &str = "http://www.w3.org/2002/07/owl#propertyChainAxiom";
+const OWL_FUNCTIONAL_PROPERTY: &str = "http://www.w3.org/2002/07/owl#FunctionalProperty";
+const OWL_INVERSE_FUNCTIONAL_PROPERTY: &str =
+    "http://www.w3.org/2002/07/owl#InverseFunctionalProperty";
+const OWL_TRANSITIVE_PROPERTY: &str = "http://www.w3.org/2002/07/owl#TransitiveProperty";
+const OWL_SYMMETRIC_PROPERTY: &str = "http://www.w3.org/2002/07/owl#SymmetricProperty";
+const OWL_ASYMMETRIC_PROPERTY: &str = "http://www.w3.org/2002/07/owl#AsymmetricProperty";
+const OWL_REFLEXIVE_PROPERTY: &str = "http://www.w3.org/2002/07/owl#ReflexiveProperty";
+const OWL_IRREFLEXIVE_PROPERTY: &str = "http://www.w3.org/2002/07/owl#IrreflexiveProperty";
+const OWL_ON_PROPERTY: &str = "http://www.w3.org/2002/07/owl#onProperty";
+const OWL_ALL_VALUES_FROM: &str = "http://www.w3.org/2002/07/owl#allValuesFrom";
+const OWL_SOME_VALUES_FROM: &str = "http://www.w3.org/2002/07/owl#someValuesFrom";
+const OWL_HAS_VALUE: &str = "http://www.w3.org/2002/07/owl#hasValue";
+const OWL_CARDINALITY: &str = "http://www.w3.org/2002/07/owl#cardinality";
+const OWL_MIN_CARDINALITY: &str = "http://www.w3.org/2002/07/owl#minCardinality";
+const OWL_MAX_CARDINALITY: &str = "http://www.w3.org/2002/07/owl#maxCardinality";
+const OWL_QUALIFIED_CARDINALITY: &str = "http://www.w3.org/2002/07/owl#qualifiedCardinality";
+const OWL_MIN_QUALIFIED_CARDINALITY: &str = "http://www.w3.org/2002/07/owl#minQualifiedCardinality";
+const OWL_MAX_QUALIFIED_CARDINALITY: &str = "http://www.w3.org/2002/07/owl#maxQualifiedCardinality";
+const OWL_ON_CLASS: &str = "http://www.w3.org/2002/07/owl#onClass";
+const OWL_ON_DATA_RANGE: &str = "http://www.w3.org/2002/07/owl#onDataRange";
+const OWL_INTERSECTION_OF: &str = "http://www.w3.org/2002/07/owl#intersectionOf";
+const OWL_UNION_OF: &str = "http://www.w3.org/2002/07/owl#unionOf";
+const OWL_COMPLEMENT_OF: &str = "http://www.w3.org/2002/07/owl#complementOf";
 const SH_NODE_SHAPE: &str = "http://www.w3.org/ns/shacl#NodeShape";
 const SH_PROPERTY_SHAPE: &str = "http://www.w3.org/ns/shacl#PropertyShape";
 const SH_TARGET_CLASS: &str = "http://www.w3.org/ns/shacl#targetClass";
@@ -136,12 +173,307 @@ pub struct SemanticIndexSummary {
     pub total_quads: usize,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum OntologyProjectionDerivationMode {
+    DirectAuthored,
+}
+
+impl OntologyProjectionDerivationMode {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::DirectAuthored => "direct-authored",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum OntologyConstructFamily {
+    PropertyDomainRange,
+    SubclassMembership,
+    DisjointEquivalenceInverse,
+    PropertyChain,
+    PropertyCharacteristic,
+    Restriction,
+    ClassExpression,
+    ShapeOverlay,
+}
+
+impl OntologyConstructFamily {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::PropertyDomainRange => "property-domain-range",
+            Self::SubclassMembership => "subclass-membership",
+            Self::DisjointEquivalenceInverse => "disjoint-equivalence-inverse",
+            Self::PropertyChain => "property-chain",
+            Self::PropertyCharacteristic => "property-characteristic",
+            Self::Restriction => "restriction",
+            Self::ClassExpression => "class-expression",
+            Self::ShapeOverlay => "shape-overlay",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum OntologyConstructKind {
+    PropertyDomain,
+    PropertyRange,
+    SubclassInclusion,
+    Membership,
+    Disjointness,
+    EquivalenceGroup,
+    InverseProperty,
+    PropertyChain,
+    PropertyCharacteristic,
+    Restriction,
+    ClassExpression,
+    ShapeOverlay,
+}
+
+impl OntologyConstructKind {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::PropertyDomain => "property-domain",
+            Self::PropertyRange => "property-range",
+            Self::SubclassInclusion => "subclass-inclusion",
+            Self::Membership => "membership",
+            Self::Disjointness => "disjointness",
+            Self::EquivalenceGroup => "equivalence-group",
+            Self::InverseProperty => "inverse-property",
+            Self::PropertyChain => "property-chain",
+            Self::PropertyCharacteristic => "property-characteristic",
+            Self::Restriction => "restriction",
+            Self::ClassExpression => "class-expression",
+            Self::ShapeOverlay => "shape-overlay",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum OntologyProjectionTermKind {
+    Iri,
+    BlankNode,
+    Literal,
+}
+
+impl OntologyProjectionTermKind {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Iri => "iri",
+            Self::BlankNode => "blank-node",
+            Self::Literal => "literal",
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct OntologyProjectionTerm {
+    pub kind: OntologyProjectionTermKind,
+    pub value: String,
+    pub label: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct OntologyProjectionSource {
+    pub source_block: String,
+    pub source_element_identifier: String,
+    pub source_name: String,
+    pub file_path: String,
+    pub line_number: usize,
+    pub block_kind: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct OntologyProjectionEvidence {
+    pub source: OntologyProjectionSource,
+    pub subject: OntologyProjectionTerm,
+    pub predicate: OntologyProjectionTerm,
+    pub object: OntologyProjectionTerm,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
+pub struct OntologyProjectionProvenance {
+    pub derivation_mode: OntologyProjectionDerivationMode,
+    pub source: OntologyProjectionSource,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pattern_contract_iri: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub evidence: Vec<OntologyProjectionEvidence>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct OntologyConstructMember {
+    pub sequence_index: usize,
+    pub term: OntologyProjectionTerm,
+    pub source: OntologyProjectionSource,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Serialize)]
+pub struct OntologySymbol {
+    pub concept_name: String,
+    pub raw_unicode_code_point: String,
+    pub rendered_unicode_character: String,
+    pub tooltip: String,
+    pub accessible_label: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum OntologyPropertyCharacteristic {
+    Functional,
+    InverseFunctional,
+    Symmetric,
+    Asymmetric,
+    Reflexive,
+    Irreflexive,
+    Transitive,
+}
+
+impl OntologyPropertyCharacteristic {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Functional => "functional",
+            Self::InverseFunctional => "inverse-functional",
+            Self::Symmetric => "symmetric",
+            Self::Asymmetric => "asymmetric",
+            Self::Reflexive => "reflexive",
+            Self::Irreflexive => "irreflexive",
+            Self::Transitive => "transitive",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum OntologyRestrictionKind {
+    Universal,
+    Existential,
+    HasValue,
+    Cardinality,
+    MinCardinality,
+    MaxCardinality,
+    QualifiedCardinality,
+    MinQualifiedCardinality,
+    MaxQualifiedCardinality,
+    OnClass,
+    OnDataRange,
+}
+
+impl OntologyRestrictionKind {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Universal => "universal",
+            Self::Existential => "existential",
+            Self::HasValue => "has-value",
+            Self::Cardinality => "cardinality",
+            Self::MinCardinality => "min-cardinality",
+            Self::MaxCardinality => "max-cardinality",
+            Self::QualifiedCardinality => "qualified-cardinality",
+            Self::MinQualifiedCardinality => "min-qualified-cardinality",
+            Self::MaxQualifiedCardinality => "max-qualified-cardinality",
+            Self::OnClass => "on-class",
+            Self::OnDataRange => "on-data-range",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum OntologyClassExpressionKind {
+    Intersection,
+    Union,
+    Complement,
+}
+
+impl OntologyClassExpressionKind {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::Intersection => "intersection",
+            Self::Union => "union",
+            Self::Complement => "complement",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize)]
+#[serde(rename_all = "kebab-case")]
+pub enum OntologyShapeOverlayKind {
+    NodeShape,
+    PropertyShape,
+}
+
+impl OntologyShapeOverlayKind {
+    fn as_str(self) -> &'static str {
+        match self {
+            Self::NodeShape => "node-shape",
+            Self::PropertyShape => "property-shape",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct OntologyConstruct {
+    pub id: String,
+    pub family: OntologyConstructFamily,
+    pub kind: OntologyConstructKind,
+    pub subject: OntologyProjectionTerm,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub predicate: Option<OntologyProjectionTerm>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub object: Option<OntologyProjectionTerm>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub property: Option<OntologyProjectionTerm>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub members: Vec<OntologyConstructMember>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub property_characteristic: Option<OntologyPropertyCharacteristic>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub restriction_kind: Option<OntologyRestrictionKind>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub class_expression_kind: Option<OntologyClassExpressionKind>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub shape_overlay_kind: Option<OntologyShapeOverlayKind>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub symbol: Option<OntologySymbol>,
+    pub provenance: OntologyProjectionProvenance,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct OntologyConstructProjection {
+    pub id: String,
+    pub family: OntologyConstructFamily,
+    pub derivation_mode: OntologyProjectionDerivationMode,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pattern_contract_iri: Option<String>,
+    pub construct_ids: Vec<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+pub struct OntologyProjectionGraph {
+    pub id: String,
+    pub derivation_mode: OntologyProjectionDerivationMode,
+    pub projections: Vec<OntologyConstructProjection>,
+    pub constructs: Vec<OntologyConstruct>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub symbols: Vec<OntologySymbol>,
+}
+
+impl OntologyProjectionGraph {
+    pub fn is_empty(&self) -> bool {
+        self.constructs.is_empty()
+    }
+}
+
 #[derive(Debug, Clone, Serialize)]
 pub struct SemanticIndex {
     pub blocks: Vec<SemanticBlock>,
     pub diagnostics: Vec<SemanticDiagnostic>,
     pub ontology_declarations: HashMap<String, Vec<OntologyTermDeclaration>>,
     pub shape_references: Vec<ShapeIriReference>,
+    pub ontology_projection: OntologyProjectionGraph,
     pub summary: SemanticIndexSummary,
 }
 
@@ -209,6 +541,7 @@ impl SemanticIndex {
     pub fn to_full_turtle_string(&self, registry: &GraphRegistry) -> String {
         let mut output = self.to_turtle_string();
         output.push_str(&build_model_context_turtle(registry, self));
+        output.push_str(&build_ontology_projection_turtle(self));
         output
     }
 
@@ -263,6 +596,10 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
 
     for node in nodes {
         let element = &node.element;
+        if element.element_type.is_semantic_query_contract() {
+            continue;
+        }
+
         let subject = element_iri(element);
         output.push_str(&format!(
             "{} a {} ;\n",
@@ -420,6 +757,440 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
     output
 }
 
+fn build_ontology_projection_turtle(index: &SemanticIndex) -> String {
+    let graph = &index.ontology_projection;
+    if graph.is_empty() {
+        return String::new();
+    }
+
+    let mut output = String::new();
+    let mut term_resources = BTreeSet::new();
+    let mut source_resources = BTreeSet::new();
+    let mut provenance_resources = BTreeSet::new();
+    let mut evidence_resources = BTreeSet::new();
+    let mut member_resources = BTreeSet::new();
+    let mut symbol_resources = BTreeSet::new();
+
+    output.push_str(
+        "# -----------------------------------------------------------------------------\n",
+    );
+    output.push_str("# Reqvire generated ontology projection facts\n\n");
+    output.push_str("@prefix reqvire: <https://www.reqvire.org/ontology#> .\n\n");
+
+    let graph_iri = projection_resource_iri(&graph.id);
+    output.push_str(&format!(
+        "{} a reqvire:OntologyProjectionGraph .\n",
+        graph_iri
+    ));
+    output.push_str(&format!(
+        "{} reqvire:projectionDerivationMode {} .\n",
+        graph_iri,
+        turtle_string(graph.derivation_mode.as_str())
+    ));
+
+    for projection in &graph.projections {
+        let projection_iri = projection_resource_iri(&projection.id);
+        output.push_str(&format!(
+            "{} reqvire:ontologyConstructProjection {} .\n",
+            graph_iri, projection_iri
+        ));
+    }
+    for construct in &graph.constructs {
+        output.push_str(&format!(
+            "{} reqvire:projectedConstruct {} .\n",
+            graph_iri,
+            projection_resource_iri(&construct.id)
+        ));
+    }
+    for symbol in &graph.symbols {
+        let symbol_iri = serialize_projection_symbol(symbol, &mut symbol_resources);
+        output.push_str(&format!(
+            "{} reqvire:ontologySymbol {} .\n",
+            graph_iri, symbol_iri
+        ));
+    }
+    output.push('\n');
+
+    for projection in &graph.projections {
+        let projection_iri = projection_resource_iri(&projection.id);
+        output.push_str(&format!(
+            "{} a reqvire:OntologyConstructProjection .\n",
+            projection_iri
+        ));
+        output.push_str(&format!(
+            "{} reqvire:constructFamily {} .\n",
+            projection_iri,
+            turtle_string(projection.family.as_str())
+        ));
+        output.push_str(&format!(
+            "{} reqvire:projectionDerivationMode {} .\n",
+            projection_iri,
+            turtle_string(projection.derivation_mode.as_str())
+        ));
+        if let Some(pattern_contract_iri) = &projection.pattern_contract_iri {
+            output.push_str(&format!(
+                "{} reqvire:constructQueryContract {} .\n",
+                projection_iri,
+                projection_resource_iri(pattern_contract_iri)
+            ));
+        }
+        for construct_id in &projection.construct_ids {
+            output.push_str(&format!(
+                "{} reqvire:projectedConstruct {} .\n",
+                projection_iri,
+                projection_resource_iri(construct_id)
+            ));
+        }
+        output.push('\n');
+    }
+
+    for construct in &graph.constructs {
+        let construct_iri = projection_resource_iri(&construct.id);
+        let source_iri =
+            serialize_projection_source(&construct.provenance.source, &mut source_resources);
+        let provenance_iri = serialize_projection_provenance(
+            &construct.id,
+            &construct.provenance,
+            &mut term_resources,
+            &mut source_resources,
+            &mut provenance_resources,
+            &mut evidence_resources,
+        );
+        let subject_iri = serialize_projection_term(&construct.subject, &mut term_resources);
+
+        output.push_str(&format!(
+            "{} a reqvire:OntologyConstruct .\n",
+            construct_iri
+        ));
+        output.push_str(&format!(
+            "{} reqvire:constructFamily {} .\n",
+            construct_iri,
+            turtle_string(construct.family.as_str())
+        ));
+        output.push_str(&format!(
+            "{} reqvire:constructKind {} .\n",
+            construct_iri,
+            turtle_string(construct.kind.as_str())
+        ));
+        output.push_str(&format!(
+            "{} reqvire:projectionDerivationMode {} .\n",
+            construct_iri,
+            turtle_string(construct.provenance.derivation_mode.as_str())
+        ));
+        output.push_str(&format!(
+            "{} reqvire:constructSourceBlock {} .\n",
+            construct_iri, source_iri
+        ));
+        output.push_str(&format!(
+            "{} reqvire:constructProvenance {} .\n",
+            construct_iri, provenance_iri
+        ));
+        output.push_str(&format!(
+            "{} reqvire:constructSubject {} .\n",
+            construct_iri, subject_iri
+        ));
+
+        if let Some(predicate) = &construct.predicate {
+            let predicate_iri = serialize_projection_term(predicate, &mut term_resources);
+            output.push_str(&format!(
+                "{} reqvire:constructPredicate {} .\n",
+                construct_iri, predicate_iri
+            ));
+        }
+        if let Some(object) = &construct.object {
+            let object_iri = serialize_projection_term(object, &mut term_resources);
+            output.push_str(&format!(
+                "{} reqvire:constructObject {} .\n",
+                construct_iri, object_iri
+            ));
+        }
+        if let Some(property) = &construct.property {
+            let property_iri = serialize_projection_term(property, &mut term_resources);
+            output.push_str(&format!(
+                "{} reqvire:constructProperty {} .\n",
+                construct_iri, property_iri
+            ));
+        }
+        if let Some(characteristic) = construct.property_characteristic {
+            output.push_str(&format!(
+                "{} reqvire:propertyCharacteristic {} .\n",
+                construct_iri,
+                turtle_string(characteristic.as_str())
+            ));
+        }
+        if let Some(restriction_kind) = construct.restriction_kind {
+            output.push_str(&format!(
+                "{} reqvire:restrictionKind {} .\n",
+                construct_iri,
+                turtle_string(restriction_kind.as_str())
+            ));
+        }
+        if let Some(class_expression_kind) = construct.class_expression_kind {
+            output.push_str(&format!(
+                "{} reqvire:classExpressionKind {} .\n",
+                construct_iri,
+                turtle_string(class_expression_kind.as_str())
+            ));
+        }
+        if let Some(shape_overlay_kind) = construct.shape_overlay_kind {
+            output.push_str(&format!(
+                "{} reqvire:shapeOverlayKind {} .\n",
+                construct_iri,
+                turtle_string(shape_overlay_kind.as_str())
+            ));
+        }
+        if let Some(symbol) = &construct.symbol {
+            let symbol_iri = serialize_projection_symbol(symbol, &mut symbol_resources);
+            output.push_str(&format!(
+                "{} reqvire:constructSymbol {} .\n",
+                construct_iri, symbol_iri
+            ));
+        }
+        for member in &construct.members {
+            let member_iri = serialize_construct_member(
+                &construct.id,
+                member,
+                &mut term_resources,
+                &mut source_resources,
+                &mut member_resources,
+            );
+            output.push_str(&format!(
+                "{} reqvire:constructMember {} .\n",
+                construct_iri, member_iri
+            ));
+        }
+        if let Some(pattern_contract_iri) = &construct.provenance.pattern_contract_iri {
+            output.push_str(&format!(
+                "{} reqvire:constructQueryContract {} .\n",
+                construct_iri,
+                projection_resource_iri(pattern_contract_iri)
+            ));
+        }
+        output.push('\n');
+    }
+
+    for resource in source_resources {
+        output.push_str(&resource);
+    }
+    for resource in provenance_resources {
+        output.push_str(&resource);
+    }
+    for resource in evidence_resources {
+        output.push_str(&resource);
+    }
+    for resource in member_resources {
+        output.push_str(&resource);
+    }
+    for resource in term_resources {
+        output.push_str(&resource);
+    }
+    for resource in symbol_resources {
+        output.push_str(&resource);
+    }
+
+    output
+}
+
+fn serialize_projection_provenance(
+    construct_id: &str,
+    provenance: &OntologyProjectionProvenance,
+    term_resources: &mut BTreeSet<String>,
+    source_resources: &mut BTreeSet<String>,
+    provenance_resources: &mut BTreeSet<String>,
+    evidence_resources: &mut BTreeSet<String>,
+) -> String {
+    let provenance_iri = projection_generated_iri("ontology-provenance", construct_id);
+    let source_iri = serialize_projection_source(&provenance.source, source_resources);
+    let mut chunk = String::new();
+    chunk.push_str(&format!(
+        "{} a reqvire:OntologyProjectionProvenance .\n",
+        provenance_iri
+    ));
+    chunk.push_str(&format!(
+        "{} reqvire:projectionDerivationMode {} .\n",
+        provenance_iri,
+        turtle_string(provenance.derivation_mode.as_str())
+    ));
+    chunk.push_str(&format!(
+        "{} reqvire:provenanceSource {} .\n",
+        provenance_iri, source_iri
+    ));
+    if let Some(pattern_contract_iri) = &provenance.pattern_contract_iri {
+        chunk.push_str(&format!(
+            "{} reqvire:constructQueryContract {} .\n",
+            provenance_iri,
+            projection_resource_iri(pattern_contract_iri)
+        ));
+    }
+    for (index, evidence) in provenance.evidence.iter().enumerate() {
+        let evidence_iri = serialize_projection_evidence(
+            construct_id,
+            index,
+            evidence,
+            term_resources,
+            source_resources,
+            evidence_resources,
+        );
+        chunk.push_str(&format!(
+            "{} reqvire:provenanceEvidence {} .\n",
+            provenance_iri, evidence_iri
+        ));
+    }
+    chunk.push('\n');
+    provenance_resources.insert(chunk);
+    provenance_iri
+}
+
+fn serialize_projection_evidence(
+    construct_id: &str,
+    sequence_index: usize,
+    evidence: &OntologyProjectionEvidence,
+    term_resources: &mut BTreeSet<String>,
+    source_resources: &mut BTreeSet<String>,
+    evidence_resources: &mut BTreeSet<String>,
+) -> String {
+    let evidence_key = format!(
+        "{}|{}|{}|{}|{}",
+        construct_id,
+        sequence_index,
+        evidence.source.source_block,
+        projection_term_key(&evidence.subject),
+        projection_term_key(&evidence.object)
+    );
+    let evidence_iri = projection_generated_iri("ontology-evidence", &evidence_key);
+    let source_iri = serialize_projection_source(&evidence.source, source_resources);
+    let subject_iri = serialize_projection_term(&evidence.subject, term_resources);
+    let predicate_iri = serialize_projection_term(&evidence.predicate, term_resources);
+    let object_iri = serialize_projection_term(&evidence.object, term_resources);
+
+    evidence_resources.insert(format!(
+        "{} a reqvire:OntologyProjectionEvidence .\n{} reqvire:constructSourceBlock {} .\n{} reqvire:constructSubject {} .\n{} reqvire:constructPredicate {} .\n{} reqvire:constructObject {} .\n\n",
+        evidence_iri,
+        evidence_iri,
+        source_iri,
+        evidence_iri,
+        subject_iri,
+        evidence_iri,
+        predicate_iri,
+        evidence_iri,
+        object_iri
+    ));
+
+    evidence_iri
+}
+
+fn serialize_construct_member(
+    construct_id: &str,
+    member: &OntologyConstructMember,
+    term_resources: &mut BTreeSet<String>,
+    source_resources: &mut BTreeSet<String>,
+    member_resources: &mut BTreeSet<String>,
+) -> String {
+    let member_key = format!(
+        "{}|{}|{}",
+        construct_id,
+        member.sequence_index,
+        projection_term_key(&member.term)
+    );
+    let member_iri = projection_generated_iri("ontology-member", &member_key);
+    let term_iri = serialize_projection_term(&member.term, term_resources);
+    let source_iri = serialize_projection_source(&member.source, source_resources);
+
+    member_resources.insert(format!(
+        "{} a reqvire:OntologyConstructMember .\n{} reqvire:memberTerm {} .\n{} reqvire:constructSourceBlock {} .\n{} reqvire:constructSequenceIndex {} .\n\n",
+        member_iri,
+        member_iri,
+        term_iri,
+        member_iri,
+        source_iri,
+        member_iri,
+        member.sequence_index
+    ));
+
+    member_iri
+}
+
+fn serialize_projection_term(
+    term: &OntologyProjectionTerm,
+    term_resources: &mut BTreeSet<String>,
+) -> String {
+    let term_iri = projection_term_iri(term);
+    term_resources.insert(format!(
+        "{} a reqvire:OntologyTerm .\n{} reqvire:termKind {} .\n{} reqvire:termValue {} .\n{} reqvire:conceptLabel {} .\n\n",
+        term_iri,
+        term_iri,
+        turtle_string(term.kind.as_str()),
+        term_iri,
+        turtle_string(&term.value),
+        term_iri,
+        turtle_string(&term.label)
+    ));
+    term_iri
+}
+
+fn serialize_projection_source(
+    source: &OntologyProjectionSource,
+    source_resources: &mut BTreeSet<String>,
+) -> String {
+    let source_iri = projection_generated_iri("semantic-block", &source.source_block);
+    source_resources.insert(format!(
+        "{} a reqvire:SemanticBlock, reqvire:OntologyProjectionSource .\n{} reqvire:sourceBlockId {} .\n{} reqvire:sourceElementIdentifier {} .\n{} reqvire:sourceName {} .\n{} reqvire:filePath {} .\n{} reqvire:lineNumber {} .\n{} reqvire:blockKind {} .\n\n",
+        source_iri,
+        source_iri,
+        turtle_string(&source.source_block),
+        source_iri,
+        turtle_string(&source.source_element_identifier),
+        source_iri,
+        turtle_string(&source.source_name),
+        source_iri,
+        turtle_string(&source.file_path),
+        source_iri,
+        source.line_number,
+        source_iri,
+        turtle_string(&source.block_kind)
+    ));
+    source_iri
+}
+
+fn serialize_projection_symbol(
+    symbol: &OntologySymbol,
+    symbol_resources: &mut BTreeSet<String>,
+) -> String {
+    let symbol_iri = projection_generated_iri("ontology-symbol", &symbol.concept_name);
+    symbol_resources.insert(format!(
+        "{} a reqvire:OntologySymbol .\n{} reqvire:symbolConceptName {} .\n{} reqvire:rawUnicodeCodePoint {} .\n{} reqvire:renderedUnicodeCharacter {} .\n{} reqvire:symbolTooltip {} .\n{} reqvire:accessibleLabel {} .\n\n",
+        symbol_iri,
+        symbol_iri,
+        turtle_string(&symbol.concept_name),
+        symbol_iri,
+        turtle_string(&symbol.raw_unicode_code_point),
+        symbol_iri,
+        turtle_string(&symbol.rendered_unicode_character),
+        symbol_iri,
+        turtle_string(&symbol.tooltip),
+        symbol_iri,
+        turtle_string(&symbol.accessible_label)
+    ));
+    symbol_iri
+}
+
+fn projection_resource_iri(value: &str) -> String {
+    format!("<{}>", escape_iri(value))
+}
+
+fn projection_generated_iri(kind: &str, canonical: &str) -> String {
+    projection_resource_iri(&format!("urn:reqvire:{}:{}", kind, stable_hash(canonical)))
+}
+
+fn projection_term_iri(term: &OntologyProjectionTerm) -> String {
+    match term.kind {
+        OntologyProjectionTermKind::Iri => projection_resource_iri(&term.value),
+        OntologyProjectionTermKind::BlankNode | OntologyProjectionTermKind::Literal => {
+            projection_generated_iri("ontology-term", &projection_term_key(term))
+        }
+    }
+}
+
 fn element_iri(element: &Element) -> String {
     format!("<urn:reqvire:element:{}>", escape_iri(&element.id))
 }
@@ -443,6 +1214,7 @@ fn element_type_classes(element_type: &ElementType) -> Vec<&'static str> {
             let subtype = match refinement_type {
                 RefinementType::Source => "reqvire:Source",
                 RefinementType::SemanticContract => "reqvire:SemanticContract",
+                RefinementType::SemanticQueryContract => "reqvire:SemanticQueryContract",
                 RefinementType::Constraint => "reqvire:Constraint",
                 RefinementType::Behavior => "reqvire:Behavior",
                 RefinementType::Specification => "reqvire:Specification",
@@ -472,6 +1244,7 @@ fn target_iri_for_link(
         LinkType::Identifier(target_identifier) => registry
             .nodes
             .get(target_identifier)
+            .filter(|target| !target.element.element_type.is_semantic_query_contract())
             .map(|target| element_iri(&target.element)),
         LinkType::InternalPath(path) => {
             let value = path.to_string_lossy();
@@ -504,6 +1277,7 @@ fn attachment_target_iri(
         AttachmentTarget::ElementIdentifier(target_identifier) => registry
             .nodes
             .get(target_identifier)
+            .filter(|target| !target.element.element_type.is_semantic_query_contract())
             .map(|target| element_iri(&target.element)),
         AttachmentTarget::FilePath(path) => {
             let value = path.to_string_lossy();
@@ -556,8 +1330,9 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
     for element in registry.get_all_elements() {
         let ontology = element::extract_single_fenced_subsection(&element.content, "Ontology");
         let shapes = element::extract_single_fenced_subsection(&element.content, "Shapes");
+        let query = element::extract_single_fenced_subsection(&element.content, "Query");
 
-        validate_semantic_sections(element, &ontology, &shapes, &mut diagnostics);
+        validate_semantic_sections(element, &ontology, &shapes, &query, &mut diagnostics);
 
         if element.element_type.is_ontology() {
             if let Some(block) = build_block(
@@ -610,6 +1385,7 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
         .filter(|block| matches!(block.kind, SemanticBlockKind::Shapes))
         .count();
     let total_quads = blocks.iter().map(|block| block.quads.len()).sum();
+    let ontology_projection = build_ontology_projection(registry, &blocks);
 
     SemanticIndex {
         summary: SemanticIndexSummary {
@@ -622,6 +1398,7 @@ pub fn build_semantic_index(registry: &GraphRegistry) -> SemanticIndex {
         diagnostics,
         ontology_declarations,
         shape_references,
+        ontology_projection,
     }
 }
 
@@ -629,8 +1406,15 @@ fn validate_semantic_sections(
     element: &Element,
     ontology: &[FencedBlock],
     shapes: &[FencedBlock],
+    query: &[FencedBlock],
     diagnostics: &mut Vec<SemanticDiagnostic>,
 ) {
+    let has_query_section = element::has_subsection(&element.content, "Query");
+    let query_line_number = query
+        .first()
+        .map(|block| block.line_number)
+        .unwrap_or(element.line_number);
+
     if element.element_type.is_ontology() {
         if ontology.len() != 1 {
             diagnostics.push(SemanticDiagnostic {
@@ -649,7 +1433,18 @@ fn validate_semantic_sections(
                 file_path: element.file_path.clone(),
                 line_number: shapes[0].line_number,
                 message: format!(
-                    "Ontology element '{}' must not contain a #### Shapes section. SHACL profiles belong in capability-owned or requirement-owned semantic-contract elements.",
+                    "Ontology element '{}' must not contain a #### Shapes section. SHACL profiles belong in requirement-owned semantic-contract elements.",
+                    element.name
+                ),
+            });
+        }
+        if has_query_section {
+            diagnostics.push(SemanticDiagnostic {
+                source: element.identifier.clone(),
+                file_path: element.file_path.clone(),
+                line_number: query_line_number,
+                message: format!(
+                    "Ontology element '{}' must not contain a #### Query section. SPARQL queries belong in requirement-owned semantic-query-contract elements.",
                     element.name
                 ),
             });
@@ -666,6 +1461,17 @@ fn validate_semantic_sections(
                 ),
             });
         }
+        if has_query_section {
+            diagnostics.push(SemanticDiagnostic {
+                source: element.identifier.clone(),
+                file_path: element.file_path.clone(),
+                line_number: query_line_number,
+                message: format!(
+                    "Semantic contract '{}' must not contain a #### Query section. Use type: semantic-query-contract.",
+                    element.name
+                ),
+            });
+        }
         if shapes.len() != 1 {
             diagnostics.push(SemanticDiagnostic {
                 source: element.identifier.clone(),
@@ -675,6 +1481,47 @@ fn validate_semantic_sections(
                     "Semantic contract '{}' must contain exactly one #### Shapes fenced Turtle block.",
                     element.name
                 ),
+            });
+        }
+    } else if element.element_type.is_semantic_query_contract() {
+        if !ontology.is_empty() {
+            diagnostics.push(SemanticDiagnostic {
+                source: element.identifier.clone(),
+                file_path: element.file_path.clone(),
+                line_number: ontology[0].line_number,
+                message: format!(
+                    "Semantic query contract '{}' must not contain a #### Ontology section. Ontology declarations belong in ontology elements.",
+                    element.name
+                ),
+            });
+        }
+        if !shapes.is_empty() {
+            diagnostics.push(SemanticDiagnostic {
+                source: element.identifier.clone(),
+                file_path: element.file_path.clone(),
+                line_number: shapes[0].line_number,
+                message: format!(
+                    "Semantic query contract '{}' must not contain a #### Shapes section. SHACL profiles belong in semantic-contract elements.",
+                    element.name
+                ),
+            });
+        }
+        if query.len() != 1 {
+            diagnostics.push(SemanticDiagnostic {
+                source: element.identifier.clone(),
+                file_path: element.file_path.clone(),
+                line_number: element.line_number,
+                message: format!(
+                    "Semantic query contract '{}' must contain exactly one #### Query fenced SPARQL block.",
+                    element.name
+                ),
+            });
+        } else if !validate_sparql_language(&query[0].language) {
+            diagnostics.push(SemanticDiagnostic {
+                source: element.identifier.clone(),
+                file_path: element.file_path.clone(),
+                line_number: query[0].line_number,
+                message: "Query fenced block must use language tag 'sparql'.".to_string(),
             });
         }
     } else {
@@ -702,6 +1549,18 @@ fn validate_semantic_sections(
                 ),
             });
         }
+        if has_query_section {
+            diagnostics.push(SemanticDiagnostic {
+                source: element.identifier.clone(),
+                file_path: element.file_path.clone(),
+                line_number: query_line_number,
+                message: format!(
+                    "Element '{}' is type '{}' and must not contain a #### Query section. Use type: semantic-query-contract.",
+                    element.name,
+                    element.element_type.as_str()
+                ),
+            });
+        }
     }
 
     if ontology.len() > 1 {
@@ -723,6 +1582,18 @@ fn validate_semantic_sections(
             line_number: shapes[1].line_number,
             message: format!(
                 "Element '{}' must contain at most one #### Shapes fenced Turtle block.",
+                element.name
+            ),
+        });
+    }
+
+    if query.len() > 1 {
+        diagnostics.push(SemanticDiagnostic {
+            source: element.identifier.clone(),
+            file_path: element.file_path.clone(),
+            line_number: query[1].line_number,
+            message: format!(
+                "Element '{}' must contain at most one #### Query fenced SPARQL block.",
                 element.name
             ),
         });
@@ -775,6 +1646,10 @@ fn build_block(
 
 fn validate_turtle_language(language: &str) -> bool {
     matches!(language.to_ascii_lowercase().as_str(), "turtle" | "ttl")
+}
+
+fn validate_sparql_language(language: &str) -> bool {
+    language == "sparql"
 }
 
 fn parse_turtle_block(content: &str) -> Result<Vec<Quad>, String> {
@@ -1028,6 +1903,1009 @@ fn validate_shacl_sanity(shapes: &[Quad]) -> Vec<String> {
     errors
 }
 
+fn build_ontology_projection(
+    registry: &GraphRegistry,
+    blocks: &[SemanticBlock],
+) -> OntologyProjectionGraph {
+    let pattern_contracts = ontology_projection_pattern_contracts(registry);
+    let rdf_lists = collect_projection_rdf_lists(blocks);
+    let object_index = collect_projection_object_index(blocks);
+    let mut builder = OntologyProjectionBuilder::new(pattern_contracts, rdf_lists, object_index);
+
+    for block in blocks {
+        for quad in &block.quads {
+            builder.visit_quad(block, quad);
+        }
+    }
+
+    builder.finish()
+}
+
+fn ontology_projection_pattern_contracts(
+    registry: &GraphRegistry,
+) -> BTreeMap<OntologyConstructFamily, String> {
+    let mut contracts = BTreeMap::new();
+    for element in registry.get_all_elements() {
+        if !element.element_type.is_semantic_query_contract() {
+            continue;
+        }
+
+        let family = match element.name.as_str() {
+            "Direct OWL Construct Projection Query Contract" => {
+                OntologyConstructFamily::DisjointEquivalenceInverse
+            }
+            "RDF List OWL Construct Projection Query Contract" => {
+                OntologyConstructFamily::PropertyChain
+            }
+            "OWL Property Metadata Projection Query Contract" => {
+                OntologyConstructFamily::PropertyDomainRange
+            }
+            _ => continue,
+        };
+
+        if let Some(contract) = &element.semantic_query_contract {
+            contracts.insert(family, contract.iri.clone());
+        }
+    }
+
+    contracts
+}
+
+struct OntologyProjectionBuilder {
+    constructs: BTreeMap<String, OntologyConstruct>,
+    equivalence_edges: Vec<EquivalenceEdge>,
+    pattern_contracts: BTreeMap<OntologyConstructFamily, String>,
+    rdf_lists: BTreeMap<String, Vec<OntologyConstructMember>>,
+    object_index: BTreeMap<(String, String), Vec<OntologyProjectionTerm>>,
+}
+
+impl OntologyProjectionBuilder {
+    fn new(
+        pattern_contracts: BTreeMap<OntologyConstructFamily, String>,
+        rdf_lists: BTreeMap<String, Vec<OntologyConstructMember>>,
+        object_index: BTreeMap<(String, String), Vec<OntologyProjectionTerm>>,
+    ) -> Self {
+        Self {
+            constructs: BTreeMap::new(),
+            equivalence_edges: Vec::new(),
+            pattern_contracts,
+            rdf_lists,
+            object_index,
+        }
+    }
+
+    fn visit_quad(&mut self, block: &SemanticBlock, quad: &Quad) {
+        match quad.predicate.as_str() {
+            RDFS_DOMAIN => {
+                self.add_direct_construct(
+                    block,
+                    quad,
+                    OntologyConstructFamily::PropertyDomainRange,
+                    OntologyConstructKind::PropertyDomain,
+                    None,
+                    None,
+                    None,
+                    None,
+                    Vec::new(),
+                );
+            }
+            RDFS_RANGE => {
+                self.add_direct_construct(
+                    block,
+                    quad,
+                    OntologyConstructFamily::PropertyDomainRange,
+                    OntologyConstructKind::PropertyRange,
+                    None,
+                    None,
+                    None,
+                    None,
+                    Vec::new(),
+                );
+            }
+            RDFS_SUBCLASS_OF => {
+                self.add_direct_construct(
+                    block,
+                    quad,
+                    OntologyConstructFamily::SubclassMembership,
+                    OntologyConstructKind::SubclassInclusion,
+                    symbol("subset-or-equal"),
+                    None,
+                    None,
+                    None,
+                    Vec::new(),
+                );
+            }
+            RDF_TYPE => self.add_type_construct(block, quad),
+            OWL_DISJOINT_WITH => {
+                self.add_direct_construct(
+                    block,
+                    quad,
+                    OntologyConstructFamily::DisjointEquivalenceInverse,
+                    OntologyConstructKind::Disjointness,
+                    symbol("disjointness"),
+                    None,
+                    None,
+                    None,
+                    Vec::new(),
+                );
+            }
+            OWL_EQUIVALENT_CLASS | OWL_EQUIVALENT_PROPERTY | OWL_SAME_AS => {
+                self.record_equivalence_edge(block, quad);
+            }
+            OWL_INVERSE_OF => {
+                self.add_direct_construct(
+                    block,
+                    quad,
+                    OntologyConstructFamily::DisjointEquivalenceInverse,
+                    OntologyConstructKind::InverseProperty,
+                    symbol("inverse-property"),
+                    None,
+                    None,
+                    None,
+                    Vec::new(),
+                );
+            }
+            OWL_PROPERTY_CHAIN_AXIOM => {
+                let members = self.members_for_list_term(&quad.object);
+                self.add_direct_construct(
+                    block,
+                    quad,
+                    OntologyConstructFamily::PropertyChain,
+                    OntologyConstructKind::PropertyChain,
+                    symbol("logical-implication"),
+                    None,
+                    None,
+                    None,
+                    members,
+                );
+            }
+            OWL_ALL_VALUES_FROM => self.add_restriction_construct(
+                block,
+                quad,
+                OntologyRestrictionKind::Universal,
+                symbol("universal-restriction"),
+            ),
+            OWL_SOME_VALUES_FROM => self.add_restriction_construct(
+                block,
+                quad,
+                OntologyRestrictionKind::Existential,
+                symbol("existential-restriction"),
+            ),
+            OWL_HAS_VALUE => {
+                self.add_restriction_construct(block, quad, OntologyRestrictionKind::HasValue, None)
+            }
+            OWL_CARDINALITY => self.add_restriction_construct(
+                block,
+                quad,
+                OntologyRestrictionKind::Cardinality,
+                None,
+            ),
+            OWL_MIN_CARDINALITY => self.add_restriction_construct(
+                block,
+                quad,
+                OntologyRestrictionKind::MinCardinality,
+                None,
+            ),
+            OWL_MAX_CARDINALITY => self.add_restriction_construct(
+                block,
+                quad,
+                OntologyRestrictionKind::MaxCardinality,
+                None,
+            ),
+            OWL_QUALIFIED_CARDINALITY => self.add_restriction_construct(
+                block,
+                quad,
+                OntologyRestrictionKind::QualifiedCardinality,
+                None,
+            ),
+            OWL_MIN_QUALIFIED_CARDINALITY => self.add_restriction_construct(
+                block,
+                quad,
+                OntologyRestrictionKind::MinQualifiedCardinality,
+                None,
+            ),
+            OWL_MAX_QUALIFIED_CARDINALITY => self.add_restriction_construct(
+                block,
+                quad,
+                OntologyRestrictionKind::MaxQualifiedCardinality,
+                None,
+            ),
+            OWL_ON_CLASS => {
+                self.add_restriction_construct(block, quad, OntologyRestrictionKind::OnClass, None)
+            }
+            OWL_ON_DATA_RANGE => self.add_restriction_construct(
+                block,
+                quad,
+                OntologyRestrictionKind::OnDataRange,
+                None,
+            ),
+            OWL_INTERSECTION_OF => self.add_class_expression_construct(
+                block,
+                quad,
+                OntologyClassExpressionKind::Intersection,
+                symbol("intersection"),
+            ),
+            OWL_UNION_OF => self.add_class_expression_construct(
+                block,
+                quad,
+                OntologyClassExpressionKind::Union,
+                symbol("union"),
+            ),
+            OWL_COMPLEMENT_OF => self.add_class_expression_construct(
+                block,
+                quad,
+                OntologyClassExpressionKind::Complement,
+                None,
+            ),
+            SH_TARGET_CLASS | SH_PROPERTY | SH_PATH | SH_DATATYPE | SH_CLASS | SH_NODE_KIND
+            | SH_MIN_COUNT | SH_MAX_COUNT | SH_PATTERN | SH_IN => {
+                self.add_shape_overlay_construct(block, quad)
+            }
+            _ => {}
+        }
+    }
+
+    fn record_equivalence_edge(&mut self, block: &SemanticBlock, quad: &Quad) {
+        let source = projection_source(block);
+        let subject = projection_term_from_subject(&quad.subject);
+        let predicate = projection_term_from_predicate(quad.predicate.as_str());
+        let object = projection_term_from_term(&quad.object);
+        self.equivalence_edges.push(EquivalenceEdge {
+            evidence: OntologyProjectionEvidence {
+                source: source.clone(),
+                subject: subject.clone(),
+                predicate: predicate.clone(),
+                object: object.clone(),
+            },
+            subject,
+            object,
+        });
+    }
+
+    fn add_type_construct(&mut self, block: &SemanticBlock, quad: &Quad) {
+        let Some(object_iri) = term_iri(&quad.object) else {
+            return;
+        };
+
+        if let Some(characteristic) = property_characteristic_for_type(object_iri) {
+            self.add_direct_construct(
+                block,
+                quad,
+                OntologyConstructFamily::PropertyCharacteristic,
+                OntologyConstructKind::PropertyCharacteristic,
+                symbol(characteristic.as_str()),
+                Some(characteristic),
+                None,
+                None,
+                Vec::new(),
+            );
+            return;
+        }
+
+        if is_declaration_type(object_iri) || object_iri == OWL_RESTRICTION {
+            if object_iri == SH_NODE_SHAPE || object_iri == SH_PROPERTY_SHAPE {
+                self.add_shape_overlay_construct(block, quad);
+            }
+            return;
+        }
+
+        self.add_direct_construct(
+            block,
+            quad,
+            OntologyConstructFamily::SubclassMembership,
+            OntologyConstructKind::Membership,
+            symbol("member-of"),
+            None,
+            None,
+            None,
+            Vec::new(),
+        );
+    }
+
+    fn add_restriction_construct(
+        &mut self,
+        block: &SemanticBlock,
+        quad: &Quad,
+        restriction_kind: OntologyRestrictionKind,
+        symbol: Option<OntologySymbol>,
+    ) {
+        let property = self
+            .objects_for_subject(&quad.subject, OWL_ON_PROPERTY)
+            .first()
+            .cloned();
+        self.add_direct_construct(
+            block,
+            quad,
+            OntologyConstructFamily::Restriction,
+            OntologyConstructKind::Restriction,
+            symbol,
+            None,
+            Some(restriction_kind),
+            None,
+            Vec::new(),
+        )
+        .with_property(property);
+    }
+
+    fn add_class_expression_construct(
+        &mut self,
+        block: &SemanticBlock,
+        quad: &Quad,
+        expression_kind: OntologyClassExpressionKind,
+        symbol: Option<OntologySymbol>,
+    ) {
+        let members = self.members_for_list_term(&quad.object);
+        self.add_direct_construct(
+            block,
+            quad,
+            OntologyConstructFamily::ClassExpression,
+            OntologyConstructKind::ClassExpression,
+            symbol,
+            None,
+            None,
+            Some(expression_kind),
+            members,
+        );
+    }
+
+    fn add_shape_overlay_construct(&mut self, block: &SemanticBlock, quad: &Quad) {
+        let shape_overlay_kind = match quad.predicate.as_str() {
+            RDF_TYPE if term_iri(&quad.object) == Some(SH_NODE_SHAPE) => {
+                Some(OntologyShapeOverlayKind::NodeShape)
+            }
+            RDF_TYPE if term_iri(&quad.object) == Some(SH_PROPERTY_SHAPE) => {
+                Some(OntologyShapeOverlayKind::PropertyShape)
+            }
+            _ => self.shape_overlay_kind_for_subject(&quad.subject),
+        };
+
+        self.add_direct_construct(
+            block,
+            quad,
+            OntologyConstructFamily::ShapeOverlay,
+            OntologyConstructKind::ShapeOverlay,
+            None,
+            None,
+            None,
+            None,
+            Vec::new(),
+        )
+        .with_shape_overlay_kind(shape_overlay_kind);
+    }
+
+    #[allow(clippy::too_many_arguments)]
+    fn add_direct_construct(
+        &mut self,
+        block: &SemanticBlock,
+        quad: &Quad,
+        family: OntologyConstructFamily,
+        kind: OntologyConstructKind,
+        symbol: Option<OntologySymbol>,
+        property_characteristic: Option<OntologyPropertyCharacteristic>,
+        restriction_kind: Option<OntologyRestrictionKind>,
+        class_expression_kind: Option<OntologyClassExpressionKind>,
+        members: Vec<OntologyConstructMember>,
+    ) -> ConstructMut<'_> {
+        let source = projection_source(block);
+        let evidence = OntologyProjectionEvidence {
+            source: source.clone(),
+            subject: projection_term_from_subject(&quad.subject),
+            predicate: projection_term_from_predicate(quad.predicate.as_str()),
+            object: projection_term_from_term(&quad.object),
+        };
+        let provenance = OntologyProjectionProvenance {
+            derivation_mode: OntologyProjectionDerivationMode::DirectAuthored,
+            source,
+            pattern_contract_iri: self.pattern_contract_for_family(family),
+            evidence: vec![evidence],
+        };
+        let subject = projection_term_from_subject(&quad.subject);
+        let predicate = projection_term_from_predicate(quad.predicate.as_str());
+        let object = projection_term_from_term(&quad.object);
+        let id = construct_id(kind, &subject, Some(&predicate), Some(&object), &members);
+        let construct = OntologyConstruct {
+            id: id.clone(),
+            family,
+            kind,
+            subject,
+            predicate: Some(predicate),
+            object: Some(object),
+            property: None,
+            members,
+            property_characteristic,
+            restriction_kind,
+            class_expression_kind,
+            shape_overlay_kind: None,
+            symbol,
+            provenance,
+        };
+
+        self.constructs.entry(id.clone()).or_insert(construct);
+        ConstructMut {
+            construct: self.constructs.get_mut(&id),
+        }
+    }
+
+    fn pattern_contract_for_family(&self, family: OntologyConstructFamily) -> Option<String> {
+        self.pattern_contracts
+            .get(&family)
+            .or_else(|| match family {
+                OntologyConstructFamily::PropertyDomainRange => self
+                    .pattern_contracts
+                    .get(&OntologyConstructFamily::PropertyDomainRange),
+                OntologyConstructFamily::SubclassMembership
+                | OntologyConstructFamily::Restriction => self
+                    .pattern_contracts
+                    .get(&OntologyConstructFamily::DisjointEquivalenceInverse),
+                OntologyConstructFamily::ClassExpression => self
+                    .pattern_contracts
+                    .get(&OntologyConstructFamily::PropertyChain),
+                OntologyConstructFamily::PropertyChain => self
+                    .pattern_contracts
+                    .get(&OntologyConstructFamily::PropertyChain),
+                OntologyConstructFamily::PropertyCharacteristic => self
+                    .pattern_contracts
+                    .get(&OntologyConstructFamily::PropertyDomainRange),
+                OntologyConstructFamily::ShapeOverlay
+                | OntologyConstructFamily::DisjointEquivalenceInverse => None,
+            })
+            .cloned()
+    }
+
+    fn members_for_list_term(&self, term: &Term) -> Vec<OntologyConstructMember> {
+        match term {
+            Term::BlankNode(node) => self
+                .rdf_lists
+                .get(&node.to_string())
+                .cloned()
+                .unwrap_or_default(),
+            Term::NamedNode(node) if node.as_str() == RDF_NIL => Vec::new(),
+            _ => Vec::new(),
+        }
+    }
+
+    fn objects_for_subject(
+        &self,
+        subject: &NamedOrBlankNode,
+        predicate: &str,
+    ) -> Vec<OntologyProjectionTerm> {
+        self.object_index
+            .get(&(subject_key(subject), predicate.to_string()))
+            .cloned()
+            .unwrap_or_default()
+    }
+
+    fn shape_overlay_kind_for_subject(
+        &self,
+        subject: &NamedOrBlankNode,
+    ) -> Option<OntologyShapeOverlayKind> {
+        let subject_types = self.objects_for_subject(subject, RDF_TYPE);
+        if subject_types.iter().any(|term| term.value == SH_NODE_SHAPE) {
+            return Some(OntologyShapeOverlayKind::NodeShape);
+        }
+        if subject_types
+            .iter()
+            .any(|term| term.value == SH_PROPERTY_SHAPE)
+        {
+            return Some(OntologyShapeOverlayKind::PropertyShape);
+        }
+
+        let subject_term = projection_term_from_subject(subject);
+        self.constructs
+            .values()
+            .filter(|construct| construct.subject == subject_term)
+            .find_map(|construct| construct.shape_overlay_kind)
+    }
+
+    fn finish(mut self) -> OntologyProjectionGraph {
+        self.materialize_equivalence_groups();
+
+        let pattern_contracts = self.pattern_contracts;
+        let mut constructs: Vec<_> = self.constructs.into_values().collect();
+        constructs.sort_by(|a, b| {
+            a.family
+                .cmp(&b.family)
+                .then_with(|| a.kind.cmp(&b.kind))
+                .then_with(|| a.id.cmp(&b.id))
+        });
+
+        let mut projections_by_family: BTreeMap<OntologyConstructFamily, Vec<String>> =
+            BTreeMap::new();
+        let mut symbols = BTreeSet::new();
+        for construct in &constructs {
+            projections_by_family
+                .entry(construct.family)
+                .or_default()
+                .push(construct.id.clone());
+            if let Some(symbol) = &construct.symbol {
+                symbols.insert(symbol.clone());
+            }
+        }
+
+        let projections = projections_by_family
+            .into_iter()
+            .map(|(family, mut construct_ids)| {
+                construct_ids.sort();
+                construct_ids.dedup();
+                OntologyConstructProjection {
+                    id: format!(
+                        "urn:reqvire:ontology-projection:{}:{}",
+                        family.as_str(),
+                        stable_hash(&construct_ids.join("|"))
+                    ),
+                    family,
+                    derivation_mode: OntologyProjectionDerivationMode::DirectAuthored,
+                    pattern_contract_iri: pattern_contract_for_family(&pattern_contracts, family),
+                    construct_ids,
+                }
+            })
+            .collect();
+
+        OntologyProjectionGraph {
+            id: "urn:reqvire:ontology-projection:graph:direct-authored".to_string(),
+            derivation_mode: OntologyProjectionDerivationMode::DirectAuthored,
+            projections,
+            constructs,
+            symbols: symbols.into_iter().collect(),
+        }
+    }
+
+    fn materialize_equivalence_groups(&mut self) {
+        if self.equivalence_edges.is_empty() {
+            return;
+        }
+
+        let mut parent: BTreeMap<String, String> = BTreeMap::new();
+        let mut terms: BTreeMap<String, OntologyProjectionTerm> = BTreeMap::new();
+        for edge in &self.equivalence_edges {
+            let subject_key = projection_term_key(&edge.subject);
+            let object_key = projection_term_key(&edge.object);
+            terms.insert(subject_key.clone(), edge.subject.clone());
+            terms.insert(object_key.clone(), edge.object.clone());
+            uf_union_strings(&mut parent, &subject_key, &object_key);
+        }
+
+        let members: Vec<String> = parent.keys().cloned().collect();
+        let mut groups: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+        for member in members {
+            let root = uf_find_string(&mut parent, &member);
+            groups.entry(root).or_default().insert(member);
+        }
+
+        for group_members in groups.values().filter(|members| members.len() > 1) {
+            let Some(first_member_key) = group_members.iter().next() else {
+                continue;
+            };
+            let Some(subject) = terms.get(first_member_key).cloned() else {
+                continue;
+            };
+            let mut evidence: Vec<_> = self
+                .equivalence_edges
+                .iter()
+                .filter(|edge| {
+                    group_members.contains(&projection_term_key(&edge.subject))
+                        && group_members.contains(&projection_term_key(&edge.object))
+                })
+                .map(|edge| edge.evidence.clone())
+                .collect();
+            evidence.sort();
+            evidence.dedup();
+
+            let Some(source) = evidence.first().map(|evidence| evidence.source.clone()) else {
+                continue;
+            };
+
+            let mut members = Vec::new();
+            for member_key in group_members {
+                if let Some(term) = terms.get(member_key) {
+                    members.push(OntologyConstructMember {
+                        sequence_index: members.len(),
+                        term: term.clone(),
+                        source: source.clone(),
+                    });
+                }
+            }
+
+            let id = construct_id(
+                OntologyConstructKind::EquivalenceGroup,
+                &subject,
+                None,
+                None,
+                &members,
+            );
+            let construct = OntologyConstruct {
+                id: id.clone(),
+                family: OntologyConstructFamily::DisjointEquivalenceInverse,
+                kind: OntologyConstructKind::EquivalenceGroup,
+                subject,
+                predicate: None,
+                object: None,
+                property: None,
+                members,
+                property_characteristic: None,
+                restriction_kind: None,
+                class_expression_kind: None,
+                shape_overlay_kind: None,
+                symbol: symbol("logical-equivalence"),
+                provenance: OntologyProjectionProvenance {
+                    derivation_mode: OntologyProjectionDerivationMode::DirectAuthored,
+                    source,
+                    pattern_contract_iri: self.pattern_contract_for_family(
+                        OntologyConstructFamily::DisjointEquivalenceInverse,
+                    ),
+                    evidence,
+                },
+            };
+            self.constructs.entry(id).or_insert(construct);
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct EquivalenceEdge {
+    subject: OntologyProjectionTerm,
+    object: OntologyProjectionTerm,
+    evidence: OntologyProjectionEvidence,
+}
+
+fn pattern_contract_for_family(
+    pattern_contracts: &BTreeMap<OntologyConstructFamily, String>,
+    family: OntologyConstructFamily,
+) -> Option<String> {
+    pattern_contracts
+        .get(&family)
+        .or_else(|| match family {
+            OntologyConstructFamily::PropertyDomainRange => {
+                pattern_contracts.get(&OntologyConstructFamily::PropertyDomainRange)
+            }
+            OntologyConstructFamily::SubclassMembership | OntologyConstructFamily::Restriction => {
+                pattern_contracts.get(&OntologyConstructFamily::DisjointEquivalenceInverse)
+            }
+            OntologyConstructFamily::ClassExpression | OntologyConstructFamily::PropertyChain => {
+                pattern_contracts.get(&OntologyConstructFamily::PropertyChain)
+            }
+            OntologyConstructFamily::PropertyCharacteristic => {
+                pattern_contracts.get(&OntologyConstructFamily::PropertyDomainRange)
+            }
+            OntologyConstructFamily::ShapeOverlay
+            | OntologyConstructFamily::DisjointEquivalenceInverse => None,
+        })
+        .cloned()
+}
+
+struct ConstructMut<'a> {
+    construct: Option<&'a mut OntologyConstruct>,
+}
+
+impl ConstructMut<'_> {
+    fn with_property(self, property: Option<OntologyProjectionTerm>) {
+        if let Some(construct) = self.construct {
+            construct.property = property;
+        }
+    }
+
+    fn with_shape_overlay_kind(self, shape_overlay_kind: Option<OntologyShapeOverlayKind>) {
+        if let Some(construct) = self.construct {
+            construct.shape_overlay_kind = shape_overlay_kind;
+        }
+    }
+}
+
+fn collect_projection_rdf_lists(
+    blocks: &[SemanticBlock],
+) -> BTreeMap<String, Vec<OntologyConstructMember>> {
+    let mut first_values: BTreeMap<String, (OntologyProjectionTerm, OntologyProjectionSource)> =
+        BTreeMap::new();
+    let mut rest_targets: BTreeMap<String, String> = BTreeMap::new();
+    let mut list_nodes = BTreeSet::new();
+
+    for block in blocks {
+        for quad in &block.quads {
+            let subject = subject_key(&quad.subject);
+            match quad.predicate.as_str() {
+                RDF_FIRST => {
+                    list_nodes.insert(subject.clone());
+                    first_values.insert(
+                        subject,
+                        (
+                            projection_term_from_term(&quad.object),
+                            projection_source(block),
+                        ),
+                    );
+                }
+                RDF_REST => {
+                    list_nodes.insert(subject.clone());
+                    match &quad.object {
+                        Term::BlankNode(node) => {
+                            let target = node.to_string();
+                            list_nodes.insert(target.clone());
+                            rest_targets.insert(subject, target);
+                        }
+                        Term::NamedNode(node) if node.as_str() == RDF_NIL => {
+                            rest_targets.insert(subject, RDF_NIL.to_string());
+                        }
+                        _ => {}
+                    }
+                }
+                _ => {}
+            }
+        }
+    }
+
+    let mut lists = BTreeMap::new();
+    for head in list_nodes {
+        let mut members = Vec::new();
+        let mut current = head.as_str();
+        let mut seen = BTreeSet::new();
+
+        while seen.insert(current.to_string()) {
+            if let Some((term, source)) = first_values.get(current) {
+                members.push(OntologyConstructMember {
+                    sequence_index: members.len(),
+                    term: term.clone(),
+                    source: source.clone(),
+                });
+            }
+
+            let Some(next) = rest_targets.get(current) else {
+                break;
+            };
+            if next == RDF_NIL {
+                break;
+            }
+            current = next;
+        }
+
+        if !members.is_empty() {
+            lists.insert(head, members);
+        }
+    }
+
+    lists
+}
+
+fn collect_projection_object_index(
+    blocks: &[SemanticBlock],
+) -> BTreeMap<(String, String), Vec<OntologyProjectionTerm>> {
+    let mut object_index: BTreeMap<(String, String), Vec<OntologyProjectionTerm>> = BTreeMap::new();
+
+    for block in blocks {
+        for quad in &block.quads {
+            let key = (
+                subject_key(&quad.subject),
+                quad.predicate.as_str().to_string(),
+            );
+            let value = projection_term_from_term(&quad.object);
+            object_index.entry(key).or_default().push(value);
+        }
+    }
+
+    for values in object_index.values_mut() {
+        values.sort();
+        values.dedup();
+    }
+
+    object_index
+}
+
+fn projection_source(block: &SemanticBlock) -> OntologyProjectionSource {
+    OntologyProjectionSource {
+        source_block: format!(
+            "{}#{}:{}",
+            block.source,
+            block.kind.as_str(),
+            block.line_number
+        ),
+        source_element_identifier: block.source.clone(),
+        source_name: block.source_name.clone(),
+        file_path: block.file_path.clone(),
+        line_number: block.line_number,
+        block_kind: block.kind.as_str().to_string(),
+    }
+}
+
+fn projection_term_from_subject(subject: &NamedOrBlankNode) -> OntologyProjectionTerm {
+    match subject {
+        NamedOrBlankNode::NamedNode(node) => projection_iri_term(node.as_str()),
+        NamedOrBlankNode::BlankNode(node) => OntologyProjectionTerm {
+            kind: OntologyProjectionTermKind::BlankNode,
+            value: node.to_string(),
+            label: "anonymous node".to_string(),
+        },
+    }
+}
+
+fn projection_term_from_predicate(predicate: &str) -> OntologyProjectionTerm {
+    projection_iri_term(predicate)
+}
+
+fn projection_term_from_term(term: &Term) -> OntologyProjectionTerm {
+    match term {
+        Term::NamedNode(node) => projection_iri_term(node.as_str()),
+        Term::BlankNode(node) => OntologyProjectionTerm {
+            kind: OntologyProjectionTermKind::BlankNode,
+            value: node.to_string(),
+            label: "anonymous node".to_string(),
+        },
+        Term::Literal(literal) => OntologyProjectionTerm {
+            kind: OntologyProjectionTermKind::Literal,
+            value: literal.value().to_string(),
+            label: literal.value().to_string(),
+        },
+    }
+}
+
+fn projection_iri_term(iri: &str) -> OntologyProjectionTerm {
+    OntologyProjectionTerm {
+        kind: OntologyProjectionTermKind::Iri,
+        value: iri.to_string(),
+        label: compact_iri_label(iri),
+    }
+}
+
+fn compact_iri_label(value: &str) -> String {
+    value
+        .trim_matches(|c| c == '<' || c == '>')
+        .rsplit(['/', '#'])
+        .find(|part| !part.is_empty())
+        .unwrap_or(value)
+        .to_string()
+}
+
+fn subject_key(subject: &NamedOrBlankNode) -> String {
+    match subject {
+        NamedOrBlankNode::NamedNode(node) => node.as_str().to_string(),
+        NamedOrBlankNode::BlankNode(node) => node.to_string(),
+    }
+}
+
+fn projection_term_key(term: &OntologyProjectionTerm) -> String {
+    format!("{}:{}", term.kind.as_str(), term.value)
+}
+
+fn uf_find_string(parent: &mut BTreeMap<String, String>, id: &str) -> String {
+    let mut root = id.to_string();
+    while let Some(next) = parent.get(&root) {
+        if next == &root {
+            break;
+        }
+        root = next.clone();
+    }
+
+    let mut current = id.to_string();
+    while current != root {
+        let next = parent
+            .get(&current)
+            .cloned()
+            .unwrap_or_else(|| root.clone());
+        parent.insert(current, root.clone());
+        current = next;
+    }
+
+    root
+}
+
+fn uf_union_strings(parent: &mut BTreeMap<String, String>, a: &str, b: &str) {
+    parent.entry(a.to_string()).or_insert_with(|| a.to_string());
+    parent.entry(b.to_string()).or_insert_with(|| b.to_string());
+    let root_a = uf_find_string(parent, a);
+    let root_b = uf_find_string(parent, b);
+    if root_a != root_b {
+        parent.insert(root_a, root_b);
+    }
+}
+
+fn property_characteristic_for_type(type_iri: &str) -> Option<OntologyPropertyCharacteristic> {
+    match type_iri {
+        OWL_FUNCTIONAL_PROPERTY => Some(OntologyPropertyCharacteristic::Functional),
+        OWL_INVERSE_FUNCTIONAL_PROPERTY => Some(OntologyPropertyCharacteristic::InverseFunctional),
+        OWL_SYMMETRIC_PROPERTY => Some(OntologyPropertyCharacteristic::Symmetric),
+        OWL_ASYMMETRIC_PROPERTY => Some(OntologyPropertyCharacteristic::Asymmetric),
+        OWL_REFLEXIVE_PROPERTY => Some(OntologyPropertyCharacteristic::Reflexive),
+        OWL_IRREFLEXIVE_PROPERTY => Some(OntologyPropertyCharacteristic::Irreflexive),
+        OWL_TRANSITIVE_PROPERTY => Some(OntologyPropertyCharacteristic::Transitive),
+        _ => None,
+    }
+}
+
+fn is_declaration_type(type_iri: &str) -> bool {
+    matches!(
+        type_iri,
+        OWL_CLASS
+            | RDFS_CLASS
+            | RDF_PROPERTY
+            | OWL_OBJECT_PROPERTY
+            | OWL_DATATYPE_PROPERTY
+            | OWL_NAMED_INDIVIDUAL
+            | RDFS_DATATYPE
+            | SH_NODE_SHAPE
+            | SH_PROPERTY_SHAPE
+    )
+}
+
+fn symbol(concept_name: &str) -> Option<OntologySymbol> {
+    let (raw_unicode_code_point, rendered_unicode_character, tooltip) = match concept_name {
+        "disjointness" => ("U+27C2", "⟂", "Disjointness"),
+        "intersection" => ("U+2229", "∩", "Intersection"),
+        "union" => ("U+222A", "∪", "Union"),
+        "logical-implication" => ("U+21D2", "⇒", "Implies"),
+        "logical-equivalence" => ("U+21D4", "⇔", "Equivalent"),
+        "universal-restriction" => ("U+2200", "∀", "Universal restriction"),
+        "existential-restriction" => ("U+2203", "∃", "Existential restriction"),
+        "member-of" => ("U+2208", "∈", "Member of"),
+        "subset-or-equal" => ("U+2286", "⊆", "Subset or equal"),
+        "symmetric" => ("U+2194", "↔", "Symmetric property"),
+        "inverse-property" => ("U+27F2", "⟲", "Inverse property"),
+        "reflexive" => ("U+25CB", "○", "Reflexive property"),
+        "irreflexive" => ("U+2209", "∉", "Irreflexive property"),
+        "transitive" => ("U+25B3", "△", "Transitive property"),
+        "asymmetric" => ("U+21AE", "↮", "Asymmetric property"),
+        "inverse-functional" => ("U+2190", "←", "Inverse functional property"),
+        "functional" => ("U+2192", "→", "Functional property"),
+        _ => return None,
+    };
+
+    Some(OntologySymbol {
+        concept_name: concept_name.to_string(),
+        raw_unicode_code_point: raw_unicode_code_point.to_string(),
+        rendered_unicode_character: rendered_unicode_character.to_string(),
+        tooltip: tooltip.to_string(),
+        accessible_label: tooltip.to_string(),
+    })
+}
+
+fn construct_id(
+    kind: OntologyConstructKind,
+    subject: &OntologyProjectionTerm,
+    predicate: Option<&OntologyProjectionTerm>,
+    object: Option<&OntologyProjectionTerm>,
+    members: &[OntologyConstructMember],
+) -> String {
+    let mut canonical = format!(
+        "{}|{}:{}",
+        kind.as_str(),
+        subject.kind.as_str(),
+        subject.value
+    );
+    if let Some(predicate) = predicate {
+        canonical.push_str(&format!(
+            "|p:{}:{}",
+            predicate.kind.as_str(),
+            predicate.value
+        ));
+    }
+    if let Some(object) = object {
+        canonical.push_str(&format!("|o:{}:{}", object.kind.as_str(), object.value));
+    }
+    for member in members {
+        canonical.push_str(&format!(
+            "|m:{}:{}:{}",
+            member.sequence_index,
+            member.term.kind.as_str(),
+            member.term.value
+        ));
+    }
+
+    format!(
+        "urn:reqvire:ontology-construct:{}:{}",
+        kind.as_str(),
+        stable_hash(&canonical)
+    )
+}
+
+fn stable_hash(value: &str) -> String {
+    const FNV_OFFSET: u64 = 0xcbf29ce484222325;
+    const FNV_PRIME: u64 = 0x100000001b3;
+
+    let mut hash = FNV_OFFSET;
+    for byte in value.as_bytes() {
+        hash ^= u64::from(*byte);
+        hash = hash.wrapping_mul(FNV_PRIME);
+    }
+
+    format!("{hash:016x}")
+}
+
 fn ontology_term_declarations_from_quads(
     element: &Element,
     quads: &[Quad],
@@ -1059,6 +2937,9 @@ fn shape_iri_references_from_quads(element: &Element, quads: &[Quad]) -> Vec<Sha
         let Some(iri) = term_iri(&quad.object) else {
             continue;
         };
+        if kind == "sh:path" && is_builtin_annotation_path(iri) {
+            continue;
+        }
         references.insert(ShapeIriReference {
             iri: iri.to_string(),
             kind: kind.to_string(),
@@ -1067,4 +2948,8 @@ fn shape_iri_references_from_quads(element: &Element, quads: &[Quad]) -> Vec<Sha
     }
 
     references.into_iter().collect()
+}
+
+fn is_builtin_annotation_path(iri: &str) -> bool {
+    matches!(iri, RDFS_LABEL | RDFS_COMMENT)
 }

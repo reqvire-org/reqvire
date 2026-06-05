@@ -35,10 +35,21 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
 
 ### Ontologies View Generation
 
-The system shall generate an Ontologies HTML page during export and serve workflows to present collected ontology and SHACL content.
+The system shall generate an Ontologies HTML page during export and serve workflows that presents ontology and SHACL semantics through an OWL-aware model viewer instead of a raw RDF triple graph.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+The Ontologies page shall:
+- Use RDF/Turtle and SHACL blocks as the parsed semantic source, while avoiding raw RDF serialization artifacts as the primary user-facing visualization.
+- Present ontology concepts as typed visual entities such as classes, object properties, datatype properties, named individuals, SHACL shapes, and datatypes, while keeping literal constraints and datatype-property literal values as inspector/search evidence rather than primary graph nodes.
+- Treat ontology properties as first-class visual nodes with domain, range, inverse, equivalence, chain, and characteristic information when those axioms are present.
+- Derive class slots and slot facets from SHACL target-class/property-shape constraints so users can inspect datatype or object range, cardinality, pattern, node-kind, and allowed-value constraints without navigating raw SHACL blank nodes.
+- Show named property nodes as reusable slots, including each target class and source shape that uses that property as a `sh:path`, so repeated property usages are understandable rather than presented as duplicate property definitions.
+- Use a defined ontology symbol and badge vocabulary so rendered symbols are stable, documented, and accessible.
+- Consume generated ontology projection facts from the semantic export context so the HTML explorer and `reqvire ontologies --full` describe the same ontology constructs.
+- Prioritize graph canvas space by using a dense full-height viewer layout with a scroll-contained inspector sidebar.
+- Separate normalized ontology constructs and SHACL-derived slots/facets from optional raw SHACL evidence; empty raw-evidence sections shall not be shown.
+- Apply viewer filters as explicit visibility contracts: role and origin filters determine node visibility, while construct filters determine construct overlays, badges, slot/facet sections, and construct evidence for nodes that remain visible.
+- Keep linked source citations in the viewer and the exported `ontologies.ttl` artifact available for traceability and downstream tooling without rendering raw Turtle blocks as the primary page content.
 
 #### Metadata
   * type: requirement
@@ -47,13 +58,78 @@ Implementation details shall follow the associated refinement specifications.
   * [Ontology Collection Output Specification](../../Functional/Output/Specifications.md#ontology-collection-output-specification)
 
 #### Relations
+  * derive: [OWL Semantic Ontology Projection](#owl-semantic-ontology-projection)
+  * derive: [Ontology Property-Centric Visualization](#ontology-property-centric-visualization)
+  * derive: [Ontology Construct Grouping](#ontology-construct-grouping)
+  * derive: [Ontology Symbol and Badge Vocabulary](#ontology-symbol-and-badge-vocabulary)
   * derivedFrom: [HTML Export](#html-export)
+  * trace: [Ontology Projection Subgraph Materialization](../../Functional/Output/Reporting.md#ontology-projection-subgraph-materialization)
   * refinedBy: [Ontologies View Generation Refinement Specification](Specifications.md#ontologies-view-generation-refinement-specification)
-  * satisfiedBy: [export.rs](../../../core/src/export.rs)
-  * satisfiedBy: [layouts.rs](../../../core/src/html/layouts.rs)
-  * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
-  * satisfiedBy: [ontologies.rs](../../../core/src/html/pages/ontologies.rs)
-  * verifiedBy: [CLI Ontologies Command Verification](../CLI/Verifications/CLIVerifications.md#cli-ontologies-command-verification)
+  * verifiedBy: [Ontology Model Viewer Analysis Verification](Verifications/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
+---
+
+### OWL Semantic Ontology Projection
+
+The system shall transform semantic-index RDF quads into generated ontology projection facts that suppress RDF serialization mechanics and expose stable ontology concepts for both full semantic export and HTML visualization.
+
+#### Details
+The projection shall classify terms by semantic role, preserve source traceability, attach generated direct-authored OWL/RDFS/SHACL construct data to `SemanticIndex`, expose that data as a reusable ontology projection subgraph inside the existing in-memory RDF projection, derive normalized slot/facet records from SHACL property shapes, and omit primary rendering of `rdf:type` edges, RDF list plumbing, metaclass resources, and anonymous blank-node implementation details unless those nodes represent a meaningful ontology construct.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * refinedBy: [OWL Semantic Ontology Projection Refinement Specification](Specifications.md#owl-semantic-ontology-projection-refinement-specification)
+  * verifiedBy: [Ontology Model Viewer Analysis Verification](Verifications/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
+---
+
+### Ontology Property-Centric Visualization
+
+The system shall render OWL object properties and datatype properties as first-class visual entities rather than only as repeated arcs between domain and range classes.
+
+#### Details
+The property visualization shall aggregate many domain and range classes without multiplying identical property arcs, distinguish object-property ranges from datatype-property ranges, and show property semantics through compact labels, compartments, badges, or inspector sections. When a named property is used by multiple SHACL property shapes, the property inspector shall present those as target-class usages with source-shape evidence rather than as duplicate property definitions.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * refinedBy: [Ontology Property-Centric Visualization Refinement Specification](Specifications.md#ontology-property-centric-visualization-refinement-specification)
+  * verifiedBy: [Ontology Model Viewer Analysis Verification](Verifications/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
+---
+
+### Ontology Construct Grouping
+
+The system shall present multi-node OWL constructs as explicit semantic groups instead of exposing their low-level RDF representation.
+
+#### Details
+Construct grouping shall cover equivalence groups, inverse properties, property-chain axioms, property characteristics, and SHACL shape overlays when those constructs are present in the collected ontology or semantic-contract content.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * refinedBy: [Ontology Construct Grouping Refinement Specification](Specifications.md#ontology-construct-grouping-refinement-specification)
+  * verifiedBy: [Ontology Model Viewer Analysis Verification](Verifications/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
+---
+
+### Ontology Symbol and Badge Vocabulary
+
+The system shall define a canonical Unicode symbol vocabulary for ontology viewer badges, edge labels, group headers, tooltips, and inspector fields.
+
+#### Details
+The symbol vocabulary shall define each symbol with its semantic meaning, raw Unicode code point, rendered Unicode character, and allowed viewer usage locations. Symbols shall supplement text labels and accessible descriptions; they shall not be the only carrier of meaning.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Ontologies View Generation](#ontologies-view-generation)
+  * refinedBy: [Ontology Symbol and Badge Vocabulary Refinement Specification](Specifications.md#ontology-symbol-and-badge-vocabulary-refinement-specification)
+  * verifiedBy: [Ontology Model Viewer Analysis Verification](Verifications/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
 ---
 
 ### Local Linked File Export

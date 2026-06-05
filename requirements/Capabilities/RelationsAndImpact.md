@@ -32,6 +32,14 @@ reqvire:ChangeImpactAnalysisShape
     sh:datatype xsd:boolean ;
   ] .
 
+reqvire:ChangeImpactPathShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ChangeImpactPath ;
+  sh:property [
+    sh:path reqvire:impactEdge ;
+    sh:class reqvire:ChangeImpactEdge ;
+  ] .
+
 reqvire:ChangeImpactEdgeShape
   a sh:NodeShape ;
   sh:targetClass reqvire:ChangeImpactEdge ;
@@ -66,6 +74,106 @@ reqvire:SemanticDependencyShape
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:in ("native" "attached" "not-found" "found-outside-context") ;
+  ] .
+
+reqvire:ImpactReviewShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ImpactReview ;
+  sh:property [
+    sh:path reqvire:reviewedByVerification ;
+    sh:class reqvire:Verification ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactScope ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactSeverity ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ChangePropagationRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ChangePropagationRule ;
+  sh:property [
+    sh:path reqvire:changeRuleName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in (
+      "parent-to-child-impact"
+      "capability-to-specified-requirement-impact"
+      "requirement-to-implementation-impact"
+      "requirement-to-verification-impact"
+      "owner-to-refinement-impact"
+      "attachment-content-impact"
+      "semantic-reference-reachability"
+      "relocation-without-content-change"
+    ) ;
+  ] ;
+  sh:property [
+    sh:path reqvire:changedThing ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:propagationTarget ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:propagationMode ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactRelation ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactDirection ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("upstream" "downstream" "bidirectional" "none") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactReason ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ChangeKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ChangeKind ;
+  sh:property [
+    sh:path reqvire:changeKindName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("content-change" "addition" "removal" "relocation" "attachment-content-change") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:changeKindMeaning ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ImpactClassificationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ImpactClassification ;
+  sh:property [
+    sh:path reqvire:impactClassificationName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("direct" "indirect" "potential") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactClassificationMeaning ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
   ] .
 ```
 
@@ -178,6 +286,7 @@ reqvire:EvidenceBackedVerificationRelationShape
   sh:targetClass reqvire:TestVerification, reqvire:FormalProofVerification ;
   sh:property [
     sh:path reqvire:satisfiedBy ;
+    sh:minCount 1 ;
     sh:class reqvire:Artifact ;
   ] .
 
@@ -213,6 +322,7 @@ reqvire:RequirementAttachmentShape
       [ sh:class reqvire:Specification ]
       [ sh:class reqvire:State ]
       [ sh:class reqvire:InputOutput ]
+      [ sh:class reqvire:SemanticQueryContract ]
     ) ;
   ] .
 
@@ -232,6 +342,7 @@ reqvire:RelationRuleShape
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "refinedBy" "refine" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
   ] ;
   sh:property [
     sh:path reqvire:allowedSourceType ;
@@ -250,9 +361,102 @@ reqvire:RelationRuleShape
     sh:in ("forward" "inverse" "non-directional") ;
   ] ;
   sh:property [
+    sh:path reqvire:inverseRelation ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+  ] ;
+  sh:property [
+    sh:path reqvire:relationConstraint ;
+    sh:class reqvire:RelationConstraint ;
+  ] ;
+  sh:property [
     sh:path reqvire:propagatesChangeImpact ;
     sh:maxCount 1 ;
     sh:datatype xsd:boolean ;
+  ] ;
+  sh:property [
+    sh:path reqvire:createsOwnership ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] ;
+  sh:property [
+    sh:path reqvire:relationRuleDescription ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:TraversalRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:TraversalRule ;
+  sh:property [
+    sh:path reqvire:traversalDirection ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("forward" "reverse" "bidirectional") ;
+  ] .
+
+reqvire:AttachmentCompatibilityRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:AttachmentCompatibilityRule ;
+  sh:property [
+    sh:path reqvire:attachmentSourceType ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:attachmentTargetType ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:attachmentOwnerType ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:attachmentRuleDescription ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:RelationUsageCategoryShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:RelationUsageCategory ;
+  sh:property [
+    sh:path reqvire:usageCategoryName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("diagram-rendering-forward" "reverse-traversal" "change-propagation" "verification-rollup") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:usageCategoryRelationName ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "refinedBy" "refine" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:usageCategoryMeaning ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:RelationSemanticCategoryShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:RelationSemanticCategory ;
+  sh:property [
+    sh:path reqvire:semanticCategoryName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("hierarchy" "capability-specification" "satisfaction" "refinement-ownership" "verification" "traceability" "attachment-dependency") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:semanticCategoryRelationName ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "refinedBy" "refine" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:semanticCategoryMeaning ;
+    sh:datatype xsd:string ;
   ] .
 ```
 

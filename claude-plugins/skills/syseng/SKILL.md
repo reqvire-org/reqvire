@@ -52,7 +52,8 @@ Version policy:
 | | `behavior` | How the system behaves in specific conditions |
 | | `state` | Lifecycle states, state machines, transitions, and state-dependent contracts |
 | | `input-output` | Payloads, messages, documents, schemas, fixtures, and data contracts |
-| | `semantic-contract` | Capability-owned or requirement-owned SHACL shape profile over reachable ontology context |
+| | `semantic-contract` | Requirement-owned SHACL shape profile over reachable ontology context |
+| | `semantic-query-contract` | Requirement-owned declarative semantic query contract with exactly one `#### Query` fenced `sparql` block over reachable ontology context |
 | Verifications | `test-verification` | Automated/manual testing (evidence-backed; requires satisfiedBy) |
 | | `formal-proof-verification` | Formal proof, model checking, theorem proving, generated fixtures, or proof reports (evidence-backed; requires satisfiedBy) |
 | | `analysis-verification` | Review, calculation, simulation |
@@ -94,11 +95,13 @@ Use an `ontology` when content defines reusable domain or model meaning:
 - `X relates to Y`
 - this domain term means...
 
-Use a `semantic-contract` when one capability or obligation needs a closed-world SHACL profile over reachable ontology terms. Semantic contracts must have `#### Shapes`, must refine exactly one compatible capability or requirement owner, and must not contain `#### Ontology`.
+Use a `semantic-contract` when one requirement obligation needs a closed-world SHACL profile over reachable ontology terms. Semantic contracts must have `#### Shapes`, must refine exactly one requirement owner, and must not contain `#### Ontology`.
+
+Use a `semantic-query-contract` when one requirement needs to record a declarative semantic query over reachable ontology context. Semantic query contracts must refine exactly one requirement, must have exactly one `#### Query` fenced `sparql` block, must not contain `#### Ontology` or `#### Shapes`, must not declare query kind/purpose, and are exposed through full search JSON. Ontology collection and full semantic export do not emit semantic-query-contract query content or metadata until a dedicated query-export command exists.
 
 Use `#### Concept References` when readable prose should bind human labels to ontology terms without filling the requirement text with CURIEs. The referenced IRI or CURIE must be declared by reachable ontology context.
 
-Cleanup rule: ontology should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in capability-owned or requirement-owned `specification`, `behavior`, `state`, `input-output`, or `semantic-contract` refinements.
+Cleanup rule: ontology should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible `specification`, `behavior`, `state`, and `input-output` refinements owned by the relevant capability or requirement. Requirement-owned `semantic-contract` and `semantic-query-contract` refinements capture requirement-specific semantic checks.
 
 Use a `requirement` when the statement says what the system must do, especially when it naturally reads as `The system shall...`.
 
@@ -126,7 +129,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" ontologies --full
 ```
 
-For MCP workflows, use the read-only `reqvire.ontologies` tool. It accepts optional `format: "turtle"` or `format: "jsonld"` and optional `full: true`. Default mode returns serialized authored ontology/SHACL content plus semantic index summary, source block metadata, diagnostics, ontology declarations, and SHACL references. Full mode also includes generated Reqvire model context triples for elements, relations, attachments, concept references, ontology declarations, and shape references.
+For MCP workflows, use the read-only `reqvire.ontologies` tool. It accepts optional `format: "turtle"` or `format: "jsonld"` and optional `full: true`. Default mode returns serialized authored ontology/SHACL content plus semantic index summary, source block metadata, diagnostics, ontology declarations, and SHACL references. Full mode also includes generated Reqvire model context triples for elements, relations, attachments, concept references, ontology declarations, and shape references. Semantic-query-contract query content and metadata remain search-only and are not emitted by default or full ontology export until query-export is specified.
 
 ## Model Commands
 
@@ -159,7 +162,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 - Among verification types, only evidence-backed verifications (`test-verification`, `formal-proof-verification`) may use `satisfiedBy`/`satisfy`
 - Each refinement is owned by exactly one valid owner via `refinedBy`
 - Capability attachments may target `ontology` elements only
-- Requirement attachments may target compatible requirement-owned `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements only
+- Requirement attachments may target compatible requirement-owned `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements only
 
 **Traceability flow:**
 ```
@@ -174,7 +177,7 @@ Requirement
   ├── specify → Capability
   ├── derive → Child Requirement
   ├── attach → Reusable Requirement Contract
-  ├── refinedBy → Semantic-Contract/Spec/Constraint/Behavior/State/Input-Output
+  ├── refinedBy → Semantic-Contract/Semantic-Query-Contract/Spec/Constraint/Behavior/State/Input-Output
   ├── satisfiedBy → Code
   └── verifiedBy → Verification → satisfiedBy → Test/Proof evidence
 ```
@@ -184,7 +187,7 @@ Requirement
 - Files begin with `# Elements` (multi-element) or `# Documents` (single-element)
 - Elements are `###` headers with unique names per file
 - Reserved `####` subsections: **Metadata**, **Relations**, **Details**, **Attachments**, **Concept References**
-- Ontology elements require exactly one `#### Ontology` fenced Turtle block; semantic contracts require exactly one `#### Shapes` fenced Turtle block
+- Ontology elements require exactly one `#### Ontology` fenced Turtle block; semantic contracts require exactly one `#### Shapes` fenced Turtle block; semantic-query-contract elements require exactly one `#### Query` fenced `sparql` block
 - Non-reserved `####` subsections become element content (use for inline specs/behaviors)
 - Relations syntax: `  * derivedFrom: [Parent](path.md#parent)`
 - Attachments syntax: `  * [Name](path.md#element)`
@@ -264,7 +267,7 @@ Load the right reference file for your task — don't work from memory on comple
 | **Add capabilities** | [AddCapability.md](reference/AddCapability.md) | New functionality, MBSE workflow, requirements hierarchy |
 | **Refactor model** | [ConsolidateRequirements.md](reference/ConsolidateRequirements.md) | Cluttered/duplicated model, fixing relations/ownership |
 | **Refactor containment structure** | [ContainmentStructureRefactor.md](reference/ContainmentStructureRefactor.md) | Reorganize folders/files around capability, ontology, and verification planes without changing model intent |
-| **Refactor capability/semantic contracts** | [CapabilitySemanticContractRefactor.md](reference/CapabilitySemanticContractRefactor.md) | Split capability scope, reusable ontology/semantic-contract meaning, and requirement obligations |
+| **Refactor ontology/contracts** | [CapabilitySemanticContractRefactor.md](reference/CapabilitySemanticContractRefactor.md) | Separate capability scope, reusable ontology terms, requirement obligations, and requirement-owned semantic contracts |
 | **Extract specs** | [SpecificationsExtractionLogic.md](reference/SpecificationsExtractionLogic.md) | Embedded details in requirements, separating EARS from specs |
 | **Clean language** | [SpecificationLanguageCleanup.md](reference/SpecificationLanguageCleanup.md) | Normative wording in refinements, language ownership |
 | **Generate tasks** | [CreatingTasks.md](reference/CreatingTasks.md) | Implementation plans from capability-scoped changes |

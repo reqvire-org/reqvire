@@ -27,7 +27,7 @@ Before applying refactor operations, confirm with the user:
 - Submodel ownership map (who owns which folders/elements)
 - Which cross-submodel dependencies are allowed as attachments
 - Which relation types are forbidden across submodels (`derive`, `derivedFrom`, `refinedBy`, `verifiedBy`)
-- Where shared contracts live (ontology elements for vocabulary, capability-owned or requirement-owned semantic contracts for shape profiles, or other compatible refinement elements)
+- Where shared contracts live (ontology elements for vocabulary, requirement-owned semantic contracts for shape profiles, or other compatible refinement elements)
 
 Do not run bulk unlink/move operations before this confirmation.
 

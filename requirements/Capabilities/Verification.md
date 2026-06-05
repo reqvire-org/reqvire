@@ -8,6 +8,7 @@ Defines SHACL constraints for verification elements and the capabilities or requ
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:VerificationShape
   a sh:NodeShape ;
@@ -34,6 +35,7 @@ reqvire:EvidenceBackedVerificationShape
   sh:targetClass reqvire:TestVerification, reqvire:FormalProofVerification ;
   sh:property [
     sh:path reqvire:satisfiedBy ;
+    sh:minCount 1 ;
     sh:class reqvire:Artifact ;
   ] ;
   sh:property [
@@ -51,6 +53,28 @@ reqvire:NonEvidenceBackedVerificationShape
   sh:property [
     sh:path reqvire:satisfy ;
     sh:maxCount 0 ;
+  ] .
+
+reqvire:VerificationTypeShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:VerificationType ;
+  sh:property [
+    sh:path reqvire:verificationTypeName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("verification" "test-verification" "formal-proof-verification" "analysis-verification" "inspection-verification" "demonstration-verification") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verificationEvidenceBacked ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verificationTypeDescription ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
   ] .
 ```
 
@@ -106,11 +130,48 @@ reqvire:RequirementCoverageShape
     sh:class reqvire:Verification ;
   ] ;
   sh:property [
+    sh:path reqvire:coverageReason ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
     sh:path reqvire:coverageState ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:in ("verified" "unverified" "blocked") ;
+  ] .
+
+reqvire:VerificationRollupRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:VerificationRollupRule ;
+  sh:property [
+    sh:path reqvire:rollupRuleName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in (
+      "leaf-requirement-verification"
+      "parent-requirement-rollup"
+      "capability-coverage-rollup"
+      "direct-capability-verification"
+      "evidence-backed-verification-satisfaction"
+      "non-evidence-backed-verification-satisfaction"
+    ) ;
+  ] ;
+  sh:property [
+    sh:path reqvire:rollupCondition ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:rollupOutcome ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:evidenceBacked ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
   ] .
 ```
 

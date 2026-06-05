@@ -21,6 +21,34 @@ echo "🚀 Reqvire binary: $REQVIRE_BIN"
 echo "🗂 Temporary directory: $TMP_DIR"
 echo "📝 Test logs directory: $LOG_DIR"
 
+run_repo_health_checks() {
+    local repo_root="$(cd "$ROOT_DIR/.." && pwd)"
+    local health_log="${LOG_DIR}/repo-health.log"
+
+    echo "🔹  Running repository health checks"
+    {
+        if rg -n "owl:deprecated true" "$repo_root/requirements/Ontologies"; then
+            echo "FAILED: Reqvire authored ontologies must not leave deprecated vocabulary declarations behind."
+            echo "Use rdfs:label/rdfs:comment for presentation metadata, or remove the stale property entirely."
+            exit 1
+        fi
+    } > "$health_log" 2>&1
+    local status=$?
+
+    if [ $status -eq 0 ]; then
+        echo "✅ repo-health - PASSED"
+    else
+        echo "❌ repo-health - FAILED"
+        echo "   Log file: $health_log"
+        echo ""
+        echo "   Full output:"
+        cat "$health_log" | sed 's/^/   /'
+        echo ""
+    fi
+
+    return $status
+}
+
 # Function to run a single test case
 run_test_case() {
 
@@ -68,6 +96,10 @@ run_test_case() {
 
 # Main Logic
 if [[ $# -eq 1 ]]; then
+    if [[ "$1" == "repo-health" ]]; then
+        run_repo_health_checks
+        exit $?
+    fi
     # Run specific test
     if [[ -d "$ROOT_DIR/$1" ]]; then
         run_test_case "$ROOT_DIR/$1"        
@@ -76,6 +108,8 @@ if [[ $# -eq 1 ]]; then
         exit 1
     fi
 else
+    run_repo_health_checks || exit 1
+
     # Run all test suites
     echo "🔄 Running all test suites..."
     for test_folder in "$ROOT_DIR/"test-*; do
@@ -86,4 +120,3 @@ else
 fi
 
 exit 0
-

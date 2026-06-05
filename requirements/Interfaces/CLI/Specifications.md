@@ -82,11 +82,13 @@ The `ontologies` command shall collect ontology `#### Ontology` content and sema
 - Command syntax: `reqvire ontologies [--jsonld] [--full] [--output <FILE>]`
 - Default output format: RDF/Turtle (`.ttl`)
 - `--jsonld`: emit JSON-LD instead of Turtle
-- `--full`: include generated RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, and semantic-contract shape references
+- `--full`: include generated RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, semantic-contract shape references, and generated ontology projection facts
+- Full generated ontology projection facts shall serialize `reqvire:OntologyProjectionGraph`, `reqvire:OntologyConstructProjection`, `reqvire:OntologyConstruct`, and `reqvire:OntologySymbol` resources, including source/provenance, construct subject/object/predicate/property facts where present, ordered member sequence facts where present, and direct-authored derivation mode.
+- Semantic-query-contract `#### Query` content and query metadata are excluded from default and `--full` output until a dedicated query-export command exists; generated ontology projection facts may cite semantic-query-contract IRIs as provenance without embedding raw query text
 - `--output <FILE>`: write the selected format to the requested file instead of stdout
 - The command shall use the graph-registry semantic index used by validation.
-- The default mode shall preserve the current artifact-only export of authored ontology and SHACL blocks.
-- The full mode shall append an in-memory RDF projection of the Reqvire graph registry context without requiring a persistent RDF store.
+- The default mode and exported `ontologies.ttl` artifact shall preserve the current artifact-only export of authored ontology and SHACL blocks without generated ontology projection facts.
+- The full mode shall append an in-memory RDF projection of the Reqvire graph registry context and generated direct-authored ontology construct subprojection without requiring a persistent RDF store.
 
 #### Metadata
  * type: specification
@@ -532,7 +534,7 @@ Search command capabilities:
 - Support comprehensive filter options (all combinable):
 - By file path glob: `--filter-file="src/**/*Reqs.md"`
 - By element name regex: `--filter-name=".*safety.*"`
-- By element type: `--filter-type="requirement"` (exact match)
+- By element type: `--filter-type="requirement"` or `--filter-type="semantic-query-contract"` (exact match)
 - By effective governance status: `--filter-status=approved`
 - By effective governance priority: `--filter-priority=high,critical`
 - By effective governance risk: `--filter-risk=high,critical`
@@ -557,6 +559,10 @@ Default output:
 - Human-readable text format when neither `--json` nor `--short` is specified
 - Full detail mode showing all element metadata and relations
 - Full JSON output includes effective governance metadata for governance-bearing elements (`capability` and `requirement`)
+- Full JSON output includes parsed semantic ADT fields when present:
+  - `ontology` for ontology elements
+  - `semantic_contract` for semantic-contract elements
+  - `semantic_query_contract` for semantic-query-contract elements, including derived IRI and Query fenced block language, content, and line number
 
 #### Metadata
  * type: specification

@@ -59,12 +59,23 @@ Billing shape contract.
 #### Shapes
 ```turtle
 @prefix billing: <urn:reqvire:test:billing:> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 billing:CorrectiveInvoiceShape
   a sh:NodeShape ;
   sh:targetClass billing:CorrectiveInvoice ;
+  sh:property [
+    sh:path rdfs:label ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path rdfs:comment ;
+    sh:datatype xsd:string ;
+  ] ;
   sh:property [
     sh:path billing:correctedInvoiceRef ;
     sh:minCount 1 ;

@@ -69,7 +69,7 @@ When starting from a `requirement`:
 When starting from a `capability`:
 - UPSTREAM traverses parent capabilities through `derivedFrom` only and does not include requirements that specify those capabilities.
 - DOWNSTREAM traverses child capabilities through `derive`, requirements through `specifiedBy`, and requirement descendants through `derive`.
-- The collected content includes attached ontology context for capability elements, inherited ontology context for descendant capability and requirement elements, and requirement-owned semantic contracts, requirement-detail refinements, and attachments for requirement elements.
+- The collected content includes attached ontology context for capability elements, inherited ontology context for descendant capability and requirement elements, and requirement-owned semantic contracts, semantic query contracts, requirement-detail refinements, and attachments for requirement elements.
 
 The `specifiedBy`/`specify` bridge is therefore directional:
 - Requirement UPSTREAM uses the bridge to add capability context.
@@ -535,7 +535,7 @@ Report commands:
 - `collect`: capability-or-requirement context collection, with upstream or downstream traversal and source citations.
 - `coverage`: requirement verification coverage, evidence-backed verification satisfaction, implementation coverage, and capability coverage rollup.
 - `traces`: verification-to-capability-root traceability trees.
-- `search`: model element search with relations, attachments, semantic-contract fields, and effective governance metadata.
+- `search`: model element search with relations, attachments, semantic-contract fields, semantic-query-contract fields, and effective governance metadata.
 - `submodels`: independent capability-rooted subgraphs, cross-submodel couplings, and summary totals.
 - `resources`: relation file targets and attachment identifier targets grouped by resource.
 - `ontologies`: collected ontology `Ontology` and semantic-contract `Shapes` Turtle blocks.
@@ -908,12 +908,18 @@ The output shall:
   - concept references from model elements to ontology terms
   - ontology term declaration edges from ontology elements to declared terms
   - semantic-contract shape reference edges from semantic contracts to referenced ontology terms
+  - generated ontology projection facts for direct-authored OWL/RDFS/SHACL constructs
 - Include source element identifier, source name, file path, section kind, and line number in the semantic index used by rendering/export.
-- Avoid requiring a persistent RDF store for this collection path; full export is an in-memory RDF projection over the graph registry and semantic index. Persistent RDF stores and SPARQL-backed search are reserved for later query support.
+- Do not emit semantic-query-contract `#### Query` content or query metadata from ontology collection, including full semantic export. Generated ontology projection facts may cite semantic-query-contract IRIs as pattern-contract provenance, but raw query text remains searchable through search JSON; a dedicated query-export command may be specified later.
+- Avoid requiring a persistent RDF store for this collection path; full export uses the existing in-memory RDF projection over the graph registry and semantic index, extended with a generated ontology construct subprojection. Persistent RDF stores, SPARQL-backed search, general query execution, query export, and inferred reasoning are reserved for later query support.
 
 **HTML Export:**
 - HTML export shall include `ontologies.ttl`.
-- HTML export shall include an Ontologies page that summarizes collected ontology and shape blocks, renders a graph explorer from parsed semantic-index quads, provides node search and inspection, supports full-window graph expansion, collapses anonymous SHACL property-shape blank nodes and RDF list infrastructure into readable owning-shape inspector constraints by default, lists the source Turtle blocks, and links to `ontologies.ttl`.
+- HTML export shall include an Ontologies page that opens directly on an OWL-aware ontology model viewer derived from parsed semantic-index quads, uses a dense full-width/full-height canvas below the fixed navigation bar, places the `ontologies.ttl` download link in the viewer sidebar, renders collected ontology/shape/RDF summary counts as a compact single-line sidebar footer, suppresses raw RDF serialization artifacts from the primary user-facing visualization, provides semantic search and inspection, preserves source citations as linked inspector/search evidence pointing to exported source HTML fragments, and does not render a page header, shared content-card footer, or raw Turtle/source-block list in the page.
+- The Ontologies page shall separate passive type-color legend entries from active visibility controls. Detailed semantic kinds such as classes, properties, individuals, datatypes, restrictions, class expressions, SHACL shapes, and resources shall remain visible through color, inspector kind, and search badges, while active filters shall use grouped layers such as ontology terms, properties, SHACL shapes, resources, relations, construct overlays, origins, and external references. Datatype-property literal values shall remain searchable and visible as inspector predicate/value evidence on their subject nodes, not as graph nodes or filter layers.
+- The Ontologies page shall treat built-in XSD, RDF, RDFS, OWL, and SHACL namespace terms as external references that can be enabled for datatype/range audit but are hidden by default so built-in datatypes such as `xsd:string` do not dominate the primary ontology graph.
+- The Ontologies page shall derive target-class and named-property slot/facet inspector sections from SHACL node shapes and property shapes, including path, datatype/class range evidence, node kind, cardinality, pattern, allowed values, and source-shape evidence. Target-class sections shall describe slots of the selected class; named-property sections shall describe each target-class usage of the selected property.
+- The Ontologies page shall render anonymous OWL class-expression blank nodes as structural constructs, not as primary domain concepts. The inspector shall show expression kind, ordered members, and usage context such as domain/range or subclass participation, while moving raw blank-node identifiers into collapsible raw details.
 - The exported navigation shall include an Ontologies link.
 
 #### Metadata
@@ -921,6 +927,49 @@ The output shall:
 
 #### Relations
  * refine: [Ontology and Shapes Collection](Reporting.md#ontology-and-shapes-collection)
+---
+
+### Ontology Projection Subgraph Materialization Specification
+
+#### Details
+Projection subgraph generation behavior:
+- Extend the existing full semantic export in-memory RDF projection with a generated `reqvire:OntologyProjectionGraph` subprojection after RDF/Turtle and SHACL parsing has produced semantic-index quads.
+- Attach generated projection data to `SemanticIndex` as structured Rust data, not as a renderer-local object. The `SemanticIndex` projection data is the authoritative in-process source for full Turtle export, full JSON-LD export, and Ontologies HTML rendering.
+- Store generated construct facts in the existing semantic export context as in-memory RDF statements derived from `SemanticIndex` projection data. Generated facts are not written back to authored Markdown ontology or semantic-contract blocks.
+- Keep projection data deterministic and serializable from `SemanticIndex` without reparsing raw Turtle in the HTML renderer.
+- Use stable generated IRIs or blank-node identifiers derived from canonical source evidence and construct membership so repeated exports remain deterministic.
+- Materialize one `reqvire:OntologyConstructProjection` record per projection pass or construct family and one or more `reqvire:OntologyConstruct` records for extracted constructs.
+- Record `reqvire:projectionDerivationMode "direct-authored"` for facts derived only from authored quads without reasoning.
+- Record `reqvire:constructSourceBlock`, source element metadata, source line, construct subject, construct object, construct property, construct member, and `reqvire:constructSequenceIndex` where order matters.
+- Attach `reqvire:OntologySymbol` facts for rendered symbols with `reqvire:symbolConceptName`, `reqvire:rawUnicodeCodePoint`, and `reqvire:renderedUnicodeCharacter`.
+- Cite the semantic-query-contract IRI that defines the construct pattern when the generated fact is governed by a requirement-owned semantic query contract. The projection subgraph must not embed the raw query text.
+
+Direct-authored construct families:
+- `rdfs:domain` and `rdfs:range` become property-domain and property-range constructs.
+- `rdfs:subClassOf` becomes inclusion constructs using `U+2286` / `⊆` unless strictness is separately proven.
+- `rdf:type` assertions for named individuals or typed resources may become membership constructs using `U+2208` / `∈`.
+- `owl:disjointWith` becomes disjointness constructs using `U+27C2` / `⟂`.
+- `owl:equivalentClass`, `owl:equivalentProperty`, and `owl:sameAs` become equivalence-group constructs using stable connected components.
+- `owl:inverseOf` becomes inverse-property constructs using `U+27F2` / `⟲`.
+- `owl:propertyChainAxiom` RDF lists become ordered property-chain constructs preserving list member order.
+- `rdf:type` declarations of OWL property characteristics become property-characteristic constructs for functional, inverse-functional, symmetric, asymmetric, reflexive, irreflexive, and transitive properties.
+- `owl:Restriction` with `owl:onProperty`, `owl:allValuesFrom`, `owl:someValuesFrom`, cardinality predicates, `owl:hasValue`, or similar authored restriction predicates becomes restriction constructs using the matching symbol vocabulary.
+- `owl:intersectionOf`, `owl:unionOf`, and `owl:complementOf` RDF list or expression structures become class-expression constructs. Set difference uses `U+2216` / `∖` only when represented by an explicit supported class-expression pattern.
+- SHACL node shapes and property shapes become shape-overlay constructs over their target classes, paths, datatypes, class constraints, node kinds, cardinality constraints, and allowed-value lists.
+- SHACL node-shape target classes plus property-shape paths and facets become viewer-facing slot/facet records attached to the target class and, when present, the named property node. On target classes these records define normalized class slots; on named properties they define source-backed usages of that property as a slot by each target class.
+- Class-expression projection records shall preserve list members in RDF list order and expose usage evidence so consumers can distinguish the expression itself from the property, subclass, or restriction construct that references it.
+
+Consumer behavior:
+- `reqvire ontologies --full` and `reqvire ontologies --full --jsonld` include generated ontology projection subgraph facts.
+- Default `reqvire ontologies` and exported `ontologies.ttl` keep authored ontology and SHACL blocks only.
+- `ontologies.html` must build its ontology explorer from the same generated projection facts used by full semantic export instead of maintaining a separate HTML-only construct model.
+- The projection subgraph is a reusable semantic data product for later SPARQL-backed search, semantic validation, or inferred-materialization work, but those later features require their own execution requirements.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Ontology Projection Subgraph Materialization](Reporting.md#ontology-projection-subgraph-materialization)
 ---
 
 ### SysML Rendering Specification

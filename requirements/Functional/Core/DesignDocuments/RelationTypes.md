@@ -124,7 +124,7 @@ This section defines which element types can use which relation types as source 
 
 2. **Capability-to-requirement bridge**: requirements use `specify` to point to the capability they specify. Capabilities use `specifiedBy` to point to requirements that specify them. System requirements must have an immediate parent through either `derivedFrom` to another requirement or `specify` to a capability.
 
-3. **Refinement types can only have refine relations**: Elements of type `source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output` can only use `refine` relations to link to their compatible owner. `source` refines capabilities; `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output` may refine capabilities or requirements. Each refinement can only be owned by one valid owner.
+3. **Refinement types can only have refine relations**: Elements of type `source`, `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output` can only use `refine` relations to link to their compatible owner. `source` refines capabilities; `semantic-contract` and `semantic-query-contract` refine requirements; `constraint`, `behavior`, `specification`, `state`, and `input-output` may refine capabilities or requirements. Each refinement can only be owned by one valid owner.
 
 4. **satisfiedBy/satisfy restricted to implementable elements**: `satisfiedBy` links requirements and evidence-backed verifications to implementation/evidence files. Capability elements are not valid sources/targets for satisfaction relations.
 

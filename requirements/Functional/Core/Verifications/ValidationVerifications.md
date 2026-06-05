@@ -452,18 +452,20 @@ Test cases:
 1. `source` refining `capability` validates successfully.
 2. `ontology` validates as an independent ontology element when semantic sections are well formed.
 3. `semantic-contract` refining `requirement` validates as a shape contract when it contains Shapes and no Ontology.
-4. `source` refining `requirement` fails.
-5. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
-6. Capability attachment to `ontology` validates.
-7. Requirement attachment to requirement-owned `semantic-contract` validates.
-8. Requirement attachment to `ontology` fails because ontology context is inherited through the owning capability path.
-9. Capability attachment to `semantic-contract` fails.
+4. `semantic-contract` owned by a capability through `refinedBy`/`refine` fails validation.
+5. `source` refining `requirement` fails.
+6. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
+7. Capability attachment to `ontology` validates.
+8. Requirement attachment to requirement-owned `semantic-contract` validates.
+9. Requirement attachment to `ontology` fails because ontology context is inherited through the owning capability path.
+10. Capability attachment to `semantic-contract` fails.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-capability-refinements/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-contract-sanity/test.sh)
   * verify: [Ontology and Semantic Contract Model](../ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
@@ -516,6 +518,30 @@ Test cases:
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-capability-refinements/test.sh)
   * verify: [Ontology and Semantic Contract Model](../ModelManagement.md#ontology-and-semantic-contract-model)
+---
+
+### Semantic Query Contract Section Validation Test
+
+This test verifies built-in semantic-query-contract section and ownership validation.
+
+#### Details
+Test cases:
+1. Requirement-owned `semantic-query-contract` with exactly one `#### Query` fenced code block using info string `sparql` and no `Ontology` or `Shapes` validates successfully.
+2. `semantic-query-contract` refining a capability fails validation.
+3. `semantic-query-contract` with `Ontology` fails validation.
+4. `semantic-query-contract` with `Shapes` fails validation.
+5. `semantic-query-contract` missing `Query` fails validation.
+6. `semantic-query-contract` with duplicate `Query` sections fails validation.
+7. `semantic-query-contract` with unsupported Query fenced language fails validation.
+8. Non-query element with `Query` fails validation because `Query` is reserved for semantic-query-contract elements.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-query-contracts/test.sh)
+  * verify: [Ontology and Semantic Contract Model](../ModelManagement.md#ontology-and-semantic-contract-model)
+  * verify: [Semantic Query Contract Element Semantic Contract](../ModelManagement.md#semantic-query-contract-element-semantic-contract)
 ---
 
 ### Single Root Hierarchy Ownership Validation Test

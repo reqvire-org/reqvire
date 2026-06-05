@@ -77,6 +77,7 @@ The filtering system **must support the following filters**, which may be active
 - `"formal-proof-verification"` - Formal proof/model-checking/theorem verification
 - `"source"` - Capability-owned source/context refinement
 - `"semantic-contract"` - Requirement-owned SHACL semantic contract refinement
+- `"semantic-query-contract"` - Requirement-owned semantic query contract refinement
 - `"constraint"` - Refinement documenting constraints
 - `"behavior"` - Refinement documenting behavior details
 - `"specification"` - Refinement documenting specifications

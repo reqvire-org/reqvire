@@ -25,7 +25,7 @@ When constructing or refactoring a system model, work from model boundaries inwa
 4. Add subcapabilities only for meaningful capability slices; do not use capability hierarchy just to share ontology.
 5. Put shared vocabulary and stable semantic relationships in ontology; attach that ontology from the owning or consuming capability so requirements inherit it through capability context.
 6. Put implementable obligations in requirements that `specify` the local capability.
-7. Put local details in capability-owned or requirement-owned refinements.
+7. Put local details in compatible refinements owned by the relevant capability or requirement.
 8. Use attachments, not hierarchy, when another capability root needs ontology or reusable requirement-owned contracts from this one.
 9. Validate `submodels`, `collect`, and change-impact paths after each boundary slice.
 
@@ -57,7 +57,7 @@ Optional subsections such as `#### Stakeholder Need`, `#### Feature`, `#### Oper
 
 Before creating requirements, answer:
 - What coherent operational, product, business, regulatory, or system ability does this address? (`capability`)
-- What semantic meaning, domain vocabulary, data shape, or policy contract must be shared? (`ontology` for vocabulary, `semantic-contract` for capability-owned or requirement-owned SHACL profiles)
+- What semantic meaning, domain vocabulary, data shape, or policy contract must be shared? (`ontology` for vocabulary attached by capabilities, `semantic-contract` for requirement-owned SHACL profiles)
 - What technical capabilities are needed? (`requirement`)
 - Are there constraints or limits to define?
 - How will this be verified?
@@ -79,9 +79,9 @@ Capability (coherent operational/system ability)
 - Check existing capability roots before adding a new one; preserve independent submodels unless the new work truly belongs in the same capability root
 - Use child capabilities for real independently verifiable operational, product, interface, stakeholder, regulatory, or domain slices
 - Use `source` refinements for stakeholder, regulatory, contractual, or external context
-- Use `semantic-contract`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements when capability-level context needs a contract before requirements are derived
+- Use `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements when capability-level context needs additional operational detail before requirements are derived
 - Use `ontology` elements for ontology/vocabulary contracts
-- Use capability-owned or requirement-owned `semantic-contract` refinements for SHACL shape profiles over reachable ontology context
+- Use requirement-owned `semantic-contract` refinements for SHACL shape profiles over reachable ontology context
 - Use `specify` / `specifiedBy` to connect requirements to capabilities
 - Derive `requirement` elements only from other requirements
 - Keep requirements atomic and testable
@@ -114,7 +114,7 @@ Use an `ontology` element when the content defines domain meaning or a machine-c
 - domain term meaning: "this term means..."
 - external or cross-subgraph ontology terms that multiple requirements should apply
 
-Use a `semantic-contract` when a specific capability or obligation needs a SHACL shape profile over reachable ontology concepts. Semantic contracts must have `#### Shapes`, must refine exactly one compatible capability or requirement owner, and must not have `#### Ontology`.
+Use a `semantic-contract` when a specific requirement obligation needs a SHACL shape profile over reachable ontology concepts. Semantic contracts must have `#### Shapes`, must refine exactly one compatible requirement owner, and must not have `#### Ontology`.
 
 A feature is often user-facing, roadmap-oriented, or product-oriented. Capabilities are broader and more stable. Features may be described inside capability content, but the `capability` element remains the primary traceable graph node.
 
@@ -138,7 +138,7 @@ Good split:
 - Requirement: `The system shall reject API requests whose access token does not conform to the Access Token validation contract.`
 - Input-output refinement, when needed: local request/response examples or API-specific representation details
 
-Keep domain definitions and reusable vocabulary in ontology when they are stable and shared. Keep capability-level or obligation-specific closed-world constraints in semantic contracts. Keep workflow behavior, implementation obligations, acceptance commitments, and verification scope in requirements.
+Keep domain definitions and reusable vocabulary in ontology when they are stable and shared. Keep requirement-obligation-specific closed-world constraints in semantic contracts. Keep workflow behavior, implementation obligations, acceptance commitments, and verification scope in requirements.
 
 When splitting existing prose, do not lose meaning:
 - Capability prose keeps capability scope and why the area exists.
@@ -228,9 +228,9 @@ Add refinements only when:
 - **State** - State machines, lifecycle states, and state-dependent contracts
 - **Input-output** - Payloads, messages, schemas, examples, and fixtures
 - **Ontology** - Shared semantic meaning and vocabulary attached by capabilities
-- **Semantic contracts** - Capability-owned or requirement-owned SHACL shape profiles for one capability or obligation
+- **Semantic contracts** - Requirement-owned SHACL shape profiles for one requirement obligation
 
-Link refinements via `refinedBy` from the capability or requirement that owns the refinement. Attach ontology elements from capabilities; link `semantic-contract` refinements from the owning capability or requirement when they define shapes.
+Link requirement-owned refinements via `refinedBy` from the requirement that owns the refinement. Attach ontology elements from capabilities; link `semantic-contract` refinements from the owning requirement when they define shapes.
 
 ### Refinement Best Practices
 
@@ -238,7 +238,7 @@ Link refinements via `refinedBy` from the capability or requirement that owns th
 - Group constraints in single file (e.g., `Constraints.md` in requirements root)
 - Define **Behaviors** and **Specifications** as elements only if other requirements depend on them
 - Define **ontology** elements when requirements need shared domain meaning or ontology vocabulary
-- Define **semantic contracts** as capability-owned or requirement-owned refinements when one capability or obligation needs a SHACL shape profile over reachable ontology context
+- Define **semantic contracts** as requirement-owned refinements when one requirement obligation needs a SHACL shape profile over reachable ontology context
 - Otherwise define them under `#### Behaviors` or `#### Specifications` subsection of the requirement
 
 ### Adding Refinement Elements

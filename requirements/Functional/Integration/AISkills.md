@@ -49,7 +49,9 @@ Artifact contract details shall follow the associated refinement specification.
  * refinedBy: [AI Skills Markdown Artifact Specification](#ai-skills-markdown-artifact-specification)
  * satisfiedBy: [analyze-coverage.md](../../../claude-plugins/commands/analyze-coverage.md)
  * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/syseng/SKILL.md)
+ * satisfiedBy: [SKILL.md](../../../claude-plugins/skills/ontology-authoring/SKILL.md)
  * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-syseng/SKILL.md)
+ * satisfiedBy: [SKILL.md](../../../codex-skills/reqvire-ontology-authoring/SKILL.md)
 ---
 
 ### AI Skills Instruction Contract Specification
@@ -81,8 +83,13 @@ AI skills markdown artifacts define the assistant-facing files that implement th
 Artifact contract rules:
 - Codex skill artifacts live under `codex-skills/reqvire-syseng`.
 - Claude skill artifacts live under `claude-plugins/skills/syseng`.
+- Codex ontology-authoring skill artifacts live under `codex-skills/reqvire-ontology-authoring`.
+- Claude ontology-authoring skill artifacts live under `claude-plugins/skills/ontology-authoring`.
 - Equivalent guidance should stay synchronized between Codex and Claude skill artifacts.
 - Assistant artifact changes should preserve MBSE workflow guidance and verification-aligned change sequencing.
+- Ontology-authoring guidance should distinguish generic labels/descriptions from ontology slots: `rdfs:label` and `rdfs:comment` are appropriate for optional presentation metadata, while true domain concepts, canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable domain meanings remain declared ontology properties even when their local names end with `Name` or `Meaning`.
+- Ontology-authoring guidance should preserve the OWL/SHACL block split: OWL `#### Ontology` blocks declare `owl:DatatypeProperty` and `owl:ObjectProperty` terms with stable `rdfs:domain`/`rdfs:range` values, including XSD ranges for datatype properties; SHACL `#### Shapes` blocks declare `sh:NodeShape` profiles using `sh:targetClass` and `sh:path` over reachable ontology terms and carry operational validation facets such as closed-world cardinality, numeric bounds, patterns, enumerations, and messages.
+- Ontology-authoring skills should keep existing-ontology cleanup guidance in a separate refactoring reference document. The main skill should load that reference only when the task is to refactor, audit, clean up, or improve existing ontology content, not for greenfield ontology creation.
 
 #### Metadata
  * type: specification

@@ -1,0 +1,59 @@
+# Elements
+
+### Access Capability
+
+Access capability.
+
+#### Metadata
+  * type: capability
+
+#### Relations
+  * refinedBy: [Capability Shape Contract](#capability-shape-contract)
+
+#### Attachments
+  * [Access Ontology](#access-ontology)
+---
+
+### Access Ontology
+
+Access ontology.
+
+#### Metadata
+  * type: ontology
+
+#### Ontology
+```turtle
+@prefix access: <urn:reqvire:test:access:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+access:AccessToken a owl:Class .
+access:expiresAt a owl:DatatypeProperty .
+```
+---
+
+### Capability Shape Contract
+
+Capability-owned semantic contracts are invalid.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * refine: [Access Capability](#access-capability)
+
+#### Shapes
+```turtle
+@prefix access: <urn:reqvire:test:access:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+access:AccessTokenShape
+  a sh:NodeShape ;
+  sh:targetClass access:AccessToken ;
+  sh:property [
+    sh:path access:expiresAt ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+```
+---

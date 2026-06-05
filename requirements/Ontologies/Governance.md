@@ -13,74 +13,116 @@ Governance metadata is part of the Reqvire semantic model because it changes pla
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:GovernanceRule a owl:Class .
-reqvire:GovernanceMetadata a owl:Class .
-reqvire:GovernanceValue a owl:Class .
+reqvire:GovernedElement a owl:Class ;
+  rdfs:subClassOf reqvire:Element ;
+  rdfs:comment "Element type that may author explicit governance metadata." .
+reqvire:Capability rdfs:subClassOf reqvire:GovernedElement .
+reqvire:Requirement rdfs:subClassOf reqvire:GovernedElement .
+reqvire:GovernanceRule a owl:Class ;
+  rdfs:subClassOf reqvire:ContractRule ;
+  rdfs:comment "Contract rule describing governance authoring, inheritance, effective value, or persistence semantics." .
+reqvire:GovernanceMetadata a owl:Class ;
+  rdfs:comment "Governance metadata concept covering status, priority, risk, and owner fields." .
+reqvire:GovernanceValue a owl:Class ;
+  rdfs:comment "Controlled vocabulary value for a governance metadata field." .
 reqvire:StatusValue a owl:Class ;
-  rdfs:subClassOf reqvire:GovernanceValue .
+  rdfs:subClassOf reqvire:GovernanceValue ;
+  rdfs:comment "Controlled status metadata value." .
 reqvire:PriorityValue a owl:Class ;
-  rdfs:subClassOf reqvire:GovernanceValue .
+  rdfs:subClassOf reqvire:GovernanceValue ;
+  rdfs:comment "Controlled priority metadata value." .
 reqvire:RiskValue a owl:Class ;
-  rdfs:subClassOf reqvire:GovernanceValue .
+  rdfs:subClassOf reqvire:GovernanceValue ;
+  rdfs:comment "Controlled risk metadata value." .
 
-reqvire:status a owl:DatatypeProperty .
-reqvire:priority a owl:DatatypeProperty .
-reqvire:risk a owl:DatatypeProperty .
-reqvire:owner a owl:DatatypeProperty .
-reqvire:governanceValueName a owl:DatatypeProperty .
-reqvire:governanceValueMeaning a owl:DatatypeProperty .
-reqvire:governanceDefaultValue a owl:DatatypeProperty .
-reqvire:governanceRuleName a owl:DatatypeProperty .
-reqvire:governanceAppliesTo a owl:DatatypeProperty .
-reqvire:governanceSourceOrder a owl:DatatypeProperty .
-reqvire:governancePersistence a owl:DatatypeProperty .
+reqvire:status a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernedElement ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Lifecycle readiness metadata token authored by capability and requirement elements." .
+reqvire:priority a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernedElement ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Planning importance metadata token authored by capability and requirement elements." .
+reqvire:risk a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernedElement ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Requirement realization risk metadata token authored by capability and requirement elements." .
+reqvire:owner a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernedElement ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Free-form accountability or routing label authored by capability and requirement elements." .
+reqvire:governanceDefaultValue a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernanceValue ;
+  rdfs:range xsd:boolean ;
+  rdfs:comment "Indicates whether a governance value is the default for its value family." .
+reqvire:governanceValueName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernanceValue ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical governance metadata value token used by Markdown metadata, filters, output, and queries." .
+reqvire:governanceRuleName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernanceRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical governance rule token used for rule lookup, reporting, and queries." .
+reqvire:governanceAppliesTo a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernanceRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Token list describing the model element families to which a governance rule applies." .
+reqvire:governanceSourceOrder a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernanceRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Ordered token list for effective governance value resolution." .
+reqvire:governancePersistence a owl:DatatypeProperty ;
+  rdfs:domain reqvire:GovernanceRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Persistence-mode token for governance metadata during formatting or mutation." .
 
 reqvire:draftStatus a reqvire:StatusValue ;
   reqvire:governanceValueName "draft" ;
-  reqvire:governanceValueMeaning "The element is being authored or revised and is not ready for formal review." ;
+  rdfs:comment "The element is being authored or revised and is not ready for formal review." ;
   reqvire:governanceDefaultValue false .
 reqvire:reviewStatus a reqvire:StatusValue ;
   reqvire:governanceValueName "review" ;
-  reqvire:governanceValueMeaning "The element is ready for, or currently under, stakeholder or engineering review." ;
+  rdfs:comment "The element is ready for, or currently under, stakeholder or engineering review." ;
   reqvire:governanceDefaultValue false .
 reqvire:approvedStatus a reqvire:StatusValue ;
   reqvire:governanceValueName "approved" ;
-  reqvire:governanceValueMeaning "The element definition has completed review and is accepted as authoritative for downstream work." ;
+  rdfs:comment "The element definition has completed review and is accepted as authoritative for downstream work." ;
   reqvire:governanceDefaultValue true .
 
 reqvire:lowPriority a reqvire:PriorityValue ;
   reqvire:governanceValueName "low" ;
-  reqvire:governanceValueMeaning "Useful or desirable, but deferrable without major mission, stakeholder, or integration impact." ;
+  rdfs:comment "Useful or desirable, but deferrable without major mission, stakeholder, or integration impact." ;
   reqvire:governanceDefaultValue false .
 reqvire:mediumPriority a reqvire:PriorityValue ;
   reqvire:governanceValueName "medium" ;
-  reqvire:governanceValueMeaning "Normal planning importance; expected to be delivered unless schedule, cost, or scope tradeoffs require adjustment." ;
+  rdfs:comment "Normal planning importance; expected to be delivered unless schedule, cost, or scope tradeoffs require adjustment." ;
   reqvire:governanceDefaultValue true .
 reqvire:highPriority a reqvire:PriorityValue ;
   reqvire:governanceValueName "high" ;
-  reqvire:governanceValueMeaning "Important to mission, stakeholder value, integration, or compliance and should be protected during tradeoffs." ;
+  rdfs:comment "Important to mission, stakeholder value, integration, or compliance and should be protected during tradeoffs." ;
   reqvire:governanceDefaultValue false .
 reqvire:criticalPriority a reqvire:PriorityValue ;
   reqvire:governanceValueName "critical" ;
-  reqvire:governanceValueMeaning "Essential; failure to satisfy creates unacceptable mission, safety, compliance, contractual, or release impact." ;
+  rdfs:comment "Essential; failure to satisfy creates unacceptable mission, safety, compliance, contractual, or release impact." ;
   reqvire:governanceDefaultValue false .
 
 reqvire:lowRisk a reqvire:RiskValue ;
   reqvire:governanceValueName "low" ;
-  reqvire:governanceValueMeaning "Requirement realization is well understood, stable, feasible, and straightforward to verify." ;
+  rdfs:comment "Requirement realization is well understood, stable, feasible, and straightforward to verify." ;
   reqvire:governanceDefaultValue true .
 reqvire:mediumRisk a reqvire:RiskValue ;
   reqvire:governanceValueName "medium" ;
-  reqvire:governanceValueMeaning "Requirement realization has manageable uncertainty, moderate implementation or verification complexity, or limited downstream coupling." ;
+  rdfs:comment "Requirement realization has manageable uncertainty, moderate implementation or verification complexity, or limited downstream coupling." ;
   reqvire:governanceDefaultValue false .
 reqvire:highRisk a reqvire:RiskValue ;
   reqvire:governanceValueName "high" ;
-  reqvire:governanceValueMeaning "Requirement realization has significant technical uncertainty, volatility, verification difficulty, integration exposure, or likely downstream rework." ;
+  rdfs:comment "Requirement realization has significant technical uncertainty, volatility, verification difficulty, integration exposure, or likely downstream rework." ;
   reqvire:governanceDefaultValue false .
 reqvire:criticalRisk a reqvire:RiskValue ;
   reqvire:governanceValueName "critical" ;
-  reqvire:governanceValueMeaning "Requirement realization has severe uncertainty or exposure where failure, change, or non-compliance may materially affect mission, safety, compliance, cost, or schedule." ;
+  rdfs:comment "Requirement realization has severe uncertainty or exposure where failure, change, or non-compliance may materially affect mission, safety, compliance, cost, or schedule." ;
   reqvire:governanceDefaultValue false .
 
 reqvire:governanceAuthoringRule a reqvire:GovernanceRule ;
@@ -107,6 +149,5 @@ reqvire:governancePersistenceRule a reqvire:GovernanceRule ;
   * type: ontology
 
 #### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
+  * derivedFrom: [Reqvire Behavior Rule Ontology](BehaviorValidationOperations.md#reqvire-behavior-rule-ontology)
 ---
-

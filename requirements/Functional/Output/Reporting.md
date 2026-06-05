@@ -202,12 +202,14 @@ Implementation details shall follow the associated refinement specifications.
 
 ### Ontology and Shapes Collection
 
-The system shall collect ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry into a reusable semantic export context, and shall optionally project Reqvire model context into the same RDF export.
+The system shall collect ontology `#### Ontology` and semantic-contract `#### Shapes` RDF blocks from the graph registry into a reusable semantic export context, and shall optionally project Reqvire model context and generated ontology construct facts into the same RDF export.
 
 #### Details
 The default collection shall expose authored ontology RDF content and semantic-contract SHACL RDF content without changing the Markdown model as the source of truth.
 
-When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, capability-to-ontology attachments, requirement-to-capability specification relations, requirement-to-semantic-contract refinement relations, ontology hierarchy relations, concept references, ontology term declarations, and semantic-contract shape references.
+When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, capability-to-ontology attachments, requirement-to-capability specification relations, requirement-to-semantic-contract refinement relations, ontology hierarchy relations, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts materialized from direct-authored OWL/RDFS/SHACL constructs.
+
+Semantic-query-contract `#### Query` content and query metadata are not part of ontology collection, full semantic export, or `ontologies.ttl`. Generated ontology projection facts may cite the semantic-query-contract IRI that defines the intended construct pattern, but raw query text remains exposed through search JSON until a dedicated query-export command is specified and implemented.
 
 The collection shall preserve source element identifiers, source file paths, section kind, and line numbers so CLI, HTML export, and downstream semantic tooling can cite the model source of each RDF block.
 
@@ -225,12 +227,44 @@ The collection shall preserve source element identifiers, source file paths, sec
   * verifiedBy: [CLI Ontologies Command Verification](../../Interfaces/CLI/Verifications/CLIVerifications.md#cli-ontologies-command-verification)
 ---
 
+### Ontology Projection Subgraph Materialization
+
+The system shall materialize generated ontology construct facts as a subgraph of the existing in-memory RDF projection so semantic exports and HTML ontology exploration consume the same ontology construct facts.
+
+#### Details
+The ontology projection subgraph shall:
+- Extend the existing in-memory RDF projection used by full semantic export; it is not a separate database, persistent store, or HTML-only model.
+- Be attached to the reusable `SemanticIndex` as structured generated projection data so semantic export, JSON-LD export, and HTML rendering share one authoritative projection source.
+- Be generated from authored ontology and semantic-contract RDF quads during semantic index processing or immediately after parsing.
+- Materialize direct-authored OWL/RDFS/SHACL constructs into Reqvire ontology projection facts without changing authored Markdown ontology or semantic-contract blocks.
+- Preserve source element identifier, source name, source file, source line, source block kind, construct subject, construct object, construct members, construct property, ordered sequence index when relevant, symbol code point, rendered symbol, and derivation mode.
+- Derive normalized SHACL slot/facet projection records from node-shape target classes and property-shape paths so target class inspectors and named property inspectors can share the same source-backed semantic evidence.
+- Include constructs for property domain/range, subclass or inclusion, class membership, disjointness, equivalence, inverse properties, property chains, property characteristics, restrictions, intersections, unions, complement or difference-style expressions when authored, and SHACL shape overlays when present.
+- Use semantic-query-contract refinements as declarative pattern contracts for the generated projection facts. The implementation may use native Rust projection over the parsed RDF graph as long as the materialized facts satisfy the same pattern intent.
+- Distinguish direct-authored projection from inferred projection. Direct-authored projection is in scope; OWL reasoning, SHACL-AF rule execution, and inferred materialization require separate inference requirements before they can contribute generated facts.
+- Feed generated facts into `reqvire ontologies --full`, `reqvire ontologies --full --jsonld`, and the Ontologies HTML explorer through the same in-memory projection context. The default `reqvire ontologies` and exported `ontologies.ttl` artifact remain authored ontology/SHACL collection outputs unless full export is requested.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
+  * [Semantic Query Contract Structure Specification](../Core/Specifications.md#semantic-query-contract-structure-specification)
+
+#### Relations
+  * specify: [Semantic Model Export](../../Capabilities/ReportsAndQuery.md#semantic-model-export)
+  * refinedBy: [Ontology Projection Subgraph Materialization Specification](Specifications.md#ontology-projection-subgraph-materialization-specification)
+  * verifiedBy: [CLI Ontologies Command Verification](../../Interfaces/CLI/Verifications/CLIVerifications.md#cli-ontologies-command-verification)
+---
+
 ### Search Report Generator
 
 The system shall implement a search report generator with comprehensive filtering and element type tracking.
 
 #### Details
 The search report must include file-level, section-level, and element-level information.
+
+Search JSON shall expose parsed semantic model fields when present. Ontology elements expose `ontology`; semantic-contract elements expose `semantic_contract`; semantic-query-contract elements expose `semantic_query_contract` with derived identity and Query fenced block details. Short mode may omit these parsed semantic fields.
 
 The system shall define comprehensive search filtering capabilities:
 - By file path patterns

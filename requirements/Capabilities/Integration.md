@@ -48,6 +48,48 @@ Requirements under this capability define concrete parsing, marker, comment-styl
   * specifiedBy: [Code Traceability](../Functional/Integration/CodeAlignment.md#code-traceability)
 ---
 
+### Reqvire Code Traceability Ontology Shape Profile
+
+Defines SHACL constraints for code traceability relation kinds and supported comment style vocabulary.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:TraceabilityRelationKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:TraceabilityRelationKind ;
+  sh:property [
+    sh:path reqvire:traceabilityRelationKindName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("satisfies" "trace") ;
+    sh:message "Traceability relation kinds must use a supported code marker relation token." ;
+  ] .
+
+reqvire:CommentStyleKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:CommentStyleKind ;
+  sh:property [
+    sh:path reqvire:commentStyleName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("hash-line" "slash-line" "dash-line" "batch-line" "css-block" "xml-block") ;
+    sh:message "Comment style kinds must use a supported source marker comment style token." ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * refine: [Code Traceability](../Functional/Integration/CodeAlignment.md#code-traceability)
+---
+
 ### GitHub Workflow Automation
 
 As a **Contributor**, I want Reqvire to support repository workflow automation, so that model documentation, validation, and review evidence can participate in pull-request and merge workflows.
@@ -73,4 +115,3 @@ Requirements under this capability define concrete workflow behavior and reposit
   * specifiedBy: [Automate Pull Request Validations](../Functional/Integration/GitHubIntegration.md#automate-pull-request-validations)
   * specifiedBy: [Generate Change Logs for Pull Requests](../Functional/Integration/GitHubIntegration.md#generate-change-logs-for-pull-requests)
 ---
-
