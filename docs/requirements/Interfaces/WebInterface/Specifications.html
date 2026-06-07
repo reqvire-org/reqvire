@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -362,9 +461,27 @@
 
   subgraph 46bd8996ef832bd8["📁 requirements/Interfaces/WebInterface"]
     subgraph 5d341d66c5d20d4a["📄 Specifications.md"]
+      33a07717060f615["Attachment Export Refinement Specification"];
+      class 33a07717060f615 default;
+      click 33a07717060f615 "Specifications.html#attachment-export-refinement-specification";
+      a45220a17d28851d["Component-Based HTML Architecture Refinement Specification"];
+      class a45220a17d28851d default;
+      click a45220a17d28851d "Specifications.html#component-based-html-architecture-refinement-specification";
+      f3834d074ae139bf["Containment View Attachment Links Refinement Specification"];
+      class f3834d074ae139bf default;
+      click f3834d074ae139bf "Specifications.html#containment-view-attachment-links-refinement-specification";
+      adcfb14beac341a0["CSS Framework Integration Refinement Specification"];
+      class adcfb14beac341a0 default;
+      click adcfb14beac341a0 "Specifications.html#css-framework-integration-refinement-specification";
       2c269288950887aa["D3.js Containment Tree Specification"];
       class 2c269288950887aa default;
       click 2c269288950887aa "Specifications.html#d3js-containment-tree-specification";
+      2690fb632f281e4e["Diagram Attachment Display Refinement Specification"];
+      class 2690fb632f281e4e default;
+      click 2690fb632f281e4e "Specifications.html#diagram-attachment-display-refinement-specification";
+      88bf91703c6fcb24["Direct OWL Construct Projection Query Contract"];
+      class 88bf91703c6fcb24 default;
+      click 88bf91703c6fcb24 "Specifications.html#direct-owl-construct-projection-query-contract";
       ac8ced009233741a["HTML Branding Specification"];
       class ac8ced009233741a default;
       click ac8ced009233741a "Specifications.html#html-branding-specification";
@@ -374,22 +491,160 @@
       1c6c804d67bc741e["HTML Navigation Bar Specification"];
       class 1c6c804d67bc741e default;
       click 1c6c804d67bc741e "Specifications.html#html-navigation-bar-specification";
+      f2848aba82e4a4a9["Local Linked File Export Refinement Specification"];
+      class f2848aba82e4a4a9 default;
+      click f2848aba82e4a4a9 "Specifications.html#local-linked-file-export-refinement-specification";
+      c4da78bec332fbb5["Model-Centric View Generation Refinement Specification"];
+      class c4da78bec332fbb5 default;
+      click c4da78bec332fbb5 "Specifications.html#model-centric-view-generation-refinement-specification";
+      a573a629dbd4e223["Model View Element Navigation Refinement Specification"];
+      class a573a629dbd4e223 default;
+      click a573a629dbd4e223 "Specifications.html#model-view-element-navigation-refinement-specification";
+      e61c330e7a0037b6["Ontologies View Generation Refinement Specification"];
+      class e61c330e7a0037b6 default;
+      click e61c330e7a0037b6 "Specifications.html#ontologies-view-generation-refinement-specification";
+      5b446b67ee40fac1["Ontology Construct Grouping Refinement Specification"];
+      class 5b446b67ee40fac1 default;
+      click 5b446b67ee40fac1 "Specifications.html#ontology-construct-grouping-refinement-specification";
+      623b9326025aac71["Ontology Property-Centric Visualization Refinement Specification"];
+      class 623b9326025aac71 default;
+      click 623b9326025aac71 "Specifications.html#ontology-property-centric-visualization-refinement-specification";
+      c20fa977763cce6c["Ontology Symbol and Badge Vocabulary Refinement Specification"];
+      class c20fa977763cce6c default;
+      click c20fa977763cce6c "Specifications.html#ontology-symbol-and-badge-vocabulary-refinement-specification";
+      16c553ddf2cb4896["OWL Property Metadata Projection Query Contract"];
+      class 16c553ddf2cb4896 default;
+      click 16c553ddf2cb4896 "Specifications.html#owl-property-metadata-projection-query-contract";
+      3a2e4dd20e2a1c36["OWL Semantic Ontology Projection Refinement Specification"];
+      class 3a2e4dd20e2a1c36 default;
+      click 3a2e4dd20e2a1c36 "Specifications.html#owl-semantic-ontology-projection-refinement-specification";
+      53c43db80a287985["Project Knowledge Graph View Refinement Specification"];
+      class 53c43db80a287985 default;
+      click 53c43db80a287985 "Specifications.html#project-knowledge-graph-view-refinement-specification";
+      52b4eca440f8ac6["RDF List OWL Construct Projection Query Contract"];
+      class 52b4eca440f8ac6 default;
+      click 52b4eca440f8ac6 "Specifications.html#rdf-list-owl-construct-projection-query-contract";
+      8f0078842fea4523["Responsive HTML Generation Refinement Specification"];
+      class 8f0078842fea4523 default;
+      click 8f0078842fea4523 "Specifications.html#responsive-html-generation-refinement-specification";
+      d18698171566f9e7["Serve Command Refinement Specification"];
+      class d18698171566f9e7 default;
+      click d18698171566f9e7 "Specifications.html#serve-command-refinement-specification";
+      fee5dd19737bb20a["Type-Safe HTML Generation Refinement Specification"];
+      class fee5dd19737bb20a default;
+      click fee5dd19737bb20a "Specifications.html#type-safe-html-generation-refinement-specification";
+      5960c3e368dd5a33["Web Interface Refinement Specification"];
+      class 5960c3e368dd5a33 default;
+      click 5960c3e368dd5a33 "Specifications.html#web-interface-refinement-specification";
       945adb3f0ea1012e["Web Interface Style Specification"];
       class 945adb3f0ea1012e default;
       click 945adb3f0ea1012e "Specifications.html#web-interface-style-specification";
     end
   end
 </div>
+<h3 id="attachment-export-refinement-specification">Attachment Export Refinement Specification</h3>
+<h4>Details</h4>
+<p>Attachment export behavior during HTML export:</p>
+<ul>
+<li>Collects attachment references from <code>element.attachments</code> across the model.</li>
+<li>Resolves each attachment as a refinement element identifier target.</li>
+<li>Skips duplicate identifier processing when the same refinement is referenced by multiple elements.</li>
+<li>Emits progress information for attachment-link processing operations.</li>
+</ul>
+<p>This keeps exported documentation complete with navigable refinement attachment links.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#attachment-export">Attachment Export</a></li>
+</ul>
+<hr />
+<h3 id="css-framework-integration-refinement-specification">CSS Framework Integration Refinement Specification</h3>
+<h4>Details</h4>
+<p>CSS framework integration behavior:</p>
+<ul>
+<li>Uses Tailwind CSS via CDN in current export flow.</li>
+<li>Applies mobile-first utility classes for responsive layout behavior.</li>
+<li>Uses responsive modifiers (<code>sm</code>, <code>md</code>, <code>lg</code>, <code>xl</code>) for adaptation.</li>
+<li>Defines Reqvire theme colors including primary, requirement, and verification tones.</li>
+</ul>
+<p>Tailwind usage provides:</p>
+<ul>
+<li>Utility-first styling for predictable page composition.</li>
+<li>Built-in responsive modifiers (for example <code>md:hidden</code>, <code>lg:flex</code>).</li>
+<li>Consistent spacing, color, and typography scales.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="HTMLGeneration.html#css-framework-integration">CSS Framework Integration</a></li>
+</ul>
+<hr />
+<h3 id="component-based-html-architecture-refinement-specification">Component-Based HTML Architecture Refinement Specification</h3>
+<h4>Details</h4>
+<p>The HTML generation system is expected to be organized into reusable components:</p>
+<p><strong>Shared components:</strong></p>
+<ul>
+<li>Compact Explorer view switcher in the fixed header</li>
+<li>Page header with metadata</li>
+<li>On-demand view help modal opened from a compact header <code>?</code> control</li>
+</ul>
+<p><strong>Reusable layouts:</strong></p>
+<ul>
+<li>Base layout for standard pages</li>
+<li>Diagram layout for full-height visualizations</li>
+</ul>
+<p><strong>Page-specific modules:</strong></p>
+<ul>
+<li>Index/Containment page</li>
+<li>Model view page</li>
+<li>Traces page</li>
+<li>Ontologies explorer page</li>
+<li>Supporting report artifact pages such as TraceFlow, Coverage, and Resources when generated by export, without exposing them as primary navigation destinations</li>
+<li>Individual specification pages</li>
+</ul>
+<p>Each component is expected to be defined once and reused across all generated pages to eliminate code duplication.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="HTMLGeneration.html#component-based-html-architecture">Component-Based HTML Architecture</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-attachment-links-refinement-specification">Containment View Attachment Links Refinement Specification</h3>
+<h4>Details</h4>
+<p>Containment view attachment rendering behavior:</p>
+<ul>
+<li>For each element with attachments, renders attachments as child nodes in the D3 tree.</li>
+<li>Uses wrench icon (<code>🔧</code>) and type <code>attachment-element</code> for element attachments.</li>
+<li>Element-attachment nodes navigate to the referenced element.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#containment-view-attachment-links">Containment View Attachment Links</a></li>
+</ul>
+<hr />
 <h3 id="d3.js-containment-tree-specification">D3.js Containment Tree Specification</h3>
 <p>Specification for the D3.js interactive containment tree visualization.</p>
 <h4>Details</h4>
-<p>The containment page (containment.html) shall display an interactive D3.js collapsible tree showing the containment hierarchy:</p>
+<p>The containment page (containment.html) is expected to display an interactive D3.js collapsible tree showing the containment hierarchy:</p>
 <ol>
 <li>Root node representing the model root</li>
 <li>Folder nodes that can be expanded/collapsed</li>
 <li>File nodes containing element children</li>
 <li>Element nodes with type-specific icons and colors</li>
-<li>Attachment nodes as children of elements (element and file attachments)</li>
+<li>Attachment nodes as children of elements (refinement element attachments)</li>
 <li>Clickable elements that navigate to their definitions</li>
 <li>Expand All / Collapse All buttons for tree control</li>
 </ol>
@@ -400,7 +655,98 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Capabilities.html#html-export">HTML Export</a></li>
+<li>refine: <a href="Capabilities.html#html-export">HTML Export</a></li>
+</ul>
+<hr />
+<h3 id="diagram-attachment-display-refinement-specification">Diagram Attachment Display Refinement Specification</h3>
+<h4>Details</h4>
+<p>Diagram attachment rendering behavior in Mermaid output:</p>
+<ul>
+<li>Renders attachment links under the element name inside node labels.</li>
+<li>Prefixes each attachment with paperclip icon (<code>📎</code>).</li>
+<li>Displays referenced refinement element names.</li>
+<li>Does not display full attachment identifier paths in node labels; identifier paths remain link targets or structured report data.</li>
+<li>Produces clickable links to the referenced refinement element.</li>
+<li>Uses Mermaid multiline label formatting (<code>&lt;br/&gt;</code>).</li>
+<li>Applies the same compact display-name rule to Model and Traces diagrams so a late-page verification or model graph cannot be widened or clipped by full <code>file#fragment</code> attachment identifiers.</li>
+</ul>
+<p>Example node:</p>
+<pre><code>elementId["Element Name&lt;br/&gt;📎 Deterministic Output Specification"]
+</code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#diagram-attachment-display">Diagram Attachment Display</a></li>
+</ul>
+<hr />
+<h3 id="direct-owl-construct-projection-query-contract">Direct OWL Construct Projection Query Contract</h3>
+<p>This query contract defines the direct-authored OWL/RDFS construct patterns that the ontology projection subgraph must materialize for inclusion, membership, disjointness, equivalence, inverse properties, and restrictions.</p>
+<h4>Query</h4>
+<pre><code class="language-sparql">PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+PREFIX sh: &lt;http://www.w3.org/ns/shacl#&gt;
+
+SELECT ?constructKind ?subject ?predicate ?object ?property ?symbol WHERE {
+  {
+    ?subject rdfs:subClassOf ?object .
+    BIND("inclusion" AS ?constructKind)
+    BIND(rdfs:subClassOf AS ?predicate)
+    BIND("U+2286" AS ?symbol)
+  }
+  UNION {
+    ?subject rdf:type ?object .
+    FILTER(?object NOT IN (owl:Class, rdfs:Class, owl:ObjectProperty, owl:DatatypeProperty, rdf:Property))
+    BIND("membership" AS ?constructKind)
+    BIND(rdf:type AS ?predicate)
+    BIND("U+2208" AS ?symbol)
+  }
+  UNION {
+    ?subject owl:disjointWith ?object .
+    BIND("disjointness" AS ?constructKind)
+    BIND(owl:disjointWith AS ?predicate)
+    BIND("U+27C2" AS ?symbol)
+  }
+  UNION {
+    VALUES ?predicate { owl:equivalentClass owl:equivalentProperty owl:sameAs }
+    ?subject ?predicate ?object .
+    BIND("equivalence" AS ?constructKind)
+    BIND("U+21D4" AS ?symbol)
+  }
+  UNION {
+    ?subject owl:inverseOf ?object .
+    BIND("inverse-property" AS ?constructKind)
+    BIND(owl:inverseOf AS ?predicate)
+    BIND("U+27F2" AS ?symbol)
+  }
+  UNION {
+    ?subject a owl:Restriction ;
+      owl:onProperty ?property ;
+      owl:allValuesFrom ?object .
+    BIND("universal-restriction" AS ?constructKind)
+    BIND(owl:allValuesFrom AS ?predicate)
+    BIND("U+2200" AS ?symbol)
+  }
+  UNION {
+    ?subject a owl:Restriction ;
+      owl:onProperty ?property ;
+      owl:someValuesFrom ?object .
+    BIND("existential-restriction" AS ?constructKind)
+    BIND(owl:someValuesFrom AS ?predicate)
+    BIND("U+2203" AS ?symbol)
+  }
+}
+</code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: semantic-query-contract</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#owl-semantic-ontology-projection">OWL Semantic Ontology Projection</a></li>
 </ul>
 <hr />
 <h3 id="html-branding-specification">HTML Branding Specification</h3>
@@ -408,20 +754,20 @@
 <h4>Details</h4>
 <p><strong>Logo and Branding:</strong></p>
 <ul>
-<li>The navigation bar shall display the Reqvire logo on the left side before the navigation links</li>
-<li>A favicon shall be included for browser tab identification</li>
-<li>Apple touch icons shall be included for mobile device support</li>
-<li>All brand assets shall be exported to an assets folder during HTML export</li>
+<li>The navigation bar is expected to display the Reqvire logo on the left side before the navigation links</li>
+<li>A favicon is expected to be included for browser tab identification</li>
+<li>Apple touch icons is expected to be included for mobile device support</li>
+<li>All brand assets is expected to be exported to an assets folder during HTML export</li>
 </ul>
 <p><strong>HTML Design:</strong>
-The system shall design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.</p>
+The system is expected to design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Capabilities.html#html-export">HTML Export</a></li>
+<li>refine: <a href="Capabilities.html#html-export">HTML Export</a></li>
 </ul>
 <hr />
 <h3 id="html-export-pipeline-specification">HTML Export Pipeline Specification</h3>
@@ -432,16 +778,17 @@ The system shall design and implement HTML pages with consistent layout, styling
 <li>Create temporary working directory (e.g., in /tmp)</li>
 <li>Generate markdown files from registry with full relations (user-created and auto-generated inverse relations)</li>
 <li>Copy all related system elements (following satisfiedBy and other relations)</li>
-<li>Copy all attachment files to temporary directory preserving structure</li>
+<li>Resolve and preserve attachment identifier links to refinement elements</li>
 </ul>
 <p><strong>Generation Pipeline (in temporary directory):</strong>
 Execute all generation commands treating temporary directory as repository root:</p>
 <ol>
 <li>Generate all Mermaid diagrams in markdown files</li>
 <li>Generate index.md (interactive D3.js tree showing containment hierarchy - main entry point)</li>
-<li>Generate model.md (model-centric visualization with nested relations from root requirements)</li>
+<li>Generate model.md (model-centric visualization with nested relations from model roots)</li>
 <li>Generate traces.md (verification upward traceability)</li>
 <li>Generate coverage.md (verification coverage report)</li>
+<li>Generate ontologies.ttl and ontologies.html from the semantic index</li>
 </ol>
 <p><strong>HTML Conversion:</strong></p>
 <ul>
@@ -465,7 +812,7 @@ Execute all generation commands treating temporary directory as repository root:
 </ul>
 <p><strong>Git Directory Exclusion:</strong></p>
 <ul>
-<li>The .git directory shall never be exported to the output folder</li>
+<li>The .git directory is expected to never be exported to the output folder</li>
 <li>This prevents internal git metadata from polluting the exported documentation</li>
 </ul>
 <p><strong>Export Related System Elements:</strong></p>
@@ -478,25 +825,67 @@ Execute all generation commands treating temporary directory as repository root:
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Capabilities.html#html-export">HTML Export</a></li>
+<li>refine: <a href="Capabilities.html#html-export">HTML Export</a></li>
 </ul>
 <hr />
 <h3 id="html-navigation-bar-specification">HTML Navigation Bar Specification</h3>
 <p>Specification for the fixed navigation bar in HTML pages.</p>
 <h4>Details</h4>
-<p>The system shall provide a fixed navigation bar in all HTML pages with links to key model artifacts for easy access.</p>
-<p>The navigation bar must include (left to right):</p>
+<p>The system is expected to provide a fixed compact header in all HTML pages with links to the primary Reqvire Explorer surfaces for easy access.</p>
+<p>The Explorer view switcher must include (left to right):</p>
 <ul>
-<li>Containment: Link to containment.html (interactive D3.js tree - main entry point)</li>
+<li>Containment: Link to index.html (interactive D3.js tree - main entry point)</li>
 <li>Model: Link to model.html (model-centric view with nested relations)</li>
 <li>Traces: Link to traces.html (verification upward traceability report)</li>
-<li>Coverage: Link to coverage.html (verification coverage report)</li>
+<li>Ontologies: Link to ontologies.html (ontology and SHACL explorer)</li>
+<li>Knowledge Graph: Link to knowledgegraph.html (actual project element/fact graph)</li>
 </ul>
-<p>The navigation bar must be:</p>
+<p>The fixed header must not expose TraceFlow, Coverage, or Resources as top-level Explorer links. Those pages may still be emitted as supporting export artifacts or generated by their dedicated report commands, but they are not primary HTML Explorer navigation destinations.</p>
+<p>The fixed header must be:</p>
 <ul>
 <li>Always visible (fixed position) while scrolling</li>
 <li>Consistent across all HTML pages</li>
 <li>Clearly visible and accessible</li>
+<li>Compact enough that navigation and footer chrome do not waste graph or document reading space</li>
+<li>Free of generated attribution footers in exported pages</li>
+</ul>
+<p>Primary Explorer pages must not spend first-viewport space on static view titles or explanatory prose. Containment, Model, Knowledge Graph, Traces, and Ontologies view explanations belong in an on-demand help modal opened from the compact header <code>?</code> control. Supporting report artifact pages may keep report-specific headings inside their own report content.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#html-export">HTML Export</a></li>
+</ul>
+<hr />
+<h3 id="local-linked-file-export-refinement-specification">Local Linked File Export Refinement Specification</h3>
+<h4>Details</h4>
+<p>Local linked-file export behavior during HTML export:</p>
+<ul>
+<li>Detect local file references in exported markdown content, including standard markdown links and markdown images.</li>
+<li>Preserve relative linked-file paths in the rendered HTML output.</li>
+<li>Copy referenced local non-markdown files into the exported artifact tree so rendered <code>href</code> and <code>img src</code> targets exist.</li>
+<li>Skip rewriting or copying external URLs, data URLs, anchor-only links, and markdown document links that are exported as HTML pages.</li>
+</ul>
+<p>This keeps exported HTML self-contained enough for local linked assets without changing author-written relative paths.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#local-linked-file-export">Local Linked File Export</a></li>
+</ul>
+<hr />
+<h3 id="model-view-element-navigation-refinement-specification">Model View Element Navigation Refinement Specification</h3>
+<h4>Details</h4>
+<p>Model-view element navigation behavior:</p>
+<ul>
+<li>Element-name headers render as hyperlinks.</li>
+<li>Links target element source file plus fragment identifier.</li>
+<li>Link format: <code>[Element Name](file_path#element-fragment)</code>.</li>
+<li>Navigation enables direct jump from model view to definition.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -504,7 +893,446 @@ Execute all generation commands treating temporary directory as repository root:
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Capabilities.html#html-export">HTML Export</a></li>
+<li>refine: <a href="Capabilities.html#model-view-element-navigation">Model View Element Navigation</a></li>
+</ul>
+<hr />
+<h3 id="model-centric-view-generation-refinement-specification">Model-Centric View Generation Refinement Specification</h3>
+<h4>Details</h4>
+<p>Model-centric view generation behavior:</p>
+<ul>
+<li>Uses model roots selected by default traversal rules as top-level entries.</li>
+<li>Expands relations recursively with full target element details.</li>
+<li>Includes summary metadata for element and relation counts.</li>
+<li>Generates Mermaid diagrams for nested relation structures.</li>
+<li>Sizes each Mermaid diagram after rendering based on its own SVG bounds. Small diagrams shrink to their natural height, while large diagrams receive an independent pan/zoom viewport; pages with many diagrams must not force every diagram, including the last one, into a fixed full-viewport-height panel.</li>
+<li>Loads the Mermaid initializer exactly once per generated page so diagrams are not parsed, mutated, or pan/zoom-initialized twice.</li>
+<li>Produces markdown output that is later rendered as <code>model.html</code>.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#model-centric-view-generation">Model-Centric View Generation</a></li>
+</ul>
+<hr />
+<h3 id="owl-property-metadata-projection-query-contract">OWL Property Metadata Projection Query Contract</h3>
+<p>This query contract defines property-centric authored patterns that the ontology projection subgraph must materialize for domain, range, and property characteristic badges.</p>
+<h4>Query</h4>
+<pre><code class="language-sparql">PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt;
+PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+
+SELECT ?constructKind ?subject ?predicate ?object ?symbol WHERE {
+  {
+    ?subject rdfs:domain ?object .
+    BIND("property-domain" AS ?constructKind)
+    BIND(rdfs:domain AS ?predicate)
+    BIND("" AS ?symbol)
+  }
+  UNION {
+    ?subject rdfs:range ?object .
+    BIND("property-range" AS ?constructKind)
+    BIND(rdfs:range AS ?predicate)
+    BIND("" AS ?symbol)
+  }
+  UNION {
+    VALUES (?object ?constructKind ?symbol) {
+      (owl:FunctionalProperty "functional-property" "U+2192")
+      (owl:InverseFunctionalProperty "inverse-functional-property" "U+2190")
+      (owl:SymmetricProperty "symmetric-property" "U+2194")
+      (owl:AsymmetricProperty "asymmetric-property" "U+21AE")
+      (owl:ReflexiveProperty "reflexive-property" "U+25CB")
+      (owl:IrreflexiveProperty "irreflexive-property" "U+2209")
+      (owl:TransitiveProperty "transitive-property" "U+25B3")
+    }
+    ?subject rdf:type ?object .
+    BIND(rdf:type AS ?predicate)
+  }
+}
+</code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: semantic-query-contract</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#ontology-property-centric-visualization">Ontology Property-Centric Visualization</a></li>
+</ul>
+<hr />
+<h3 id="owl-semantic-ontology-projection-refinement-specification">OWL Semantic Ontology Projection Refinement Specification</h3>
+<h4>Details</h4>
+<p>Semantic projection behavior:</p>
+<ul>
+<li>Classifies resources into semantic node kinds, including OWL/RDFS class, object property, datatype property, RDF property, named individual, SHACL node shape, SHACL property shape, datatype, and generic RDF resource when no stronger kind is known. Literal values are not primary graph nodes; they are subject-owned inspector/search evidence.</li>
+<li>Promotes otherwise-generic named resources to named-individual view nodes when their RDF type evidence references a class declared in the same ontology graph, even when the authored RDF does not explicitly include <code>owl:NamedIndividual</code>.</li>
+<li>Materializes direct-authored OWL/RDFS/SHACL constructs as generated ontology projection facts attached to <code>SemanticIndex</code> before full semantic export or HTML rendering.</li>
+<li>Preserves full IRI, compact label, RDF types, source element identifiers, source file paths, source line numbers, comments, related SHACL constraints, normalized slot/facet evidence, optional raw SHACL evidence, and projection provenance in the HTML explorer model derived from <code>SemanticIndex.ontology_projection</code>.</li>
+<li>Derives SHACL slot/facet records from property-shape blank nodes and attaches them to the target class plus named property metadata as viewer-facing construct evidence. Target class nodes present those records as slots of the class; property usage rows present those records as class-specific usages of the selected property.</li>
+<li>Uses semantic-query-contract refinements as declarative SPARQL pattern contracts for direct-authored construct extraction; the implementation may execute equivalent native Rust projection over parsed quads until a general query execution layer exists.</li>
+<li>Does not emit semantic-query-contract raw query text through ontology collection or <code>--full</code>; generated facts may cite semantic-query-contract IRIs as provenance.</li>
+<li>Separates direct-authored generated facts from inferred facts. Direct-authored facts may drive HTML/export now; inferred facts require a later inference or materialization requirement.</li>
+<li>Suppresses <code>rdf:type</code> edges, OWL/RDFS metaclass nodes such as <code>owl:Class</code>, <code>owl:ObjectProperty</code>, <code>owl:DatatypeProperty</code>, and <code>rdfs:Class</code>, and RDF list plumbing from the primary graph.</li>
+<li>Suppresses anonymous blank nodes from the primary graph unless the blank node represents a meaningful semantic construct such as a property chain, equivalence group, SHACL shape, or collection member.</li>
+<li>Retains unmodeled RDF statements only as inspector/source evidence, not as graph nodes and edges.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#owl-semantic-ontology-projection">OWL Semantic Ontology Projection</a></li>
+</ul>
+<hr />
+<h3 id="ontologies-view-generation-refinement-specification">Ontologies View Generation Refinement Specification</h3>
+<h4>Details</h4>
+<p>Ontologies view generation behavior:</p>
+<ul>
+<li>Uses the semantic index built from graph-registry ontology and semantic-contract elements.</li>
+<li>Displays summary counts for ontology blocks, shape blocks, RDF quads, total blocks, and the <code>ontologies.ttl</code> download action as one compact footer row in the ontology viewer sidebar.</li>
+<li>Builds the browser visualization, search index, and inspector construct metadata from <code>SemanticIndex.ontology_projection</code> facts; raw quads may support labels, comments, RDF type evidence, SHACL constraint display, and generic low-level links, but shall not be a separate authoritative extraction path for OWL/RDFS construct metadata.</li>
+<li>Does not expose the raw RDF triple graph as the primary user-facing ontology visualization.</li>
+<li>Reuses the same generated ontology construct projection that full semantic export emits so <code>ontologies.html</code> is not maintained as a separate HTML-only semantic model.</li>
+<li>Opens directly on the ontology explorer without a separate page header, descriptive preamble, top-level summary-card band, footer, or shared padded content card.</li>
+<li>Uses a dense canvas layout that fills the available viewport below the fixed navigation bar so ontology graph space is prioritized.</li>
+<li>Uses Sigma.js over a Graphology graph with ForceAtlas2 layout for the ontology visualization, matching the project knowledge graph rendering engine while preserving ontology-specific projection and filter semantics. Uses Sigma curved-arrow edge programs and the edge-curve parallel-edge indexer for ontology relationship edges so parallel edges between the same nodes bend apart instead of stacking labels on top of each other.</li>
+<li>Uses an ontology-diagram visual language rather than a raw RDF graph: class-like terms, restrictions, and class expressions render as compact circular or elliptical anchors; object/datatype/RDF properties render as labeled relationship edges and inspector evidence rather than standalone graph nodes; datatype, named-individual, SHACL, and generic resource nodes remain visually distinct; relation edges render as directed ontology-diagram connectors with visible arrowheads. Layout should favor class-centered neighborhoods where property labels stay close to their domain/range class anchors, similar to established ontology diagram viewers.</li>
+<li>Draws relation connectors with subtle arrowheads and muted strokes so direction remains visible without arrows visually overflowing or dominating node labels.</li>
+<li>Styles ontology edges in a WebVOWL-aligned visual grammar while retaining Reqvire colors: property relationships use compact colored label badges on the edge, subclass relationships use plain <code>Subclass of</code> labels, edge labels are anchored on the same curved connector geometry as the rendered Sigma edge, and relation strokes remain dark enough to read against the ontology canvas.</li>
+<li>Renders OWL set-operator/class-expression member links with a dedicated Sigma curved-arrow edge program plus Sigma’s edge-label canvas renderer hook for a visible dashed connector, white diamond start marker, and open arrowhead, matching WebVOWL’s structural set-operator link behavior while preserving the expression kind and members in node labels and inspector evidence.</li>
+<li>Classifies renderable ontology nodes through a single construct-class contract derived from semantic type and projection construct evidence. Restriction and class-expression classification drives glyph rendering, WebVOWL-style visibility filters, construct-only node gating, and focused-neighborhood behavior consistently.</li>
+<li>Renders OWL set-operator/class-expression and restriction nodes as compact glyph-only construct circles using a Sigma-managed construct glyph canvas layer, so union/intersection/complement and restriction expressions read like WebVOWL construct nodes instead of ordinary labeled ontology nodes.</li>
+<li>Shows glyph-only construct circles and white diamond construct markers only for actual OWL anonymous construct nodes, such as <code>owl:unionOf</code>, <code>owl:intersectionOf</code>, <code>owl:complementOf</code>, and <code>owl:Restriction</code>, when the corresponding <code>Class expressions</code> or <code>Restrictions</code> visibility control allows them and the focused edge visibility rules make their neighborhood visible.</li>
+<li>Uses <code>@sigma/edge-curve</code>’s curved-label renderer for non-property construct labels so labels follow the same curve geometry as the Sigma edge program.</li>
+<li>Renders subclass connectors with WebVOWL-style dotted/open-arrow visual treatment while keeping the readable <code>Subclass of</code> label anchored on the connector.</li>
+<li>Keeps generic SHACL overlay relationship labels off the graph canvas because the overlay line and inspector evidence are sufficient; only more specific ontology/SHACL relation labels should render as edge text.</li>
+<li>Uses Sigma’s default node-label and hover rendering for ordinary ontology node labels. Normal graph labels may be density-truncated, but the selected or hovered ordinary ontology node label shall switch to the full term label; glyph-only construct nodes remain unlabeled and show their semantic symbol through the construct glyph canvas layer.</li>
+<li>Hides ontology relationship edges in the default full-graph view to avoid a hairball, matching the Knowledge Graph behavior. On node hover or click selection, shows only ontology edges directly incident to the focused node set; active property/construct filters determine which focused edges are eligible to appear.</li>
+<li>Enables Sigma z-index rendering and a Sigma-managed focus overlay canvas so the hovered or selected ontology focus neighborhood is redrawn above unselected nodes and edges, including cases where normal Sigma edge layers would otherwise sit below unrelated node layers.</li>
+<li>Sizes circular class anchors by graph connection degree within bounded minimum and maximum sizes so highly connected ontology concepts read as stronger anchors without making low-degree concepts unreadable or letting label length dominate circle size.</li>
+<li>Uses a muted ontology-diagram palette: blue class anchors, muted property link labels and property inspector badges, yellow datatype leaves, purple named individuals, and red SHACL shapes, with the graph canvas using a low-contrast gray-green background.</li>
+<li>Allocates a right inspector/sidebar wide enough for source links and long identifiers, and confines overflowing inspector content to an internal sidebar scroll area rather than scrolling the whole page.</li>
+<li>Does not render a raw Turtle/source-block list in <code>ontologies.html</code>.</li>
+<li>Preserves source element identifier, source name, file path, line number, and block kind as inspector/search evidence.</li>
+<li>Renders source citations in the inspector as links to the exported source HTML page and element fragment.</li>
+<li>Provides the exported <code>ontologies.ttl</code> download link only in the compact sidebar footer so the top of the sidebar remains available for search and inspection.</li>
+<li>Colors rendered nodes by semantic role rather than by provenance. Classes, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic RDF resources each use distinct legend swatches and graph colors, while object/datatype/RDF property kinds remain visible through property link labels, inspector badges, and search metadata instead of graph-node fill colors.</li>
+<li>Treats a named IRI with <code>rdf:type</code> pointing to a declared ontology class as a named individual for node color, search badge, and inspector kind when the node has no stronger semantic role such as class, property, shape, datatype, restriction, or class expression. The <code>rdf:type</code> statement remains represented as membership construct evidence rather than as a generic RDF edge.</li>
+<li>Reserves SHACL colors for actual SHACL node shapes and property shapes. SHACL references to ontology terms remain evidence on the referenced term and do not recolor classes, individuals, datatypes, restrictions, class expressions, or property metadata as SHACL shapes.</li>
+<li>Keeps SHACL references to ontology terms as source/construct evidence without recoloring the referenced ontology class or property metadata as a SHACL shape.</li>
+<li>Treats built-in vocabulary references from XSD, RDF, RDFS, OWL, and SHACL namespaces as external references. External references remain available for datatype/range audit, but they are hidden by default to prevent built-in terms such as <code>xsd:string</code> from cluttering the primary ontology map.</li>
+<li>Does not render literal values as primary graph nodes or as a visibility filter layer. Literal object values from datatype properties remain searchable and are shown in the inspector as predicate/value evidence owned by the selected subject node.</li>
+<li>Labels class-expression nodes with their property usage context when the expression is used as a property domain or range, for example <code>refine range: Capability ∪ Requirement</code>, so OWL domain/range constraints do not look like authored Reqvire model relations.</li>
+<li>Derives class and property slot facets from SHACL node shapes by combining <code>sh:targetClass</code>, <code>sh:property</code>, <code>sh:path</code>, <code>sh:datatype</code>, <code>sh:class</code>, <code>sh:nodeKind</code>, <code>sh:minCount</code>, <code>sh:maxCount</code>, <code>sh:pattern</code>, and <code>sh:in</code>. The target class inspector shall show those slots and facets directly, with source-shape evidence, without requiring users to inspect the shape node first.</li>
+<li>Attaches SHACL-derived slot facets to the named property metadata as well when the <code>sh:path</code> value is a named property already present in the graph model. On a selected class or term, those records represent property usages as slots; they must be labeled as property usages rather than as duplicate property definitions.</li>
+</ul>
+<p>Interaction behavior:</p>
+<ul>
+<li>Provides search over ontology labels, IRIs, semantic kinds, source elements, and SHACL constraint terms.</li>
+<li>Provides node or construct focus, neighbor highlighting, and an inspector for full IRI, semantic kind, RDF type evidence, comments, datatype-property literal values, source citations, property usages, domain/range, property characteristics, equivalence membership, inverse relationships, property chains, normalized SHACL-derived slots/facets, and optional raw SHACL evidence.</li>
+<li>Treats graph visibility controls as canvas-only controls. Role filters and WebVOWL-style visibility toggles shall not remove facts, properties, badges, SHACL facets, constructs, or source evidence from the right inspector pane for the selected node.</li>
+<li>Shows raw SHACL evidence only when direct raw constraints are attached to the inspected node. Class and property nodes that only receive normalized SHACL overlays must not show an empty raw-evidence section, and normalized slots/facets remain the primary readable representation of those SHACL overlays.</li>
+<li>Provides grouped semantic node role controls and a <code>Constructs</code> visibility group for WebVOWL-style toggles covering datatype properties, object properties, class membership, class disjointness, restrictions, class expressions, and SHACL slot overlays. For these visibility toggles, checked means shown on the canvas. Equivalence, inverse properties, property chains, and property characteristics remain passive notation/inspector evidence until they have a direct canvas-visible representation.</li>
+<li>Preserves interactive graph manipulation while filtering, focusing, panning, zooming, and resizing; filtering shall not reset the current camera, focusing shall center the selected node, and reset shall rerun the ForceAtlas2 layout without losing ontology-diagram visual conventions.</li>
+<li>Provides a compact passive color key for detailed semantic node roles and separate filter controls for visibility layers.</li>
+<li>Keeps Reqvire’s richer passive type and construct legends available alongside the WebVOWL-style visibility controls, because Reqvire exposes additional semantic constructs beyond class disjointness and set operators.</li>
+<li>Treats only filter-control entries as selectable filter-in controls in the interactive viewer. The default filter state shall open as a readable authored ontology map: ontology terms, datatype-property links, object-property links, class-membership edges, and SHACL slot overlays are checked; relationship edges remain hidden until hover or selection focus; SHACL shapes, generic resources/individuals, disjointness, restrictions, class expressions, and external references are opt-in.</li>
+<li>Uses shared warm-neutral active filter controls, search-result hover rows, inspector headers, and generic evidence cards so filter and selection state reads as part of the explorer theme rather than as unrelated gray-green or blue UI chrome.</li>
+<li>Keeps detailed type-color entries passive so users do not have to treat every color swatch as a visibility control.</li>
+<li>Supports multi-select grouped role filters for ontology terms, SHACL shapes, generic RDF resources, and external vocabulary references. Property links are controlled by the datatype-property and object-property visibility filters. Detailed semantic types remain visible through color, inspector kind, and search badges.</li>
+<li>Keeps the external-reference role filter available but inactive by default; enabling it shows built-in vocabulary nodes used by datatype constraints, ranges, and other audit-oriented constructs.</li>
+<li>Presents domain/range, subclass, membership, disjointness, equivalence, inverse, property chain, property characteristic, restriction, class-expression, and SHACL-overlay constructs in a passive <code>Notation</code> legend rather than as a second active construct-filter panel.</li>
+<li>Treats relation styling as passive visual notation, not as an independent filter layer. WebVOWL-style visibility controls determine which clutter categories are shown, such as class membership, disjointness, restrictions, class expressions, and SHACL slot overlays.</li>
+<li>Applies WebVOWL-style visibility controls to construct-specific edges, construct-only nodes, and graph node badges without making nodes visible when their role filter is disabled. The right inspector pane remains an unfiltered evidence view for the selected node.</li>
+<li>Does not expose or render graph-registry provenance or generated-projection provenance as graph-wide visual layers. Registry/projection provenance remains inspector and export evidence, not a visual layer selector and not a reason to add otherwise non-semantic debug nodes to the primary graph.</li>
+<li>Treats construct-only visual nodes, including generated restriction and class-expression nodes, as semantic construct nodes controlled by their upper construct filter rather than by a separate provenance filter.</li>
+<li>Combines active filters predictably on the canvas: role filters are hard gates for authored node/resource visibility, and unchecked WebVOWL-style visibility toggles remove their named clutter categories from property links, edges, construct-only nodes, and graph badges.</li>
+<li>Keeps filtered-out canvas nodes, edges, and graph badges visually suppressed or hidden without clearing or narrowing the current inspector selection.</li>
+<li>Applies directional subclass and membership badges only to the subject side of the construct; superclass and class-object nodes must not display <code>⊆</code> or <code>∈</code> merely because another node points to them.</li>
+<li>Keeps raw Turtle content available through <code>ontologies.ttl</code> instead of duplicating the serialized text in the HTML viewer.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#ontologies-view-generation">Ontologies View Generation</a></li>
+</ul>
+<hr />
+<h3 id="ontology-construct-grouping-refinement-specification">Ontology Construct Grouping Refinement Specification</h3>
+<h4>Details</h4>
+<p>OWL construct grouping behavior:</p>
+<ul>
+<li>Computes equivalence groups for <code>owl:equivalentClass</code>, <code>owl:equivalentProperty</code>, and <code>owl:sameAs</code> using deterministic connected components over the equivalent resources.</li>
+<li>Assigns each equivalence group a stable identifier derived from a canonical sorted member list rather than a random UUID.</li>
+<li>Renders equivalence groups as collapsible group nodes or grouped regions so users can inspect group membership without requiring pairwise equivalence edges to dominate the graph.</li>
+<li>Represents <code>owl:inverseOf</code> as inverse property metadata with clear visual treatment where applicable and inspector evidence.</li>
+<li>Parses <code>owl:propertyChainAxiom</code> RDF lists into ordered chain members and attaches the ordered chain to the defining object property.</li>
+<li>Renders property chains as collapsible ordered chain constructs, preserving the member order from the RDF list.</li>
+<li>Allows an object property to participate in multiple property chains without duplicating graph nodes for the property.</li>
+<li>Presents SHACL node shapes and property shapes as an overlay on referenced ontology terms and as inspector constraints, not as raw blank-node plumbing mixed with the ontology model.</li>
+<li>Presents anonymous OWL class-expression blank nodes such as <code>owl:unionOf</code>, <code>owl:intersectionOf</code>, and <code>owl:complementOf</code> as structural inspector constructs with expression kind, ordered members, and usage context. Raw blank-node identifiers are available only in collapsible raw details.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#ontology-construct-grouping">Ontology Construct Grouping</a></li>
+</ul>
+<hr />
+<h3 id="ontology-property-centric-visualization-refinement-specification">Ontology Property-Centric Visualization Refinement Specification</h3>
+<h4>Details</h4>
+<p>Property-centric visualization behavior:</p>
+<ul>
+<li>Renders object properties and datatype properties as first-class property semantics: labeled domain/range links in the graph plus property usage rows in the inspector, not standalone property nodes.</li>
+<li>Aggregates all <code>rdfs:domain</code> classes and all <code>rdfs:range</code> classes or datatypes for each property.</li>
+<li>Renders one deduplicated labeled relationship for each meaningful domain/range pair so that one property with many domains or ranges does not become a cluttered duplicate subgraph.</li>
+<li>Keeps property detail, including full URI, semantic kind, domain/range terms, inverse/equivalence/chain evidence, characteristics, source citations, and SHACL slot facets, in the inspector for selected classes, individuals, and terms.</li>
+<li>Distinguishes object-property ranges that point to classes from datatype-property ranges that point to datatypes or literal constraints.</li>
+<li>Shows property characteristics as compact badges or inspector attributes instead of overloading the primary label by default.</li>
+<li>Shows SHACL-derived slot facets on target classes and property usage rows, including datatype/class range constraints, node kind, min/max cardinality, pattern constraints, allowed values, and source shape.</li>
+<li>Recognizes OWL property characteristic types including functional, inverse functional, transitive, symmetric, asymmetric, reflexive, and irreflexive properties.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#ontology-property-centric-visualization">Ontology Property-Centric Visualization</a></li>
+</ul>
+<hr />
+<h3 id="ontology-symbol-and-badge-vocabulary-refinement-specification">Ontology Symbol and Badge Vocabulary Refinement Specification</h3>
+<h4>Details</h4>
+<p>The ontology viewer symbol vocabulary defines canonical rendered symbols for OWL and set-theoretic concepts. The viewer shall render the <code>Rendered Unicode Character</code> value for visual badges and shall keep the <code>Raw Unicode</code> code point available in source/specification evidence.</p>
+<p>Symbols shall:</p>
+<ul>
+<li>Appear only in approved viewer locations listed in the table.</li>
+<li>Have tooltip text and inspector text that names the semantic concept.</li>
+<li>Have accessible labels when rendered in interactive controls, badges, edges, or group headers.</li>
+<li>Supplement normal labels; labels such as property names and class names shall remain searchable without symbol prefixes.</li>
+<li>Keep raw Unicode code points in source/specification evidence and semantic data; do not render raw code points as visible badge text in the ontology inspector.</li>
+<li>Prefer domain labels such as <code>Subclass</code> over low-level set-theory labels such as <code>Subset or equal</code> when rendering visible ontology badges.</li>
+<li>Use font fallbacks that can render mathematical and arrow symbols consistently.</li>
+</ul>
+<table><thead><tr><th>Concept</th><th>Raw Unicode</th><th>Rendered Unicode Character</th><th>Viewer Usage</th><th>Tooltip / Accessible Label</th></tr></thead><tbody>
+<tr><td>Disjointness</td><td>U+27C2</td><td>⟂</td><td>Class expression badge, construct group</td><td>Disjointness</td></tr>
+<tr><td>Logical AND / Set Intersection</td><td>U+2229</td><td>∩</td><td>Class expression badge, construct group</td><td>Intersection</td></tr>
+<tr><td>Logical OR / Set Union</td><td>U+222A</td><td>∪</td><td>Class expression badge, construct group</td><td>Union</td></tr>
+<tr><td>Logical Implication</td><td>U+21D2</td><td>⇒</td><td>Rule or implication edge label</td><td>Implies</td></tr>
+<tr><td>Logical Equivalence</td><td>U+21D4</td><td>⇔</td><td>Equivalence edge label, equivalence group header</td><td>Equivalent</td></tr>
+<tr><td>Universal Quantifier</td><td>U+2200</td><td>∀</td><td>Restriction badge, inspector field</td><td>Universal restriction</td></tr>
+<tr><td>Existential Quantifier</td><td>U+2203</td><td>∃</td><td>Restriction badge, inspector field</td><td>Existential restriction</td></tr>
+<tr><td>Set Membership</td><td>U+2208</td><td>∈</td><td>Inspector field, class membership edge label</td><td>Member of</td></tr>
+<tr><td>Set Non-Membership</td><td>U+2209</td><td>∉</td><td>Inspector field, class exclusion edge label</td><td>Not member of</td></tr>
+<tr><td>Set Inclusion</td><td>U+2286</td><td>⊆</td><td>Subclass or inclusion badge</td><td>Subset or equal</td></tr>
+<tr><td>Proper Subset</td><td>U+2282</td><td>⊂</td><td>Strict inclusion badge</td><td>Proper subset</td></tr>
+<tr><td>Set Difference</td><td>U+2216</td><td>∖</td><td>Class expression badge</td><td>Set difference</td></tr>
+<tr><td>Symmetric Relation</td><td>U+2194</td><td>↔</td><td>Property characteristic badge</td><td>Symmetric property</td></tr>
+<tr><td>Inverse Relation</td><td>U+27F2</td><td>⟲</td><td>Inverse property edge label, property badge</td><td>Inverse property</td></tr>
+<tr><td>Reflexive Relation</td><td>U+25CB</td><td>○</td><td>Property characteristic badge</td><td>Reflexive property</td></tr>
+<tr><td>Transitive Relation</td><td>U+25B3</td><td>△</td><td>Property characteristic badge</td><td>Transitive property</td></tr>
+<tr><td>Antisymmetric / Asymmetric Relation</td><td>U+21AE</td><td>↮</td><td>Property characteristic badge</td><td>Asymmetric property</td></tr>
+<tr><td>Inverse Functional</td><td>U+2190</td><td>←</td><td>Property characteristic badge</td><td>Inverse functional property</td></tr>
+<tr><td>Functional</td><td>U+2192</td><td>→</td><td>Property characteristic badge</td><td>Functional property</td></tr>
+</tbody></table>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#ontology-symbol-and-badge-vocabulary">Ontology Symbol and Badge Vocabulary</a></li>
+</ul>
+<hr />
+<h3 id="project-knowledge-graph-view-refinement-specification">Project Knowledge Graph View Refinement Specification</h3>
+<h4>Details</h4>
+<p>Project knowledge graph view generation behavior:</p>
+<ul>
+<li>Uses the parsed <code>GraphRegistry</code> after validation and opposite-relation propagation so the view reflects the actual current model state.</li>
+<li>Emits <code>knowledgegraph.html</code> as a primary Explorer page during export and serve workflows.</li>
+<li>Builds graph nodes from actual Reqvire elements and resource targets, not from raw RDF triples or ontology vocabulary definitions.</li>
+<li>Builds graph edges from actual relation facts, attachment facts, and concept-reference facts. User-authored and generated opposite relation facts shall remain distinguishable as evidence in the graph data and inspector.</li>
+<li>Emits Reqvire root submodel metadata alongside graph nodes and edges so Knowledge Graph variants can align visual subgraphs with the same capability-rooted submodel boundaries reported by the <code>submodels</code> command.</li>
+<li>Classifies element nodes into four primary system-model layers: ontology definitions, capabilities, requirements, and verifications. Requirement-owned refinements are subordinate requirement detail/contract nodes, not an additional system-model layer. Custom/other elements and resource targets are supporting project-fact nodes, not additional model layers.</li>
+<li>Separates system-model layer membership from relation semantics. Layer membership controls node role color and filtering; relation semantics control whether an edge is structural (<code>derive</code>, <code>specify</code>, <code>refine</code>) or an overlay/evidence fact (<code>attach</code>, <code>satisfiedBy</code>, <code>verifiedBy</code>, <code>trace</code>, concept reference, file target, or external target).</li>
+<li>Shows file-path and external URL targets as resource nodes only when actual project facts reference them.</li>
+<li>Treats ontology IRI concept-reference targets like attachment/resource targets in the main Knowledge Graph instead of exposing a separate concept-reference node category; detailed OWL/RDFS/SHACL vocabulary exploration remains the responsibility of the Ontologies view.</li>
+<li>Provides search over element names, identifiers, file paths, relation facts, attachment facts, governance, metadata, and concept references.</li>
+<li>Treats KN2/Cytoscape as an exploratory renderer over the same Knowledge Graph data. Its default structural layout and cluster coloring shall use Reqvire ownership hierarchy relations (<code>derive</code>, <code>specify</code>, and <code>refine</code>) seeded from exported root submodels. Attachments, concept references, verification/satisfaction, and trace facts shall be optional overlays and shall not participate in submodel layout or cluster detection.</li>
+<li>Preserves the four-layer model when overlays are enabled: ontology attachments, requirement-owned refinement details/contracts, verification evidence, satisfaction evidence, and trace links may connect across layers or subordinate nodes, but they must not imply a new layer or a new capability-root submodel boundary.</li>
+<li>Renders search results with the same role-color swatch used by the graph and legend, and omits redundant parenthesized type suffixes so result lists remain scan-friendly.</li>
+<li>Centers the graph viewport on a node selected from search or direct graph click.</li>
+<li>Provides a right-side inspector with element type, identifier, source file/line link, description, governance, metadata, incoming facts, outgoing facts, attachments, and concept references.</li>
+<li>Renders long inspector fields such as element identifiers and source paths as stacked label/value field rows so labels do not consume horizontal space from long values.</li>
+<li>Colors the inspector kind badge with the same role color used by the graph node and legend entry so node type recognition is consistent across graph and inspector.</li>
+<li>Uses a dense full-height WebGL graph canvas, compact left filter panel, and scroll-contained inspector sidebar so graph space is prioritized.</li>
+<li>Uses the same explorer surface language as the Ontologies view: gray canvas, off-white sidebar, compact translucent left legend, shared search/header/footer rhythm, and matching muted control colors. The left legend background, active filter controls, search-result hover rows, inspector headers, and generic evidence cards must use shared warm-neutral surface tokens rather than gray-green or blue-tinted selection fills.</li>
+<li>Opens in a readable project-element default state: core element roles are visible, while file-path and external-URL resource targets are opt-in through the left filter because resource leaves can dominate dense project graphs.</li>
+<li>Renders with Sigma.js over a Graphology graph so the project fact graph uses WebGL rendering rather than SVG.</li>
+<li>Uses Sigma 3 default node-label and hover rendering for project fact graph labels, without a custom node-label canvas renderer or disabled hover renderer. Normal graph labels may be density-truncated, but the selected or hovered node label shall switch to the full element label.</li>
+<li>Uses Graphology ForceAtlas2 with size-aware settings, Barnes-Hut optimization, deterministic initial positions, and a fallback diagnostic if renderer initialization fails.</li>
+<li>Preserves Sigma pan/zoom, search, filters, click inspection, and relation topology while treating resource targets as opt-in visual noise controls.</li>
+<li>Keeps attachments/concept references, verification/satisfaction, and trace as opt-in overlay edge groups in the main Knowledge Graph renderer; those overlay facts may appear during focused exploration but must not drive initial layout partitioning.</li>
+<li>Hides relation edges in the default full-graph view to avoid a hairball. On node hover or click selection, shows only relation edges directly incident to the focused node, keeps the focused node and directly connected neighbors visually prominent, and fades unconnected nodes to low visual strength without changing active filters or graph data. The dimmed color shall be computed as a 20% original-node-color blend over the graph canvas background rather than by passing WebGL-sensitive alpha color strings to Sigma. A clicked node remains the pinned focus after pointer rollout; clicking empty graph space clears the pinned focus and returns to the default edge-hidden view.</li>
+<li>Supports additive focus exploration: when a node is clicked, its direct neighborhood remains pinned; hovering another visible node, including a neighbor selected by the clicked focus, temporarily adds that hovered node’s direct neighborhood and incident edges to the visible focus set without clearing the clicked focus.</li>
+<li>Does not use renderer glow/highlight effects for selection; selection is communicated through pinned focus, forced label visibility, direct incident edges, and alpha fading of unrelated nodes.</li>
+<li>Draws relation facts in the same canonical directions used by Mermaid diagrams: <code>derive</code>, <code>specifiedBy</code>, <code>satisfiedBy</code>, <code>refinedBy</code>, <code>verifiedBy</code>, and <code>trace</code>. Opposite propagated facts such as <code>derivedFrom</code>, <code>specify</code>, <code>satisfy</code>, <code>refine</code>, and <code>verify</code> shall be reversed and deduplicated into the canonical visual edge rather than rendered as duplicate parallel relations.</li>
+<li>Owns its viewport sizing directly and includes a browser-side sizing fallback so the WebGL graph remains visible even when the shared export wrapper does not provide a resolved parent height.</li>
+<li>Emits graph data with source and target identifiers that all resolve to exported graph nodes so Graphology edge insertion cannot fail before drawing.</li>
+<li>Uses one saturated role color contract across the Knowledge Graph legend, graph nodes, search swatches, and inspector kind badges: capability <code>#1976D2</code>, requirement/refinement <code>#673AB7</code>, verification <code>#4CAF50</code>, ontology <code>#B08A00</code>, resource <code>#FFCA28</code>, and other/default <code>#424242</code>.</li>
+<li>Uses darker role borders only as subtle accents so legend entries, graph nodes, search result swatches, and inspector badges read as one consistent visual system instead of mixing pastel controls with saturated graph nodes.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#project-knowledge-graph-view">Project Knowledge Graph View</a></li>
+</ul>
+<hr />
+<h3 id="rdf-list-owl-construct-projection-query-contract">RDF List OWL Construct Projection Query Contract</h3>
+<p>This query contract defines authored RDF-list constructs that the ontology projection subgraph must materialize for intersections, unions, and property chains. The native projector shall preserve list order when creating generated projection facts.</p>
+<h4>Query</h4>
+<pre><code class="language-sparql">PREFIX rdf: &lt;http://www.w3.org/1999/02/22-rdf-syntax-ns#&gt;
+PREFIX owl: &lt;http://www.w3.org/2002/07/owl#&gt;
+
+SELECT ?constructKind ?subject ?predicate ?list ?member ?symbol WHERE {
+  {
+    ?subject owl:intersectionOf ?list .
+    ?list rdf:rest*/rdf:first ?member .
+    BIND("intersection" AS ?constructKind)
+    BIND(owl:intersectionOf AS ?predicate)
+    BIND("U+2229" AS ?symbol)
+  }
+  UNION {
+    ?subject owl:unionOf ?list .
+    ?list rdf:rest*/rdf:first ?member .
+    BIND("union" AS ?constructKind)
+    BIND(owl:unionOf AS ?predicate)
+    BIND("U+222A" AS ?symbol)
+  }
+  UNION {
+    ?subject owl:propertyChainAxiom ?list .
+    ?list rdf:rest*/rdf:first ?member .
+    BIND("property-chain" AS ?constructKind)
+    BIND(owl:propertyChainAxiom AS ?predicate)
+    BIND("U+21D2" AS ?symbol)
+  }
+}
+</code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: semantic-query-contract</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#owl-semantic-ontology-projection">OWL Semantic Ontology Projection</a></li>
+</ul>
+<hr />
+<h3 id="responsive-html-generation-refinement-specification">Responsive HTML Generation Refinement Specification</h3>
+<h4>Details</h4>
+<p>Responsive HTML behavior:</p>
+<ul>
+<li>Supports viewport widths from 320px (mobile) through 1920px+ (desktop).</li>
+<li>Uses mobile-first CSS with progressive enhancement.</li>
+<li>Keeps the compact fixed Explorer view switcher usable on narrow viewports without exposing report-only pages as primary navigation.</li>
+<li>Scales typography and spacing by responsive breakpoints.</li>
+</ul>
+<p>Breakpoints:</p>
+<ul>
+<li><code>sm</code>: 640px and up.</li>
+<li><code>md</code>: 768px and up.</li>
+<li><code>lg</code>: 1024px and up.</li>
+<li><code>xl</code>: 1280px and up.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="HTMLGeneration.html#responsive-html-generation">Responsive HTML Generation</a></li>
+</ul>
+<hr />
+<h3 id="serve-command-refinement-specification">Serve Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Serve command behavior:</p>
+<ul>
+<li>Accept <code>--host &lt;HOST&gt;</code> option to specify the bind address (default: localhost)</li>
+<li>Accept <code>--port &lt;PORT&gt;</code> option to specify the server port (default: 8080)</li>
+<li>Use a random temporary directory for HTML export</li>
+<li>Run HTML Export to generate complete documentation in the temporary directory</li>
+<li>Start an HTTP server serving static files from the temporary directory</li>
+<li>Display clickable server URL for user to open in browser</li>
+<li>Display instructions to press Ctrl-C to stop server</li>
+<li>Continue serving until terminated by the user (Ctrl-C)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Capabilities.html#serve-command">Serve Command</a></li>
+</ul>
+<hr />
+<h3 id="type-safe-html-generation-refinement-specification">Type-Safe HTML Generation Refinement Specification</h3>
+<h4>Details</h4>
+<p>Type-safe HTML generation behavior:</p>
+<ul>
+<li>Uses <code>maud</code> macros for compile-time HTML generation.</li>
+<li>Relies on Rust type checks to validate structure during compilation.</li>
+<li>Prevents malformed tags, unclosed nodes, and invalid nesting.</li>
+<li>Produces well-formed HTML5 output for generated pages.</li>
+</ul>
+<p>This shifts most structural HTML errors to compile time instead of runtime.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="HTMLGeneration.html#type-safe-html-generation">Type-Safe HTML Generation</a></li>
+</ul>
+<hr />
+<h3 id="web-interface-refinement-specification">Web Interface Refinement Specification</h3>
+<h4>Details</h4>
+<p>The browse interface allows users to:</p>
+<ul>
+<li>View HTML-rendered specifications and requirements</li>
+<li>Navigate through diagrams and visualizations</li>
+<li>Access verification traces and coverage reports</li>
+<li>Explore the complete model structure through an integrated web interface</li>
+</ul>
+<p>This capability enables both human users (via browser) and AI agents (via MCP server) to efficiently explore and understand the System model without manually navigating file structures.</p>
+<p>All generated HTML content is expected to produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.</p>
+<p>The system is expected to ensure deterministic HTML output by:</p>
+<ul>
+<li>Sorting elements by identifier before rendering</li>
+<li>Sorting relations by type and target identifier</li>
+<li>Maintaining consistent navigation and page ordering</li>
+<li>Generating stable diagram node and relation ordering</li>
+</ul>
+<p>This determinism ensures that:</p>
+<ul>
+<li>Running HTML generation multiple times produces byte-identical output</li>
+<li>Version control diffs reflect actual content changes</li>
+<li>Continuous integration pipelines produce reproducible results</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../Interfaces.html#web-interface">Web Interface</a></li>
 </ul>
 <hr />
 <h3 id="web-interface-style-specification">Web Interface Style Specification</h3>
@@ -512,7 +1340,8 @@ Execute all generation commands treating temporary directory as repository root:
 <h4>Details</h4>
 <p><strong>Page Layout:</strong></p>
 <ul>
-<li>Navigation bar at top with links to views</li>
+<li>Compact fixed header at top with the primary Explorer view switcher</li>
+<li>Optional on-demand help modal for the current view</li>
 <li>Content area with responsive width</li>
 <li>Sidebar for element tree (optional)</li>
 </ul>
@@ -529,14 +1358,19 @@ The web interface uses a monochrome grayscale theme for consistent, professional
 <tr><td>Navigation hover</td><td>#2a2a2a</td><td>Subtle highlight on hover</td></tr>
 <tr><td>Primary/Buttons</td><td>#333333</td><td>Lighter gray for interactive elements</td></tr>
 <tr><td>Primary hover</td><td>#4a4a4a</td><td>Button hover state</td></tr>
-<tr><td>Page background</td><td>#FAFAFA</td><td>Light gray page background</td></tr>
+<tr><td>Page background</td><td>#ececea</td><td>Warm neutral application background</td></tr>
 <tr><td>Content background</td><td>#FFFFFF</td><td>White content cards</td></tr>
 <tr><td>Text primary</td><td>#212121</td><td>Dark gray for headings</td></tr>
 <tr><td>Text secondary</td><td>#424242</td><td>Medium gray for body text</td></tr>
 <tr><td>Text muted</td><td>#757575</td><td>Light gray for secondary info</td></tr>
 <tr><td>Links</td><td>#4a4a4a</td><td>Grayscale links</td></tr>
 <tr><td>Borders</td><td>#EEEEEE</td><td>Light borders</td></tr>
-<tr><td>Highlight</td><td>#d0d0d0</td><td>Selection/highlight color</td></tr>
+<tr><td>Surface card</td><td>#f7f7f4</td><td>Explorer sidebar/card surface</td></tr>
+<tr><td>Surface muted</td><td>#f1efe9</td><td>Generic inspector evidence field background</td></tr>
+<tr><td>Surface hover</td><td>#e8e4da</td><td>Search-result and control hover state</td></tr>
+<tr><td>Surface active</td><td>#ddd6c7</td><td>Active/selected control state</td></tr>
+<tr><td>Surface border</td><td>#c7c1b7</td><td>Border for muted/active explorer surfaces</td></tr>
+<tr><td>Highlight</td><td>#ddd6c7</td><td>Selection/highlight color</td></tr>
 </tbody></table>
 <p><strong>Element Cards:</strong></p>
 <table><thead><tr><th>Element Type</th><th>Border Color</th><th>Background</th></tr></thead><tbody>
@@ -552,6 +1386,7 @@ The web interface uses a monochrome grayscale theme for consistent, professional
 <li>Breadcrumb trail for element hierarchy</li>
 <li>Clickable relation links</li>
 <li>Collapsible sections for long content</li>
+<li>No generated footer attribution in exported Explorer pages</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -559,7 +1394,7 @@ The web interface uses a monochrome grayscale theme for consistent, professional
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Capabilities.html#html-export">HTML Export</a></li>
+<li>refine: <a href="Capabilities.html#html-export">HTML Export</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -608,7 +1443,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -617,10 +1453,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -633,7 +1472,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -651,6 +1490,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1043,9 +1887,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

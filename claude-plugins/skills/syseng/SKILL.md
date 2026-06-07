@@ -46,8 +46,8 @@ Version policy:
 | Capabilities | `capability` | Coherent operational, product, business, regulatory, or system ability that bridges ontology, requirements, and verification |
 | Requirements | `requirement` | Implementable system obligations (functional, performance, interface, compliance) |
 | Ontology | `ontology` | First-class OWL/Turtle vocabulary and semantic model terms reusable by capabilities and requirements |
-| Refinements | `source` | External need, regulation, policy, or source material owned by a capability |
-| | `specification` | Detailed definitions refining a capability or requirement |
+| Refinements | `source` | External need, regulation, policy, or source material owned by a requirement |
+| | `specification` | Detailed definitions refining a requirement |
 | | `constraint` | Limits and boundaries on system behavior |
 | | `behavior` | How the system behaves in specific conditions |
 | | `state` | Lifecycle states, state machines, transitions, and state-dependent contracts |
@@ -73,7 +73,7 @@ A capability answers:
 
 A capability is not a weaker requirement, UI screen, deployment artifact, code module, ticket/task, or low-level implementation detail. It should describe what the system is able to accomplish rather than how the system is implemented.
 
-Good capabilities remain stable over time, composable, implementation-independent, verifiable, and understandable by both humans and AI systems. They may be decomposed into child capabilities, own compatible refinements, attach ontology, be specified by requirements, and be directly verified. They are not directly satisfied; implementation coverage rolls up from requirements that specify them.
+Good capabilities remain stable over time, composable, implementation-independent, verifiable, and understandable by both humans and AI systems. They may be decomposed into child capabilities, attach ontology, be specified by requirements, and be directly verified. They are not directly satisfied and do not own refinements; implementation coverage rolls up from requirements that specify them.
 
 File names do not define Reqvire element semantics. Existing project-local paths such as `*Feature.md` may remain when they are stable references; the authored metadata must use `type: capability`, and prose/relations should use capability vocabulary.
 
@@ -101,7 +101,7 @@ Use a `semantic-query-contract` when one requirement needs to record a declarati
 
 Use `#### Concept References` when readable prose should bind human labels to ontology terms without filling the requirement text with CURIEs. The referenced IRI or CURIE must be declared by reachable ontology context.
 
-Cleanup rule: ontology should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible `specification`, `behavior`, `state`, and `input-output` refinements owned by the relevant capability or requirement. Requirement-owned `semantic-contract` and `semantic-query-contract` refinements capture requirement-specific semantic checks.
+Cleanup rule: ontology should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Requirement-owned `semantic-contract` and `semantic-query-contract` refinements capture requirement-specific semantic checks.
 
 Use a `requirement` when the statement says what the system must do, especially when it naturally reads as `The system shall...`.
 
@@ -114,7 +114,7 @@ When constructing or refactoring a Reqvire system model:
 3. Keep ontology elements in `requirements/Ontologies`; capabilities attach ontology from there instead of nesting ontology in capability files.
 4. Treat ontology as first-class and orthogonal to capability/requirement structure: ontology defines reusable terms and relationships; capabilities attach ontology so child capabilities and specifying requirements inherit it through the owning capability path.
 5. Keep hierarchy inside capability, requirement, or ontology families; cross-root reuse must be explicit attachments.
-6. Move stable reusable meaning to ontology; keep obligations in requirements and exact implementation/interface behavior in capability-owned or requirement-owned refinements.
+6. Move stable reusable meaning to ontology; keep obligations in requirements and exact implementation/interface behavior in requirement-owned refinements.
 7. Attach ontology to the consuming capability, or attach reusable requirement-owned contracts to consuming requirements, instead of using hierarchy to cross submodel boundaries.
 8. Update verifications and e2e fixtures in the same slice when requirements, report shape, names, or output expectations change.
 9. Validate in slices with `validate`, `lint`, `submodels`, and focused tests before broadening the refactor.
@@ -149,7 +149,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 | `specify` / `specifiedBy` | `requirement` / `capability` | Bridge from requirements to their owning capability |
 | `satisfiedBy` / `satisfy` | `requirement`, `test-verification`, `formal-proof-verification` only | Link to implementation or evidence artifacts |
 | `verifiedBy` / `verify` | `capability`, `requirement` / verification element | Link capabilities and requirements to verification elements |
-| `refinedBy` / `refine` | `capability`, `requirement` | Ownership of subtype-compatible refinement elements |
+| `refinedBy` / `refine` | `requirement` | Ownership of subtype-compatible refinement elements |
 | `trace` | Any | Non-directional traceability |
 | Attachments | `capability`, `requirement` | Reference existing ontology or compatible requirement-owned refinement contracts across explicit subgraph boundaries |
 
@@ -160,14 +160,14 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 - Ontology hierarchy uses `derivedFrom`/`derive` only between ontology elements; ontology elements do not author attachments
 - Capabilities may be directly verified but are not directly satisfied; capability coverage also rolls up from requirements that specify them
 - Among verification types, only evidence-backed verifications (`test-verification`, `formal-proof-verification`) may use `satisfiedBy`/`satisfy`
-- Each refinement is owned by exactly one valid owner via `refinedBy`
+- Each refinement is owned by exactly one valid requirement owner via `refinedBy`
+- Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, `semantic-contract`, or `semantic-query-contract` refinements
 - Capability attachments may target `ontology` elements only
-- Requirement attachments may target compatible requirement-owned `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements only
+- Requirement attachments may target compatible requirement-owned `source`, `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements only
 
 **Traceability flow:**
 ```
 Capability
-  ├── refinedBy → Source/Semantic-Contract/Spec/Constraint/Behavior/State/Input-Output
   ├── attach → Ontology
   ├── derive → Subcapability
   ├── verifiedBy → Verification
@@ -177,7 +177,7 @@ Requirement
   ├── specify → Capability
   ├── derive → Child Requirement
   ├── attach → Reusable Requirement Contract
-  ├── refinedBy → Semantic-Contract/Semantic-Query-Contract/Spec/Constraint/Behavior/State/Input-Output
+  ├── refinedBy → Source/Semantic-Contract/Semantic-Query-Contract/Spec/Constraint/Behavior/State/Input-Output
   ├── satisfiedBy → Code
   └── verifiedBy → Verification → satisfiedBy → Test/Proof evidence
 ```

@@ -1,9 +1,6 @@
 // Pages module - individual page generators
 
-pub mod coverage;
 pub mod index;
-pub mod model;
+pub mod kn2;
+pub mod knowledgegraph;
 pub mod ontologies;
-pub mod resources;
-pub mod traceflow;
-pub mod traces;

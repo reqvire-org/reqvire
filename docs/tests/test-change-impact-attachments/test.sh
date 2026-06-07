@@ -62,12 +62,12 @@ echo "Test 1 passed"
 echo ""
 
 # ==================================
-# Test 2: File Attachment Content Change Detection
+# Test 2: Second Attached Refinement Content Change Detection
 # ==================================
-echo "Test 2: File attachment content change is detected..."
+echo "Test 2: Second attached refinement content change is detected..."
 
-# Modify the file attachment content
-sed -i 's/export_YYYYMMDD.json/export_YYYY-MM-DD.json/' "$TEST_DIR/specifications/docs/export-spec.md"
+# Modify second attached refinement content
+sed -i 's/export_YYYYMMDD.json/export_YYYY-MM-DD.json/' "$TEST_DIR/specifications/Requirements.md"
 
 # Run change-impact
 set +e
@@ -86,14 +86,14 @@ SANITIZED_OUTPUT=$(echo "$OUTPUT" | grep -v "INFO  reqvire::config" | grep -v "W
 
 # Compare against expected output
 if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-file-attachment-change.txt" <(echo "$SANITIZED_OUTPUT"); then
-  echo "❌ FAILED: File attachment content change output does not match expected."
+  echo "❌ FAILED: Second attached refinement content change output does not match expected."
   echo ""
   echo "If changes are intentional, update ${TEST_SCRIPT_DIR}/expected/expected-file-attachment-change.txt"
   exit 1
 fi
 
 # Commit the change for next test
-cd "$TEST_DIR" && git add -A && git commit -q -m "Change file attachment content"
+cd "$TEST_DIR" && git add -A && git commit -q -m "Change attached refinement content"
 
 echo "Test 2 passed"
 echo ""

@@ -1,6 +1,6 @@
 use maud::{html, Markup, PreEscaped};
 
-/// Generate custom CSS that matches the old template system exactly
+/// Generate custom CSS for exported source/specification pages.
 pub fn custom() -> Markup {
     html! {
         style {
@@ -32,8 +32,16 @@ pub fn custom() -> Markup {
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #fbfbf8;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-base: #fbfbf8;
+                    --reqvire-surface-card: var(--reqvire-surface-base);
+                    --reqvire-surface-canvas: var(--reqvire-surface-base);
+                    --reqvire-surface-muted: #f6f7f4;
+                    --reqvire-surface-hover: #ecefea;
+                    --reqvire-surface-active: #172027;
+                    --reqvire-surface-active-text: #fbfbf8;
+                    --reqvire-surface-border: #c7c7bf;
                 }
 
                 /* Ensure body takes full height */
@@ -42,7 +50,7 @@ pub fn custom() -> Markup {
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -75,7 +83,7 @@ pub fn custom() -> Markup {
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -89,13 +97,28 @@ pub fn custom() -> Markup {
                     vertical-align: middle;
                 }
 
+                .reqvire-route-links {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-route-links::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -108,6 +131,79 @@ pub fn custom() -> Markup {
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: var(--reqvire-surface-card);
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -142,7 +238,27 @@ pub fn custom() -> Markup {
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
                 }
 
-                /* Content area typography and styling - matches old template exactly */
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
+                }
+
+                .reqvire-html-body[data-reqvire-explorer-shell="true"] .reqvire-page-outer {
+                    width: 100% !important;
+                    max-width: 100% !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+
+                .reqvire-html-body[data-reqvire-explorer-shell="true"] .reqvire-page-card {
+                    min-height: calc(100vh - 50px) !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    border-radius: 0 !important;
+                    box-shadow: none !important;
+                    background: transparent !important;
+                }
+
+                /* Content area typography and styling for exported source/specification pages */
                 /* Use higher specificity to override Tailwind reset */
                 .bg-white h1, .content h1, h1 {
                     color: var(--color-text-primary) !important;
@@ -264,11 +380,12 @@ pub fn custom() -> Markup {
                     margin: 5px 0 !important;
                 }
 
-                /* Custom Mermaid diagram styles - matches old template */
+                /* Custom Mermaid diagram styles for exported source/specification pages */
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;

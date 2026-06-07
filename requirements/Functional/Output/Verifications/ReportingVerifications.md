@@ -549,62 +549,61 @@ This test verifies that the system correctly tracks and displays custom element 
   * verify: [Search Report Generator](../Reporting.md#search-report-generator)
 ---
 
-### HTML Export Containment View Integration Test
+### HTML Export Model Containment Modes Integration Test
 
-This test verifies that the containment view is correctly integrated into HTML export with proper navigation, interactive capabilities, and styling.
+This test verifies that Model Sunburst and Icicle containment modes are correctly integrated into HTML export with proper navigation, interactive capabilities, and styling.
 
 #### Details
 
 ##### Test Criteria
 1. **File generation:**
    - Run `reqvire export` command
-   - Verify `containment.html` file is created in output directory
-   - Verify file contains valid HTML5
+   - Verify `index.html` is created in output directory as the Explorer shell
+   - Verify `index.html#/model` route contains the Model view with List, Grid, Sunburst, and Icicle modes
    - Test file size is reasonable (< 1MB for typical models)
 
 2. **Navigation integration:**
-   - Verify containment view appears in navigation menu
-   - Test link text is "Containment View" or "Model Structure"
-   - Verify clicking nav link loads containment page
+   - Verify the left Explorer pane exposes compact Model mode controls without primary left-pane links for separate Containment or Filesystem routes
+   - Verify Sunburst and Icicle mode controls switch the Model view into containment partition renderers
    - Test navigation persistence across page loads
 
-3. **Mermaid diagram embedding:**
-   - Verify page contains embedded Mermaid diagram
-   - Verify Mermaid.js library is loaded
-   - Test diagram renders correctly in browser
-   - Verify clickable links work (navigate to element pages)
+3. **Native Model modes:**
+   - Verify the Model route renders native List, Grid, Sunburst, and Icicle modes from the Project Store
+   - Verify file deep links support file inspection without becoming separate primary Filesystem or Containment views
+   - Verify Sunburst and Icicle render without iframe-mounted static artifacts
+   - Verify Sunburst and Icicle support click-to-drill/zoom and breadcrumb navigation
+   - Verify clickable element rows or shapes open the shared in-shell element detail modal
 
-4. **Hierarchical tree navigation:**
-   - Verify page includes tree view component
-   - Test folders can be expanded/collapsed
-   - Verify clicking elements navigates to their pages
-   - Test tree state persistence
+4. **Hierarchical list/filesystem navigation:**
+   - Verify the shared Explorer left project tree includes folder, file, and multi-element document navigation
+   - Verify list view groups elements by file
+   - Verify List content starts after the left Explorer pane/strip and preserves a right gutter before the inspector lane and tool rail
+   - Verify clicking elements preserves the current Model mode context
 
 5. **Styling consistency:**
-   - Verify page uses same CSS as other export pages
+   - Verify page uses the shared Explorer shell and style contract
    - Test element type colors match specification
-   - Verify layout matches existing pages
+   - Verify layout matches Model, Traces, Ontologies, and KN2 inspector/control treatment
+   - Verify the left Explorer pane/strip remains visible while the page/canvas scrolls
    - Test responsive design on different screen sizes
 
 6. **Interactive capabilities:**
-   - Test element type filtering controls
-   - Verify filter updates both diagram and tree
    - Test search/filter by folder or file name
-   - Verify search highlights matches
+   - Verify search results can select folders, files, or elements
 
 7. **Integration with model:**
-   - Test containment view updates when model changes
+   - Test Model containment modes update when the model changes
    - Verify new elements appear after re-export
    - Test moved elements show in correct location
    - Verify deterministic output for version control
 
 ##### Acceptance Criteria
-- containment.html file is generated correctly
-- Page appears in navigation menu
-- Mermaid diagram renders and is interactive
-- Tree navigation works correctly
-- Styling is consistent with existing pages
-- Interactive capabilities (filter, search) function properly
+- `index.html` Explorer shell and Model route are generated correctly
+- Sunburst and Icicle appear as Model mode controls in the left Explorer pane
+- Model List, Grid, Sunburst, and Icicle modes render and are interactive
+- Model List/Grid modes provide filesystem/model browsing
+- Styling is consistent with the shared headerless Explorer shell
+- Interactive capabilities (search, selection, drill/zoom) function properly
 - Integration updates correctly when model changes
 
 #### Metadata
@@ -754,8 +753,8 @@ This test verifies that the resources command correctly generates reports showin
 - JSON output provides structured data with relations, attachments, and summary
 
 **HTML Export Integration:**
-- Resources view available in HTML export
-- Navigation link appears in header alongside other views
+- Resources view is available as a supporting SPA route in HTML export
+- Supporting report routes are reachable through canonical route links or source/report affordances, not a shared top header
 
 ##### Test Criteria
 1. **Basic text output**
@@ -791,9 +790,9 @@ This test verifies that the resources command correctly generates reports showin
 
 6. **HTML export integration**
    Command: `reqvire export --output=/tmp/test-export`
-   - resources.html file generated
-   - Navigation header includes Resources link
-   - Resources view contains same content as CLI text output
+   - Resources route data is seeded into the single `index.html` SPA Project Store
+   - No standalone Resources HTML entry point is generated
+   - Resources view reads equivalent resource/file evidence from the Project Store and contains the same content as CLI text output
 
 7. **Empty sections handling**
    - If no InternalPath relations exist, Relations section shows appropriate message
@@ -1144,31 +1143,32 @@ This test verifies that the `submodels` command reports independent capability-r
 
 ### TraceFlow View Test
 
-This test verifies that the TraceFlow view page is correctly generated during HTML export with an interactive D3.js Sankey diagram showing verification traceability flow.
+This test verifies that TraceFlow/Traces data is correctly seeded into the SPA Explorer during HTML export and can render an interactive D3.js Sankey diagram showing verification traceability flow.
 
 #### Details
 
 ##### Acceptance Criteria
-- System shall generate `traceflow.html` file during HTML export
-- TraceFlow page shall contain D3.js Sankey diagram visualization
+- System shall seed traceability flow data into the single `index.html` SPA Project Store during HTML export
+- TraceFlow/Traces SPA views shall contain D3.js Sankey diagram visualization behavior when that mode is exposed
 - Sankey diagram shall show flow from capabilities to requirements to verifications, including direct capability-to-verification links when present
-- Navigation bar shall include "TraceFlow" link after "Traces"
+- TraceFlow/Traces shall be reachable through SPA routes or right-tool workflows without adding a primary left Explorer view link
 - Diagram shall support pan/zoom with mouse wheel and buttons
 - Diagram shall support touch pinch-zoom for mobile devices
 - Clicking nodes shall navigate to element definition pages
-- Page shall include title, description, and usage instructions
+- View guidance shall be available through the shared help/inspector surfaces rather than a static first-viewport page title, description, or instruction block
 
 ##### Test Criteria
-1. **File Generation**
+1. **SPA Store Generation**
    Command: `reqvire export --output <dir>`
    - exits code **0**
-   - `traceflow.html` file exists in output directory
-   - file contains valid HTML5
+   - `index.html` file exists in output directory
+   - No standalone TraceFlow HTML file exists in output directory
+   - `index.html` contains valid HTML5 and Project Store trace data
 
 2. **Navigation Integration**
-   - All HTML files contain "TraceFlow" link in navigation bar
-   - Link positioned after "Traces" and before "Coverage"
-   - Link href is `traceflow.html` (with correct relative prefix)
+   - SPA route data can reach Traces/TraceFlow behavior
+   - Primary left Explorer pane does not expose TraceFlow, Coverage, or Resources as top-level view links
+   - No link href targets a standalone TraceFlow HTML artifact
 
 3. **Sankey Diagram Content**
    - Page contains D3.js Sankey diagram
@@ -1182,10 +1182,9 @@ This test verifies that the TraceFlow view page is correctly generated during HT
    - Touch pinch-zoom works on mobile
    - Node click navigates to element page
 
-5. **Page Content**
-   - Title: "TraceFlow - Verification Traceability"
-   - Description text explaining the view
-   - Instructions for using the diagram
+5. **View Guidance**
+   - No static first-viewport title/prose block is required in the routed Explorer workspace
+   - Help or inspector affordances describe the TraceFlow/Traces diagram when requested
 
 #### Metadata
   * type: test-verification

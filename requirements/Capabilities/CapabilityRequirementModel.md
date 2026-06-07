@@ -2,7 +2,7 @@
 
 ### Reqvire Capability Ontology Shape Profile
 
-Defines SHACL constraints for capability structure, ownership, refinement, verification, and forbidden implementation satisfaction edges.
+Defines SHACL constraints for capability structure, ontology attachment context, specification, verification, and forbidden implementation satisfaction or refinement ownership edges.
 
 #### Shapes
 ```turtle
@@ -23,7 +23,7 @@ reqvire:CapabilityShape
   ] ;
   sh:property [
     sh:path reqvire:refinedBy ;
-    sh:class reqvire:Refinement ;
+    sh:maxCount 0 ;
   ] ;
   sh:property [
     sh:path reqvire:specifiedBy ;
@@ -42,18 +42,12 @@ reqvire:CapabilityShape
     sh:maxCount 0 ;
   ] ;
   sh:property [
+    sh:path reqvire:refine ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
     sh:path reqvire:specify ;
     sh:maxCount 0 ;
-  ] .
-
-reqvire:CapabilityOwnedRefinementShape
-  a sh:NodeShape ;
-  sh:targetClass reqvire:CapabilityOwnedRefinement ;
-  sh:property [
-    sh:path reqvire:refine ;
-    sh:minCount 1 ;
-    sh:maxCount 1 ;
-    sh:class reqvire:Capability ;
   ] .
 ```
 
@@ -326,10 +320,7 @@ reqvire:RefinementShape
     sh:path reqvire:refine ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:or (
-      [ sh:class reqvire:Capability ]
-      [ sh:class reqvire:Requirement ]
-    ) ;
+    sh:class reqvire:Requirement ;
   ] ;
   sh:property [
     sh:path reqvire:derive ;
@@ -371,7 +362,7 @@ reqvire:SourceShape
     sh:path reqvire:refine ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:class reqvire:Capability ;
+    sh:class reqvire:Requirement ;
   ] .
 
 reqvire:SpecificationShape
@@ -381,10 +372,7 @@ reqvire:SpecificationShape
     sh:path reqvire:refine ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:or (
-      [ sh:class reqvire:Capability ]
-      [ sh:class reqvire:Requirement ]
-    ) ;
+    sh:class reqvire:Requirement ;
   ] .
 
 reqvire:ConstraintShape
@@ -394,10 +382,7 @@ reqvire:ConstraintShape
     sh:path reqvire:refine ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:or (
-      [ sh:class reqvire:Capability ]
-      [ sh:class reqvire:Requirement ]
-    ) ;
+    sh:class reqvire:Requirement ;
   ] .
 
 reqvire:BehaviorShape
@@ -407,10 +392,7 @@ reqvire:BehaviorShape
     sh:path reqvire:refine ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:or (
-      [ sh:class reqvire:Capability ]
-      [ sh:class reqvire:Requirement ]
-    ) ;
+    sh:class reqvire:Requirement ;
   ] .
 
 reqvire:StateShape
@@ -420,10 +402,7 @@ reqvire:StateShape
     sh:path reqvire:refine ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:or (
-      [ sh:class reqvire:Capability ]
-      [ sh:class reqvire:Requirement ]
-    ) ;
+    sh:class reqvire:Requirement ;
   ] .
 
 reqvire:InputOutputShape
@@ -433,10 +412,7 @@ reqvire:InputOutputShape
     sh:path reqvire:refine ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:or (
-      [ sh:class reqvire:Capability ]
-      [ sh:class reqvire:Requirement ]
-    ) ;
+    sh:class reqvire:Requirement ;
   ] .
 ```
 

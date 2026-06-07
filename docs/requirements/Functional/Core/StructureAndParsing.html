@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -362,10 +461,10 @@
 
   subgraph 8735c0a811307e57["📁 requirements/Functional/Core"]
     subgraph 193cce1f294b91c8["📄 ModelManagement.md"]
-      15293612289d990c["Relation Types and behaviors<br/>📎 RelationTypes.md<br/>📎 requirements/Refinements.md#relation-semantics-specification"];
+      15293612289d990c["Relation Types and behaviors"];
       class 15293612289d990c systemRequirement;
       click 15293612289d990c "ModelManagement.html#relation-types-and-behaviors";
-      1275026756e287b9["Verification Type Categories<br/>📎 requirements/Refinements.md#supported-element-types-specification"];
+      1275026756e287b9["Verification Type Categories<br/>📎 Supported Element Types Specification"];
       class 1275026756e287b9 systemRequirement;
       click 1275026756e287b9 "ModelManagement.html#verification-type-categories";
     end
@@ -373,31 +472,57 @@
       ad64383b5bdb4b7b["Element Type Metadata Specification"];
       class ad64383b5bdb4b7b default;
       click ad64383b5bdb4b7b "Specifications.html#element-type-metadata-specification";
+      6a217868a7f39318["Identifiers and Relations Refinement Specification"];
+      class 6a217868a7f39318 default;
+      click 6a217868a7f39318 "Specifications.html#identifiers-and-relations-refinement-specification";
+      7aec12d2bfda4f69["Requirement Governance Metadata Specification"];
+      class 7aec12d2bfda4f69 default;
+      click 7aec12d2bfda4f69 "Specifications.html#requirement-governance-metadata-specification";
+      1051bcc3484f3543["Specification File Identification Refinement Specification"];
+      class 1051bcc3484f3543 default;
+      click 1051bcc3484f3543 "Specifications.html#specification-file-identification-refinement-specification";
+      21bb1a85358e322b["Structure and Addressing in Markdown Documents Refinement Specification"];
+      class 21bb1a85358e322b default;
+      click 21bb1a85358e322b "Specifications.html#structure-and-addressing-in-markdown-documents-refinement-specification";
     end
     subgraph b88b5e4ef23c0883["📄 StructureAndParsing.md"]
-      136749f37a361991["Element Identity Model<br/>📎 ElementIdentity.md"];
+      136749f37a361991["Element Identity Model"];
       class 136749f37a361991 systemRequirement;
       click 136749f37a361991 "StructureAndParsing.html#element-identity-model";
-      7971fe15dab8f0b7["Identifiers and Relations<br/>📎 IdentifiersAndRelations.md"];
+      7971fe15dab8f0b7["Identifiers and Relations"];
       class 7971fe15dab8f0b7 systemRequirement;
       click 7971fe15dab8f0b7 "StructureAndParsing.html#identifiers-and-relations";
-      9e793aabc302d0d5["Reserved Subsections Support<br/>📎 ReservedSubsections.md"];
+      9e793aabc302d0d5["Reserved Subsections Support"];
       class 9e793aabc302d0d5 systemRequirement;
       click 9e793aabc302d0d5 "StructureAndParsing.html#reserved-subsections-support";
       c1fde7d1c17c2acb["Specification File Identification"];
       class c1fde7d1c17c2acb systemRequirement;
       click c1fde7d1c17c2acb "StructureAndParsing.html#specification-file-identification";
-      625bdde09d955477["Structure and Addressing in Markdown Documents<br/>📎 MarkdownStructure.md"];
+      625bdde09d955477["Structure and Addressing in Markdown Documents"];
       class 625bdde09d955477 systemRequirement;
       click 625bdde09d955477 "StructureAndParsing.html#structure-and-addressing-in-markdown-documents";
     end
-    subgraph 98067cc5207d6b91["📄 Validation.md"]
-      fcfc76ba4d193d75["Attachment Target Validation"];
-      class fcfc76ba4d193d75 systemRequirement;
-      click fcfc76ba4d193d75 "Validation.html#attachment-target-validation";
-      fed54223697ea04e["Internal Consistency Validator"];
-      class fed54223697ea04e systemRequirement;
-      click fed54223697ea04e "Validation.html#internal-consistency-validator";
+  end
+  subgraph 7bb0bcf0f847d54a["📁 requirements/Functional/Core/DesignDocuments"]
+    subgraph d6f3569ac1a09566["📄 ElementIdentity.md"]
+      4f19ca335bfceb7e["ElementIdentity"];
+      class 4f19ca335bfceb7e default;
+      click 4f19ca335bfceb7e "DesignDocuments/ElementIdentity.html#elementidentity";
+    end
+    subgraph 5516c8522e4ea3ec["📄 IdentifiersAndRelations.md"]
+      3394bed72061da13["IdentifiersAndRelations"];
+      class 3394bed72061da13 default;
+      click 3394bed72061da13 "DesignDocuments/IdentifiersAndRelations.html#identifiersandrelations";
+    end
+    subgraph b674a4de47de32c6["📄 MarkdownStructure.md"]
+      f80cd6900c516b48["MarkdownStructure"];
+      class f80cd6900c516b48 default;
+      click f80cd6900c516b48 "DesignDocuments/MarkdownStructure.html#markdownstructure";
+    end
+    subgraph 53d13c6bde6ba9df["📄 ReservedSubsections.md"]
+      52bf99ada68a9c8c["ReservedSubsections"];
+      class 52bf99ada68a9c8c default;
+      click 52bf99ada68a9c8c "DesignDocuments/ReservedSubsections.html#reservedsubsections";
     end
   end
   subgraph 6c93988fc728d1f8["📁 requirements/Functional/Core/Verifications"]
@@ -427,16 +552,12 @@
       click 6cf270efbdc5a78 "Verifications/ParsingVerifications.html#specification-file-identification-test";
     end
     subgraph 46a9d0ceb9db210e["📄 ValidationVerifications.md"]
+      576cfeab198c03b2["Document Refinement Validation Test"];
+      class 576cfeab198c03b2 verification;
+      click 576cfeab198c03b2 "Verifications/ValidationVerifications.html#document-refinement-validation-test";
       83d989f6ea529f74["Invalid Header Structure Test"];
       class 83d989f6ea529f74 verification;
       click 83d989f6ea529f74 "Verifications/ValidationVerifications.html#invalid-header-structure-test";
-    end
-  end
-  subgraph 91eede421faaa553["📁 requirements/Functional/Operations"]
-    subgraph e1e686bef27807d6["📄 ElementManipulation.md"]
-      bf9a2f73b67492b9["Create Element Operation<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
-      class bf9a2f73b67492b9 systemRequirement;
-      click bf9a2f73b67492b9 "../Operations/ElementManipulation.html#create-element-operation";
     end
   end
   subgraph 75874bcc96c01d2f["📁 requirements/Functional/Operations/Verifications"]
@@ -446,23 +567,8 @@
       click ccbfdf0d74ac48bf "../Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification";
     end
   end
-  subgraph e57e8ed6cc4cc063["📁 requirements/Functional/Processing"]
-    subgraph 743a852fd07358e8["📄 ChangeImpact.md"]
-      a27cb4ff2637ed4a["Change Impact Detection"];
-      class a27cb4ff2637ed4a systemRequirement;
-      click a27cb4ff2637ed4a "../Processing/ChangeImpact.html#change-impact-detection";
-    end
-  end
-  subgraph cfe1eea0278796bc["📁 requirements/Interfaces/CLI"]
-    subgraph 43307c569ff89429["📄 Commands.md"]
-      457ab64992d42aa4["Attachment Commands<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
-      class 457ab64992d42aa4 systemRequirement;
-      click 457ab64992d42aa4 "../../Interfaces/CLI/Commands.html#attachment-commands";
-    end
-  end
   136749f37a361991 -.->|deriveReqT| 7971fe15dab8f0b7;
-  136749f37a361991 -.->|deriveReqT| fed54223697ea04e;
-  136749f37a361991 -.->|deriveReqT| a27cb4ff2637ed4a;
+  136749f37a361991 -->|refinedBy| 4f19ca335bfceb7e;
   e068cb8b03a77b4d["element.rs"];
   class e068cb8b03a77b4d default;
   click e068cb8b03a77b4d "../../../core/src/element.rs";
@@ -473,30 +579,35 @@
   136749f37a361991 -->|satisfiedBy| 35bd98d101f36b62;
   136749f37a361991 -.->|verifiedBy| 49c372fbdf0ebe68;
   7971fe15dab8f0b7 -.->|deriveReqT| 15293612289d990c;
+  7971fe15dab8f0b7 -->|refinedBy| 3394bed72061da13;
+  7971fe15dab8f0b7 -->|refinedBy| 6a217868a7f39318;
   1cfe88f8d3cc7aac["relation.rs"];
   class 1cfe88f8d3cc7aac default;
   click 1cfe88f8d3cc7aac "../../../core/src/relation.rs";
   7971fe15dab8f0b7 -->|satisfiedBy| 1cfe88f8d3cc7aac;
   9e793aabc302d0d5 -.->|deriveReqT| 1275026756e287b9;
-  9e793aabc302d0d5 -.->|deriveReqT| fcfc76ba4d193d75;
-  9e793aabc302d0d5 -.->|deriveReqT| bf9a2f73b67492b9;
-  9e793aabc302d0d5 -.->|deriveReqT| 457ab64992d42aa4;
+  9e793aabc302d0d5 -->|refinedBy| 52bf99ada68a9c8c;
+  9e793aabc302d0d5 -->|refinedBy| ad64383b5bdb4b7b;
+  9e793aabc302d0d5 -->|refinedBy| 7aec12d2bfda4f69;
   9e793aabc302d0d5 -->|satisfiedBy| e068cb8b03a77b4d;
   9e793aabc302d0d5 -->|satisfiedBy| 35bd98d101f36b62;
-  9e793aabc302d0d5 -->|satisfiedBy| ad64383b5bdb4b7b;
   9e793aabc302d0d5 -.->|verifiedBy| 43a55500f0bebfda;
   9e793aabc302d0d5 -.->|verifiedBy| 18307065fb353848;
   9e793aabc302d0d5 -.->|verifiedBy| ff62a0266193ee63;
   9e793aabc302d0d5 -.->|verifiedBy| 98ae4e1997fb1002;
   9e793aabc302d0d5 -.->|verifiedBy| 55d54f4d3853a23b;
+  c1fde7d1c17c2acb -->|refinedBy| 1051bcc3484f3543;
   499d48218b73f571["model.rs"];
   class 499d48218b73f571 default;
   click 499d48218b73f571 "../../../core/src/model.rs";
   c1fde7d1c17c2acb -->|satisfiedBy| 499d48218b73f571;
   c1fde7d1c17c2acb -->|satisfiedBy| 35bd98d101f36b62;
   c1fde7d1c17c2acb -.->|verifiedBy| 6cf270efbdc5a78;
+  c1fde7d1c17c2acb -.->|verifiedBy| 576cfeab198c03b2;
   625bdde09d955477 -.->|deriveReqT| 136749f37a361991;
   625bdde09d955477 -.->|deriveReqT| 9e793aabc302d0d5;
+  625bdde09d955477 -->|refinedBy| f80cd6900c516b48;
+  625bdde09d955477 -->|refinedBy| 21bb1a85358e322b;
   625bdde09d955477 -->|satisfiedBy| e068cb8b03a77b4d;
   625bdde09d955477 -->|satisfiedBy| 499d48218b73f571;
   625bdde09d955477 -->|satisfiedBy| 35bd98d101f36b62;
@@ -507,78 +618,43 @@
   625bdde09d955477 -->|satisfiedBy| bfee2085e3bb9f2b;
   625bdde09d955477 -.->|verifiedBy| 83d989f6ea529f74;
   625bdde09d955477 -.->|verifiedBy| ccbfdf0d74ac48bf;
-  fed54223697ea04e -.->|deriveReqT| 14c74cc4fb33d735;
-  fed54223697ea04e -->|satisfiedBy| 499d48218b73f571;
-  fed54223697ea04e -->|satisfiedBy| 35bd98d101f36b62;
-  fed54223697ea04e -.->|verifiedBy| ad323c8d4c0751e;
-  a27cb4ff2637ed4a -.->|deriveReqT| 1868da177a2e8ffd;
-  a27cb4ff2637ed4a -.->|deriveReqT| 27ee21b54c142739;
-  4391424e97bc407a["change_impact.rs"];
-  class 4391424e97bc407a default;
-  click 4391424e97bc407a "../../../core/src/change_impact.rs";
-  a27cb4ff2637ed4a -->|satisfiedBy| 4391424e97bc407a;
-  a27cb4ff2637ed4a -.->|verifiedBy| 3758f5f1c504cd42;
   5f9cbc6f907e8045["test.sh"];
   class 5f9cbc6f907e8045 default;
   click 5f9cbc6f907e8045 "../../../tests/test-parsing-functionality/test.sh";
   49c372fbdf0ebe68 -->|satisfiedBy| 5f9cbc6f907e8045;
+  15293612289d990c -.->|deriveReqT| 7279235dcea11cc5;
   15293612289d990c -.->|deriveReqT| 3b924660b3d92e9d;
   15293612289d990c -.->|deriveReqT| 7b8a81499865dbaa;
   15293612289d990c -.->|deriveReqT| ac192cac778569d0;
-  15293612289d990c -.->|deriveReqT| 4a77e514d9e5539b;
   15293612289d990c -.->|deriveReqT| 6a54472e974b0c63;
+  15293612289d990c -->|refinedBy| 41dbb4a1af09e878;
+  15293612289d990c -->|refinedBy| 76d641164354982e;
+  15293612289d990c -->|refinedBy| 32bc0a15650ebf08;
   15293612289d990c -->|satisfiedBy| 1cfe88f8d3cc7aac;
   15293612289d990c -.->|verifiedBy| 98ae4e1997fb1002;
-  1275026756e287b9 -->|satisfiedBy| 75dfb35477f838d5;
-  fcfc76ba4d193d75 -.->|deriveReqT| 38109a2549fc3c4f;
-  fcfc76ba4d193d75 -->|satisfiedBy| 499d48218b73f571;
-  fcfc76ba4d193d75 -->|satisfiedBy| 35bd98d101f36b62;
-  fcfc76ba4d193d75 -.->|verifiedBy| 18307065fb353848;
-  fcfc76ba4d193d75 -.->|verifiedBy| ff62a0266193ee63;
-  25bf5cc42f41e395["cli.rs"];
-  class 25bf5cc42f41e395 default;
-  click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| 25bf5cc42f41e395;
-  993c12e82435a78e["crud.rs"];
-  class 993c12e82435a78e default;
-  click 993c12e82435a78e "../../../core/src/crud.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| 993c12e82435a78e;
-  d07e49b06be4058e["diff.rs"];
-  class d07e49b06be4058e default;
-  click d07e49b06be4058e "../../../core/src/diff.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| d07e49b06be4058e;
-  95cf526671ec752c["graph_registry.rs"];
-  class 95cf526671ec752c default;
-  click 95cf526671ec752c "../../../core/src/graph_registry.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| 95cf526671ec752c;
-  bf9a2f73b67492b9 -->|satisfiedBy| 35bd98d101f36b62;
-  bdf9762d399478a5["utils.rs"];
-  class bdf9762d399478a5 default;
-  click bdf9762d399478a5 "../../../core/src/utils.rs";
-  bf9a2f73b67492b9 -->|satisfiedBy| bdf9762d399478a5;
-  bf9a2f73b67492b9 -->|satisfiedBy| 40714cbda978a508;
-  bf9a2f73b67492b9 -->|satisfiedBy| 3c85593db589fd04;
-  bf9a2f73b67492b9 -->|satisfiedBy| 86e301b42cc16d0d;
-  bf9a2f73b67492b9 -.->|verifiedBy| 221f6c008823a4d0;
-  bf9a2f73b67492b9 -.->|verifiedBy| d5bf7d0addaf6d19;
-  457ab64992d42aa4 -->|satisfiedBy| 9919cc3402a3c1b9;
-  457ab64992d42aa4 -.->|verifiedBy| 1c80039ebf669864;
-  457ab64992d42aa4 -.->|verifiedBy| 285be0a87e4eada0;
+  1275026756e287b9 -->|refinedBy| 75dfb35477f838d5;
+  6da864fbba49def6["test.sh"];
+  class 6da864fbba49def6 default;
+  click 6da864fbba49def6 "../../../tests/test-attachment-export/test.sh";
+  43a55500f0bebfda -->|satisfiedBy| 6da864fbba49def6;
   d882e7ff8e1ffe95["test.sh"];
   class d882e7ff8e1ffe95 default;
   click d882e7ff8e1ffe95 "../../../tests/test-assets/test.sh";
-  43a55500f0bebfda -->|satisfiedBy| d882e7ff8e1ffe95;
   18307065fb353848 -->|satisfiedBy| d882e7ff8e1ffe95;
   ff62a0266193ee63 -->|satisfiedBy| d882e7ff8e1ffe95;
   98ae4e1997fb1002 -->|satisfiedBy| 5f9cbc6f907e8045;
-  ea6a90c3d551dae4["test.sh"];
-  class ea6a90c3d551dae4 default;
-  click ea6a90c3d551dae4 "../../../tests/test-search-all-capabilities/test.sh";
-  55d54f4d3853a23b -->|satisfiedBy| ea6a90c3d551dae4;
+  164ab977539aaf34["test.sh"];
+  class 164ab977539aaf34 default;
+  click 164ab977539aaf34 "../../../tests/test-search-all-capabilities/test.sh";
+  55d54f4d3853a23b -->|satisfiedBy| 164ab977539aaf34;
   94d34e73992ff9ac["test.sh"];
   class 94d34e73992ff9ac default;
   click 94d34e73992ff9ac "../../../tests/test-gitignore-integration/test.sh";
   6cf270efbdc5a78 -->|satisfiedBy| 94d34e73992ff9ac;
+  a8b5e6f72b3e3451["test.sh"];
+  class a8b5e6f72b3e3451 default;
+  click a8b5e6f72b3e3451 "../../../tests/test-document-refinement-format/test.sh";
+  576cfeab198c03b2 -->|satisfiedBy| a8b5e6f72b3e3451;
   5150ae05d0a88a84["test.sh"];
   class 5150ae05d0a88a84 default;
   click 5150ae05d0a88a84 "../../../tests/test-invalid-relations/test.sh";
@@ -589,25 +665,26 @@
   ccbfdf0d74ac48bf -->|satisfiedBy| aaf45a054cfa1d47;
 </div>
 <h3 id="specification-file-identification">Specification File Identification</h3>
-<p>The system shall only parse markdown files that are identified as specification files. A markdown file is considered a specification file if and only if its first level-1 heading (<code>#</code>) is exactly <code># Elements</code>. Files not meeting this criterion shall be ignored during model parsing, even if they have a <code>.md</code> extension.</p>
+<p>The system shall identify supported markdown model document types by the first level-1 heading (<code>#</code>) and apply type-specific processing rules.</p>
 <h4>Details</h4>
+<p>Supported model document types:</p>
 <ul>
-<li>The <code># Elements</code> heading must be the first H1 header in the file</li>
-<li>Leading whitespace, blank lines, or frontmatter before the heading are allowed</li>
-<li>Files without <code># Elements</code> as first H1 are silently skipped (no error)</li>
-<li>This rule applies in addition to <code>.gitignore</code> and <code>.reqvireignore</code> exclusions</li>
-<li>The page title is not stored or tracked by the system</li>
+<li><code># Elements</code>: parsed as element collections.</li>
+<li><code># Documents</code>: parsed as a single-element document format with <code>## Metadata</code>, optional <code>## Relations</code>, and a dynamic <code>## &lt;Actual Element Name&gt;</code> section (the section heading itself is the element name) whose body may contain any markdown headers.</li>
 </ul>
+<p>Unsupported first H1 headings shall be ignored by element parsing.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../../UserStories.html#defining-model-structure">Defining Model Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#specification-file-identification-refinement-specification">Specification File Identification Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>specify: <a href="../../Capabilities.html#defining-model-structure">Defining Model Structure</a></li>
 <li>verifiedBy: <a href="Verifications/ParsingVerifications.html#specification-file-identification-test">Specification File Identification Test</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#document-refinement-validation-test">Document Refinement Validation Test</a></li>
 </ul>
 <hr />
 <h3 id="structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</h3>
@@ -616,20 +693,18 @@
 <ul>
 <li>type: requirement</li>
 </ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/MarkdownStructure.html">MarkdownStructure.html</a></li>
-</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#element-identity-model">Element Identity Model</a></li>
 <li>derive: <a href="#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#defining-model-structure">Defining Model Structure</a></li>
+<li>refinedBy: <a href="DesignDocuments/MarkdownStructure.html#markdownstructure">MarkdownStructure</a></li>
+<li>refinedBy: <a href="Specifications.html#structure-and-addressing-in-markdown-documents-refinement-specification">Structure and Addressing in Markdown Documents Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/subsection.rs">subsection.rs</a></li>
+<li>specify: <a href="../../Capabilities.html#defining-model-structure">Defining Model Structure</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-header-structure-test">Invalid Header Structure Test</a></li>
 <li>verifiedBy: <a href="../Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
 </ul>
@@ -640,16 +715,11 @@
 <ul>
 <li>type: requirement</li>
 </ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/ElementIdentity.html">ElementIdentity.html</a></li>
-</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#identifiers-and-relations">Identifiers and Relations</a></li>
-<li>derive: <a href="Validation.html#internal-consistency-validator">Internal Consistency Validator</a></li>
-<li>derive: <a href="../Processing/ChangeImpact.html#change-impact-detection">Change Impact Detection</a></li>
 <li>derivedFrom: <a href="#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+<li>refinedBy: <a href="DesignDocuments/ElementIdentity.html#elementidentity">ElementIdentity</a></li>
 <li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ParsingVerifications.html#fragment-normalization-test">Fragment Normalization Test</a></li>
@@ -661,51 +731,43 @@
 <ul>
 <li>type: requirement</li>
 </ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/IdentifiersAndRelations.html">IdentifiersAndRelations.html</a></li>
-</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
 <li>derivedFrom: <a href="#element-identity-model">Element Identity Model</a></li>
+<li>refinedBy: <a href="DesignDocuments/IdentifiersAndRelations.html#identifiersandrelations">IdentifiersAndRelations</a></li>
+<li>refinedBy: <a href="Specifications.html#identifiers-and-relations-refinement-specification">Identifiers and Relations Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
 </ul>
 <hr />
 <h3 id="reserved-subsections-support">Reserved Subsections Support</h3>
-<p>The system shall support the following reserved subsections with predefined structure and behavior: Relations, Details, Metadata, and Attachments.</p>
+<p>The system shall support reserved subsections with predefined structure and behavior.</p>
 <h4>Details</h4>
-<p>The system shall support following reserved subsections:</p>
+<p>Reserved subsection vocabulary is defined by the Reqvire core element ontology. Parser-facing support includes:</p>
 <ul>
-<li><strong>Relations</strong>: Define relationships between elements</li>
-<li><strong>Details</strong>: Extend requirement text with additional information</li>
-<li><strong>Metadata</strong>: Define element type and classification</li>
-<li><strong>Attachments</strong>: Link external documents and Refinement elements
-<ul>
-<li>Can contain file paths (markdown links where text equals href)</li>
-<li>Can contain element identifiers (markdown links to Refinement elements ONLY)</li>
-</ul>
-</li>
+<li><strong>Relations</strong>: authored relation edges</li>
+<li><strong>Details</strong>: narrative element context</li>
+<li><strong>Metadata</strong>: element metadata, element type, and governance metadata where valid</li>
+<li><strong>Attachments</strong>: explicit attached ontology or requirement-owned contract dependencies</li>
+<li><strong>Concept References</strong>: readable bindings to reachable ontology terms</li>
+<li><strong>Ontology</strong>: ontology-element Turtle content</li>
+<li><strong>Shapes</strong>: requirement-owned semantic-contract SHACL content</li>
+<li><strong>Query</strong>: generic semantic-query-contract content with exactly one fenced <code>sparql</code> code block</li>
 </ul>
 <p>Each reserved subsection has specific parsing rules, validation requirements, and behaviors.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
 </ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/ReservedSubsections.html">ReservedSubsections.html</a></li>
-</ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="ModelManagement.html#verification-type-categories">Verification Type Categories</a></li>
-<li>derive: <a href="Validation.html#attachment-target-validation">Attachment Target Validation</a></li>
-<li>derive: <a href="../Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
-<li>derive: <a href="../../Interfaces/CLI/Commands.html#attachment-commands">Attachment Commands</a></li>
 <li>derivedFrom: <a href="#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+<li>refinedBy: <a href="DesignDocuments/ReservedSubsections.html#reservedsubsections">ReservedSubsections</a></li>
+<li>refinedBy: <a href="Specifications.html#element-type-metadata-specification">Element Type Metadata Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#requirement-governance-metadata-specification">Requirement Governance Metadata Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#element-type-metadata-specification">Element Type Metadata Specification</a></li>
 <li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachment-output-rendering-verification">Attachment Output Rendering Verification</a></li>
 <li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</a></li>
 <li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-validation-verification">Attachments Validation Verification</a></li>
@@ -759,7 +821,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -768,10 +831,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -784,7 +850,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -802,6 +868,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1194,9 +1265,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

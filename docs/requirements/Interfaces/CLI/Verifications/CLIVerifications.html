@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../../coverage.html" class="nav-link">Coverage</a><a href="../../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../../model.html" class="mobile-nav-link">Model</a><a href="../../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -368,6 +467,15 @@
       bd0b4833b30da28["CLI Help Structure Verification"];
       class bd0b4833b30da28 verification;
       click bd0b4833b30da28 "CLIVerifications.html#cli-help-structure-verification";
+      725e45a9cfd0052f["CLI Ontologies Command Verification"];
+      class 725e45a9cfd0052f verification;
+      click 725e45a9cfd0052f "CLIVerifications.html#cli-ontologies-command-verification";
+      195d60b0c0c57e66["CLI Size Estimate JSON Option Verification"];
+      class 195d60b0c0c57e66 verification;
+      click 195d60b0c0c57e66 "CLIVerifications.html#cli-size-estimate-json-option-verification";
+      6d4ef7ac3da46416["Explicit Workspace Selection Verification"];
+      class 6d4ef7ac3da46416 verification;
+      click 6d4ef7ac3da46416 "CLIVerifications.html#explicit-workspace-selection-verification";
       e2664857a303b33e["Verification Traces Element Navigation Test"];
       class e2664857a303b33e verification;
       click e2664857a303b33e "CLIVerifications.html#verification-traces-element-navigation-test";
@@ -381,6 +489,18 @@
   class 7478201b4d47e866 default;
   click 7478201b4d47e866 "../../../../tests/test-cli-help-structure/test.sh";
   bd0b4833b30da28 -->|satisfiedBy| 7478201b4d47e866;
+  a7e44dc2dcda3f["test.sh"];
+  class a7e44dc2dcda3f default;
+  click a7e44dc2dcda3f "../../../../tests/test-ontologies-command/test.sh";
+  725e45a9cfd0052f -->|satisfiedBy| a7e44dc2dcda3f;
+  df92bf508f2f7295["test.sh"];
+  class df92bf508f2f7295 default;
+  click df92bf508f2f7295 "../../../../tests/test-model-command/test.sh";
+  195d60b0c0c57e66 -->|satisfiedBy| df92bf508f2f7295;
+  929bc2f9d8ff4b16["test.sh"];
+  class 929bc2f9d8ff4b16 default;
+  click 929bc2f9d8ff4b16 "../../../../tests/test-workspace-flag/test.sh";
+  6d4ef7ac3da46416 -->|satisfiedBy| 929bc2f9d8ff4b16;
   4c7c54f9c1995852["test.sh"];
   class 4c7c54f9c1995852 default;
   click 4c7c54f9c1995852 "../../../../tests/test-verification-traces/test.sh";
@@ -484,11 +604,85 @@ Command: <code>reqvire</code></p>
 <li>satisfiedBy: <a href="../../../../tests/test-cli-help-structure/test.sh">test.sh</a></li>
 <li>verify: <a href="../Commands.html#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
 <li>verify: <a href="../Commands.html#cli-coverage-command">CLI Coverage Command</a></li>
+<li>verify: <a href="../Commands.html#cli-json-file-output-option">CLI JSON File Output Option</a></li>
+<li>verify: <a href="../Commands.html#cli-model-diagram-command">CLI Model Diagram Command</a></li>
+<li>verify: <a href="../Commands.html#cli-ontologies-command">CLI Ontologies Command</a></li>
 <li>verify: <a href="../Commands.html#cli-search-command">CLI Search Command</a></li>
+<li>verify: <a href="../Commands.html#cli-submodels-command">CLI Submodels Command</a></li>
 <li>verify: <a href="../Commands.html#cli-traces-command">CLI Traces Command</a></li>
 <li>verify: <a href="../Commands.html#format-command">Format Command</a></li>
 <li>verify: <a href="../Commands.html#validate-command">Validate Command</a></li>
 <li>verify: <a href="../../WebInterface/Capabilities.html#html-export">HTML Export</a></li>
+</ul>
+<hr />
+<h3 id="cli-ontologies-command-verification">CLI Ontologies Command Verification</h3>
+<p>This verification shall prove that the ontologies command and export workflow collect ontology <code>Ontology</code> content and semantic-contract <code>Shapes</code> content.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Run <code>reqvire ontologies</code> and verify Turtle output contains ontology declarations and SHACL shape references without generated ontology projection facts.</li>
+<li>Run <code>reqvire ontologies --jsonld</code> and verify the output is valid JSON-LD without generated ontology projection facts.</li>
+<li>Run <code>reqvire ontologies --full</code> and verify Turtle output contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.</li>
+<li>Run <code>reqvire ontologies --full --jsonld</code> and verify JSON-LD output contains Reqvire model context triples and generated ontology projection facts.</li>
+<li>Run <code>reqvire export --output &lt;DIR&gt;</code> and verify <code>ontologies.ttl</code> and <code>ontologies.html</code> are generated.</li>
+<li>Verify exported <code>ontologies.ttl</code> contains collected ontology content without generated ontology projection facts.</li>
+<li>Verify exported <code>ontologies.html</code> contains the ontology explorer, compact sidebar summary footer, <code>.ttl</code> download action, linked source citation evidence, generated semantic construct evidence from the ontology projection subgraph, dense viewport layout CSS, and no obsolete raw Turtle/source-block list or page-header preamble.</li>
+<li>Verify the Reqvire authored ontology source tree does not contain stale <code>owl:deprecated true</code> presentation-only vocabulary declarations after ontology refactoring.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-ontologies-command/test.sh">test.sh</a></li>
+<li>verify: <a href="../../../Functional/Output/Reporting.html#ontology-and-shapes-collection">Ontology and Shapes Collection</a></li>
+<li>verify: <a href="../../../Functional/Output/Reporting.html#ontology-projection-subgraph-materialization">Ontology Projection Subgraph Materialization</a></li>
+<li>verify: <a href="../Commands.html#cli-ontologies-command">CLI Ontologies Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-size-estimate-json-option-verification">CLI Size Estimate JSON Option Verification</h3>
+<p>This verification shall prove that the CLI size-estimate option is JSON-only and enables element size estimates for supported commands.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Run <code>reqvire model --json --with-size-estimates</code> and verify element payloads include <code>size_estimate</code>.</li>
+<li>Run <code>reqvire model --with-size-estimates</code> without <code>--json</code> and verify the command fails with a clear diagnostic.</li>
+<li>Run <code>reqvire model --json</code> without <code>--with-size-estimates</code> and verify element payloads omit <code>size_estimate</code>.</li>
+<li>Verify non-JSON model output is unchanged when the option is absent.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-model-command/test.sh">test.sh</a></li>
+<li>verify: <a href="../Commands.html#cli-size-estimate-json-option">CLI Size Estimate JSON Option</a></li>
+</ul>
+<hr />
+<h3 id="explicit-workspace-selection-verification">Explicit Workspace Selection Verification</h3>
+<p>This verification shall prove that Reqvire commands can be launched outside a project while operating on an explicitly selected workspace.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Run a normal CLI report command from outside the target repository using <code>--workspace &lt;DIR&gt;</code> and verify it reads the selected workspace model.</li>
+<li>Run model mutation commands from outside the target repository using <code>--workspace &lt;DIR&gt;</code> and verify changed files are written inside the selected workspace.</li>
+<li>Run file move mutation from outside the target repository using <code>--workspace &lt;DIR&gt;</code> and verify the moved file and updated model references remain inside the selected workspace.</li>
+<li>Run change-impact from outside the target repository using <code>--workspace &lt;DIR&gt;</code> and verify git comparison is computed against the selected workspace repository.</li>
+<li>Run MCP stdio startup from outside the target repository using <code>--workspace &lt;DIR&gt;</code> and verify workspace status reports the selected workspace.</li>
+<li>Verify workspace selection is applied before ignore-pattern loading and model validation.</li>
+<li>Verify invalid workspace paths fail before command execution.</li>
+<li>Verify omitting <code>--workspace</code> preserves current working directory behavior.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-workspace-flag/test.sh">test.sh</a></li>
+<li>verify: <a href="../Commands.html#explicit-workspace-selection">Explicit Workspace Selection</a></li>
 </ul>
 <hr />
 <h3 id="verification-traces-element-navigation-test">Verification Traces Element Navigation Test</h3>
@@ -560,7 +754,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -569,10 +764,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -585,7 +783,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -603,6 +801,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -995,9 +1198,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

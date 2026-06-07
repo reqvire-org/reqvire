@@ -252,10 +252,10 @@ reqvire:verificationMergeCategory a reqvire:MergeCompatibilityCategory ;
   reqvire:mergeCategoryElementType "verification", "test-verification", "analysis-verification", "inspection-verification", "demonstration-verification", "formal-proof-verification" ;
   rdfs:comment "Verification elements merge only within the verification element family." ;
   reqvire:mergeRequiresSameCategory true .
-reqvire:capabilityRefinementMergeCategory a reqvire:MergeCompatibilityCategory ;
-  rdfs:label "capability-refinement" ;
+reqvire:refinementMergeCategory a reqvire:MergeCompatibilityCategory ;
+  rdfs:label "refinement" ;
   reqvire:mergeCategoryElementType "source", "constraint", "behavior", "specification", "state", "input-output" ;
-  rdfs:comment "Capability-owned refinements merge only with compatible capability-owned refinements." ;
+  rdfs:comment "Requirement-owned refinements merge only with compatible requirement-owned refinements." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:requirementRefinementMergeCategory a reqvire:MergeCompatibilityCategory ;
   rdfs:label "requirement-refinement" ;

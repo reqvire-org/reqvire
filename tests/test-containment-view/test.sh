@@ -16,7 +16,7 @@ set -uo pipefail
 # - Element nodes with proper styling based on type
 # - Clickable links to element locations
 # - JSON output provides valid structured data with correct schema
-# - HTML export includes containment view page with interactive capabilities
+# - HTML export includes Model Sunburst/Icicle containment mode data with interactive capabilities
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -276,7 +276,7 @@ echo ""
 echo "Test 8.4: Intermediate folders without files..."
 
 # ParentOnly folder has no direct files, only ChildFolder subfolder with files
-# The containment view should include ParentOnly even though it has no files
+# The containment hierarchy should include ParentOnly even though it has no files
 
 # Check that ParentOnly folder appears in diagram
 if ! echo "$MERMAID_DIAGRAM" | grep -q "ParentOnly"; then
@@ -359,7 +359,7 @@ echo "✓ --short flag works correctly (shows $SHORT_NODE_COUNT root elements vs
 # Test 8.6: Design Documents in Containment View (diff comparison)
 # ==================================
 echo ""
-echo "Test 8.6: Design documents in containment view..."
+echo "Test 8.6: Design documents in containment hierarchy..."
 
 # Save extracted mermaid diagram for comparison
 echo "$MERMAID_DIAGRAM" > "$TEST_DIR/actual-containment-diagram.mmd"
@@ -372,7 +372,7 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-containment-diagram.mmd" "$TE
   exit 1
 fi
 
-echo "✓ Design documents are included in containment view"
+echo "✓ Design documents are included in containment hierarchy"
 
 # ==================================
 # Test 9: HTML Export Integration (Optional)
@@ -385,19 +385,19 @@ cd "$TEST_DIR" && "$REQVIRE_BIN" export --output output 2>&1
 EXPORT_EXIT=$?
 set -e
 
-if [ $EXPORT_EXIT -eq 0 ] && [ -f "$TEST_DIR/output/containment.html" ]; then
-  # Verify HTML file exists and contains Mermaid
-  if ! grep -q "graph TD" "$TEST_DIR/output/containment.html"; then
-    echo "❌ FAILED: containment.html doesn't contain Mermaid diagram"
+if [ $EXPORT_EXIT -eq 0 ] && [ -f "$TEST_DIR/output/index.html" ]; then
+  CONTAINMENT_ENTRY="$TEST_DIR/output/containment"'.html'
+  if [ -f "$CONTAINMENT_ENTRY" ]; then
+    echo "❌ FAILED: standalone containment page must not be generated"
     exit 1
   fi
 
-  if ! grep -q "mermaid" "$TEST_DIR/output/containment.html"; then
-    echo "❌ FAILED: containment.html doesn't include Mermaid.js"
+  if ! grep -q "reqvireProjectStore" "$TEST_DIR/output/index.html"; then
+    echo "❌ FAILED: index.html doesn't include the SPA Project Store seed"
     exit 1
   fi
 
-  echo "✓ HTML export includes containment view"
+  echo "✓ HTML export includes containment SPA data in index.html"
 else
   echo "⏸  HTML export integration not yet implemented (optional)"
 fi
@@ -406,5 +406,5 @@ fi
 # Final Result
 # ==================================
 echo ""
-echo "✅ All containment view tests passed"
+echo "✅ All containment hierarchy tests passed"
 exit 0

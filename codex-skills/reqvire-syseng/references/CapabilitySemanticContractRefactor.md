@@ -6,12 +6,12 @@ Use this workflow when migrating an existing Reqvire model toward clear capabili
 
 Separate three concerns without losing traceability:
 
-- Capabilities own coherent operational/system ability, source context, compatible refinements, and reusable ontology vocabulary.
+- Capabilities own coherent operational/system ability, reusable ontology attachment context, and direct verification context.
 - `ontology` elements own stable model/domain meaning: `X is`, `X has`, `X relates to Y`, allowed semantic structure, and shared OWL/Turtle vocabulary.
 - Requirements own implementable obligations: what the system shall do, what can satisfy it, and what verification proves it.
 - Requirement-owned `semantic-contract` refinements own SHACL shape profiles over reachable ontology terms.
 - Ontology attached by capabilities should define nouns, relationships, allowed semantic categories, and stable model rules.
-- Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible `specification`, `behavior`, `state`, and `input-output` refinements owned by the relevant capability or requirement. Requirement-owned shape-only `semantic-contract` refinements capture requirement-specific SHACL profiles.
+- Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Requirement-owned shape-only `semantic-contract` refinements capture requirement-specific SHACL profiles.
 
 ## Capability Modeling Philosophy
 
@@ -205,7 +205,7 @@ Use:
 - capability `Attachments` to ontology elements.
 - `requirement refinedBy semantic-contract` for requirement-owned SHACL profiles; semantic contracts refine exactly one compatible requirement owner.
 - Capability attachments only for ontology elements from other capability roots.
-- Requirement attachments only for compatible requirement-owned `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements.
+- Requirement attachments only for compatible requirement-owned `source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements.
 
 Do not use `trace` as a substitute for ownership or dependency.
 Do not remove a cross-root dependency unless the consumer now has an explicit attachment that gives `collect` and change impact the same dependency path.

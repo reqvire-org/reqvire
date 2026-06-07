@@ -21,26 +21,29 @@ git config user.name "Test"
 # Create test specifications
 mkdir -p "$TEMP_DIR/specifications"
 
-cat > "$TEMP_DIR/specifications/UserRequirements.md" << 'EOF'
-# User Requirements
-
-### User Login
-
-Users shall be able to log into the system.
-
-#### Metadata
-  * type: user-requirement
-
-#### Relations
-  * derivedFrom: [System Access](#system-access)
----
+cat > "$TEMP_DIR/specifications/Capabilities.md" << 'EOF'
+# Capabilities
 
 ### System Access
 
-Users shall have access to the system capabilities.
+System access is the capability for authenticated use of protected system capabilities.
 
 #### Metadata
-  * type: user-requirement
+  * type: capability
+
+#### Relations
+  * specifiedBy: [User Login](#user-login)
+---
+
+### User Login
+
+The system shall allow users to log into protected system capabilities.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [System Access](#system-access)
 ---
 EOF
 
@@ -52,7 +55,7 @@ cat > "$TEMP_DIR/specifications/SystemRequirements.md" << 'EOF'
 The system shall implement authentication.
 
 #### Relations
-  * derivedFrom: [User Login](UserRequirements.md#user-login)
+  * derivedFrom: [User Login](Capabilities.md#user-login)
 ---
 
 ### Session Management
@@ -60,7 +63,7 @@ The system shall implement authentication.
 The system shall manage user sessions.
 
 #### Relations
-  * derivedFrom: [User Login](UserRequirements.md#user-login)
+  * derivedFrom: [User Login](Capabilities.md#user-login)
 ---
 EOF
 
@@ -125,40 +128,38 @@ if ! grep -q "TraceFlow" "$OUTPUT_DIR/traceflow.html"; then
 fi
 echo "PASS: traceflow.html has TraceFlow title"
 
-echo "Test 5: Navigation contains TraceFlow link"
-if ! grep -q 'traceflow.html.*TraceFlow' "$OUTPUT_DIR/index.html"; then
-    echo "FAIL: Navigation does not contain TraceFlow link"
+echo "Test 5: Navigation omits TraceFlow link from primary Explorer header"
+if grep -q 'traceflow.html.*TraceFlow' "$OUTPUT_DIR/index.html"; then
+    echo "FAIL: Navigation should not contain TraceFlow link"
     exit 1
 fi
-echo "PASS: Navigation contains TraceFlow link"
+echo "PASS: Navigation omits TraceFlow link"
 
-echo "Test 6: TraceFlow link is positioned after Traces"
-# Check that traceflow appears after traces in navigation by checking character positions
-# (Maud generates minified HTML so line numbers don't work)
+echo "Test 6: Primary Explorer navigation still contains Traces before Ontologies"
 TRACES_POS=$(grep -b -o 'traces.html.*Traces<' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
-TRACEFLOW_POS=$(grep -b -o 'traceflow.html.*TraceFlow<' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
+ONTOLOGIES_POS=$(grep -b -o 'ontologies.html.*Ontologies<' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
 if [ -z "$TRACES_POS" ]; then
     echo "FAIL: Traces link not found"
     exit 1
 fi
-if [ -z "$TRACEFLOW_POS" ]; then
-    echo "FAIL: TraceFlow link not found"
+if [ -z "$ONTOLOGIES_POS" ]; then
+    echo "FAIL: Ontologies link not found"
     exit 1
 fi
-if [ "$TRACEFLOW_POS" -le "$TRACES_POS" ]; then
-    echo "FAIL: TraceFlow link is not positioned after Traces (traces pos: $TRACES_POS, traceflow pos: $TRACEFLOW_POS)"
+if [ "$ONTOLOGIES_POS" -le "$TRACES_POS" ]; then
+    echo "FAIL: Ontologies link is not positioned after Traces (traces pos: $TRACES_POS, ontologies pos: $ONTOLOGIES_POS)"
     exit 1
 fi
-echo "PASS: TraceFlow link is positioned after Traces"
+echo "PASS: Primary Explorer navigation order is valid"
 
-echo "Test 7: All HTML files have TraceFlow in navigation"
+echo "Test 7: All HTML files omit TraceFlow from primary Explorer navigation"
 for html_file in "$OUTPUT_DIR"/*.html; do
-    if ! grep -q 'traceflow.html' "$html_file"; then
-        echo "FAIL: $html_file does not have TraceFlow in navigation"
+    if grep -q 'traceflow.html.*TraceFlow' "$html_file"; then
+        echo "FAIL: $html_file exposes TraceFlow in navigation"
         exit 1
     fi
 done
-echo "PASS: All HTML files have TraceFlow in navigation"
+echo "PASS: All HTML files omit TraceFlow navigation"
 
 echo ""
 echo "All TraceFlow view tests passed!"

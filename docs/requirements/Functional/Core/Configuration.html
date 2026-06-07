@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -362,8 +461,8 @@
 
   subgraph 8735c0a811307e57["📁 requirements/Functional/Core"]
     subgraph ce194c8f6727a221["📄 Configuration.md"]
-      f02dac6e75313544["Coexistence of Structured and Unstructured Documents<br/>📎 requirements/Refinements.md#refinement-specification"];
-      class f02dac6e75313544 userRequirement;
+      f02dac6e75313544["Coexistence of Structured and Unstructured Documents<br/>📎 Refinement Specification"];
+      class f02dac6e75313544 systemRequirement;
       click f02dac6e75313544 "Configuration.html#coexistence-of-structured-and-unstructured-documents";
       66f4b835345ddf91["Ignore Files Integration"];
       class 66f4b835345ddf91 systemRequirement;
@@ -374,9 +473,6 @@
       f225228c6f9046e1["Requirements Processing"];
       class f225228c6f9046e1 systemRequirement;
       click f225228c6f9046e1 "Configuration.html#requirements-processing";
-      fdaf3aa93f19ec5["Reserved Repository Files Exclusion"];
-      class fdaf3aa93f19ec5 systemRequirement;
-      click fdaf3aa93f19ec5 "Configuration.html#reserved-repository-files-exclusion";
       9577f209f3e80942["Structured Markdown Files Search and Detection"];
       class 9577f209f3e80942 systemRequirement;
       click 9577f209f3e80942 "Configuration.html#structured-markdown-files-search-and-detection";
@@ -385,9 +481,15 @@
       bce2fe8ffb765797["Ignore Files Specification"];
       class bce2fe8ffb765797 default;
       click bce2fe8ffb765797 "Specifications.html#ignore-files-specification";
-      973db75b41c8556d["Reserved Files Specification"];
-      class 973db75b41c8556d default;
-      click 973db75b41c8556d "Specifications.html#reserved-files-specification";
+      1430d7b60ec1c791["Ignoring Unstructured Documents Refinement Specification"];
+      class 1430d7b60ec1c791 default;
+      click 1430d7b60ec1c791 "Specifications.html#ignoring-unstructured-documents-refinement-specification";
+      5daa4f3c15187fd5["Requirements Processing Refinement Specification"];
+      class 5daa4f3c15187fd5 default;
+      click 5daa4f3c15187fd5 "Specifications.html#requirements-processing-refinement-specification";
+      d1493aad1b134797["Structured Markdown Files Search and Detection Refinement Specification"];
+      class d1493aad1b134797 default;
+      click d1493aad1b134797 "Specifications.html#structured-markdown-files-search-and-detection-refinement-specification";
     end
   end
   subgraph 6c93988fc728d1f8["📁 requirements/Functional/Core/Verifications"]
@@ -404,11 +506,6 @@
     end
   end
   subgraph 91eede421faaa553["📁 requirements/Functional/Operations"]
-    subgraph e1e686bef27807d6["📄 ElementManipulation.md"]
-      9cdb6297e49a3802["Target Location Validation and Auto-Creation"];
-      class 9cdb6297e49a3802 systemRequirement;
-      click 9cdb6297e49a3802 "../Operations/ElementManipulation.html#target-location-validation-and-auto-creation";
-    end
     subgraph e87e3ee72f8fcc8a["📄 Formatting.md"]
       3126a7da8d2fc941["File Pattern Exclusion for Format"];
       class 3126a7da8d2fc941 systemRequirement;
@@ -423,19 +520,19 @@
     end
   end
   f02dac6e75313544 -.->|deriveReqT| a1795409a371f481;
-  66f4b835345ddf91 -.->|deriveReqT| 9cdb6297e49a3802;
+  66f4b835345ddf91 -->|refinedBy| bce2fe8ffb765797;
   ff93ce3d1f286d8a["config.rs"];
   class ff93ce3d1f286d8a default;
   click ff93ce3d1f286d8a "../../../cli/src/config.rs";
   66f4b835345ddf91 -->|satisfiedBy| ff93ce3d1f286d8a;
-  66f4b835345ddf91 -->|satisfiedBy| bce2fe8ffb765797;
   66f4b835345ddf91 -.->|verifiedBy| f8b4586a036406cd;
   a1795409a371f481 -.->|deriveReqT| 66f4b835345ddf91;
   a1795409a371f481 -.->|deriveReqT| f225228c6f9046e1;
-  a1795409a371f481 -.->|deriveReqT| fdaf3aa93f19ec5;
   a1795409a371f481 -.->|deriveReqT| 3126a7da8d2fc941;
+  a1795409a371f481 -->|refinedBy| 1430d7b60ec1c791;
   a1795409a371f481 -->|satisfiedBy| ff93ce3d1f286d8a;
   f225228c6f9046e1 -.->|deriveReqT| 9577f209f3e80942;
+  f225228c6f9046e1 -->|refinedBy| 5daa4f3c15187fd5;
   499d48218b73f571["model.rs"];
   class 499d48218b73f571 default;
   click 499d48218b73f571 "../../../core/src/model.rs";
@@ -446,26 +543,17 @@
   f225228c6f9046e1 -->|satisfiedBy| 35bd98d101f36b62;
   f225228c6f9046e1 -.->|verifiedBy| 5352180257d54fb2;
   f225228c6f9046e1 -.->|verifiedBy| d7a45cebd272c16;
-  fdaf3aa93f19ec5 -->|satisfiedBy| ff93ce3d1f286d8a;
-  fdaf3aa93f19ec5 -->|satisfiedBy| 973db75b41c8556d;
-  fdaf3aa93f19ec5 -.->|verifiedBy| f8b4586a036406cd;
+  9577f209f3e80942 -->|refinedBy| d1493aad1b134797;
   9577f209f3e80942 -->|satisfiedBy| 499d48218b73f571;
   9577f209f3e80942 -.->|verifiedBy| cd31aec9ae0c3ed3;
-  95cf526671ec752c["graph_registry.rs"];
-  class 95cf526671ec752c default;
-  click 95cf526671ec752c "../../../core/src/graph_registry.rs";
-  9cdb6297e49a3802 -->|satisfiedBy| 95cf526671ec752c;
-  bdf9762d399478a5["utils.rs"];
-  class bdf9762d399478a5 default;
-  click bdf9762d399478a5 "../../../core/src/utils.rs";
-  9cdb6297e49a3802 -->|satisfiedBy| bdf9762d399478a5;
-  9cdb6297e49a3802 -->|satisfiedBy| 1dc0e8b76789ffce;
-  9cdb6297e49a3802 -.->|verifiedBy| c0a8cdea5e5972df;
   94d34e73992ff9ac["test.sh"];
   class 94d34e73992ff9ac default;
   click 94d34e73992ff9ac "../../../tests/test-gitignore-integration/test.sh";
   f8b4586a036406cd -->|satisfiedBy| 94d34e73992ff9ac;
   3126a7da8d2fc941 -.->|deriveReqT| 327e10e1bebd5bde;
+  bdf9762d399478a5["utils.rs"];
+  class bdf9762d399478a5 default;
+  click bdf9762d399478a5 "../../../core/src/utils.rs";
   3126a7da8d2fc941 -->|satisfiedBy| bdf9762d399478a5;
   f0923d0189e77f4c["test.sh"];
   class f0923d0189e77f4c default;
@@ -484,7 +572,7 @@
 <p>The system shall allow structured markdown and unstructured. (eg., markdown, PDFs, DOCX, raw text) documents to coexist within the same System model.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
@@ -493,20 +581,13 @@
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#defining-model-structure">Defining Model Structure</a></li>
+<li>specify: <a href="../../Capabilities.html#defining-model-structure">Defining Model Structure</a></li>
 </ul>
 <hr />
 <h3 id="ignoring-unstructured-documents">Ignoring Unstructured Documents</h3>
 <p>The system shall support configurable glob patterns to exclude specific files from requirement processing.</p>
 <h4>Details</h4>
-<p>Exclusion patterns are defined in <code>.reqvireignore</code> file at the repository root, using the same format as <code>.gitignore</code>:</p>
-<pre><code class="language-.reqvireignore"># Example patterns to exclude from structured documents processing
-**/Logical*.md
-**/Physical*.md
-**/draft-*.md
-examples/**
-</code></pre>
-<p>The <code>.reqvireignore</code> file provides Reqvire-specific exclusions for files that should remain in version control but not be processed as requirements.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -515,9 +596,9 @@ examples/**
 <ul>
 <li>derive: <a href="#ignore-files-integration">Ignore Files Integration</a></li>
 <li>derive: <a href="#requirements-processing">Requirements Processing</a></li>
-<li>derive: <a href="#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a></li>
 <li>derive: <a href="../Operations/Formatting.html#file-pattern-exclusion-for-format">File Pattern Exclusion for Format</a></li>
 <li>derivedFrom: <a href="#coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</a></li>
+<li>refinedBy: <a href="Specifications.html#ignoring-unstructured-documents-refinement-specification">Ignoring Unstructured Documents Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
 </ul>
 <hr />
@@ -536,22 +617,16 @@ examples/**
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="../Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
 <li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>refinedBy: <a href="Specifications.html#ignore-files-specification">Ignore Files Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#ignore-files-specification">Ignore Files Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a></li>
 </ul>
 <hr />
 <h3 id="requirements-processing">Requirements Processing</h3>
 <p>The system shall parse the files in all folders and subfolders from the root of git repository which are not explicitly excluded using .gitignore and .reqvireignore files.</p>
 <h4>Details</h4>
-<p>File exclusion is handled through:</p>
-<ul>
-<li>.gitignore patterns (files not in version control)</li>
-<li>.reqvireignore patterns (files in version control but excluded from requirements processing)</li>
-<li>Reserved repository files (README.md, LICENSE.md, etc.)</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -560,6 +635,7 @@ examples/**
 <ul>
 <li>derive: <a href="#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a></li>
 <li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+<li>refinedBy: <a href="Specifications.html#requirements-processing-refinement-specification">Requirements Processing Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#same-file-fragment-relations-test">Same-File Fragment Relations Test</a></li>
@@ -569,12 +645,7 @@ examples/**
 <h3 id="structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</h3>
 <p>The system shall identify all structured markdown documents available for processing in all directories and sub-directories of the git repository root based on predefined rules.</p>
 <h4>Details</h4>
-<p>Identification Process:</p>
-<ol>
-<li><strong>File Selection</strong>: The process scans all files in the the git repository root and all sub folders.</li>
-<li><strong>Excluded Patterns Check</strong>: If a file matches any excluded patterns, it is marked as <strong>not a structured document file</strong>.</li>
-<li><strong>File Extension Check</strong>: If the file does not have a <code>.md</code> extension, it is marked as <strong>not a structured document file</strong>.</li>
-</ol>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -582,25 +653,9 @@ examples/**
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#requirements-processing">Requirements Processing</a></li>
+<li>refinedBy: <a href="Specifications.html#structured-markdown-files-search-and-detection-refinement-specification">Structured Markdown Files Search and Detection Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></li>
-</ul>
-<hr />
-<h3 id="reserved-repository-files-exclusion">Reserved Repository Files Exclusion</h3>
-<p>The system shall automatically exclude certain common repository documentation files from structured markdown processing.</p>
-<h4>Details</h4>
-<p>The system shall define which repository documentation filenames are reserved and excluded from parsing.</p>
-<p>Reserved files serve general repository documentation purposes rather than structured requirements. This automatic exclusion prevents confusion and reduces the need for explicit .reqvireignore patterns.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
-<li>satisfiedBy: <a href="../../../cli/src/config.rs">config.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#reserved-files-specification">Reserved Files Specification</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -649,7 +704,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -658,10 +714,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -674,7 +733,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -692,6 +751,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1084,9 +1148,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

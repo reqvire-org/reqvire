@@ -120,9 +120,9 @@ Expected checks:
 - Run `reqvire ontologies --jsonld` and verify the output is valid JSON-LD without generated ontology projection facts.
 - Run `reqvire ontologies --full` and verify Turtle output contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
 - Run `reqvire ontologies --full --jsonld` and verify JSON-LD output contains Reqvire model context triples and generated ontology projection facts.
-- Run `reqvire export --output <DIR>` and verify `ontologies.ttl` and `ontologies.html` are generated.
+- Run `reqvire export --output <DIR>` and verify `ontologies.ttl` is generated and the Ontologies Explorer view is available from the canonical SPA route `index.html#/ontologies`.
 - Verify exported `ontologies.ttl` contains collected ontology content without generated ontology projection facts.
-- Verify exported `ontologies.html` contains the ontology explorer, compact sidebar summary footer, `.ttl` download action, linked source citation evidence, generated semantic construct evidence from the ontology projection subgraph, dense viewport layout CSS, and no obsolete raw Turtle/source-block list or page-header preamble.
+- Verify the SPA Ontologies view contains the ontology explorer, compact shared Inspector-lane summary footer, `.ttl` download action, linked source citation evidence, generated semantic construct evidence from the ontology projection subgraph, dense viewport layout CSS, and no obsolete raw Turtle/source-block list or page-header preamble.
 - Verify the Reqvire authored ontology source tree does not contain stale `owl:deprecated true` presentation-only vocabulary declarations after ontology refactoring.
 
 #### Metadata

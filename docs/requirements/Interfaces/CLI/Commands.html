@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -402,10 +501,13 @@
       f7d422af274a64cf["Add Command Error Messages Test"];
       class f7d422af274a64cf verification;
       click f7d422af274a64cf "../../Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test";
-      868e15205b620ba2["CLI Add Element Test<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      65f1ed4cf8dab788["Atomic Relation Relink Test"];
+      class 65f1ed4cf8dab788 verification;
+      click 65f1ed4cf8dab788 "../../Functional/Operations/Verifications/ElementManipulationVerifications.html#atomic-relation-relink-test";
+      868e15205b620ba2["CLI Add Element Test<br/>📎 Element Ordering Behavior"];
       class 868e15205b620ba2 verification;
       click 868e15205b620ba2 "../../Functional/Operations/Verifications/ElementManipulationVerifications.html#cli-add-element-test";
-      d4a6f578d691e888["CLI Move Element Test<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      d4a6f578d691e888["CLI Move Element Test<br/>📎 Element Ordering Behavior"];
       class d4a6f578d691e888 verification;
       click d4a6f578d691e888 "../../Functional/Operations/Verifications/ElementManipulationVerifications.html#cli-move-element-test";
       7d317f5d862a0785["CLI Move File Test"];
@@ -428,7 +530,7 @@
       click 9f8ff23aca853fa0 "../../Functional/Operations/Verifications/ElementManipulationVerifications.html#unlink-command-verification";
     end
     subgraph cae715fe712bf6a2["📄 FormattingVerifications.md"]
-      c89bd750e0ad5b9d["Element Ordering Verification<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      c89bd750e0ad5b9d["Element Ordering Verification<br/>📎 Element Ordering Behavior"];
       class c89bd750e0ad5b9d verification;
       click c89bd750e0ad5b9d "../../Functional/Operations/Verifications/FormattingVerifications.html#element-ordering-verification";
       ccbfdf0d74ac48bf["Format Command Requirements Verification"];
@@ -451,12 +553,27 @@
       ccc548a455bf2b45["CLI Collect Command Test"];
       class ccc548a455bf2b45 verification;
       click ccc548a455bf2b45 "../../Functional/Output/Verifications/ReportingVerifications.html#cli-collect-command-test";
+      9e559ca84ae17bac["CLI JSON File Output Test"];
+      class 9e559ca84ae17bac verification;
+      click 9e559ca84ae17bac "../../Functional/Output/Verifications/ReportingVerifications.html#cli-json-file-output-test";
+      f1434402b83d319["Model Command Verification"];
+      class f1434402b83d319 verification;
+      click f1434402b83d319 "../../Functional/Output/Verifications/ReportingVerifications.html#model-command-verification";
       3c9f85ce80e7b0c["Resources Report Verification"];
       class 3c9f85ce80e7b0c verification;
       click 3c9f85ce80e7b0c "../../Functional/Output/Verifications/ReportingVerifications.html#resources-report-verification";
       246afbd94e01647b["Search Command Tests"];
       class 246afbd94e01647b verification;
       click 246afbd94e01647b "../../Functional/Output/Verifications/ReportingVerifications.html#search-command-tests";
+      ce9d1013350fc8e["Semantic Contract Search JSON Test"];
+      class ce9d1013350fc8e verification;
+      click ce9d1013350fc8e "../../Functional/Output/Verifications/ReportingVerifications.html#semantic-contract-search-json-test";
+      777ac3cbda264394["Semantic Query Contract Search JSON Test"];
+      class 777ac3cbda264394 verification;
+      click 777ac3cbda264394 "../../Functional/Output/Verifications/ReportingVerifications.html#semantic-query-contract-search-json-test";
+      b32babb6538c47ce["Submodels Report Verification"];
+      class b32babb6538c47ce verification;
+      click b32babb6538c47ce "../../Functional/Output/Verifications/ReportingVerifications.html#submodels-report-verification";
       75ff73f91ee1b985["Verification Coverage Report Test"];
       class 75ff73f91ee1b985 verification;
       click 75ff73f91ee1b985 "../../Functional/Output/Verifications/ReportingVerifications.html#verification-coverage-report-test";
@@ -490,78 +607,191 @@
   end
   subgraph cfe1eea0278796bc["📁 requirements/Interfaces/CLI"]
     subgraph 43307c569ff89429["📄 Commands.md"]
-      457ab64992d42aa4["Attachment Commands<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      457ab64992d42aa4["Attachment Commands<br/>📎 File Persistence Behavior<br/>📎 Dry-Run Mode Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Satisfied Refinement Constraint"];
       class 457ab64992d42aa4 systemRequirement;
       click 457ab64992d42aa4 "Commands.html#attachment-commands";
-      104c59d25b737d22["CLI Add Element Command<br/>📎 requirements/Functional/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#create-element-override-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#create-element-workflow-specification<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      104c59d25b737d22["CLI Add Element Command<br/>📎 Git Repository Scope Specification<br/>📎 File Persistence Behavior<br/>📎 Target Location Constraint<br/>📎 Dry-Run Mode Behavior<br/>📎 Create Element Override Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure<br/>📎 Create Element Workflow Specification<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Satisfied Refinement Constraint"];
       class 104c59d25b737d22 systemRequirement;
       click 104c59d25b737d22 "Commands.html#cli-add-element-command";
-      68e30181f97f6f71["CLI Change Impact Report Command<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification"];
+      68e30181f97f6f71["CLI Change Impact Report Command<br/>📎 JSON Output Structure<br/>📎 Text Output Formatting<br/>📎 Mermaid Diagram Style Specification"];
       class 68e30181f97f6f71 systemRequirement;
       click 68e30181f97f6f71 "Commands.html#cli-change-impact-report-command";
-      9a2adde3721af9df["CLI Collect Command<br/>📎 requirements/Functional/Output/Specifications.md#collect-content-specification<br/>📎 requirements/Functional/Output/Specifications.md#collect-output-format-specification"];
+      9a2adde3721af9df["CLI Collect Command<br/>📎 Collect Content Specification<br/>📎 Collect Output Format Specification"];
       class 9a2adde3721af9df systemRequirement;
       click 9a2adde3721af9df "Commands.html#cli-collect-command";
-      218fa75a3081be32["CLI Containment Command<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 ContainmentView.md<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#d3js-containment-tree-specification"];
+      218fa75a3081be32["CLI Containment Command<br/>📎 JSON Output Structure<br/>📎 Mermaid Diagram Style Specification<br/>📎 ContainmentView<br/>📎 D3.js Containment Tree Specification"];
       class 218fa75a3081be32 systemRequirement;
       click 218fa75a3081be32 "Commands.html#cli-containment-command";
-      43efd1fafe961f2e["CLI Coverage Command<br/>📎 requirements/Functional/Core/Specifications.md#verification-type-selection-guidelines<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting"];
+      43efd1fafe961f2e["CLI Coverage Command<br/>📎 Verification Type Selection Guidelines<br/>📎 JSON Output Structure<br/>📎 Implementation Coverage Output Structure Specification<br/>📎 Text Output Formatting"];
       class 43efd1fafe961f2e systemRequirement;
       click 43efd1fafe961f2e "Commands.html#cli-coverage-command";
+      d5c13851c4c6937a["CLI Diff Output"];
+      class d5c13851c4c6937a systemRequirement;
+      click d5c13851c4c6937a "Commands.html#cli-diff-output";
       d6147550e948449e["CLI Interface Structure"];
       class d6147550e948449e systemRequirement;
       click d6147550e948449e "Commands.html#cli-interface-structure";
-      ec02481a0771dca["CLI Lint Command<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#lint-output-specification<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting<br/>📎 requirements/Functional/Operations/Specifications.md#multi-branch-convergence-detection-specification"];
+      7def69c3e42b5eda["CLI JSON File Output Option"];
+      class 7def69c3e42b5eda systemRequirement;
+      click 7def69c3e42b5eda "Commands.html#cli-json-file-output-option";
+      ec02481a0771dca["CLI Lint Command<br/>📎 Dry-Run Mode Behavior<br/>📎 JSON Output Structure<br/>📎 Lint Output Specification<br/>📎 Cross-Submodel Hierarchical Relation Detection Specification<br/>📎 Text Output Formatting<br/>📎 Multi-Branch Convergence Detection Specification"];
       class ec02481a0771dca systemRequirement;
       click ec02481a0771dca "Commands.html#cli-lint-command";
-      51a6083e0a55197c["CLI Merge Element Command<br/>📎 requirements/Functional/Operations/Behaviors.md#merge-content-transformation-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#merge-type-compatibility-constraint<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#merge-element-workflow-specification<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      51a6083e0a55197c["CLI Merge Element Command<br/>📎 Merge Content Transformation Behavior<br/>📎 Merge Type Compatibility Constraint<br/>📎 JSON Output Structure<br/>📎 Merge Element Workflow Specification<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Satisfied Refinement Constraint"];
       class 51a6083e0a55197c systemRequirement;
       click 51a6083e0a55197c "Commands.html#cli-merge-element-command";
-      151987ac330b33f0["CLI Model Diagram Command<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 requirements/Functional/Output/Behaviors.md#reverse-relation-traversal-behavior<br/>📎 requirements/Functional/Output/Behaviors.md#start-element-type-filter-behavior<br/>📎 requirements/Functional/Core/Behaviors.md#type-validation-error-behavior"];
+      151987ac330b33f0["CLI Model Diagram Command<br/>📎 JSON Output Structure<br/>📎 Mermaid Diagram Style Specification<br/>📎 Model Diagram Output Formats Refinement Specification<br/>📎 Reverse Relation Traversal Behavior<br/>📎 Start Element Type Filter Behavior<br/>📎 Type Validation Error Behavior"];
       class 151987ac330b33f0 systemRequirement;
       click 151987ac330b33f0 "Commands.html#cli-model-diagram-command";
-      a68fbec67469256b["CLI Move Asset Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification"];
+      a68fbec67469256b["CLI Move Asset Command<br/>📎 File Persistence Behavior<br/>📎 Dry-Run Mode Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure"];
       class a68fbec67469256b systemRequirement;
       click a68fbec67469256b "Commands.html#cli-move-asset-command";
-      7ef6cb0e4258e1bc["CLI Move Element Command<br/>📎 requirements/Functional/Core/Specifications.md#git-repository-scope-specification<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#move-element-workflow-specification"];
+      7ef6cb0e4258e1bc["CLI Move Element Command<br/>📎 Git Repository Scope Specification<br/>📎 File Persistence Behavior<br/>📎 Target Location Constraint<br/>📎 Dry-Run Mode Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure<br/>📎 Move Element Workflow Specification"];
       class 7ef6cb0e4258e1bc systemRequirement;
       click 7ef6cb0e4258e1bc "Commands.html#cli-move-element-command";
-      d9c57dd799158af9["CLI Move File Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure"];
+      d9c57dd799158af9["CLI Move File Command<br/>📎 File Persistence Behavior<br/>📎 Target Location Constraint<br/>📎 Dry-Run Mode Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure"];
       class d9c57dd799158af9 systemRequirement;
       click d9c57dd799158af9 "Commands.html#cli-move-file-command";
-      91025cd88b1df4f0["CLI Remove Asset Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification"];
+      20d776ffac1813b2["CLI Ontologies Command<br/>📎 Semantic Contract Structure Specification<br/>📎 Ontology Collection Output Specification"];
+      class 20d776ffac1813b2 systemRequirement;
+      click 20d776ffac1813b2 "Commands.html#cli-ontologies-command";
+      192a91b7dc64a3f1["CLI Relink Command<br/>📎 Atomic Relation Relink Workflow Specification<br/>📎 Atomic Relink Validity Constraint<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure"];
+      class 192a91b7dc64a3f1 systemRequirement;
+      click 192a91b7dc64a3f1 "Commands.html#cli-relink-command";
+      91025cd88b1df4f0["CLI Remove Asset Command<br/>📎 File Persistence Behavior<br/>📎 Dry-Run Mode Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure"];
       class 91025cd88b1df4f0 systemRequirement;
       click 91025cd88b1df4f0 "Commands.html#cli-remove-asset-command";
-      1f8022dac203e679["CLI Remove Element Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Operations/Specifications.md#delete-element-workflow-specification"];
+      1f8022dac203e679["CLI Remove Element Command<br/>📎 File Persistence Behavior<br/>📎 Dry-Run Mode Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure<br/>📎 Delete Element Workflow Specification"];
       class 1f8022dac203e679 systemRequirement;
       click 1f8022dac203e679 "Commands.html#cli-remove-element-command";
-      2f51b946a8587225["CLI Rename Element Command<br/>📎 requirements/Functional/Operations/Behaviors.md#file-persistence-behavior<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure"];
+      2f51b946a8587225["CLI Rename Element Command<br/>📎 File Persistence Behavior<br/>📎 Dry-Run Mode Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure"];
       class 2f51b946a8587225 systemRequirement;
       click 2f51b946a8587225 "Commands.html#cli-rename-element-command";
       ee7ad64abb668237["CLI Resources Command"];
       class ee7ad64abb668237 systemRequirement;
       click ee7ad64abb668237 "Commands.html#cli-resources-command";
-      d2fc543d82f61bbb["CLI Search Command<br/>📎 requirements/Refinements.md#supported-element-types-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Behaviors.md#short-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#text-output-formatting<br/>📎 requirements/Functional/Core/Behaviors.md#type-validation-error-behavior"];
+      d2fc543d82f61bbb["CLI Search Command<br/>📎 Requirement Governance Metadata Specification<br/>📎 Supported Element Types Specification<br/>📎 JSON Output Structure<br/>📎 Short Mode Behavior<br/>📎 Text Output Formatting<br/>📎 Type Validation Error Behavior"];
       class d2fc543d82f61bbb systemRequirement;
       click d2fc543d82f61bbb "Commands.html#cli-search-command";
-      9578836eb8e0fc6["CLI Traces Command<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-style-specification<br/>📎 requirements/Functional/Core/Behaviors.md#type-validation-error-behavior"];
+      5efef97a644ff665["CLI Size Estimate JSON Option"];
+      class 5efef97a644ff665 systemRequirement;
+      click 5efef97a644ff665 "Commands.html#cli-size-estimate-json-option";
+      5a229a180ca4cff2["CLI Submodels Command<br/>📎 JSON Output Structure<br/>📎 Requirement Submodels Report Specification"];
+      class 5a229a180ca4cff2 systemRequirement;
+      click 5a229a180ca4cff2 "Commands.html#cli-submodels-command";
+      9578836eb8e0fc6["CLI Traces Command<br/>📎 JSON Output Structure<br/>📎 Verification Trace Tree Construction<br/>📎 Mermaid Diagram Style Specification<br/>📎 Type Validation Error Behavior"];
       class 9578836eb8e0fc6 systemRequirement;
       click 9578836eb8e0fc6 "Commands.html#cli-traces-command";
-      62f24ccbcd1f428a["Detailed Error Handling and Logging<br/>📎 requirements/Functional/Core/Behaviors.md#validation-error-reporting-behavior"];
+      62f24ccbcd1f428a["Detailed Error Handling and Logging<br/>📎 Validation Error Reporting Behavior"];
       class 62f24ccbcd1f428a systemRequirement;
       click 62f24ccbcd1f428a "Commands.html#detailed-error-handling-and-logging";
-      8d334537008d94ba["Format Command<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure"];
+      65a36338cf783547["Explicit Workspace Selection<br/>📎 Git Repository Scope Specification"];
+      class 65a36338cf783547 systemRequirement;
+      click 65a36338cf783547 "Commands.html#explicit-workspace-selection";
+      8d334537008d94ba["Format Command<br/>📎 Dry-Run Mode Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure"];
       class 8d334537008d94ba systemRequirement;
       click 8d334537008d94ba "Commands.html#format-command";
-      c04221154b7fc90d["Relation Commands<br/>📎 requirements/Functional/Operations/Specifications.md#relation-operations-specification<br/>📎 RelationTypes.md<br/>📎 requirements/Functional/Operations/Behaviors.md#dry-run-mode-behavior<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification"];
+      c04221154b7fc90d["Relation Commands<br/>📎 Relation Operations Specification<br/>📎 RelationTypes<br/>📎 Dry-Run Mode Behavior<br/>📎 Diff Output Format Specification<br/>📎 JSON Output Structure"];
       class c04221154b7fc90d systemRequirement;
       click c04221154b7fc90d "Commands.html#relation-commands";
-      a8750da2c3580220["Validate Command<br/>📎 requirements/Functional/Core/Behaviors.md#two-pass-validation-behavior<br/>📎 requirements/Functional/Core/Behaviors.md#validation-error-reporting-behavior<br/>📎 requirements/Functional/Output/Specifications.md#json-output-structure<br/>📎 requirements/Functional/Output/Specifications.md#error-message-format-specification<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      a8750da2c3580220["Validate Command<br/>📎 Two-Pass Validation Behavior<br/>📎 Validation Error Reporting Behavior<br/>📎 JSON Output Structure<br/>📎 Error Message Format Specification<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Satisfied Refinement Constraint"];
       class a8750da2c3580220 systemRequirement;
       click a8750da2c3580220 "Commands.html#validate-command";
       43f4a4bb333138eb["Verification Traces Element Navigation"];
       class 43f4a4bb333138eb systemRequirement;
       click 43f4a4bb333138eb "Commands.html#verification-traces-element-navigation";
+    end
+    subgraph 48eada14a147409e["📄 Specifications.md"]
+      7d39cbeb78007adf["CLI Add Element Command Refinement Specification"];
+      class 7d39cbeb78007adf default;
+      click 7d39cbeb78007adf "Specifications.html#cli-add-element-command-refinement-specification";
+      563b689d0d348544["CLI Collect Command Refinement Specification"];
+      class 563b689d0d348544 default;
+      click 563b689d0d348544 "Specifications.html#cli-collect-command-refinement-specification";
+      5f1d7777a2e84761["CLI Coverage Command Refinement Specification"];
+      class 5f1d7777a2e84761 default;
+      click 5f1d7777a2e84761 "Specifications.html#cli-coverage-command-refinement-specification";
+      2189ddc3b8d04a16["CLI Interface Structure Refinement Specification"];
+      class 2189ddc3b8d04a16 default;
+      click 2189ddc3b8d04a16 "Specifications.html#cli-interface-structure-refinement-specification";
+      360c2818a449d8e["CLI JSON File Output Option Refinement Specification"];
+      class 360c2818a449d8e default;
+      click 360c2818a449d8e "Specifications.html#cli-json-file-output-option-refinement-specification";
+      52547c1c57f39f0e["CLI Lint Command Refinement Specification"];
+      class 52547c1c57f39f0e default;
+      click 52547c1c57f39f0e "Specifications.html#cli-lint-command-refinement-specification";
+      853d6a8c46fcbdd5["CLI Merge Element Command Refinement Specification"];
+      class 853d6a8c46fcbdd5 default;
+      click 853d6a8c46fcbdd5 "Specifications.html#cli-merge-element-command-refinement-specification";
+      7db2eb21d9bdb600["CLI Model Diagram Command Refinement Specification"];
+      class 7db2eb21d9bdb600 default;
+      click 7db2eb21d9bdb600 "Specifications.html#cli-model-diagram-command-refinement-specification";
+      c1ea7da85046420d["CLI Move Asset Command Refinement Specification"];
+      class c1ea7da85046420d default;
+      click c1ea7da85046420d "Specifications.html#cli-move-asset-command-refinement-specification";
+      9d09b899d0a1b39a["CLI Move Element Command Refinement Specification"];
+      class 9d09b899d0a1b39a default;
+      click 9d09b899d0a1b39a "Specifications.html#cli-move-element-command-refinement-specification";
+      a6dcf99643828dc2["CLI Move File Command Refinement Specification"];
+      class a6dcf99643828dc2 default;
+      click a6dcf99643828dc2 "Specifications.html#cli-move-file-command-refinement-specification";
+      1f105b0dfc004220["CLI Ontologies Command Refinement Specification"];
+      class 1f105b0dfc004220 default;
+      click 1f105b0dfc004220 "Specifications.html#cli-ontologies-command-refinement-specification";
+      aee053039551b55a["CLI Relink Command Refinement Specification"];
+      class aee053039551b55a default;
+      click aee053039551b55a "Specifications.html#cli-relink-command-refinement-specification";
+      7185b03dc19996e0["CLI Remove Asset Command Refinement Specification"];
+      class 7185b03dc19996e0 default;
+      click 7185b03dc19996e0 "Specifications.html#cli-remove-asset-command-refinement-specification";
+      5e7e5c38a6ca8d1["CLI Remove Element Command Refinement Specification"];
+      class 5e7e5c38a6ca8d1 default;
+      click 5e7e5c38a6ca8d1 "Specifications.html#cli-remove-element-command-refinement-specification";
+      ceb5cdf983046189["CLI Rename Element Command Refinement Specification"];
+      class ceb5cdf983046189 default;
+      click ceb5cdf983046189 "Specifications.html#cli-rename-element-command-refinement-specification";
+      1ce37be3b261bf11["CLI Resources Command Refinement Specification"];
+      class 1ce37be3b261bf11 default;
+      click 1ce37be3b261bf11 "Specifications.html#cli-resources-command-refinement-specification";
+      2b2a121f3fe44a94["CLI Search Command Refinement Specification"];
+      class 2b2a121f3fe44a94 default;
+      click 2b2a121f3fe44a94 "Specifications.html#cli-search-command-refinement-specification";
+      d519de7f0729c2eb["CLI Size Estimate JSON Option Specification"];
+      class d519de7f0729c2eb default;
+      click d519de7f0729c2eb "Specifications.html#cli-size-estimate-json-option-specification";
+      a27e2d678cf0d6a2["CLI Submodels Command Refinement Specification"];
+      class a27e2d678cf0d6a2 default;
+      click a27e2d678cf0d6a2 "Specifications.html#cli-submodels-command-refinement-specification";
+      3139be6773fdd42a["CLI Traces Command Refinement Specification"];
+      class 3139be6773fdd42a default;
+      click 3139be6773fdd42a "Specifications.html#cli-traces-command-refinement-specification";
+      1d21a62c9647e320["Detailed Error Handling and Logging Refinement Specification"];
+      class 1d21a62c9647e320 default;
+      click 1d21a62c9647e320 "Specifications.html#detailed-error-handling-and-logging-refinement-specification";
+      c074fc10f83523a["Diff Output Format Specification"];
+      class c074fc10f83523a default;
+      click c074fc10f83523a "Specifications.html#diff-output-format-specification";
+      2ef5fb673837eda6["Error Message Format Specification"];
+      class 2ef5fb673837eda6 default;
+      click 2ef5fb673837eda6 "Specifications.html#error-message-format-specification";
+      e88b683427bde936["Explicit Workspace Selection Specification"];
+      class e88b683427bde936 default;
+      click e88b683427bde936 "Specifications.html#explicit-workspace-selection-specification";
+      ae6b4f74282d8b68["Format Command Refinement Specification"];
+      class ae6b4f74282d8b68 default;
+      click ae6b4f74282d8b68 "Specifications.html#format-command-refinement-specification";
+      91d2577e91c2e917["Mutating Command Hierarchy Safety Refinement Specification"];
+      class 91d2577e91c2e917 default;
+      click 91d2577e91c2e917 "Specifications.html#mutating-command-hierarchy-safety-refinement-specification";
+      29b533e39150f497["Relation Commands Refinement Specification"];
+      class 29b533e39150f497 default;
+      click 29b533e39150f497 "Specifications.html#relation-commands-refinement-specification";
+      a977253b3256c7a7["Validate Command Refinement Specification"];
+      class a977253b3256c7a7 default;
+      click a977253b3256c7a7 "Specifications.html#validate-command-refinement-specification";
+      617c21f9d62d0e83["Verification Traces Element Navigation Refinement Specification"];
+      class 617c21f9d62d0e83 default;
+      click 617c21f9d62d0e83 "Specifications.html#verification-traces-element-navigation-refinement-specification";
     end
   end
   subgraph e258363212a98952["📁 requirements/Interfaces/CLI/Verifications"]
@@ -572,30 +802,47 @@
       bd0b4833b30da28["CLI Help Structure Verification"];
       class bd0b4833b30da28 verification;
       click bd0b4833b30da28 "Verifications/CLIVerifications.html#cli-help-structure-verification";
+      725e45a9cfd0052f["CLI Ontologies Command Verification"];
+      class 725e45a9cfd0052f verification;
+      click 725e45a9cfd0052f "Verifications/CLIVerifications.html#cli-ontologies-command-verification";
+      195d60b0c0c57e66["CLI Size Estimate JSON Option Verification"];
+      class 195d60b0c0c57e66 verification;
+      click 195d60b0c0c57e66 "Verifications/CLIVerifications.html#cli-size-estimate-json-option-verification";
+      6d4ef7ac3da46416["Explicit Workspace Selection Verification"];
+      class 6d4ef7ac3da46416 verification;
+      click 6d4ef7ac3da46416 "Verifications/CLIVerifications.html#explicit-workspace-selection-verification";
       e2664857a303b33e["Verification Traces Element Navigation Test"];
       class e2664857a303b33e verification;
       click e2664857a303b33e "Verifications/CLIVerifications.html#verification-traces-element-navigation-test";
     end
   end
-  457ab64992d42aa4 -->|satisfiedBy| 9919cc3402a3c1b9;
-  457ab64992d42aa4 -.->|verifiedBy| 1c80039ebf669864;
-  457ab64992d42aa4 -.->|verifiedBy| 285be0a87e4eada0;
+  457ab64992d42aa4 -->|refinedBy| 9919cc3402a3c1b9;
   25bf5cc42f41e395["cli.rs"];
   class 25bf5cc42f41e395 default;
   click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
+  457ab64992d42aa4 -->|satisfiedBy| 25bf5cc42f41e395;
+  993c12e82435a78e["crud.rs"];
+  class 993c12e82435a78e default;
+  click 993c12e82435a78e "../../../core/src/crud.rs";
+  457ab64992d42aa4 -->|satisfiedBy| 993c12e82435a78e;
+  457ab64992d42aa4 -.->|verifiedBy| 1c80039ebf669864;
+  457ab64992d42aa4 -.->|verifiedBy| 285be0a87e4eada0;
+  104c59d25b737d22 -->|refinedBy| 7d39cbeb78007adf;
   104c59d25b737d22 -->|satisfiedBy| 25bf5cc42f41e395;
   104c59d25b737d22 -.->|verifiedBy| 9ce04315a8dd0d88;
   104c59d25b737d22 -.->|verifiedBy| f7d422af274a64cf;
   104c59d25b737d22 -.->|verifiedBy| 868e15205b620ba2;
+  68e30181f97f6f71 -->|refinedBy| 1893052f3cbc0d97;
   68e30181f97f6f71 -->|satisfiedBy| 25bf5cc42f41e395;
-  68e30181f97f6f71 -->|satisfiedBy| 1893052f3cbc0d97;
   68e30181f97f6f71 -.->|verifiedBy| b4cebcb9f2649a4f;
   68e30181f97f6f71 -.->|verifiedBy| dc9eb3da0c5e0ed0;
   68e30181f97f6f71 -.->|verifiedBy| b5f861c2be8eddab;
   68e30181f97f6f71 -.->|verifiedBy| 349d095f92fc1135;
   68e30181f97f6f71 -.->|verifiedBy| bd0b4833b30da28;
+  9a2adde3721af9df -->|refinedBy| 563b689d0d348544;
   9a2adde3721af9df -->|satisfiedBy| 25bf5cc42f41e395;
   9a2adde3721af9df -.->|verifiedBy| ccc548a455bf2b45;
+  218fa75a3081be32 -->|refinedBy| e3571c4e0809ece6;
   218fa75a3081be32 -->|satisfiedBy| 25bf5cc42f41e395;
   4a8772cb0c75593a["containment.rs"];
   class 4a8772cb0c75593a default;
@@ -605,78 +852,139 @@
   class d4166762363eb31d default;
   click d4166762363eb31d "../../../core/src/diagrams.rs";
   218fa75a3081be32 -->|satisfiedBy| d4166762363eb31d;
-  218fa75a3081be32 -->|satisfiedBy| e3571c4e0809ece6;
+  43efd1fafe961f2e -->|refinedBy| 5f1d7777a2e84761;
   43efd1fafe961f2e -->|satisfiedBy| 25bf5cc42f41e395;
   43efd1fafe961f2e -.->|verifiedBy| 75ff73f91ee1b985;
   43efd1fafe961f2e -.->|verifiedBy| bd0b4833b30da28;
+  d5c13851c4c6937a -->|refinedBy| c074fc10f83523a;
+  d07e49b06be4058e["diff.rs"];
+  class d07e49b06be4058e default;
+  click d07e49b06be4058e "../../../core/src/diff.rs";
+  d5c13851c4c6937a -->|satisfiedBy| d07e49b06be4058e;
+  d6147550e948449e -.->|deriveReqT| 457ab64992d42aa4;
   d6147550e948449e -.->|deriveReqT| 104c59d25b737d22;
   d6147550e948449e -.->|deriveReqT| 68e30181f97f6f71;
   d6147550e948449e -.->|deriveReqT| 9a2adde3721af9df;
   d6147550e948449e -.->|deriveReqT| 218fa75a3081be32;
   d6147550e948449e -.->|deriveReqT| 43efd1fafe961f2e;
+  d6147550e948449e -.->|deriveReqT| d5c13851c4c6937a;
+  d6147550e948449e -.->|deriveReqT| 7def69c3e42b5eda;
   d6147550e948449e -.->|deriveReqT| ec02481a0771dca;
   d6147550e948449e -.->|deriveReqT| 51a6083e0a55197c;
   d6147550e948449e -.->|deriveReqT| 151987ac330b33f0;
   d6147550e948449e -.->|deriveReqT| a68fbec67469256b;
   d6147550e948449e -.->|deriveReqT| 7ef6cb0e4258e1bc;
   d6147550e948449e -.->|deriveReqT| d9c57dd799158af9;
+  d6147550e948449e -.->|deriveReqT| 20d776ffac1813b2;
+  d6147550e948449e -.->|deriveReqT| 192a91b7dc64a3f1;
   d6147550e948449e -.->|deriveReqT| 91025cd88b1df4f0;
   d6147550e948449e -.->|deriveReqT| 1f8022dac203e679;
   d6147550e948449e -.->|deriveReqT| 2f51b946a8587225;
   d6147550e948449e -.->|deriveReqT| ee7ad64abb668237;
   d6147550e948449e -.->|deriveReqT| d2fc543d82f61bbb;
+  d6147550e948449e -.->|deriveReqT| 5efef97a644ff665;
+  d6147550e948449e -.->|deriveReqT| 5a229a180ca4cff2;
   d6147550e948449e -.->|deriveReqT| 9578836eb8e0fc6;
   d6147550e948449e -.->|deriveReqT| 62f24ccbcd1f428a;
+  d6147550e948449e -.->|deriveReqT| 65a36338cf783547;
   d6147550e948449e -.->|deriveReqT| 8d334537008d94ba;
   d6147550e948449e -.->|deriveReqT| c04221154b7fc90d;
   d6147550e948449e -.->|deriveReqT| a8750da2c3580220;
+  d6147550e948449e -->|refinedBy| 2189ddc3b8d04a16;
   d6147550e948449e -->|satisfiedBy| 25bf5cc42f41e395;
+  7def69c3e42b5eda -->|refinedBy| 360c2818a449d8e;
+  7def69c3e42b5eda -->|satisfiedBy| 25bf5cc42f41e395;
+  7def69c3e42b5eda -.->|verifiedBy| 9e559ca84ae17bac;
+  7def69c3e42b5eda -.->|verifiedBy| bd0b4833b30da28;
+  ec02481a0771dca -->|refinedBy| 52547c1c57f39f0e;
   ec02481a0771dca -->|satisfiedBy| 25bf5cc42f41e395;
+  51a6083e0a55197c -->|refinedBy| 853d6a8c46fcbdd5;
   51a6083e0a55197c -->|satisfiedBy| 25bf5cc42f41e395;
+  151987ac330b33f0 -->|refinedBy| 7db2eb21d9bdb600;
   151987ac330b33f0 -->|satisfiedBy| 25bf5cc42f41e395;
   151987ac330b33f0 -->|satisfiedBy| d4166762363eb31d;
+  151987ac330b33f0 -.->|verifiedBy| f1434402b83d319;
+  151987ac330b33f0 -.->|verifiedBy| bd0b4833b30da28;
+  a68fbec67469256b -->|refinedBy| c1ea7da85046420d;
   a68fbec67469256b -->|satisfiedBy| 25bf5cc42f41e395;
   a68fbec67469256b -.->|verifiedBy| 2f4e61e9544880a6;
+  7ef6cb0e4258e1bc -->|refinedBy| 9d09b899d0a1b39a;
   7ef6cb0e4258e1bc -->|satisfiedBy| 25bf5cc42f41e395;
   7ef6cb0e4258e1bc -.->|verifiedBy| c40e17e0f8f2b5ec;
   7ef6cb0e4258e1bc -.->|verifiedBy| d4a6f578d691e888;
+  d9c57dd799158af9 -->|refinedBy| a6dcf99643828dc2;
   d9c57dd799158af9 -->|satisfiedBy| 25bf5cc42f41e395;
   d9c57dd799158af9 -.->|verifiedBy| c40e17e0f8f2b5ec;
   d9c57dd799158af9 -.->|verifiedBy| 7d317f5d862a0785;
+  20d776ffac1813b2 -->|refinedBy| 1f105b0dfc004220;
+  20d776ffac1813b2 -->|satisfiedBy| 25bf5cc42f41e395;
+  242ec6a051230b63["semantic_contract.rs"];
+  class 242ec6a051230b63 default;
+  click 242ec6a051230b63 "../../../core/src/semantic_contract.rs";
+  20d776ffac1813b2 -->|satisfiedBy| 242ec6a051230b63;
+  20d776ffac1813b2 -.->|verifiedBy| bd0b4833b30da28;
+  20d776ffac1813b2 -.->|verifiedBy| 725e45a9cfd0052f;
+  192a91b7dc64a3f1 -->|refinedBy| aee053039551b55a;
+  192a91b7dc64a3f1 -->|refinedBy| 91d2577e91c2e917;
+  192a91b7dc64a3f1 -.->|verifiedBy| 65f1ed4cf8dab788;
+  91025cd88b1df4f0 -->|refinedBy| 7185b03dc19996e0;
   91025cd88b1df4f0 -->|satisfiedBy| 25bf5cc42f41e395;
   91025cd88b1df4f0 -.->|verifiedBy| 9ae645d347d4b31a;
+  1f8022dac203e679 -->|refinedBy| 5e7e5c38a6ca8d1;
   1f8022dac203e679 -->|satisfiedBy| 25bf5cc42f41e395;
   1f8022dac203e679 -.->|verifiedBy| c5f295328df58029;
+  2f51b946a8587225 -->|refinedBy| ceb5cdf983046189;
   2f51b946a8587225 -->|satisfiedBy| 25bf5cc42f41e395;
   2f51b946a8587225 -.->|verifiedBy| 7701c4bcfa966fe6;
+  ee7ad64abb668237 -->|refinedBy| 1ce37be3b261bf11;
   ee7ad64abb668237 -->|satisfiedBy| 25bf5cc42f41e395;
   ee7ad64abb668237 -.->|verifiedBy| 3c9f85ce80e7b0c;
+  d2fc543d82f61bbb -->|refinedBy| 2b2a121f3fe44a94;
   d2fc543d82f61bbb -->|satisfiedBy| 25bf5cc42f41e395;
   d2fc543d82f61bbb -.->|verifiedBy| 29ee19ee5dd27edc;
   d2fc543d82f61bbb -.->|verifiedBy| 246afbd94e01647b;
+  d2fc543d82f61bbb -.->|verifiedBy| ce9d1013350fc8e;
+  d2fc543d82f61bbb -.->|verifiedBy| 777ac3cbda264394;
   d2fc543d82f61bbb -.->|verifiedBy| bd0b4833b30da28;
+  5efef97a644ff665 -->|refinedBy| d519de7f0729c2eb;
+  5efef97a644ff665 -->|satisfiedBy| 25bf5cc42f41e395;
+  5efef97a644ff665 -.->|verifiedBy| 195d60b0c0c57e66;
+  5a229a180ca4cff2 -->|refinedBy| a27e2d678cf0d6a2;
+  5a229a180ca4cff2 -->|satisfiedBy| 25bf5cc42f41e395;
+  5a229a180ca4cff2 -.->|verifiedBy| b32babb6538c47ce;
+  5a229a180ca4cff2 -.->|verifiedBy| bd0b4833b30da28;
   9578836eb8e0fc6 -.->|deriveReqT| 43f4a4bb333138eb;
+  9578836eb8e0fc6 -->|refinedBy| 3139be6773fdd42a;
   9578836eb8e0fc6 -->|satisfiedBy| 25bf5cc42f41e395;
   9578836eb8e0fc6 -.->|verifiedBy| e13ea8567a46f8fd;
   9578836eb8e0fc6 -.->|verifiedBy| fb056d10eb059222;
   9578836eb8e0fc6 -.->|verifiedBy| bd0b4833b30da28;
+  62f24ccbcd1f428a -->|refinedBy| 1d21a62c9647e320;
+  62f24ccbcd1f428a -->|refinedBy| 2ef5fb673837eda6;
   637652e86464c11b["error.rs"];
   class 637652e86464c11b default;
   click 637652e86464c11b "../../../core/src/error.rs";
   62f24ccbcd1f428a -->|satisfiedBy| 637652e86464c11b;
   62f24ccbcd1f428a -.->|verifiedBy| f7d422af274a64cf;
+  65a36338cf783547 -->|refinedBy| e88b683427bde936;
+  65a36338cf783547 -->|satisfiedBy| 25bf5cc42f41e395;
+  65a36338cf783547 -.->|verifiedBy| 6d4ef7ac3da46416;
+  8d334537008d94ba -->|refinedBy| ae6b4f74282d8b68;
   8d334537008d94ba -->|satisfiedBy| 25bf5cc42f41e395;
   8d334537008d94ba -.->|verifiedBy| c89bd750e0ad5b9d;
   8d334537008d94ba -.->|verifiedBy| ccbfdf0d74ac48bf;
   8d334537008d94ba -.->|verifiedBy| 5df244b54d1b239c;
   8d334537008d94ba -.->|verifiedBy| bd0b4833b30da28;
+  c04221154b7fc90d -->|refinedBy| 29b533e39150f497;
   c04221154b7fc90d -->|satisfiedBy| 25bf5cc42f41e395;
   c04221154b7fc90d -.->|verifiedBy| 410dbe84dc2c3481;
   c04221154b7fc90d -.->|verifiedBy| ea3a2bf2fbe74057;
   c04221154b7fc90d -.->|verifiedBy| 9f8ff23aca853fa0;
+  a8750da2c3580220 -->|refinedBy| a977253b3256c7a7;
   a8750da2c3580220 -->|satisfiedBy| 25bf5cc42f41e395;
   a8750da2c3580220 -.->|verifiedBy| ad323c8d4c0751e;
   a8750da2c3580220 -.->|verifiedBy| bd0b4833b30da28;
+  43f4a4bb333138eb -->|refinedBy| 617c21f9d62d0e83;
   7c4732996c9a3ae7["verification_trace.rs"];
   class 7c4732996c9a3ae7 default;
   click 7c4732996c9a3ae7 "../../../core/src/verification_trace.rs";
@@ -722,6 +1030,14 @@
   class 9862b6a220f5be7c default;
   click 9862b6a220f5be7c "../../../tests/test-coverage-report/test.sh";
   75ff73f91ee1b985 -->|satisfiedBy| 9862b6a220f5be7c;
+  1a3a9fd7cadfa36a["test.sh"];
+  class 1a3a9fd7cadfa36a default;
+  click 1a3a9fd7cadfa36a "../../../tests/test-json-file-output/test.sh";
+  9e559ca84ae17bac -->|satisfiedBy| 1a3a9fd7cadfa36a;
+  df92bf508f2f7295["test.sh"];
+  class df92bf508f2f7295 default;
+  click df92bf508f2f7295 "../../../tests/test-model-command/test.sh";
+  f1434402b83d319 -->|satisfiedBy| df92bf508f2f7295;
   2f4e61e9544880a6 -->|satisfiedBy| d882e7ff8e1ffe95;
   661275cf7a337c0e["test.sh"];
   class 661275cf7a337c0e default;
@@ -730,6 +1046,14 @@
   d4a6f578d691e888 -->|satisfiedBy| 7f91546dcec3d680;
   7d317f5d862a0785 -->|satisfiedBy| 7f91546dcec3d680;
   7d317f5d862a0785 -->|satisfiedBy| 661275cf7a337c0e;
+  a7e44dc2dcda3f["test.sh"];
+  class a7e44dc2dcda3f default;
+  click a7e44dc2dcda3f "../../../tests/test-ontologies-command/test.sh";
+  725e45a9cfd0052f -->|satisfiedBy| a7e44dc2dcda3f;
+  8f3780989fe6dbaf["test.sh"];
+  class 8f3780989fe6dbaf default;
+  click 8f3780989fe6dbaf "../../../tests/test-relink-command/test.sh";
+  65f1ed4cf8dab788 -->|satisfiedBy| 8f3780989fe6dbaf;
   9ae645d347d4b31a -->|satisfiedBy| d882e7ff8e1ffe95;
   c5f295328df58029 -->|satisfiedBy| 7f91546dcec3d680;
   7701c4bcfa966fe6 -->|satisfiedBy| 7f91546dcec3d680;
@@ -738,15 +1062,32 @@
   click c326a5f02f65c781 "../../../tests/test-resources-report/test.sh";
   3c9f85ce80e7b0c -->|satisfiedBy| c326a5f02f65c781;
   29ee19ee5dd27edc -->|satisfiedBy| d882e7ff8e1ffe95;
-  ea6a90c3d551dae4["test.sh"];
-  class ea6a90c3d551dae4 default;
-  click ea6a90c3d551dae4 "../../../tests/test-search-all-capabilities/test.sh";
-  246afbd94e01647b -->|satisfiedBy| ea6a90c3d551dae4;
+  164ab977539aaf34["test.sh"];
+  class 164ab977539aaf34 default;
+  click 164ab977539aaf34 "../../../tests/test-search-all-capabilities/test.sh";
+  246afbd94e01647b -->|satisfiedBy| 164ab977539aaf34;
+  980257c30300b5aa["test.sh"];
+  class 980257c30300b5aa default;
+  click 980257c30300b5aa "../../../tests/test-semantic-contract-json/test.sh";
+  ce9d1013350fc8e -->|satisfiedBy| 980257c30300b5aa;
+  6e45b4e97ce264de["test.sh"];
+  class 6e45b4e97ce264de default;
+  click 6e45b4e97ce264de "../../../tests/test-semantic-query-contracts/test.sh";
+  777ac3cbda264394 -->|satisfiedBy| 6e45b4e97ce264de;
+  195d60b0c0c57e66 -->|satisfiedBy| df92bf508f2f7295;
+  7a9a1f5f9dde1b47["test.sh"];
+  class 7a9a1f5f9dde1b47 default;
+  click 7a9a1f5f9dde1b47 "../../../tests/test-submodels-command/test.sh";
+  b32babb6538c47ce -->|satisfiedBy| 7a9a1f5f9dde1b47;
   4c7c54f9c1995852["test.sh"];
   class 4c7c54f9c1995852 default;
   click 4c7c54f9c1995852 "../../../tests/test-verification-traces/test.sh";
   e13ea8567a46f8fd -->|satisfiedBy| 4c7c54f9c1995852;
   fb056d10eb059222 -->|satisfiedBy| 4c7c54f9c1995852;
+  929bc2f9d8ff4b16["test.sh"];
+  class 929bc2f9d8ff4b16 default;
+  click 929bc2f9d8ff4b16 "../../../tests/test-workspace-flag/test.sh";
+  6d4ef7ac3da46416 -->|satisfiedBy| 929bc2f9d8ff4b16;
   81623fde4ecde03d["test.sh"];
   class 81623fde4ecde03d default;
   click 81623fde4ecde03d "../../../tests/test-element-ordering/test.sh";
@@ -771,29 +1112,74 @@
   ad323c8d4c0751e -->|satisfiedBy| 5150ae05d0a88a84;
   e2664857a303b33e -->|satisfiedBy| 4c7c54f9c1995852;
 </div>
+<h3 id="cli-interface-structure">CLI Interface Structure</h3>
+<p>The CLI interface shall implement the clear <code>[OPTIONS] &lt;COMMAND&gt; [COMMAND OPTIONS]</code> structure.</p>
+<h4>Details</h4>
+<p>Implementation details shall follow the associated refinement specifications.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#attachment-commands">Attachment Commands</a></li>
+<li>derive: <a href="#cli-add-element-command">CLI Add Element Command</a></li>
+<li>derive: <a href="#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
+<li>derive: <a href="#cli-collect-command">CLI Collect Command</a></li>
+<li>derive: <a href="#cli-containment-command">CLI Containment Command</a></li>
+<li>derive: <a href="#cli-coverage-command">CLI Coverage Command</a></li>
+<li>derive: <a href="#cli-diff-output">CLI Diff Output</a></li>
+<li>derive: <a href="#cli-json-file-output-option">CLI JSON File Output Option</a></li>
+<li>derive: <a href="#cli-lint-command">CLI Lint Command</a></li>
+<li>derive: <a href="#cli-merge-element-command">CLI Merge Element Command</a></li>
+<li>derive: <a href="#cli-model-diagram-command">CLI Model Diagram Command</a></li>
+<li>derive: <a href="#cli-move-asset-command">CLI Move Asset Command</a></li>
+<li>derive: <a href="#cli-move-element-command">CLI Move Element Command</a></li>
+<li>derive: <a href="#cli-move-file-command">CLI Move File Command</a></li>
+<li>derive: <a href="#cli-ontologies-command">CLI Ontologies Command</a></li>
+<li>derive: <a href="#cli-relink-command">CLI Relink Command</a></li>
+<li>derive: <a href="#cli-remove-asset-command">CLI Remove Asset Command</a></li>
+<li>derive: <a href="#cli-remove-element-command">CLI Remove Element Command</a></li>
+<li>derive: <a href="#cli-rename-element-command">CLI Rename Element Command</a></li>
+<li>derive: <a href="#cli-resources-command">CLI Resources Command</a></li>
+<li>derive: <a href="#cli-search-command">CLI Search Command</a></li>
+<li>derive: <a href="#cli-size-estimate-json-option">CLI Size Estimate JSON Option</a></li>
+<li>derive: <a href="#cli-submodels-command">CLI Submodels Command</a></li>
+<li>derive: <a href="#cli-traces-command">CLI Traces Command</a></li>
+<li>derive: <a href="#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></li>
+<li>derive: <a href="#explicit-workspace-selection">Explicit Workspace Selection</a></li>
+<li>derive: <a href="#format-command">Format Command</a></li>
+<li>derive: <a href="#relation-commands">Relation Commands</a></li>
+<li>derive: <a href="#validate-command">Validate Command</a></li>
+<li>derivedFrom: <a href="../Interfaces.html#cli-interface">CLI interface</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-interface-structure-refinement-specification">CLI Interface Structure Refinement Specification</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+</ul>
+<hr />
 <h3 id="attachment-commands">Attachment Commands</h3>
-<p><strong>DEPRECATED</strong>: Attachment functionality has been unified into the <code>link</code> and <code>unlink</code> commands. Use <code>reqvire link &lt;element&gt; attaching &lt;target&gt;</code> and <code>reqvire unlink &lt;element&gt; &lt;target&gt;</code> instead.</p>
 <p>The system shall provide attachment management through the unified link/unlink commands using the ‘attaching’ keyword.</p>
 <h4>Details</h4>
-<p>Attachment management has been consolidated into the Relation Commands. The attach/detach commands are superseded by:</p>
+<p>Attachment management behavior:</p>
 <p><strong>Attach (via link):</strong></p>
 <ul>
-<li>Syntax: <code>reqvire link &lt;element-name&gt; attaching &lt;target&gt; [--dry-run]</code></li>
-<li>Target: internal file path OR Refinement element name (auto-detected)</li>
+<li>Syntax: <code>reqvire link &lt;element-name&gt; attaching &lt;target&gt; [--dry-run] [--json] [--output &lt;FILE&gt;]</code></li>
+<li>Target: Refinement element identifier</li>
 <li>Create Attachments subsection if doesn’t exist</li>
-<li>Add link to subsection with format <code>* [display-name](path)</code></li>
+<li>Add link to subsection with format <code>* [display-name](file.html#refinement-id)</code></li>
 <li>Skip if already attached (idempotent)</li>
 <li>Support many-to-many (same attachment to multiple elements)</li>
 <li>Support dry-run mode for preview</li>
+<li>Support structured JSON output and JSON file output</li>
 </ul>
 <p><strong>Detach (via unlink):</strong></p>
 <ul>
-<li>Syntax: <code>reqvire unlink &lt;element-name&gt; &lt;target&gt; [--dry-run]</code></li>
+<li>Syntax: <code>reqvire unlink &lt;element-name&gt; &lt;target&gt; [--dry-run] [--json] [--output &lt;FILE&gt;]</code></li>
 <li>Auto-detects whether target is relation or attachment</li>
 <li>Remove link from Attachments subsection</li>
 <li>Remove subsection if no attachments remain</li>
 <li>Trigger change impact on element</li>
 <li>Support dry-run mode for preview</li>
+<li>Support structured JSON output and JSON file output</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -803,108 +1189,25 @@
 <ul>
 <li><a href="../../Functional/Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../../Functional/Core/Constraints.html#attachment-hierarchical-independence-constraint">Attachment Hierarchical Independence Constraint</a></li>
 <li><a href="../../Functional/Core/Constraints.html#attachment-satisfied-refinement-constraint">Attachment Satisfied Refinement Constraint</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../../Functional/Core/StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>satisfiedBy: <a href="../../Functional/Core/Behaviors.html#attachment-input-auto-detection-behavior">Attachment Input Auto-Detection Behavior</a></li>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="../../Functional/Core/Behaviors.html#attachment-input-auto-detection-behavior">Attachment Input Auto-Detection Behavior</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Core/Verifications/AttachmentsVerifications.html#attach-command-verification">Attach Command Verification</a></li>
 <li>verifiedBy: <a href="../../Functional/Core/Verifications/AttachmentsVerifications.html#detach-command-verification">Detach Command Verification</a></li>
 </ul>
 <hr />
-<h3 id="cli-interface-structure">CLI Interface Structure</h3>
-<p>The CLI interface shall implement the clear <code>[OPTIONS] &lt;COMMAND&gt; [COMMAND OPTIONS]</code> structure.</p>
-<h4>Details</h4>
-<p>The CLI must display all commands and options and command’s options flattened in the main help output which must also be a default command:</p>
-<pre><code>Reqvire requirements &amp; traceability management tool
-
-Usage: reqvire [OPTIONS] &lt;COMMAND&gt; [COMMAND OPTIONS]
-
-Commands:
-  export            Export model to browsable HTML documentation
-  serve             Serve model as browsable HTML documentation via HTTP server
-  format            Format and normalize requirements files
-  validate          Validate model
-  search            Search and filter model elements
-  change-impact     Analyze change impact and provide report
-  traces            Generate verification traces
-  coverage          Generate verification coverage report
-  model             Generate model-centric structure diagram
-  lint              Analyze model quality and detect issues
-  add               Add new element to model
-  rm                Remove element from model
-  mv                Move element to different location
-  rename            Rename element
-  merge             Merge multiple elements into target element
-  mv-file           Move entire specification file
-  link              Add relation or attachment between elements
-  unlink            Remove relation or attachment (auto-detects)
-  mv-asset          Move/rename asset file and update references
-  rm-asset          Remove asset file and remove references
-  containment       Generate containment view
-  resources         Generate resources report
-  help              Print help for commands
-
-Options:
-  -h, --help               Print help
-  -V, --version            Print version
-
-&lt;COMMAND OPTIONS&gt;:
-  Each command has its own options displayed in a flattened section
-  (e.g., FORMAT OPTIONS, VALIDATE OPTIONS, etc.)
-</code></pre>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derive: <a href="#cli-add-element-command">CLI Add Element Command</a></li>
-<li>derive: <a href="#cli-change-impact-report-command">CLI Change Impact Report Command</a></li>
-<li>derive: <a href="#cli-collect-command">CLI Collect Command</a></li>
-<li>derive: <a href="#cli-containment-command">CLI Containment Command</a></li>
-<li>derive: <a href="#cli-coverage-command">CLI Coverage Command</a></li>
-<li>derive: <a href="#cli-lint-command">CLI Lint Command</a></li>
-<li>derive: <a href="#cli-merge-element-command">CLI Merge Element Command</a></li>
-<li>derive: <a href="#cli-model-diagram-command">CLI Model Diagram Command</a></li>
-<li>derive: <a href="#cli-move-asset-command">CLI Move Asset Command</a></li>
-<li>derive: <a href="#cli-move-element-command">CLI Move Element Command</a></li>
-<li>derive: <a href="#cli-move-file-command">CLI Move File Command</a></li>
-<li>derive: <a href="#cli-remove-asset-command">CLI Remove Asset Command</a></li>
-<li>derive: <a href="#cli-remove-element-command">CLI Remove Element Command</a></li>
-<li>derive: <a href="#cli-rename-element-command">CLI Rename Element Command</a></li>
-<li>derive: <a href="#cli-resources-command">CLI Resources Command</a></li>
-<li>derive: <a href="#cli-search-command">CLI Search Command</a></li>
-<li>derive: <a href="#cli-traces-command">CLI Traces Command</a></li>
-<li>derive: <a href="#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></li>
-<li>derive: <a href="#format-command">Format Command</a></li>
-<li>derive: <a href="#relation-commands">Relation Commands</a></li>
-<li>derive: <a href="#validate-command">Validate Command</a></li>
-<li>derivedFrom: <a href="../Interfaces.html#cli-interface">CLI interface</a></li>
-<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
-</ul>
-<hr />
 <h3 id="cli-add-element-command">CLI Add Element Command</h3>
-<p>The system shall provide an <code>add</code> command to create new model elements by accepting element definition in Markdown format from stdin, validating the structure, and inserting it into the target file.</p>
+<p>The system shall provide an <code>add</code> command to create new model elements by accepting element definition in Markdown format from stdin or the <code>--content</code> argument, validating the structure, and inserting it into the target file.</p>
 <h4>Details</h4>
-<p>The <code>add</code> command shall:</p>
-<ul>
-<li>Accept element definition input from standard input (stdin)</li>
-<li>Accept target file path as required positional argument (resolved relative to Git repository root)</li>
-<li>Support command syntax: <code>reqvire add &lt;file&gt;</code></li>
-<li>Validate element structure before insertion</li>
-<li>Insert element into file following Element Ordering Behavior</li>
-<li>Apply changes immediately by default</li>
-<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
-<li>Support <code>--override</code> flag to replace existing element with same name</li>
-<li>Output git-style diff showing file changes by default</li>
-<li>Support <code>--json</code> flag for structured output format</li>
-<li>Report validation errors if element structure is invalid</li>
-<li>Exit with code 0 on success, non-zero on error</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -916,7 +1219,7 @@ Options:
 <li><a href="../../Functional/Operations/Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#create-element-override-behavior">Create Element Override Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../../Functional/Operations/Specifications.html#create-element-workflow-specification">Create Element Workflow Specification</a></li>
 <li><a href="../../Functional/Core/Constraints.html#attachment-hierarchical-independence-constraint">Attachment Hierarchical Independence Constraint</a></li>
@@ -925,6 +1228,7 @@ Options:
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-add-element-command-refinement-specification">CLI Add Element Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-duplicate-detection-test">Add Command Duplicate Detection Test</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">Add Command Error Messages Test</a></li>
@@ -970,8 +1274,8 @@ Options:
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="../../Functional/Processing/Behaviors.html#change-propagation-behavior">Change Propagation Behavior</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
-<li>satisfiedBy: <a href="../../Functional/Processing/Behaviors.html#change-propagation-behavior">Change Propagation Behavior</a></li>
 <li>verifiedBy: <a href="../../Functional/Processing/Verifications/ChangeImpactVerifications.html#change-impact-analysis-verification">Change Impact Analysis Verification</a></li>
 <li>verifiedBy: <a href="../../Functional/Processing/Verifications/ChangeImpactVerifications.html#change-impact-detection-test">Change Impact Detection Test</a></li>
 <li>verifiedBy: <a href="../../Functional/Processing/Verifications/ChangeImpactVerifications.html#change-impact-relations-test">Change Impact Relations Test</a></li>
@@ -982,20 +1286,7 @@ Options:
 <h3 id="cli-collect-command">CLI Collect Command</h3>
 <p>The system shall provide a <code>collect</code> command that performs content collection as specified in the attached specifications.</p>
 <h4>Details</h4>
-<p>Command syntax: <code>reqvire collect &lt;element-name&gt; [--json]</code></p>
-<p><strong>Arguments:</strong></p>
-<ul>
-<li><code>&lt;element-name&gt;</code> - Required. Name of the requirement element to collect from.</li>
-</ul>
-<p><strong>Options:</strong></p>
-<ul>
-<li><code>--json</code> - Output in JSON format instead of text</li>
-</ul>
-<p><strong>Exit codes:</strong></p>
-<ul>
-<li>0 on success</li>
-<li>Non-zero on error (element not found, invalid type, etc.)</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1008,6 +1299,7 @@ Options:
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-collect-command-refinement-specification">CLI Collect Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#cli-collect-command-test">CLI Collect Command Test</a></li>
 </ul>
@@ -1038,38 +1330,22 @@ Options:
 <ul>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../../Functional/Output/Specifications.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
-<li><a href="../../Functional/Output/DesignDocuments/ContainmentView.html">ContainmentView.html</a></li>
+<li><a href="../../Functional/Output/DesignDocuments/ContainmentView.html#containmentview">ContainmentView</a></li>
 <li><a href="../WebInterface/Specifications.html#d3js-containment-tree-specification">D3.js Containment Tree Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="../../Functional/Output/Behaviors.html#short-mode-behavior">Short Mode Behavior</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/containment.rs">containment.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
-<li>satisfiedBy: <a href="../../Functional/Output/Behaviors.html#short-mode-behavior">Short Mode Behavior</a></li>
 </ul>
 <hr />
 <h3 id="cli-coverage-command">CLI Coverage Command</h3>
-<p>The system shall provide a <code>coverage</code> command that generates verification coverage reports focusing on leaf requirements, test-verification satisfaction status, and orphaned verifications.</p>
+<p>The system shall provide a <code>coverage</code> command that generates both verification coverage and requirement implementation coverage reports.</p>
 <h4>Details</h4>
-<p>The command shall:</p>
-<ul>
-<li>Be invoked as <code>reqvire coverage</code></li>
-<li>Support <code>--json</code> flag for JSON output format</li>
-<li>Default to human-readable text output when JSON flag is not present</li>
-<li>Generate reports focusing on leaf requirements (requirements without forward relations to other requirements)</li>
-<li>Show the percentage and details of verified and unverified leaf requirements</li>
-<li>Include breakdowns by file, section, and verification type</li>
-<li>Show satisfaction status of test-verification elements (those with satisfiedBy relations)</li>
-<li>Show orphaned verifications (verification elements without any verify relations to requirements)</li>
-<li>Follow <a href="../System/Processing/VerificationTraces.html#verification-roll-up-strategy">Verification Roll-up Strategy</a></li>
-<li>Test-verification elements require satisfiedBy relations to be considered satisfied</li>
-<li>Analysis, inspection, and demonstration verification elements are considered satisfied by default</li>
-<li>Exit with status code 0 on success</li>
-<li>Exit with non-zero status code on errors</li>
-</ul>
-<p>Command output shall be written to stdout for easy redirection to files.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1078,38 +1354,54 @@ Options:
 <ul>
 <li><a href="../../Functional/Core/Specifications.html#verification-type-selection-guidelines">Verification Type Selection Guidelines</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
+<li><a href="../../Functional/Output/Specifications.html#implementation-coverage-output-structure-specification">Implementation Coverage Output Structure Specification</a></li>
 <li><a href="../../Functional/Output/Specifications.html#text-output-formatting">Text Output Formatting</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-coverage-command-refinement-specification">CLI Coverage Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#verification-coverage-report-test">Verification Coverage Report Test</a></li>
+<li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
+</ul>
+<hr />
+<h3 id="cli-diff-output">CLI Diff Output</h3>
+<p>The CLI shall provide a standardized diff-style output contract for commands that preview or report file modifications.</p>
+<h4>Details</h4>
+<p>The diff output contract shall define a shared presentation format for command results that show line-level file changes.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
+</ul>
+<hr />
+<h3 id="cli-json-file-output-option">CLI JSON File Output Option</h3>
+<p>The system shall provide an <code>--output &lt;FILE&gt;</code> option on all commands that support <code>--json</code>, allowing JSON output to be written to a file instead of stdout.</p>
+<h4>Details</h4>
+<p>Implementation details shall follow the associated refinement specifications.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-json-file-output-option-refinement-specification">CLI JSON File Output Option Refinement Specification</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#cli-json-file-output-test">CLI JSON File Output Test</a></li>
 <li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
 </ul>
 <hr />
 <h3 id="cli-lint-command">CLI Lint Command</h3>
 <p>The system shall implement a <code>lint</code> command that analyzes model quality and detects issues in requirements relations, providing categorized output that distinguishes between auto-fixable issues and those requiring manual review.</p>
 <h4>Details</h4>
-<p>The command shall:</p>
-<ul>
-<li>Be invoked as <code>reqvire lint</code></li>
-<li>Default to dry-run mode (report issues without applying fixes)</li>
-<li>Support <code>--fixable</code> flag to show only auto-fixable issues</li>
-<li>Support <code>--auditable</code> flag to show only issues requiring manual review</li>
-<li>Support <code>--fix</code> flag to automatically apply fixes for auto-fixable issues</li>
-<li>Support <code>--json</code> flag for structured JSON output</li>
-<li>Default to showing ALL issues when no filter flags are provided</li>
-<li>Categorize output into two sections:
-<ul>
-<li><strong>Auto-fixable Issues</strong>: Issues that can be automatically corrected by the system</li>
-<li><strong>Needs Manual Review</strong>: Issues that require human judgment to resolve</li>
-</ul>
-</li>
-<li>Exit with status code 0 when no issues are found or when fixes are successfully applied</li>
-<li>Exit with non-zero status code on errors</li>
-</ul>
-<p>Command output shall be written to stdout for easy redirection to files.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1119,29 +1411,21 @@ Options:
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../../Functional/Operations/Specifications.html#lint-output-specification">Lint Output Specification</a></li>
+<li><a href="../../Functional/Operations/Specifications.html#cross-submodel-hierarchical-relation-detection-specification">Cross-Submodel Hierarchical Relation Detection Specification</a></li>
 <li><a href="../../Functional/Output/Specifications.html#text-output-formatting">Text Output Formatting</a></li>
 <li><a href="../../Functional/Operations/Specifications.html#multi-branch-convergence-detection-specification">Multi-Branch Convergence Detection Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-lint-command-refinement-specification">CLI Lint Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 </ul>
 <hr />
 <h3 id="cli-merge-element-command">CLI Merge Element Command</h3>
 <p>The system shall provide a <code>merge</code> command to combine multiple elements into a target element.</p>
 <h4>Details</h4>
-<p>The <code>merge</code> command shall:</p>
-<ul>
-<li>Accept target element name as first required positional argument</li>
-<li>Accept one or more source element names as subsequent required arguments</li>
-<li>Support command syntax: <code>reqvire merge &lt;target&gt; &lt;source1&gt; [source2...]</code></li>
-<li>Apply changes immediately by default</li>
-<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
-<li>Output git-style diff showing all affected files by default</li>
-<li>Support <code>--json</code> flag for structured output</li>
-<li>Exit with code 0 on success, non-zero on error</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1158,22 +1442,14 @@ Options:
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-merge-element-command-refinement-specification">CLI Merge Element Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 </ul>
 <hr />
 <h3 id="cli-model-diagram-command">CLI Model Diagram Command</h3>
 <p>System shall provide CLI command to generate model diagrams with optional filtering and output format selection.</p>
 <h4>Details</h4>
-<ul>
-<li>Command shall be named <code>model</code></li>
-<li>Shall support <code>--from=&lt;name&gt;</code> flag for filtering from specific element by name</li>
-<li>Element names are globally unique, allowing lookup by name alone</li>
-<li>Shall support <code>--json</code> flag for JSON output format</li>
-<li>Shall support <code>--reverse</code> flag for leaf-to-root traversal</li>
-<li>Shall support <code>--filter-type=&lt;types&gt;</code> flag with comma-separated element types to filter starting points (consistent with search command)</li>
-<li>Default output shall be markdown with embedded Mermaid diagram</li>
-<li>Shall integrate with existing model diagram generation functionality</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications. The command shall support default model-root traversal, filtered traversal, Markdown output, pure Mermaid output, and JSON output.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1182,6 +1458,7 @@ Options:
 <ul>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../../Functional/Output/Specifications.html#mermaid-diagram-style-specification">Mermaid Diagram Style Specification</a></li>
+<li><a href="../../Functional/Output/Specifications.html#model-diagram-output-formats-refinement-specification">Model Diagram Output Formats Refinement Specification</a></li>
 <li><a href="../../Functional/Output/Behaviors.html#reverse-relation-traversal-behavior">Reverse Relation Traversal Behavior</a></li>
 <li><a href="../../Functional/Output/Behaviors.html#start-element-type-filter-behavior">Start Element Type Filter Behavior</a></li>
 <li><a href="../../Functional/Core/Behaviors.html#type-validation-error-behavior">Type Validation Error Behavior</a></li>
@@ -1189,31 +1466,17 @@ Options:
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-model-diagram-command-refinement-specification">CLI Model Diagram Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
+<li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#model-command-verification">Model Command Verification</a></li>
+<li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
 </ul>
 <hr />
 <h3 id="cli-move-asset-command">CLI Move Asset Command</h3>
 <p>The system shall provide a <code>mv-asset</code> command to move or rename InternalPath files and automatically update all references across the model.</p>
 <h4>Details</h4>
-<p>The <code>mv-asset</code> command shall:</p>
-<ul>
-<li>Accept old file path as required positional argument</li>
-<li>Accept new file path as required positional argument</li>
-<li>Find all elements referencing the file as InternalPath</li>
-<li>Update all InternalPath references:
-<ul>
-<li>In Attachments subsection (update both display text and href)</li>
-<li>In Relations (satisfiedBy, satisfy, trace targets)</li>
-</ul>
-</li>
-<li>Physically move/rename the file on filesystem</li>
-<li>Apply changes immediately by default</li>
-<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
-<li>Output git-style diff showing all affected files</li>
-<li>Report all affected elements and relation updates</li>
-<li>Exit with code 0 on success, non-zero on error</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1222,11 +1485,13 @@ Options:
 <ul>
 <li><a href="../../Functional/Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-move-asset-command-refinement-specification">CLI Move Asset Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Core/Verifications/AttachmentsVerifications.html#move-asset-command-verification">Move Asset Command Verification</a></li>
 </ul>
@@ -1234,22 +1499,7 @@ Options:
 <h3 id="cli-move-element-command">CLI Move Element Command</h3>
 <p>The system shall provide a <code>mv</code> command to move existing model elements to different file locations while automatically updating all relations that reference the moved element.</p>
 <h4>Details</h4>
-<p>The <code>mv</code> command shall:</p>
-<ul>
-<li>Accept element name as required positional argument</li>
-<li>Accept target file path as required positional argument (resolved relative to Git repository root)</li>
-<li>Support command syntax: <code>reqvire mv &lt;element-name&gt; &lt;file&gt;</code></li>
-<li>Move element to target file following Element Ordering Behavior</li>
-<li>Update all incoming relations system-wide with new identifier</li>
-<li>Preserve element content, metadata, and outgoing relations</li>
-<li>Apply changes immediately by default</li>
-<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
-<li>Output git-style diff showing all affected files by default</li>
-<li>Support <code>--json</code> flag for structured output with relation updates and identifier change</li>
-<li>Report identifier change (old → new)</li>
-<li>Report error if element does not exist or target location is invalid</li>
-<li>Exit with code 0 on success, non-zero on error</li>
-</ul>
+<p>The command shall reject moving an element into an existing <code># Documents</code> file when that move would create more than one element in the target document file.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1260,13 +1510,14 @@ Options:
 <li><a href="../../Functional/Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="../../Functional/Operations/Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../../Functional/Operations/Specifications.html#move-element-workflow-specification">Move Element Workflow Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-move-element-command-refinement-specification">CLI Move Element Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification">Subdirectory Processing Verification</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#cli-move-element-test">CLI Move Element Test</a></li>
@@ -1275,15 +1526,7 @@ Options:
 <h3 id="cli-move-file-command">CLI Move File Command</h3>
 <p>The system shall provide a <code>mv-file</code> command to move entire specification files with all their elements to a new location.</p>
 <h4>Details</h4>
-<p>The <code>mv-file</code> command shall:</p>
-<ul>
-<li>Accept source file path (required, relative to current working directory)</li>
-<li>Accept target file path (required, relative to current working directory)</li>
-<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
-<li>Support <code>--json</code> flag for structured output</li>
-<li>Exit with code 0 on success, non-zero on error</li>
-<li>Command syntax: <code>reqvire mv-file &lt;source-file&gt; &lt;target-file&gt;</code></li>
-</ul>
+<p>The command shall reject <code>mv-file --squash</code> when the target file is an existing <code># Documents</code> file.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1293,37 +1536,76 @@ Options:
 <li><a href="../../Functional/Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="../../Functional/Operations/Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-move-file-command-refinement-specification">CLI Move File Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification">Subdirectory Processing Verification</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#cli-move-file-test">CLI Move File Test</a></li>
 </ul>
 <hr />
+<h3 id="cli-ontologies-command">CLI Ontologies Command</h3>
+<p>The system shall provide an <code>ontologies</code> command that collects all ontology <code>#### Ontology</code> and semantic-contract <code>#### Shapes</code> RDF blocks from the graph registry, with an optional full semantic model projection.</p>
+<h4>Details</h4>
+<p>The command shall:</p>
+<ul>
+<li>Emit RDF/Turtle by default.</li>
+<li>Support <code>--jsonld</code> to emit JSON-LD instead of Turtle.</li>
+<li>Support <code>--full</code> to include RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, semantic-contract shape references, and generated ontology projection facts.</li>
+<li>Exclude semantic-query-contract <code>#### Query</code> content and query metadata from default and <code>--full</code> output until a dedicated query-export command exists; generated ontology projection facts may cite semantic-query-contract IRIs without embedding raw query text.</li>
+<li>Support <code>--output &lt;FILE&gt;</code> to write the selected format to a file.</li>
+<li>Reuse the semantic index built from the graph registry instead of reparsing Turtle separately from validation.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../../Functional/Core/Specifications.html#semantic-contract-structure-specification">Semantic Contract Structure Specification</a></li>
+<li><a href="../../Functional/Output/Specifications.html#ontology-collection-output-specification">Ontology Collection Output Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-ontologies-command-refinement-specification">CLI Ontologies Command Refinement Specification</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/semantic_contract.rs">semantic_contract.rs</a></li>
+<li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
+<li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-ontologies-command-verification">CLI Ontologies Command Verification</a></li>
+</ul>
+<hr />
+<h3 id="cli-relink-command">CLI Relink Command</h3>
+<p>The system shall provide a <code>relink</code> command that exposes the atomic relation relink operation.</p>
+<h4>Details</h4>
+<p>Implementation details shall follow the associated refinement specifications.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../../Functional/Operations/Specifications.html#atomic-relation-relink-workflow-specification">Atomic Relation Relink Workflow Specification</a></li>
+<li><a href="../../Functional/Operations/Constraints.html#atomic-relink-validity-constraint">Atomic Relink Validity Constraint</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-relink-command-refinement-specification">CLI Relink Command Refinement Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#mutating-command-hierarchy-safety-refinement-specification">Mutating Command Hierarchy Safety Refinement Specification</a></li>
+<li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#atomic-relation-relink-test">Atomic Relation Relink Test</a></li>
+</ul>
+<hr />
 <h3 id="cli-remove-asset-command">CLI Remove Asset Command</h3>
 <p>The system shall provide an <code>rm-asset</code> command to remove InternalPath files and automatically remove all references from the model.</p>
 <h4>Details</h4>
-<p>The <code>rm-asset</code> command shall:</p>
-<ul>
-<li>Accept file path as required positional argument</li>
-<li>Find all elements referencing the file as InternalPath</li>
-<li>Remove all InternalPath references:
-<ul>
-<li>From Attachments subsection (remove link entry, remove subsection if empty)</li>
-<li>From Relations (remove entire relation line for satisfiedBy, satisfy, trace)</li>
-</ul>
-</li>
-<li>Delete physical file from filesystem</li>
-<li>Apply changes immediately by default</li>
-<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
-<li>Output git-style diff showing all affected files</li>
-<li>Report all affected elements and removed relations</li>
-<li>Exit with code 0 on success, non-zero on error</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1332,11 +1614,13 @@ Options:
 <ul>
 <li><a href="../../Functional/Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-remove-asset-command-refinement-specification">CLI Remove Asset Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Core/Verifications/AttachmentsVerifications.html#remove-asset-command-verification">Remove Asset Command Verification</a></li>
 </ul>
@@ -1344,19 +1628,7 @@ Options:
 <h3 id="cli-remove-element-command">CLI Remove Element Command</h3>
 <p>The system shall provide an <code>rm</code> command to delete existing model elements and automatically remove all relations referencing the deleted element.</p>
 <h4>Details</h4>
-<p>The <code>rm</code> command shall:</p>
-<ul>
-<li>Accept element name as required positional argument</li>
-<li>Support command syntax: <code>reqvire rm &lt;element-name&gt;</code></li>
-<li>Delete the specified element from its file</li>
-<li>Remove all incoming relations from other elements</li>
-<li>Apply changes immediately by default</li>
-<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
-<li>Output git-style diff showing file changes by default</li>
-<li>Support <code>--json</code> flag for structured output with affected relations</li>
-<li>Report error if element does not exist</li>
-<li>Exit with code 0 on success, non-zero on error</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1365,13 +1637,14 @@ Options:
 <ul>
 <li><a href="../../Functional/Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../../Functional/Operations/Specifications.html#delete-element-workflow-specification">Delete Element Workflow Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-remove-element-command-refinement-specification">CLI Remove Element Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#cli-remove-element-test">CLI Remove Element Test</a></li>
 </ul>
@@ -1379,19 +1652,7 @@ Options:
 <h3 id="cli-rename-element-command">CLI Rename Element Command</h3>
 <p>The system shall provide a <code>rename</code> command to rename existing model elements while automatically updating all relations that reference the renamed element.</p>
 <h4>Details</h4>
-<p>The <code>rename</code> command shall:</p>
-<ul>
-<li>Accept current element name (required)</li>
-<li>Accept new element name (required)</li>
-<li>Update all incoming relations system-wide with new identifier</li>
-<li>Apply changes immediately by default</li>
-<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
-<li>Output git-style diff showing all affected files by default</li>
-<li>Support <code>--json</code> flag for structured output with relation updates and identifier change</li>
-<li>Report identifier change (old → new)</li>
-<li>Report error if element does not exist or new name conflicts with existing element</li>
-<li>Exit with code 0 on success, non-zero on error</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1400,12 +1661,13 @@ Options:
 <ul>
 <li><a href="../../Functional/Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-rename-element-command-refinement-specification">CLI Rename Element Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#cli-rename-element-test">CLI Rename Element Test</a></li>
 </ul>
@@ -1413,29 +1675,15 @@ Options:
 <h3 id="cli-resources-command">CLI Resources Command</h3>
 <p>The system shall provide a <code>resources</code> command that generates a report showing all files referenced by the model through relations and attachments.</p>
 <h4>Details</h4>
-<p>The command shall:</p>
-<ul>
-<li>Be invoked as <code>reqvire resources</code></li>
-<li>Support <code>--json</code> flag for JSON output format</li>
-<li>Default to human-readable text output when JSON flag is not present</li>
-<li>Generate two sections: Relations and Attachments</li>
-<li>Show files from InternalPath relation targets (satisfiedBy, trace, etc.)</li>
-<li>Show files from FilePath attachment targets</li>
-<li>List files alphabetically by path</li>
-<li>For each file, show referencing elements with links</li>
-<li>Sort references by relation type (for relations section), then by element identifier</li>
-<li>Exit with status code 0 on success</li>
-<li>Exit with non-zero status code on errors</li>
-</ul>
-<p>Command output shall be written to stdout for easy redirection to files.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../../Functional/Output/Reporting.html#resources-report">Resources Report</a></li>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-resources-command-refinement-specification">CLI Resources Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#resources-report-verification">Resources Report Verification</a></li>
 </ul>
@@ -1443,46 +1691,14 @@ Options:
 <h3 id="cli-search-command">CLI Search Command</h3>
 <p>The system shall provide a unified search function, activated by the <code>search</code> root command, which shall search and report on model elements with comprehensive filtering capabilities.</p>
 <h4>Details</h4>
-<p>Search command capabilities:</p>
-<ul>
-<li><code>search</code>: Search model elements and output results to stdout</li>
-<li>Support <code>--json</code> flag for structured JSON output</li>
-<li>Support <code>--short</code> flag for abbreviated output (both text and JSON)</li>
-<li>Support comprehensive filter options (all combinable):
-<ul>
-<li>By file path glob: <code>--filter-file="src/**/*Reqs.md"</code></li>
-<li>By element name regex: <code>--filter-name=".*safety.*"</code></li>
-<li>By element type: <code>--filter-type="system-requirement"</code> (exact match)</li>
-<li>By element content regex: <code>--filter-content="MUST"</code></li>
-<li>By page content regex: <code>--filter-page-content="architecture"</code></li>
-<li>By having relations: <code>--have-relations=verifiedBy,satisfiedBy</code> (comma-separated, must have ALL)</li>
-<li>By not having relations: <code>--not-have-relations=verifiedBy</code> (comma-separated, must NOT have ALL)</li>
-<li>By having attachments: <code>--has-attachments</code> (filter elements with Attachments subsection)</li>
-<li>By attachment path pattern: <code>--filter-attachment &lt;glob&gt;</code> (supports glob patterns like <code>*.pdf</code>, <code>docs/*</code>)</li>
-</ul>
-</li>
-</ul>
-<p>Short mode behavior:</p>
-<ul>
-<li>Text output: Display abbreviated one-line format per element</li>
-<li>JSON output: Omit fields: <code>content</code>, <code>page_content</code>, <code>verified_relations_count</code>, <code>satisfied_relations_count</code>, <code>element_count</code>, <code>total_elements</code>, <code>global_counters</code></li>
-</ul>
-<p>Error handling:</p>
-<ul>
-<li>Invalid regex patterns shall return clear error message showing the faulty pattern and exit</li>
-<li>Invalid relation type names shall return error with list of valid relation types</li>
-</ul>
-<p>Default output:</p>
-<ul>
-<li>Human-readable text format when neither <code>--json</code> nor <code>--short</code> is specified</li>
-<li>Full detail mode showing all element metadata and relations</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications. Search JSON shall expose parsed semantic ADT fields for ontology elements, semantic-contract elements, and semantic-query-contract elements when full results are requested.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
+<li><a href="../../Functional/Core/Specifications.html#requirement-governance-metadata-specification">Requirement Governance Metadata Specification</a></li>
 <li><a href="../../Refinements.html#supported-element-types-specification">Supported Element Types Specification</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 <li><a href="../../Functional/Output/Behaviors.html#short-mode-behavior">Short Mode Behavior</a></li>
@@ -1492,58 +1708,69 @@ Options:
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-search-command-refinement-specification">CLI Search Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Core/Verifications/AttachmentsVerifications.html#attachment-search-filters-verification">Attachment Search Filters Verification</a></li>
 <li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#search-command-tests">Search Command Tests</a></li>
+<li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#semantic-contract-search-json-test">Semantic Contract Search JSON Test</a></li>
+<li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#semantic-query-contract-search-json-test">Semantic Query Contract Search JSON Test</a></li>
+<li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
+</ul>
+<hr />
+<h3 id="cli-size-estimate-json-option">CLI Size Estimate JSON Option</h3>
+<p>The CLI shall provide an opt-in <code>--with-size-estimates</code> option for supported JSON report commands.</p>
+<h4>Details</h4>
+<ul>
+<li>The option shall enable model building with element size estimates for the command invocation.</li>
+<li>The option shall be valid only for commands that emit JSON model evidence.</li>
+<li>The option shall require <code>--json</code> when used by CLI report commands.</li>
+<li>If the option is used without <code>--json</code>, the CLI shall fail with a clear error.</li>
+<li>The option shall not change non-JSON output behavior.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-size-estimate-json-option-specification">CLI Size Estimate JSON Option Specification</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-size-estimate-json-option-verification">CLI Size Estimate JSON Option Verification</a></li>
+</ul>
+<hr />
+<h3 id="cli-submodels-command">CLI Submodels Command</h3>
+<p>The system shall provide a <code>submodels</code> command that reports independent capability-rooted hierarchies and cross-submodel requirement couplings.</p>
+<h4>Details</h4>
+<p>The command shall support:</p>
+<ul>
+<li><code>--from &lt;NAME&gt;</code> to scope report output to one capability or requirement subtree by name</li>
+<li><code>--json</code> and <code>--output &lt;FILE&gt;</code> for machine-readable output</li>
+<li>In <code>--from</code> mode, selected capability scopes are listed as the scoped capability submodel; selected requirement scopes are treated as boundaries and are not listed as submodel entries</li>
+</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
+<li><a href="../../Functional/Output/Specifications.html#requirement-submodels-report-specification">Requirement Submodels Report Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-submodels-command-refinement-specification">CLI Submodels Command Refinement Specification</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#submodels-report-verification">Submodels Report Verification</a></li>
 <li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
 </ul>
 <hr />
 <h3 id="cli-traces-command">CLI Traces Command</h3>
-<p>The system shall provide a <code>traces</code> command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy from verifications to root requirements.</p>
+<p>The system shall provide a <code>traces</code> command that generates and outputs upward trace trees for verification elements, showing the complete requirement hierarchy and owning capability context.</p>
 <h4>Details</h4>
-<p>The command shall:</p>
-<ul>
-<li>Be invoked as <code>reqvire traces</code></li>
-<li>Generate output in Markdown format with embedded Mermaid diagrams by default</li>
-<li>Support <code>--json</code> flag for structured JSON output without diagrams</li>
-<li>Show verification elements as roots with arrows following relation semantics</li>
-<li>Include clickable links on all nodes (verifications and requirements) in Mermaid diagrams</li>
-<li>Highlight directly verified requirements using CSS classes in diagrams</li>
-<li>Traverse all upward parent relations to reach root requirements</li>
-<li>Merge multiple verification paths into a single tree per verification</li>
-<li>Exit with status code 0 on success</li>
-<li>Exit with non-zero status code on errors</li>
-</ul>
-<p>The Mermaid diagrams generated for verification traces shall include clickable links on diagram nodes that navigate to the referenced element using relative paths (the <code>traces</code> command always uses relative paths and does not support the <code>--links-with-blobs</code> flag).</p>
-<p>Command output shall be written to stdout for easy redirection to files.</p>
-<p><strong>Filter Options:</strong>
-The system shall support filtering verification traces by verification ID, name pattern, and verification type to allow users to generate traces for specific subsets of verifications.</p>
-<p>The following filter options shall be supported:</p>
-<ul>
-<li><code>--filter-id=&lt;id&gt;</code>: Generate trace for a specific verification element by its full identifier</li>
-<li><code>--filter-name=&lt;regex&gt;</code>: Filter verifications by name using regular expression matching</li>
-<li><code>--filter-type=&lt;type&gt;</code>: Filter by verification type (test-verification, analysis-verification, inspection-verification, demonstration-verification)</li>
-</ul>
-<p>Filters shall be combinable, and when multiple filters are specified, only verifications matching ALL filter criteria shall be included in the output.</p>
-<p><strong>From-Folder Option:</strong>
-The system shall support a <code>--from-folder</code> option for the <code>traces</code> command that specifies the relative path from where Reqvire runs to the folder where generated output files will be saved, enabling generation of relative links in Mermaid diagrams and other outputs that are portable when the output is saved in different locations.</p>
-<p>The <code>--from-folder</code> option shall:</p>
-<ul>
-<li>Accept a relative path string as parameter (e.g., <code>--from-folder=docs/verification-reports</code>)</li>
-<li>Default to empty/current directory when not specified (maintaining existing behavior)</li>
-<li>Support special case <code>/</code> to indicate the reqvire root (git root), keeping identifiers as git-root-relative paths</li>
-<li>Adjust all clickable links in Mermaid diagrams to be relative to the specified folder path</li>
-<li>Adjust all file path references in output to be relative to the specified folder path</li>
-<li>Work with both Markdown output (with Mermaid diagrams) and JSON output</li>
-<li>Ensure generated links work correctly when the output file is saved in the specified folder</li>
-<li>Use the standard path resolution logic to calculate relative paths from the from-folder to git root</li>
-</ul>
-<p><strong>Example usage:</strong></p>
-<pre><code class="language-bash"># Generate traces with links relative to docs/reports/ folder
-reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
-
-# Links in the output will be relative to docs/reports/ (e.g., ../../specifications/file.md)
-</code></pre>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1559,6 +1786,7 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 <ul>
 <li>derive: <a href="#verification-traces-element-navigation">Verification Traces Element Navigation</a></li>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#cli-traces-command-refinement-specification">CLI Traces Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#verification-traces-filter-options-test">Verification Traces Filter Options Test</a></li>
 <li>verifiedBy: <a href="../../Functional/Output/Verifications/ReportingVerifications.html#verification-traces-from-folder-test">Verification Traces From-Folder Test</a></li>
@@ -1568,12 +1796,7 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 <h3 id="verification-traces-element-navigation">Verification Traces Element Navigation</h3>
 <p>The system shall make verification element names in the traces report clickable links that navigate to the element’s definition in its source file.</p>
 <h4>Details</h4>
-<ul>
-<li>Verification element names displayed as headers shall be hyperlinks</li>
-<li>Links shall point to the verification’s source file with fragment identifier</li>
-<li>Format: <code>[Verification Name](file_path#element-fragment)</code></li>
-<li>Enables direct navigation from traces report to verification definition</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1581,12 +1804,15 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-traces-command">CLI Traces Command</a></li>
+<li>refinedBy: <a href="Specifications.html#verification-traces-element-navigation-refinement-specification">Verification Traces Element Navigation Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/verification_trace.rs">verification_trace.rs</a></li>
 <li>verifiedBy: <a href="Verifications/CLIVerifications.html#verification-traces-element-navigation-test">Verification Traces Element Navigation Test</a></li>
 </ul>
 <hr />
 <h3 id="detailed-error-handling-and-logging">Detailed Error Handling and Logging</h3>
 <p>The system shall implement detailed error handling and logging throughout the application to facilitate troubleshooting and provide meaningful feedback.</p>
+<h4>Details</h4>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1598,29 +1824,21 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#detailed-error-handling-and-logging-refinement-specification">Detailed Error Handling and Logging Refinement Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#error-message-format-specification">Error Message Format Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/error.rs">error.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">Add Command Error Messages Test</a></li>
 </ul>
 <hr />
-<h3 id="format-command">Format Command</h3>
-<p>The system shall provide a formatting function, activated by the (format command), which shall execute the formatting process upon user request.</p>
+<h3 id="explicit-workspace-selection">Explicit Workspace Selection</h3>
+<p>The system shall allow command invocations to select the Reqvire workspace explicitly without requiring the caller process to start inside the workspace directory.</p>
 <h4>Details</h4>
-<p><code>format</code> command shall:</p>
 <ul>
-<li>Default to dry-run mode (show suggested changes without applying them)</li>
-<li>Require –fix flag to actually apply formatting changes to files</li>
-<li>Display a diff-style summary of changes that would be or have been made</li>
-<li>Support –json flag for structured output of formatting results</li>
-<li>Show git diff style output with line numbers and colors for both preview and actual formatting</li>
-<li>Support –with-full-relations flag to include all registered relations (user-created and auto-generated)</li>
-</ul>
-<p>Additional behavior:</p>
-<ul>
-<li>By default (no –fix flag), preview changes without applying them</li>
-<li>–fix flag applies the formatting changes to files</li>
-<li>–json flag outputs formatting results in JSON format including file changes and diff information</li>
-<li>When formatting is applied, show a summary of changed files with diff details</li>
-<li>–with-full-relations flag inserts all relations from the model registry into elements, including auto-generated inverse relations (e.g., satisfiedBy from satisfy, derive from derivedFrom)</li>
+<li>The CLI shall provide a global workspace selection option.</li>
+<li>Workspace selection shall apply before model parsing, ignore-pattern loading, git root discovery, reporting, and mutation execution.</li>
+<li>Workspace selection shall preserve existing behavior when the option is not provided.</li>
+<li>Workspace selection shall apply consistently to normal CLI commands and MCP server startup.</li>
+<li>Workspace selection shall reject invalid workspace directories before executing a command.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -1628,13 +1846,34 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 </ul>
 <h4>Attachments</h4>
 <ul>
+<li><a href="../../Functional/Core/Specifications.html#git-repository-scope-specification">Git Repository Scope Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#explicit-workspace-selection-specification">Explicit Workspace Selection Specification</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>verifiedBy: <a href="Verifications/CLIVerifications.html#explicit-workspace-selection-verification">Explicit Workspace Selection Verification</a></li>
+</ul>
+<hr />
+<h3 id="format-command">Format Command</h3>
+<p>The system shall provide a formatting function, activated by the (format command), which shall execute the formatting process upon user request.</p>
+<h4>Details</h4>
+<p>Implementation details shall follow the associated refinement specifications.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#format-command-refinement-specification">Format Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/FormattingVerifications.html#element-ordering-verification">Element Ordering Verification</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/FormattingVerifications.html#format-command-requirements-verification">Format Command Requirements Verification</a></li>
@@ -1645,26 +1884,7 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 <h3 id="relation-commands">Relation Commands</h3>
 <p>The system shall provide unified CLI commands for relation and attachment management: link and unlink.</p>
 <h4>Details</h4>
-<p>The <code>link</code> command shall:</p>
-<ul>
-<li>Accept syntax: <code>reqvire link &lt;source&gt; &lt;relation-type-or-attaching&gt; &lt;target&gt;</code></li>
-<li>Source: existing element name</li>
-<li>Relation-type: one of derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace, OR ‘attaching’</li>
-<li>Target types for relations: element name, internal file path, or external URL (http/https)</li>
-<li>Target types for attaching: internal file path or Refinement element name (external URLs NOT allowed)</li>
-<li>When ‘attaching’ is used with an external URL, reject with error suggesting to use ‘trace’ relation instead</li>
-<li>When relation or attachment already exists, return error with clear message</li>
-<li>Support <code>--dry-run</code> flag for preview</li>
-</ul>
-<p>The <code>unlink</code> command shall:</p>
-<ul>
-<li>Accept syntax: <code>reqvire unlink &lt;source&gt; &lt;target&gt;</code></li>
-<li>Auto-detect: searches relations first, then attachments</li>
-<li>Only one relation per source-target pair is allowed</li>
-<li>Source: existing element name</li>
-<li>Target: element name or file path</li>
-<li>Support <code>--dry-run</code> flag for preview</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1672,13 +1892,15 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 <h4>Attachments</h4>
 <ul>
 <li><a href="../../Functional/Operations/Specifications.html#relation-operations-specification">Relation Operations Specification</a></li>
-<li><a href="../../Functional/Core/DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
+<li><a href="../../Functional/Core/DesignDocuments/RelationTypes.html#relationtypes">RelationTypes</a></li>
 <li><a href="../../Functional/Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li><a href="../../Functional/Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#relation-commands-refinement-specification">Relation Commands Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#link-command-cross-section-detection-test">Link Command Cross-Section Detection Test</a></li>
 <li>verifiedBy: <a href="../../Functional/Operations/Verifications/ElementManipulationVerifications.html#link-command-verification">Link Command Verification</a></li>
@@ -1688,32 +1910,7 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 <h3 id="validate-command">Validate Command</h3>
 <p>The system shall provide a validation command that executes model validation and reports any issues found.</p>
 <h4>Details</h4>
-<p><code>validate</code> command shall:</p>
-<ul>
-<li>Execute two-pass validation strategy:
-<ul>
-<li><strong>Pass 1: Element Collection and Local Validation</strong>
-<ul>
-<li>Parse all markdown files</li>
-<li>Extract elements with metadata</li>
-<li>Perform local validation (element uniqueness, identifier format, metadata syntax)</li>
-<li>Report errors if found</li>
-</ul>
-</li>
-<li><strong>Pass 2: Graph Construction and Relation Validation</strong>
-<ul>
-<li>Build GraphRegistry from collected elements</li>
-<li>Validate all relations (target existence, type compatibility)</li>
-<li>Perform cross-component validation</li>
-<li>Report errors if found</li>
-</ul>
-</li>
-</ul>
-</li>
-<li>Print all validation issues found in the model</li>
-<li>Output a success message “No validation issues found” when the model is valid</li>
-<li>Support –json flag to output validation results in JSON format</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -1723,13 +1920,14 @@ reqvire traces --from-folder=docs/reports &gt; docs/reports/traces.md
 <li><a href="../../Functional/Core/Behaviors.html#two-pass-validation-behavior">Two-Pass Validation Behavior</a></li>
 <li><a href="../../Functional/Core/Behaviors.html#validation-error-reporting-behavior">Validation Error Reporting Behavior</a></li>
 <li><a href="../../Functional/Output/Specifications.html#json-output-structure">JSON Output Structure</a></li>
-<li><a href="../../Functional/Output/Specifications.html#error-message-format-specification">Error Message Format Specification</a></li>
+<li><a href="Specifications.html#error-message-format-specification">Error Message Format Specification</a></li>
 <li><a href="../../Functional/Core/Constraints.html#attachment-hierarchical-independence-constraint">Attachment Hierarchical Independence Constraint</a></li>
 <li><a href="../../Functional/Core/Constraints.html#attachment-satisfied-refinement-constraint">Attachment Satisfied Refinement Constraint</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#cli-interface-structure">CLI Interface Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#validate-command-refinement-specification">Validate Command Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>verifiedBy: <a href="../../Functional/Core/Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
 <li>verifiedBy: <a href="Verifications/CLIVerifications.html#cli-help-structure-verification">CLI Help Structure Verification</a></li>
@@ -1781,7 +1979,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -1790,10 +1989,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -1806,7 +2008,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -1824,6 +2026,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -2216,9 +2423,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

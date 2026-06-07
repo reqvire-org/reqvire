@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,17 +447,28 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
+  subgraph bbcd64366752f8c2["📁 requirements/Capabilities"]
+    subgraph e7fc74a6eb710df9["📄 BehaviorValidationOperations.md"]
+      b2792a65f70f5b72["Reqvire Behavior Rule Ontology Shape Profile"];
+      class b2792a65f70f5b72 default;
+      click b2792a65f70f5b72 "../../Capabilities/BehaviorValidationOperations.html#reqvire-behavior-rule-ontology-shape-profile";
+      6f0850d8a3e2f599["Reqvire Validation Ontology Shape Profile"];
+      class 6f0850d8a3e2f599 default;
+      click 6f0850d8a3e2f599 "../../Capabilities/BehaviorValidationOperations.html#reqvire-validation-ontology-shape-profile";
+    end
+  end
   subgraph 8735c0a811307e57["📁 requirements/Functional/Core"]
     subgraph d1a073c5dbdc4a00["📄 Behaviors.md"]
       6789e7e9e093c884["Two-Pass Validation Behavior"];
@@ -376,35 +485,59 @@
       c2c71cb34cb7b7c9["Cross-Section Duplicate Constraint"];
       class c2c71cb34cb7b7c9 default;
       click c2c71cb34cb7b7c9 "Constraints.html#cross-section-duplicate-constraint";
+      1d75992c57f0ac29["Single Root Hierarchy Ownership Constraint"];
+      class 1d75992c57f0ac29 default;
+      click 1d75992c57f0ac29 "Constraints.html#single-root-hierarchy-ownership-constraint";
     end
     subgraph 525b4b735cf204bb["📄 Specifications.md"]
+      8720635a1cd26404["Attachment Scope Validation Refinement Specification"];
+      class 8720635a1cd26404 default;
+      click 8720635a1cd26404 "Specifications.html#attachment-scope-validation-refinement-specification";
+      61c0c91f5d9011b["Attachment Target Validation Refinement Specification"];
+      class 61c0c91f5d9011b default;
+      click 61c0c91f5d9011b "Specifications.html#attachment-target-validation-refinement-specification";
+      fb486bf104caf606["Excluded File Relation Validation Refinement Specification"];
+      class fb486bf104caf606 default;
+      click fb486bf104caf606 "Specifications.html#excluded-file-relation-validation-refinement-specification";
+      9b081d653b7c6fb3["Integrated Validation Refinement Specification"];
+      class 9b081d653b7c6fb3 default;
+      click 9b081d653b7c6fb3 "Specifications.html#integrated-validation-refinement-specification";
+      17cc29ccff3fb41d["Internal Consistency Validator Refinement Specification"];
+      class 17cc29ccff3fb41d default;
+      click 17cc29ccff3fb41d "Specifications.html#internal-consistency-validator-refinement-specification";
+      d688486d96aa9bfc["Relation Element Type Validator Refinement Specification"];
+      class d688486d96aa9bfc default;
+      click d688486d96aa9bfc "Specifications.html#relation-element-type-validator-refinement-specification";
       bfa72151f513d464["Requirements Processing Specification"];
       class bfa72151f513d464 default;
       click bfa72151f513d464 "Specifications.html#requirements-processing-specification";
+      f76de08278324f68["Semantic Contract Reference Context Validation Specification"];
+      class f76de08278324f68 default;
+      click f76de08278324f68 "Specifications.html#semantic-contract-reference-context-validation-specification";
     end
     subgraph 98067cc5207d6b91["📄 Validation.md"]
-      38109a2549fc3c4f["Attachment Scope Validation<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      38109a2549fc3c4f["Attachment Scope Validation<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Subgraph Direction Constraint<br/>📎 Attachment Satisfied Refinement Constraint"];
       class 38109a2549fc3c4f systemRequirement;
       click 38109a2549fc3c4f "Validation.html#attachment-scope-validation";
       fcfc76ba4d193d75["Attachment Target Validation"];
       class fcfc76ba4d193d75 systemRequirement;
       click fcfc76ba4d193d75 "Validation.html#attachment-target-validation";
+      dba3d12b1044169f["Behavior Rule Semantic Contract"];
+      class dba3d12b1044169f systemRequirement;
+      click dba3d12b1044169f "Validation.html#behavior-rule-semantic-contract";
       df9b3eb5275616dd["Cross-Component Dependency Validator"];
       class df9b3eb5275616dd systemRequirement;
       click df9b3eb5275616dd "Validation.html#cross-component-dependency-validator";
       14c74cc4fb33d735["Cross-Section Duplicate Validation"];
       class 14c74cc4fb33d735 systemRequirement;
       click 14c74cc4fb33d735 "Validation.html#cross-section-duplicate-validation";
-      a869d98120d611e3["Enhanced Validation Error Reporting"];
-      class a869d98120d611e3 userRequirement;
-      click a869d98120d611e3 "Validation.html#enhanced-validation-error-reporting";
       327e10e1bebd5bde["Excluded File Relation Validation"];
       class 327e10e1bebd5bde systemRequirement;
       click 327e10e1bebd5bde "Validation.html#excluded-file-relation-validation";
       f1ee9af5e71df06a["GraphRegistry as Primary Registry"];
       class f1ee9af5e71df06a systemRequirement;
       click f1ee9af5e71df06a "Validation.html#graphregistry-as-primary-registry";
-      b207bb8eb7f88839["Integrated Validation<br/>📎 requirements/Functional/Core/Behaviors.md#two-pass-validation-behavior"];
+      b207bb8eb7f88839["Integrated Validation<br/>📎 Two-Pass Validation Behavior"];
       class b207bb8eb7f88839 systemRequirement;
       click b207bb8eb7f88839 "Validation.html#integrated-validation";
       fed54223697ea04e["Internal Consistency Validator"];
@@ -419,6 +552,12 @@
       dcb530333efa6cc3["Relation Type Validation"];
       class dcb530333efa6cc3 systemRequirement;
       click dcb530333efa6cc3 "Validation.html#relation-type-validation";
+      2175fcbf8cfb5b09["Semantic Contract Reference Context Validation"];
+      class 2175fcbf8cfb5b09 systemRequirement;
+      click 2175fcbf8cfb5b09 "Validation.html#semantic-contract-reference-context-validation";
+      1a63cf93636c83f5["Single Root Hierarchy Ownership"];
+      class 1a63cf93636c83f5 systemRequirement;
+      click 1a63cf93636c83f5 "Validation.html#single-root-hierarchy-ownership";
       32ca10d548006362["Two-Pass Validation Strategy"];
       class 32ca10d548006362 systemRequirement;
       click 32ca10d548006362 "Validation.html#two-pass-validation-strategy";
@@ -426,23 +565,26 @@
       class dcd747ef36b02f8c systemRequirement;
       click dcd747ef36b02f8c "Validation.html#type-validation-error-requirement";
       6226bc768d0185df["Validate Cross-Component Dependencies"];
-      class 6226bc768d0185df userRequirement;
+      class 6226bc768d0185df systemRequirement;
       click 6226bc768d0185df "Validation.html#validate-cross-component-dependencies";
       15086e20fb6e1f44["Validate Filesystem Structure"];
-      class 15086e20fb6e1f44 userRequirement;
+      class 15086e20fb6e1f44 systemRequirement;
       click 15086e20fb6e1f44 "Validation.html#validate-filesystem-structure";
       ff8ff08f0c0500f0["Validate Internal Consistency"];
-      class ff8ff08f0c0500f0 userRequirement;
+      class ff8ff08f0c0500f0 systemRequirement;
       click ff8ff08f0c0500f0 "Validation.html#validate-internal-consistency";
       76fbd08929220b2f["Validate Markdown Structure"];
-      class 76fbd08929220b2f userRequirement;
+      class 76fbd08929220b2f systemRequirement;
       click 76fbd08929220b2f "Validation.html#validate-markdown-structure";
       4a77e514d9e5539b["Validate Relation Types"];
-      class 4a77e514d9e5539b userRequirement;
+      class 4a77e514d9e5539b systemRequirement;
       click 4a77e514d9e5539b "Validation.html#validate-relation-types";
-      e5ee40ed53dd3c3["Validation Error Handling<br/>📎 requirements/Functional/Output/Specifications.md#error-message-format-specification"];
+      e5ee40ed53dd3c3["Validation Error Handling"];
       class e5ee40ed53dd3c3 systemRequirement;
       click e5ee40ed53dd3c3 "Validation.html#validation-error-handling";
+      af1ff4e38694e3fb["Validation Rule Semantic Contract"];
+      class af1ff4e38694e3fb systemRequirement;
+      click af1ff4e38694e3fb "Validation.html#validation-rule-semantic-contract";
     end
   end
   subgraph 6c93988fc728d1f8["📁 requirements/Functional/Core/Verifications"]
@@ -456,11 +598,17 @@
       ff62a0266193ee63["Attachments Validation Verification"];
       class ff62a0266193ee63 verification;
       click ff62a0266193ee63 "Verifications/AttachmentsVerifications.html#attachments-validation-verification";
+      bddfad77c89d5e71["Ontology and Contract Attachment Verification"];
+      class bddfad77c89d5e71 verification;
+      click bddfad77c89d5e71 "Verifications/AttachmentsVerifications.html#ontology-and-contract-attachment-verification";
     end
     subgraph 46a9d0ceb9db210e["📄 ValidationVerifications.md"]
       f0aeb8d3ad027b6e["Cross-Section Duplicate Validation Test"];
       class f0aeb8d3ad027b6e verification;
       click f0aeb8d3ad027b6e "Verifications/ValidationVerifications.html#cross-section-duplicate-validation-test";
+      576cfeab198c03b2["Document Refinement Validation Test"];
+      class 576cfeab198c03b2 verification;
+      click 576cfeab198c03b2 "Verifications/ValidationVerifications.html#document-refinement-validation-test";
       4bbdeefb4231596e["Element Type Relation Compatibility Test"];
       class 4bbdeefb4231596e verification;
       click 4bbdeefb4231596e "Verifications/ValidationVerifications.html#element-type-relation-compatibility-test";
@@ -476,7 +624,13 @@
       5352180257d54fb2["Same-File Fragment Relations Test"];
       class 5352180257d54fb2 verification;
       click 5352180257d54fb2 "Verifications/ValidationVerifications.html#same-file-fragment-relations-test";
-      776101677ee97029["Type Validation Errors Test<br/>📎 requirements/Functional/Core/Behaviors.md#type-validation-error-behavior"];
+      2d5af227dfb08f48["Semantic Contract SHACL Sanity Validation Test"];
+      class 2d5af227dfb08f48 verification;
+      click 2d5af227dfb08f48 "Verifications/ValidationVerifications.html#semantic-contract-shacl-sanity-validation-test";
+      63f4d042c4d8f040["Single Root Hierarchy Ownership Validation Test"];
+      class 63f4d042c4d8f040 verification;
+      click 63f4d042c4d8f040 "Verifications/ValidationVerifications.html#single-root-hierarchy-ownership-validation-test";
+      776101677ee97029["Type Validation Errors Test<br/>📎 Type Validation Error Behavior"];
       class 776101677ee97029 verification;
       click 776101677ee97029 "Verifications/ValidationVerifications.html#type-validation-errors-test";
       2d8c79b0a3233f70["Unstructured Documents Test"];
@@ -491,12 +645,15 @@
       click f7d422af274a64cf "../Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test";
     end
   end
+  38109a2549fc3c4f -->|refinedBy| 8720635a1cd26404;
   499d48218b73f571["model.rs"];
   class 499d48218b73f571 default;
   click 499d48218b73f571 "../../../core/src/model.rs";
   38109a2549fc3c4f -->|satisfiedBy| 499d48218b73f571;
   38109a2549fc3c4f -.->|verifiedBy| d7cd30e5e333aa7;
+  38109a2549fc3c4f -.->|verifiedBy| bddfad77c89d5e71;
   fcfc76ba4d193d75 -.->|deriveReqT| 38109a2549fc3c4f;
+  fcfc76ba4d193d75 -->|refinedBy| 61c0c91f5d9011b;
   fcfc76ba4d193d75 -->|satisfiedBy| 499d48218b73f571;
   35bd98d101f36b62["parser.rs"];
   class 35bd98d101f36b62 default;
@@ -504,35 +661,31 @@
   fcfc76ba4d193d75 -->|satisfiedBy| 35bd98d101f36b62;
   fcfc76ba4d193d75 -.->|verifiedBy| 18307065fb353848;
   fcfc76ba4d193d75 -.->|verifiedBy| ff62a0266193ee63;
+  fcfc76ba4d193d75 -.->|verifiedBy| bddfad77c89d5e71;
+  dba3d12b1044169f -->|refinedBy| b2792a65f70f5b72;
   df9b3eb5275616dd -->|satisfiedBy| 499d48218b73f571;
   df9b3eb5275616dd -->|satisfiedBy| 35bd98d101f36b62;
   df9b3eb5275616dd -.->|verifiedBy| ad323c8d4c0751e;
+  14c74cc4fb33d735 -->|refinedBy| c2c71cb34cb7b7c9;
   14c74cc4fb33d735 -->|satisfiedBy| 499d48218b73f571;
-  14c74cc4fb33d735 -->|satisfiedBy| c2c71cb34cb7b7c9;
   14c74cc4fb33d735 -.->|verifiedBy| f0aeb8d3ad027b6e;
-  a869d98120d611e3 -.->|deriveReqT| dcb530333efa6cc3;
-  a869d98120d611e3 -.->|deriveReqT| dcd747ef36b02f8c;
-  a869d98120d611e3 -.->|deriveReqT| e5ee40ed53dd3c3;
-  637652e86464c11b["error.rs"];
-  class 637652e86464c11b default;
-  click 637652e86464c11b "../../../core/src/error.rs";
-  a869d98120d611e3 -->|satisfiedBy| 637652e86464c11b;
-  a869d98120d611e3 -->|satisfiedBy| fc1df5aa988472a;
-  a869d98120d611e3 -.->|verifiedBy| f7d422af274a64cf;
+  327e10e1bebd5bde -->|refinedBy| fb486bf104caf606;
   327e10e1bebd5bde -->|satisfiedBy| 35bd98d101f36b62;
   327e10e1bebd5bde -.->|verifiedBy| 2d8c79b0a3233f70;
+  f1ee9af5e71df06a -->|refinedBy| bfa72151f513d464;
   95cf526671ec752c["graph_registry.rs"];
   class 95cf526671ec752c default;
   click 95cf526671ec752c "../../../core/src/graph_registry.rs";
   f1ee9af5e71df06a -->|satisfiedBy| 95cf526671ec752c;
   f1ee9af5e71df06a -->|satisfiedBy| 499d48218b73f571;
-  f1ee9af5e71df06a -->|satisfiedBy| bfa72151f513d464;
   f1ee9af5e71df06a -.->|verifiedBy| cd31aec9ae0c3ed3;
+  b207bb8eb7f88839 -->|refinedBy| 9b081d653b7c6fb3;
   25bf5cc42f41e395["cli.rs"];
   class 25bf5cc42f41e395 default;
   click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
   b207bb8eb7f88839 -->|satisfiedBy| 25bf5cc42f41e395;
   fed54223697ea04e -.->|deriveReqT| 14c74cc4fb33d735;
+  fed54223697ea04e -->|refinedBy| 17cc29ccff3fb41d;
   fed54223697ea04e -->|satisfiedBy| 499d48218b73f571;
   fed54223697ea04e -->|satisfiedBy| 35bd98d101f36b62;
   fed54223697ea04e -.->|verifiedBy| ad323c8d4c0751e;
@@ -541,9 +694,11 @@
   4e665d02fddc5598 -.->|verifiedBy| 83d989f6ea529f74;
   4e665d02fddc5598 -.->|verifiedBy| ad323c8d4c0751e;
   4e665d02fddc5598 -.->|verifiedBy| f7d422af274a64cf;
+  9f1021634cff7f57 -->|refinedBy| d688486d96aa9bfc;
   9f1021634cff7f57 -->|satisfiedBy| 95cf526671ec752c;
   9f1021634cff7f57 -->|satisfiedBy| 499d48218b73f571;
   9f1021634cff7f57 -->|satisfiedBy| 35bd98d101f36b62;
+  9f1021634cff7f57 -.->|verifiedBy| 576cfeab198c03b2;
   9f1021634cff7f57 -.->|verifiedBy| 4bbdeefb4231596e;
   9f1021634cff7f57 -.->|verifiedBy| ad323c8d4c0751e;
   1cfe88f8d3cc7aac["relation.rs"];
@@ -552,30 +707,52 @@
   dcb530333efa6cc3 -->|satisfiedBy| 1cfe88f8d3cc7aac;
   dcb530333efa6cc3 -.->|verifiedBy| ad323c8d4c0751e;
   dcb530333efa6cc3 -.->|verifiedBy| 5352180257d54fb2;
+  2175fcbf8cfb5b09 -->|refinedBy| f76de08278324f68;
+  2175fcbf8cfb5b09 -->|satisfiedBy| 95cf526671ec752c;
+  2175fcbf8cfb5b09 -.->|verifiedBy| 2d5af227dfb08f48;
+  1a63cf93636c83f5 -->|refinedBy| 1d75992c57f0ac29;
+  1a63cf93636c83f5 -->|satisfiedBy| 95cf526671ec752c;
+  1a63cf93636c83f5 -.->|verifiedBy| 63f4d042c4d8f040;
+  32ca10d548006362 -->|refinedBy| 6789e7e9e093c884;
   32ca10d548006362 -->|satisfiedBy| 499d48218b73f571;
-  32ca10d548006362 -->|satisfiedBy| 6789e7e9e093c884;
+  dcd747ef36b02f8c -->|refinedBy| 5f843b087a10d61b;
   e068cb8b03a77b4d["element.rs"];
   class e068cb8b03a77b4d default;
   click e068cb8b03a77b4d "../../../core/src/element.rs";
   dcd747ef36b02f8c -->|satisfiedBy| e068cb8b03a77b4d;
   dcd747ef36b02f8c -->|satisfiedBy| 1cfe88f8d3cc7aac;
-  dcd747ef36b02f8c -->|satisfiedBy| 5f843b087a10d61b;
   dcd747ef36b02f8c -.->|verifiedBy| 776101677ee97029;
+  6226bc768d0185df -.->|deriveReqT| dba3d12b1044169f;
   6226bc768d0185df -.->|deriveReqT| df9b3eb5275616dd;
+  6226bc768d0185df -.->|deriveReqT| af1ff4e38694e3fb;
   ff8ff08f0c0500f0 -.->|deriveReqT| fcfc76ba4d193d75;
   ff8ff08f0c0500f0 -.->|deriveReqT| f1ee9af5e71df06a;
   ff8ff08f0c0500f0 -.->|deriveReqT| b207bb8eb7f88839;
   ff8ff08f0c0500f0 -.->|deriveReqT| fed54223697ea04e;
+  ff8ff08f0c0500f0 -.->|deriveReqT| dcb530333efa6cc3;
+  ff8ff08f0c0500f0 -.->|deriveReqT| 1a63cf93636c83f5;
   ff8ff08f0c0500f0 -.->|deriveReqT| 32ca10d548006362;
+  ff8ff08f0c0500f0 -.->|deriveReqT| dcd747ef36b02f8c;
+  ff8ff08f0c0500f0 -.->|deriveReqT| e5ee40ed53dd3c3;
   76fbd08929220b2f -.->|deriveReqT| 4e665d02fddc5598;
   4a77e514d9e5539b -.->|deriveReqT| 9f1021634cff7f57;
+  e5ee40ed53dd3c3 -->|refinedBy| fc1df5aa988472a;
+  637652e86464c11b["error.rs"];
+  class 637652e86464c11b default;
+  click 637652e86464c11b "../../../core/src/error.rs";
   e5ee40ed53dd3c3 -->|satisfiedBy| 637652e86464c11b;
   e5ee40ed53dd3c3 -->|satisfiedBy| 499d48218b73f571;
   e5ee40ed53dd3c3 -.->|verifiedBy| ad323c8d4c0751e;
+  e5ee40ed53dd3c3 -.->|verifiedBy| f7d422af274a64cf;
+  af1ff4e38694e3fb -->|refinedBy| 6f0850d8a3e2f599;
   63f4742e633e3986["test.sh"];
   class 63f4742e633e3986 default;
   click 63f4742e633e3986 "../../../tests/test-attachment-constraints/test.sh";
   d7cd30e5e333aa7 -->|satisfiedBy| 63f4742e633e3986;
+  81ef20c82035bea6["test.sh"];
+  class 81ef20c82035bea6 default;
+  click 81ef20c82035bea6 "../../../tests/test-capability-attachments/test.sh";
+  bddfad77c89d5e71 -->|satisfiedBy| 81ef20c82035bea6;
   d882e7ff8e1ffe95["test.sh"];
   class d882e7ff8e1ffe95 default;
   click d882e7ff8e1ffe95 "../../../tests/test-assets/test.sh";
@@ -589,10 +766,6 @@
   class 4179509ffe0be04b default;
   click 4179509ffe0be04b "../../../tests/test-duplicate-detection/test.sh";
   f0aeb8d3ad027b6e -->|satisfiedBy| 4179509ffe0be04b;
-  fe0a74a2cd2af425["test.sh"];
-  class fe0a74a2cd2af425 default;
-  click fe0a74a2cd2af425 "../../../tests/test-add-command-error-messages/test.sh";
-  f7d422af274a64cf -->|satisfiedBy| fe0a74a2cd2af425;
   3ee9a5ae2313e6b0["test.sh"];
   class 3ee9a5ae2313e6b0 default;
   click 3ee9a5ae2313e6b0 "../../../tests/test-valid-relations/test.sh";
@@ -602,6 +775,14 @@
   click b3573dfcbb8f5f40 "../../../tests/test-excluded-patterns/test.sh";
   cd31aec9ae0c3ed3 -->|satisfiedBy| b3573dfcbb8f5f40;
   83d989f6ea529f74 -->|satisfiedBy| 5150ae05d0a88a84;
+  fe0a74a2cd2af425["test.sh"];
+  class fe0a74a2cd2af425 default;
+  click fe0a74a2cd2af425 "../../../tests/test-add-command-error-messages/test.sh";
+  f7d422af274a64cf -->|satisfiedBy| fe0a74a2cd2af425;
+  a8b5e6f72b3e3451["test.sh"];
+  class a8b5e6f72b3e3451 default;
+  click a8b5e6f72b3e3451 "../../../tests/test-document-refinement-format/test.sh";
+  576cfeab198c03b2 -->|satisfiedBy| a8b5e6f72b3e3451;
   845fe9ccbc0f0550["test.sh"];
   class 845fe9ccbc0f0550 default;
   click 845fe9ccbc0f0550 "../../../tests/test-element-type-relation-compatibility/test.sh";
@@ -610,102 +791,23 @@
   class f0923d0189e77f4c default;
   click f0923d0189e77f4c "../../../tests/test-fragment-relations/test.sh";
   5352180257d54fb2 -->|satisfiedBy| f0923d0189e77f4c;
+  17b64e3b53162666["test.sh"];
+  class 17b64e3b53162666 default;
+  click 17b64e3b53162666 "../../../tests/test-semantic-contract-sanity/test.sh";
+  2d5af227dfb08f48 -->|satisfiedBy| 17b64e3b53162666;
+  6b5153e9a077d95c["test.sh"];
+  class 6b5153e9a077d95c default;
+  click 6b5153e9a077d95c "../../../tests/test-single-root-hierarchy-validation/test.sh";
+  63f4d042c4d8f040 -->|satisfiedBy| 6b5153e9a077d95c;
   ddd4d40b5d6bdcc9["test.sh"];
   class ddd4d40b5d6bdcc9 default;
   click ddd4d40b5d6bdcc9 "../../../tests/test-type-validation-errors/test.sh";
   776101677ee97029 -->|satisfiedBy| ddd4d40b5d6bdcc9;
 </div>
-<h3 id="enhanced-validation-error-reporting">Enhanced Validation Error Reporting</h3>
-<p>The system shall include context for resolution in validation errors.</p>
-<h4>Details</h4>
-<p>The system shall define validation error reporting behavior.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derive: <a href="#relation-type-validation">Relation Type Validation</a></li>
-<li>derive: <a href="#type-validation-error-requirement">Type Validation Error Requirement</a></li>
-<li>derive: <a href="#validation-error-handling">Validation Error Handling</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
-<li>satisfiedBy: <a href="../../../core/src/error.rs">error.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#validation-error-reporting-behavior">Validation Error Reporting Behavior</a></li>
-<li>verifiedBy: <a href="../Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">Add Command Error Messages Test</a></li>
-</ul>
-<hr />
-<h3 id="relation-type-validation">Relation Type Validation</h3>
-<p>The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
-<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#same-file-fragment-relations-test">Same-File Fragment Relations Test</a></li>
-</ul>
-<hr />
-<h3 id="type-validation-error-requirement">Type Validation Error Requirement</h3>
-<p>The system shall display all valid type options when type validation fails.</p>
-<h4>Details</h4>
-<ul>
-<li>Invalid element types shall show list of valid element types including custom type pattern</li>
-<li>Invalid relation types shall show list of valid relation types</li>
-<li>Element type list format: “type1, type2, … For custom types use: other-TYPENAME”</li>
-<li>Relation type list format: “type1, type2, …” (alphabetically sorted)</li>
-</ul>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
-<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#type-validation-error-behavior">Type Validation Error Behavior</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#type-validation-errors-test">Type Validation Errors Test</a></li>
-</ul>
-<hr />
-<h3 id="validation-error-handling">Validation Error Handling</h3>
-<p>The system shall maintain consistent error handling across both validation passes, collecting all errors within each pass before reporting.</p>
-<h4>Details</h4>
-<p>Error handling shall follow these principles:</p>
-<ol>
-<li><strong>Complete pass execution</strong>: Each pass runs to completion, collecting all errors found</li>
-<li><strong>Aggregated reporting</strong>: All errors from a pass are reported together</li>
-<li><strong>Early termination</strong>: Process exits after reporting errors from either pass</li>
-<li><strong>Existing error format</strong>: Error messages maintain the current format and structure</li>
-<li><strong>Exit codes</strong>: Non-zero exit codes indicate validation failures</li>
-</ol>
-<p>This ensures users see all relevant errors at once rather than fixing issues one at a time.</p>
-<h4>Metadata</h4>
-<ul>
-<li>type: requirement</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../Output/Specifications.html#error-message-format-specification">Error Message Format Specification</a></li>
-</ul>
-<h4>Relations</h4>
-<ul>
-<li>derivedFrom: <a href="#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
-<li>satisfiedBy: <a href="../../../core/src/error.rs">error.rs</a></li>
-<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
-</ul>
-<hr />
 <h3 id="excluded-file-relation-validation">Excluded File Relation Validation</h3>
 <p>The system shall properly validate relations targeting files matching excluded filename patterns, enabling references to excluded files while still respecting their exclusion from processing and formatting operations.</p>
 <h4>Details</h4>
-<p>The validation process for excluded files:</p>
-<ol>
-<li>Files matching excluded patterns are registered in the element registry for relation validation only</li>
-<li>Internal elements within excluded files are not processed or validated</li>
-</ol>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -713,20 +815,52 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Operations/Formatting.html#file-pattern-exclusion-for-format">File Pattern Exclusion for Format</a></li>
+<li>refinedBy: <a href="Specifications.html#excluded-file-relation-validation-refinement-specification">Excluded File Relation Validation Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#unstructured-documents-test">Unstructured Documents Test</a></li>
+</ul>
+<hr />
+<h3 id="semantic-contract-reference-context-validation">Semantic Contract Reference Context Validation</h3>
+<p>The system shall reject semantic-contract shape references that cannot be resolved within the owner ontology context.</p>
+<h4>Details</h4>
+<p>When validating semantic contracts, the system shall require each SHACL reference to resolve to an ontology term declared by an ontology element reachable through the owning requirement’s capability context, including ontology attached to that capability or inherited from ancestor capabilities.</p>
+<p>The system shall reject references to terms declared outside the reachable capability ontology context because such references bypass the capability-level attachment path required for change-impact traceability.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="ModelManagement.html#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>refinedBy: <a href="Specifications.html#semantic-contract-reference-context-validation-specification">Semantic Contract Reference Context Validation Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#semantic-contract-shacl-sanity-validation-test">Semantic Contract SHACL Sanity Validation Test</a></li>
 </ul>
 <hr />
 <h3 id="validate-cross-component-dependencies">Validate Cross-Component Dependencies</h3>
 <p>The system shall validate dependencies across different components of the System model to identify mismatches or gaps.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#behavior-rule-semantic-contract">Behavior Rule Semantic Contract</a></li>
 <li>derive: <a href="#cross-component-dependency-validator">Cross-Component Dependency Validator</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
+<li>derive: <a href="#validation-rule-semantic-contract">Validation Rule Semantic Contract</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#validating-structures">Validating Structures</a></li>
+</ul>
+<hr />
+<h3 id="behavior-rule-semantic-contract">Behavior Rule Semantic Contract</h3>
+<p>The system shall define SHACL constraints for behavior rules, state transitions, and behavior refinement structure.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#validate-cross-component-dependencies">Validate Cross-Component Dependencies</a></li>
+<li>refinedBy: <a href="../../Capabilities/BehaviorValidationOperations.html#reqvire-behavior-rule-ontology-shape-profile">Reqvire Behavior Rule Ontology Shape Profile</a></li>
 </ul>
 <hr />
 <h3 id="cross-component-dependency-validator">Cross-Component Dependency Validator</h3>
@@ -743,22 +877,34 @@
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
 </ul>
 <hr />
+<h3 id="validation-rule-semantic-contract">Validation Rule Semantic Contract</h3>
+<p>The system shall define SHACL constraints for validation rule metadata, validation scope, severity, condition, and outcome.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#validate-cross-component-dependencies">Validate Cross-Component Dependencies</a></li>
+<li>refinedBy: <a href="../../Capabilities/BehaviorValidationOperations.html#reqvire-validation-ontology-shape-profile">Reqvire Validation Ontology Shape Profile</a></li>
+</ul>
+<hr />
 <h3 id="validate-filesystem-structure">Validate Filesystem Structure</h3>
 <p>The system shall validate the organization of files and folders in the repository to ensure consistency with the MBSE methodology.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#validating-structures">Validating Structures</a></li>
 </ul>
 <hr />
 <h3 id="validate-internal-consistency">Validate Internal Consistency</h3>
 <p>The system shall check the internal consistency of the system model, ensuring that relationships and elements align correctly.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -766,28 +912,18 @@
 <li>derive: <a href="#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a></li>
 <li>derive: <a href="#integrated-validation">Integrated Validation</a></li>
 <li>derive: <a href="#internal-consistency-validator">Internal Consistency Validator</a></li>
+<li>derive: <a href="#relation-type-validation">Relation Type Validation</a></li>
+<li>derive: <a href="#single-root-hierarchy-ownership">Single Root Hierarchy Ownership</a></li>
 <li>derive: <a href="#two-pass-validation-strategy">Two-Pass Validation Strategy</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
+<li>derive: <a href="#type-validation-error-requirement">Type Validation Error Requirement</a></li>
+<li>derive: <a href="#validation-error-handling">Validation Error Handling</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#validating-structures">Validating Structures</a></li>
 </ul>
 <hr />
 <h3 id="attachment-target-validation">Attachment Target Validation</h3>
 <p>The system shall validate attachment targets and reject invalid attachment references during model validation.</p>
 <h4>Details</h4>
-<p>Attachment targets support two types of references:</p>
-<p><strong>File Paths:</strong></p>
-<ul>
-<li>Normalized to git-root-relative paths</li>
-<li>Validated for file existence during model validation</li>
-<li>Standard markdown link format where link text equals href</li>
-</ul>
-<p><strong>Element Identifiers:</strong></p>
-<ul>
-<li>Must point to Refinement element types only (constraint, behavior, specification)</li>
-<li>Normalized like relation targets (resolved to full identifier path)</li>
-<li>Validation shall reject identifiers pointing to non-Refinement elements</li>
-<li>Provides clear error message indicating the expected element type</li>
-</ul>
-<p>This validation ensures that attachments either reference existing files or valid Refinement elements that provide supplementary documentation.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -795,18 +931,19 @@
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#attachment-scope-validation">Attachment Scope Validation</a></li>
-<li>derivedFrom: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
 <li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>refinedBy: <a href="Specifications.html#attachment-target-validation-refinement-specification">Attachment Target Validation Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</a></li>
 <li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachments-validation-verification">Attachments Validation Verification</a></li>
+<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#ontology-and-contract-attachment-verification">Ontology and Contract Attachment Verification</a></li>
 </ul>
 <hr />
 <h3 id="attachment-scope-validation">Attachment Scope Validation</h3>
 <p>The system shall validate attachment scope constraints and report validation errors for violations.</p>
 <h4>Details</h4>
-<p>When validating attachments (both refinement elements and file assets), the system shall enforce the attachment scope constraints and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -814,13 +951,16 @@
 <h4>Attachments</h4>
 <ul>
 <li><a href="Constraints.html#attachment-hierarchical-independence-constraint">Attachment Hierarchical Independence Constraint</a></li>
+<li><a href="Constraints.html#attachment-subgraph-direction-constraint">Attachment Subgraph Direction Constraint</a></li>
 <li><a href="Constraints.html#attachment-satisfied-refinement-constraint">Attachment Satisfied Refinement Constraint</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#attachment-target-validation">Attachment Target Validation</a></li>
+<li>refinedBy: <a href="Specifications.html#attachment-scope-validation-refinement-specification">Attachment Scope Validation Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachment-scope-constraints-test">Attachment Scope Constraints Test</a></li>
+<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#ontology-and-contract-attachment-verification">Ontology and Contract Attachment Verification</a></li>
 </ul>
 <hr />
 <h3 id="graphregistry-as-primary-registry">GraphRegistry as Primary Registry</h3>
@@ -843,31 +983,16 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>refinedBy: <a href="Specifications.html#requirements-processing-specification">Requirements Processing Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#requirements-processing-specification">Requirements Processing Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#requirements-files-search-and-detection-test">Requirements Files Search and Detection Test</a></li>
 </ul>
 <hr />
 <h3 id="integrated-validation">Integrated Validation</h3>
 <p>The system shall automatically perform validation when any command requires the parsed model, eliminating the need for a separate validate command.</p>
 <h4>Details</h4>
-<p>Commands shall be categorized into two groups:</p>
-<p><strong>Commands requiring validated model:</strong></p>
-<ul>
-<li>model-summary: Needs complete element and relation data</li>
-<li>change-impact: Requires valid relations for impact analysis</li>
-<li>traces: Needs validated relationships for traceability</li>
-<li>generate-index: Requires complete element registry</li>
-<li>coverage-report: Requires complete verification data</li>
-</ul>
-<p><strong>Commands operating on raw files:</strong></p>
-<ul>
-<li>html: Converts markdown to HTML without parsing elements</li>
-<li>format: Fixes markdown formatting without validation</li>
-<li>shell: Interactive mode with optional validation</li>
-</ul>
-<p>Commands in the first group shall automatically run the two-pass validation and exit if any errors are found. Commands in the second group shall skip validation to allow operation on potentially invalid documents.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -879,23 +1004,14 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>refinedBy: <a href="Specifications.html#integrated-validation-refinement-specification">Integrated Validation Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 </ul>
 <hr />
 <h3 id="internal-consistency-validator">Internal Consistency Validator</h3>
 <p>The system shall implement a consistency validator that verifies logical coherence within the model, including checking for circular dependencies, orphaned elements, inconsistent relationship patterns, and element name uniqueness, with detailed error reporting.</p>
 <h4>Details</h4>
-<p>The consistency validator shall verify:</p>
-<ul>
-<li><strong>Global Element Name Uniqueness</strong>: Element names are globally unique across all files in the model</li>
-<li><strong>Duplicate Detection</strong>: Detect and report when multiple elements in different files share the same name</li>
-<li><strong>Location Reporting</strong>: Report both file locations where duplicate element names occur</li>
-<li><strong>Clear Error Messages</strong>: Error messages clearly indicate that element names must be globally unique</li>
-<li><strong>Circular Dependencies</strong>: Detect and report circular dependency chains in requirements</li>
-<li><strong>Orphaned Elements</strong>: Identify elements without proper traceability connections</li>
-<li><strong>Inconsistent Patterns</strong>: Detect relationship patterns that violate model constraints</li>
-</ul>
-<p>Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -903,8 +1019,8 @@
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#cross-section-duplicate-validation">Cross-Section Duplicate Validation</a></li>
-<li>derivedFrom: <a href="StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
 <li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>refinedBy: <a href="Specifications.html#internal-consistency-validator-refinement-specification">Internal Consistency Validator Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
@@ -914,7 +1030,7 @@
 <p>The system shall detect when the same target appears in both the Relations and Attachments subsections of an element, treating this as a validation error.</p>
 <h4>Details</h4>
 <p>A constraint defines the detailed rules for cross-section duplicate detection.</p>
-<p>This applies to all target types: element identifiers and file paths.</p>
+<p>This applies to identifier targets.</p>
 <p>Within-section duplicates (same entry repeated within Relations OR within Attachments) are formatting issues handled by the format operation, not validation errors.</p>
 <h4>Metadata</h4>
 <ul>
@@ -923,9 +1039,39 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#internal-consistency-validator">Internal Consistency Validator</a></li>
+<li>refinedBy: <a href="Constraints.html#cross-section-duplicate-constraint">Cross-Section Duplicate Constraint</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>satisfiedBy: <a href="Constraints.html#cross-section-duplicate-constraint">Cross-Section Duplicate Constraint</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#cross-section-duplicate-validation-test">Cross-Section Duplicate Validation Test</a></li>
+</ul>
+<hr />
+<h3 id="relation-type-validation">Relation Type Validation</h3>
+<p>The system shall validate relation types against a defined vocabulary and provide clear error messages for unsupported relation types, including suggestions for the correct relation types.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#same-file-fragment-relations-test">Same-File Fragment Relations Test</a></li>
+</ul>
+<hr />
+<h3 id="single-root-hierarchy-ownership">Single Root Hierarchy Ownership</h3>
+<p>The system shall enforce that each requirement hierarchy resolves to exactly one owning capability root through <code>specify</code>/<code>specifiedBy</code> and requirement/capability hierarchy relations.</p>
+<h4>Details</h4>
+<p>Validation details shall follow the associated hierarchy ownership constraint.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>refinedBy: <a href="Constraints.html#single-root-hierarchy-ownership-constraint">Single Root Hierarchy Ownership Constraint</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#single-root-hierarchy-ownership-validation-test">Single Root Hierarchy Ownership Validation Test</a></li>
 </ul>
 <hr />
 <h3 id="two-pass-validation-strategy">Two-Pass Validation Strategy</h3>
@@ -939,20 +1085,68 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>refinedBy: <a href="Behaviors.html#two-pass-validation-behavior">Two-Pass Validation Behavior</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#two-pass-validation-behavior">Two-Pass Validation Behavior</a></li>
+</ul>
+<hr />
+<h3 id="type-validation-error-requirement">Type Validation Error Requirement</h3>
+<p>The system shall display all valid type options when type validation fails.</p>
+<h4>Details</h4>
+<ul>
+<li>Invalid element types shall show list of valid element types including custom type pattern</li>
+<li>Invalid relation types shall show list of valid relation types</li>
+<li>Element type list format: “type1, type2, … For custom types use: other-TYPENAME”</li>
+<li>Relation type list format: “type1, type2, …” (alphabetically sorted)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>refinedBy: <a href="Behaviors.html#type-validation-error-behavior">Type Validation Error Behavior</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#type-validation-errors-test">Type Validation Errors Test</a></li>
+</ul>
+<hr />
+<h3 id="validation-error-handling">Validation Error Handling</h3>
+<p>The system shall maintain consistent error handling across both validation passes, collecting all errors within each pass before reporting.</p>
+<h4>Details</h4>
+<p>Error handling shall follow these principles:</p>
+<ol>
+<li><strong>Complete pass execution</strong>: Each pass runs to completion, collecting all errors found</li>
+<li><strong>Aggregated reporting</strong>: All errors from a pass are reported together</li>
+<li><strong>Early termination</strong>: Process exits after reporting errors from either pass</li>
+<li><strong>Existing error format</strong>: Error messages maintain the current format and structure</li>
+<li><strong>Exit codes</strong>: Non-zero exit codes indicate validation failures</li>
+</ol>
+<p>This ensures users see all relevant errors at once rather than fixing issues one at a time.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#validate-internal-consistency">Validate Internal Consistency</a></li>
+<li>refinedBy: <a href="Behaviors.html#validation-error-reporting-behavior">Validation Error Reporting Behavior</a></li>
+<li>satisfiedBy: <a href="../../../core/src/error.rs">error.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
+<li>verifiedBy: <a href="../Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test">Add Command Error Messages Test</a></li>
 </ul>
 <hr />
 <h3 id="validate-markdown-structure">Validate Markdown Structure</h3>
 <p>The system shall validate the Markdown structure of system model to ensure compliance with formatting standards.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#markdown-structure-validator">Markdown Structure Validator</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#validating-structures">Validating Structures</a></li>
 </ul>
 <hr />
 <h3 id="markdown-structure-validator">Markdown Structure Validator</h3>
@@ -975,44 +1169,30 @@
 <p>The system shall validate relation types and allow only supported types.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#relation-element-type-validator">Relation Element Type Validator</a></li>
-<li>derivedFrom: <a href="ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#validating-structures">Validating Structures</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#validating-structures">Validating Structures</a></li>
 </ul>
 <hr />
 <h3 id="relation-element-type-validator">Relation Element Type Validator</h3>
 <p>The system shall implement validation that verifies relation endpoints have appropriate element types based on the relation type, following the Element Type Relation Compatibility matrix.</p>
 <h4>Details</h4>
-<p>The validator enforces the constraints defined in the <a href="DesignDocuments/RelationTypes.html#element-type-relation-compatibility">Element Type Relation Compatibility</a> specification:</p>
-<ul>
-<li>For <code>derivedFrom</code>/<code>derive</code> relations, validate that both source and target are requirement types (<code>requirement</code> or <code>user-requirement</code>)</li>
-<li>For <code>verifiedBy</code>/<code>verify</code> relations, validate that one endpoint is a requirement element and the other is a verification element</li>
-<li>For <code>satisfiedBy</code>/<code>satisfy</code> relations, validate that one endpoint is a requirement or test-verification element and the other is an implementation element</li>
-<li>For verification elements with <code>satisfiedBy</code> relations, validate that only test-verification elements may use satisfiedBy (other verification types should not have satisfiedBy relations)</li>
-<li><code>trace</code> relations are always allowed for any non-refinement element type</li>
-<li>Refinement types (<code>constraint</code>, <code>behavior</code>, <code>specification</code>) can only have <code>satisfy</code> relations and cannot have Attachments subsections</li>
-<li>Warnings should be issued when relation endpoints have incompatible element types</li>
-</ul>
-<p>This validation occurs:</p>
-<ul>
-<li>During model parsing and validation (model.rs, parser.rs)</li>
-<li>During link operations at CRUD time (graph_registry.rs)</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
 <li>derivedFrom: <a href="#validate-relation-types">Validate Relation Types</a></li>
+<li>refinedBy: <a href="Specifications.html#relation-element-type-validator-refinement-specification">Relation Element Type Validator Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#document-refinement-validation-test">Document Refinement Validation Test</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">Element Type Relation Compatibility Test</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a></li>
 </ul>
@@ -1063,7 +1243,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -1072,10 +1253,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -1088,7 +1272,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -1106,6 +1290,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1498,9 +1687,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

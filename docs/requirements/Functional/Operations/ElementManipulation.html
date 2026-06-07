@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -370,6 +469,9 @@
       click 2a2729a903e6692f "Behaviors.html#merge-content-transformation-behavior";
     end
     subgraph efce051cd2e037ec["📄 Constraints.md"]
+      6f154fd234df5c1b["Atomic Relink Validity Constraint"];
+      class 6f154fd234df5c1b default;
+      click 6f154fd234df5c1b "Constraints.html#atomic-relink-validity-constraint";
       3e506d76554b3740["Merge Type Compatibility Constraint"];
       class 3e506d76554b3740 default;
       click 3e506d76554b3740 "Constraints.html#merge-type-compatibility-constraint";
@@ -378,22 +480,28 @@
       click 1dc0e8b76789ffce "Constraints.html#target-location-constraint";
     end
     subgraph e1e686bef27807d6["📄 ElementManipulation.md"]
-      bf9a2f73b67492b9["Create Element Operation<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      4b855068aa046af4["Atomic Relation Relink Operation"];
+      class 4b855068aa046af4 systemRequirement;
+      click 4b855068aa046af4 "ElementManipulation.html#atomic-relation-relink-operation";
+      bf9a2f73b67492b9["Create Element Operation<br/>📎 Target Location Constraint<br/>📎 Element Ordering Behavior<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Satisfied Refinement Constraint<br/>📎 Element Type Metadata Specification"];
       class bf9a2f73b67492b9 systemRequirement;
       click bf9a2f73b67492b9 "ElementManipulation.html#create-element-operation";
+      72f22745a788dc51["CRUD Semantic Contract Mutation Validation"];
+      class 72f22745a788dc51 systemRequirement;
+      click 72f22745a788dc51 "ElementManipulation.html#crud-semantic-contract-mutation-validation";
       591265fa14ecd72d["Delete Element Operation"];
       class 591265fa14ecd72d systemRequirement;
       click 591265fa14ecd72d "ElementManipulation.html#delete-element-operation";
-      cab861a199d11c3c["Element Manipulation File Persistence<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      cab861a199d11c3c["Element Manipulation File Persistence<br/>📎 Element Ordering Behavior"];
       class cab861a199d11c3c systemRequirement;
       click cab861a199d11c3c "ElementManipulation.html#element-manipulation-file-persistence";
-      451abcac00b45de4["Merge Element Operation<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      451abcac00b45de4["Merge Element Operation<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Satisfied Refinement Constraint"];
       class 451abcac00b45de4 systemRequirement;
       click 451abcac00b45de4 "ElementManipulation.html#merge-element-operation";
-      c68daf5bfafc5a05["Move Element Operation<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      c68daf5bfafc5a05["Move Element Operation<br/>📎 Target Location Constraint<br/>📎 Element Ordering Behavior"];
       class c68daf5bfafc5a05 systemRequirement;
       click c68daf5bfafc5a05 "ElementManipulation.html#move-element-operation";
-      b9c9829782477a6c["Move File Operation<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint"];
+      b9c9829782477a6c["Move File Operation<br/>📎 Target Location Constraint"];
       class b9c9829782477a6c systemRequirement;
       click b9c9829782477a6c "ElementManipulation.html#move-file-operation";
       f006550e707e055f["Relation Consistency Maintenance"];
@@ -402,34 +510,55 @@
       8f31bcc56d19f6e9["Rename Element Operation"];
       class 8f31bcc56d19f6e9 systemRequirement;
       click 8f31bcc56d19f6e9 "ElementManipulation.html#rename-element-operation";
-      9cdb6297e49a3802["Target Location Validation and Auto-Creation"];
+      9cdb6297e49a3802["Target Location Validation and Auto-Creation<br/>📎 Ignore Files Specification<br/>📎 Git Repository Scope Specification"];
       class 9cdb6297e49a3802 systemRequirement;
       click 9cdb6297e49a3802 "ElementManipulation.html#target-location-validation-and-auto-creation";
     end
     subgraph 7c2e7eef0051f760["📄 Specifications.md"]
+      a7b4c0859c00f8c0["Atomic Relation Relink Workflow Specification"];
+      class a7b4c0859c00f8c0 default;
+      click a7b4c0859c00f8c0 "Specifications.html#atomic-relation-relink-workflow-specification";
       3c85593db589fd04["Create Element Workflow Specification"];
       class 3c85593db589fd04 default;
       click 3c85593db589fd04 "Specifications.html#create-element-workflow-specification";
+      77b41858f3db4284["CRUD Semantic Contract Validation Specification"];
+      class 77b41858f3db4284 default;
+      click 77b41858f3db4284 "Specifications.html#crud-semantic-contract-validation-specification";
       bc1f889f5f12a980["Delete Element Workflow Specification"];
       class bc1f889f5f12a980 default;
       click bc1f889f5f12a980 "Specifications.html#delete-element-workflow-specification";
+      24b88aebbed843aa["Element Manipulation File Persistence Refinement Specification"];
+      class 24b88aebbed843aa default;
+      click 24b88aebbed843aa "Specifications.html#element-manipulation-file-persistence-refinement-specification";
       9a6c593ffee9a214["Merge Element Workflow Specification"];
       class 9a6c593ffee9a214 default;
       click 9a6c593ffee9a214 "Specifications.html#merge-element-workflow-specification";
       c75283445bce637a["Move Element Workflow Specification"];
       class c75283445bce637a default;
       click c75283445bce637a "Specifications.html#move-element-workflow-specification";
+      1b95a8b32866b9da["Move File Operation Refinement Specification"];
+      class 1b95a8b32866b9da default;
+      click 1b95a8b32866b9da "Specifications.html#move-file-operation-refinement-specification";
       4366fe5150f6d7c2["Orphaned Children Error Message Specification"];
       class 4366fe5150f6d7c2 default;
       click 4366fe5150f6d7c2 "Specifications.html#orphaned-children-error-message-specification";
+      d6ef2a6838aa58b3["Relation Consistency Maintenance Refinement Specification"];
+      class d6ef2a6838aa58b3 default;
+      click d6ef2a6838aa58b3 "Specifications.html#relation-consistency-maintenance-refinement-specification";
       86e301b42cc16d0d["Relation Validation Specification"];
       class 86e301b42cc16d0d default;
       click 86e301b42cc16d0d "Specifications.html#relation-validation-specification";
+      581571713cc6244e["Rename Element Operation Refinement Specification"];
+      class 581571713cc6244e default;
+      click 581571713cc6244e "Specifications.html#rename-element-operation-refinement-specification";
     end
   end
   subgraph 75874bcc96c01d2f["📁 requirements/Functional/Operations/Verifications"]
     subgraph 264302f069db5bdb["📄 ElementManipulationVerifications.md"]
-      221f6c008823a4d0["Create Element Override Test<br/>📎 requirements/Functional/Operations/Behaviors.md#create-element-override-behavior"];
+      65f1ed4cf8dab788["Atomic Relation Relink Test"];
+      class 65f1ed4cf8dab788 verification;
+      click 65f1ed4cf8dab788 "Verifications/ElementManipulationVerifications.html#atomic-relation-relink-test";
+      221f6c008823a4d0["Create Element Override Test<br/>📎 Create Element Override Behavior"];
       class 221f6c008823a4d0 verification;
       click 221f6c008823a4d0 "Verifications/ElementManipulationVerifications.html#create-element-override-test";
       d5bf7d0addaf6d19["Create Element Test"];
@@ -438,7 +567,7 @@
       bfd28e1e74918526["Delete Element Test"];
       class bfd28e1e74918526 verification;
       click bfd28e1e74918526 "Verifications/ElementManipulationVerifications.html#delete-element-test";
-      362774efb36e2279["File Persistence Test<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      362774efb36e2279["File Persistence Test<br/>📎 Element Ordering Behavior"];
       class 362774efb36e2279 verification;
       click 362774efb36e2279 "Verifications/ElementManipulationVerifications.html#file-persistence-test";
       c7b35d6963f1017["Merge Elements Test"];
@@ -458,26 +587,34 @@
       click c0a8cdea5e5972df "Verifications/ElementManipulationVerifications.html#target-location-validation-test";
     end
     subgraph cae715fe712bf6a2["📄 FormattingVerifications.md"]
-      c89bd750e0ad5b9d["Element Ordering Verification<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      c89bd750e0ad5b9d["Element Ordering Verification<br/>📎 Element Ordering Behavior"];
       class c89bd750e0ad5b9d verification;
       click c89bd750e0ad5b9d "Verifications/FormattingVerifications.html#element-ordering-verification";
     end
   end
+  4b855068aa046af4 -->|refinedBy| 6f154fd234df5c1b;
+  4b855068aa046af4 -->|refinedBy| a7b4c0859c00f8c0;
+  993c12e82435a78e["crud.rs"];
+  class 993c12e82435a78e default;
+  click 993c12e82435a78e "../../../core/src/crud.rs";
+  4b855068aa046af4 -->|satisfiedBy| 993c12e82435a78e;
+  95cf526671ec752c["graph_registry.rs"];
+  class 95cf526671ec752c default;
+  click 95cf526671ec752c "../../../core/src/graph_registry.rs";
+  4b855068aa046af4 -->|satisfiedBy| 95cf526671ec752c;
+  4b855068aa046af4 -.->|verifiedBy| 65f1ed4cf8dab788;
+  bf9a2f73b67492b9 -->|refinedBy| 40714cbda978a508;
+  bf9a2f73b67492b9 -->|refinedBy| 3c85593db589fd04;
+  bf9a2f73b67492b9 -->|refinedBy| 86e301b42cc16d0d;
   25bf5cc42f41e395["cli.rs"];
   class 25bf5cc42f41e395 default;
   click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
   bf9a2f73b67492b9 -->|satisfiedBy| 25bf5cc42f41e395;
-  993c12e82435a78e["crud.rs"];
-  class 993c12e82435a78e default;
-  click 993c12e82435a78e "../../../core/src/crud.rs";
   bf9a2f73b67492b9 -->|satisfiedBy| 993c12e82435a78e;
   d07e49b06be4058e["diff.rs"];
   class d07e49b06be4058e default;
   click d07e49b06be4058e "../../../core/src/diff.rs";
   bf9a2f73b67492b9 -->|satisfiedBy| d07e49b06be4058e;
-  95cf526671ec752c["graph_registry.rs"];
-  class 95cf526671ec752c default;
-  click 95cf526671ec752c "../../../core/src/graph_registry.rs";
   bf9a2f73b67492b9 -->|satisfiedBy| 95cf526671ec752c;
   35bd98d101f36b62["parser.rs"];
   class 35bd98d101f36b62 default;
@@ -487,45 +624,62 @@
   class bdf9762d399478a5 default;
   click bdf9762d399478a5 "../../../core/src/utils.rs";
   bf9a2f73b67492b9 -->|satisfiedBy| bdf9762d399478a5;
-  bf9a2f73b67492b9 -->|satisfiedBy| 40714cbda978a508;
-  bf9a2f73b67492b9 -->|satisfiedBy| 3c85593db589fd04;
-  bf9a2f73b67492b9 -->|satisfiedBy| 86e301b42cc16d0d;
   bf9a2f73b67492b9 -.->|verifiedBy| 221f6c008823a4d0;
   bf9a2f73b67492b9 -.->|verifiedBy| d5bf7d0addaf6d19;
+  72f22745a788dc51 -->|refinedBy| 77b41858f3db4284;
+  72f22745a788dc51 -->|satisfiedBy| 993c12e82435a78e;
+  72f22745a788dc51 -->|satisfiedBy| 95cf526671ec752c;
+  72f22745a788dc51 -.->|verifiedBy| bfd28e1e74918526;
+  591265fa14ecd72d -->|refinedBy| bc1f889f5f12a980;
+  591265fa14ecd72d -->|refinedBy| 4366fe5150f6d7c2;
   591265fa14ecd72d -->|satisfiedBy| 25bf5cc42f41e395;
   591265fa14ecd72d -->|satisfiedBy| 993c12e82435a78e;
   591265fa14ecd72d -->|satisfiedBy| d07e49b06be4058e;
   591265fa14ecd72d -->|satisfiedBy| 95cf526671ec752c;
-  591265fa14ecd72d -->|satisfiedBy| bc1f889f5f12a980;
-  591265fa14ecd72d -->|satisfiedBy| 4366fe5150f6d7c2;
   591265fa14ecd72d -.->|verifiedBy| bfd28e1e74918526;
+  cab861a199d11c3c -->|refinedBy| 24b88aebbed843aa;
   cab861a199d11c3c -->|satisfiedBy| 993c12e82435a78e;
   cab861a199d11c3c -->|satisfiedBy| 95cf526671ec752c;
   cab861a199d11c3c -.->|verifiedBy| 362774efb36e2279;
   cab861a199d11c3c -.->|verifiedBy| c89bd750e0ad5b9d;
+  451abcac00b45de4 -->|refinedBy| 2a2729a903e6692f;
+  451abcac00b45de4 -->|refinedBy| 3e506d76554b3740;
+  451abcac00b45de4 -->|refinedBy| 9a6c593ffee9a214;
   451abcac00b45de4 -->|satisfiedBy| 993c12e82435a78e;
   451abcac00b45de4 -->|satisfiedBy| d07e49b06be4058e;
   451abcac00b45de4 -->|satisfiedBy| 95cf526671ec752c;
-  451abcac00b45de4 -->|satisfiedBy| 2a2729a903e6692f;
-  451abcac00b45de4 -->|satisfiedBy| 3e506d76554b3740;
-  451abcac00b45de4 -->|satisfiedBy| 9a6c593ffee9a214;
   451abcac00b45de4 -.->|verifiedBy| c7b35d6963f1017;
+  c68daf5bfafc5a05 -->|refinedBy| c75283445bce637a;
   c68daf5bfafc5a05 -->|satisfiedBy| 25bf5cc42f41e395;
   c68daf5bfafc5a05 -->|satisfiedBy| 993c12e82435a78e;
   c68daf5bfafc5a05 -->|satisfiedBy| d07e49b06be4058e;
   c68daf5bfafc5a05 -->|satisfiedBy| 95cf526671ec752c;
-  c68daf5bfafc5a05 -->|satisfiedBy| c75283445bce637a;
   c68daf5bfafc5a05 -.->|verifiedBy| 9ae2cd53e62b6a33;
+  b9c9829782477a6c -->|refinedBy| 1b95a8b32866b9da;
+  b9c9829782477a6c -->|satisfiedBy| 25bf5cc42f41e395;
+  b9c9829782477a6c -->|satisfiedBy| 993c12e82435a78e;
+  b9c9829782477a6c -->|satisfiedBy| d07e49b06be4058e;
+  b9c9829782477a6c -->|satisfiedBy| 95cf526671ec752c;
   b9c9829782477a6c -.->|verifiedBy| af599fec38b8c0bf;
+  f006550e707e055f -->|refinedBy| d6ef2a6838aa58b3;
   f006550e707e055f -->|satisfiedBy| 95cf526671ec752c;
   f006550e707e055f -.->|verifiedBy| 81422a9a6525acd7;
+  8f31bcc56d19f6e9 -->|refinedBy| 581571713cc6244e;
   8f31bcc56d19f6e9 -->|satisfiedBy| 993c12e82435a78e;
   8f31bcc56d19f6e9 -->|satisfiedBy| d07e49b06be4058e;
   8f31bcc56d19f6e9 -->|satisfiedBy| 95cf526671ec752c;
+  9cdb6297e49a3802 -->|refinedBy| 1dc0e8b76789ffce;
   9cdb6297e49a3802 -->|satisfiedBy| 95cf526671ec752c;
   9cdb6297e49a3802 -->|satisfiedBy| bdf9762d399478a5;
-  9cdb6297e49a3802 -->|satisfiedBy| 1dc0e8b76789ffce;
   9cdb6297e49a3802 -.->|verifiedBy| c0a8cdea5e5972df;
+  8f3780989fe6dbaf["test.sh"];
+  class 8f3780989fe6dbaf default;
+  click 8f3780989fe6dbaf "../../../tests/test-relink-command/test.sh";
+  65f1ed4cf8dab788 -->|satisfiedBy| 8f3780989fe6dbaf;
+  f10c783b357e0e6f["test.sh"];
+  class f10c783b357e0e6f default;
+  click f10c783b357e0e6f "../../../tests/test-crud-override/test.sh";
+  221f6c008823a4d0 -->|satisfiedBy| f10c783b357e0e6f;
   7f91546dcec3d680["test.sh"];
   class 7f91546dcec3d680 default;
   click 7f91546dcec3d680 "../../../tests/test-crud-manipulation/test.sh";
@@ -539,15 +693,25 @@
   class 81623fde4ecde03d default;
   click 81623fde4ecde03d "../../../tests/test-element-ordering/test.sh";
   c89bd750e0ad5b9d -->|satisfiedBy| 81623fde4ecde03d;
+  1713fb38fd4be4bf["test.sh"];
+  class 1713fb38fd4be4bf default;
+  click 1713fb38fd4be4bf "../../../tests/test-document-operation-constraints/test.sh";
+  c7b35d6963f1017 -->|satisfiedBy| 1713fb38fd4be4bf;
+  80a06703e90d8ba1["test.sh"];
+  class 80a06703e90d8ba1 default;
+  click 80a06703e90d8ba1 "../../../tests/test-merge-elements/test.sh";
+  c7b35d6963f1017 -->|satisfiedBy| 80a06703e90d8ba1;
   99e20055749fc61e["test.sh"];
   class 99e20055749fc61e default;
   click 99e20055749fc61e "../../../tests/test-crud-empty-file-cleanup/test.sh";
   9ae2cd53e62b6a33 -->|satisfiedBy| 99e20055749fc61e;
   9ae2cd53e62b6a33 -->|satisfiedBy| 7f91546dcec3d680;
+  9ae2cd53e62b6a33 -->|satisfiedBy| 1713fb38fd4be4bf;
   6d7253e029455f50["test.sh"];
   class 6d7253e029455f50 default;
   click 6d7253e029455f50 "../../../tests/test-crud-mv-file-squash/test.sh";
   af599fec38b8c0bf -->|satisfiedBy| 6d7253e029455f50;
+  af599fec38b8c0bf -->|satisfiedBy| 1713fb38fd4be4bf;
   87a76fd329b99a81["test.sh"];
   class 87a76fd329b99a81 default;
   click 87a76fd329b99a81 "../../../tests/test-crud-relation-consistency/test.sh";
@@ -557,6 +721,41 @@
   click cf7b1e3aeef95d4 "../../../tests/test-crud-target-location-validation/test.sh";
   c0a8cdea5e5972df -->|satisfiedBy| cf7b1e3aeef95d4;
 </div>
+<h3 id="atomic-relation-relink-operation">Atomic Relation Relink Operation</h3>
+<p>The system shall provide an atomic relation relink operation that rewires an existing relation target to a new target while preserving model validity.</p>
+<h4>Details</h4>
+<p>For hierarchical relinks (<code>derivedFrom</code>/<code>derive</code>), the operation shall support subgraph boundary relinking semantics, applying changes as one transaction and validating the resulting model state before persistence.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Constraints.html#atomic-relink-validity-constraint">Atomic Relink Validity Constraint</a></li>
+<li>refinedBy: <a href="Specifications.html#atomic-relation-relink-workflow-specification">Atomic Relation Relink Workflow Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#atomic-relation-relink-test">Atomic Relation Relink Test</a></li>
+</ul>
+<hr />
+<h3 id="crud-semantic-contract-mutation-validation">CRUD Semantic Contract Mutation Validation</h3>
+<p>The system shall validate semantic-contract reference integrity before persisting graph-backed CRUD mutations.</p>
+<h4>Details</h4>
+<p>When a CRUD mutation changes model elements or relations, the system shall reject the candidate model before persistence if any semantic-contract Shapes reference becomes undeclared by all ontology elements or is declared only outside reachable capability ontology context.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Specifications.html#crud-semantic-contract-validation-specification">CRUD Semantic Contract Validation Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#delete-element-test">Delete Element Test</a></li>
+</ul>
+<hr />
 <h3 id="create-element-operation">Create Element Operation</h3>
 <p>The system shall provide the capability to create new model elements by accepting a full element definition string in Markdown format, validating the element structure and relations, and inserting it into the target file.</p>
 <h4>Metadata</h4>
@@ -569,20 +768,20 @@
 <li><a href="Behaviors.html#element-ordering-behavior">Element Ordering Behavior</a></li>
 <li><a href="../Core/Constraints.html#attachment-hierarchical-independence-constraint">Attachment Hierarchical Independence Constraint</a></li>
 <li><a href="../Core/Constraints.html#attachment-satisfied-refinement-constraint">Attachment Satisfied Refinement Constraint</a></li>
+<li><a href="../Core/Specifications.html#element-type-metadata-specification">Element Type Metadata Specification</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
-<li>derivedFrom: <a href="../Core/StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>refinedBy: <a href="Behaviors.html#create-element-override-behavior">Create Element Override Behavior</a></li>
+<li>refinedBy: <a href="Specifications.html#create-element-workflow-specification">Create Element Workflow Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#relation-validation-specification">Relation Validation Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/parser.rs">parser.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#create-element-override-behavior">Create Element Override Behavior</a></li>
-<li>satisfiedBy: <a href="Specifications.html#create-element-workflow-specification">Create Element Workflow Specification</a></li>
-<li>satisfiedBy: <a href="Specifications.html#relation-validation-specification">Relation Validation Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#create-element-override-test">Create Element Override Test</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#create-element-test">Create Element Test</a></li>
 </ul>
@@ -596,12 +795,12 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Specifications.html#delete-element-workflow-specification">Delete Element Workflow Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#orphaned-children-error-message-specification">Orphaned Children Error Message Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#delete-element-workflow-specification">Delete Element Workflow Specification</a></li>
-<li>satisfiedBy: <a href="Specifications.html#orphaned-children-error-message-specification">Orphaned Children Error Message Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#delete-element-test">Delete Element Test</a></li>
 </ul>
 <hr />
@@ -618,6 +817,7 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Specifications.html#element-manipulation-file-persistence-refinement-specification">Element Manipulation File Persistence Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#file-persistence-test">File Persistence Test</a></li>
@@ -626,6 +826,9 @@
 <hr />
 <h3 id="merge-element-operation">Merge Element Operation</h3>
 <p>The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and attachments while enforcing type compatibility and removing source elements after successful merge.</p>
+<h4>Details</h4>
+<p>When the merge target is a <code># Documents</code> model file element, the operation shall preserve the <code># Documents</code> file format and keep the result as a single-element document file.
+The operation shall reject merges where a source element is in a <code># Documents</code> file and the target element is in a <code># Elements</code> file. That conversion can violate <code># Elements</code> parsing constraints and shall be performed manually.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -638,17 +841,19 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Behaviors.html#merge-content-transformation-behavior">Merge Content Transformation Behavior</a></li>
+<li>refinedBy: <a href="Constraints.html#merge-type-compatibility-constraint">Merge Type Compatibility Constraint</a></li>
+<li>refinedBy: <a href="Specifications.html#merge-element-workflow-specification">Merge Element Workflow Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#merge-content-transformation-behavior">Merge Content Transformation Behavior</a></li>
-<li>satisfiedBy: <a href="Constraints.html#merge-type-compatibility-constraint">Merge Type Compatibility Constraint</a></li>
-<li>satisfiedBy: <a href="Specifications.html#merge-element-workflow-specification">Merge Element Workflow Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#merge-elements-test">Merge Elements Test</a></li>
 </ul>
 <hr />
 <h3 id="move-element-operation">Move Element Operation</h3>
 <p>The system shall provide the capability to move existing model elements to different file locations while automatically updating all relations that reference the moved element, creating target files if needed, and removing empty source files when no elements remain.</p>
+<h4>Details</h4>
+<p>The operation shall reject moves into an existing <code># Documents</code> file when that move would introduce an additional element. <code># Documents</code> files are single-element model files.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -661,42 +866,18 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Specifications.html#move-element-workflow-specification">Move Element Workflow Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#move-element-workflow-specification">Move Element Workflow Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#move-element-test">Move Element Test</a></li>
 </ul>
 <hr />
 <h3 id="move-file-operation">Move File Operation</h3>
 <p>The system shall provide the capability to move entire specification files with all their elements to a new location in the repository while updating all relation references throughout the model.</p>
 <h4>Details</h4>
-<p>When moving a file, the system shall:</p>
-<ul>
-<li>Accept source file path (relative to git repository root)</li>
-<li>Accept target file path (relative to git repository root)</li>
-<li>Accept optional squashing flag</li>
-<li>Validate both source and target paths</li>
-<li>Move the physical file from source to target location</li>
-<li>Update all element identifiers within the file to reflect the new file path</li>
-<li>Update all relation references (both forward and backward) throughout the model that point to any element in the moved file</li>
-<li>Preserve all file content, structure, and formatting</li>
-<li>Provide updates report following Diff Output Format Specification</li>
-</ul>
-<p>The system shall reject the operation with a clear error message if:</p>
-<ul>
-<li>The source file does not exist</li>
-<li>The target file already exists (unless –squash flag is provided)</li>
-<li>The source or target paths fail validation</li>
-</ul>
-<p><strong>Squash Mode Behavior:</strong>
-When the –squash flag is provided and the target file already exists, the system shall:</p>
-<ul>
-<li>Move all elements from the source file to the target end of file</li>
-<li>Remove the source file after all elements have been successfully moved</li>
-<li>Preserve element ordering from the source file when inserting into target section</li>
-</ul>
+<p>When <code>--squash</code> is requested, the operation shall reject squashing into an existing <code># Documents</code> target file. <code># Documents</code> files are single-element model files and cannot accept squashed multi-element content.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -708,26 +889,18 @@ When the –squash flag is provided and the target file already exists, the syst
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Specifications.html#move-file-operation-refinement-specification">Move File Operation Refinement Specification</a></li>
+<li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#move-file-squash-test">Move File Squash Test</a></li>
 </ul>
 <hr />
 <h3 id="relation-consistency-maintenance">Relation Consistency Maintenance</h3>
 <p>The system shall maintain bidirectional relation consistency when elements are manipulated, ensuring that forward and backward relations remain synchronized.</p>
 <h4>Details</h4>
-<p>When manipulating elements, the system shall ensure:</p>
-<ul>
-<li>If element A derives from element B, then B must have a derive relation to A</li>
-<li>If element A is verified by verification V, then V must have a verify relation to A</li>
-<li>When an element is deleted, both forward and backward relations are removed</li>
-<li>When an element is moved, both forward and backward relations are updated</li>
-<li>After any manipulation operation, the model remains in a valid state with no dangling relations</li>
-</ul>
-<p><strong>Validation:</strong></p>
-<ul>
-<li>The system shall validate relation consistency after each manipulation operation</li>
-<li>The system shall report any inconsistencies detected during manipulation</li>
-<li>The system shall prevent operations that would leave the model in an inconsistent state</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -735,6 +908,7 @@ When the –squash flag is provided and the target file already exists, the syst
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Specifications.html#relation-consistency-maintenance-refinement-specification">Relation Consistency Maintenance Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#relation-consistency-test">Relation Consistency Test</a></li>
 </ul>
@@ -742,21 +916,7 @@ When the –squash flag is provided and the target file already exists, the syst
 <h3 id="rename-element-operation">Rename Element Operation</h3>
 <p>The system shall provide the capability to rename existing model elements by changing their heading text while updating all relation references and the registry.</p>
 <h4>Details</h4>
-<p>When renaming an element, the system shall:</p>
-<ul>
-<li>Accept the current element name and the new element name</li>
-<li>Validate that the current element exists in the model registry</li>
-<li>Validate that the new name is globally unique in the model registry</li>
-<li>Update the element’s heading text in the markdown file</li>
-<li>Update all relation references (both forward and backward) to use the new element identifier</li>
-<li>Update the element identifier in the registry</li>
-<li>Provide updates report following Diff Output Format Specification</li>
-</ul>
-<p>The system shall reject the operation with a clear error message if:</p>
-<ul>
-<li>The element does not exist</li>
-<li>The new name conflicts with an existing element</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -764,6 +924,7 @@ When the –squash flag is provided and the target file already exists, the syst
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Specifications.html#rename-element-operation-refinement-specification">Rename Element Operation Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diff.rs">diff.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
@@ -777,14 +938,17 @@ When the –squash flag is provided and the target file already exists, the syst
 <ul>
 <li>type: requirement</li>
 </ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Core/Specifications.html#ignore-files-specification">Ignore Files Specification</a></li>
+<li><a href="../Core/Specifications.html#git-repository-scope-specification">Git Repository Scope Specification</a></li>
+</ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../Core/Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
 <li>derivedFrom: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
-<li>derivedFrom: <a href="../Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+<li>refinedBy: <a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/utils.rs">utils.rs</a></li>
-<li>satisfiedBy: <a href="Constraints.html#target-location-constraint">Target Location Constraint</a></li>
 <li>verifiedBy: <a href="Verifications/ElementManipulationVerifications.html#target-location-validation-test">Target Location Validation Test</a></li>
 </ul>
 <hr />
@@ -834,7 +998,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -843,10 +1008,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -859,7 +1027,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -877,6 +1045,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1269,9 +1442,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

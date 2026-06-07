@@ -116,7 +116,7 @@ The validator shall enforce the structural rules derived from those contracts:
 - A top-level requirement must have `specify` pointing to exactly one capability.
 - A child requirement may omit `specify` when it has `derivedFrom` pointing to another requirement; the owning capability is inherited through the requirement hierarchy.
 - If a requirement has both `derivedFrom` and `specify`, the explicit `specify` capability must match the inherited capability.
-- Capabilities are not directly satisfied or verified; implementation and verification status roll up from requirements that specify them.
+- Capabilities may be directly verified but are not directly satisfied; implementation coverage rolls up from requirements that specify them.
 - Governance metadata is valid on capability and requirement elements only and inherits through the nearest parent in the same family or through the owning capability when a top-level requirement specifies a capability.
 
 #### Metadata
@@ -131,6 +131,8 @@ The validator shall enforce the structural rules derived from those contracts:
 Path resolution and scope validation rules for Git repository-based project management.
 
 #### Details
+Git repository scope defines source-file discovery and path normalization. It does not define logical model ownership and does not by itself classify a referenced path as a modeled resource or evidence file.
+
 **Git Root Detection:**
 - Git root is detected via `git rev-parse --show-toplevel`
 - All internal paths are normalized to git-root-relative format for storage
@@ -143,6 +145,8 @@ Path resolution and scope validation rules for Git repository-based project mana
 **Processing Scope:**
 - When run from git root: all files in the repository are processed
 - When run from a subdirectory: processing is limited to files within that subdirectory scope
+- Markdown files parsed as model documents become source file containers in browser exports when they are emitted for browsing
+- Relation and attachment targets outside parsed model documents remain modeled resources or evidence targets unless separately exported as source file containers
 
 **Scope Boundary Validation:**
 - Relations referencing elements outside the subdirectory scope report missing relation target errors
@@ -253,12 +257,12 @@ Rationale: Element names serve as stable IDs for element identity, independent o
 ### Refinement Element Structure Constraints Refinement Specification
 
 #### Details
-Refinement elements serve as detailed documentation that augments capabilities or requirements and drives implementation. Their relation usage is restricted because:
-- They represent atomic pieces of information focused on documenting capabilities or requirements
+Refinement elements serve as requirement-owned subordinate details or contracts that drive implementation. Their relation usage is restricted because:
+- They represent atomic pieces of information focused on documenting requirements
 - They are primarily referenced through the Attachments subsection of other elements
-- Their `refine` relation links back to the capability or requirement they refine, establishing ownership
-- Each refinement can only be owned by one capability or requirement according to its subtype
-- They do not define requirement governance metadata; governance context for a refinement is obtained from its owning capability or requirement
+- Their `refine` relation links back to the requirement they refine, establishing ownership
+- Each refinement can only be owned by one compatible requirement according to its subtype
+- They do not define requirement governance metadata; governance context for a refinement is obtained from its owning requirement
 
 When a Refinement element contains relations other than `refine`, the validator is expected to report an error indicating that only `refine` relations are allowed for refinement types.
 
@@ -307,7 +311,7 @@ Requirement governance metadata is declared in the `#### Metadata` subsection of
 
 Requirement governance metadata covers requirement management accountability and decision context: `status` represents the requirement lifecycle state, `priority` represents planning importance, `risk` represents realization risk, and `owner` represents maintenance accountability.
 
-Elements outside the governance-bearing family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Refinement elements (`source`, `constraint`, `behavior`, `specification`, `state`, and `input-output`) obtain governance context from their compatible owning capability or requirement instead of authored metadata. Requirement-owned `semantic-contract` and `semantic-query-contract` refinements obtain governance context from their owning requirement.
+Elements outside the governance-bearing family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Refinement elements (`source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, `semantic-contract`, and `semantic-query-contract`) obtain governance context from their owning requirement instead of authored metadata.
 
 When any non-governance-bearing element declares requirement governance metadata keys, the validator is expected to report an error indicating that governance metadata is only valid on capability and requirement elements.
 
@@ -425,6 +429,7 @@ The implementation shall enforce the ontology and semantic-contract structure:
 - Ontology elements define reusable vocabulary and model meaning.
 - `semantic-contract` must not refine a capability.
 - `semantic-contract` refining a requirement means a SHACL profile.
+- `source`, `constraint`, `behavior`, `specification`, `state`, and `input-output` must not refine a capability; they are requirement-owned subordinate details or contracts.
 - Requirement-owned shape contracts define closed-world SHACL profiles over terms reachable from the owning requirement context and must not define local ontology terms.
 - Ontology and semantic-contract elements use reserved type-specific subsections:
   - `ontology`: `#### Ontology` is required with exactly one fenced Turtle block; `#### Shapes` is forbidden.

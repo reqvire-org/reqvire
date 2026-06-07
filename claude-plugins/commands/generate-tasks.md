@@ -56,7 +56,7 @@ Generate implementation task plan from capability-scoped requirement changes on 
    This provides:
    - Complete upstream chain, including owning capabilities and parent requirements
    - Capability meaning, ontology references, and requirement obligations for context
-   - Refinement elements that refine the capability or requirement
+   - Refinement elements that refine the requirement
    - Attached design documents
    - Full implementation context
 

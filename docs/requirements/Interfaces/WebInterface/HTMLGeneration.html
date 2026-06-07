@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -369,7 +468,7 @@
       class ac6971954304c571 systemRequirement;
       click ac6971954304c571 "HTMLGeneration.html#css-framework-integration";
       bb0ee0a283e500e8["Mobile-Friendly Documentation"];
-      class bb0ee0a283e500e8 userRequirement;
+      class bb0ee0a283e500e8 systemRequirement;
       click bb0ee0a283e500e8 "HTMLGeneration.html#mobile-friendly-documentation";
       4e47e768f2a254cb["Responsive HTML Generation"];
       class 4e47e768f2a254cb systemRequirement;
@@ -377,6 +476,20 @@
       f5edec5aaf14290d["Type-Safe HTML Generation"];
       class f5edec5aaf14290d systemRequirement;
       click f5edec5aaf14290d "HTMLGeneration.html#type-safe-html-generation";
+    end
+    subgraph 5d341d66c5d20d4a["📄 Specifications.md"]
+      a45220a17d28851d["Component-Based HTML Architecture Refinement Specification"];
+      class a45220a17d28851d default;
+      click a45220a17d28851d "Specifications.html#component-based-html-architecture-refinement-specification";
+      adcfb14beac341a0["CSS Framework Integration Refinement Specification"];
+      class adcfb14beac341a0 default;
+      click adcfb14beac341a0 "Specifications.html#css-framework-integration-refinement-specification";
+      8f0078842fea4523["Responsive HTML Generation Refinement Specification"];
+      class 8f0078842fea4523 default;
+      click 8f0078842fea4523 "Specifications.html#responsive-html-generation-refinement-specification";
+      fee5dd19737bb20a["Type-Safe HTML Generation Refinement Specification"];
+      class fee5dd19737bb20a default;
+      click fee5dd19737bb20a "Specifications.html#type-safe-html-generation-refinement-specification";
     end
   end
   subgraph 7b06d045a68fb066["📁 requirements/Interfaces/WebInterface/Verifications"]
@@ -398,17 +511,38 @@
       click 6c8b966ffd2cffc4 "Verifications/HTMLGenerationVerifications.html#responsive-design-verification";
     end
   end
+  fa0ecb1299582ab -->|refinedBy| a45220a17d28851d;
+  ae5d03eefa618da1["components.rs"];
+  class ae5d03eefa618da1 default;
+  click ae5d03eefa618da1 "../../../core/src/html/components.rs";
+  fa0ecb1299582ab -->|satisfiedBy| ae5d03eefa618da1;
   fa0ecb1299582ab -.->|verifiedBy| cd4d13fa425c5ad;
   fa0ecb1299582ab -.->|verifiedBy| 79ec057500b741e;
+  ac6971954304c571 -->|refinedBy| adcfb14beac341a0;
+  e948fd9e3ed02443["styles.rs"];
+  class e948fd9e3ed02443 default;
+  click e948fd9e3ed02443 "../../../core/src/html/styles.rs";
+  ac6971954304c571 -->|satisfiedBy| e948fd9e3ed02443;
   ac6971954304c571 -.->|verifiedBy| 6c8b966ffd2cffc4;
   bb0ee0a283e500e8 -.->|deriveReqT| fa0ecb1299582ab;
   bb0ee0a283e500e8 -.->|deriveReqT| 4e47e768f2a254cb;
   bb0ee0a283e500e8 -.->|deriveReqT| f5edec5aaf14290d;
   bb0ee0a283e500e8 -.->|verifiedBy| 3d80dd755086873a;
   4e47e768f2a254cb -.->|deriveReqT| ac6971954304c571;
+  4e47e768f2a254cb -->|refinedBy| 8f0078842fea4523;
+  4e47e768f2a254cb -->|satisfiedBy| e948fd9e3ed02443;
+  68fef32bd3e3323d["html_export.rs"];
+  class 68fef32bd3e3323d default;
+  click 68fef32bd3e3323d "../../../core/src/html_export.rs";
+  4e47e768f2a254cb -->|satisfiedBy| 68fef32bd3e3323d;
   4e47e768f2a254cb -.->|verifiedBy| 79ec057500b741e;
   4e47e768f2a254cb -.->|verifiedBy| 3d80dd755086873a;
   4e47e768f2a254cb -.->|verifiedBy| 6c8b966ffd2cffc4;
+  f5edec5aaf14290d -->|refinedBy| fee5dd19737bb20a;
+  b6f563ab46761a95["mod.rs"];
+  class b6f563ab46761a95 default;
+  click b6f563ab46761a95 "../../../core/src/html/mod.rs";
+  f5edec5aaf14290d -->|satisfiedBy| b6f563ab46761a95;
   f5edec5aaf14290d -.->|verifiedBy| 73786e8c37d9673f;
   effc979c2c2475cf["test.sh"];
   class effc979c2c2475cf default;
@@ -422,7 +556,7 @@
 <p>The system shall provide mobile-friendly HTML documentation accessible on smartphones and tablets.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -436,30 +570,7 @@
 <h3 id="component-based-html-architecture">Component-Based HTML Architecture</h3>
 <p>The system shall use component-based architecture for HTML generation to eliminate duplication and improve maintainability.</p>
 <h4>Details</h4>
-<p>The HTML generation system shall be organized into reusable components:</p>
-<p><strong>Shared components:</strong></p>
-<ul>
-<li>Navigation menu (with mobile/desktop variants)</li>
-<li>Page header with metadata</li>
-<li>Footer</li>
-<li>Mobile menu toggle</li>
-</ul>
-<p><strong>Reusable layouts:</strong></p>
-<ul>
-<li>Base layout for standard pages</li>
-<li>Diagram layout for full-height visualizations</li>
-</ul>
-<p><strong>Page-specific modules:</strong></p>
-<ul>
-<li>Index/Containment page</li>
-<li>Model view page</li>
-<li>Traces page</li>
-<li>TraceFlow page</li>
-<li>Coverage page</li>
-<li>Resources page</li>
-<li>Individual specification pages</li>
-</ul>
-<p>Each component shall be defined once and reused across all generated pages to eliminate code duplication.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -467,6 +578,8 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#mobile-friendly-documentation">Mobile-Friendly Documentation</a></li>
+<li>refinedBy: <a href="Specifications.html#component-based-html-architecture-refinement-specification">Component-Based HTML Architecture Refinement Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/html/components.rs">components.rs</a></li>
 <li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#component-reuse-verification">Component Reuse Verification</a></li>
 <li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#integration-test-verification">Integration Test Verification</a></li>
 </ul>
@@ -474,20 +587,7 @@
 <h3 id="responsive-html-generation">Responsive HTML Generation</h3>
 <p>The system shall generate HTML documentation with responsive design supporting desktop, tablet, and mobile viewports.</p>
 <h4>Details</h4>
-<p>The system shall:</p>
-<ul>
-<li>Support viewport widths from 320px (mobile) to 1920px+ (desktop)</li>
-<li>Use mobile-first CSS approach with progressive enhancement</li>
-<li>Provide hamburger navigation menu for screens &lt; 768px</li>
-<li>Scale typography and spacing based on viewport size using responsive breakpoints</li>
-</ul>
-<p>Responsive breakpoints:</p>
-<ul>
-<li>sm: 640px and up (small tablets)</li>
-<li>md: 768px and up (tablets)</li>
-<li>lg: 1024px and up (desktops)</li>
-<li>xl: 1280px and up (large desktops)</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -496,6 +596,9 @@
 <ul>
 <li>derive: <a href="#css-framework-integration">CSS Framework Integration</a></li>
 <li>derivedFrom: <a href="#mobile-friendly-documentation">Mobile-Friendly Documentation</a></li>
+<li>refinedBy: <a href="Specifications.html#responsive-html-generation-refinement-specification">Responsive HTML Generation Refinement Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/html/styles.rs">styles.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/html_export.rs">html_export.rs</a></li>
 <li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#integration-test-verification">Integration Test Verification</a></li>
 <li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#mobile-responsiveness-verification">Mobile Responsiveness Verification</a></li>
 <li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#responsive-design-verification">Responsive Design Verification</a></li>
@@ -504,26 +607,7 @@
 <h3 id="css-framework-integration">CSS Framework Integration</h3>
 <p>The system shall integrate Tailwind CSS utility framework for consistent responsive styling.</p>
 <h4>Details</h4>
-<p>The system shall:</p>
-<ul>
-<li>Include Tailwind CSS via CDN for development</li>
-<li>Use mobile-first utility classes for responsive design</li>
-<li>Apply responsive breakpoints (sm, md, lg, xl) for layout adaptation</li>
-<li>Define custom theme colors for Reqvire branding:
-<ul>
-<li>Primary: Indigo (#3F51B5)</li>
-<li>Requirement: Deep Purple (#673AB7)</li>
-<li>Verification: Emerald Green (#4CAF50)</li>
-</ul>
-</li>
-</ul>
-<p>Tailwind provides:</p>
-<ul>
-<li>Utility-first CSS for rapid development</li>
-<li>Built-in responsive modifiers (e.g., <code>md:hidden</code>, <code>lg:flex</code>)</li>
-<li>Consistent spacing, colors, and typography scale</li>
-<li>Small bundle size with tree-shaking capability</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -531,20 +615,15 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#responsive-html-generation">Responsive HTML Generation</a></li>
+<li>refinedBy: <a href="Specifications.html#css-framework-integration-refinement-specification">CSS Framework Integration Refinement Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/html/styles.rs">styles.rs</a></li>
 <li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#responsive-design-verification">Responsive Design Verification</a></li>
 </ul>
 <hr />
 <h3 id="type-safe-html-generation">Type-Safe HTML Generation</h3>
 <p>The system shall generate HTML using type-safe Rust macros to prevent invalid HTML at compile time.</p>
 <h4>Details</h4>
-<p>The system shall:</p>
-<ul>
-<li>Use Maud crate for compile-time HTML generation</li>
-<li>Validate HTML structure at compile time through Rust’s type system</li>
-<li>Prevent malformed HTML tags, unclosed elements, and invalid nesting</li>
-<li>Generate well-formed HTML5 output conforming to W3C standards</li>
-</ul>
-<p>This ensures HTML validity errors are caught during compilation rather than at runtime or by users.</p>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -552,6 +631,8 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#mobile-friendly-documentation">Mobile-Friendly Documentation</a></li>
+<li>refinedBy: <a href="Specifications.html#type-safe-html-generation-refinement-specification">Type-Safe HTML Generation Refinement Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/html/mod.rs">mod.rs</a></li>
 <li>verifiedBy: <a href="Verifications/HTMLGenerationVerifications.html#html-validity-verification">HTML Validity Verification</a></li>
 </ul>
 <hr />
@@ -601,7 +682,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -610,10 +692,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -626,7 +711,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -644,6 +729,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1036,9 +1126,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

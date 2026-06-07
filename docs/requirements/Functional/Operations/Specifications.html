@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -362,18 +461,36 @@
 
   subgraph 91eede421faaa553["📁 requirements/Functional/Operations"]
     subgraph 7c2e7eef0051f760["📄 Specifications.md"]
+      a7b4c0859c00f8c0["Atomic Relation Relink Workflow Specification"];
+      class a7b4c0859c00f8c0 default;
+      click a7b4c0859c00f8c0 "Specifications.html#atomic-relation-relink-workflow-specification";
       3c85593db589fd04["Create Element Workflow Specification"];
       class 3c85593db589fd04 default;
       click 3c85593db589fd04 "Specifications.html#create-element-workflow-specification";
+      df95c1cef065c4b["Cross-Submodel Hierarchical Relation Detection Specification"];
+      class df95c1cef065c4b default;
+      click df95c1cef065c4b "Specifications.html#cross-submodel-hierarchical-relation-detection-specification";
+      77b41858f3db4284["CRUD Semantic Contract Validation Specification"];
+      class 77b41858f3db4284 default;
+      click 77b41858f3db4284 "Specifications.html#crud-semantic-contract-validation-specification";
       bc1f889f5f12a980["Delete Element Workflow Specification"];
       class bc1f889f5f12a980 default;
       click bc1f889f5f12a980 "Specifications.html#delete-element-workflow-specification";
       7f30e57cc80e9b87["Document Structure Specification"];
       class 7f30e57cc80e9b87 default;
       click 7f30e57cc80e9b87 "Specifications.html#document-structure-specification";
+      24b88aebbed843aa["Element Manipulation File Persistence Refinement Specification"];
+      class 24b88aebbed843aa default;
+      click 24b88aebbed843aa "Specifications.html#element-manipulation-file-persistence-refinement-specification";
       7d378fffc473b5bd["Format Consistency Specification"];
       class 7d378fffc473b5bd default;
       click 7d378fffc473b5bd "Specifications.html#format-consistency-specification";
+      1b4f87d934e52735["Full Relations Insertion Refinement Specification"];
+      class 1b4f87d934e52735 default;
+      click 1b4f87d934e52735 "Specifications.html#full-relations-insertion-refinement-specification";
+      2cc213f4e71d8361["Lint Auto-fix Capability Refinement Specification"];
+      class 2cc213f4e71d8361 default;
+      click 2cc213f4e71d8361 "Specifications.html#lint-auto-fix-capability-refinement-specification";
       b8a5e3adb9b5d82d["Lint Output Specification"];
       class b8a5e3adb9b5d82d default;
       click b8a5e3adb9b5d82d "Specifications.html#lint-output-specification";
@@ -383,15 +500,27 @@
       c75283445bce637a["Move Element Workflow Specification"];
       class c75283445bce637a default;
       click c75283445bce637a "Specifications.html#move-element-workflow-specification";
+      1b95a8b32866b9da["Move File Operation Refinement Specification"];
+      class 1b95a8b32866b9da default;
+      click 1b95a8b32866b9da "Specifications.html#move-file-operation-refinement-specification";
       c5d346cc41243982["Multi-Branch Convergence Detection Specification"];
       class c5d346cc41243982 default;
       click c5d346cc41243982 "Specifications.html#multi-branch-convergence-detection-specification";
+      fea4815297cf40ac["Operation Command Contract Specification"];
+      class fea4815297cf40ac default;
+      click fea4815297cf40ac "Specifications.html#operation-command-contract-specification";
       4366fe5150f6d7c2["Orphaned Children Error Message Specification"];
       class 4366fe5150f6d7c2 default;
       click 4366fe5150f6d7c2 "Specifications.html#orphaned-children-error-message-specification";
       6a995b12e8da977a["Redundant Hierarchical Relations Specification"];
       class 6a995b12e8da977a default;
       click 6a995b12e8da977a "Specifications.html#redundant-hierarchical-relations-specification";
+      8df948c9d6f16ed9["Redundant Verify Relations Detection Refinement Specification"];
+      class 8df948c9d6f16ed9 default;
+      click 8df948c9d6f16ed9 "Specifications.html#redundant-verify-relations-detection-refinement-specification";
+      d6ef2a6838aa58b3["Relation Consistency Maintenance Refinement Specification"];
+      class d6ef2a6838aa58b3 default;
+      click d6ef2a6838aa58b3 "Specifications.html#relation-consistency-maintenance-refinement-specification";
       2a23f1dee6913aeb["Relation Operations Specification"];
       class 2a23f1dee6913aeb default;
       click 2a23f1dee6913aeb "Specifications.html#relation-operations-specification";
@@ -401,13 +530,92 @@
       86e301b42cc16d0d["Relation Validation Specification"];
       class 86e301b42cc16d0d default;
       click 86e301b42cc16d0d "Specifications.html#relation-validation-specification";
+      581571713cc6244e["Rename Element Operation Refinement Specification"];
+      class 581571713cc6244e default;
+      click 581571713cc6244e "Specifications.html#rename-element-operation-refinement-specification";
     end
   end
 </div>
+<h3 id="atomic-relation-relink-workflow-specification">Atomic Relation Relink Workflow Specification</h3>
+<p>Detailed workflow for atomically relinking an existing relation target.</p>
+<h4>Details</h4>
+<p>When relinking a relation, the system is expected to:</p>
+<ul>
+<li>Resolve source element and both targets (<code>old-target</code>, <code>new-target</code>) in the current model.</li>
+<li>Verify that the source currently has the specified relation to <code>old-target</code>.</li>
+<li>Build an in-memory transaction plan for relation rewiring.</li>
+<li>Apply candidate rewiring in memory first, without persisting files.</li>
+<li>Validate the candidate model after rewiring, including all existing validation rules.</li>
+<li>Persist changes only when candidate validation succeeds.</li>
+<li>Roll back and report errors when candidate validation fails.</li>
+</ul>
+<p>For hierarchical relinks (<code>derivedFrom</code>/<code>derive</code>):</p>
+<ul>
+<li>Support subgraph boundary relinking semantics where the source can represent the root of a moved hierarchy boundary.</li>
+<li>Reject relinks that introduce circular dependency, missing parent relation, or single-root hierarchy ownership violations.</li>
+</ul>
+<p>Output behavior:</p>
+<ul>
+<li>Support dry-run diff preview without persistence.</li>
+<li>Report affected elements/files deterministically.</li>
+<li>Return non-zero status on any failed validation or unresolved target.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ElementManipulation.html#atomic-relation-relink-operation">Atomic Relation Relink Operation</a></li>
+</ul>
+<hr />
+<h3 id="crud-semantic-contract-validation-specification">CRUD Semantic Contract Validation Specification</h3>
+<p>Candidate semantic-contract validation for graph-backed CRUD mutations.</p>
+<h4>Details</h4>
+<p>Before any graph-backed CRUD mutation persists model files, the system is expected to validate the mutated in-memory model for dangling semantic-contract references.</p>
+<p>This pre-persistence validation applies to graph-backed mutation commands:</p>
+<ul>
+<li><code>add</code></li>
+<li><code>add --override</code></li>
+<li><code>rm</code></li>
+<li><code>mv</code></li>
+<li><code>rename</code></li>
+<li><code>merge</code></li>
+<li><code>mv-file</code></li>
+<li><code>link</code></li>
+<li><code>unlink</code></li>
+<li><code>relink</code></li>
+</ul>
+<p>When a mutation would leave a <code>Shapes</code> reference to an IRI that is not declared by any ontology <code>Ontology</code>, the command is expected to fail before flushing changes. The error is expected to include:</p>
+<ul>
+<li>the referencing semantic-contract identifier</li>
+<li>the reference kind, such as <code>sh:path</code>, <code>sh:targetClass</code>, or <code>sh:class</code></li>
+<li>the missing IRI</li>
+<li>fix guidance to update/remove the SHACL reference or restore the declaration</li>
+</ul>
+<p>When the mutation removed the ontology element that previously declared the missing IRI, the error is expected to include the removed declaration source identifier.</p>
+<p>The command is expected not to persist source-file changes when this validation fails.</p>
+<p>When a mutation would leave a <code>Shapes</code> reference to an IRI that is declared by an ontology element outside reachable ontology context, the command is expected to fail before flushing changes. The error is expected to include:</p>
+<ul>
+<li>the referencing semantic-contract identifier</li>
+<li>the reference kind, such as <code>sh:path</code>, <code>sh:targetClass</code>, or <code>sh:class</code></li>
+<li>the referenced IRI</li>
+<li>the declaring ontology identifier</li>
+<li>guidance to attach the declaring ontology to the owning or consuming capability, move the declaration into reachable capability ontology context, or update/remove the reference</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ElementManipulation.html#crud-semantic-contract-mutation-validation">CRUD Semantic Contract Mutation Validation</a></li>
+</ul>
+<hr />
 <h3 id="create-element-workflow-specification">Create Element Workflow Specification</h3>
 <p>Detailed workflow for creating new model elements.</p>
 <h4>Details</h4>
-<p>When creating a new element, the system shall:</p>
+<p>When creating a new element, the system is expected to:</p>
 <ul>
 <li>Accept a string containing the full element definition in Markdown format</li>
 <li>Accept target location: file path</li>
@@ -419,7 +627,7 @@
 <li>Insert the element into the target file following Element Ordering Behavior</li>
 <li>Reject the operation and report validation errors if validation fails</li>
 <li>Provide updates report following Diff Output Format Specification</li>
-<li>The system shall support override mode to replace existing element with same name following rules defined in Create Element Override Behavior</li>
+<li>The system is expected to support override mode to replace existing element with same name following rules defined in Create Element Override Behavior</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -427,16 +635,43 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+<li>refine: <a href="ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+</ul>
+<hr />
+<h3 id="cross-submodel-hierarchical-relation-detection-specification">Cross-Submodel Hierarchical Relation Detection Specification</h3>
+<ul>
+<li>Determine ownership roots from hierarchical relations using only hierarchy edges (for example <code>derivedFrom</code> and <code>derive</code>).</li>
+<li>For each user-created hierarchical relation where source root differs from target root, create a manual-review lint item.</li>
+<li>Include in that item:</li>
+<li><code>source</code>, <code>target</code>, and <code>relation_type</code></li>
+<li>owning source root</li>
+<li>owning target root</li>
+<li>rationale that states why the relation breaks submodel ownership and should be converted to attachment-based coupling.</li>
+<li>Report such findings in:</li>
+<li>default text output under <strong>Needs Manual Review</strong></li>
+<li><code>--auditable</code> output</li>
+<li><code>needs_manual_review</code> JSON array</li>
+<li>Do not include cross-submodel hierarchical items in auto-fix output (<code>--fixable</code>).</li>
+<li>Never auto-remove cross-submodel hierarchical relations; they require explicit model refactoring.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Linting.html#cross-submodel-hierarchical-relation-detection">Cross-Submodel Hierarchical Relation Detection</a></li>
 </ul>
 <hr />
 <h3 id="delete-element-workflow-specification">Delete Element Workflow Specification</h3>
 <p>Detailed workflow for deleting existing model elements.</p>
 <h4>Details</h4>
-<p>When deleting an element, the system shall:</p>
+<p>When deleting an element, the system is expected to:</p>
 <ul>
 <li>Check if any child elements would become orphaned (have no remaining parent hierarchical relations after deletion)</li>
 <li>Reject the operation if any child would become orphaned</li>
+<li>Validate the candidate model before persistence and reject deletion when removing the element would leave semantic-contract SHACL references to ontology terms that are no longer declared anywhere</li>
+<li>Report semantic deletion blockers with the referencing semantic-contract identifier, reference kind, missing IRI, and the deleted element/semantic contract that removed the declaration when known</li>
 <li>Provide clear error message listing orphaned children with resolution guidance</li>
 <li>Allow deletion if children have other parent hierarchical relations</li>
 <li>Remove the element and all its content from the source file</li>
@@ -455,10 +690,10 @@
 </ul>
 <p><strong>Relation Handling:</strong></p>
 <ul>
-<li>All <code>derivedFrom</code> relations pointing to the deleted element shall be removed</li>
-<li>All <code>verifiedBy</code> relations pointing to the deleted element shall be removed</li>
-<li>All <code>verify</code> relations pointing to the deleted element shall be removed</li>
-<li>All <code>satisfiedBy</code> relations pointing to the deleted element shall be removed</li>
+<li>All <code>derivedFrom</code> relations pointing to the deleted element is expected to be removed</li>
+<li>All <code>verifiedBy</code> relations pointing to the deleted element is expected to be removed</li>
+<li>All <code>verify</code> relations pointing to the deleted element is expected to be removed</li>
+<li>All <code>satisfiedBy</code> relations pointing to the deleted element is expected to be removed</li>
 <li>Relations from the deleted element are automatically removed with the element</li>
 </ul>
 <h4>Metadata</h4>
@@ -467,7 +702,7 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
+<li>refine: <a href="ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
 </ul>
 <hr />
 <h3 id="document-structure-specification">Document Structure Specification</h3>
@@ -499,7 +734,19 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Formatting.html#document-structure-normalization">Document Structure Normalization</a></li>
+<li>refine: <a href="Formatting.html#document-structure-normalization">Document Structure Normalization</a></li>
+</ul>
+<hr />
+<h3 id="element-manipulation-file-persistence-refinement-specification">Element Manipulation File Persistence Refinement Specification</h3>
+<h4>Details</h4>
+<p>The system is expected to persist all element manipulation operations to the source files in storage, synchronizing changes from the in-memory model to the file system and reordering elements following the Element Ordering Behavior.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
 </ul>
 <hr />
 <h3 id="format-consistency-specification">Format Consistency Specification</h3>
@@ -538,7 +785,44 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a></li>
+<li>refine: <a href="Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a></li>
+</ul>
+<hr />
+<h3 id="full-relations-insertion-refinement-specification">Full Relations Insertion Refinement Specification</h3>
+<h4>Details</h4>
+<p>Auto-generated relations are inverse relations created by the parser during model loading but not persisted to files by default. See Relation Types Specification for opposite relation pairs.</p>
+<p>When –with-full-relations is active:</p>
+<ul>
+<li>All relations from the model registry are written to the Relations subsection</li>
+<li>Relations are sorted according to the Relation Ordering Normalization requirement</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Formatting.html#full-relations-insertion">Full Relations Insertion</a></li>
+</ul>
+<hr />
+<h3 id="lint-auto-fix-capability-refinement-specification">Lint Auto-fix Capability Refinement Specification</h3>
+<h4>Details</h4>
+<p>Auto-fix behavior:</p>
+<ul>
+<li>Applies fixes only for issues categorized as auto-fixable.</li>
+<li>Modifies affected markdown files directly.</li>
+<li>Removes redundant verify relations from verification elements where safe.</li>
+<li>Preserves unrelated content and formatting.</li>
+<li>Reports all applied changes (files modified, relations removed).</li>
+<li>Skips issues categorized as needing manual review.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Linting.html#lint-auto-fix-capability">Lint Auto-fix Capability</a></li>
 </ul>
 <hr />
 <h3 id="lint-output-specification">Lint Output Specification</h3>
@@ -547,14 +831,15 @@
 <p><strong>Text Output Structure:</strong></p>
 <ul>
 <li>Section headers: “Auto-fixable Issues” and “Needs Manual Review” (when applicable)</li>
-<li>For each issue category:
+<li>For each issue category:</li>
+</ul>
 <ul>
 <li>Issue type heading (e.g., “Safe Redundant Hierarchical Relations”, “Redundant Verify Relations”)</li>
 <li>List of affected elements with file paths and identifiers</li>
 <li>Specific relations flagged as redundant</li>
 <li>Brief explanation of why the relation is redundant, including which intermediate paths provide alternate routes</li>
 </ul>
-</li>
+<ul>
 <li>For auto-fixable issues: indicate these can be fixed with <code>--fix</code> flag</li>
 <li>For manual review issues: explain why human judgment is required</li>
 </ul>
@@ -566,6 +851,7 @@
 <li>Specific relation details (type, target)</li>
 <li>Rationale text explaining the redundancy</li>
 <li>Intermediate paths that make the direct relation redundant</li>
+<li>Semantic-contract references are validated before lint output; outside-context semantic references are validation errors and are not emitted as lint findings</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -573,13 +859,13 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Linting.html#model-linting">Model Linting</a></li>
+<li>refine: <a href="Linting.html#model-linting">Model Linting</a></li>
 </ul>
 <hr />
 <h3 id="merge-element-workflow-specification">Merge Element Workflow Specification</h3>
 <p>Detailed workflow for merging multiple source elements into a target element.</p>
 <h4>Details</h4>
-<p>When merging elements, the system shall:</p>
+<p>When merging elements, the system is expected to:</p>
 <ul>
 <li>Accept target element name (must exist in the model)</li>
 <li>Accept one or more source element names (must exist in the model)</li>
@@ -591,12 +877,22 @@
 <li>Remove empty source files when no elements remain</li>
 <li>Provide updates report following Diff Output Format Specification</li>
 </ul>
-<p>The system shall reject the operation with a clear error message if:</p>
+<p>The system is expected to reject the operation with a clear error message if:</p>
 <ul>
 <li>The target element does not exist</li>
 <li>Any source element does not exist</li>
 <li>Source and target element types are incompatible per Merge Type Compatibility Constraint</li>
 <li>Merged result would have cross-section duplicates per Merge Content Transformation Behavior</li>
+</ul>
+<p>For <code># Documents</code> targets:</p>
+<ul>
+<li>The merged result is expected to remain serialized as <code># Documents</code> with a single implicit element.</li>
+<li>Merged content is expected to remain inside the <code>## &lt;Actual Element Name&gt;</code> body of that element.</li>
+</ul>
+<p>For document-to-elements merge direction:</p>
+<ul>
+<li>If any source element is in a <code># Documents</code> file and the target element is in a <code># Elements</code> file, the merge is expected to be rejected with a clear error.</li>
+<li>The error is expected to state that this conversion must be done manually to avoid breaking <code># Elements</code> parsing rules.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -604,13 +900,13 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ElementManipulation.html#merge-element-operation">Merge Element Operation</a></li>
+<li>refine: <a href="ElementManipulation.html#merge-element-operation">Merge Element Operation</a></li>
 </ul>
 <hr />
 <h3 id="move-element-workflow-specification">Move Element Workflow Specification</h3>
 <p>Detailed workflow for moving existing model elements to different file locations.</p>
 <h4>Details</h4>
-<p>When moving an element, the system shall:</p>
+<p>When moving an element, the system is expected to:</p>
 <ul>
 <li>Validate the target location using path validation rules</li>
 <li>Create target file if it does not exist (subject to validation constraints)</li>
@@ -624,6 +920,10 @@
 <li>Ensure the element name is globally unique in the model</li>
 <li>Provide updates report following Diff Output Format Specification</li>
 </ul>
+<p>Document format rule:</p>
+<ul>
+<li>If the target file is an existing <code># Documents</code> file, moving an element from a different file into it is expected to be rejected with a clear error, because <code># Documents</code> files contain exactly one element.</li>
+</ul>
 <p><strong>Empty Source File Cleanup:</strong></p>
 <ul>
 <li>After moving the element, check if the source file contains any remaining elements</li>
@@ -632,13 +932,13 @@
 </ul>
 <p><strong>Relation Update Requirements:</strong></p>
 <ul>
-<li>All relations (both forward and backward) pointing to the moved element shall be updated to the new identifier</li>
-<li>Relations within the moved element (outgoing relations) shall be preserved unchanged</li>
+<li>All relations (both forward and backward) pointing to the moved element is expected to be updated to the new identifier</li>
+<li>Relations within the moved element (outgoing relations) is expected to be preserved unchanged</li>
 </ul>
 <p><strong>Identifier Update:</strong></p>
 <ul>
 <li>The element’s identifier changes from <code>&lt;old-file&gt;#&lt;element-name&gt;</code> to <code>&lt;new-file&gt;#&lt;element-name&gt;</code></li>
-<li>All references to the old identifier shall be updated to the new identifier</li>
+<li>All references to the old identifier is expected to be updated to the new identifier</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -646,7 +946,45 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ElementManipulation.html#move-element-operation">Move Element Operation</a></li>
+<li>refine: <a href="ElementManipulation.html#move-element-operation">Move Element Operation</a></li>
+</ul>
+<hr />
+<h3 id="move-file-operation-refinement-specification">Move File Operation Refinement Specification</h3>
+<h4>Details</h4>
+<p>When moving a file, the system is expected to:</p>
+<ul>
+<li>Accept source file path (relative to git repository root)</li>
+<li>Accept target file path (relative to git repository root)</li>
+<li>Accept optional squashing flag</li>
+<li>Validate both source and target paths</li>
+<li>Move the physical file from source to target location</li>
+<li>Update all element identifiers within the file to reflect the new file path</li>
+<li>Update all relation references (both forward and backward) throughout the model that point to any element in the moved file</li>
+<li>Preserve all file content, structure, and formatting</li>
+<li>Provide updates report following Diff Output Format Specification</li>
+</ul>
+<p>The system is expected to reject the operation with a clear error message if:</p>
+<ul>
+<li>The source file does not exist</li>
+<li>The target file already exists (unless –squash flag is provided)</li>
+<li>The source or target paths fail validation</li>
+<li><code>--squash</code> is used with a target that is an existing <code># Documents</code> file</li>
+</ul>
+<p><strong>Squash Mode Behavior:</strong>
+When the –squash flag is provided and the target file already exists, the system is expected to:</p>
+<ul>
+<li>Move all elements from the source file to the target end of file</li>
+<li>Remove the source file after all elements have been successfully moved</li>
+<li>Preserve element ordering from the source file when inserting into target section</li>
+<li>Reject squash if target is <code># Documents</code> format (single-element document file)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ElementManipulation.html#move-file-operation">Move File Operation</a></li>
 </ul>
 <hr />
 <h3 id="multi-branch-convergence-detection-specification">Multi-Branch Convergence Detection Specification</h3>
@@ -666,13 +1004,13 @@
 </ul>
 <p><strong>Example:</strong></p>
 <pre><code>Authorization (root)
-  → Management API
-    → API Specification
-  → Public API
-    → API Specification
+ → Management API
+ → API Specification
+ → Public API
+ → API Specification
 </code></pre>
 <p>API Specification reaches Authorization through two branches (Management API and Public API). Both branches might be semantically valid (spec derives from auth in context of both APIs), OR one might be a modeling error that should be removed.</p>
-<p>Detection shall:</p>
+<p>Detection is expected to:</p>
 <ul>
 <li>Use the trace tree building logic to identify elements that reach common ancestors through multiple distinct branch paths</li>
 <li>Exclude cases where a direct relation exists (those are handled by Redundant Hierarchical Relations Detection)</li>
@@ -692,11 +1030,37 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Linting.html#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></li>
+<li>refine: <a href="Linting.html#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a></li>
+</ul>
+<hr />
+<h3 id="operation-command-contract-specification">Operation Command Contract Specification</h3>
+<p>Common contract fields for graph-backed model operations.</p>
+<h4>Details</h4>
+<p>Operation family vocabulary is defined by the Reqvire operation ontology. Operation specifications define command-facing behavior, not ontology vocabulary.</p>
+<p>Each graph-backed operation specification is expected to define:</p>
+<ul>
+<li>command name or API entry point</li>
+<li>operation family, such as mutation, report, validation, formatting, or relation maintenance</li>
+<li>accepted inputs and path interpretation</li>
+<li>output behavior for text, JSON, dry-run, and diff modes where supported</li>
+<li>whether the operation requires a valid parsed model before execution</li>
+<li>whether the operation can persist source-file changes</li>
+<li>validation gates that must pass before persistence</li>
+<li>rollback behavior and error reporting when a candidate mutation is rejected</li>
+<li>relation, attachment, and semantic-contract consistency guarantees preserved by the operation</li>
+</ul>
+<p>Concrete command names, flags, output fields, file paths, workflow steps, and persistence behavior belong in these operation specifications or behavior refinements.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../Core/ModelManagement.html#element-manipulation-operations">Element Manipulation Operations</a></li>
 </ul>
 <hr />
 <h3 id="orphaned-children-error-message-specification">Orphaned Children Error Message Specification</h3>
-<p>The error message for orphaned children prevention shall include:</p>
+<p>The error message for orphaned children prevention is expected to include:</p>
 <ul>
 <li>Statement that deletion cannot proceed due to orphaned children</li>
 <li>Element name being deleted</li>
@@ -710,7 +1074,7 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
+<li>refine: <a href="ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
 </ul>
 <hr />
 <h3 id="redundant-hierarchical-relations-specification">Redundant Hierarchical Relations Specification</h3>
@@ -730,7 +1094,7 @@
 <li><strong>Multi-path/branching redundancy</strong>: Element reaches ancestor through multiple convergent paths</li>
 </ul>
 <p><strong>Detection Logic:</strong></p>
-<p>The system shall use verification trace tree logic for detection:</p>
+<p>The system is expected to use verification trace tree logic for detection:</p>
 <ul>
 <li>Create a virtual/dummy verification element</li>
 <li>Connect the virtual verification to ALL leaf requirements (requirements with no derived children) via virtual verify relations</li>
@@ -740,7 +1104,7 @@
 </ul>
 <p>This approach reuses the proven trace tree logic for redundancy detection, ensuring consistency with verify relation redundancy detection.</p>
 <p><strong>Safe Auto-Removal Criteria:</strong></p>
-<p>A redundant hierarchical derivation relation shall be considered safe to auto-remove when ALL of the following conditions are met:</p>
+<p>A redundant hierarchical derivation relation is expected to be considered safe to auto-remove when ALL of the following conditions are met:</p>
 <ol>
 <li><strong>Direct relation exists</strong>: Element A has a direct derivedFrom relation to element C</li>
 <li><strong>Alternate path exists</strong>: There exists at least one path from A to C through intermediate elements (single or multiple convergent paths)</li>
@@ -748,23 +1112,23 @@
 </ol>
 <p><strong>Examples:</strong></p>
 <p><em>Single-chain redundancy (auto-removable):</em></p>
-<pre><code>User Requirement A
-  → System Requirement B
-    → Implementation C
+<pre><code>Requirement A
+ → Requirement B
+ → Requirement C
 
 Redundant: A → C (can be safely auto-removed)
 Reason: C is reachable via A → B → C
 </code></pre>
 <p><em>Multi-path/branching redundancy (auto-removable):</em></p>
 <pre><code>Authorization A
-  → Public API B → API Specification D
-  → Management API C → API Specification D
+ → Public API B → API Specification D
+ → Management API C → API Specification D
 
 Redundant: A → D (can be safely auto-removed)
 Reason: D is reachable via A → B → D and A → C → D
 </code></pre>
 <p><strong>Auto-Removal Behavior:</strong></p>
-<p>When auto-fix mode is activated, the system shall:</p>
+<p>When auto-fix mode is activated, the system is expected to:</p>
 <ul>
 <li>Remove ALL redundant derivedFrom relations where alternate paths exist</li>
 <li>Preserve traceability through intermediate elements</li>
@@ -780,7 +1144,53 @@ Reason: D is reachable via A → B → D and A → C → D
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Linting.html#redundant-hierarchical-relations-detection-and-auto-removal">Redundant Hierarchical Relations Detection and Auto-Removal</a></li>
+<li>refine: <a href="Linting.html#redundant-hierarchical-relations-detection-and-auto-removal">Redundant Hierarchical Relations Detection and Auto-Removal</a></li>
+</ul>
+<hr />
+<h3 id="redundant-verify-relations-detection-refinement-specification">Redundant Verify Relations Detection Refinement Specification</h3>
+<h4>Details</h4>
+<p>Redundant verify relation detection behavior:</p>
+<ul>
+<li>Detects cases where a verification directly verifies both a leaf requirement and its ancestor.</li>
+<li>Uses verification trace tree analysis to determine ancestor reachability.</li>
+<li>Treats leaf verification as sufficient when hierarchy roll-up already covers ancestors.</li>
+<li>Reuses trace-tree logic from <a href="../Processing/VerificationTraces.html#verification-trace-builder">Verification Trace Builder</a>.</li>
+<li>Reports redundant direct verify relations as model noise.</li>
+<li>Categorizes these findings as auto-fixable.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Linting.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a></li>
+</ul>
+<hr />
+<h3 id="relation-consistency-maintenance-refinement-specification">Relation Consistency Maintenance Refinement Specification</h3>
+<h4>Details</h4>
+<p>Relation consistency maintenance behavior during element manipulation:</p>
+<ul>
+<li>Maintains opposite relation consistency for supported relation pairs.</li>
+<li>If element <code>A</code> has <code>derivedFrom</code> to <code>B</code>, ensures inverse <code>derive</code> exists from <code>B</code> to <code>A</code>.</li>
+<li>If element <code>A</code> is <code>verifiedBy</code> verification <code>V</code>, ensures inverse <code>verify</code> exists from <code>V</code> to <code>A</code>.</li>
+<li>On delete operations, removes both incoming and outgoing relation references for deleted elements.</li>
+<li>On move/rename operations, updates relation targets for both forward and backward references.</li>
+<li>Preserves valid graph state after each manipulation step without dangling relation targets.</li>
+</ul>
+<p>Validation behavior:</p>
+<ul>
+<li>Runs relation-consistency checks after manipulation operations.</li>
+<li>Reports detected inconsistencies with actionable context.</li>
+<li>Blocks manipulations that would leave the model in inconsistent relation state.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a></li>
 </ul>
 <hr />
 <h3 id="relation-operations-specification">Relation Operations Specification</h3>
@@ -817,7 +1227,7 @@ Reason: D is reachable via A → B → D and A → C → D
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="../Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a></li>
+<li>refine: <a href="../Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a></li>
 </ul>
 <hr />
 <h3 id="relation-ordering-specification">Relation Ordering Specification</h3>
@@ -840,7 +1250,7 @@ Reason: D is reachable via A → B → D and A → C → D
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Formatting.html#relation-ordering-normalization">Relation Ordering Normalization</a></li>
+<li>refine: <a href="Formatting.html#relation-ordering-normalization">Relation Ordering Normalization</a></li>
 </ul>
 <hr />
 <h3 id="relation-validation-specification">Relation Validation Specification</h3>
@@ -872,7 +1282,33 @@ Reason: D is reachable via A → B → D and A → C → D
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+<li>refine: <a href="ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+</ul>
+<hr />
+<h3 id="rename-element-operation-refinement-specification">Rename Element Operation Refinement Specification</h3>
+<h4>Details</h4>
+<p>When renaming an element, the system is expected to:</p>
+<ul>
+<li>Accept the current element name and the new element name</li>
+<li>Validate that the current element exists in the model registry</li>
+<li>Validate that the new name is globally unique in the model registry</li>
+<li>Update the element’s heading text in the markdown file</li>
+<li>Update all relation references (both forward and backward) to use the new element identifier</li>
+<li>Update the element identifier in the registry</li>
+<li>Provide updates report following Diff Output Format Specification</li>
+</ul>
+<p>The system is expected to reject the operation with a clear error message if:</p>
+<ul>
+<li>The element does not exist</li>
+<li>The new name conflicts with an existing element</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ElementManipulation.html#rename-element-operation">Rename Element Operation</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -921,7 +1357,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -930,10 +1367,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -946,7 +1386,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -964,6 +1404,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1356,9 +1801,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

@@ -2,9 +2,9 @@
 
 # Reqvire
 
-<img src="doc/logo.png" alt="Reqvire Logo" width="200">
+<img src="doc/logo-long.png" alt="Reqvire Logo" width="360">
 
-**Semantic engineering graph for building verifiable and traceable systems.**
+**Semantic engineering framework for building verifiable and traceable systems.**
 
 [![Latest Release](https://img.shields.io/github/v/release/Reqvire/reqvire?style=flat-square&logo=github&color=blue)](https://github.com/reqvire-org/reqvire/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)
@@ -18,7 +18,7 @@
 
 # What is Reqvire?
 
-Semantic engineering graph for building verifiable and traceable systems.
+Semantic engineering framework for building verifiable and traceable systems.
 
 Model ontologies, capabilities, requirements, refinements, and verification directly inside Git — with AI-native traceability and engineering context built in.
 

@@ -6,7 +6,8 @@ Navigation behavior in HTML export.
 
 #### Details
 **Inter-page Navigation:**
-- Element links navigate to element page with anchor
+- Element links in Explorer views navigate to `index.html#/elements/<identifier>` and open a scrollable Project Store-backed element modal without leaving the active Explorer context
+- Element modals include a secondary source-page link to the generated file HTML anchor when exact source-page browsing is needed
 - File links navigate to file page
 - External links open in new tab
 
@@ -15,7 +16,7 @@ Navigation behavior in HTML export.
 - Each segment clickable
 
 **Search:**
-- Client-side search in index page
+- Client-side search in the `index.html#/search` Explorer route backed by Project Store search documents
 - Filter by name, type, content
 
 #### Metadata

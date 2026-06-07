@@ -18,6 +18,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - Paths in HTML files should maintain the original relative structure
 # - System should work in environments without Git repositories
 # - The .git directory should not be exported
+# - index.html should be the SPA Explorer shell and Project Store host
 #
 # Test Criteria:
 # - Command exits with success (0) return code
@@ -29,6 +30,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - Both GitHub-style URLs and direct file paths in mermaid click links are handled correctly
 # - Paths should not have duplicated folder names (e.g., specifications/specifications)
 # - The .git directory is not present in export output
+# - Project Store seed and canonical route markers are present in index.html
 #
 
 # Generate HTML
@@ -76,6 +78,49 @@ fi
 if [ -f "${TEST_DIR}/SpecificationIndex.md" ] && [ ! -f "${TEST_DIR}/output/index.html" ]; then
   echo "❌ FAILED: SpecificationIndex.md was not converted to index.html"
   exit 1
+fi
+
+if [ -f "${TEST_DIR}/output/index.html" ]; then
+  # index.html is the compiled React Explorer SPA bundle with the seed injected.
+  if ! grep -q '<div id="root"></div>' "${TEST_DIR}/output/index.html"; then
+    echo "❌ FAILED: index.html must be the Reqvire Explorer SPA bundle (mount point)"
+    exit 1
+  fi
+
+  if ! grep -q "assets/explorer.js" "${TEST_DIR}/output/index.html" \
+     || [ ! -f "${TEST_DIR}/output/assets/explorer.js" ] \
+     || [ ! -f "${TEST_DIR}/output/assets/explorer.css" ]; then
+    echo "❌ FAILED: index.html must reference the compiled Explorer bundle assets"
+    exit 1
+  fi
+
+  if ! grep -q "reqvireProjectStore" "${TEST_DIR}/output/index.html"; then
+    echo "❌ FAILED: index.html must seed the browser-local Project Store"
+    exit 1
+  fi
+
+  # The legacy store.rs runtime must not be embedded in the exported bundle.
+  if grep -q 'id="reqvire-explorer-runtime"' "${TEST_DIR}/output/index.html" \
+     || grep -q "ReqvireExplorerStore" "${TEST_DIR}/output/index.html"; then
+    echo "❌ FAILED: index.html must not embed the legacy store.rs Explorer runtime"
+    exit 1
+  fi
+
+  INDEX_FILE="${TEST_DIR}/output/index.html" node - <<'NODE'
+const fs = require('fs');
+const html = fs.readFileSync(process.env.INDEX_FILE, 'utf8');
+const projectStoreScript = html.match(/<script[^>]*id=["']reqvire-project-store["'][^>]*>([\s\S]*?)<\/script>/);
+if (!projectStoreScript) {
+  console.error('index.html missing reqvire-project-store seed script');
+  process.exit(1);
+}
+try {
+  new Function(projectStoreScript[1]);
+} catch (error) {
+  console.error(`reqvire-project-store seed must parse as JavaScript: ${error.message}`);
+  process.exit(1);
+}
+NODE
 fi
 
 # Helper function to compare files and show diff on failure

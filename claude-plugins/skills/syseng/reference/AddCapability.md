@@ -8,7 +8,7 @@
 
 ```
 1. Capability first       → Define the coherent operational/system ability
-2. Semantic context    → Add source, ontology, and capability refinements when domain meaning or external contracts matter
+2. Semantic context    → Attach ontology when shared domain meaning matters
 3. Requirements        → Define what the system shall do (never skip implementable obligations)
 4. Refinements         → Add specifications, constraints, behaviors, state, input-output, and semantic-contract refinements as needed
 5. Verifications       → Add verification elements for capabilities or leaf requirements
@@ -25,7 +25,7 @@ When constructing or refactoring a system model, work from model boundaries inwa
 4. Add subcapabilities only for meaningful capability slices; do not use capability hierarchy just to share ontology.
 5. Put shared vocabulary and stable semantic relationships in ontology; attach that ontology from the owning or consuming capability so requirements inherit it through capability context.
 6. Put implementable obligations in requirements that `specify` the local capability.
-7. Put local details in compatible refinements owned by the relevant capability or requirement.
+7. Put local details in compatible refinements owned by the relevant requirement.
 8. Use attachments, not hierarchy, when another capability root needs ontology or reusable requirement-owned contracts from this one.
 9. Validate `submodels`, `collect`, and change-impact paths after each boundary slice.
 
@@ -217,7 +217,7 @@ reqvire link "Capability Name" "specifiedBy" "System Capability Implementation"
 reqvire link "Child Requirement" "derivedFrom" "System Capability Implementation"
 ```
 
-**Relation types**: `derivedFrom` (child → parent inside same family), `derive` (parent → child inside same family), `specify` (requirement → capability), `specifiedBy` (capability → requirement), `verifiedBy` (capability or requirement → verification), `verify` (verification → capability or requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification → implementation or evidence), `satisfy` (implementation/evidence → requirement/test-verification/formal-proof-verification), `refinedBy` (owner → refinement), `refine` (refinement → owner), `trace` (non-directional traceability)
+**Relation types**: `derivedFrom` (child -> parent inside same family), `derive` (parent -> child inside same family), `specify` (requirement -> capability), `specifiedBy` (capability -> requirement), `verifiedBy` (capability or requirement -> verification), `verify` (verification -> capability or requirement), `satisfiedBy` (requirement/test-verification/formal-proof-verification -> implementation or evidence), `satisfy` (implementation/evidence -> requirement/test-verification/formal-proof-verification), `refinedBy` (requirement -> refinement), `refine` (refinement -> requirement), `trace` (non-directional traceability)
 
 ## Step 3: Add Refinements (if needed)
 

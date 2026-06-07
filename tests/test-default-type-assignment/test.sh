@@ -128,6 +128,8 @@ printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 # Check that command succeeded
 if [ $EXIT_CODE -ne 0 ]; then
     echo "FAILED: Command failed with exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+    cat "${TEST_DIR}/test_results.log"
+    exit 1
     OVERALL_RESULT=1
 fi
 
@@ -226,6 +228,7 @@ No type metadata - should default to requirement.
 
 #### Relations
   * specify: #root-capability
+  * refinedBy: [Source Refinement](#source-refinement)
   * refinedBy: [State Refinement](#state-refinement)
   * refinedBy: [Input Output Refinement](#input-output-refinement)
   * refinedBy: [Semantic Contract Refinement](#semantic-contract-refinement)
@@ -244,7 +247,7 @@ No type metadata - should default to requirement.
   * type: source
 
 #### Relations
-  * refine: #root-capability
+  * refine: #explicit-requirement
 
 ### Semantic Contract Refinement
 
@@ -364,6 +367,8 @@ printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
     echo "FAILED: Command failed when processing all element types" >> "${TEST_DIR}/test_results.log"
+    cat "${TEST_DIR}/test_results.log"
+    exit 1
     OVERALL_RESULT=1
 fi
 

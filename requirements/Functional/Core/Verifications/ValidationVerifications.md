@@ -449,11 +449,11 @@ This test verifies that ontology and semantic-contract ownership rules are enfor
 
 #### Details
 Test cases:
-1. `source` refining `capability` validates successfully.
+1. `source` refining `requirement` validates successfully.
 2. `ontology` validates as an independent ontology element when semantic sections are well formed.
 3. `semantic-contract` refining `requirement` validates as a shape contract when it contains Shapes and no Ontology.
 4. `semantic-contract` owned by a capability through `refinedBy`/`refine` fails validation.
-5. `source` refining `requirement` fails.
+5. `source` refining `capability` fails.
 6. `constraint`, `behavior`, `specification`, `state`, or `input-output` refining `capability` fails.
 7. Capability attachment to `ontology` validates.
 8. Requirement attachment to requirement-owned `semantic-contract` validates.

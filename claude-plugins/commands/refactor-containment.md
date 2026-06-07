@@ -80,7 +80,7 @@ Classify content:
 - `capability` roots and child capability subgraphs,
 - `ontology` elements and shared semantic vocabulary,
 - requirements that specify capabilities,
-- refinements owned by capability or requirement elements,
+- refinements owned by requirement elements,
 - verification elements and evidence links.
 
 ### 3. Produce a plan before editing

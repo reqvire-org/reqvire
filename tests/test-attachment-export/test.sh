@@ -50,28 +50,39 @@ if [ ! -f "${TEST_DIR}/output/docs/DesignSpec.md" ] && [ ! -f "${TEST_DIR}/outpu
 fi
 
 # ============================================================
-# Test 2: Index view shows attachment links
+# Test 2: SPA Project Store contains attachment links
 # ============================================================
-
-# Check that index.html exists
+# Check that index.html (SPA bundle) exists and standalone containment is absent.
 if [ ! -f "${TEST_DIR}/output/index.html" ]; then
   echo "❌ FAILED: index.html was not generated"
   exit 1
 fi
-
-# Check for paperclip icon in index
-if ! grep -q "📎" "${TEST_DIR}/output/index.html"; then
-  echo "❌ FAILED: Index does not contain attachment links with 📎 icon"
-  echo "Searching for attachment links in index.html..."
-  grep -i "attachment\|DesignSpec" "${TEST_DIR}/output/index.html" || true
+CONTAINMENT_ENTRY="${TEST_DIR}/output/containment"'.html'
+if [ -f "$CONTAINMENT_ENTRY" ]; then
+  echo "❌ FAILED: standalone containment page must not be generated"
   exit 1
 fi
 
-# Check that attached refinement display name appears in index
-if ! grep -q "Design Spec Contract" "${TEST_DIR}/output/index.html"; then
-  echo "❌ FAILED: Index does not contain attached refinement name 'Design Spec Contract'"
-  exit 1
-fi
+INDEX_FILE="${TEST_DIR}/output/index.html" node - <<'NODE'
+const fs = require('fs');
+const html = fs.readFileSync(process.env.INDEX_FILE, 'utf8');
+const match = html.match(/(?:const|let|var)\s+reqvireProjectStore\s*=\s*(\{[\s\S]*?\});\s*<\/script>/);
+if (!match) {
+  console.error('❌ FAILED: index.html missing Project Store seed');
+  process.exit(1);
+}
+const store = JSON.parse(match[1]);
+const serialized = JSON.stringify({
+  attachments: store.attachments,
+  elements: store.elements,
+  relations: store.relations,
+  resources: store.resources,
+});
+if (!serialized.includes('Design Spec Contract') || !serialized.includes('docs/DesignSpec.md')) {
+  console.error('❌ FAILED: Project Store does not contain attachment evidence for Design Spec Contract');
+  process.exit(1);
+}
+NODE
 
 # ============================================================
 # Test 3: Diagrams show attachments in element boxes
@@ -86,7 +97,7 @@ fi
 
 # Check that mermaid diagram contains attachment with line break
 # The attachment should appear in the element node label with format:
-# Element Name<br/>📎 DesignSpec.md
+# Element Name<br/>📎 Design Spec Contract
 
 # Extract expected content (trimmed)
 EXPECTED_PATTERN=$(cat "${TEST_SCRIPT_DIR}/expected/expected-diagram-content.txt" | head -1)
@@ -102,8 +113,14 @@ if ! grep -qF "$EXPECTED_PATTERN" "$SPEC_HTML"; then
 fi
 
 # Verify paperclip icon is in the diagram context
-if ! grep -q '📎.*docs/DesignSpec.md#design-spec-contract' "$SPEC_HTML"; then
-  echo "❌ FAILED: Diagram does not show 📎 icon with attached refinement identifier"
+# Visible diagram labels should stay compact; full identifiers remain link targets or structured data.
+if ! grep -q '📎.*Design Spec Contract' "$SPEC_HTML"; then
+  echo "❌ FAILED: Diagram does not show 📎 icon with attached refinement display name"
+  exit 1
+fi
+
+if grep -q '📎.*docs/DesignSpec.md#design-spec-contract' "$SPEC_HTML"; then
+  echo "❌ FAILED: Diagram visible label should not expose full attached refinement identifier"
   exit 1
 fi
 

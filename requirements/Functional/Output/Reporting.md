@@ -48,7 +48,7 @@ The system shall expose element-level `size_estimate` records in JSON model evid
 
 ### Collect Capability and Requirement Context
 
-The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, inherited capability ontology context, refinedBy targets, attached requirement contract contents, and source citations in text or JSON format.
+The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, inherited capability ontology context, requirement-owned `refinedBy` targets, attached requirement contract contents, and source citations in text or JSON format.
 
 #### Details
 The system shall define:
@@ -433,7 +433,7 @@ The report helps track verification completeness and identify gaps in requiremen
 
 ### TraceFlow View Report Generation
 
-The system shall generate a TraceFlow view page showing the verification traceability flow using an interactive D3.js Sankey diagram visualization. The view displays how capabilities are specified by requirements, how requirements flow to verifications, and how capabilities may be directly verified.
+The system shall seed TraceFlow/Traces SPA route data showing verification traceability flow for an interactive D3.js Sankey diagram visualization. The routed view displays how capabilities are specified by requirements, how requirements flow to verifications, and how capabilities may be directly verified without emitting a standalone TraceFlow artifact.
 
 #### Metadata
   * type: requirement

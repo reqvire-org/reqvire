@@ -1,3 +1,5 @@
+tests/**/output/
+*Plan.md
 tmpspec
 tmpdoc
 
@@ -44,3 +46,4 @@ npm/reqvire/artifacts/
 npm/reqvire/*.tgz
 .index
 .env
+.playwright-cli

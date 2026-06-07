@@ -33,7 +33,7 @@ Reqvire implements requirement refinement through explicit refinement elements l
 
 #### Details
 **Refinement Ownership:**
-- Refinement content is captured in dedicated elements (`semantic-query-contract`, `specification`, `constraint`, `behavior`, `state`, `input-output`)
+- Refinement content is captured in dedicated requirement-owned elements (`source`, `semantic-contract`, `semantic-query-contract`, `specification`, `constraint`, `behavior`, `state`, `input-output`)
 - Requirement owns refinement via `refinedBy`; refinement points back via `refine`
 - Refinement elements can be attached by external requirements when ownership constraints allow
 
@@ -80,7 +80,7 @@ The canonical type vocabulary is defined by the Reqvire core element, capability
 The implementation shall use those contracts as the authoritative source for:
 - capability, requirement, refinement, verification, and custom type categories
 - default element type semantics
-- capability-owned and requirement-owned refinement type semantics
+- requirement-owned refinement type semantics
 - evidence-backed verification type semantics
 
 Parser-facing behavior remains:

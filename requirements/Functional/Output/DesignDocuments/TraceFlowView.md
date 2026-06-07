@@ -14,7 +14,7 @@
 
 The TraceFlow view displays the verification traceability flow using an interactive D3.js Sankey diagram visualization. This view shows how capabilities are specified by requirements, how requirements flow to verifications, and how capabilities may be directly verified, providing a clear visual representation of the traceability relationships.
 
-The TraceFlow page is accessible via the "TraceFlow" link in the navigation bar, positioned after "Traces".
+TraceFlow behavior is exposed through the single SPA Explorer export and Project Store trace projection. It is not emitted as a standalone HTML artifact and is not a primary left Explorer view destination.
 
 ## Visualization
 
@@ -61,38 +61,37 @@ The visualization uses consistent colors matching other diagrams:
 
 HTML export integration must:
 
-**TraceFlow Page:**
-- Generate as `traceflow.md` containing the Sankey visualization
-- Convert to `traceflow.html` during export
-- Include in navigation bar after "Traces" link
+**TraceFlow SPA View:**
+- Seed traceability flow data into the browser-local Project Store during export
+- Render Sankey visualization behavior from the SPA route/view layer
+- Do not generate standalone TraceFlow markdown or HTML artifacts during export
 
 **Integration with Existing Export:**
 - Follow existing HTML export styling and structure
 - Use Reqvire color scheme for consistency
-- Maintain consistent navigation patterns
+- Maintain consistent SPA navigation patterns without exposing TraceFlow as a primary left Explorer view
 - Support pan/zoom controls like other diagrams
 
 **Requirements:**
-- Generated during `reqvire export` command
+- Seeded during `reqvire export` command
 - Updates automatically when model changes
 - Deterministic output for version control
 
 ---
 
-## Page Content
+## View Content
 
-The TraceFlow page shall contain:
+The TraceFlow SPA view shall contain:
 
-1. **Page Title**: "TraceFlow - Verification Traceability"
-2. **Description**: Brief explanation of what the view shows
-3. **Instructions**: How to interact with the diagram
-4. **Sankey Diagram**: The D3.js Sankey visualization
+1. **Sankey Diagram**: The D3.js Sankey visualization
+2. **Inspector Evidence**: Selection details in the shared right `Inspector` lane when exposed by the view
+3. **Help Guidance**: Brief explanation and interaction guidance through the shared help/inspector surfaces rather than a static first-viewport page title/prose block
 
 ---
 
-## Navigation
+## Access
 
-The TraceFlow link shall be added to the navigation bar:
-- Position: After "Traces", before "Coverage"
-- Link text: "TraceFlow"
-- Target: `traceflow.html`
+The TraceFlow behavior shall remain available through SPA routing/tooling:
+- Link text when referenced from reports: "TraceFlow"
+- Target: SPA route/view state, not a standalone TraceFlow HTML artifact
+- Primary left Explorer pane: no TraceFlow, Coverage, or Resources top-level link

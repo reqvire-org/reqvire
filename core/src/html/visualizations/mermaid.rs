@@ -17,14 +17,14 @@ pub fn render(diagram_code: &str) -> Markup {
 }
 
 /// Generate Mermaid initialization scripts (public for use in pages)
-/// This matches the old template/model.html implementation exactly
+/// This matches the Mermaid rendering contract for exported source/report pages.
 pub fn scripts() -> Markup {
     html! {
         // External dependencies
         script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js" {}
         script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js" {}
 
-        // Mermaid initialization - matches old template exactly
+        // Mermaid initialization for exported source/report pages
         script type="module" {
             (PreEscaped(include_str!("../../../templates/mermaid-init.js")))
         }

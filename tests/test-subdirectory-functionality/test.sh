@@ -108,8 +108,8 @@ if grep -q "click.*specifications/" "$SUBMODULE_HTML"; then
   fi
 fi
 
-# Check index.html and traces.html for correct file paths
-for artifact in "index.html" "traces.html"; do
+# Check index.html for correct file paths
+for artifact in "index.html"; do
   ARTIFACT_PATH="${TMP_DIR}/project-root/submodule/subdirectory-html/$artifact"
   if [ -f "$ARTIFACT_PATH" ]; then
     # File paths in artifacts should be specifications/, not submodule/specifications/

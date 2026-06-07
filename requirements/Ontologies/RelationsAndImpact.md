@@ -209,7 +209,7 @@ reqvire:requirementToVerificationImpactRule a reqvire:ChangePropagationRule ;
 reqvire:ownerToRefinementImpactRule a reqvire:ChangePropagationRule ;
   rdfs:label "Owner to refinement impact" ;
   reqvire:changeRuleName "owner-to-refinement-impact" ;
-  reqvire:changedThing "capability-or-requirement-owner" ;
+  reqvire:changedThing "requirement-owner" ;
   reqvire:impactRelation "refinedBy" ;
   reqvire:impactDirection "downstream" ;
   reqvire:propagationTarget "owned-refinement" ;
@@ -309,14 +309,14 @@ reqvire:specifiedBy a owl:ObjectProperty ;
   rdfs:comment "Forward relation from a capability to a requirement that specifies it." .
 reqvire:refine a owl:ObjectProperty ;
   rdfs:domain reqvire:Refinement ;
-  rdfs:range [ a owl:Class ; owl:unionOf (reqvire:Capability reqvire:Requirement) ] ;
+  rdfs:range reqvire:Requirement ;
   owl:inverseOf reqvire:refinedBy ;
-  rdfs:comment "Inverse ownership relation from a refinement to its capability or requirement owner." .
+  rdfs:comment "Inverse ownership relation from a refinement to its requirement owner." .
 reqvire:refinedBy a owl:ObjectProperty ;
-  rdfs:domain [ a owl:Class ; owl:unionOf (reqvire:Capability reqvire:Requirement) ] ;
+  rdfs:domain reqvire:Requirement ;
   rdfs:range reqvire:Refinement ;
   owl:inverseOf reqvire:refine ;
-  rdfs:comment "Forward ownership relation from a capability or requirement to an owned refinement." .
+  rdfs:comment "Forward ownership relation from a requirement to an owned refinement." .
 reqvire:verify a owl:ObjectProperty ;
   rdfs:domain reqvire:Verification ;
   rdfs:range [ a owl:Class ; owl:unionOf (reqvire:Capability reqvire:Requirement) ] ;
@@ -483,9 +483,9 @@ reqvire:satisfactionRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryRelationName "satisfy", "satisfiedBy" .
 reqvire:refinementRelationCategory a reqvire:RelationSemanticCategory ;
   rdfs:label "Refinement ownership relations" ;
-  rdfs:comment "Ownership of capability-owned and requirement-owned refinements." ;
+  rdfs:comment "Ownership of requirement-owned refinements." ;
   reqvire:semanticCategoryName "refinement-ownership" ;
-  reqvire:semanticCategoryMeaning "Ownership of capability-owned and requirement-owned refinements." ;
+  reqvire:semanticCategoryMeaning "Ownership of requirement-owned refinements." ;
   reqvire:semanticCategoryRelationName "refine", "refinedBy" .
 reqvire:verificationRelationCategory a reqvire:RelationSemanticCategory ;
   rdfs:label "Verification relations" ;
@@ -554,19 +554,19 @@ reqvire:refinedByRelationRule a reqvire:RelationRule ;
   rdfs:label "refinedBy" ;
   reqvire:relationName "refinedBy" ;
   reqvire:inverseRelation reqvire:refine ;
-  reqvire:allowedSourceType "capability", "requirement" ;
+  reqvire:allowedSourceType "requirement" ;
   reqvire:allowedTargetType "subtype-compatible-refinement" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Capability or requirement owns a subtype-compatible refinement element." .
+  reqvire:relationRuleDescription "Requirement owns a subtype-compatible refinement element." .
 
 reqvire:refineRelationRule a reqvire:RelationRule ;
   rdfs:label "refine" ;
   reqvire:relationName "refine" ;
   reqvire:inverseRelation reqvire:refinedBy ;
   reqvire:allowedSourceType "refinement" ;
-  reqvire:allowedTargetType "capability-or-requirement-owner" ;
+  reqvire:allowedTargetType "requirement-owner" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact false ;
@@ -634,7 +634,7 @@ reqvire:attachmentRelationRule a reqvire:RelationRule ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership false ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Attachment references capability-owned ontology context or a compatible requirement-owned refinement contract across explicit subgraph boundaries." .
+  reqvire:relationRuleDescription "Attachment references capability-attached ontology context or a compatible requirement-owned refinement contract across explicit subgraph boundaries." .
 
 reqvire:capabilityAttachmentCompatibilityRule a reqvire:AttachmentCompatibilityRule ;
   rdfs:label "Capability attachment compatibility" ;

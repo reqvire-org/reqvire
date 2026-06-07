@@ -116,7 +116,7 @@ Expected checks:
 - Verify `owner` accepts a free-form string.
 - Verify inherited or default `status: approved` is not treated as explicit approval evidence.
 - Verify non-governance-bearing elements that declare `status`, `priority`, `risk`, or `owner` metadata are rejected with clear diagnostics.
-- Verify governance context for a refinement element is resolved from its owning capability or requirement through `refine` / `refinedBy`, not from metadata authored on the refinement.
+- Verify governance context for a refinement element is resolved from its owning requirement through `refine` / `refinedBy`, not from metadata authored on the refinement.
 
 #### Metadata
   * type: test-verification

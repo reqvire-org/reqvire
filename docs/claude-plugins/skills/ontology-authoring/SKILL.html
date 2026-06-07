@@ -1,0 +1,638 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>SKILL</title><link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
+                :root {
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
+
+                    /* Element Type Colors */
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
+
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
+
+                    /* Interactive Colors */
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
+
+                    /* Text Colors */
+                    --color-text-primary: #212121;
+                    --color-text-secondary: #424242;
+                    --color-text-muted: #757575;
+                    --color-background: #ececea;
+                    --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
+                }
+
+                /* Ensure body takes full height */
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 0;
+                    background-color: var(--color-background);
+                    color: var(--color-text-secondary);
+                }
+
+                /* Navigation bar */
+                .reqvire-nav {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    background-color: var(--color-nav);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 20px;
+                }
+
+                .reqvire-nav a {
+                    color: white;
+                    text-decoration: none;
+                    padding: 0 15px;
+                    font-weight: 500;
+                    transition: background-color 0.2s;
+                }
+
+                .reqvire-nav a:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: none;
+                }
+
+                .nav-logo {
+                    margin-right: 16px;
+                }
+
+                .nav-logo:hover {
+                    background-color: transparent !important;
+                    text-decoration: none !important;
+                }
+
+                .nav-logo img {
+                    height: 24px;
+                    width: auto;
+                    vertical-align: middle;
+                }
+
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 7px 10px;
+                    margin-right: 0;
+                    border-radius: 3px;
+                    font-size: 14px;
+                    transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
+                }
+
+                .nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .nav-link:active {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
+
+                .mobile-nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 20px;
+                    display: block;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: background-color 0.2s;
+                }
+
+                .mobile-nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    color: white;
+                }
+
+                .reqvire-nav-spacer {
+                    height: 50px;
+                }
+
+                /* Content container */
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+
+                .content {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
+                }
+
+                /* Content area typography and styling - matches old template exactly */
+                /* Use higher specificity to override Tailwind reset */
+                .bg-white h1, .content h1, h1 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 2px solid #EEEEEE !important;
+                    padding-bottom: 10px !important;
+                    margin-top: 0 !important;
+                    font-size: 2em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h2, .content h2, h2 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 1px solid #EEEEEE !important;
+                    padding-bottom: 5px !important;
+                    font-size: 1.5em !important;
+                    font-weight: bold !important;
+                    margin-top: 20px !important;
+                }
+
+                .bg-white h3, .content h3, h3 {
+                    color: var(--color-text-primary) !important;
+                    margin-top: 25px !important;
+                    font-size: 1.17em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h4, .content h4, h4 {
+                    color: var(--color-text-secondary) !important;
+                    font-weight: 600 !important;
+                    font-size: 1em !important;
+                    margin-top: 15px !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                .content a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                div.bg-white > a {
+                    color: var(--color-primary) !important;
+                    text-decoration: none !important;
+                    font-weight: 500 !important;
+                    transition: text-decoration 0.15s ease !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):hover,
+                .content a:not(.nav-link):not(.mobile-nav-link):hover {
+                    text-decoration: underline !important;
+                }
+
+                .bg-white a:focus, .content a:focus {
+                    outline: 2px solid var(--color-primary);
+                    outline-offset: 2px;
+                }
+
+                .bg-white table, .content table, table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    margin: 20px 0 !important;
+                }
+
+                .bg-white table, .bg-white th, .bg-white td,
+                .content table, .content th, .content td {
+                    border: 1px solid #EEEEEE !important;
+                }
+
+                .bg-white th, .bg-white td,
+                .content th, .content td {
+                    padding: 8px 12px !important;
+                    text-align: left !important;
+                }
+
+                .bg-white th, .content th {
+                    background-color: #F5F5F5 !important;
+                    color: #212121 !important;
+                    font-weight: 600 !important;
+                }
+
+                .bg-white tr:hover td, .content tr:hover td {
+                    background-color: #FFF8E1 !important;
+                }
+
+                .bg-white code, .content code, code {
+                    background: #f6f8fa !important;
+                    padding: 2px 4px !important;
+                    border-radius: 3px !important;
+                    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+                    font-size: 90% !important;
+                }
+
+                .bg-white pre, .content pre, pre {
+                    background: #f6f8fa !important;
+                    border-radius: 3px !important;
+                    padding: 16px !important;
+                    overflow: auto !important;
+                }
+
+                .bg-white pre code, .content pre code {
+                    background: transparent !important;
+                    padding: 0 !important;
+                }
+
+                .bg-white blockquote, .content blockquote, blockquote {
+                    margin: 0 !important;
+                    padding: 0 15px !important;
+                    color: var(--color-text-muted) !important;
+                    border-left: 4px solid var(--color-primary) !important;
+                }
+
+                .bg-white p, .content p {
+                    margin: 10px 0 !important;
+                    line-height: 1.6 !important;
+                }
+
+                .bg-white ul, .content ul,
+                .bg-white ol, .content ol {
+                    margin: 10px 0 !important;
+                    padding-left: 30px !important;
+                }
+
+                .bg-white li, .content li {
+                    margin: 5px 0 !important;
+                }
+
+                /* Custom Mermaid diagram styles - matches old template */
+                .mermaid {
+                    margin: 20px 0;
+                    text-align: center;
+                    height: auto;
+                    min-height: 280px;
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    border: 1px solid #EEEEEE;
+                    border-radius: 3px;
+                    background-color: #FAFAFA;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: center;
+                    /* Hide raw markdown text until rendered */
+                    color: transparent;
+                }
+
+                .mermaid svg {
+                    /* Show rendered diagram */
+                    color: initial;
+                }
+
+                .mermaid svg {
+                    width: 100%;
+                    height: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                /* Diagram navigation buttons */
+                .diagram-nav-buttons {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    z-index: 999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    background-color: rgba(255, 255, 255, 0.85);
+                    padding: 3px;
+                    border-radius: 3px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+                }
+
+                .diagram-nav-row {
+                    display: flex;
+                    gap: 2px;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn {
+                    width: 22px;
+                    height: 22px;
+                    background-color: var(--color-primary);
+                    color: white;
+                    border: none;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn:hover {
+                    background-color: var(--color-primary-hover);
+                }
+
+                .diagram-nav-btn:active {
+                    background-color: var(--color-primary-active);
+                }
+
+                /* Smooth transitions for interactive elements */
+                a, button {
+                    transition: all 0.2s ease-in-out;
+                }
+
+                /* Responsive typography */
+                @media (max-width: 640px) {
+                    h1 { font-size: 1.5rem; }
+                    h2 { font-size: 1.25rem; }
+                    h3 { font-size: 1.125rem; }
+                }
+
+                /* Print styles */
+                @media print {
+                    nav, .no-print { display: none; }
+                }
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><hr />
+<h2 id="name:-reqvire-ontology-authoring
+description:-expert-workflow-for-creating,-extending,-and-validating-reqvire-ontology-elements-for-it-engineering,-systems-engineering,-mbse,-and-system-of-interest-modeling.-use-for-competency-question-driven-ontology-scoping,-owl/turtle-vocabulary,-capability-attachment-context,-semantic-contract-and-semantic-query-contract-boundaries,-ontology-hierarchy,-domain/range/property-modeling,-individuals,-axioms,-and-reqvire-validation;-trigger-when-codex-needs-to-add-or-revise-files-under-requirements/ontologies,-author-####-ontology-turtle-blocks-or-requirement-owned-####-query-sparql-blocks,-decide-whether-meaning-belongs-in-ontology-vs-requirement/specification/semantic-contract/semantic-query-contract,-or-prepare-ontology-terms-for-reqvire-html-visualization-and-semantic-export.">name: reqvire-ontology-authoring
+description: Expert workflow for creating, extending, and validating Reqvire ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest modeling. Use for competency-question-driven ontology scoping, OWL/Turtle vocabulary, capability attachment context, semantic-contract and semantic-query-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, and Reqvire validation; trigger when Codex needs to add or revise files under requirements/Ontologies, author #### Ontology Turtle blocks or requirement-owned #### Query sparql blocks, decide whether meaning belongs in ontology vs requirement/specification/semantic-contract/semantic-query-contract, or prepare ontology terms for Reqvire HTML visualization and semantic export.</h2>
+<h1 id="reqvire-ontology-authoring">Reqvire Ontology Authoring</h1>
+<p>Author Reqvire ontology content as reusable building blocks for system-of-interest models, not implementation detail. Reqvire managed-project ontologies are primarily for IT engineering, systems engineering, MBSE, architecture, interfaces, verification, operations, and other system model concerns. Use ontology elements for stable nouns, relationships, categories, and model meaning; use requirements for obligations; use requirement-owned semantic-contract elements for SHACL profiles over reachable ontology context; use semantic-query-contract elements for requirement-owned declarative semantic queries over reachable context.</p>
+<h2 id="workflow">Workflow</h2>
+<ol>
+<li>Establish the domain-concept frame before project-specific examples.
+<ul>
+<li>Identify the system of interest and the domain viewpoints the ontology must support: product/domain, engineering/MBSE, operations, governance, interfaces, verification, assurance, or business process.</li>
+<li>Name the most reusable top-level concepts before leaves such as concrete providers or specific workflows.</li>
+<li>Typical first-pass concepts for IT/MBSE projects include <code>SystemOfInterest</code>, <code>Actor</code>, <code>CapabilityArea</code>, <code>ManagedResource</code>, <code>BusinessArtifact</code>, <code>OperationalArtifact</code>, <code>InterfaceSurface</code>, <code>ExternalSystem</code> or <code>EnablingSystem</code>, <code>LifecycleState</code>, <code>Operation</code>, <code>Policy</code>, <code>Risk</code>, and <code>VerificationEvidence</code>.</li>
+<li>Check the five ontology building blocks: classes/concepts, instances/individuals, properties/slots, relationships, and axioms/rules.</li>
+</ul>
+</li>
+<li>Define the system-of-interest scope and 5-10 competency questions.
+<ul>
+<li>Ask what an ontology-backed model must answer about the system, subsystems, capabilities, functions, interfaces, requirements, verification, deployment, operations, risks, or evidence.</li>
+<li>Treat these questions as the litmus test for scope. The ontology should contain enough vocabulary and relationships to answer them at the required level of detail.</li>
+<li>Keep the questions sketch-level; they do not need to be exhaustive.</li>
+</ul>
+</li>
+<li>Develop the class hierarchy and properties together.
+<ul>
+<li>For new ontology work, use top-down modeling by default: define the domain-level concepts first, then specialize them into project-specific concepts.</li>
+<li>For refactoring existing ontology or source material, first inventory the concrete existing terms bottom-up, then reorganize them into the target top-down domain hierarchy.</li>
+<li>Use a combined pass only after the top-level hierarchy exists: add important leaves from project sources, then insert middle-level concepts that make competency questions answerable.</li>
+<li>For each class candidate, immediately ask what object properties and datatype properties are needed: ownership, state, allocation, interface exposure, verification evidence, operational effect, constraints, and identifiers.</li>
+</ul>
+</li>
+<li>Inspect the ontology plane:
+<ul>
+<li><code>reqvire search --filter-type=ontology --short</code></li>
+<li><code>reqvire ontologies</code></li>
+<li>Read the existing <code>requirements/Ontologies/*.md</code> file that owns nearby vocabulary.</li>
+</ul>
+</li>
+<li>Decide whether to extend an existing ontology or create a new ontology element.
+<ul>
+<li>Extend when the new terms belong to an existing vocabulary root.</li>
+<li>Create a new ontology when the terms form a coherent reusable vocabulary with separate ownership, lifecycle, or capability attachment scope.</li>
+</ul>
+</li>
+<li>Derive candidate classes, properties, individuals, and axioms from the domain frame and competency questions.</li>
+<li>Place ontology elements under <code>requirements/Ontologies</code>.</li>
+<li>Author exactly one <code>#### Ontology</code> fenced Turtle block per ontology element.</li>
+<li>Link ontology hierarchy with <code>derivedFrom</code> only between ontology elements.</li>
+<li>Attach ontology from consuming capabilities. Do not attach ontology directly from requirements.</li>
+<li>Add or update semantic contracts only when a closed-world SHACL profile is needed.</li>
+<li>Add or update semantic query contracts only when a requirement owns a declarative semantic query over reachable ontology context.</li>
+<li>Validate before finishing.</li>
+</ol>
+<h2 id="modeling-split">Modeling Split</h2>
+<p>Use <code>ontology</code> for:</p>
+<ul>
+<li>Classes/concepts, such as <code>reqvire:RequirementCoverage a owl:Class</code>.</li>
+<li>Object properties and datatype properties declared in <code>#### Ontology</code> blocks with stable <code>rdfs:domain</code> and <code>rdfs:range</code> when those semantics are true.</li>
+<li>Stable vocabulary individuals, such as element type records, rule records, report kinds, governance values, and enum-like categories. For new controlled vocabulary records, explicitly type the record as both <code>owl:NamedIndividual</code> and its domain class, for example <code>ex:collectReportKind a owl:NamedIndividual, ex:ReportKind</code>.</li>
+<li>Stable hierarchy and axioms, such as <code>rdfs:subClassOf</code>, <code>rdfs:domain</code>, <code>rdfs:range</code>, <code>owl:inverseOf</code>, equivalence, disjointness, and property chains when semantically true.</li>
+<li>MBSE/system-of-interest concepts, such as system, subsystem, function, interface, port, deployment environment, operational mode, verification evidence, risk, hazard, dependency, allocation, and traceability category.</li>
+</ul>
+<p>Use <code>requirement</code> for implementable obligations, especially statements that naturally read as “The system shall…”.</p>
+<p>Use <code>specification</code>, <code>behavior</code>, <code>constraint</code>, <code>state</code>, or <code>input-output</code> for exact commands, file paths, outputs, workflows, schemas, UI behavior, and implementation-specific details.</p>
+<p>Use <code>semantic-contract</code> for requirement-owned SHACL <code>sh:NodeShape</code> profiles. A semantic contract must have <code>#### Shapes</code>, use <code>sh:targetClass</code> and <code>sh:path</code> over reachable ontology terms, refine exactly one requirement owner, and must not contain <code>#### Ontology</code>.</p>
+<p>Use <code>semantic-query-contract</code> for requirement-owned declarative graph queries. A semantic query contract must refine exactly one requirement, use the generic <code>#### Query</code> heading, contain exactly one fenced code block with info string <code>sparql</code>, and must not declare a query kind. It must not contain <code>#### Ontology</code> or <code>#### Shapes</code>. Search JSON exposes parsed query-contract fields; ontology collection and full semantic export do not emit query contracts until a dedicated query-export command exists. The initial feature does not define execution, inference strategy, or persistent RDF store behavior.</p>
+<p>For greenfield ontology creation templates and examples, read <code>references/OntologyAuthoring.md</code>.</p>
+<p>For refactoring or improving existing ontology files, read <code>references/OntologyRefactoring.md</code>. Do not load the refactoring reference for new ontology creation unless the user explicitly asks to refactor or improve existing ontology content.</p>
+<h2 id="labels,-definitions,-and-domain-tokens">Labels, Definitions, and Domain Tokens</h2>
+<p>Use <code>rdfs:label</code> and <code>rdfs:comment</code> for labels and descriptions unless the value is a true domain concept, contract token, or query/validation target. Treat them as the default for presentation text, not replacements for ontology slots.</p>
+<ul>
+<li><code>rdfs:label</code> is optional presentation label text when no more specific domain property is needed.</li>
+<li><code>rdfs:comment</code> is optional explanatory description text for a class, property, individual, or axiom.</li>
+<li>Create a domain class or property when a label/description value is itself system meaning that requirements, SHACL, queries, reports, or payloads depend on.</li>
+<li>Keep custom datatype properties only when the literal is part of the system contract: authored metadata tokens, parser fields, export fields, interface enum values, report kinds, rule conditions, queryable attributes, or controlled-vocabulary payloads.</li>
+<li>If a SHACL shape validates a presentation-only <code>*Name</code>, <code>*Label</code>, <code>*Meaning</code>, or description field, refactor the SHACL <code>sh:path</code> to <code>rdfs:label</code> or <code>rdfs:comment</code> instead of preserving a custom property.</li>
+<li>Do not infer that a property is only a label because it ends with <code>Name</code> or only a comment because it ends with <code>Meaning</code>.</li>
+<li>Controlled-vocabulary individuals get formal semantics from their IRI, explicit <code>owl:NamedIndividual</code> typing, typed class membership, hierarchy, and axioms. Domain token and definition properties may still be required for validation and queries.</li>
+<li>Do not replace canonical token properties with <code>rdfs:label</code> when project files, CLI output, API payloads, semantic contracts, reports, or queries depend on the literal. For example, keep <code>ex:reportKindName "collect"</code> for a report command token; <code>rdfs:label</code> may be added for presentation but is not the contract token.</li>
+</ul>
+<h2 id="owl-/-shacl-block-split">OWL / SHACL Block Split</h2>
+<p>Use OWL datatype/object properties for slots and relationships with stable domain/range semantics. Use SHACL shapes for operational validation facets.</p>
+<ul>
+<li>In <code>#### Ontology</code>, define classes, <code>owl:DatatypeProperty</code> and <code>owl:ObjectProperty</code> declarations, stable <code>rdfs:domain</code>/<code>rdfs:range</code>, hierarchy, metadata annotations, and stable OWL axioms.</li>
+<li>For datatype properties, set <code>rdfs:range</code> to an XSD datatype such as <code>xsd:string</code>, <code>xsd:boolean</code>, <code>xsd:integer</code>, <code>xsd:decimal</code>, <code>xsd:float</code>, <code>xsd:double</code>, <code>xsd:dateTime</code>, or <code>xsd:date</code>.</li>
+<li>For object properties, set <code>rdfs:domain</code> to the subject class and <code>rdfs:range</code> to the object class when both are stable.</li>
+<li>In <code>#### Shapes</code>, declare <code>sh:NodeShape</code> resources, target existing OWL classes with <code>sh:targetClass</code>, and validate existing properties with <code>sh:path</code>.</li>
+<li>Do not redefine <code>ex:Class a owl:Class</code> inside a SHACL shape block. The shape consumes the ontology; it does not own the class declaration.</li>
+<li>Put closed-world cardinality, patterns, enumerations, numeric bounds, messages, and data-quality rules in SHACL, not in the ontology block. Use OWL cardinality restrictions only when they are true domain axioms and reasoner semantics are intended.</li>
+<li>Keep OWL and SHACL separable so ontology exports remain useful to OWL/RDFS tools while semantic contracts remain useful to SHACL validators.</li>
+</ul>
+<h2 id="owl/turtle-quick-reference">OWL/Turtle Quick Reference</h2>
+<p>Reqvire ontology blocks are Turtle using OWL/RDFS vocabulary. Prefer compact, stable CURIEs and define terms explicitly before referencing them.</p>
+<pre><code class="language-turtle">@prefix ex: &lt;https://example.org/ontology#&gt; .
+@prefix owl: &lt;http://www.w3.org/2002/07/owl#&gt; .
+@prefix rdfs: &lt;http://www.w3.org/2000/01/rdf-schema#&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+ex:ManagedResource a owl:Class .
+
+ex:Deployment a owl:Class ;
+  rdfs:subClassOf ex:ManagedResource .
+
+ex:Environment a owl:Class ;
+  rdfs:subClassOf ex:ManagedResource .
+
+ex:InterfaceSurface a owl:Class .
+ex:PublicApiSurface a owl:Class ;
+  rdfs:subClassOf ex:InterfaceSurface .
+ex:PrivateApiSurface a owl:Class ;
+  rdfs:subClassOf ex:InterfaceSurface .
+
+ex:productionEnvironment a owl:NamedIndividual, ex:Environment ;
+  ex:resourceIdentifier "env-prod" .
+
+ex:resourceIdentifier a owl:DatatypeProperty ;
+  rdfs:domain ex:ManagedResource ;
+  rdfs:range xsd:string .
+
+ex:deploymentBelongsToEnvironment a owl:ObjectProperty ;
+  rdfs:domain ex:Deployment ;
+  rdfs:range ex:Environment ;
+  owl:inverseOf ex:environmentHostsDeployment .
+
+ex:environmentHostsDeployment a owl:ObjectProperty ;
+  rdfs:domain ex:Environment ;
+  rdfs:range ex:Deployment .
+
+ex:DeploymentWithEnvironment a owl:Class ;
+  rdfs:subClassOf ex:Deployment,
+    [ a owl:Restriction ;
+      owl:onProperty ex:deploymentBelongsToEnvironment ;
+      owl:someValuesFrom ex:Environment ] .
+
+ex:IntegrationBoundary a owl:Class ;
+  owl:equivalentClass ex:InterfaceSurface .
+
+ex:interfaceExposesResource a owl:ObjectProperty .
+ex:exposesResource a owl:ObjectProperty ;
+  owl:equivalentProperty ex:interfaceExposesResource .
+
+ex:environmentHasPolicy a owl:ObjectProperty .
+ex:resourceImpactedByPolicy a owl:ObjectProperty ;
+  owl:propertyChainAxiom (ex:deploymentBelongsToEnvironment ex:environmentHasPolicy) .
+
+ex:PublicApiSurface owl:disjointWith ex:PrivateApiSurface .
+</code></pre>
+<p>Use <code>owl:Class</code> for concepts, explicit <code>owl:NamedIndividual</code> plus domain-class typing for stable vocabulary records, <code>owl:DatatypeProperty</code> for literal slots, <code>owl:ObjectProperty</code> for relationship slots, <code>rdfs:subClassOf</code> for is-a hierarchy, <code>rdfs:domain</code>/<code>rdfs:range</code> for stable slot attachment and allowed values, and OWL axioms such as <code>owl:Restriction</code>, <code>owl:inverseOf</code>, <code>owl:equivalentClass</code>, <code>owl:equivalentProperty</code>, <code>owl:disjointWith</code>, and <code>owl:propertyChainAxiom</code> only when the semantics are true. Use SHACL shapes for closed-world validation such as required fields, cardinality, enumerations, or datatype checks.</p>
+<h2 id="validation">Validation</h2>
+<p>Run focused validation after ontology edits:</p>
+<pre><code class="language-bash">npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" validate
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" ontologies
+</code></pre>
+<p>When working in the Reqvire source repository, the local Rust CLI is also acceptable:</p>
+<pre><code class="language-bash">cargo run -q -p cli -- --workspace "$PWD" validate
+</code></pre>
+<h2 id="guardrails">Guardrails</h2>
+<ul>
+<li>Keep ontology text reusable and implementation-independent.</li>
+<li>Start from the domain frame and competency questions, and remove ontology terms that do not help answer them or support future system-of-interest modeling.</li>
+<li>Declare referenced ontology terms before SHACL shapes reference them.</li>
+<li>Prefer deterministic IRIs and stable CURIE prefixes.</li>
+<li>Avoid random UUIDs in authored ontology unless the domain truly requires non-semantic identifiers.</li>
+<li>Do not put governance metadata on ontology elements.</li>
+<li>Do not claim implementation satisfaction from ontology elements.</li>
+<li>If adding many property semantics, include domain/range only when the domain and range are stable and not misleadingly broad.</li>
+</ul>
+</div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

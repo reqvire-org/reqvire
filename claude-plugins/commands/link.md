@@ -65,7 +65,7 @@ ${1:-The user will provide source element, relation type (or 'attaching'), and t
 | `verify` | Source verifies target | Verification to requirement |
 | `satisfiedBy` | Source is satisfied by target | Requirement to implementation |
 | `satisfy` | Source satisfies target | Implementation to requirement |
-| `refinedBy` | Source owns target as refinement | Capability to `source`, or requirement to requirement-owned refinement |
+| `refinedBy` | Source owns target as refinement | Requirement to requirement-owned refinement |
 | `refine` | Source refines target | Refinement element to compatible owner (auto-generated) |
 | `trace` | General traceability link | Any traceability relationship |
 | `attaching` | Attach file or element | Attach ontology to capabilities, or compatible requirement-owned refinements to requirements |

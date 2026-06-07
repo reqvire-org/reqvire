@@ -1,0 +1,119 @@
+/*
+ * Canonical Explorer hash routes.
+ *
+ * Routes are `index.html#/<view>` so the exported Explorer works from local
+ * files and simple static servers. Element identifiers themselves contain `#`
+ * (e.g. `path/File.md#fragment`); since `location.hash` captures everything
+ * after the first `#`, the inner `#` is preserved as part of the route string.
+ */
+
+export type ViewId =
+  | "model"
+  | "knowledge-graph"
+  | "kn2"
+  | "traces"
+  | "ontologies"
+  | "coverage"
+  | "resources"
+  | "files"
+  | "search";
+
+export const DEFAULT_VIEW: ViewId = "model";
+
+/** Primary Explorer workspace view. */
+export const PRIMARY_VIEWS: { id: ViewId; label: string }[] = [
+  { id: "model", label: "Model" },
+];
+
+/** Specialist views reached from the right vertical tool rail. */
+export const TOOL_RAIL_VIEWS: { id: ViewId; label: string }[] = [
+  { id: "knowledge-graph", label: "Knowledge Graph" },
+  { id: "traces", label: "Traces" },
+  { id: "ontologies", label: "Ontologies" },
+  { id: "kn2", label: "KN2" },
+];
+
+/** Secondary/report views reachable by route but not in primary navigation. */
+const SECONDARY_VIEWS: ViewId[] = ["coverage", "resources", "files", "search"];
+
+const ALL_VIEW_IDS = new Set<ViewId>([
+  ...PRIMARY_VIEWS.map((v) => v.id),
+  ...TOOL_RAIL_VIEWS.map((v) => v.id),
+  ...SECONDARY_VIEWS,
+]);
+
+export const VIEW_TITLES: Record<ViewId, string> = {
+  model: "Model",
+  "knowledge-graph": "Knowledge Graph",
+  kn2: "KN2",
+  traces: "Traces",
+  ontologies: "Ontologies",
+  coverage: "Coverage",
+  resources: "Resources",
+  files: "Model",
+  search: "Search",
+};
+
+export interface ParsedRoute {
+  /** Active base view rendered under any element-detail modal. */
+  view: ViewId;
+  /** Path param for `files` routes, or query for `search`. */
+  param: string | null;
+  /** Set when the route is an element-detail overlay (`#/elements/<id>`). */
+  elementId: string | null;
+}
+
+export function isViewId(value: string): value is ViewId {
+  return ALL_VIEW_IDS.has(value as ViewId);
+}
+
+export function routeForView(view: ViewId): string {
+  return `#/${view}`;
+}
+
+export function routeForElement(identifier: string): string {
+  return `#/elements/${identifier}`;
+}
+
+/**
+ * Parse a raw `location.hash` into a route. `previousView` is used as the base
+ * view when the hash is an element-detail overlay so closing the modal returns
+ * to the underlying Explorer route.
+ */
+export function parseHash(rawHash: string, previousView: ViewId): ParsedRoute {
+  let hash = rawHash.startsWith("#") ? rawHash.slice(1) : rawHash;
+  if (hash.startsWith("/")) hash = hash.slice(1);
+
+  if (hash === "") {
+    return { view: DEFAULT_VIEW, param: null, elementId: null };
+  }
+
+  if (hash.startsWith("elements/")) {
+    const identifier = hash.slice("elements/".length);
+    return {
+      view: previousView,
+      param: null,
+      elementId: identifier.length > 0 ? identifier : null,
+    };
+  }
+
+  if (hash.startsWith("files/")) {
+    return { view: "files", param: hash.slice("files/".length), elementId: null };
+  }
+
+  if (hash === "search" || hash.startsWith("search/") || hash.startsWith("search?")) {
+    const q = hash.startsWith("search/")
+      ? hash.slice("search/".length)
+      : hash.startsWith("search?")
+        ? hash.slice("search?".length)
+        : "";
+    return { view: "search", param: q || null, elementId: null };
+  }
+
+  const segment = hash.split("/")[0];
+  if (isViewId(segment)) {
+    return { view: segment, param: null, elementId: null };
+  }
+
+  return { view: DEFAULT_VIEW, param: null, elementId: null };
+}

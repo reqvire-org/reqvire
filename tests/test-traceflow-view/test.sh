@@ -1,6 +1,6 @@
 #!/bin/bash
-# Test: TraceFlow View Generation
-# Verifies that reqvire export generates traceflow.html with Sankey diagram
+# Test: Traces SPA Projection Export
+# Verifies that reqvire export seeds trace data into the single SPA export.
 
 set -e
 
@@ -97,71 +97,56 @@ EOF
 OUTPUT_DIR=$(mktemp -d)
 trap "rm -rf $TEMP_DIR $OUTPUT_DIR" EXIT
 
-echo "Test 1: TraceFlow file generation"
+echo "Test 1: Single SPA export generation"
 cd "$TEMP_DIR"
 "$REQVIRE_BIN" export --output "$OUTPUT_DIR" > /dev/null 2>&1
 
-if [ ! -f "$OUTPUT_DIR/traceflow.html" ]; then
-    echo "FAIL: traceflow.html was not generated"
+if [ ! -f "$OUTPUT_DIR/index.html" ]; then
+    echo "FAIL: index.html was not generated"
     exit 1
 fi
-echo "PASS: traceflow.html was generated"
+echo "PASS: index.html was generated"
 
-echo "Test 2: TraceFlow HTML is valid"
-if ! grep -q "<!DOCTYPE html>" "$OUTPUT_DIR/traceflow.html"; then
-    echo "FAIL: traceflow.html is not valid HTML"
+echo "Test 2: Removed TraceFlow standalone page is absent"
+TRACEFLOW_ENTRY="$OUTPUT_DIR/traceflow"'.html'
+if [ -f "$TRACEFLOW_ENTRY" ]; then
+    echo "FAIL: standalone TraceFlow page must not be generated"
     exit 1
 fi
-echo "PASS: traceflow.html is valid HTML"
+echo "PASS: standalone TraceFlow page is absent"
 
-echo "Test 3: TraceFlow contains Sankey diagram"
-if ! grep -q "d3-sankey" "$OUTPUT_DIR/traceflow.html"; then
-    echo "FAIL: traceflow.html does not contain Sankey diagram"
+echo "Test 3: SPA bundle is valid"
+if ! grep -qi "<!doctype html>" "$OUTPUT_DIR/index.html" || ! grep -q "assets/explorer.js" "$OUTPUT_DIR/index.html"; then
+    echo "FAIL: index.html is not the SPA bundle"
     exit 1
 fi
-echo "PASS: traceflow.html contains Sankey diagram"
+echo "PASS: index.html is the SPA bundle"
 
-echo "Test 4: TraceFlow page has title"
-if ! grep -q "TraceFlow" "$OUTPUT_DIR/traceflow.html"; then
-    echo "FAIL: traceflow.html does not have TraceFlow title"
-    exit 1
-fi
-echo "PASS: traceflow.html has TraceFlow title"
-
-echo "Test 5: Navigation contains TraceFlow link"
-if ! grep -q 'traceflow.html.*TraceFlow' "$OUTPUT_DIR/index.html"; then
-    echo "FAIL: Navigation does not contain TraceFlow link"
-    exit 1
-fi
-echo "PASS: Navigation contains TraceFlow link"
-
-echo "Test 6: TraceFlow link is positioned after Traces"
-# Check that traceflow appears after traces in navigation by checking character positions
-# (Maud generates minified HTML so line numbers don't work)
-TRACES_POS=$(grep -b -o 'traces.html.*Traces<' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
-TRACEFLOW_POS=$(grep -b -o 'traceflow.html.*TraceFlow<' "$OUTPUT_DIR/index.html" | head -1 | cut -d: -f1)
-if [ -z "$TRACES_POS" ]; then
-    echo "FAIL: Traces link not found"
-    exit 1
-fi
-if [ -z "$TRACEFLOW_POS" ]; then
-    echo "FAIL: TraceFlow link not found"
-    exit 1
-fi
-if [ "$TRACEFLOW_POS" -le "$TRACES_POS" ]; then
-    echo "FAIL: TraceFlow link is not positioned after Traces (traces pos: $TRACES_POS, traceflow pos: $TRACEFLOW_POS)"
-    exit 1
-fi
-echo "PASS: TraceFlow link is positioned after Traces"
-
-echo "Test 7: All HTML files have TraceFlow in navigation"
-for html_file in "$OUTPUT_DIR"/*.html; do
-    if ! grep -q 'traceflow.html' "$html_file"; then
-        echo "FAIL: $html_file does not have TraceFlow in navigation"
-        exit 1
-    fi
-done
-echo "PASS: All HTML files have TraceFlow in navigation"
+echo "Test 4: Project Store contains Traces route and trace projection"
+INDEX_FILE="$OUTPUT_DIR/index.html" node - <<'NODE'
+const fs = require('fs');
+const html = fs.readFileSync(process.env.INDEX_FILE, 'utf8');
+const match = html.match(/(?:const|let|var)\s+reqvireProjectStore\s*=\s*(\{[\s\S]*?\});\s*<\/script>/);
+if (!match) {
+  console.error('FAIL: index.html missing Project Store seed');
+  process.exit(1);
+}
+const store = JSON.parse(match[1]);
+const route = (store.routes?.canonical || []).find((candidate) => candidate.id === 'traces');
+if (!route || route.pattern !== '#/traces') {
+  console.error('FAIL: Project Store missing canonical #/traces route');
+  process.exit(1);
+}
+if (!store.traces || typeof store.traces !== "object") {
+  console.error('FAIL: Project Store missing trace projection data');
+  process.exit(1);
+}
+if ("legacy" in (store.routes || {})) {
+  console.error('FAIL: Project Store must not advertise page compatibility routes');
+  process.exit(1);
+}
+NODE
+echo "PASS: Project Store contains Traces SPA data"
 
 echo ""
-echo "All TraceFlow view tests passed!"
+echo "All Traces SPA projection tests passed!"

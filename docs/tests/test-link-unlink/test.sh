@@ -24,6 +24,19 @@ assert_file_matches() {
   fi
 }
 
+assert_output_matches() {
+  local expected="$1"
+  local actual="$2"
+  local description="$3"
+
+  if ! diff -u "$expected" "$actual"; then
+    echo "FAILED: $description"
+    echo ""
+    echo "If changes are intentional, update $expected"
+    exit 1
+  fi
+}
+
 echo "===================================="
 echo "Link/Unlink Commands Tests"
 echo "===================================="
@@ -298,12 +311,23 @@ rm -f "$TEST_DIR/specifications/Verifications.md"
 cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
 # Elements
 
+### Test Capability
+
+Capability root.
+
+#### Metadata
+  * type: capability
+---
+
 ### Parent Req
 
 Parent.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Capability](#test-capability)
 ---
 
 ### Child Req
@@ -314,6 +338,7 @@ Child.
   * type: requirement
 
 #### Relations
+  * specify: [Test Capability](#test-capability)
   * derivedFrom: [Parent Req](#parent-req)
 ---
 EOF
@@ -333,6 +358,9 @@ Child.
 
 #### Metadata
   * type: requirement
+
+#### Relations
+  * specify: [Test Capability](#test-capability)
 ---
 
 ### Parent Req
@@ -340,14 +368,109 @@ Child.
 Parent.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Capability](#test-capability)
+---
+
+### Test Capability
+
+Capability root.
+
+#### Metadata
+  * type: capability
 ---
 
 EOF
 
 assert_file_matches "$TEST_DIR/expected-test14.md" "$TEST_DIR/specifications/Requirements.md" "Unlink from opposite side should remove user-created relation"
+rm -f "$TEST_DIR/expected-test14.md"
 
 echo "Test 14 passed"
+echo ""
+
+# ==================================
+# Test 15: Link rejects multi-root hierarchy ownership violation
+# ==================================
+echo "Test 15: Link rejects multi-root hierarchy ownership violation..."
+
+# Keep fixture valid so this test asserts the command-level single-root rejection only.
+rm -f "$TEST_DIR/specifications/Verifications.md"
+
+cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
+# Elements
+
+### Capability A
+
+#### Metadata
+  * type: capability
+---
+
+### Capability B
+
+#### Metadata
+  * type: capability
+---
+
+### Parent A
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Capability A](#capability-a)
+---
+
+### Parent B
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Capability B](#capability-b)
+---
+
+### Child
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Capability A](#capability-a)
+  * derivedFrom: [Parent A](#parent-a)
+---
+EOF
+
+BEFORE_TEST15="$(mktemp /tmp/reqvire-link-before15-XXXXXX.md)"
+cp "$TEST_DIR/specifications/Requirements.md" "$BEFORE_TEST15"
+
+set +e
+LINK_MULTIROOT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Child" "derivedFrom" "Parent B" 2>&1)
+LINK_MULTIROOT_EXIT=$?
+set -e
+
+if [ $LINK_MULTIROOT_EXIT -eq 0 ]; then
+  echo "FAILED: Link should fail deterministically with single-root ownership violation"
+  exit 1
+fi
+
+printf "%s\n" "$LINK_MULTIROOT_OUTPUT" \
+  | sed 's/\x1b\[[0-9;]*m//g' \
+  | sed -E 's/^\[[^]]+\][[:space:]]*//' \
+  | grep -E "Single-root hierarchy ownership violation" \
+  > "$TEST_DIR/output/15-link-multiroot-error.actual.txt"
+
+assert_output_matches \
+  "${TEST_SCRIPT_DIR}/expected/15-link-multiroot-error.txt" \
+  "$TEST_DIR/output/15-link-multiroot-error.actual.txt" \
+  "Deterministic single-root error output mismatch for link"
+
+assert_file_matches "$BEFORE_TEST15" "$TEST_DIR/specifications/Requirements.md" "Failed link must not modify file"
+
+rm -f "$BEFORE_TEST15"
+
+echo "Test 15 passed"
 echo ""
 
 echo "===================================="

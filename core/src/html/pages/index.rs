@@ -11,7 +11,7 @@ use maud::{html, Markup, PreEscaped};
 ///
 pub fn render(html_content: &str, nav_prefix: &str) -> Markup {
     let diagram = html! {
-        div class="containment-page w-full h-full p-4" {
+        div class="reqvire-explorer-shell containment-page w-full h-full p-4" {
             (PreEscaped(html_content))
         }
     };

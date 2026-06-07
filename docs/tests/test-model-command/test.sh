@@ -11,11 +11,11 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # Satisfies: specifications/Verifications/ReportsTests.md#model-command-verification
 #
 # Acceptance Criteria:
-# - `reqvire model` generates model-centric output showing root requirements with nested relations
+# - `reqvire model` generates model-centric output showing ontology roots and capability roots with nested relations
 # - `reqvire model --from=<name>` generates nested structure from specified element
 # - `reqvire model --json` generates valid JSON with nested element structure
 # - `reqvire model --from=<name> --json` generates filtered JSON from specified starting point
-# - Default mode filters to root requirements (no hierarchical parent relations)
+# - Default mode filters to ontology roots and capability roots
 # - Relations contain full target element details recursively
 #
 # Test Criteria:
@@ -47,8 +47,8 @@ if ! grep -q '```mermaid' <<< "$OUTPUT"; then
     exit 1
 fi
 
-if ! grep -q 'graph LR' <<< "$OUTPUT"; then
-    echo "❌ FAILED: Mermaid diagram missing 'graph LR' declaration"
+if ! grep -q 'graph TD' <<< "$OUTPUT"; then
+    echo "❌ FAILED: Mermaid diagram missing 'graph TD' declaration"
     exit 1
 fi
 
@@ -61,6 +61,46 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected_output.md" "${TEST_DIR}/actua
     echo "Expected: ${TEST_DIR}/expected_output.md"
     echo "Actual: ${TEST_DIR}/actual_output.md"
     diff -u "${TEST_SCRIPT_DIR}/expected/expected_output.md" "${TEST_DIR}/actual_output.md"
+    exit 1
+fi
+
+# Test 1b: Pure Mermaid Output
+echo "Running: reqvire model --mmd" >> "${TEST_DIR}/test_results.log"
+set +e
+MMD_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --mmd 2>&1)
+MMD_EXIT_CODE=$?
+set -e
+
+echo "Exit code: $MMD_EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$MMD_OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $MMD_EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: model --mmd command exited with code $MMD_EXIT_CODE"
+    echo "$MMD_OUTPUT"
+    exit 1
+fi
+
+if ! grep -q '^graph TD' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output missing Mermaid graph declaration"
+    echo "$MMD_OUTPUT"
+    exit 1
+fi
+
+if grep -q '```' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output should not contain Markdown fences"
+    echo "$MMD_OUTPUT"
+    exit 1
+fi
+
+if ! grep -q 'Model Command Ontology' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output should include ontology roots"
+    echo "$MMD_OUTPUT"
+    exit 1
+fi
+
+if ! grep -q -- '-->|attaches|' <<< "$MMD_OUTPUT"; then
+    echo "❌ FAILED: model --mmd output should include attachment edges"
+    echo "$MMD_OUTPUT"
     exit 1
 fi
 
@@ -110,6 +150,62 @@ if [ "$EXPECTED_JSON" != "$ACTUAL_JSON" ]; then
     echo "Expected: ${TEST_DIR}/expected_output.json"
     echo "Actual: ${TEST_DIR}/actual_output.json"
     diff -u <(echo "$EXPECTED_JSON") <(echo "$ACTUAL_JSON") || true
+    exit 1
+fi
+
+if echo "$OUTPUT" | jq -e '.. | objects | has("size_estimate")' >/dev/null 2>&1; then
+    echo "❌ FAILED: model --json should omit size_estimate unless explicitly enabled"
+    exit 1
+fi
+
+# Test 2b: Size estimates are JSON-only and opt-in
+echo "Running: reqvire model --with-size-estimates without --json" >> "${TEST_DIR}/test_results.log"
+set +e
+SIZE_ERROR_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --with-size-estimates 2>&1)
+SIZE_ERROR_EXIT_CODE=$?
+set -e
+
+if [ $SIZE_ERROR_EXIT_CODE -eq 0 ]; then
+    echo "❌ FAILED: model --with-size-estimates without --json should fail"
+    echo "$SIZE_ERROR_OUTPUT"
+    exit 1
+fi
+
+if ! grep -q -- "--with-size-estimates requires --json" <<< "$SIZE_ERROR_OUTPUT"; then
+    echo "❌ FAILED: size-estimate JSON-only diagnostic missing"
+    echo "$SIZE_ERROR_OUTPUT"
+    exit 1
+fi
+
+echo "Running: reqvire model --json --with-size-estimates" >> "${TEST_DIR}/test_results.log"
+set +e
+SIZE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --json --with-size-estimates 2>&1)
+SIZE_EXIT_CODE=$?
+set -e
+
+if [ $SIZE_EXIT_CODE -ne 0 ]; then
+    echo "❌ FAILED: model --json --with-size-estimates exited with code $SIZE_EXIT_CODE"
+    echo "$SIZE_OUTPUT"
+    exit 1
+fi
+
+echo "$SIZE_OUTPUT" | jq . >/dev/null 2>&1
+if [ $? -ne 0 ]; then
+    echo "❌ FAILED: size-estimate output is not valid JSON"
+    exit 1
+fi
+
+if ! echo "$SIZE_OUTPUT" | jq -e '
+  [.elements[]? | .. | objects | select(has("identifier") and has("name"))] as $elements
+  | ($elements | length) > 0
+  and all($elements[];
+    (.size_estimate.content_bytes | type == "number")
+    and (.size_estimate.rendered_context_bytes | type == "number")
+    and (.size_estimate.estimated_tokens | type == "number")
+  )
+' >/dev/null 2>&1; then
+    echo "❌ FAILED: model --json --with-size-estimates should include size estimates on all element payloads"
+    echo "$SIZE_OUTPUT"
     exit 1
 fi
 

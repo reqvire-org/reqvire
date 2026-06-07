@@ -34,8 +34,8 @@ Relation usage categories are reusable model vocabulary and are defined by the R
 | **specifiedBy** | specify | Yes | No | Yes | Links a capability to a requirement that specifies it |
 | **satisfiedBy** | satisfy | Yes | No | Yes | Links a requirement to implementation elements that satisfy it |
 | **satisfy** | satisfiedBy | No | Yes | No | Links an implementation to the requirement it satisfies |
-| **refinedBy** | refine | Yes | No | Yes | Links a capability or requirement to refinement elements |
-| **refine** | refinedBy | No | Yes | No | Links a refinement element to the capability or requirement it refines |
+| **refinedBy** | refine | Yes | No | Yes | Links a requirement to subordinate refinement elements |
+| **refine** | refinedBy | No | Yes | No | Links a refinement element to the requirement it refines |
 | **verifiedBy** | verify | Yes | No | Yes | Links a capability or requirement to verification artifacts |
 | **verify** | verifiedBy | No | Yes | No | Links a verification artifact to the capability or requirement it verifies |
 | **trace** | None | Yes | No | No | Establishes a trace relationship without change propagation |
@@ -91,8 +91,8 @@ This section defines which element types can use which relation types as source 
 | **specifiedBy** | capability | requirement | Capability is specified by a requirement |
 | **satisfiedBy** | requirement, test-verification, formal-proof-verification | InternalPath (files) | System requirements and evidence-backed verifications link to implementation or evidence artifacts |
 | **satisfy** | InternalPath (files) | requirement, test-verification, formal-proof-verification | Inverse of satisfiedBy (auto-generated) |
-| **refinedBy** | capability, requirement | subtype-specific refinement types | Capabilities and requirements own compatible refinements |
-| **refine** | refinement types | capability, requirement | Inverse of refinedBy (auto-generated), constrained by refinement subtype |
+| **refinedBy** | requirement | subtype-specific refinement types | Requirements own subordinate refinements |
+| **refine** | refinement types | requirement | Inverse of refinedBy (auto-generated), constrained by refinement subtype |
 | **verifiedBy** | capability or requirement | All verification types | Capabilities and requirements link to verifications |
 | **verify** | All verification types | capability or requirement | Verifications link to capabilities or requirements |
 | **trace** | Any (except refinement types) | Any | Documentation/discovery, no type constraints |
@@ -124,7 +124,7 @@ This section defines which element types can use which relation types as source 
 
 2. **Capability-to-requirement bridge**: requirements use `specify` to point to the capability they specify. Capabilities use `specifiedBy` to point to requirements that specify them. System requirements must have an immediate parent through either `derivedFrom` to another requirement or `specify` to a capability.
 
-3. **Refinement types can only have refine relations**: Elements of type `source`, `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output` can only use `refine` relations to link to their compatible owner. `source` refines capabilities; `semantic-contract` and `semantic-query-contract` refine requirements; `constraint`, `behavior`, `specification`, `state`, and `input-output` may refine capabilities or requirements. Each refinement can only be owned by one valid owner.
+3. **Refinement types can only have refine relations**: Elements of type `source`, `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output` can only use `refine` relations to link to their compatible requirement owner. Each refinement can only be owned by one valid requirement.
 
 4. **satisfiedBy/satisfy restricted to implementable elements**: `satisfiedBy` links requirements and evidence-backed verifications to implementation/evidence files. Capability elements are not valid sources/targets for satisfaction relations.
 

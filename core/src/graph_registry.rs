@@ -1059,7 +1059,7 @@ impl GraphRegistry {
                             if !attachment_type_valid {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned semantic-contract, constraint, behavior, specification, state, or input-output.",
+                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned source, semantic-contract, semantic-query-contract, constraint, behavior, specification, state, or input-output.",
                                         element.file_path,
                                         element.name,
                                         element.element_type.as_str(),
@@ -1076,7 +1076,7 @@ impl GraphRegistry {
                             {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "'{}' has no refine relation. Refinements must refine a capability or requirement before they can be attached. (file: {}, element: {})",
+                                        "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements. (file: {}, element: {})",
                                         target_node.element.name,
                                         element.file_path,
                                         element.name
@@ -1933,7 +1933,7 @@ impl GraphRegistry {
                 };
                 if !owner.element.element_type.is_requirement() {
                     errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic contract '{}' must refine a requirement, not '{}'.",
+                        "Semantic contract '{}' must refine a requirement, not '{}'. Refinements are requirement-owned only; capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.",
                         element.identifier,
                         owner.element.element_type.as_str()
                     )));
@@ -1952,7 +1952,7 @@ impl GraphRegistry {
                 };
                 if !owner.element.element_type.is_requirement() {
                     errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic query contract '{}' must refine a requirement, not '{}'.",
+                        "Semantic query contract '{}' must refine a requirement, not '{}'. Refinements are requirement-owned only; capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.",
                         element.identifier,
                         owner.element.element_type.as_str()
                     )));
@@ -2244,7 +2244,7 @@ impl GraphRegistry {
         None
     }
 
-    /// Validates that each refinement is owned by at most one capability or requirement via refinedBy.
+    /// Validates that each refinement is owned by at most one requirement via refinedBy.
     /// A refinement element or file can only appear as a target of refinedBy from one owner.
     fn validate_refinement_ownership_uniqueness(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating refinement ownership uniqueness...");
@@ -2275,7 +2275,7 @@ impl GraphRegistry {
                         };
                         errors.push(ReqvireError::InvalidMarkdownStructure(
                             format!(
-                                "Refinement '{}' is owned by multiple elements: '{}' and '{}'. Each refinement can only be owned by one capability or requirement via refinedBy.",
+                                "Refinement '{}' is owned by multiple elements: '{}' and '{}'. Each refinement can only be owned by one requirement via refinedBy; refinements are requirement-owned only.",
                                 target_name,
                                 first,
                                 second
@@ -5253,7 +5253,7 @@ impl GraphRegistry {
                         .unwrap_or(att_id);
                     return Err(ReqvireError::InvalidAttachmentTarget(
                         format!(
-                            "'{}' has no refine relation. Refinements must refine a capability or requirement before they can be attached.",
+                            "'{}' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.",
                             att_name
                         ),
                     ));

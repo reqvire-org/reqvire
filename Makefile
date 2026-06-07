@@ -10,7 +10,18 @@ define update_version
 	sed -i 's/^version = ".*"/version = "$(1)"/' $(CARGO_TOML)
 endef
 
-.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major docs
+.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major docs explorer build
+
+# Build the React/Vite Explorer SPA bundle. The exported/served index.html is
+# this bundle; core/build.rs embeds explorer/dist at compile time, so this must
+# run before `cargo build` for the real bundle to be embedded.
+explorer:
+	@echo "Building Explorer SPA bundle..."
+	cd explorer && npm ci && npm run build
+
+# Build the Explorer bundle, then the Rust workspace (so the bundle is embedded).
+build: explorer
+	cargo build
 
 # Version update targets
 update-patch:
@@ -41,7 +52,8 @@ prepare-release:
 	@echo "Current version: $(VERSION)"
 	@echo "Updating Cargo.lock..."
 	cargo update
-	@echo "Building project to verify changes..."
+	@echo "Building Explorer bundle and project to verify changes..."
+	$(MAKE) explorer
 	cargo build
 	@echo "Running tests to ensure stability..."
 	cargo test
@@ -78,6 +90,7 @@ release:
 	fi
 	@echo "Verifying version $(VERSION) is ready for release..."
 	@echo "Building and testing to ensure stability..."
+	$(MAKE) explorer
 	cargo build --release
 	cargo test
 	@echo "Creating release tag v$(VERSION)..."

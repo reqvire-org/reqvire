@@ -75,14 +75,14 @@ The filtering system **must support the following filters**, which may be active
 - `"inspection-verification"` - Inspection verification
 - `"demonstration-verification"` - Demonstration verification
 - `"formal-proof-verification"` - Formal proof/model-checking/theorem verification
-- `"source"` - Capability-owned source/context refinement
+- `"source"` - Requirement-owned source refinement
 - `"semantic-contract"` - Requirement-owned SHACL semantic contract refinement
 - `"semantic-query-contract"` - Requirement-owned semantic query contract refinement
-- `"constraint"` - Refinement documenting constraints
-- `"behavior"` - Refinement documenting behavior details
-- `"specification"` - Refinement documenting specifications
-- `"state"` - Refinement documenting lifecycle state
-- `"input-output"` - Refinement documenting payloads, messages, fixtures, or data contracts
+- `"constraint"` - Requirement-owned constraint refinement
+- `"behavior"` - Requirement-owned behavior refinement
+- `"specification"` - Requirement-owned specification refinement
+- `"state"` - Requirement-owned lifecycle state refinement
+- `"input-output"` - Requirement-owned payload, message, fixture, or data contract refinement
 - `"file"` - File element
 - Any user-defined type (e.g., `"interface"`, `"design"`)
 

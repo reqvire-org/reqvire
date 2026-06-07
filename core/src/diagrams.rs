@@ -155,9 +155,11 @@ impl<'a> ModelDiagramGenerator<'a> {
                                     .file_name()
                                     .map(|n| n.to_string_lossy().into_owned())
                                     .unwrap_or_else(|| path.to_string_lossy().into_owned()),
-                                crate::element::AttachmentTarget::ElementIdentifier(id) => {
-                                    id.clone()
-                                }
+                                crate::element::AttachmentTarget::ElementIdentifier(id) => self
+                                    .registry
+                                    .get_element(id)
+                                    .map(|target| target.name.clone())
+                                    .unwrap_or_else(|| attachment_target_label(id)),
                             })
                             .collect();
                         element_nodes.push(ElementNode {
@@ -563,7 +565,10 @@ fn generate_file_diagram(
                             .file_name()
                             .map(|n| n.to_string_lossy().into_owned())
                             .unwrap_or_else(|| path.to_string_lossy().into_owned()),
-                        crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+                        crate::element::AttachmentTarget::ElementIdentifier(id) => registry
+                            .get_element(id)
+                            .map(|target| target.name.clone())
+                            .unwrap_or_else(|| attachment_target_label(id)),
                     };
                     label.push_str(&format!("<br/>📎 {}", escape_label(&attachment_name)));
                 }
@@ -1096,6 +1101,19 @@ pub fn escape_label(text: &str) -> String {
         .replace(']', "&#93;")
         .replace('(', "&#40;")
         .replace(')', "&#41;")
+}
+
+fn attachment_target_label(target: &str) -> String {
+    let fragment_or_path = target.rsplit('#').next().unwrap_or(target);
+    let basename = fragment_or_path
+        .rsplit('/')
+        .next()
+        .unwrap_or(fragment_or_path);
+    if basename.is_empty() {
+        target.to_string()
+    } else {
+        basename.to_string()
+    }
 }
 
 /// Generate containment view diagram showing folder/file/element hierarchy

@@ -437,7 +437,7 @@ Value type describes what kind of value can fill the slot.
 | Enumerated value | One value from a controlled set. | lifecycle state: active, paused, failed, terminated; risk level: low, medium, high, critical |
 | Instance value | Link to an individual of an allowed class. | deployment belongs to an `Environment`; resource owned by an `Actor`; interface exposes a `ManagedResource` |
 
-For datatype properties, express value type with an RDF datatype such as `xsd:string`, `xsd:boolean`, `xsd:integer`, or `xsd:decimal` when appropriate. For object properties, express the allowed class with `rdfs:range` when the range is stable. Use SHACL shapes when a capability or requirement needs closed-world cardinality, datatype, enumeration, numeric range, regex, or allowed-class validation.
+For datatype properties, express value type with an RDF datatype such as `xsd:string`, `xsd:boolean`, `xsd:integer`, or `xsd:decimal` when appropriate. For object properties, express the allowed class with `rdfs:range` when the range is stable. Use requirement-owned SHACL shapes when a requirement needs closed-world cardinality, datatype, enumeration, numeric range, regex, or allowed-class validation.
 
 ### OWL / SHACL Hybrid Datatype Pattern
 

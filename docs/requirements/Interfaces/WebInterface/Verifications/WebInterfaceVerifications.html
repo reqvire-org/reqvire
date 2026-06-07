@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../../coverage.html" class="nav-link">Coverage</a><a href="../../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../../model.html" class="mobile-nav-link">Model</a><a href="../../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -371,12 +470,18 @@
       55142ee2c012c875["Diagram Attachment Display Verification"];
       class 55142ee2c012c875 verification;
       click 55142ee2c012c875 "WebInterfaceVerifications.html#diagram-attachment-display-verification";
+      bac83148d8bf28b6["HTML Export Local Linked Files Verification"];
+      class bac83148d8bf28b6 verification;
+      click bac83148d8bf28b6 "WebInterfaceVerifications.html#html-export-local-linked-files-verification";
       a7eeaf4fd1d17030["HTML Export Verification"];
       class a7eeaf4fd1d17030 verification;
       click a7eeaf4fd1d17030 "WebInterfaceVerifications.html#html-export-verification";
       5e30c180284e9196["Model View Element Navigation Test"];
       class 5e30c180284e9196 verification;
       click 5e30c180284e9196 "WebInterfaceVerifications.html#model-view-element-navigation-test";
+      d57772c444d5d34b["Ontology Model Viewer Analysis Verification"];
+      class d57772c444d5d34b verification;
+      click d57772c444d5d34b "WebInterfaceVerifications.html#ontology-model-viewer-analysis-verification";
       d48ee06d20b13bcc["Serve Command Verification"];
       class d48ee06d20b13bcc verification;
       click d48ee06d20b13bcc "WebInterfaceVerifications.html#serve-command-verification";
@@ -388,6 +493,10 @@
   10fd7a6a648e333a -->|satisfiedBy| 6da864fbba49def6;
   4761515e40f428b4 -->|satisfiedBy| 6da864fbba49def6;
   55142ee2c012c875 -->|satisfiedBy| 6da864fbba49def6;
+  8fecc6990d24d28a["test.sh"];
+  class 8fecc6990d24d28a default;
+  click 8fecc6990d24d28a "../../../../tests/test-html-export-local-images/test.sh";
+  bac83148d8bf28b6 -->|satisfiedBy| 8fecc6990d24d28a;
   7f5ed48bc960d276["test.sh"];
   class 7f5ed48bc960d276 default;
   click 7f5ed48bc960d276 "../../../../tests/test-html-export/test.sh";
@@ -402,21 +511,20 @@
   d48ee06d20b13bcc -->|satisfiedBy| b2e17101035a75d;
 </div>
 <h3 id="attachment-export-verification">Attachment Export Verification</h3>
-<p>This test verifies that HTML export copies all attachment files to the output directory.</p>
+<p>This test verifies that HTML export preserves attachment identifier links to referenced refinement elements.</p>
 <h4>Details</h4>
 <h5>Acceptance Criteria:</h5>
 <ul>
-<li>System shall copy all attachment files referenced by elements</li>
-<li>Attachment files shall preserve their relative paths in output</li>
-<li>Duplicate attachments (same file referenced multiple times) shall be copied only once</li>
-<li>All attachment file types shall be supported (md, pdf, txt, etc.)</li>
+<li>System shall preserve all refinement-identifier attachments referenced by elements</li>
+<li>Attachment identifier links shall resolve to referenced refinement elements in exported HTML</li>
+<li>Duplicate attachments (same refinement referenced multiple times) shall be processed consistently</li>
 </ul>
 <h5>Test Criteria:</h5>
 <ul>
 <li>Create model with elements having attachments</li>
 <li>Run HTML export command</li>
-<li>Verify attachment files exist in output directory at correct relative paths</li>
-<li>Verify attachment files content matches original</li>
+<li>Verify attachment links in exported HTML resolve to refinement element anchors</li>
+<li>Verify identifier targets are navigable from rendered pages</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -435,9 +543,7 @@
 <ul>
 <li>Elements with attachments shall show attachments as child nodes in D3.js tree</li>
 <li>Element attachments (refinements) shall use wrench icon (🔧) with type <code>attachment-element</code></li>
-<li>File attachments shall use paperclip icon (📎) with type <code>attachment-file</code></li>
 <li>Element attachments shall be clickable and navigate to the referenced element</li>
-<li>File attachments shall show filename and path for reference</li>
 </ul>
 <h5>Test Criteria:</h5>
 <ul>
@@ -445,7 +551,6 @@
 <li>Run HTML export command</li>
 <li>Verify containment.html contains d3-tree JSON data with attachment nodes</li>
 <li>Verify attachment-element nodes have links to element definitions</li>
-<li>Verify attachment-file nodes show file paths</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -462,17 +567,19 @@
 <h4>Details</h4>
 <h5>Acceptance Criteria:</h5>
 <ul>
-<li>Element boxes in diagrams shall include attachment filenames</li>
+<li>Element boxes in diagrams shall include attached refinement element names</li>
 <li>Attachments shall be prefixed with paperclip icon (📎)</li>
 <li>Attachments shall appear below element name using line breaks</li>
 <li>Attachment display shall not break diagram rendering</li>
+<li>Model and Traces diagram labels shall not expose full <code>file#fragment</code> attachment identifiers as visible node text</li>
 </ul>
 <h5>Test Criteria:</h5>
 <ul>
 <li>Create model with element having attachments</li>
 <li>Generate diagram (format or model command)</li>
 <li>Verify Mermaid output contains multiline labels with attachments</li>
-<li>Verify attachment filenames appear with 📎 prefix</li>
+<li>Verify attached refinement element names appear with 📎 prefix</li>
+<li>Verify exported Model and Traces pages use compact attachment labels and still render Mermaid containers for the final graph</li>
 <li>Verify diagram renders correctly with attachment labels</li>
 </ul>
 <h4>Metadata</h4>
@@ -483,6 +590,32 @@
 <ul>
 <li>satisfiedBy: <a href="../../../../tests/test-attachment-export/test.sh">test.sh</a></li>
 <li>verify: <a href="../Capabilities.html#diagram-attachment-display">Diagram Attachment Display</a></li>
+</ul>
+<hr />
+<h3 id="html-export-local-linked-files-verification">HTML Export Local Linked Files Verification</h3>
+<p>This test verifies that HTML export preserves local linked-file references used in exported markdown content.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria:</h5>
+<ul>
+<li>Exported HTML pages shall preserve local file reference paths for markdown-rendered links and images</li>
+<li>Local non-markdown files referenced by exported markdown content shall exist in the export output</li>
+<li>Exported HTML pages shall render local file references without converting asset paths to HTML document paths</li>
+</ul>
+<h5>Test Criteria:</h5>
+<ul>
+<li>Create model content with local file references</li>
+<li>Run HTML export command</li>
+<li>Verify exported HTML contains the expected local <code>href</code> and <code>&lt;img src&gt;</code> paths</li>
+<li>Verify the referenced local files exist in the output tree</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-html-export-local-images/test.sh">test.sh</a></li>
+<li>verify: <a href="../Capabilities.html#local-linked-file-export">Local Linked File Export</a></li>
 </ul>
 <hr />
 <h3 id="html-export-verification">HTML Export Verification</h3>
@@ -506,6 +639,7 @@
 <ul>
 <li>Command exits with success (0) return code</li>
 <li>HTML files are generated at the expected location with .html extension</li>
+<li>Generated KN2 output exposes concept-reference facts as a relation toggle/filter, and disabling that relation can remove concept reference targets from the visible graph.</li>
 <li>Output directory contains containment.html file</li>
 <li>containment.html contains D3.js tree visualization</li>
 <li>containment.html includes d3-tree JSON data block</li>
@@ -547,6 +681,75 @@
 <ul>
 <li>satisfiedBy: <a href="../../../../tests/test-model-command/test.sh">test.sh</a></li>
 <li>verify: <a href="../Capabilities.html#model-view-element-navigation">Model View Element Navigation</a></li>
+</ul>
+<hr />
+<h3 id="ontology-model-viewer-analysis-verification">Ontology Model Viewer Analysis Verification</h3>
+<p>This analysis verifies that the Ontologies page behaves as an ontology model viewer rather than a raw RDF triple viewer.</p>
+<h4>Details</h4>
+<p>Expected analysis checks:</p>
+<ul>
+<li>Confirm the primary Ontologies visualization, search data, and inspector construct metadata are built from <code>SemanticIndex.ontology_projection</code>, the same generated ontology construct projection used by full semantic export.</li>
+<li>Confirm the primary viewer does not render <code>rdf:type</code> edges, OWL/RDFS metaclass nodes, RDF list plumbing, anonymous SHACL property-shape blank nodes, or generic literal plumbing as the main user-facing graph.</li>
+<li>Confirm classes, object properties, datatype properties, RDF properties, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources are classified into distinct semantic kinds when present, while property terms are projected as graph relationship semantics rather than standalone graph nodes.</li>
+<li>Confirm datatype-property literal values are not graph nodes or visibility filter layers, but remain searchable and appear in the selected subject node inspector as predicate/value evidence.</li>
+<li>Confirm a named IRI typed only by a declared ontology class, without explicit <code>owl:NamedIndividual</code>, is shown in graph data and the inspector as a named individual while retaining its <code>∈</code> membership construct evidence.</li>
+<li>Confirm visual coloring is driven by semantic kind, not by source provenance, so a class referenced by SHACL remains class-colored, property metadata remains property-typed in links/inspector/search, and actual SHACL node shapes and property shapes use SHACL-specific colors.</li>
+<li>Confirm built-in XSD, RDF, RDFS, OWL, and SHACL namespace references are available as an external-reference layer that is hidden by default and can be enabled for datatype/range audit.</li>
+<li>Confirm object and datatype properties are first-class relationship semantics with aggregated domain and range information rendered as labeled links and inspector property usage evidence, not as standalone graph nodes.</li>
+<li>Confirm SHACL node-shape target classes and property usage rows receive derived slot/facet inspector sections from property-shape paths, datatype/class range constraints, node kind, cardinality, pattern, allowed values, and source-shape evidence.</li>
+<li>Confirm target-class slot/facet sections are labeled as class slots, property usage sections are labeled as usages of the selected property by target classes, and repeated usages with different target classes or source shapes are not presented as duplicate property definitions.</li>
+<li>Confirm raw SHACL evidence is shown only when direct raw constraints are attached to the inspected node and that classes or property metadata with only normalized SHACL overlays do not show an empty raw-evidence section.</li>
+<li>Confirm equivalence groups use stable deterministic identifiers derived from canonical member lists.</li>
+<li>Confirm domain/range, subclass/member-of, disjointness, equivalence groups, inverse properties, property chains, property characteristics, class-expression/restriction constructs, SHACL overlays, provenance/source citations, and symbols are represented from generated semantic projection constructs when present in the ontology input.</li>
+<li>Confirm class-expression nodes used as property domain/range expressions display contextual labels such as <code>refine range: Capability ∪ Requirement</code>, while preserving expression members and property usage evidence in the inspector.</li>
+<li>Confirm semantic-query-contract refinements define the direct-authored construct extraction patterns while raw query text remains out of ontology collection and full semantic export.</li>
+<li>Confirm ontology viewer symbols are defined with semantic meaning, raw Unicode code point, rendered Unicode character, allowed viewer usage, tooltip text, and accessible labels.</li>
+<li>Confirm ontology inspector badges render the symbol and semantic label without rendering the raw Unicode code point as visible badge text, and that visible badge labels prefer domain wording such as <code>Subclass</code>.</li>
+<li>Confirm subclass and membership badges are directional and are not mirrored onto superclass or class-object nodes solely because those nodes are construct targets.</li>
+<li>Confirm source citations remain available as inspector/search evidence, link to the exported source HTML page fragments, and the exported <code>ontologies.ttl</code> artifact remains available for raw RDF/Turtle auditability and downstream tooling.</li>
+<li>Confirm <code>ontologies.html</code> opens directly on the explorer, fills the available viewport below the fixed navigation bar, places the <code>.ttl</code> download action in the same compact single-line sidebar footer as the summary counts, and does not render the old top/sidebar action bar, raw Turtle/source-block list, page header preamble, or shared content-card footer.</li>
+<li>Confirm the ontology graph uses the Sigma.js, Graphology, and ForceAtlas2 rendering engine already used by the project knowledge graph while preserving ontology-specific projection and filter semantics, and uses Sigma curved-arrow edge programs to separate parallel edges and labels between the same nodes.</li>
+<li>Confirm ontology graph property and construct edge labels are anchored on the same curved connector geometry as the rendered Sigma edge rather than at unrelated straight-line chord positions.</li>
+<li>Confirm OWL set-operator/class-expression member links use a dedicated Sigma curved-arrow edge program plus Sigma’s edge-label canvas renderer hook for visible dashed connectors, white diamond start markers, and open arrowheads, render as unlabeled structural connectors, and retain expression kind/member evidence in node labels and the inspector.</li>
+<li>Confirm ontology render nodes use one construct-class contract derived from semantic type and projection construct evidence, and that restriction/class-expression classification drives glyph rendering, visibility filters, construct-only node gating, and focused-neighborhood behavior consistently.</li>
+<li>Confirm OWL set-operator/class-expression and restriction nodes render as compact glyph-only construct circles through a Sigma-managed construct glyph canvas layer rather than as ordinary text-labeled ontology nodes.</li>
+<li>Confirm glyph-only construct circles and white diamond construct markers appear only for actual OWL anonymous construct nodes, such as <code>owl:unionOf</code>, <code>owl:intersectionOf</code>, <code>owl:complementOf</code>, and <code>owl:Restriction</code>, when their <code>Class expressions</code> or <code>Restrictions</code> visibility controls and focused edge visibility rules make the construct neighborhood visible.</li>
+<li>Confirm non-property construct labels use <code>@sigma/edge-curve</code>’s curved-label renderer so labels follow the same curve geometry as the Sigma edge program.</li>
+<li>Confirm subclass connectors render with WebVOWL-style dotted/open-arrow treatment while keeping readable <code>Subclass of</code> labels anchored on the connector.</li>
+<li>Confirm ontology node labels use Sigma default node-label and hover rendering for ordinary ontology nodes, selected or hovered ordinary ontology nodes display their full labels even when normal unfocused labels are truncated for density, and glyph-only construct nodes remain unlabeled while showing their symbols through the construct glyph canvas layer.</li>
+<li>Confirm the ontology graph uses ontology-diagram visual conventions: class-like concepts, restrictions, and class expressions render as compact circular or elliptical anchors; properties render as labeled domain/range relationship edges near their anchors rather than graph boxes; datatype/resource/SHACL nodes remain visually distinct; relation edges use directed ontology-diagram connector lines with visible direction arrowheads; and the graph supports Sigma pan/zoom, selected-node centering, and reset-driven layout.</li>
+<li>Confirm ontology relationship edges are hidden in the default full-graph view and appear only for edges incident to the hovered or selected focus node set, with property and construct filters limiting which focused edges are eligible.</li>
+<li>Confirm Sigma z-index rendering and the Sigma-managed focus overlay canvas are enabled so the hovered or selected ontology focus neighborhood is painted above unselected graph items, including edges that would otherwise be below unrelated node layers.</li>
+<li>Confirm generic SHACL overlay edges render as unlabeled overlay lines while retaining inspector/projection evidence, unless an edge carries a more specific ontology/SHACL relation label.</li>
+<li>Confirm relation connectors and arrowheads remain visible but subtle enough not to overflow or dominate labels.</li>
+<li>Confirm circular class-anchor size is bounded and grows from graph connection degree rather than label length, so highly connected concepts are visually emphasized while low-degree concepts remain compact.</li>
+<li>Confirm graph nodes, property link labels, inspector badges, and legend swatches use the muted ontology-diagram palette consistently, including blue class anchors, muted property semantics, yellow datatypes, purple named individuals, red SHACL shapes, and a low-contrast gray-green canvas.</li>
+<li>Confirm search, focus, inspector, filters, and the compact legend operate over semantic ontology roles and OWL constructs rather than generic RDF predicate edges.</li>
+<li>Confirm the detailed semantic type color key and construct notation key are passive, while visibility controls are separate coarse role toggles and WebVOWL-style visibility controls.</li>
+<li>Confirm the passive type legend exposes separate color swatches only for semantic kinds that can render as nodes, including classes, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources; property kinds remain visible through property links, inspector badges, search metadata, and WebVOWL-style visibility controls.</li>
+<li>Confirm the <code>Constructs</code> visibility group exposes WebVOWL-style controls for datatype properties, object properties, class membership, class disjointness, restrictions, class expressions, and SHACL slot overlays without replacing Reqvire’s richer type and construct legends, and that checked means shown on the canvas.</li>
+<li>Confirm the grouped role filters expose ontology terms, SHACL shapes, resources, and external references instead of making every detailed type swatch clickable, and property links are controlled through datatype-property and object-property visibility controls.</li>
+<li>Confirm the default filter state opens with datatype-property links, object-property links, class-membership edges, and SHACL slot overlays checked, while SHACL shapes, generic resources/individuals, disjointness, equivalence, inverse-property overlays, property chains, property characteristics, restrictions, class expressions, and external references are inactive until selected.</li>
+<li>Confirm role filters are hard gates for node visibility, so disabling SHACL shapes hides SHACL shape nodes even when SHACL slot overlay collapse filtering is not enabled.</li>
+<li>Confirm the passive <code>Notation</code> legend covers domain/range, subclass, membership, disjointness, equivalence, inverse, property chain, property characteristic, restriction, class-expression, and SHACL-overlay constructs without exposing those rows as a second construct-filter panel.</li>
+<li>Confirm relation styling is passive visual notation rather than a selectable filter, and WebVOWL-style visibility controls determine which clutter categories are shown.</li>
+<li>Confirm equivalence, inverse-property, property-chain, and property-characteristic constructs remain visible as passive legend/inspector evidence rather than active filters while they have no direct canvas-visible toggle effect.</li>
+<li>Confirm visibility controls affect construct-only canvas nodes, construct-specific canvas edges, and graph node badges without making nodes visible when their role filter is disabled, while the inspector continues to show the selected node’s full evidence.</li>
+<li>Confirm graph-registry provenance and generated-projection provenance are not exposed as graph-wide filter axes; source/provenance evidence remains available in the inspector and export data.</li>
+<li>Confirm active filters combine inclusively within one category and narrow together across different active categories on the canvas without narrowing the right inspector pane.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: analysis-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../../../Functional/Output/Reporting.html#ontology-projection-subgraph-materialization">Ontology Projection Subgraph Materialization</a></li>
+<li>verify: <a href="../Capabilities.html#ontologies-view-generation">Ontologies View Generation</a></li>
+<li>verify: <a href="../Capabilities.html#ontology-construct-grouping">Ontology Construct Grouping</a></li>
+<li>verify: <a href="../Capabilities.html#ontology-property-centric-visualization">Ontology Property-Centric Visualization</a></li>
+<li>verify: <a href="../Capabilities.html#ontology-symbol-and-badge-vocabulary">Ontology Symbol and Badge Vocabulary</a></li>
+<li>verify: <a href="../Capabilities.html#owl-semantic-ontology-projection">OWL Semantic Ontology Projection</a></li>
 </ul>
 <hr />
 <h3 id="serve-command-verification">Serve Command Verification</h3>
@@ -632,7 +835,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -641,10 +845,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -657,7 +864,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -675,6 +882,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1067,9 +1279,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

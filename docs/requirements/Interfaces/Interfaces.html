@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../index.html" class="nav-logo flex items-center pr-4"><img src="../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../index.html" class="nav-link">Containment</a><a href="../../model.html" class="nav-link">Model</a><a href="../../traces.html" class="nav-link">Traces</a><a href="../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../coverage.html" class="nav-link">Coverage</a><a href="../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../index.html" class="mobile-nav-link">Containment</a><a href="../../model.html" class="mobile-nav-link">Model</a><a href="../../traces.html" class="mobile-nav-link">Traces</a><a href="../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../index.html" class="nav-logo flex items-center pr-4"><img src="../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../index.html" class="nav-link">Containment</a><a href="../../model.html" class="nav-link">Model</a><a href="../../traces.html" class="nav-link">Traces</a><a href="../../ontologies.html" class="nav-link">Ontologies</a><a href="../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -363,10 +462,13 @@
   subgraph c97e5d4c96ea3f37["📁 requirements/Interfaces"]
     subgraph 7ecaecf58817be05["📄 Interfaces.md"]
       90bec7578aacbe9d["CLI interface"];
-      class 90bec7578aacbe9d userRequirement;
+      class 90bec7578aacbe9d systemRequirement;
       click 90bec7578aacbe9d "Interfaces.html#cli-interface";
+      be06ead5176f4b37["MCP Interface"];
+      class be06ead5176f4b37 systemRequirement;
+      click be06ead5176f4b37 "Interfaces.html#mcp-interface";
       ea7f8e1ac2ba1ba4["Web Interface"];
-      class ea7f8e1ac2ba1ba4 userRequirement;
+      class ea7f8e1ac2ba1ba4 systemRequirement;
       click ea7f8e1ac2ba1ba4 "Interfaces.html#web-interface";
     end
   end
@@ -377,91 +479,305 @@
       click d6147550e948449e "CLI/Commands.html#cli-interface-structure";
     end
   end
+  subgraph 6cbe3da4cf3e13bd["📁 requirements/Interfaces/MCP"]
+    subgraph 1321e27ab3a26212["📄 Specifications.md"]
+      eb6c065ee6e21795["MCP Interface Boundary Specification"];
+      class eb6c065ee6e21795 default;
+      click eb6c065ee6e21795 "MCP/Specifications.html#mcp-interface-boundary-specification";
+    end
+    subgraph f2250f10ec1c6295["📄 Tools.md"]
+      732364a8098459f2["MCP Access Control Baseline"];
+      class 732364a8098459f2 systemRequirement;
+      click 732364a8098459f2 "MCP/Tools.html#mcp-access-control-baseline";
+      3bc3d9c65bc369["MCP Adapter Boundary"];
+      class 3bc3d9c65bc369 systemRequirement;
+      click 3bc3d9c65bc369 "MCP/Tools.html#mcp-adapter-boundary";
+      74669547ad2e3712["MCP Compatibility Versioning"];
+      class 74669547ad2e3712 systemRequirement;
+      click 74669547ad2e3712 "MCP/Tools.html#mcp-compatibility-versioning";
+      f75c8534d40c8f5b["MCP Model Evidence Tools<br/>📎 Requirement Governance Metadata Specification<br/>📎 Flexible Search Type Filtering Refinement Specification<br/>📎 Containment View Report Refinement Specification<br/>📎 Collect Content Specification<br/>📎 Requirement Submodels Report Specification<br/>📎 Ontology Collection Output Specification"];
+      class f75c8534d40c8f5b systemRequirement;
+      click f75c8534d40c8f5b "MCP/Tools.html#mcp-model-evidence-tools";
+      86e92a6e165784e3["MCP Mutation Concurrency Control"];
+      class 86e92a6e165784e3 systemRequirement;
+      click 86e92a6e165784e3 "MCP/Tools.html#mcp-mutation-concurrency-control";
+      147e8dd3f41a9ef1["MCP Mutation Execution Flow"];
+      class 147e8dd3f41a9ef1 systemRequirement;
+      click 147e8dd3f41a9ef1 "MCP/Tools.html#mcp-mutation-execution-flow";
+      6d2b33c25848e8bf["MCP Mutation Tool Safety<br/>📎 Dry-Run Mode Behavior<br/>📎 File Persistence Behavior<br/>📎 Create Element Workflow Specification<br/>📎 Delete Element Workflow Specification<br/>📎 Move Element Workflow Specification<br/>📎 Rename Element Operation Refinement Specification<br/>📎 Merge Element Workflow Specification<br/>📎 Move File Operation Refinement Specification<br/>📎 Relation Operations Specification<br/>📎 Atomic Relation Relink Workflow Specification<br/>📎 Relation Consistency Maintenance Refinement Specification"];
+      class 6d2b33c25848e8bf systemRequirement;
+      click 6d2b33c25848e8bf "MCP/Tools.html#mcp-mutation-tool-safety";
+      91d50c11f06255bd["MCP Protocol Standard Conformance"];
+      class 91d50c11f06255bd systemRequirement;
+      click 91d50c11f06255bd "MCP/Tools.html#mcp-protocol-standard-conformance";
+      5ea6d404ab3ace9a["MCP Quality Traceability Tools<br/>📎 Lint Output Specification<br/>📎 Requirement Implementation Coverage Logic Specification<br/>📎 Verification Trace Tree Construction<br/>📎 Resources Report Format Specification<br/>📎 Impact Scope Computation Specification"];
+      class 5ea6d404ab3ace9a systemRequirement;
+      click 5ea6d404ab3ace9a "MCP/Tools.html#mcp-quality-traceability-tools";
+      d06243c9bb44185e["MCP Resource Interface<br/>📎 Resources Report Format Specification<br/>📎 Containment View Report Refinement Specification<br/>📎 Requirement Submodels Report Specification"];
+      class d06243c9bb44185e systemRequirement;
+      click d06243c9bb44185e "MCP/Tools.html#mcp-resource-interface";
+      8ac0c232a68df777["MCP Server Command"];
+      class 8ac0c232a68df777 systemRequirement;
+      click 8ac0c232a68df777 "MCP/Tools.html#mcp-server-command";
+      a4165afa63f6519c["MCP Server State and Cache"];
+      class a4165afa63f6519c systemRequirement;
+      click a4165afa63f6519c "MCP/Tools.html#mcp-server-state-and-cache";
+      cbad0460edbccc72["MCP Shared Operation Interfaces<br/>📎 JSON Output Structure"];
+      class cbad0460edbccc72 systemRequirement;
+      click cbad0460edbccc72 "MCP/Tools.html#mcp-shared-operation-interfaces";
+      5ba2ba92880c5d99["MCP Streamable HTTP Transport"];
+      class 5ba2ba92880c5d99 systemRequirement;
+      click 5ba2ba92880c5d99 "MCP/Tools.html#mcp-streamable-http-transport";
+      981b5f9ef0cc645f["MCP Streamable HTTP Transport Safety"];
+      class 981b5f9ef0cc645f systemRequirement;
+      click 981b5f9ef0cc645f "MCP/Tools.html#mcp-streamable-http-transport-safety";
+      4810afe687008f0c["MCP Structured Payload Interfaces"];
+      class 4810afe687008f0c systemRequirement;
+      click 4810afe687008f0c "MCP/Tools.html#mcp-structured-payload-interfaces";
+      34f494770c237765["MCP Tool Exposure Scope"];
+      class 34f494770c237765 systemRequirement;
+      click 34f494770c237765 "MCP/Tools.html#mcp-tool-exposure-scope";
+      6bf5f2c2a061a27f["MCP Tool Side Effect Classification"];
+      class 6bf5f2c2a061a27f systemRequirement;
+      click 6bf5f2c2a061a27f "MCP/Tools.html#mcp-tool-side-effect-classification";
+      1bba032a48873248["MCP Workspace Session Tools"];
+      class 1bba032a48873248 systemRequirement;
+      click 1bba032a48873248 "MCP/Tools.html#mcp-workspace-session-tools";
+    end
+  end
   subgraph 46bd8996ef832bd8["📁 requirements/Interfaces/WebInterface"]
-    subgraph 318b1cdfa03981b0["📄 Capabilities.md"]
-      343e7b2d42df05e8["HTML Export"];
-      class 343e7b2d42df05e8 systemRequirement;
-      click 343e7b2d42df05e8 "WebInterface/Capabilities.html#html-export";
-      9b566692fe070492["Serve Command<br/>📎 requirements/Interfaces/WebInterface/Specifications.md#html-export-pipeline-specification"];
-      class 9b566692fe070492 systemRequirement;
-      click 9b566692fe070492 "WebInterface/Capabilities.html#serve-command";
+    subgraph 73163a8f56e13f6b["📄 Capabilities.md"]
+      f1d7c20722277929["HTML Export"];
+      class f1d7c20722277929 systemRequirement;
+      click f1d7c20722277929 "WebInterface/Capabilities.html#html-export";
+      7f8ec6f50f4892e1["Serve Command<br/>📎 Two-Pass Validation Behavior<br/>📎 Validation Error Reporting Behavior<br/>📎 HTML Export Pipeline Specification"];
+      class 7f8ec6f50f4892e1 systemRequirement;
+      click 7f8ec6f50f4892e1 "WebInterface/Capabilities.html#serve-command";
     end
     subgraph c7d31f0c38cfb0c5["📄 HTMLGeneration.md"]
       bb0ee0a283e500e8["Mobile-Friendly Documentation"];
-      class bb0ee0a283e500e8 userRequirement;
+      class bb0ee0a283e500e8 systemRequirement;
       click bb0ee0a283e500e8 "WebInterface/HTMLGeneration.html#mobile-friendly-documentation";
+    end
+    subgraph 5d341d66c5d20d4a["📄 Specifications.md"]
+      5960c3e368dd5a33["Web Interface Refinement Specification"];
+      class 5960c3e368dd5a33 default;
+      click 5960c3e368dd5a33 "WebInterface/Specifications.html#web-interface-refinement-specification";
     end
   end
   90bec7578aacbe9d -.->|deriveReqT| d6147550e948449e;
-  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 343e7b2d42df05e8;
-  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 9b566692fe070492;
+  be06ead5176f4b37 -.->|deriveReqT| 732364a8098459f2;
+  be06ead5176f4b37 -.->|deriveReqT| 3bc3d9c65bc369;
+  be06ead5176f4b37 -.->|deriveReqT| 74669547ad2e3712;
+  be06ead5176f4b37 -.->|deriveReqT| f75c8534d40c8f5b;
+  be06ead5176f4b37 -.->|deriveReqT| 86e92a6e165784e3;
+  be06ead5176f4b37 -.->|deriveReqT| 147e8dd3f41a9ef1;
+  be06ead5176f4b37 -.->|deriveReqT| 6d2b33c25848e8bf;
+  be06ead5176f4b37 -.->|deriveReqT| 91d50c11f06255bd;
+  be06ead5176f4b37 -.->|deriveReqT| 5ea6d404ab3ace9a;
+  be06ead5176f4b37 -.->|deriveReqT| d06243c9bb44185e;
+  be06ead5176f4b37 -.->|deriveReqT| 8ac0c232a68df777;
+  be06ead5176f4b37 -.->|deriveReqT| a4165afa63f6519c;
+  be06ead5176f4b37 -.->|deriveReqT| cbad0460edbccc72;
+  be06ead5176f4b37 -.->|deriveReqT| 5ba2ba92880c5d99;
+  be06ead5176f4b37 -.->|deriveReqT| 981b5f9ef0cc645f;
+  be06ead5176f4b37 -.->|deriveReqT| 4810afe687008f0c;
+  be06ead5176f4b37 -.->|deriveReqT| 34f494770c237765;
+  be06ead5176f4b37 -.->|deriveReqT| 6bf5f2c2a061a27f;
+  be06ead5176f4b37 -.->|deriveReqT| 1bba032a48873248;
+  be06ead5176f4b37 -->|refinedBy| eb6c065ee6e21795;
+  ea7f8e1ac2ba1ba4 -.->|deriveReqT| f1d7c20722277929;
+  ea7f8e1ac2ba1ba4 -.->|deriveReqT| 7f8ec6f50f4892e1;
   ea7f8e1ac2ba1ba4 -.->|deriveReqT| bb0ee0a283e500e8;
+  ea7f8e1ac2ba1ba4 -->|refinedBy| 5960c3e368dd5a33;
+  d6147550e948449e -.->|deriveReqT| 457ab64992d42aa4;
   d6147550e948449e -.->|deriveReqT| 104c59d25b737d22;
   d6147550e948449e -.->|deriveReqT| 68e30181f97f6f71;
   d6147550e948449e -.->|deriveReqT| 9a2adde3721af9df;
   d6147550e948449e -.->|deriveReqT| 218fa75a3081be32;
   d6147550e948449e -.->|deriveReqT| 43efd1fafe961f2e;
+  d6147550e948449e -.->|deriveReqT| d5c13851c4c6937a;
+  d6147550e948449e -.->|deriveReqT| 7def69c3e42b5eda;
   d6147550e948449e -.->|deriveReqT| ec02481a0771dca;
   d6147550e948449e -.->|deriveReqT| 51a6083e0a55197c;
   d6147550e948449e -.->|deriveReqT| 151987ac330b33f0;
   d6147550e948449e -.->|deriveReqT| a68fbec67469256b;
   d6147550e948449e -.->|deriveReqT| 7ef6cb0e4258e1bc;
   d6147550e948449e -.->|deriveReqT| d9c57dd799158af9;
+  d6147550e948449e -.->|deriveReqT| 20d776ffac1813b2;
+  d6147550e948449e -.->|deriveReqT| 192a91b7dc64a3f1;
   d6147550e948449e -.->|deriveReqT| 91025cd88b1df4f0;
   d6147550e948449e -.->|deriveReqT| 1f8022dac203e679;
   d6147550e948449e -.->|deriveReqT| 2f51b946a8587225;
   d6147550e948449e -.->|deriveReqT| ee7ad64abb668237;
   d6147550e948449e -.->|deriveReqT| d2fc543d82f61bbb;
+  d6147550e948449e -.->|deriveReqT| 5efef97a644ff665;
+  d6147550e948449e -.->|deriveReqT| 5a229a180ca4cff2;
   d6147550e948449e -.->|deriveReqT| 9578836eb8e0fc6;
   d6147550e948449e -.->|deriveReqT| 62f24ccbcd1f428a;
+  d6147550e948449e -.->|deriveReqT| 65a36338cf783547;
   d6147550e948449e -.->|deriveReqT| 8d334537008d94ba;
   d6147550e948449e -.->|deriveReqT| c04221154b7fc90d;
   d6147550e948449e -.->|deriveReqT| a8750da2c3580220;
+  d6147550e948449e -->|refinedBy| 2189ddc3b8d04a16;
   25bf5cc42f41e395["cli.rs"];
   class 25bf5cc42f41e395 default;
   click 25bf5cc42f41e395 "../../cli/src/cli.rs";
   d6147550e948449e -->|satisfiedBy| 25bf5cc42f41e395;
-  343e7b2d42df05e8 -.->|deriveReqT| e03d9fc7fee23cbf;
-  343e7b2d42df05e8 -.->|deriveReqT| 1a4bd1d4cf59c6c3;
-  343e7b2d42df05e8 -.->|deriveReqT| 399558ec4fcaeca;
-  343e7b2d42df05e8 -.->|deriveReqT| 27d051a7dc8ddd3d;
-  343e7b2d42df05e8 -.->|deriveReqT| 965615d978d68cf5;
-  343e7b2d42df05e8 -->|satisfiedBy| 25bf5cc42f41e395;
+  732364a8098459f2 -->|refinedBy| 67d70cb8b83bbaf9;
+  e122f0ee1b749264["mcp.rs"];
+  class e122f0ee1b749264 default;
+  click e122f0ee1b749264 "../../cli/src/mcp.rs";
+  732364a8098459f2 -->|satisfiedBy| e122f0ee1b749264;
+  732364a8098459f2 -.->|verifiedBy| b052bbe8556b8c5;
+  732364a8098459f2 -.->|verifiedBy| 3440cf3ef576cfad;
+  3bc3d9c65bc369 -->|refinedBy| 548da40bc839e91a;
+  3bc3d9c65bc369 -->|satisfiedBy| e122f0ee1b749264;
+  bdeaf62d42b3b0fd["tool_interface.rs"];
+  class bdeaf62d42b3b0fd default;
+  click bdeaf62d42b3b0fd "../../core/src/tool_interface.rs";
+  3bc3d9c65bc369 -->|satisfiedBy| bdeaf62d42b3b0fd;
+  3bc3d9c65bc369 -.->|verifiedBy| 4f523cf9dc143348;
+  74669547ad2e3712 -->|refinedBy| 1def1af8c68e7192;
+  74669547ad2e3712 -->|satisfiedBy| e122f0ee1b749264;
+  74669547ad2e3712 -.->|verifiedBy| b2942ba5a2b2a89b;
+  74669547ad2e3712 -.->|verifiedBy| 3440cf3ef576cfad;
+  f75c8534d40c8f5b -->|refinedBy| d41fd1abc97107a3;
+  f75c8534d40c8f5b -->|satisfiedBy| e122f0ee1b749264;
+  f75c8534d40c8f5b -.->|verifiedBy| ca3d33b1b63743c5;
+  f75c8534d40c8f5b -.->|verifiedBy| 3440cf3ef576cfad;
+  86e92a6e165784e3 -->|refinedBy| f76b0bd906e9f0a2;
+  86e92a6e165784e3 -->|satisfiedBy| e122f0ee1b749264;
+  86e92a6e165784e3 -.->|verifiedBy| 7105e6806384d90f;
+  147e8dd3f41a9ef1 -->|refinedBy| 36da5cfd63ecc9d2;
+  147e8dd3f41a9ef1 -->|satisfiedBy| e122f0ee1b749264;
+  993c12e82435a78e["crud.rs"];
+  class 993c12e82435a78e default;
+  click 993c12e82435a78e "../../core/src/crud.rs";
+  147e8dd3f41a9ef1 -->|satisfiedBy| 993c12e82435a78e;
+  79d54e418e36893["format.rs"];
+  class 79d54e418e36893 default;
+  click 79d54e418e36893 "../../core/src/format.rs";
+  147e8dd3f41a9ef1 -->|satisfiedBy| 79d54e418e36893;
+  147e8dd3f41a9ef1 -.->|verifiedBy| 4f70df0082b4c982;
+  147e8dd3f41a9ef1 -.->|verifiedBy| 3440cf3ef576cfad;
+  6d2b33c25848e8bf -->|refinedBy| 8c3145a164438691;
+  6d2b33c25848e8bf -->|satisfiedBy| e122f0ee1b749264;
+  6d2b33c25848e8bf -->|satisfiedBy| 993c12e82435a78e;
+  6d2b33c25848e8bf -->|satisfiedBy| 79d54e418e36893;
+  6d2b33c25848e8bf -.->|verifiedBy| 87cbe2079514bb05;
+  6d2b33c25848e8bf -.->|verifiedBy| 3440cf3ef576cfad;
+  91d50c11f06255bd -->|refinedBy| 8af720cb64cd56dc;
+  91d50c11f06255bd -->|satisfiedBy| e122f0ee1b749264;
+  91d50c11f06255bd -.->|verifiedBy| c4c71224d9c1067;
+  91d50c11f06255bd -.->|verifiedBy| 3440cf3ef576cfad;
+  5ea6d404ab3ace9a -->|refinedBy| 2d1677ddce80027;
+  5ea6d404ab3ace9a -->|satisfiedBy| e122f0ee1b749264;
+  5ea6d404ab3ace9a -.->|verifiedBy| 1d91791cf726407f;
+  5ea6d404ab3ace9a -.->|verifiedBy| 3440cf3ef576cfad;
+  d06243c9bb44185e -->|refinedBy| 169bc3dd544d7631;
+  d06243c9bb44185e -->|satisfiedBy| e122f0ee1b749264;
+  d06243c9bb44185e -.->|verifiedBy| fac8002b618be747;
+  d06243c9bb44185e -.->|verifiedBy| 3440cf3ef576cfad;
+  8ac0c232a68df777 -->|refinedBy| a4ad33045c548571;
+  8ac0c232a68df777 -->|refinedBy| 5b94a41c8ec2390e;
+  8ac0c232a68df777 -->|satisfiedBy| 25bf5cc42f41e395;
+  44f548bfa9793430["main.rs"];
+  class 44f548bfa9793430 default;
+  click 44f548bfa9793430 "../../cli/src/main.rs";
+  8ac0c232a68df777 -->|satisfiedBy| 44f548bfa9793430;
+  8ac0c232a68df777 -->|satisfiedBy| e122f0ee1b749264;
+  8ac0c232a68df777 -->|satisfiedBy| bdeaf62d42b3b0fd;
+  8ac0c232a68df777 -.->|verifiedBy| 2abb5d98db3bba93;
+  8ac0c232a68df777 -.->|verifiedBy| 3440cf3ef576cfad;
+  8ac0c232a68df777 -.->|verifiedBy| 50f19a13fbc0fcf9;
+  a4165afa63f6519c -->|refinedBy| 8aa4b4257704c0b0;
+  a4165afa63f6519c -->|satisfiedBy| e122f0ee1b749264;
+  a4165afa63f6519c -.->|verifiedBy| 1e3eb280b915a449;
+  cbad0460edbccc72 -->|refinedBy| 82f1d780459fce9b;
+  cbad0460edbccc72 -->|refinedBy| 67aa1019763486e7;
+  cbad0460edbccc72 -->|satisfiedBy| e122f0ee1b749264;
+  cbad0460edbccc72 -->|satisfiedBy| bdeaf62d42b3b0fd;
+  cbad0460edbccc72 -.->|verifiedBy| 3440cf3ef576cfad;
+  cbad0460edbccc72 -.->|verifiedBy| 969370cf4231d3a0;
+  cbad0460edbccc72 -.->|verifiedBy| ee824fed0a8b64d4;
+  5ba2ba92880c5d99 -->|refinedBy| 35b45ba5a7f717bf;
+  5ba2ba92880c5d99 -->|satisfiedBy| 25bf5cc42f41e395;
+  5ba2ba92880c5d99 -->|satisfiedBy| e122f0ee1b749264;
+  5ba2ba92880c5d99 -.->|verifiedBy| 7105e6806384d90f;
+  981b5f9ef0cc645f -->|refinedBy| 1237ea57e3f5c9e1;
+  981b5f9ef0cc645f -->|satisfiedBy| e122f0ee1b749264;
+  981b5f9ef0cc645f -.->|verifiedBy| 7105e6806384d90f;
+  4810afe687008f0c -->|refinedBy| 126576f978a4a554;
+  4810afe687008f0c -->|satisfiedBy| e122f0ee1b749264;
+  4810afe687008f0c -.->|verifiedBy| 3440cf3ef576cfad;
+  4810afe687008f0c -.->|verifiedBy| 6cdf9343969bbbbb;
+  34f494770c237765 -->|refinedBy| dbd381d6c283e9a2;
+  34f494770c237765 -->|satisfiedBy| e122f0ee1b749264;
+  34f494770c237765 -.->|verifiedBy| 3440cf3ef576cfad;
+  34f494770c237765 -.->|verifiedBy| 5f825912aca1dcf9;
+  6bf5f2c2a061a27f -->|refinedBy| 5ebc26178aca5f6d;
+  6bf5f2c2a061a27f -->|refinedBy| 3141f30e51cf1dc;
+  6bf5f2c2a061a27f -->|satisfiedBy| e122f0ee1b749264;
+  6bf5f2c2a061a27f -.->|verifiedBy| 3440cf3ef576cfad;
+  6bf5f2c2a061a27f -.->|verifiedBy| 7c378d24c3a50773;
+  1bba032a48873248 -->|refinedBy| df36d24148d47125;
+  1bba032a48873248 -->|satisfiedBy| e122f0ee1b749264;
+  1bba032a48873248 -.->|verifiedBy| 3440cf3ef576cfad;
+  1bba032a48873248 -.->|verifiedBy| 81a576be8906dc15;
+  f1d7c20722277929 -.->|deriveReqT| fed9a9e6fb52297d;
+  f1d7c20722277929 -.->|deriveReqT| bb98ffe82b87c981;
+  f1d7c20722277929 -.->|deriveReqT| 1d23e36a60f942b7;
+  f1d7c20722277929 -.->|deriveReqT| 880225932f5184e0;
+  f1d7c20722277929 -.->|deriveReqT| 81f2efab870b79ff;
+  f1d7c20722277929 -.->|deriveReqT| 8b9ede973ff6e89f;
+  f1d7c20722277929 -.->|deriveReqT| a74b4edc5f1b1bf8;
+  f1d7c20722277929 -.->|deriveReqT| f94fc7bcb77f2ee1;
+  f1d7c20722277929 -->|refinedBy| f43dc87fd2c9eea4;
+  f1d7c20722277929 -->|refinedBy| 2c269288950887aa;
+  f1d7c20722277929 -->|refinedBy| ac8ced009233741a;
+  f1d7c20722277929 -->|refinedBy| 32592aed4644ac95;
+  f1d7c20722277929 -->|refinedBy| 1c6c804d67bc741e;
+  f1d7c20722277929 -->|refinedBy| 945adb3f0ea1012e;
+  f1d7c20722277929 -->|satisfiedBy| 25bf5cc42f41e395;
   bd747195bcfe94dd["export.rs"];
   class bd747195bcfe94dd default;
   click bd747195bcfe94dd "../../core/src/export.rs";
-  343e7b2d42df05e8 -->|satisfiedBy| bd747195bcfe94dd;
+  f1d7c20722277929 -->|satisfiedBy| bd747195bcfe94dd;
   fe66abc142b678e5["layouts.rs"];
   class fe66abc142b678e5 default;
   click fe66abc142b678e5 "../../core/src/html/layouts.rs";
-  343e7b2d42df05e8 -->|satisfiedBy| fe66abc142b678e5;
+  f1d7c20722277929 -->|satisfiedBy| fe66abc142b678e5;
   b6f563ab46761a95["mod.rs"];
   class b6f563ab46761a95 default;
   click b6f563ab46761a95 "../../core/src/html/mod.rs";
-  343e7b2d42df05e8 -->|satisfiedBy| b6f563ab46761a95;
+  f1d7c20722277929 -->|satisfiedBy| b6f563ab46761a95;
+  7d71015ec49dc545["knowledgegraph.rs"];
+  class 7d71015ec49dc545 default;
+  click 7d71015ec49dc545 "../../core/src/html/pages/knowledgegraph.rs";
+  f1d7c20722277929 -->|satisfiedBy| 7d71015ec49dc545;
+  dc9f164fdf950690["ontologies.rs"];
+  class dc9f164fdf950690 default;
+  click dc9f164fdf950690 "../../core/src/html/pages/ontologies.rs";
+  f1d7c20722277929 -->|satisfiedBy| dc9f164fdf950690;
   68fef32bd3e3323d["html_export.rs"];
   class 68fef32bd3e3323d default;
   click 68fef32bd3e3323d "../../core/src/html_export.rs";
-  343e7b2d42df05e8 -->|satisfiedBy| 68fef32bd3e3323d;
+  f1d7c20722277929 -->|satisfiedBy| 68fef32bd3e3323d;
   b4e855d4c9269f88["index_generator.rs"];
   class b4e855d4c9269f88 default;
   click b4e855d4c9269f88 "../../core/src/index_generator.rs";
-  343e7b2d42df05e8 -->|satisfiedBy| b4e855d4c9269f88;
-  343e7b2d42df05e8 -->|satisfiedBy| f43dc87fd2c9eea4;
-  343e7b2d42df05e8 -->|satisfiedBy| 2c269288950887aa;
-  343e7b2d42df05e8 -->|satisfiedBy| ac8ced009233741a;
-  343e7b2d42df05e8 -->|satisfiedBy| 32592aed4644ac95;
-  343e7b2d42df05e8 -->|satisfiedBy| 1c6c804d67bc741e;
-  343e7b2d42df05e8 -->|satisfiedBy| 945adb3f0ea1012e;
-  343e7b2d42df05e8 -.->|verifiedBy| bd0b4833b30da28;
-  343e7b2d42df05e8 -.->|verifiedBy| a7eeaf4fd1d17030;
-  9b566692fe070492 -->|satisfiedBy| 25bf5cc42f41e395;
+  f1d7c20722277929 -->|satisfiedBy| b4e855d4c9269f88;
+  f1d7c20722277929 -.->|verifiedBy| f0e08fab6460a234;
+  f1d7c20722277929 -.->|verifiedBy| bd0b4833b30da28;
+  f1d7c20722277929 -.->|verifiedBy| a7eeaf4fd1d17030;
+  7f8ec6f50f4892e1 -->|refinedBy| d18698171566f9e7;
+  7f8ec6f50f4892e1 -->|satisfiedBy| 25bf5cc42f41e395;
   70c4d955a4bb93c["serve.rs"];
   class 70c4d955a4bb93c default;
   click 70c4d955a4bb93c "../../cli/src/serve.rs";
-  9b566692fe070492 -->|satisfiedBy| 70c4d955a4bb93c;
-  9b566692fe070492 -.->|trace| a8750da2c3580220;
-  9b566692fe070492 -.->|verifiedBy| d48ee06d20b13bcc;
+  7f8ec6f50f4892e1 -->|satisfiedBy| 70c4d955a4bb93c;
+  7f8ec6f50f4892e1 -.->|verifiedBy| d48ee06d20b13bcc;
   bb0ee0a283e500e8 -.->|deriveReqT| fa0ecb1299582ab;
   bb0ee0a283e500e8 -.->|deriveReqT| 4e47e768f2a254cb;
   bb0ee0a283e500e8 -.->|deriveReqT| f5edec5aaf14290d;
@@ -471,49 +787,67 @@
 <p>The system shall provide command line interface (CLI) to faciliate model management.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="CLI/Commands.html#cli-interface-structure">CLI Interface Structure</a></li>
-<li>derivedFrom: <a href="../UserStories.html#system-model-interfaces">System Model Interfaces</a></li>
+<li>specify: <a href="../Capabilities/Interfaces.html#command-line-interface">Command-Line Interface</a></li>
+</ul>
+<hr />
+<h3 id="mcp-interface">MCP Interface</h3>
+<p>The system shall provide a Model Context Protocol interface for external tools, IDE integrations, CI adapters, and AI agents to access Reqvire model capabilities through typed tool interfaces.</p>
+<h4>Details</h4>
+<ul>
+<li>The MCP interface shall adapt Reqvire core behavior to MCP clients.</li>
+<li>The MCP interface shall avoid becoming a second model engine.</li>
+<li>The MCP interface shall avoid becoming a generic shell gateway.</li>
+<li>The MCP interface shall avoid becoming a client-specific abstraction.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="MCP/Tools.html#mcp-access-control-baseline">MCP Access Control Baseline</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-adapter-boundary">MCP Adapter Boundary</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-compatibility-versioning">MCP Compatibility Versioning</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-model-evidence-tools">MCP Model Evidence Tools</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-mutation-concurrency-control">MCP Mutation Concurrency Control</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-mutation-execution-flow">MCP Mutation Execution Flow</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-mutation-tool-safety">MCP Mutation Tool Safety</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-protocol-standard-conformance">MCP Protocol Standard Conformance</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-quality-traceability-tools">MCP Quality Traceability Tools</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-resource-interface">MCP Resource Interface</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-server-command">MCP Server Command</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-server-state-and-cache">MCP Server State and Cache</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-shared-operation-interfaces">MCP Shared Operation Interfaces</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-streamable-http-transport">MCP Streamable HTTP Transport</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-streamable-http-transport-safety">MCP Streamable HTTP Transport Safety</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-structured-payload-interfaces">MCP Structured Payload Interfaces</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-tool-exposure-scope">MCP Tool Exposure Scope</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-tool-side-effect-classification">MCP Tool Side Effect Classification</a></li>
+<li>derive: <a href="MCP/Tools.html#mcp-workspace-session-tools">MCP Workspace Session Tools</a></li>
+<li>refinedBy: <a href="MCP/Specifications.html#mcp-interface-boundary-specification">MCP Interface Boundary Specification</a></li>
+<li>specify: <a href="../Capabilities/Interfaces.html#mcp-tool-interface">MCP Tool Interface</a></li>
 </ul>
 <hr />
 <h3 id="web-interface">Web Interface</h3>
 <p>The system SHALL provide a web-based interface to browse the System model documentation, including all generated artifacts such as diagrams, reports, and verification traces.</p>
 <h4>Details</h4>
-<p>The browse interface allows users to:</p>
-<ul>
-<li>View HTML-rendered specifications and requirements</li>
-<li>Navigate through diagrams and visualizations</li>
-<li>Access verification traces and coverage reports</li>
-<li>Explore the complete model structure through an integrated web interface</li>
-</ul>
-<p>This capability enables both human users (via browser) and AI agents (via MCP server) to efficiently explore and understand the System model without manually navigating file structures.</p>
-<p>All generated HTML content shall produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.</p>
-<p>The system shall ensure deterministic HTML output by:</p>
-<ul>
-<li>Sorting elements by identifier before rendering</li>
-<li>Sorting relations by type and target identifier</li>
-<li>Maintaining consistent navigation and page ordering</li>
-<li>Generating stable diagram node and relation ordering</li>
-</ul>
-<p>This determinism ensures that:</p>
-<ul>
-<li>Running HTML generation multiple times produces byte-identical output</li>
-<li>Version control diffs reflect actual content changes</li>
-<li>Continuous integration pipelines produce reproducible results</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="WebInterface/Capabilities.html#html-export">HTML Export</a></li>
 <li>derive: <a href="WebInterface/Capabilities.html#serve-command">Serve Command</a></li>
 <li>derive: <a href="WebInterface/HTMLGeneration.html#mobile-friendly-documentation">Mobile-Friendly Documentation</a></li>
-<li>derivedFrom: <a href="../UserStories.html#system-model-interfaces">System Model Interfaces</a></li>
+<li>refinedBy: <a href="WebInterface/Specifications.html#web-interface-refinement-specification">Web Interface Refinement Specification</a></li>
+<li>specify: <a href="../Capabilities/Interfaces.html#web-documentation-interface">Web Documentation Interface</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -562,7 +896,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -571,10 +906,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -587,7 +925,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -605,6 +943,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -997,9 +1340,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

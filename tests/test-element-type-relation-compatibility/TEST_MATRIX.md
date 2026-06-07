@@ -84,11 +84,10 @@ Based on the Element Type Relation Compatibility specification, the following te
 
 | Element Type | Relation | Target Type | Expected | Test Case |
 |--------------|----------|-------------|----------|-----------|
-| source | refine | capability | ✅ PASS | valid-refinement/source-refine-capability |
+| source | refine | requirement | ✅ PASS | valid-refinement/source-refine-requirement |
 | ontology | derivedFrom | ontology | ✅ PASS | valid-hierarchy/ontology-derived-from-ontology |
-| semantic-contract | refine | capability | ✅ PASS | valid-refinement/semantic-contract-refine-capability |
-| behavior | refine | capability | ✅ PASS | valid-refinement/behavior-refine-capability |
 | semantic-contract | refine | requirement | ✅ PASS | valid-refinement/semantic-contract-refine-requirement |
+| semantic-query-contract | refine | requirement | ✅ PASS | valid-refinement/semantic-query-contract-refine-requirement |
 | constraint | refine | requirement | ✅ PASS | valid-refinement/constraint-refine-requirement |
 | behavior | refine | requirement | ✅ PASS | valid-refinement/behavior-refine-requirement |
 | specification | refine | requirement | ✅ PASS | valid-refinement/specification-refine-requirement |
@@ -105,6 +104,12 @@ Based on the Element Type Relation Compatibility specification, the following te
 | behavior | trace | ❌ FAIL | invalid-refinement/behavior-trace |
 | specification | derivedFrom | ❌ FAIL | invalid-refinement/specification-derivedfrom |
 | specification | trace | ❌ FAIL | invalid-refinement/specification-trace |
+| source | refine capability | ❌ FAIL | invalid-capability-refinements/source-refine-capability |
+| constraint | refine capability | ❌ FAIL | invalid-capability-refinements/constraint-refine-capability |
+| behavior | refine capability | ❌ FAIL | invalid-capability-refinements/behavior-refine-capability |
+| specification | refine capability | ❌ FAIL | invalid-capability-refinements/specification-refine-capability |
+| state | refine capability | ❌ FAIL | invalid-capability-refinements/state-refine-capability |
+| input-output | refine capability | ❌ FAIL | invalid-capability-refinements/input-output-refine-capability |
 
 ## Summary
 

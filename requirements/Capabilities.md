@@ -26,7 +26,6 @@ This capability answers how Reqvire structures system models in Markdown, which 
   * [Reqvire Governance Ontology](Ontologies/Governance.md#reqvire-governance-ontology)
 
 #### Relations
-  * refinedBy: [Defining Model Structure Source](#defining-model-structure-source)
   * specifiedBy: [Coexistence of Structured and Unstructured Documents](Functional/Core/Configuration.md#coexistence-of-structured-and-unstructured-documents)
   * specifiedBy: [Git Repository as Project Root](Functional/Core/ModelManagement.md#git-repository-as-project-root)
   * specifiedBy: [Specification File Identification](Functional/Core/StructureAndParsing.md#specification-file-identification)
@@ -59,10 +58,10 @@ The Reqvire model is intentionally split into separate capability-root subgraphs
 Shared terms come from explicit capability-level ontology attachments, not from one universal capability hierarchy and not from direct requirement ontology attachments. This keeps each model concern independently collectible, reviewable, and impact-analyzable while preserving auditable dependencies between contracts.
 
 #### Metadata
-  * type: source
+  * type: specification
 
 #### Relations
-  * refine: [Defining Model Structure](#defining-model-structure)
+  * refine: [Ontology and Semantic Contract Model](Functional/Core/ModelManagement.md#ontology-and-semantic-contract-model)
 ---
 
 ### Reqvire Core Element Ontology Shape Profile

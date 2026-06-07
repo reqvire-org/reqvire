@@ -67,9 +67,9 @@ if ! grep -q "📎" "${TEST_DIR}/output/index.html"; then
   exit 1
 fi
 
-# Check that attachment filename appears in index (may be converted to .html)
-if ! grep -q "DesignSpec" "${TEST_DIR}/output/index.html"; then
-  echo "❌ FAILED: Index does not contain attachment filename 'DesignSpec'"
+# Check that attached refinement display name appears in index
+if ! grep -q "Design Spec Contract" "${TEST_DIR}/output/index.html"; then
+  echo "❌ FAILED: Index does not contain attached refinement name 'Design Spec Contract'"
   exit 1
 fi
 
@@ -86,7 +86,7 @@ fi
 
 # Check that mermaid diagram contains attachment with line break
 # The attachment should appear in the element node label with format:
-# Element Name<br/>📎 DesignSpec.md
+# Element Name<br/>📎 Design Spec Contract
 
 # Extract expected content (trimmed)
 EXPECTED_PATTERN=$(cat "${TEST_SCRIPT_DIR}/expected/expected-diagram-content.txt" | head -1)
@@ -102,8 +102,24 @@ if ! grep -qF "$EXPECTED_PATTERN" "$SPEC_HTML"; then
 fi
 
 # Verify paperclip icon is in the diagram context
-if ! grep -q '📎.*DesignSpec' "$SPEC_HTML"; then
-  echo "❌ FAILED: Diagram does not show 📎 icon with attachment filename"
+# Visible diagram labels should stay compact; full identifiers remain link targets or structured data.
+if ! grep -q '📎.*Design Spec Contract' "$SPEC_HTML"; then
+  echo "❌ FAILED: Diagram does not show 📎 icon with attached refinement display name"
+  exit 1
+fi
+
+if grep -q '📎.*docs/DesignSpec.md#design-spec-contract' "$SPEC_HTML"; then
+  echo "❌ FAILED: Diagram visible label should not expose full attached refinement identifier"
+  exit 1
+fi
+
+if ! grep -q '📎.*Design Spec Contract' "${TEST_DIR}/output/traces.html"; then
+  echo "❌ FAILED: Traces diagram does not show compact attached refinement display name"
+  exit 1
+fi
+
+if grep -q '📎.*docs/DesignSpec.md#design-spec-contract' "${TEST_DIR}/output/traces.html"; then
+  echo "❌ FAILED: Traces diagram visible label should not expose full attached refinement identifier"
   exit 1
 fi
 

@@ -1,15 +1,14 @@
 use crate::element;
-use crate::relation;
 use crate::error::ReqvireError;
+use crate::relation;
 use globset::{Glob, GlobMatcher};
 use regex::Regex;
 
-
 pub struct Filters {
-    file_glob:    Option<GlobMatcher>,
-    name_re:      Option<Regex>,
-    type_pat:     Option<String>,
-    content_re:   Option<Regex>,
+    file_glob: Option<GlobMatcher>,
+    name_re: Option<Regex>,
+    type_pat: Option<String>,
+    content_re: Option<Regex>,
     not_verified: bool,
     not_satisfied: bool,
     has_attachments: bool,
@@ -18,6 +17,7 @@ pub struct Filters {
 
 impl Filters {
     /// Builds a Filters struct, or returns a ReqvireError::InvalidGlob / InvalidRegex
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         file: Option<&str>,
         name_regex: Option<&str>,
@@ -29,14 +29,13 @@ impl Filters {
         attachment: Option<&str>,
     ) -> Result<Self, ReqvireError> {
         fn compile_glob(pat: &str) -> Result<GlobMatcher, ReqvireError> {
-            let glob =Glob::new(pat)
+            let glob = Glob::new(pat)
                 .map_err(|e| ReqvireError::InvalidGlob(e.to_string()))?
                 .compile_matcher();
             Ok(glob)
-
         }
 
-        let file_glob = file.map(|p| compile_glob(p)).transpose()?;
+        let file_glob = file.map(compile_glob).transpose()?;
         let name_re = match name_regex {
             Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
             None => None,
@@ -59,7 +58,7 @@ impl Filters {
             Some(r) => Some(Regex::new(r).map_err(|e| ReqvireError::InvalidRegex(e.to_string()))?),
             None => None,
         };
-        let attachment_glob = attachment.map(|p| compile_glob(p)).transpose()?;
+        let attachment_glob = attachment.map(compile_glob).transpose()?;
 
         Ok(Filters {
             file_glob,
@@ -90,9 +89,8 @@ impl Filters {
         // 3) type filter
         if let Some(tp) = &self.type_pat {
             // Handle "other-TYPENAME" pattern for custom types
-            if tp.starts_with("other-") {
+            if let Some(custom_type_name) = tp.strip_prefix("other-") {
                 // Extract the custom type name after "other-"
-                let custom_type_name = &tp[6..];
                 match &e.element_type {
                     element::ElementType::Other(actual_name) => {
                         if actual_name.to_lowercase() != custom_type_name {
@@ -103,28 +101,30 @@ impl Filters {
                 }
             } else {
                 let filter_type = element::ElementType::from_metadata(tp);
-                if &e.element_type != &filter_type {
+                if e.element_type != filter_type {
                     return false;
                 }
             }
         }
         // 5) content regex
         if let Some(re) = &self.content_re {
-            let text = e.content.clone();
-            if !re.is_match(&text) {
+            if !re.is_match(&e.content) {
                 return false;
             }
         }
 
         // Pre-compute verify/satisfy counts for later filters
-        let verified_count = e.relations.iter()
+        let verified_count = e
+            .relations
+            .iter()
             .filter(|r| relation::is_verification_relation(r.relation_type))
             .count();
 
-        let satisfied_count = e.relations.iter()
+        let satisfied_count = e
+            .relations
+            .iter()
             .filter(|r| relation::is_satisfaction_relation(r.relation_type))
             .count();
-
 
         // 6) not_verified: exclude any element that *has* a verified relation
         if self.not_verified && verified_count > 0 {
@@ -140,7 +140,9 @@ impl Filters {
         }
         // 9) attachment_glob: only include elements with attachments matching the glob
         if let Some(g) = &self.attachment_glob {
-            let has_matching_attachment = e.attachments.iter()
+            let has_matching_attachment = e
+                .attachments
+                .iter()
                 .any(|a| g.is_match(a.target.as_str().as_str()));
             if !has_matching_attachment {
                 return false;

@@ -17,7 +17,7 @@ Physical containment answers:
 Graph relations answer:
 
 - Which capability does this requirement specify?
-- Which requirement or capability owns this refinement?
+- Which requirement owns this refinement?
 - Which ontology gives this subgraph meaning?
 - Which verification proves this capability or requirement?
 - Which evidence satisfies this requirement or verification?
@@ -35,7 +35,7 @@ Recommended top-level model planes:
   Verifications/
 ```
 
-Optional project-level files such as `UseCases.md`, `Stakeholders.md`, or `Glossary.md` may remain at `./` when they intentionally sit outside one capability folder. If content becomes independently traceable, verifiable, or capability-owned, move it into the appropriate capability subgraph.
+Optional project-level files such as `UseCases.md`, `Stakeholders.md`, or `Glossary.md` may remain at `./` when they intentionally sit outside one capability folder. If content becomes independently traceable, verifiable, or requirement-owned, move it into the appropriate capability subgraph.
 
 ## Model Planes
 
@@ -103,7 +103,6 @@ A capability subgraph may own:
 - the root `type: capability` element
 - child capabilities when decomposition is useful
 - requirements that specify the capability
-- capability-owned refinements
 - requirement-owned refinements
 - requirement-owned semantic contracts for specific requirement obligations
 - local architecture or design specifications that refine elements in that subgraph
@@ -153,7 +152,7 @@ Refinement files usually use names like:
 <Topic>SemanticContracts.md
 ```
 
-Refinements are owned by exactly one compatible capability or requirement through `refine` / `refinedBy`. Use refinements when content is too detailed for a requirement statement but still needs traceability.
+Refinements are owned by exactly one compatible requirement through `refine` / `refinedBy`. Use refinements when content is too detailed for a requirement statement but still needs traceability.
 
 Use semantic contracts when one requirement needs a machine-readable SHACL profile over reachable ontology terms. Semantic contracts must refine exactly one compatible requirement owner, contain `#### Shapes`, and not contain `#### Ontology`.
 

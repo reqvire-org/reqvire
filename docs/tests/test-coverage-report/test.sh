@@ -12,7 +12,7 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # - Legacy command `coverage-report` is also supported (deprecated)
 # - Command shall support `--json` flag for JSON output format
 # - Coverage report shall include summary section with total counts and percentages for leaf requirements
-# - Coverage report shall show breakdown by verification type (test, analysis, inspection, demonstration)
+# - Coverage report shall show breakdown by verification type (test, formal-proof, analysis, inspection, demonstration)
 # - Coverage report shall list verified leaf requirements grouped by file and section
 # - Coverage report shall list unverified leaf requirements with details
 # - Coverage report shall list satisfied test-verification elements (those with satisfiedBy relations)
@@ -25,7 +25,7 @@ TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # - Command exits with success (0) return code
 # - Basic coverage report contains expected sections and formatting for leaf requirements
 # - JSON output is valid and contains required fields for both leaf requirements and test-verification elements
-# - Coverage percentages are correctly calculated separately for leaf requirements and test-verifications
+# - Coverage percentages are correctly calculated separately for leaf requirements and evidence-backed verifications
 
 # Test 1: Basic Coverage Report (Text Output)
 echo "Starting test..." > "${TEST_DIR}/test_results.log"
@@ -147,9 +147,60 @@ if ! echo "$OUTPUT" | jq '.summary | has("verification_types")' | grep -q true; 
     exit 1
 fi
 
+# Check summary structure - Implementation Coverage
+if ! echo "$OUTPUT" | jq '.summary | has("total_requirements_in_scope")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'total_requirements_in_scope'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary | has("covered_requirements")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'covered_requirements'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary | has("uncovered_requirements")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'uncovered_requirements'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary | has("implementation_coverage_percentage")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'implementation_coverage_percentage'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary | has("coverage_sources")' | grep -q true; then
+    echo "❌ FAILED: JSON summary missing 'coverage_sources'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("direct_satisfied")' | grep -q true; then
+    echo "❌ FAILED: JSON summary coverage_sources missing 'direct_satisfied'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("refinement_contract_satisfied_via_attachment")' | grep -q true; then
+    echo "❌ FAILED: JSON summary coverage_sources missing 'refinement_contract_satisfied_via_attachment'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary.coverage_sources | has("refinement_contract_satisfied_via_child")' | grep -q true; then
+    echo "❌ FAILED: JSON summary coverage_sources missing 'refinement_contract_satisfied_via_child'"
+    exit 1
+fi
+
 # Check verification_types structure
 if ! echo "$OUTPUT" | jq '.summary.verification_types | has("test")' | grep -q true; then
     echo "❌ FAILED: JSON verification_types missing 'test'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.summary.verification_types | has("formal_proof")' | grep -q true; then
+    echo "❌ FAILED: JSON verification_types missing 'formal_proof'"
+    exit 1
+fi
+
+if [ "$(echo "$OUTPUT" | jq '.summary.verification_types.formal_proof')" -ne 2 ]; then
+    echo "❌ FAILED: Expected 2 formal-proof verifications in verification type breakdown"
     exit 1
 fi
 
@@ -186,6 +237,53 @@ fi
 
 if ! echo "$OUTPUT" | jq '.unsatisfied_test_verifications | has("files")' | grep -q true; then
     echo "❌ FAILED: JSON unsatisfied_test_verifications missing 'files'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.covered_requirements | has("files")' | grep -q true; then
+    echo "❌ FAILED: JSON covered_requirements missing 'files'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.uncovered_requirements | has("files")' | grep -q true; then
+    echo "❌ FAILED: JSON uncovered_requirements missing 'files'"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq 'has("capability_coverage")' | grep -q true; then
+    echo "❌ FAILED: JSON missing 'capability_coverage' field"
+    exit 1
+fi
+
+if ! echo "$OUTPUT" | jq '.capability_coverage | has("capabilities")' | grep -q true; then
+    echo "❌ FAILED: JSON capability_coverage missing 'capabilities'"
+    exit 1
+fi
+
+CAPABILITY_COUNT=$(echo "$OUTPUT" | jq '.capability_coverage.capabilities | length')
+if [ "$CAPABILITY_COUNT" -ne 1 ]; then
+    echo "❌ FAILED: Expected 1 capability coverage entry, got $CAPABILITY_COUNT"
+    exit 1
+fi
+
+COVERAGE_CAPABILITY=$(echo "$OUTPUT" | jq '.capability_coverage.capabilities[] | select(.name == "Coverage Capability")')
+if [ -z "$COVERAGE_CAPABILITY" ]; then
+    echo "❌ FAILED: Missing Coverage Capability roll-up"
+    exit 1
+fi
+
+if [ "$(echo "$COVERAGE_CAPABILITY" | jq '.aggregate_leaf_requirements')" -ne 5 ]; then
+    echo "❌ FAILED: Coverage Capability should roll up 5 leaf requirements"
+    exit 1
+fi
+
+if [ "$(echo "$COVERAGE_CAPABILITY" | jq '.aggregate_verified_leaf_requirements')" -ne 4 ]; then
+    echo "❌ FAILED: Coverage Capability should roll up 4 verified leaf requirements"
+    exit 1
+fi
+
+if [ "$(echo "$COVERAGE_CAPABILITY" | jq -r '.mark')" != "partial" ]; then
+    echo "❌ FAILED: Coverage Capability mark should be partial"
     exit 1
 fi
 
@@ -244,20 +342,21 @@ fi
 
 # Based on our test specifications, we expect:
 # LEAF REQUIREMENTS:
-# - 3 total leaf requirements (Leaf Requirement Verified, Leaf Requirement Unverified, Another Leaf Requirement Verified)
-# - 2 verified (Leaf Requirement Verified, Another Leaf Requirement Verified)
+# - 5 total leaf requirements
+# - 4 verified
 # - 1 unverified (Leaf Requirement Unverified)
-EXPECTED_TOTAL_LEAF=3
-EXPECTED_VERIFIED_LEAF=2
+# - 2 total test verifications and 2 total formal-proof verifications are evidence-backed
+EXPECTED_TOTAL_LEAF=5
+EXPECTED_VERIFIED_LEAF=4
 EXPECTED_UNVERIFIED_LEAF=1
 
-# TEST VERIFICATIONS:
-# - 2 total test verifications (Test Verification Satisfied, Test Verification Unsatisfied)
-# - 1 satisfied (Test Verification Satisfied with satisfiedBy)
-# - 1 unsatisfied (Test Verification Unsatisfied without satisfiedBy)
-EXPECTED_TOTAL_TEST=2
-EXPECTED_SATISFIED_TEST=1
-EXPECTED_UNSATISFIED_TEST=1
+# EVIDENCE-BACKED VERIFICATIONS:
+# - 4 total evidence-backed verifications (2 test, 2 formal-proof)
+# - 2 satisfied (one test, one formal-proof)
+# - 2 unsatisfied (one test, one formal-proof)
+EXPECTED_TOTAL_TEST=4
+EXPECTED_SATISFIED_TEST=2
+EXPECTED_UNSATISFIED_TEST=2
 
 if [ "$TOTAL_LEAF" -ne "$EXPECTED_TOTAL_LEAF" ]; then
     echo "❌ FAILED: Expected $EXPECTED_TOTAL_LEAF total leaf requirements, got $TOTAL_LEAF"

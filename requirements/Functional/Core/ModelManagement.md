@@ -220,13 +220,14 @@ The system shall support first-class `ontology` elements for reusable semantic v
 #### Details
 Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated `requirements/Ontologies` folder rather than nested in capability files. Ontology-controlled vocabulary records shall carry formal semantics through IRI identity, typed class membership, hierarchy, and axioms; standard annotation properties such as `rdfs:label` and `rdfs:comment` may be used for optional presentation metadata, but canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable meanings shall remain declared domain properties. Deprecated presentation-only ontology properties shall not remain in authored Reqvire ontology source after refactoring. Requirement-owned semantic contracts shall define SHACL shape profiles for one obligation and must not define ontology vocabulary. Requirement-owned semantic query contracts shall define graph queries over reachable semantic model context without query-kind classification, ontology vocabulary, or SHACL shape profiles.
 
-Capability elements attach ontology elements to make vocabulary reachable for the capability, descendant capabilities, and requirements that specify that capability context. Requirement elements must not attach ontology directly; they inherit ontology context through their owning capability path. Requirements may refine to semantic contracts and semantic query contracts when they need closed-world shape profiles or declarative semantic checks over reachable ontology terms. Capability and requirement elements may refine to behavior, state, specification, constraint, and input-output refinements when they need additional operational or contract detail.
+Capability elements attach ontology elements to make vocabulary reachable for the capability, descendant capabilities, and requirements that specify that capability context. Requirement elements must not attach ontology directly; they inherit ontology context through their owning capability path. Requirements may refine to source, semantic contracts, semantic query contracts, behavior, state, specification, constraint, and input-output refinements when they need subordinate detail or contracts over reachable ontology terms. Capabilities must not own source, constraint, behavior, specification, state, input-output, semantic-contract, or semantic-query-contract refinements through `refinedBy`/`refine`.
 
 #### Metadata
   * type: requirement
 
 #### Relations
   * derivedFrom: [Capability Model Structure](#capability-model-structure)
+  * refinedBy: [Defining Model Structure Source](../../Capabilities.md#defining-model-structure-source)
   * refinedBy: [Ontology Annotation Convention Specification](Specifications.md#ontology-annotation-convention-specification)
   * refinedBy: [Semantic Contract Structure Specification](Specifications.md#semantic-contract-structure-specification)
   * refinedBy: [Semantic Query Contract Structure Specification](Specifications.md#semantic-query-contract-structure-specification)
@@ -249,7 +250,7 @@ The system shall define SHACL constraints for shared Reqvire element identity, t
 
 ### Capability Element Semantic Contract
 
-The system shall define SHACL constraints for capability structure, capability hierarchy, capability refinements, capability specification, and forbidden capability satisfaction edges.
+The system shall define SHACL constraints for capability structure, capability hierarchy, ontology attachment, capability specification, direct capability verification, and forbidden capability satisfaction or refinement ownership edges.
 
 #### Metadata
   * type: requirement

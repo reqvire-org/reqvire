@@ -65,7 +65,7 @@ EXPECTED_PASS2_ERRORS=(
   "Missing relation target:"
   "Incompatible element types for relation:"
   "Circular dependency error:"
-  "Non-test-verification element with satisfiedBy relation:"
+  "Non-evidence-backed verification element with satisfiedBy relation:"
   "Missing parent relation:"
 )
 
@@ -96,12 +96,23 @@ mkdir -p "${TEST_DIR}/valid-test/specifications"
 cat > "${TEST_DIR}/valid-test/specifications/ValidRequirements.md" << 'EOF'
 # Elements
 
+### Valid Capability
+
+Capability root for the valid model.
+
+#### Metadata
+  * type: capability
+---
+
+### Valid Requirement
 
 This is a valid requirement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
+#### Relations
+  * specify: [Valid Capability](#valid-capability)
 ---
 
 ### Requirement with Valid Header Structure in Details
@@ -119,7 +130,10 @@ Level 5+ headers are allowed inside Details subsection.
 Content with multiple header levels.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Valid Capability](#valid-capability)
 EOF
 
 cd "${TEST_DIR}/valid-test"

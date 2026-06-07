@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,22 +447,85 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
+  subgraph 68908f1dbfe487c0["📁 requirements"]
+    subgraph a8b22e0cbd5624d6["📄 Capabilities.md"]
+      1d4327c51e6056ec["Defining Model Structure Source"];
+      class 1d4327c51e6056ec default;
+      click 1d4327c51e6056ec "../../Capabilities.html#defining-model-structure-source";
+      3ebf6415286f8172["Reqvire Core Element Ontology Shape Profile"];
+      class 3ebf6415286f8172 default;
+      click 3ebf6415286f8172 "../../Capabilities.html#reqvire-core-element-ontology-shape-profile";
+    end
+    subgraph 922090a32bce0711["📄 Refinements.md"]
+      e3505bdf96f2e996["Containment Specification"];
+      class e3505bdf96f2e996 default;
+      click e3505bdf96f2e996 "../../Refinements.html#containment-specification";
+      12b8c722b73f030f["Refinement Specification"];
+      class 12b8c722b73f030f default;
+      click 12b8c722b73f030f "../../Refinements.html#refinement-specification";
+      32bc0a15650ebf08["Relation Semantics Specification"];
+      class 32bc0a15650ebf08 default;
+      click 32bc0a15650ebf08 "../../Refinements.html#relation-semantics-specification";
+      a03cf6f1eda0c5c["Supported Element Types Specification"];
+      class a03cf6f1eda0c5c default;
+      click a03cf6f1eda0c5c "../../Refinements.html#supported-element-types-specification";
+    end
+  end
+  subgraph bbcd64366752f8c2["📁 requirements/Capabilities"]
+    subgraph c00d4202d494a9af["📄 CapabilityRequirementModel.md"]
+      3dd88fbebe59cc99["Reqvire Capability Ontology Shape Profile"];
+      class 3dd88fbebe59cc99 default;
+      click 3dd88fbebe59cc99 "../../Capabilities/CapabilityRequirementModel.html#reqvire-capability-ontology-shape-profile";
+      b51429b1cbd782f0["Reqvire Custom Element Trace Shape Profile"];
+      class b51429b1cbd782f0 default;
+      click b51429b1cbd782f0 "../../Capabilities/CapabilityRequirementModel.html#reqvire-custom-element-trace-shape-profile";
+      e82ff9bb6ac32c53["Reqvire Ontology Element Shape Profile"];
+      class e82ff9bb6ac32c53 default;
+      click e82ff9bb6ac32c53 "../../Capabilities/CapabilityRequirementModel.html#reqvire-ontology-element-shape-profile";
+      e65fb349dc001034["Reqvire Refinement Subtype Shape Profile"];
+      class e65fb349dc001034 default;
+      click e65fb349dc001034 "../../Capabilities/CapabilityRequirementModel.html#reqvire-refinement-subtype-shape-profile";
+      1238fa91a7587b7d["Reqvire Requirement Ontology Shape Profile"];
+      class 1238fa91a7587b7d default;
+      click 1238fa91a7587b7d "../../Capabilities/CapabilityRequirementModel.html#reqvire-requirement-ontology-shape-profile";
+      7aa7d3226c35322f["Reqvire Semantic Contract Ontology Shape Profile"];
+      class 7aa7d3226c35322f default;
+      click 7aa7d3226c35322f "../../Capabilities/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology-shape-profile";
+      653ec6f7403e119b["Reqvire Semantic Query Contract Shape Profile"];
+      class 653ec6f7403e119b default;
+      click 653ec6f7403e119b "../../Capabilities/CapabilityRequirementModel.html#reqvire-semantic-query-contract-shape-profile";
+    end
+    subgraph d24be3195694ce6c["📄 Governance.md"]
+      97a28c4a5896f9e5["Reqvire Governance Ontology Shape Profile"];
+      class 97a28c4a5896f9e5 default;
+      click 97a28c4a5896f9e5 "../../Capabilities/Governance.html#reqvire-governance-ontology-shape-profile";
+    end
+    subgraph b68ed0f4380d8e73["📄 RelationsAndImpact.md"]
+      96e2833e2b059e36["Reqvire Relation Ontology Shape Profile"];
+      class 96e2833e2b059e36 default;
+      click 96e2833e2b059e36 "../../Capabilities/RelationsAndImpact.html#reqvire-relation-ontology-shape-profile";
+    end
+  end
   subgraph 8735c0a811307e57["📁 requirements/Functional/Core"]
     subgraph d1a073c5dbdc4a00["📄 Behaviors.md"]
       3301b4a3dd652151["Attachment Identifier CRUD Update Behavior"];
       class 3301b4a3dd652151 default;
       click 3301b4a3dd652151 "Behaviors.html#attachment-identifier-crud-update-behavior";
+      76230a21e4de06ea["Requirement Governance Metadata Inheritance Behavior"];
+      class 76230a21e4de06ea default;
+      click 76230a21e4de06ea "Behaviors.html#requirement-governance-metadata-inheritance-behavior";
       c7a7113c11f9175d["Subdirectory Auto-Detection Behavior"];
       class c7a7113c11f9175d default;
       click c7a7113c11f9175d "Behaviors.html#subdirectory-auto-detection-behavior";
@@ -376,6 +537,9 @@
       2013d4b62a0c841["Attachment Satisfied Refinement Constraint"];
       class 2013d4b62a0c841 default;
       click 2013d4b62a0c841 "Constraints.html#attachment-satisfied-refinement-constraint";
+      104588d95ae3b87b["Attachment Subgraph Direction Constraint"];
+      class 104588d95ae3b87b default;
+      click 104588d95ae3b87b "Constraints.html#attachment-subgraph-direction-constraint";
       c1660a11594249ca["Element Type Relation Compatibility Constraint"];
       class c1660a11594249ca default;
       click c1660a11594249ca "Constraints.html#element-type-relation-compatibility-constraint";
@@ -387,52 +551,128 @@
       c36682220045e7c5["Attachment Scope Constraints"];
       class c36682220045e7c5 systemRequirement;
       click c36682220045e7c5 "ModelManagement.html#attachment-scope-constraints";
-      659a813dd417bc5e["Default Requirement Type Assignment<br/>📎 requirements/Functional/Core/Specifications.md#element-type-metadata-specification"];
-      class 659a813dd417bc5e userRequirement;
+      367e11dc22acd51f["Capability Collect Traversal"];
+      class 367e11dc22acd51f systemRequirement;
+      click 367e11dc22acd51f "ModelManagement.html#capability-collect-traversal";
+      a67ed8e461cca702["Capability Coverage Rollup"];
+      class a67ed8e461cca702 systemRequirement;
+      click a67ed8e461cca702 "ModelManagement.html#capability-coverage-rollup";
+      6a8f34976efdf2db["Capability Element Semantic Contract"];
+      class 6a8f34976efdf2db systemRequirement;
+      click 6a8f34976efdf2db "ModelManagement.html#capability-element-semantic-contract";
+      7279235dcea11cc5["Capability Model Structure"];
+      class 7279235dcea11cc5 systemRequirement;
+      click 7279235dcea11cc5 "ModelManagement.html#capability-model-structure";
+      d36f87fcef968d48["Core Element Semantic Contract"];
+      class d36f87fcef968d48 systemRequirement;
+      click d36f87fcef968d48 "ModelManagement.html#core-element-semantic-contract";
+      573246bbaa4be070["Custom Element Trace Semantic Contract"];
+      class 573246bbaa4be070 systemRequirement;
+      click 573246bbaa4be070 "ModelManagement.html#custom-element-trace-semantic-contract";
+      659a813dd417bc5e["Default Requirement Type Assignment<br/>📎 Element Type Metadata Specification"];
+      class 659a813dd417bc5e systemRequirement;
       click 659a813dd417bc5e "ModelManagement.html#default-requirement-type-assignment";
       d27e40511b457522["Efficient Processing"];
-      class d27e40511b457522 userRequirement;
+      class d27e40511b457522 systemRequirement;
       click d27e40511b457522 "ModelManagement.html#efficient-processing";
-      d7718b70035d8d84["Element Manipulation Operations<br/>📎 requirements/Functional/Output/Specifications.md#diff-output-format-specification"];
-      class d7718b70035d8d84 userRequirement;
+      d7718b70035d8d84["Element Manipulation Operations"];
+      class d7718b70035d8d84 systemRequirement;
       click d7718b70035d8d84 "ModelManagement.html#element-manipulation-operations";
-      3b924660b3d92e9d["Element Type Relation Compatibility<br/>📎 requirements/Refinements.md#supported-element-types-specification"];
+      3b924660b3d92e9d["Element Type Relation Compatibility"];
       class 3b924660b3d92e9d systemRequirement;
       click 3b924660b3d92e9d "ModelManagement.html#element-type-relation-compatibility";
-      43eafdd22a501023["Git Repository as Project Root<br/>📎 requirements/Refinements.md#containment-specification"];
-      class 43eafdd22a501023 userRequirement;
+      43eafdd22a501023["Git Repository as Project Root"];
+      class 43eafdd22a501023 systemRequirement;
       click 43eafdd22a501023 "ModelManagement.html#git-repository-as-project-root";
-      7b8a81499865dbaa["Refinement Element Structure Constraints<br/>📎 requirements/Refinements.md#supported-element-types-specification"];
+      72562cf089b8eb9c["Governance Metadata Semantic Contract"];
+      class 72562cf089b8eb9c systemRequirement;
+      click 72562cf089b8eb9c "ModelManagement.html#governance-metadata-semantic-contract";
+      d5d88a3d4a6c67f8["Ontology and Semantic Contract Model"];
+      class d5d88a3d4a6c67f8 systemRequirement;
+      click d5d88a3d4a6c67f8 "ModelManagement.html#ontology-and-semantic-contract-model";
+      db001ea578a47f9c["Ontology Element Semantic Contract"];
+      class db001ea578a47f9c systemRequirement;
+      click db001ea578a47f9c "ModelManagement.html#ontology-element-semantic-contract";
+      2a3d60fd26663814["Opt-In Element Size Estimate Model Build"];
+      class 2a3d60fd26663814 systemRequirement;
+      click 2a3d60fd26663814 "ModelManagement.html#opt-in-element-size-estimate-model-build";
+      7b8a81499865dbaa["Refinement Element Structure Constraints<br/>📎 Supported Element Types Specification"];
       class 7b8a81499865dbaa systemRequirement;
       click 7b8a81499865dbaa "ModelManagement.html#refinement-element-structure-constraints";
-      ac192cac778569d0["Relation Management Operations<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      58a94e5626db01["Refinement Subtype Semantic Contract"];
+      class 58a94e5626db01 systemRequirement;
+      click 58a94e5626db01 "ModelManagement.html#refinement-subtype-semantic-contract";
+      ac192cac778569d0["Relation Management Operations<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Satisfied Refinement Constraint"];
       class ac192cac778569d0 systemRequirement;
       click ac192cac778569d0 "ModelManagement.html#relation-management-operations";
-      15293612289d990c["Relation Types and behaviors<br/>📎 RelationTypes.md<br/>📎 requirements/Refinements.md#relation-semantics-specification"];
+      f33df8b7df7a1eae["Relation Model Semantic Contract"];
+      class f33df8b7df7a1eae systemRequirement;
+      click f33df8b7df7a1eae "ModelManagement.html#relation-model-semantic-contract";
+      15293612289d990c["Relation Types and behaviors"];
       class 15293612289d990c systemRequirement;
       click 15293612289d990c "ModelManagement.html#relation-types-and-behaviors";
+      ca5ba489f711d5b3["Requirement Element Semantic Contract"];
+      class ca5ba489f711d5b3 systemRequirement;
+      click ca5ba489f711d5b3 "ModelManagement.html#requirement-element-semantic-contract";
+      6f754ea1b96a7f28["Requirement Governance Metadata<br/>📎 Requirement Governance Metadata Specification"];
+      class 6f754ea1b96a7f28 systemRequirement;
+      click 6f754ea1b96a7f28 "ModelManagement.html#requirement-governance-metadata";
+      d1a3194f9fc694b7["Semantic Contract Element Semantic Contract"];
+      class d1a3194f9fc694b7 systemRequirement;
+      click d1a3194f9fc694b7 "ModelManagement.html#semantic-contract-element-semantic-contract";
+      ad8e41dcb7709165["Semantic Query Contract Element Semantic Contract"];
+      class ad8e41dcb7709165 systemRequirement;
+      click ad8e41dcb7709165 "ModelManagement.html#semantic-query-contract-element-semantic-contract";
       5dea9fe53eee419e["Template-Based Model Bootstrapping"];
-      class 5dea9fe53eee419e userRequirement;
+      class 5dea9fe53eee419e systemRequirement;
       click 5dea9fe53eee419e "ModelManagement.html#template-based-model-bootstrapping";
-      1275026756e287b9["Verification Type Categories<br/>📎 requirements/Refinements.md#supported-element-types-specification"];
+      1275026756e287b9["Verification Type Categories<br/>📎 Supported Element Types Specification"];
       class 1275026756e287b9 systemRequirement;
       click 1275026756e287b9 "ModelManagement.html#verification-type-categories";
     end
     subgraph 525b4b735cf204bb["📄 Specifications.md"]
+      1353efe23a00f376["Capability Model Structure Specification"];
+      class 1353efe23a00f376 default;
+      click 1353efe23a00f376 "Specifications.html#capability-model-structure-specification";
+      d3a4af0c7830e650["Default Requirement Type Assignment Refinement Specification"];
+      class d3a4af0c7830e650 default;
+      click d3a4af0c7830e650 "Specifications.html#default-requirement-type-assignment-refinement-specification";
+      df10773d499c69c1["Element Size Estimate Model Build Specification"];
+      class df10773d499c69c1 default;
+      click df10773d499c69c1 "Specifications.html#element-size-estimate-model-build-specification";
       f95149e7369cd429["Git Repository Scope Specification"];
       class f95149e7369cd429 default;
       click f95149e7369cd429 "Specifications.html#git-repository-scope-specification";
+      cd8a9af591fa197e["Ontology Annotation Convention Specification"];
+      class cd8a9af591fa197e default;
+      click cd8a9af591fa197e "Specifications.html#ontology-annotation-convention-specification";
+      d1b07b356a99eb61["Refinement Element Structure Constraints Refinement Specification"];
+      class d1b07b356a99eb61 default;
+      click d1b07b356a99eb61 "Specifications.html#refinement-element-structure-constraints-refinement-specification";
+      76d641164354982e["Relation Types and behaviors Refinement Specification"];
+      class 76d641164354982e default;
+      click 76d641164354982e "Specifications.html#relation-types-and-behaviors-refinement-specification";
+      91a719c39b871cd0["Semantic Contract Structure Specification"];
+      class 91a719c39b871cd0 default;
+      click 91a719c39b871cd0 "Specifications.html#semantic-contract-structure-specification";
+      6aa697deba497bde["Semantic Query Contract Structure Specification"];
+      class 6aa697deba497bde default;
+      click 6aa697deba497bde "Specifications.html#semantic-query-contract-structure-specification";
       75dfb35477f838d5["Verification Type Selection Guidelines"];
       class 75dfb35477f838d5 default;
       click 75dfb35477f838d5 "Specifications.html#verification-type-selection-guidelines";
     end
     subgraph 98067cc5207d6b91["📄 Validation.md"]
-      9f1021634cff7f57["Relation Element Type Validator"];
-      class 9f1021634cff7f57 systemRequirement;
-      click 9f1021634cff7f57 "Validation.html#relation-element-type-validator";
-      4a77e514d9e5539b["Validate Relation Types"];
-      class 4a77e514d9e5539b userRequirement;
-      click 4a77e514d9e5539b "Validation.html#validate-relation-types";
+      2175fcbf8cfb5b09["Semantic Contract Reference Context Validation"];
+      class 2175fcbf8cfb5b09 systemRequirement;
+      click 2175fcbf8cfb5b09 "Validation.html#semantic-contract-reference-context-validation";
+    end
+  end
+  subgraph 7bb0bcf0f847d54a["📁 requirements/Functional/Core/DesignDocuments"]
+    subgraph 23c0ad0087264438["📄 RelationTypes.md"]
+      41dbb4a1af09e878["RelationTypes"];
+      class 41dbb4a1af09e878 default;
+      click 41dbb4a1af09e878 "DesignDocuments/RelationTypes.html#relationtypes";
     end
   end
   subgraph 6c93988fc728d1f8["📁 requirements/Functional/Core/Verifications"]
@@ -443,8 +683,14 @@
       d7cd30e5e333aa7["Attachment Scope Constraints Test"];
       class d7cd30e5e333aa7 verification;
       click d7cd30e5e333aa7 "Verifications/AttachmentsVerifications.html#attachment-scope-constraints-test";
+      bddfad77c89d5e71["Ontology and Contract Attachment Verification"];
+      class bddfad77c89d5e71 verification;
+      click bddfad77c89d5e71 "Verifications/AttachmentsVerifications.html#ontology-and-contract-attachment-verification";
     end
     subgraph 83363717080555bd["📄 ParsingVerifications.md"]
+      40f003dc227a4ebe["Element Size Estimate Model Build Verification"];
+      class 40f003dc227a4ebe verification;
+      click 40f003dc227a4ebe "Verifications/ParsingVerifications.html#element-size-estimate-model-build-verification";
       98ae4e1997fb1002["Element Subsection Parsing Test"];
       class 98ae4e1997fb1002 verification;
       click 98ae4e1997fb1002 "Verifications/ParsingVerifications.html#element-subsection-parsing-test";
@@ -454,14 +700,35 @@
       52b50094727794f3["Refinement Relations Rejection Test"];
       class 52b50094727794f3 verification;
       click 52b50094727794f3 "Verifications/ParsingVerifications.html#refinement-relations-rejection-test";
+      4826b40eec78ead8["Requirement Governance Metadata Verification"];
+      class 4826b40eec78ead8 verification;
+      click 4826b40eec78ead8 "Verifications/ParsingVerifications.html#requirement-governance-metadata-verification";
     end
     subgraph 46a9d0ceb9db210e["📄 ValidationVerifications.md"]
+      3cd73c95ec94215d["Capability Element Relation Compatibility Test"];
+      class 3cd73c95ec94215d verification;
+      click 3cd73c95ec94215d "Verifications/ValidationVerifications.html#capability-element-relation-compatibility-test";
       40f8f3dcc6a4e8bd["Default Element Type Assignment Test"];
       class 40f8f3dcc6a4e8bd verification;
       click 40f8f3dcc6a4e8bd "Verifications/ValidationVerifications.html#default-element-type-assignment-test";
       4bbdeefb4231596e["Element Type Relation Compatibility Test"];
       class 4bbdeefb4231596e verification;
       click 4bbdeefb4231596e "Verifications/ValidationVerifications.html#element-type-relation-compatibility-test";
+      505bbd553d472b70["Semantic Contract Ontology Declaration Validation Test"];
+      class 505bbd553d472b70 verification;
+      click 505bbd553d472b70 "Verifications/ValidationVerifications.html#semantic-contract-ontology-declaration-validation-test";
+      ac837460db07e2b["Semantic Contract Ownership Validation Test"];
+      class ac837460db07e2b verification;
+      click ac837460db07e2b "Verifications/ValidationVerifications.html#semantic-contract-ownership-validation-test";
+      4502203d20440d01["Semantic Contract Section Validation Test"];
+      class 4502203d20440d01 verification;
+      click 4502203d20440d01 "Verifications/ValidationVerifications.html#semantic-contract-section-validation-test";
+      2d5af227dfb08f48["Semantic Contract SHACL Sanity Validation Test"];
+      class 2d5af227dfb08f48 verification;
+      click 2d5af227dfb08f48 "Verifications/ValidationVerifications.html#semantic-contract-shacl-sanity-validation-test";
+      aa9e7db027089424["Semantic Query Contract Section Validation Test"];
+      class aa9e7db027089424 verification;
+      click aa9e7db027089424 "Verifications/ValidationVerifications.html#semantic-query-contract-section-validation-test";
       c40e17e0f8f2b5ec["Subdirectory Processing Verification"];
       class c40e17e0f8f2b5ec verification;
       click c40e17e0f8f2b5ec "Verifications/ValidationVerifications.html#subdirectory-processing-verification";
@@ -477,22 +744,28 @@
       click 3586ac1e2c5e9779 "../Operations/Behaviors.html#file-persistence-behavior";
     end
     subgraph e1e686bef27807d6["📄 ElementManipulation.md"]
-      bf9a2f73b67492b9["Create Element Operation<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      4b855068aa046af4["Atomic Relation Relink Operation"];
+      class 4b855068aa046af4 systemRequirement;
+      click 4b855068aa046af4 "../Operations/ElementManipulation.html#atomic-relation-relink-operation";
+      bf9a2f73b67492b9["Create Element Operation<br/>📎 Target Location Constraint<br/>📎 Element Ordering Behavior<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Satisfied Refinement Constraint<br/>📎 Element Type Metadata Specification"];
       class bf9a2f73b67492b9 systemRequirement;
       click bf9a2f73b67492b9 "../Operations/ElementManipulation.html#create-element-operation";
+      72f22745a788dc51["CRUD Semantic Contract Mutation Validation"];
+      class 72f22745a788dc51 systemRequirement;
+      click 72f22745a788dc51 "../Operations/ElementManipulation.html#crud-semantic-contract-mutation-validation";
       591265fa14ecd72d["Delete Element Operation"];
       class 591265fa14ecd72d systemRequirement;
       click 591265fa14ecd72d "../Operations/ElementManipulation.html#delete-element-operation";
-      cab861a199d11c3c["Element Manipulation File Persistence<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      cab861a199d11c3c["Element Manipulation File Persistence<br/>📎 Element Ordering Behavior"];
       class cab861a199d11c3c systemRequirement;
       click cab861a199d11c3c "../Operations/ElementManipulation.html#element-manipulation-file-persistence";
-      451abcac00b45de4["Merge Element Operation<br/>📎 requirements/Functional/Core/Constraints.md#attachment-hierarchical-independence-constraint<br/>📎 requirements/Functional/Core/Constraints.md#attachment-satisfied-refinement-constraint"];
+      451abcac00b45de4["Merge Element Operation<br/>📎 Attachment Hierarchical Independence Constraint<br/>📎 Attachment Satisfied Refinement Constraint"];
       class 451abcac00b45de4 systemRequirement;
       click 451abcac00b45de4 "../Operations/ElementManipulation.html#merge-element-operation";
-      c68daf5bfafc5a05["Move Element Operation<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      c68daf5bfafc5a05["Move Element Operation<br/>📎 Target Location Constraint<br/>📎 Element Ordering Behavior"];
       class c68daf5bfafc5a05 systemRequirement;
       click c68daf5bfafc5a05 "../Operations/ElementManipulation.html#move-element-operation";
-      b9c9829782477a6c["Move File Operation<br/>📎 requirements/Functional/Operations/Constraints.md#target-location-constraint"];
+      b9c9829782477a6c["Move File Operation<br/>📎 Target Location Constraint"];
       class b9c9829782477a6c systemRequirement;
       click b9c9829782477a6c "../Operations/ElementManipulation.html#move-file-operation";
       f006550e707e055f["Relation Consistency Maintenance"];
@@ -501,11 +774,14 @@
       8f31bcc56d19f6e9["Rename Element Operation"];
       class 8f31bcc56d19f6e9 systemRequirement;
       click 8f31bcc56d19f6e9 "../Operations/ElementManipulation.html#rename-element-operation";
-      9cdb6297e49a3802["Target Location Validation and Auto-Creation"];
+      9cdb6297e49a3802["Target Location Validation and Auto-Creation<br/>📎 Ignore Files Specification<br/>📎 Git Repository Scope Specification"];
       class 9cdb6297e49a3802 systemRequirement;
       click 9cdb6297e49a3802 "../Operations/ElementManipulation.html#target-location-validation-and-auto-creation";
     end
     subgraph 7c2e7eef0051f760["📄 Specifications.md"]
+      fea4815297cf40ac["Operation Command Contract Specification"];
+      class fea4815297cf40ac default;
+      click fea4815297cf40ac "../Operations/Specifications.html#operation-command-contract-specification";
       2a23f1dee6913aeb["Relation Operations Specification"];
       class 2a23f1dee6913aeb default;
       click 2a23f1dee6913aeb "../Operations/Specifications.html#relation-operations-specification";
@@ -520,6 +796,11 @@
       class 9f8ff23aca853fa0 verification;
       click 9f8ff23aca853fa0 "../Operations/Verifications/ElementManipulationVerifications.html#unlink-command-verification";
     end
+    subgraph cae715fe712bf6a2["📄 FormattingVerifications.md"]
+      e7bb6b43b5004034["Requirement Governance Metadata Formatting Verification"];
+      class e7bb6b43b5004034 verification;
+      click e7bb6b43b5004034 "../Operations/Verifications/FormattingVerifications.html#requirement-governance-metadata-formatting-verification";
+    end
   end
   subgraph e6e9a42ade18cb0e["📁 requirements/Functional/Output"]
     subgraph a1762b6e181c2fd0["📄 DiagramGeneration.md"]
@@ -527,20 +808,51 @@
       class 6a54472e974b0c63 systemRequirement;
       click 6a54472e974b0c63 "../Output/DiagramGeneration.html#trace-relation-non-directional-behavior";
     end
+    subgraph 7799005208c6c9c1["📄 Specifications.md"]
+      44edd20d6499d54b["Capability Collect Traversal Specification"];
+      class 44edd20d6499d54b default;
+      click 44edd20d6499d54b "../Output/Specifications.html#capability-collect-traversal-specification";
+    end
   end
+  subgraph 6ac6c5ebccc78d5e["📁 requirements/Functional/Output/Verifications"]
+    subgraph d02aea5a4453b115["📄 ReportingVerifications.md"]
+      d049826754852324["Capability Collect Traversal Test"];
+      class d049826754852324 verification;
+      click d049826754852324 "../Output/Verifications/ReportingVerifications.html#capability-collect-traversal-test";
+      36da585d91683f31["Capability Coverage Rollup Test"];
+      class 36da585d91683f31 verification;
+      click 36da585d91683f31 "../Output/Verifications/ReportingVerifications.html#capability-coverage-rollup-test";
+    end
+  end
+  42398f2c82684691 -->|refinedBy| 3301b4a3dd652151;
   993c12e82435a78e["crud.rs"];
   class 993c12e82435a78e default;
   click 993c12e82435a78e "../../../core/src/crud.rs";
   42398f2c82684691 -->|satisfiedBy| 993c12e82435a78e;
-  42398f2c82684691 -->|satisfiedBy| 3301b4a3dd652151;
   42398f2c82684691 -.->|verifiedBy| 2b94b4f8deb0b47d;
-  c36682220045e7c5 -->|satisfiedBy| 22726f1465bcc665;
-  c36682220045e7c5 -->|satisfiedBy| 2013d4b62a0c841;
+  c36682220045e7c5 -->|refinedBy| 22726f1465bcc665;
+  c36682220045e7c5 -->|refinedBy| 2013d4b62a0c841;
+  c36682220045e7c5 -->|refinedBy| 104588d95ae3b87b;
   c36682220045e7c5 -.->|verifiedBy| d7cd30e5e333aa7;
+  367e11dc22acd51f -->|refinedBy| 44edd20d6499d54b;
+  367e11dc22acd51f -.->|verifiedBy| d049826754852324;
+  a67ed8e461cca702 -.->|verifiedBy| 36da585d91683f31;
+  6a8f34976efdf2db -->|refinedBy| 3dd88fbebe59cc99;
+  7279235dcea11cc5 -.->|deriveReqT| 367e11dc22acd51f;
+  7279235dcea11cc5 -.->|deriveReqT| a67ed8e461cca702;
+  7279235dcea11cc5 -.->|deriveReqT| d5d88a3d4a6c67f8;
+  7279235dcea11cc5 -->|refinedBy| 1353efe23a00f376;
+  7279235dcea11cc5 -.->|verifiedBy| 3cd73c95ec94215d;
+  d36f87fcef968d48 -->|refinedBy| 3ebf6415286f8172;
+  573246bbaa4be070 -->|refinedBy| b51429b1cbd782f0;
+  659a813dd417bc5e -->|refinedBy| d3a4af0c7830e650;
   659a813dd417bc5e -.->|verifiedBy| 98ae4e1997fb1002;
   659a813dd417bc5e -.->|verifiedBy| 40f8f3dcc6a4e8bd;
+  d27e40511b457522 -.->|deriveReqT| 2a3d60fd26663814;
   d7718b70035d8d84 -.->|deriveReqT| 42398f2c82684691;
+  d7718b70035d8d84 -.->|deriveReqT| 4b855068aa046af4;
   d7718b70035d8d84 -.->|deriveReqT| bf9a2f73b67492b9;
+  d7718b70035d8d84 -.->|deriveReqT| 72f22745a788dc51;
   d7718b70035d8d84 -.->|deriveReqT| 591265fa14ecd72d;
   d7718b70035d8d84 -.->|deriveReqT| cab861a199d11c3c;
   d7718b70035d8d84 -.->|deriveReqT| 451abcac00b45de4;
@@ -549,49 +861,117 @@
   d7718b70035d8d84 -.->|deriveReqT| f006550e707e055f;
   d7718b70035d8d84 -.->|deriveReqT| 8f31bcc56d19f6e9;
   d7718b70035d8d84 -.->|deriveReqT| 9cdb6297e49a3802;
-  d7718b70035d8d84 -->|satisfiedBy| 47acd7522229ece9;
-  d7718b70035d8d84 -->|satisfiedBy| 3586ac1e2c5e9779;
-  3b924660b3d92e9d -.->|deriveReqT| 9f1021634cff7f57;
-  3b924660b3d92e9d -->|satisfiedBy| c1660a11594249ca;
-  3b924660b3d92e9d -.->|verifiedBy| 4bbdeefb4231596e;
-  43eafdd22a501023 -.->|deriveReqT| 9cdb6297e49a3802;
-  9893721bc67f82c9["git_commands.rs"];
-  class 9893721bc67f82c9 default;
-  click 9893721bc67f82c9 "../../../core/src/git_commands.rs";
-  43eafdd22a501023 -->|satisfiedBy| 9893721bc67f82c9;
-  43eafdd22a501023 -->|satisfiedBy| c7a7113c11f9175d;
-  43eafdd22a501023 -->|satisfiedBy| f95149e7369cd429;
-  43eafdd22a501023 -.->|verifiedBy| c40e17e0f8f2b5ec;
-  7b8a81499865dbaa -.->|deriveReqT| c36682220045e7c5;
-  499d48218b73f571["model.rs"];
-  class 499d48218b73f571 default;
-  click 499d48218b73f571 "../../../core/src/model.rs";
-  7b8a81499865dbaa -->|satisfiedBy| 499d48218b73f571;
-  7b8a81499865dbaa -.->|verifiedBy| 581d470f0ef1f431;
-  7b8a81499865dbaa -.->|verifiedBy| 52b50094727794f3;
-  ac192cac778569d0 -->|satisfiedBy| 993c12e82435a78e;
+  d7718b70035d8d84 -->|refinedBy| 47acd7522229ece9;
+  d7718b70035d8d84 -->|refinedBy| 3586ac1e2c5e9779;
+  d7718b70035d8d84 -->|refinedBy| fea4815297cf40ac;
+  3b924660b3d92e9d -->|refinedBy| c1660a11594249ca;
+  3b924660b3d92e9d -->|refinedBy| a03cf6f1eda0c5c;
   95cf526671ec752c["graph_registry.rs"];
   class 95cf526671ec752c default;
   click 95cf526671ec752c "../../../core/src/graph_registry.rs";
-  ac192cac778569d0 -->|satisfiedBy| 95cf526671ec752c;
-  ac192cac778569d0 -->|satisfiedBy| 2a23f1dee6913aeb;
-  ac192cac778569d0 -.->|verifiedBy| ea3a2bf2fbe74057;
-  ac192cac778569d0 -.->|verifiedBy| 9f8ff23aca853fa0;
-  15293612289d990c -.->|deriveReqT| 3b924660b3d92e9d;
-  15293612289d990c -.->|deriveReqT| 7b8a81499865dbaa;
-  15293612289d990c -.->|deriveReqT| ac192cac778569d0;
-  15293612289d990c -.->|deriveReqT| 4a77e514d9e5539b;
-  15293612289d990c -.->|deriveReqT| 6a54472e974b0c63;
+  3b924660b3d92e9d -->|satisfiedBy| 95cf526671ec752c;
   1cfe88f8d3cc7aac["relation.rs"];
   class 1cfe88f8d3cc7aac default;
   click 1cfe88f8d3cc7aac "../../../core/src/relation.rs";
+  3b924660b3d92e9d -->|satisfiedBy| 1cfe88f8d3cc7aac;
+  3b924660b3d92e9d -.->|verifiedBy| 3cd73c95ec94215d;
+  3b924660b3d92e9d -.->|verifiedBy| 4bbdeefb4231596e;
+  43eafdd22a501023 -->|refinedBy| c7a7113c11f9175d;
+  43eafdd22a501023 -->|refinedBy| f95149e7369cd429;
+  43eafdd22a501023 -->|refinedBy| e3505bdf96f2e996;
+  43eafdd22a501023 -.->|verifiedBy| c40e17e0f8f2b5ec;
+  72562cf089b8eb9c -->|refinedBy| 97a28c4a5896f9e5;
+  d5d88a3d4a6c67f8 -.->|deriveReqT| 6a8f34976efdf2db;
+  d5d88a3d4a6c67f8 -.->|deriveReqT| d36f87fcef968d48;
+  d5d88a3d4a6c67f8 -.->|deriveReqT| 72562cf089b8eb9c;
+  d5d88a3d4a6c67f8 -.->|deriveReqT| db001ea578a47f9c;
+  d5d88a3d4a6c67f8 -.->|deriveReqT| f33df8b7df7a1eae;
+  d5d88a3d4a6c67f8 -.->|deriveReqT| ca5ba489f711d5b3;
+  d5d88a3d4a6c67f8 -.->|deriveReqT| d1a3194f9fc694b7;
+  d5d88a3d4a6c67f8 -.->|deriveReqT| ad8e41dcb7709165;
+  d5d88a3d4a6c67f8 -.->|deriveReqT| 2175fcbf8cfb5b09;
+  d5d88a3d4a6c67f8 -->|refinedBy| 1d4327c51e6056ec;
+  d5d88a3d4a6c67f8 -->|refinedBy| cd8a9af591fa197e;
+  d5d88a3d4a6c67f8 -->|refinedBy| 91a719c39b871cd0;
+  d5d88a3d4a6c67f8 -->|refinedBy| 6aa697deba497bde;
+  d5d88a3d4a6c67f8 -.->|verifiedBy| bddfad77c89d5e71;
+  d5d88a3d4a6c67f8 -.->|verifiedBy| 505bbd553d472b70;
+  d5d88a3d4a6c67f8 -.->|verifiedBy| ac837460db07e2b;
+  d5d88a3d4a6c67f8 -.->|verifiedBy| 4502203d20440d01;
+  d5d88a3d4a6c67f8 -.->|verifiedBy| 2d5af227dfb08f48;
+  d5d88a3d4a6c67f8 -.->|verifiedBy| aa9e7db027089424;
+  db001ea578a47f9c -->|refinedBy| e82ff9bb6ac32c53;
+  2a3d60fd26663814 -->|refinedBy| df10773d499c69c1;
+  e068cb8b03a77b4d["element.rs"];
+  class e068cb8b03a77b4d default;
+  click e068cb8b03a77b4d "../../../core/src/element.rs";
+  2a3d60fd26663814 -->|satisfiedBy| e068cb8b03a77b4d;
+  2a3d60fd26663814 -->|satisfiedBy| 95cf526671ec752c;
+  499d48218b73f571["model.rs"];
+  class 499d48218b73f571 default;
+  click 499d48218b73f571 "../../../core/src/model.rs";
+  2a3d60fd26663814 -->|satisfiedBy| 499d48218b73f571;
+  2a3d60fd26663814 -.->|verifiedBy| 40f003dc227a4ebe;
+  7b8a81499865dbaa -.->|deriveReqT| c36682220045e7c5;
+  7b8a81499865dbaa -.->|deriveReqT| 573246bbaa4be070;
+  7b8a81499865dbaa -.->|deriveReqT| 58a94e5626db01;
+  7b8a81499865dbaa -->|refinedBy| d1b07b356a99eb61;
+  7b8a81499865dbaa -->|refinedBy| 12b8c722b73f030f;
+  7b8a81499865dbaa -->|satisfiedBy| 499d48218b73f571;
+  7b8a81499865dbaa -.->|verifiedBy| 581d470f0ef1f431;
+  7b8a81499865dbaa -.->|verifiedBy| 52b50094727794f3;
+  7b8a81499865dbaa -.->|verifiedBy| 4826b40eec78ead8;
+  58a94e5626db01 -->|refinedBy| e65fb349dc001034;
+  ac192cac778569d0 -->|refinedBy| 2a23f1dee6913aeb;
+  ac192cac778569d0 -->|satisfiedBy| 993c12e82435a78e;
+  ac192cac778569d0 -->|satisfiedBy| 95cf526671ec752c;
+  ac192cac778569d0 -.->|verifiedBy| ea3a2bf2fbe74057;
+  ac192cac778569d0 -.->|verifiedBy| 9f8ff23aca853fa0;
+  f33df8b7df7a1eae -->|refinedBy| 96e2833e2b059e36;
+  15293612289d990c -.->|deriveReqT| 7279235dcea11cc5;
+  15293612289d990c -.->|deriveReqT| 3b924660b3d92e9d;
+  15293612289d990c -.->|deriveReqT| 7b8a81499865dbaa;
+  15293612289d990c -.->|deriveReqT| ac192cac778569d0;
+  15293612289d990c -.->|deriveReqT| 6a54472e974b0c63;
+  15293612289d990c -->|refinedBy| 41dbb4a1af09e878;
+  15293612289d990c -->|refinedBy| 76d641164354982e;
+  15293612289d990c -->|refinedBy| 32bc0a15650ebf08;
   15293612289d990c -->|satisfiedBy| 1cfe88f8d3cc7aac;
   15293612289d990c -.->|verifiedBy| 98ae4e1997fb1002;
-  1275026756e287b9 -->|satisfiedBy| 75dfb35477f838d5;
+  ca5ba489f711d5b3 -->|refinedBy| 1238fa91a7587b7d;
+  6f754ea1b96a7f28 -->|refinedBy| 76230a21e4de06ea;
+  6f754ea1b96a7f28 -->|satisfiedBy| e068cb8b03a77b4d;
+  6f754ea1b96a7f28 -->|satisfiedBy| 95cf526671ec752c;
+  399c3564599787ff["search.rs"];
+  class 399c3564599787ff default;
+  click 399c3564599787ff "../../../core/src/search.rs";
+  6f754ea1b96a7f28 -->|satisfiedBy| 399c3564599787ff;
+  6f754ea1b96a7f28 -.->|verifiedBy| 4826b40eec78ead8;
+  6f754ea1b96a7f28 -.->|verifiedBy| e7bb6b43b5004034;
+  d1a3194f9fc694b7 -->|refinedBy| 7aa7d3226c35322f;
+  ad8e41dcb7709165 -->|refinedBy| 653ec6f7403e119b;
+  ad8e41dcb7709165 -.->|verifiedBy| aa9e7db027089424;
+  1275026756e287b9 -->|refinedBy| 75dfb35477f838d5;
+  5c31e20a1da9bc6e["test.sh"];
+  class 5c31e20a1da9bc6e default;
+  click 5c31e20a1da9bc6e "../../../tests/test-refinement-elements/test.sh";
+  2b94b4f8deb0b47d -->|satisfiedBy| 5c31e20a1da9bc6e;
   63f4742e633e3986["test.sh"];
   class 63f4742e633e3986 default;
   click 63f4742e633e3986 "../../../tests/test-attachment-constraints/test.sh";
   d7cd30e5e333aa7 -->|satisfiedBy| 63f4742e633e3986;
+  ebb4611bba8f814b["test.sh"];
+  class ebb4611bba8f814b default;
+  click ebb4611bba8f814b "../../../tests/test-collect-command/test.sh";
+  d049826754852324 -->|satisfiedBy| ebb4611bba8f814b;
+  9862b6a220f5be7c["test.sh"];
+  class 9862b6a220f5be7c default;
+  click 9862b6a220f5be7c "../../../tests/test-coverage-report/test.sh";
+  36da585d91683f31 -->|satisfiedBy| 9862b6a220f5be7c;
+  8b5a68b29c336b41["test.sh"];
+  class 8b5a68b29c336b41 default;
+  click 8b5a68b29c336b41 "../../../tests/test-capability-model/test.sh";
+  3cd73c95ec94215d -->|satisfiedBy| 8b5a68b29c336b41;
   5f9cbc6f907e8045["test.sh"];
   class 5f9cbc6f907e8045 default;
   click 5f9cbc6f907e8045 "../../../tests/test-parsing-functionality/test.sh";
@@ -600,6 +980,14 @@
   class f63a7acfc08bf665 default;
   click f63a7acfc08bf665 "../../../tests/test-default-type-assignment/test.sh";
   40f8f3dcc6a4e8bd -->|satisfiedBy| f63a7acfc08bf665;
+  4b855068aa046af4 -->|refinedBy| 6f154fd234df5c1b;
+  4b855068aa046af4 -->|refinedBy| a7b4c0859c00f8c0;
+  4b855068aa046af4 -->|satisfiedBy| 993c12e82435a78e;
+  4b855068aa046af4 -->|satisfiedBy| 95cf526671ec752c;
+  4b855068aa046af4 -.->|verifiedBy| 65f1ed4cf8dab788;
+  bf9a2f73b67492b9 -->|refinedBy| 40714cbda978a508;
+  bf9a2f73b67492b9 -->|refinedBy| 3c85593db589fd04;
+  bf9a2f73b67492b9 -->|refinedBy| 86e301b42cc16d0d;
   25bf5cc42f41e395["cli.rs"];
   class 25bf5cc42f41e395 default;
   click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
@@ -618,50 +1006,54 @@
   class bdf9762d399478a5 default;
   click bdf9762d399478a5 "../../../core/src/utils.rs";
   bf9a2f73b67492b9 -->|satisfiedBy| bdf9762d399478a5;
-  bf9a2f73b67492b9 -->|satisfiedBy| 40714cbda978a508;
-  bf9a2f73b67492b9 -->|satisfiedBy| 3c85593db589fd04;
-  bf9a2f73b67492b9 -->|satisfiedBy| 86e301b42cc16d0d;
   bf9a2f73b67492b9 -.->|verifiedBy| 221f6c008823a4d0;
   bf9a2f73b67492b9 -.->|verifiedBy| d5bf7d0addaf6d19;
+  72f22745a788dc51 -->|refinedBy| 77b41858f3db4284;
+  72f22745a788dc51 -->|satisfiedBy| 993c12e82435a78e;
+  72f22745a788dc51 -->|satisfiedBy| 95cf526671ec752c;
+  72f22745a788dc51 -.->|verifiedBy| bfd28e1e74918526;
+  591265fa14ecd72d -->|refinedBy| bc1f889f5f12a980;
+  591265fa14ecd72d -->|refinedBy| 4366fe5150f6d7c2;
   591265fa14ecd72d -->|satisfiedBy| 25bf5cc42f41e395;
   591265fa14ecd72d -->|satisfiedBy| 993c12e82435a78e;
   591265fa14ecd72d -->|satisfiedBy| d07e49b06be4058e;
   591265fa14ecd72d -->|satisfiedBy| 95cf526671ec752c;
-  591265fa14ecd72d -->|satisfiedBy| bc1f889f5f12a980;
-  591265fa14ecd72d -->|satisfiedBy| 4366fe5150f6d7c2;
   591265fa14ecd72d -.->|verifiedBy| bfd28e1e74918526;
+  cab861a199d11c3c -->|refinedBy| 24b88aebbed843aa;
   cab861a199d11c3c -->|satisfiedBy| 993c12e82435a78e;
   cab861a199d11c3c -->|satisfiedBy| 95cf526671ec752c;
   cab861a199d11c3c -.->|verifiedBy| 362774efb36e2279;
   cab861a199d11c3c -.->|verifiedBy| c89bd750e0ad5b9d;
+  451abcac00b45de4 -->|refinedBy| 2a2729a903e6692f;
+  451abcac00b45de4 -->|refinedBy| 3e506d76554b3740;
+  451abcac00b45de4 -->|refinedBy| 9a6c593ffee9a214;
   451abcac00b45de4 -->|satisfiedBy| 993c12e82435a78e;
   451abcac00b45de4 -->|satisfiedBy| d07e49b06be4058e;
   451abcac00b45de4 -->|satisfiedBy| 95cf526671ec752c;
-  451abcac00b45de4 -->|satisfiedBy| 2a2729a903e6692f;
-  451abcac00b45de4 -->|satisfiedBy| 3e506d76554b3740;
-  451abcac00b45de4 -->|satisfiedBy| 9a6c593ffee9a214;
   451abcac00b45de4 -.->|verifiedBy| c7b35d6963f1017;
+  c68daf5bfafc5a05 -->|refinedBy| c75283445bce637a;
   c68daf5bfafc5a05 -->|satisfiedBy| 25bf5cc42f41e395;
   c68daf5bfafc5a05 -->|satisfiedBy| 993c12e82435a78e;
   c68daf5bfafc5a05 -->|satisfiedBy| d07e49b06be4058e;
   c68daf5bfafc5a05 -->|satisfiedBy| 95cf526671ec752c;
-  c68daf5bfafc5a05 -->|satisfiedBy| c75283445bce637a;
   c68daf5bfafc5a05 -.->|verifiedBy| 9ae2cd53e62b6a33;
+  b9c9829782477a6c -->|refinedBy| 1b95a8b32866b9da;
+  b9c9829782477a6c -->|satisfiedBy| 25bf5cc42f41e395;
+  b9c9829782477a6c -->|satisfiedBy| 993c12e82435a78e;
+  b9c9829782477a6c -->|satisfiedBy| d07e49b06be4058e;
+  b9c9829782477a6c -->|satisfiedBy| 95cf526671ec752c;
   b9c9829782477a6c -.->|verifiedBy| af599fec38b8c0bf;
+  f006550e707e055f -->|refinedBy| d6ef2a6838aa58b3;
   f006550e707e055f -->|satisfiedBy| 95cf526671ec752c;
   f006550e707e055f -.->|verifiedBy| 81422a9a6525acd7;
+  8f31bcc56d19f6e9 -->|refinedBy| 581571713cc6244e;
   8f31bcc56d19f6e9 -->|satisfiedBy| 993c12e82435a78e;
   8f31bcc56d19f6e9 -->|satisfiedBy| d07e49b06be4058e;
   8f31bcc56d19f6e9 -->|satisfiedBy| 95cf526671ec752c;
+  9cdb6297e49a3802 -->|refinedBy| 1dc0e8b76789ffce;
   9cdb6297e49a3802 -->|satisfiedBy| 95cf526671ec752c;
   9cdb6297e49a3802 -->|satisfiedBy| bdf9762d399478a5;
-  9cdb6297e49a3802 -->|satisfiedBy| 1dc0e8b76789ffce;
   9cdb6297e49a3802 -.->|verifiedBy| c0a8cdea5e5972df;
-  9f1021634cff7f57 -->|satisfiedBy| 95cf526671ec752c;
-  9f1021634cff7f57 -->|satisfiedBy| 499d48218b73f571;
-  9f1021634cff7f57 -->|satisfiedBy| 35bd98d101f36b62;
-  9f1021634cff7f57 -.->|verifiedBy| 4bbdeefb4231596e;
-  9f1021634cff7f57 -.->|verifiedBy| ad323c8d4c0751e;
   845fe9ccbc0f0550["test.sh"];
   class 845fe9ccbc0f0550 default;
   click 845fe9ccbc0f0550 "../../../tests/test-element-type-relation-compatibility/test.sh";
@@ -670,43 +1062,57 @@
   class 661275cf7a337c0e default;
   click 661275cf7a337c0e "../../../tests/test-subdirectory-functionality/test.sh";
   c40e17e0f8f2b5ec -->|satisfiedBy| 661275cf7a337c0e;
+  2175fcbf8cfb5b09 -->|refinedBy| f76de08278324f68;
+  2175fcbf8cfb5b09 -->|satisfiedBy| 95cf526671ec752c;
+  2175fcbf8cfb5b09 -.->|verifiedBy| 2d5af227dfb08f48;
+  81ef20c82035bea6["test.sh"];
+  class 81ef20c82035bea6 default;
+  click 81ef20c82035bea6 "../../../tests/test-capability-attachments/test.sh";
+  bddfad77c89d5e71 -->|satisfiedBy| 81ef20c82035bea6;
+  17b64e3b53162666["test.sh"];
+  class 17b64e3b53162666 default;
+  click 17b64e3b53162666 "../../../tests/test-semantic-contract-sanity/test.sh";
+  505bbd553d472b70 -->|satisfiedBy| 17b64e3b53162666;
+  c005512de67da043["test.sh"];
+  class c005512de67da043 default;
+  click c005512de67da043 "../../../tests/test-capability-refinements/test.sh";
+  ac837460db07e2b -->|satisfiedBy| c005512de67da043;
+  ac837460db07e2b -->|satisfiedBy| 17b64e3b53162666;
+  4502203d20440d01 -->|satisfiedBy| c005512de67da043;
+  2d5af227dfb08f48 -->|satisfiedBy| 17b64e3b53162666;
+  6e45b4e97ce264de["test.sh"];
+  class 6e45b4e97ce264de default;
+  click 6e45b4e97ce264de "../../../tests/test-semantic-query-contracts/test.sh";
+  aa9e7db027089424 -->|satisfiedBy| 6e45b4e97ce264de;
+  df92bf508f2f7295["test.sh"];
+  class df92bf508f2f7295 default;
+  click df92bf508f2f7295 "../../../tests/test-model-command/test.sh";
+  40f003dc227a4ebe -->|satisfiedBy| df92bf508f2f7295;
+  581d470f0ef1f431 -->|satisfiedBy| 5c31e20a1da9bc6e;
+  52b50094727794f3 -->|satisfiedBy| 5c31e20a1da9bc6e;
+  ff8f6e8dd6d43794["test.sh"];
+  class ff8f6e8dd6d43794 default;
+  click ff8f6e8dd6d43794 "../../../tests/test-requirement-governance-metadata/test.sh";
+  4826b40eec78ead8 -->|satisfiedBy| ff8f6e8dd6d43794;
   e2ae1addbaec6335["test.sh"];
   class e2ae1addbaec6335 default;
   click e2ae1addbaec6335 "../../../tests/test-link-unlink/test.sh";
   ea3a2bf2fbe74057 -->|satisfiedBy| e2ae1addbaec6335;
   9f8ff23aca853fa0 -->|satisfiedBy| e2ae1addbaec6335;
-  4a77e514d9e5539b -.->|deriveReqT| 9f1021634cff7f57;
+  6a54472e974b0c63 -->|refinedBy| c9dc7f61cf808a53;
+  6a54472e974b0c63 -->|satisfiedBy| 95cf526671ec752c;
+  6a54472e974b0c63 -->|satisfiedBy| 1cfe88f8d3cc7aac;
   6a54472e974b0c63 -.->|verifiedBy| ad323c8d4c0751e;
   6a54472e974b0c63 -.->|verifiedBy| 881f005c754cdc5b;
+  e7bb6b43b5004034 -->|satisfiedBy| ff8f6e8dd6d43794;
 </div>
 <h3 id="default-requirement-type-assignment">Default Requirement Type Assignment</h3>
 <p>The system shall automatically assign the <strong>default type <code>requirement</code></strong> to all elements if not explicitly specified in their <code>metadata</code> subsection.</p>
 <h4>Details</h4>
-<details>
-<summary>Type Assignment Rules</summary>
-<p>When an element does not have a <code>#### Metadata</code> subsection with a <code>type</code> property, the system assigns the default type <code>requirement</code>.</p>
-<p><strong>This behavior is location-independent:</strong> All elements default to type <code>requirement</code> regardless of their folder location within the Git repository.</p>
-<p><strong>To use other element types</strong>, users must explicitly specify the type in the element’s Metadata subsection:</p>
-<pre><code class="language-markdown">#### Metadata
-  * type: user-requirement
-</code></pre>
-<p><strong>Supported element types:</strong></p>
-<ul>
-<li><code>requirement</code> (default)</li>
-<li><code>user-requirement</code></li>
-<li><code>verification</code> / <code>test-verification</code></li>
-<li><code>analysis-verification</code></li>
-<li><code>inspection-verification</code></li>
-<li><code>demonstration-verification</code></li>
-<li><code>constraint</code> (refinement type)</li>
-<li><code>behavior</code> (refinement type)</li>
-<li><code>specification</code> (refinement type)</li>
-<li><code>other</code></li>
-</ul>
-</details>
+<p>Type assignment behavior shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
@@ -714,7 +1120,8 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../../UserStories.html#operating-on-model-elements">Operating on Model Elements</a></li>
+<li>refinedBy: <a href="Specifications.html#default-requirement-type-assignment-refinement-specification">Default Requirement Type Assignment Refinement Specification</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#operating-on-model-elements">Operating on Model Elements</a></li>
 <li>verifiedBy: <a href="Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#default-element-type-assignment-test">Default Element Type Assignment Test</a></li>
 </ul>
@@ -723,12 +1130,36 @@
 <p>The system shall process structured documents and relations to extract model-relevant information efficiently.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../../UserStories.html#operating-on-model-elements">Operating on Model Elements</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#promote-automation-and-efficiency">Promote Automation and Efficiency</a></li>
+<li>derive: <a href="#opt-in-element-size-estimate-model-build">Opt-In Element Size Estimate Model Build</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#operating-on-model-elements">Operating on Model Elements</a></li>
+</ul>
+<hr />
+<h3 id="opt-in-element-size-estimate-model-build">Opt-In Element Size Estimate Model Build</h3>
+<p>The system shall support an opt-in model build mode that computes canonical size estimates for parsed model elements.</p>
+<h4>Details</h4>
+<ul>
+<li>Element size estimates shall be model evidence metadata derived during model build when explicitly enabled.</li>
+<li>Normal model loading shall not compute size estimates by default.</li>
+<li>Size estimates shall not be written to source Markdown files.</li>
+<li>The model build option shall be reusable by CLI JSON commands and MCP server startup.</li>
+<li>Size estimates shall be element-level metadata; report-level aggregate estimates are out of scope for this requirement.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#efficient-processing">Efficient Processing</a></li>
+<li>refinedBy: <a href="Specifications.html#element-size-estimate-model-build-specification">Element Size Estimate Model Build Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#element-size-estimate-model-build-verification">Element Size Estimate Model Build Verification</a></li>
 </ul>
 <hr />
 <h3 id="element-manipulation-operations">Element Manipulation Operations</h3>
@@ -742,16 +1173,14 @@
 </ul>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../Output/Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#attachment-identifier-updates">Attachment Identifier Updates</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#atomic-relation-relink-operation">Atomic Relation Relink Operation</a></li>
 <li>derive: <a href="../Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
+<li>derive: <a href="../Operations/ElementManipulation.html#crud-semantic-contract-mutation-validation">CRUD Semantic Contract Mutation Validation</a></li>
 <li>derive: <a href="../Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
 <li>derive: <a href="../Operations/ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a></li>
 <li>derive: <a href="../Operations/ElementManipulation.html#merge-element-operation">Merge Element Operation</a></li>
@@ -760,9 +1189,10 @@
 <li>derive: <a href="../Operations/ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a></li>
 <li>derive: <a href="../Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a></li>
 <li>derive: <a href="../Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#operating-on-model-elements">Operating on Model Elements</a></li>
-<li>satisfiedBy: <a href="../Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
-<li>satisfiedBy: <a href="../Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li>refinedBy: <a href="../Operations/Behaviors.html#dry-run-mode-behavior">Dry-Run Mode Behavior</a></li>
+<li>refinedBy: <a href="../Operations/Behaviors.html#file-persistence-behavior">File Persistence Behavior</a></li>
+<li>refinedBy: <a href="../Operations/Specifications.html#operation-command-contract-specification">Operation Command Contract Specification</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#operating-on-model-elements">Operating on Model Elements</a></li>
 </ul>
 <hr />
 <h3 id="attachment-identifier-updates">Attachment Identifier Updates</h3>
@@ -782,8 +1212,8 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#element-manipulation-operations">Element Manipulation Operations</a></li>
+<li>refinedBy: <a href="Behaviors.html#attachment-identifier-crud-update-behavior">Attachment Identifier CRUD Update Behavior</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#attachment-identifier-crud-update-behavior">Attachment Identifier CRUD Update Behavior</a></li>
 <li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachment-identifier-crud-verification">Attachment Identifier CRUD Verification</a></li>
 </ul>
 <hr />
@@ -799,19 +1229,14 @@
 </ul>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../../Refinements.html#containment-specification">Containment Specification</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="../Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#defining-model-structure">Defining Model Structure</a></li>
-<li>satisfiedBy: <a href="../../../core/src/git_commands.rs">git_commands.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#subdirectory-auto-detection-behavior">Subdirectory Auto-Detection Behavior</a></li>
-<li>satisfiedBy: <a href="Specifications.html#git-repository-scope-specification">Git Repository Scope Specification</a></li>
+<li>refinedBy: <a href="Behaviors.html#subdirectory-auto-detection-behavior">Subdirectory Auto-Detection Behavior</a></li>
+<li>refinedBy: <a href="Specifications.html#git-repository-scope-specification">Git Repository Scope Specification</a></li>
+<li>refinedBy: <a href="../../Refinements.html#containment-specification">Containment Specification</a></li>
+<li>specify: <a href="../../Capabilities.html#defining-model-structure">Defining Model Structure</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#subdirectory-processing-verification">Subdirectory Processing Verification</a></li>
 </ul>
 <hr />
@@ -821,21 +1246,196 @@
 <ul>
 <li>type: requirement</li>
 </ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/RelationTypes.html">RelationTypes.html</a></li>
-<li><a href="../../Refinements.html#relation-semantics-specification">Relation Semantics Specification</a></li>
-</ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#capability-model-structure">Capability Model Structure</a></li>
 <li>derive: <a href="#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
 <li>derive: <a href="#refinement-element-structure-constraints">Refinement Element Structure Constraints</a></li>
 <li>derive: <a href="#relation-management-operations">Relation Management Operations</a></li>
-<li>derive: <a href="Validation.html#validate-relation-types">Validate Relation Types</a></li>
 <li>derive: <a href="../Output/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></li>
 <li>derivedFrom: <a href="StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a></li>
+<li>refinedBy: <a href="DesignDocuments/RelationTypes.html#relationtypes">RelationTypes</a></li>
+<li>refinedBy: <a href="Specifications.html#relation-types-and-behaviors-refinement-specification">Relation Types and behaviors Refinement Specification</a></li>
+<li>refinedBy: <a href="../../Refinements.html#relation-semantics-specification">Relation Semantics Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a></li>
+</ul>
+<hr />
+<h3 id="capability-model-structure">Capability Model Structure</h3>
+<p>The system shall support <code>capability</code> elements as product/capability roots that are specified by requirements.</p>
+<h4>Details</h4>
+<p>Capability model behavior shall follow the relation type and validation specifications.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#capability-collect-traversal">Capability Collect Traversal</a></li>
+<li>derive: <a href="#capability-coverage-rollup">Capability Coverage Rollup</a></li>
+<li>derive: <a href="#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>derivedFrom: <a href="#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>refinedBy: <a href="Specifications.html#capability-model-structure-specification">Capability Model Structure Specification</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#capability-element-relation-compatibility-test">Capability Element Relation Compatibility Test</a></li>
+</ul>
+<hr />
+<h3 id="capability-collect-traversal">Capability Collect Traversal</h3>
+<p>The system shall collect capability and requirement context using separate capability and requirement hierarchy traversal with the <code>specifiedBy</code>/<code>specify</code> bridge only where directionally intended.</p>
+<h4>Details</h4>
+<p>Collect traversal behavior shall follow the associated output specification.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#capability-model-structure">Capability Model Structure</a></li>
+<li>refinedBy: <a href="../Output/Specifications.html#capability-collect-traversal-specification">Capability Collect Traversal Specification</a></li>
+<li>verifiedBy: <a href="../Output/Verifications/ReportingVerifications.html#capability-collect-traversal-test">Capability Collect Traversal Test</a></li>
+</ul>
+<hr />
+<h3 id="capability-coverage-rollup">Capability Coverage Rollup</h3>
+<p>The system shall report capability verification and implementation coverage by rolling up coverage from requirements that specify each capability.</p>
+<h4>Details</h4>
+<p>Capability coverage shall remain separate from capability validation. Capability elements may be directly verified but are not directly satisfied.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#capability-model-structure">Capability Model Structure</a></li>
+<li>verifiedBy: <a href="../Output/Verifications/ReportingVerifications.html#capability-coverage-rollup-test">Capability Coverage Rollup Test</a></li>
+</ul>
+<hr />
+<h3 id="ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</h3>
+<p>The system shall support first-class <code>ontology</code> elements for reusable semantic vocabulary, requirement-owned <code>semantic-contract</code> refinement elements for obligation-specific SHACL shape profiles, and requirement-owned <code>semantic-query-contract</code> refinement elements for declarative semantic queries.</p>
+<h4>Details</h4>
+<p>Ontology elements shall define ontology vocabulary, model concepts, semantic categories, and reusable domain meaning. Authored Reqvire ontology elements shall be kept under the dedicated <code>requirements/Ontologies</code> folder rather than nested in capability files. Ontology-controlled vocabulary records shall carry formal semantics through IRI identity, typed class membership, hierarchy, and axioms; standard annotation properties such as <code>rdfs:label</code> and <code>rdfs:comment</code> may be used for optional presentation metadata, but canonical authored tokens, parser fields, interface enum values, report kinds, controlled-vocabulary payloads, and queryable meanings shall remain declared domain properties. Deprecated presentation-only ontology properties shall not remain in authored Reqvire ontology source after refactoring. Requirement-owned semantic contracts shall define SHACL shape profiles for one obligation and must not define ontology vocabulary. Requirement-owned semantic query contracts shall define graph queries over reachable semantic model context without query-kind classification, ontology vocabulary, or SHACL shape profiles.</p>
+<p>Capability elements attach ontology elements to make vocabulary reachable for the capability, descendant capabilities, and requirements that specify that capability context. Requirement elements must not attach ontology directly; they inherit ontology context through their owning capability path. Requirements may refine to source, semantic contracts, semantic query contracts, behavior, state, specification, constraint, and input-output refinements when they need subordinate detail or contracts over reachable ontology terms. Capabilities must not own source, constraint, behavior, specification, state, input-output, semantic-contract, or semantic-query-contract refinements through <code>refinedBy</code>/<code>refine</code>.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derive: <a href="#capability-element-semantic-contract">Capability Element Semantic Contract</a></li>
+<li>derive: <a href="#core-element-semantic-contract">Core Element Semantic Contract</a></li>
+<li>derive: <a href="#governance-metadata-semantic-contract">Governance Metadata Semantic Contract</a></li>
+<li>derive: <a href="#ontology-element-semantic-contract">Ontology Element Semantic Contract</a></li>
+<li>derive: <a href="#relation-model-semantic-contract">Relation Model Semantic Contract</a></li>
+<li>derive: <a href="#requirement-element-semantic-contract">Requirement Element Semantic Contract</a></li>
+<li>derive: <a href="#semantic-contract-element-semantic-contract">Semantic Contract Element Semantic Contract</a></li>
+<li>derive: <a href="#semantic-query-contract-element-semantic-contract">Semantic Query Contract Element Semantic Contract</a></li>
+<li>derive: <a href="Validation.html#semantic-contract-reference-context-validation">Semantic Contract Reference Context Validation</a></li>
+<li>derivedFrom: <a href="#capability-model-structure">Capability Model Structure</a></li>
+<li>refinedBy: <a href="../../Capabilities.html#defining-model-structure-source">Defining Model Structure Source</a></li>
+<li>refinedBy: <a href="Specifications.html#ontology-annotation-convention-specification">Ontology Annotation Convention Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#semantic-contract-structure-specification">Semantic Contract Structure Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#semantic-query-contract-structure-specification">Semantic Query Contract Structure Specification</a></li>
+<li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#ontology-and-contract-attachment-verification">Ontology and Contract Attachment Verification</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#semantic-contract-ontology-declaration-validation-test">Semantic Contract Ontology Declaration Validation Test</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#semantic-contract-ownership-validation-test">Semantic Contract Ownership Validation Test</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#semantic-contract-section-validation-test">Semantic Contract Section Validation Test</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#semantic-contract-shacl-sanity-validation-test">Semantic Contract SHACL Sanity Validation Test</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#semantic-query-contract-section-validation-test">Semantic Query Contract Section Validation Test</a></li>
+</ul>
+<hr />
+<h3 id="capability-element-semantic-contract">Capability Element Semantic Contract</h3>
+<p>The system shall define SHACL constraints for capability structure, capability hierarchy, ontology attachment, capability specification, direct capability verification, and forbidden capability satisfaction or refinement ownership edges.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>refinedBy: <a href="../../Capabilities/CapabilityRequirementModel.html#reqvire-capability-ontology-shape-profile">Reqvire Capability Ontology Shape Profile</a></li>
+</ul>
+<hr />
+<h3 id="core-element-semantic-contract">Core Element Semantic Contract</h3>
+<p>The system shall define SHACL constraints for shared Reqvire element identity, type, file location, and structural metadata.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>refinedBy: <a href="../../Capabilities.html#reqvire-core-element-ontology-shape-profile">Reqvire Core Element Ontology Shape Profile</a></li>
+</ul>
+<hr />
+<h3 id="governance-metadata-semantic-contract">Governance Metadata Semantic Contract</h3>
+<p>The system shall define SHACL constraints for governance metadata on capability and requirement elements and forbid governance metadata on non-governance elements.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>refinedBy: <a href="../../Capabilities/Governance.html#reqvire-governance-ontology-shape-profile">Reqvire Governance Ontology Shape Profile</a></li>
+</ul>
+<hr />
+<h3 id="ontology-element-semantic-contract">Ontology Element Semantic Contract</h3>
+<p>The system shall define SHACL constraints for ontology elements as vocabulary-bearing graph nodes that carry ontology text and do not own shapes, attachments, governance, verification, or satisfaction edges.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>refinedBy: <a href="../../Capabilities/CapabilityRequirementModel.html#reqvire-ontology-element-shape-profile">Reqvire Ontology Element Shape Profile</a></li>
+</ul>
+<hr />
+<h3 id="relation-model-semantic-contract">Relation Model Semantic Contract</h3>
+<p>The system shall define SHACL constraints for Reqvire relation usage, attachment usage, verification evidence relation usage, and relation-rule metadata.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>refinedBy: <a href="../../Capabilities/RelationsAndImpact.html#reqvire-relation-ontology-shape-profile">Reqvire Relation Ontology Shape Profile</a></li>
+</ul>
+<hr />
+<h3 id="requirement-element-semantic-contract">Requirement Element Semantic Contract</h3>
+<p>The system shall define SHACL constraints for requirement ownership, requirement hierarchy, capability specification, refinements, verification, and implementation satisfaction edges.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>refinedBy: <a href="../../Capabilities/CapabilityRequirementModel.html#reqvire-requirement-ontology-shape-profile">Reqvire Requirement Ontology Shape Profile</a></li>
+</ul>
+<hr />
+<h3 id="semantic-contract-element-semantic-contract">Semantic Contract Element Semantic Contract</h3>
+<p>The system shall define SHACL constraints for semantic-contract identity, shape content, and single requirement ownership.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>refinedBy: <a href="../../Capabilities/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology-shape-profile">Reqvire Semantic Contract Ontology Shape Profile</a></li>
+</ul>
+<hr />
+<h3 id="semantic-query-contract-element-semantic-contract">Semantic Query Contract Element Semantic Contract</h3>
+<p>The system shall define SHACL constraints for semantic-query-contract identity, query content, query language, and single requirement ownership.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>refinedBy: <a href="../../Capabilities/CapabilityRequirementModel.html#reqvire-semantic-query-contract-shape-profile">Reqvire Semantic Query Contract Shape Profile</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#semantic-query-contract-section-validation-test">Semantic Query Contract Section Validation Test</a></li>
 </ul>
 <hr />
 <h3 id="element-type-relation-compatibility">Element Type Relation Compatibility</h3>
@@ -846,28 +1446,21 @@
 <ul>
 <li>type: requirement</li>
 </ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../../Refinements.html#supported-element-types-specification">Supported Element Types Specification</a></li>
-</ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
 <li>derivedFrom: <a href="#relation-types-and-behaviors">Relation Types and behaviors</a></li>
-<li>satisfiedBy: <a href="Constraints.html#element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</a></li>
+<li>refinedBy: <a href="Constraints.html#element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</a></li>
+<li>refinedBy: <a href="../../Refinements.html#supported-element-types-specification">Supported Element Types Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/relation.rs">relation.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ValidationVerifications.html#capability-element-relation-compatibility-test">Capability Element Relation Compatibility Test</a></li>
 <li>verifiedBy: <a href="Verifications/ValidationVerifications.html#element-type-relation-compatibility-test">Element Type Relation Compatibility Test</a></li>
 </ul>
 <hr />
 <h3 id="refinement-element-structure-constraints">Refinement Element Structure Constraints</h3>
-<p>The system shall restrict Refinement elements (constraint, behavior, specification) to only allow <code>satisfy</code> relations.</p>
+<p>The system shall restrict Refinement elements (<code>source</code>, <code>semantic-contract</code>, <code>semantic-query-contract</code>, <code>constraint</code>, <code>behavior</code>, <code>specification</code>, <code>state</code>, <code>input-output</code>) to only allow <code>refine</code> relations.</p>
 <h4>Details</h4>
-<p>Refinement elements serve as detailed documentation that can be attached to other elements. Their relation usage is restricted because:</p>
-<ul>
-<li>They represent atomic pieces of information focused on documenting requirements</li>
-<li>They are primarily referenced through the Attachments subsection of other elements</li>
-<li>Their <code>satisfy</code> relation links back to the requirement they fulfill</li>
-</ul>
-<p>When a Refinement element contains relations other than <code>satisfy</code>, the validator shall report an error indicating that only <code>satisfy</code> relations are allowed for refinement types.</p>
+<p>Refinement relation validation shall enforce the subtype-compatible refinement vocabulary defined by the Reqvire capability, requirement, ontology, and semantic-contract model contracts.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -879,14 +1472,19 @@
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#attachment-scope-constraints">Attachment Scope Constraints</a></li>
+<li>derive: <a href="#custom-element-trace-semantic-contract">Custom Element Trace Semantic Contract</a></li>
+<li>derive: <a href="#refinement-subtype-semantic-contract">Refinement Subtype Semantic Contract</a></li>
 <li>derivedFrom: <a href="#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>refinedBy: <a href="Specifications.html#refinement-element-structure-constraints-refinement-specification">Refinement Element Structure Constraints Refinement Specification</a></li>
+<li>refinedBy: <a href="../../Refinements.html#refinement-specification">Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ParsingVerifications.html#refinement-element-type-parsing-test">Refinement Element Type Parsing Test</a></li>
 <li>verifiedBy: <a href="Verifications/ParsingVerifications.html#refinement-relations-rejection-test">Refinement Relations Rejection Test</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#requirement-governance-metadata-verification">Requirement Governance Metadata Verification</a></li>
 </ul>
 <hr />
 <h3 id="attachment-scope-constraints">Attachment Scope Constraints</h3>
-<p>The system shall enforce scope constraints on attachments (both refinement elements and file assets) to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.</p>
+<p>The system shall enforce scope constraints on refinement-element attachments to ensure proper cross-submodel traceability while preventing redundant or invalid attachment relationships.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -894,9 +1492,34 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#refinement-element-structure-constraints">Refinement Element Structure Constraints</a></li>
-<li>satisfiedBy: <a href="Constraints.html#attachment-hierarchical-independence-constraint">Attachment Hierarchical Independence Constraint</a></li>
-<li>satisfiedBy: <a href="Constraints.html#attachment-satisfied-refinement-constraint">Attachment Satisfied Refinement Constraint</a></li>
+<li>refinedBy: <a href="Constraints.html#attachment-hierarchical-independence-constraint">Attachment Hierarchical Independence Constraint</a></li>
+<li>refinedBy: <a href="Constraints.html#attachment-satisfied-refinement-constraint">Attachment Satisfied Refinement Constraint</a></li>
+<li>refinedBy: <a href="Constraints.html#attachment-subgraph-direction-constraint">Attachment Subgraph Direction Constraint</a></li>
 <li>verifiedBy: <a href="Verifications/AttachmentsVerifications.html#attachment-scope-constraints-test">Attachment Scope Constraints Test</a></li>
+</ul>
+<hr />
+<h3 id="custom-element-trace-semantic-contract">Custom Element Trace Semantic Contract</h3>
+<p>The system shall define SHACL constraints for custom <code>other-*</code> element types as trace-only extension nodes.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#refinement-element-structure-constraints">Refinement Element Structure Constraints</a></li>
+<li>refinedBy: <a href="../../Capabilities/CapabilityRequirementModel.html#reqvire-custom-element-trace-shape-profile">Reqvire Custom Element Trace Shape Profile</a></li>
+</ul>
+<hr />
+<h3 id="refinement-subtype-semantic-contract">Refinement Subtype Semantic Contract</h3>
+<p>The system shall define SHACL constraints for concrete refinement subtype ownership and allowed refinement traceability.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#refinement-element-structure-constraints">Refinement Element Structure Constraints</a></li>
+<li>refinedBy: <a href="../../Capabilities/CapabilityRequirementModel.html#reqvire-refinement-subtype-shape-profile">Reqvire Refinement Subtype Shape Profile</a></li>
 </ul>
 <hr />
 <h3 id="relation-management-operations">Relation Management Operations</h3>
@@ -926,11 +1549,34 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+<li>refinedBy: <a href="../Operations/Specifications.html#relation-operations-specification">Relation Operations Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/crud.rs">crud.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
-<li>satisfiedBy: <a href="../Operations/Specifications.html#relation-operations-specification">Relation Operations Specification</a></li>
 <li>verifiedBy: <a href="../Operations/Verifications/ElementManipulationVerifications.html#link-command-verification">Link Command Verification</a></li>
 <li>verifiedBy: <a href="../Operations/Verifications/ElementManipulationVerifications.html#unlink-command-verification">Unlink Command Verification</a></li>
+</ul>
+<hr />
+<h3 id="requirement-governance-metadata">Requirement Governance Metadata</h3>
+<p>The system shall support governance metadata for requirement elements, including status, priority, risk, and owner, with effective values resolved from authored metadata, hierarchy inheritance, and defaults.</p>
+<h4>Details</h4>
+<p>Governance metadata behavior shall follow the associated refinement specifications.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#requirement-governance-metadata-specification">Requirement Governance Metadata Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refinedBy: <a href="Behaviors.html#requirement-governance-metadata-inheritance-behavior">Requirement Governance Metadata Inheritance Behavior</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/graph_registry.rs">graph_registry.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/search.rs">search.rs</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#operating-on-model-elements">Operating on Model Elements</a></li>
+<li>verifiedBy: <a href="Verifications/ParsingVerifications.html#requirement-governance-metadata-verification">Requirement Governance Metadata Verification</a></li>
+<li>verifiedBy: <a href="../Operations/Verifications/FormattingVerifications.html#requirement-governance-metadata-formatting-verification">Requirement Governance Metadata Formatting Verification</a></li>
 </ul>
 <hr />
 <h3 id="template-based-model-bootstrapping">Template-Based Model Bootstrapping</h3>
@@ -950,11 +1596,11 @@
 <p>The system discovers all available templates in the repository and allows the user to select which template to apply.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derivedFrom: <a href="../../UserStories.html#operating-on-model-elements">Operating on Model Elements</a></li>
+<li>specify: <a href="../../Capabilities/BehaviorValidationOperations.html#operating-on-model-elements">Operating on Model Elements</a></li>
 </ul>
 <hr />
 <h3 id="verification-type-categories">Verification Type Categories</h3>
@@ -970,7 +1616,7 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-<li>satisfiedBy: <a href="Specifications.html#verification-type-selection-guidelines">Verification Type Selection Guidelines</a></li>
+<li>refinedBy: <a href="Specifications.html#verification-type-selection-guidelines">Verification Type Selection Guidelines</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -1019,7 +1665,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -1028,10 +1675,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -1044,7 +1694,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -1062,6 +1712,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1454,9 +2109,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

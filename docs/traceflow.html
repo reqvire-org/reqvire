@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -395,7 +493,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -404,10 +503,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -420,7 +522,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -438,6 +540,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -830,11 +937,11 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="index.html" class="nav-logo flex items-center pr-4"><img src="assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="index.html" class="nav-link">Containment</a><a href="model.html" class="nav-link">Model</a><a href="traces.html" class="nav-link">Traces</a><a href="traceflow.html" class="nav-link">TraceFlow</a><a href="coverage.html" class="nav-link">Coverage</a><a href="resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="index.html" class="mobile-nav-link">Containment</a><a href="model.html" class="mobile-nav-link">Model</a><a href="traces.html" class="mobile-nav-link">Traces</a><a href="traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="coverage.html" class="mobile-nav-link">Coverage</a><a href="resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="traceflow">TraceFlow</h1>
-<p>The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from stakeholder needs (user requirements) through system specifications (system requirements) to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.</p>
+</script></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="index.html" class="nav-logo flex items-center pr-4"><img src="assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="index.html" class="nav-link">Containment</a><a href="model.html" class="nav-link">Model</a><a href="traces.html" class="nav-link">Traces</a><a href="ontologies.html" class="nav-link">Ontologies</a><a href="knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="traceflow">TraceFlow</h1>
+<p>The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from capability-level product capabilities through system requirements to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.</p>
 <p><strong>Instructions:</strong> Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control.</p>
 <p>
-<div class="d3-sankey-container" id="d3sankey_6153941ae2a0">
+<div class="d3-sankey-container" id="d3sankey_5f11ceadaaa0">
     <svg class="d3-sankey-svg"></svg>
 </div>
 <script src="https://d3js.org/d3.v7.min.js"></script>
@@ -854,19 +961,14 @@ window.addEventListener('resize', function() {
       "link": "requirements/Interfaces/CLI/Commands.md#attachment-commands"
     },
     {
-      "name": "Reserved Subsections Support",
+      "name": "CLI Interface Structure",
       "type": "requirement",
-      "link": "requirements/Functional/Core/StructureAndParsing.md#reserved-subsections-support"
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-interface-structure"
     },
     {
-      "name": "Structure and Addressing in Markdown Documents",
+      "name": "CLI interface",
       "type": "requirement",
-      "link": "requirements/Functional/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents"
-    },
-    {
-      "name": "Defining Model Structure",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#defining-model-structure"
+      "link": "requirements/Interfaces/Interfaces.md#cli-interface"
     },
     {
       "name": "Attachment Identifier CRUD Verification",
@@ -880,18 +982,23 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Element Manipulation Operations",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Core/ModelManagement.md#element-manipulation-operations"
-    },
-    {
-      "name": "Operating on Model Elements",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#operating-on-model-elements"
     },
     {
       "name": "Attachment Output Rendering Verification",
       "type": "verification",
       "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachment-output-rendering-verification"
+    },
+    {
+      "name": "Reserved Subsections Support",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/StructureAndParsing.md#reserved-subsections-support"
+    },
+    {
+      "name": "Structure and Addressing in Markdown Documents",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/StructureAndParsing.md#structure-and-addressing-in-markdown-documents"
     },
     {
       "name": "Attachment Scope Constraints Test",
@@ -935,13 +1042,8 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Validate Internal Consistency",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Core/Validation.md#validate-internal-consistency"
-    },
-    {
-      "name": "Validating Structures",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#validating-structures"
     },
     {
       "name": "Attachment Search Filters Verification",
@@ -952,21 +1054,6 @@ window.addEventListener('resize', function() {
       "name": "CLI Search Command",
       "type": "requirement",
       "link": "requirements/Interfaces/CLI/Commands.md#cli-search-command"
-    },
-    {
-      "name": "CLI Interface Structure",
-      "type": "requirement",
-      "link": "requirements/Interfaces/CLI/Commands.md#cli-interface-structure"
-    },
-    {
-      "name": "CLI interface",
-      "type": "user-requirement",
-      "link": "requirements/Interfaces/Interfaces.md#cli-interface"
-    },
-    {
-      "name": "System Model Interfaces",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#system-model-interfaces"
     },
     {
       "name": "Attachments Change Impact Verification",
@@ -980,13 +1067,8 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Tracing Structural Changes",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Output/Reporting.md#tracing-structural-changes"
-    },
-    {
-      "name": "Trace Changes in System Model",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#trace-changes-in-system-model"
     },
     {
       "name": "Attachments Subsection Parsing Verification",
@@ -1014,6 +1096,21 @@ window.addEventListener('resize', function() {
       "link": "requirements/Interfaces/CLI/Commands.md#cli-move-asset-command"
     },
     {
+      "name": "Ontology and Contract Attachment Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#ontology-and-contract-attachment-verification"
+    },
+    {
+      "name": "Ontology and Semantic Contract Model",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#ontology-and-semantic-contract-model"
+    },
+    {
+      "name": "Capability Model Structure",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#capability-model-structure"
+    },
+    {
       "name": "Remove Asset Command Verification",
       "type": "verification",
       "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.md#remove-asset-command-verification"
@@ -1024,13 +1121,28 @@ window.addEventListener('resize', function() {
       "link": "requirements/Interfaces/CLI/Commands.md#cli-remove-asset-command"
     },
     {
+      "name": "Element Size Estimate Model Build Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#element-size-estimate-model-build-verification"
+    },
+    {
+      "name": "Opt-In Element Size Estimate Model Build",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#opt-in-element-size-estimate-model-build"
+    },
+    {
+      "name": "Efficient Processing",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#efficient-processing"
+    },
+    {
       "name": "Element Subsection Parsing Test",
       "type": "verification",
       "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#element-subsection-parsing-test"
     },
     {
       "name": "Default Requirement Type Assignment",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Core/ModelManagement.md#default-requirement-type-assignment"
     },
     {
@@ -1054,6 +1166,16 @@ window.addEventListener('resize', function() {
       "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#refinement-relations-rejection-test"
     },
     {
+      "name": "Requirement Governance Metadata Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#requirement-governance-metadata-verification"
+    },
+    {
+      "name": "Requirement Governance Metadata",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#requirement-governance-metadata"
+    },
+    {
       "name": "Specification File Identification Test",
       "type": "verification",
       "link": "requirements/Functional/Core/Verifications/ParsingVerifications.md#specification-file-identification-test"
@@ -1062,6 +1184,16 @@ window.addEventListener('resize', function() {
       "name": "Specification File Identification",
       "type": "requirement",
       "link": "requirements/Functional/Core/StructureAndParsing.md#specification-file-identification"
+    },
+    {
+      "name": "Capability Element Relation Compatibility Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#capability-element-relation-compatibility-test"
+    },
+    {
+      "name": "Element Type Relation Compatibility",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#element-type-relation-compatibility"
     },
     {
       "name": "Cross-Section Duplicate Validation Test",
@@ -1084,14 +1216,9 @@ window.addEventListener('resize', function() {
       "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#default-element-type-assignment-test"
     },
     {
-      "name": "Element Type Relation Compatibility Test",
+      "name": "Document Refinement Validation Test",
       "type": "verification",
-      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#element-type-relation-compatibility-test"
-    },
-    {
-      "name": "Element Type Relation Compatibility",
-      "type": "requirement",
-      "link": "requirements/Functional/Core/ModelManagement.md#element-type-relation-compatibility"
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#document-refinement-validation-test"
     },
     {
       "name": "Relation Element Type Validator",
@@ -1100,8 +1227,13 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Validate Relation Types",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Core/Validation.md#validate-relation-types"
+    },
+    {
+      "name": "Element Type Relation Compatibility Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#element-type-relation-compatibility-test"
     },
     {
       "name": "File Exclusion Test",
@@ -1120,13 +1252,8 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Coexistence of Structured and Unstructured Documents",
-      "type": "user-requirement",
-      "link": "requirements/Functional/Core/Configuration.md#coexistence-of-structured-and-unstructured-documents"
-    },
-    {
-      "name": "Reserved Repository Files Exclusion",
       "type": "requirement",
-      "link": "requirements/Functional/Core/Configuration.md#reserved-repository-files-exclusion"
+      "link": "requirements/Functional/Core/Configuration.md#coexistence-of-structured-and-unstructured-documents"
     },
     {
       "name": "Invalid Header Structure Test",
@@ -1140,7 +1267,7 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Validate Markdown Structure",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Core/Validation.md#validate-markdown-structure"
     },
     {
@@ -1155,18 +1282,13 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Validate Cross-Component Dependencies",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Core/Validation.md#validate-cross-component-dependencies"
     },
     {
       "name": "Relation Type Validation",
       "type": "requirement",
       "link": "requirements/Functional/Core/Validation.md#relation-type-validation"
-    },
-    {
-      "name": "Enhanced Validation Error Reporting",
-      "type": "user-requirement",
-      "link": "requirements/Functional/Core/Validation.md#enhanced-validation-error-reporting"
     },
     {
       "name": "Validation Error Handling",
@@ -1209,13 +1331,58 @@ window.addEventListener('resize', function() {
       "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#same-file-fragment-relations-test"
     },
     {
+      "name": "Semantic Contract Ontology Declaration Validation Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#semantic-contract-ontology-declaration-validation-test"
+    },
+    {
+      "name": "Semantic Contract Ownership Validation Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#semantic-contract-ownership-validation-test"
+    },
+    {
+      "name": "Semantic Contract SHACL Sanity Validation Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#semantic-contract-shacl-sanity-validation-test"
+    },
+    {
+      "name": "Semantic Contract Reference Context Validation",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/Validation.md#semantic-contract-reference-context-validation"
+    },
+    {
+      "name": "Semantic Contract Section Validation Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#semantic-contract-section-validation-test"
+    },
+    {
+      "name": "Semantic Query Contract Section Validation Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#semantic-query-contract-section-validation-test"
+    },
+    {
+      "name": "Semantic Query Contract Element Semantic Contract",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#semantic-query-contract-element-semantic-contract"
+    },
+    {
+      "name": "Single Root Hierarchy Ownership Validation Test",
+      "type": "verification",
+      "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#single-root-hierarchy-ownership-validation-test"
+    },
+    {
+      "name": "Single Root Hierarchy Ownership",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/Validation.md#single-root-hierarchy-ownership"
+    },
+    {
       "name": "Subdirectory Processing Verification",
       "type": "verification",
       "link": "requirements/Functional/Core/Verifications/ValidationVerifications.md#subdirectory-processing-verification"
     },
     {
       "name": "Git Repository as Project Root",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Core/ModelManagement.md#git-repository-as-project-root"
     },
     {
@@ -1274,6 +1441,21 @@ window.addEventListener('resize', function() {
       "link": "requirements/Interfaces/CLI/Commands.md#detailed-error-handling-and-logging"
     },
     {
+      "name": "Atomic Relation Relink Test",
+      "type": "verification",
+      "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#atomic-relation-relink-test"
+    },
+    {
+      "name": "Atomic Relation Relink Operation",
+      "type": "requirement",
+      "link": "requirements/Functional/Operations/ElementManipulation.md#atomic-relation-relink-operation"
+    },
+    {
+      "name": "CLI Relink Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-relink-command"
+    },
+    {
       "name": "CLI Add Element Test",
       "type": "verification",
       "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-add-element-test"
@@ -1327,6 +1509,11 @@ window.addEventListener('resize', function() {
       "name": "Delete Element Test",
       "type": "verification",
       "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#delete-element-test"
+    },
+    {
+      "name": "CRUD Semantic Contract Mutation Validation",
+      "type": "requirement",
+      "link": "requirements/Functional/Operations/ElementManipulation.md#crud-semantic-contract-mutation-validation"
     },
     {
       "name": "Delete Element Operation",
@@ -1434,16 +1621,6 @@ window.addEventListener('resize', function() {
       "link": "requirements/Functional/Operations/Formatting.md#format-consistency-enforcement"
     },
     {
-      "name": "Model Formatting",
-      "type": "user-requirement",
-      "link": "requirements/Functional/Operations/Formatting.md#model-formatting"
-    },
-    {
-      "name": "Formatting Model Documents",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#formatting-model-documents"
-    },
-    {
       "name": "Format Command",
       "type": "requirement",
       "link": "requirements/Interfaces/CLI/Commands.md#format-command"
@@ -1460,7 +1637,7 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Git-Style Diff Output for Format",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Operations/Formatting.md#git-style-diff-output-for-format"
     },
     {
@@ -1504,24 +1681,29 @@ window.addEventListener('resize', function() {
       "link": "requirements/Functional/Operations/Formatting.md#relation-ordering-normalization"
     },
     {
+      "name": "Requirement Governance Metadata Formatting Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.md#requirement-governance-metadata-formatting-verification"
+    },
+    {
       "name": "Lint Command Verification",
       "type": "verification",
       "link": "requirements/Functional/Operations/Verifications/LintingVerifications.md#lint-command-verification"
     },
     {
-      "name": "Lint Auto-fix Capability",
+      "name": "Cross-Submodel Hierarchical Relation Detection",
       "type": "requirement",
-      "link": "requirements/Functional/Operations/Linting.md#lint-auto-fix-capability"
+      "link": "requirements/Functional/Operations/Linting.md#cross-submodel-hierarchical-relation-detection"
     },
     {
       "name": "Model Linting",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Operations/Linting.md#model-linting"
     },
     {
-      "name": "Linting Model Quality",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#linting-model-quality"
+      "name": "Lint Auto-fix Capability",
+      "type": "requirement",
+      "link": "requirements/Functional/Operations/Linting.md#lint-auto-fix-capability"
     },
     {
       "name": "Multi-Branch Convergence Detection",
@@ -1550,23 +1732,8 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Automate Documentation Export",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Integration/GitHubIntegration.md#automate-documentation-export"
-    },
-    {
-      "name": "Integrate with GitHub Workflows",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#integrate-with-github-workflows"
-    },
-    {
-      "name": "Promote Automation and Efficiency",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#promote-automation-and-efficiency"
-    },
-    {
-      "name": "Automate Pull Request Validations",
-      "type": "user-requirement",
-      "link": "requirements/Functional/Integration/GitHubIntegration.md#automate-pull-request-validations"
     },
     {
       "name": "Diagram Generation Test",
@@ -1580,23 +1747,13 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Interactive Mermaid Diagrams",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Output/DiagramGeneration.md#interactive-mermaid-diagrams"
     },
     {
       "name": "Model Reports",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Output/Reporting.md#model-reports"
-    },
-    {
-      "name": "Provide Reports",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#provide-reports"
-    },
-    {
-      "name": "Generate Diagrams",
-      "type": "user-requirement",
-      "link": "requirements/UserStories.md#generate-diagrams"
     },
     {
       "name": "Diagram Relation Filtering Verification",
@@ -1629,19 +1786,104 @@ window.addEventListener('resize', function() {
       "link": "requirements/Interfaces/CLI/Commands.md#cli-collect-command"
     },
     {
+      "name": "CLI JSON File Output Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#cli-json-file-output-test"
+    },
+    {
+      "name": "CLI JSON File Output Option",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-json-file-output-option"
+    },
+    {
+      "name": "Capability Collect Traversal Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#capability-collect-traversal-test"
+    },
+    {
+      "name": "Capability Collect Traversal",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#capability-collect-traversal"
+    },
+    {
+      "name": "Capability Coverage Rollup Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#capability-coverage-rollup-test"
+    },
+    {
+      "name": "Capability Coverage Rollup",
+      "type": "requirement",
+      "link": "requirements/Functional/Core/ModelManagement.md#capability-coverage-rollup"
+    },
+    {
+      "name": "Containment Hierarchy Extraction Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#containment-hierarchy-extraction-test"
+    },
+    {
+      "name": "Containment View Report",
+      "type": "requirement",
+      "link": "requirements/Functional/Output/Reporting.md#containment-view-report"
+    },
+    {
+      "name": "Model Structure and Summaries",
+      "type": "requirement",
+      "link": "requirements/Functional/Output/Reporting.md#model-structure-and-summaries"
+    },
+    {
       "name": "Containment View Design Documents Test",
       "type": "verification",
       "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#containment-view-design-documents-test"
     },
     {
-      "name": "Containment View Report",
-      "type": "user-requirement",
-      "link": "requirements/Functional/Output/Reporting.md#containment-view-report"
+      "name": "Containment View JSON Output Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#containment-view-json-output-test"
     },
     {
-      "name": "Model Structure and Summaries",
-      "type": "user-requirement",
-      "link": "requirements/Functional/Output/Reporting.md#model-structure-and-summaries"
+      "name": "Containment View Mermaid Diagram Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#containment-view-mermaid-diagram-test"
+    },
+    {
+      "name": "Containment View Text Output Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#containment-view-text-output-test"
+    },
+    {
+      "name": "Custom Element Type Tracking Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#custom-element-type-tracking-test"
+    },
+    {
+      "name": "Search Report Generator",
+      "type": "requirement",
+      "link": "requirements/Functional/Output/Reporting.md#search-report-generator"
+    },
+    {
+      "name": "HTML Export Containment View Integration Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#html-export-containment-view-integration-test"
+    },
+    {
+      "name": "HTML Export",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Capabilities.md#html-export"
+    },
+    {
+      "name": "Web Interface",
+      "type": "requirement",
+      "link": "requirements/Interfaces/Interfaces.md#web-interface"
+    },
+    {
+      "name": "JSON Element Size Estimate Output Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#json-element-size-estimate-output-verification"
+    },
+    {
+      "name": "JSON Element Size Estimate Exposure",
+      "type": "requirement",
+      "link": "requirements/Functional/Output/Reporting.md#json-element-size-estimate-exposure"
     },
     {
       "name": "Model Command Verification",
@@ -1659,6 +1901,11 @@ window.addEventListener('resize', function() {
       "link": "requirements/Functional/Output/Reporting.md#model-diagram-output-formats"
     },
     {
+      "name": "CLI Model Diagram Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-model-diagram-command"
+    },
+    {
       "name": "Multi-Type Search Filter Test",
       "type": "verification",
       "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#multi-type-search-filter-test"
@@ -1670,13 +1917,8 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Flexible Search Type Filtering",
-      "type": "user-requirement",
-      "link": "requirements/Functional/Output/Reporting.md#flexible-search-type-filtering"
-    },
-    {
-      "name": "Search Report Generator",
       "type": "requirement",
-      "link": "requirements/Functional/Output/Reporting.md#search-report-generator"
+      "link": "requirements/Functional/Output/Reporting.md#flexible-search-type-filtering"
     },
     {
       "name": "Resources Report Verification",
@@ -1685,7 +1927,7 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Resources Report",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Output/Reporting.md#resources-report"
     },
     {
@@ -1709,6 +1951,16 @@ window.addEventListener('resize', function() {
       "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#search-command-tests"
     },
     {
+      "name": "Semantic Contract Search JSON Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#semantic-contract-search-json-test"
+    },
+    {
+      "name": "Semantic Query Contract Search JSON Test",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#semantic-query-contract-search-json-test"
+    },
+    {
       "name": "Start Type Filter Test",
       "type": "verification",
       "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#start-type-filter-test"
@@ -1717,6 +1969,21 @@ window.addEventListener('resize', function() {
       "name": "Start Element Type Filtering",
       "type": "requirement",
       "link": "requirements/Functional/Output/Reporting.md#start-element-type-filtering"
+    },
+    {
+      "name": "Submodels Report Verification",
+      "type": "verification",
+      "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#submodels-report-verification"
+    },
+    {
+      "name": "Requirement Submodels Report",
+      "type": "requirement",
+      "link": "requirements/Functional/Output/Reporting.md#requirement-submodels-report"
+    },
+    {
+      "name": "CLI Submodels Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-submodels-command"
     },
     {
       "name": "TraceFlow View Test",
@@ -1730,7 +1997,7 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Verification Coverage Report",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Functional/Output/Reporting.md#verification-coverage-report"
     },
     {
@@ -1759,6 +2026,16 @@ window.addEventListener('resize', function() {
       "link": "requirements/Functional/Output/Verifications/ReportingVerifications.md#verification-traces-from-folder-test"
     },
     {
+      "name": "Capability Ontology and Semantic Contract Change Impact Test",
+      "type": "verification",
+      "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#capability-ontology-and-semantic-contract-change-impact-test"
+    },
+    {
+      "name": "Requirements Change Propagation",
+      "type": "requirement",
+      "link": "requirements/Functional/Processing/ChangeImpact.md#requirements-change-propagation"
+    },
+    {
       "name": "Change Impact Analysis Verification",
       "type": "verification",
       "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-analysis-verification"
@@ -1774,11 +2051,6 @@ window.addEventListener('resize', function() {
       "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-detection-test"
     },
     {
-      "name": "Requirements Change Propagation",
-      "type": "requirement",
-      "link": "requirements/Functional/Processing/ChangeImpact.md#requirements-change-propagation"
-    },
-    {
       "name": "Change Impact Relations Test",
       "type": "verification",
       "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#change-impact-relations-test"
@@ -1792,6 +2064,11 @@ window.addEventListener('resize', function() {
       "name": "Element Content Extraction Test",
       "type": "verification",
       "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#element-content-extraction-test"
+    },
+    {
+      "name": "Impact Scope Summary Test",
+      "type": "verification",
+      "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.md#impact-scope-summary-test"
     },
     {
       "name": "Structural Change Reports Verification",
@@ -1814,14 +2091,44 @@ window.addEventListener('resize', function() {
       "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.md#cli-help-structure-verification"
     },
     {
-      "name": "HTML Export",
+      "name": "CLI Ontologies Command",
       "type": "requirement",
-      "link": "requirements/Interfaces/WebInterface/Capabilities.md#html-export"
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-ontologies-command"
     },
     {
-      "name": "Web Interface",
-      "type": "user-requirement",
-      "link": "requirements/Interfaces/Interfaces.md#web-interface"
+      "name": "CLI Ontologies Command Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.md#cli-ontologies-command-verification"
+    },
+    {
+      "name": "Ontology and Shapes Collection",
+      "type": "requirement",
+      "link": "requirements/Functional/Output/Reporting.md#ontology-and-shapes-collection"
+    },
+    {
+      "name": "Ontology Projection Subgraph Materialization",
+      "type": "requirement",
+      "link": "requirements/Functional/Output/Reporting.md#ontology-projection-subgraph-materialization"
+    },
+    {
+      "name": "CLI Size Estimate JSON Option Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.md#cli-size-estimate-json-option-verification"
+    },
+    {
+      "name": "CLI Size Estimate JSON Option",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#cli-size-estimate-json-option"
+    },
+    {
+      "name": "Explicit Workspace Selection Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.md#explicit-workspace-selection-verification"
+    },
+    {
+      "name": "Explicit Workspace Selection",
+      "type": "requirement",
+      "link": "requirements/Interfaces/CLI/Commands.md#explicit-workspace-selection"
     },
     {
       "name": "Verification Traces Element Navigation Test",
@@ -1832,6 +2139,206 @@ window.addEventListener('resize', function() {
       "name": "Verification Traces Element Navigation",
       "type": "requirement",
       "link": "requirements/Interfaces/CLI/Commands.md#verification-traces-element-navigation"
+    },
+    {
+      "name": "MCP Access Control Baseline Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-access-control-baseline-verification"
+    },
+    {
+      "name": "MCP Access Control Baseline",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-access-control-baseline"
+    },
+    {
+      "name": "MCP Interface",
+      "type": "requirement",
+      "link": "requirements/Interfaces/Interfaces.md#mcp-interface"
+    },
+    {
+      "name": "MCP Contract Layer Boundary Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-contract-layer-boundary-verification"
+    },
+    {
+      "name": "MCP Adapter Boundary",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-adapter-boundary"
+    },
+    {
+      "name": "MCP Contract Versioning Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-contract-versioning-verification"
+    },
+    {
+      "name": "MCP Compatibility Versioning",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-compatibility-versioning"
+    },
+    {
+      "name": "MCP HTTP Transport End-to-End Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-http-transport-end-to-end-verification"
+    },
+    {
+      "name": "MCP Mutation Concurrency Control",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-mutation-concurrency-control"
+    },
+    {
+      "name": "MCP Streamable HTTP Transport",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-streamable-http-transport"
+    },
+    {
+      "name": "MCP Streamable HTTP Transport Safety",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-streamable-http-transport-safety"
+    },
+    {
+      "name": "MCP Model Evidence Tools Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-model-evidence-tools-verification"
+    },
+    {
+      "name": "MCP Model Evidence Tools",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-model-evidence-tools"
+    },
+    {
+      "name": "MCP Mutation Execution Flow Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-mutation-execution-flow-verification"
+    },
+    {
+      "name": "MCP Mutation Execution Flow",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-mutation-execution-flow"
+    },
+    {
+      "name": "MCP Mutation Tool Safety Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-mutation-tool-safety-verification"
+    },
+    {
+      "name": "MCP Mutation Tool Safety",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-mutation-tool-safety"
+    },
+    {
+      "name": "MCP Protocol Standard Conformance Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-protocol-standard-conformance-verification"
+    },
+    {
+      "name": "MCP Protocol Standard Conformance",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-protocol-standard-conformance"
+    },
+    {
+      "name": "MCP Quality Traceability Tools Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-quality-traceability-tools-verification"
+    },
+    {
+      "name": "MCP Quality Traceability Tools",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-quality-traceability-tools"
+    },
+    {
+      "name": "MCP Resource Interface Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-resource-interface-verification"
+    },
+    {
+      "name": "MCP Resource Interface",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-resource-interface"
+    },
+    {
+      "name": "MCP Server Command Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-server-command-verification"
+    },
+    {
+      "name": "MCP Server Command",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-server-command"
+    },
+    {
+      "name": "MCP Server End-to-End Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-server-end-to-end-verification"
+    },
+    {
+      "name": "MCP Shared Operation Interfaces",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-shared-operation-interfaces"
+    },
+    {
+      "name": "MCP Structured Payload Interfaces",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-structured-payload-interfaces"
+    },
+    {
+      "name": "MCP Tool Exposure Scope",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-tool-exposure-scope"
+    },
+    {
+      "name": "MCP Tool Side Effect Classification",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-tool-side-effect-classification"
+    },
+    {
+      "name": "MCP Workspace Session Tools",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-workspace-session-tools"
+    },
+    {
+      "name": "MCP Server State and Cache Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-server-state-and-cache-verification"
+    },
+    {
+      "name": "MCP Server State and Cache",
+      "type": "requirement",
+      "link": "requirements/Interfaces/MCP/Tools.md#mcp-server-state-and-cache"
+    },
+    {
+      "name": "MCP Shared Operation Contracts Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-shared-operation-contracts-verification"
+    },
+    {
+      "name": "MCP Size Estimate Startup Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-size-estimate-startup-verification"
+    },
+    {
+      "name": "MCP Structured Payload Contracts Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-structured-payload-contracts-verification"
+    },
+    {
+      "name": "MCP Tool Call Contracts Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-tool-call-contracts-verification"
+    },
+    {
+      "name": "MCP Tool Exposure Scope Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-tool-exposure-scope-verification"
+    },
+    {
+      "name": "MCP Tool Side Effect Classification Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-tool-side-effect-classification-verification"
+    },
+    {
+      "name": "MCP Workspace Session Tools Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.md#mcp-workspace-session-tools-verification"
     },
     {
       "name": "Component Reuse Verification",
@@ -1845,7 +2352,7 @@ window.addEventListener('resize', function() {
     },
     {
       "name": "Mobile-Friendly Documentation",
-      "type": "user-requirement",
+      "type": "requirement",
       "link": "requirements/Interfaces/WebInterface/HTMLGeneration.md#mobile-friendly-documentation"
     },
     {
@@ -1862,6 +2369,11 @@ window.addEventListener('resize', function() {
       "name": "Integration Test Verification",
       "type": "verification",
       "link": "requirements/Interfaces/WebInterface/Verifications/HTMLGenerationVerifications.md#integration-test-verification"
+    },
+    {
+      "name": "Project Knowledge Graph View",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Capabilities.md#project-knowledge-graph-view"
     },
     {
       "name": "Responsive HTML Generation",
@@ -1914,6 +2426,16 @@ window.addEventListener('resize', function() {
       "link": "requirements/Interfaces/WebInterface/Capabilities.md#diagram-attachment-display"
     },
     {
+      "name": "HTML Export Local Linked Files Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#html-export-local-linked-files-verification"
+    },
+    {
+      "name": "Local Linked File Export",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Capabilities.md#local-linked-file-export"
+    },
+    {
       "name": "HTML Export Verification",
       "type": "verification",
       "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#html-export-verification"
@@ -1934,6 +2456,36 @@ window.addEventListener('resize', function() {
       "link": "requirements/Interfaces/WebInterface/Capabilities.md#model-centric-view-generation"
     },
     {
+      "name": "Ontology Model Viewer Analysis Verification",
+      "type": "verification",
+      "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification"
+    },
+    {
+      "name": "Ontologies View Generation",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Capabilities.md#ontologies-view-generation"
+    },
+    {
+      "name": "Ontology Construct Grouping",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Capabilities.md#ontology-construct-grouping"
+    },
+    {
+      "name": "Ontology Property-Centric Visualization",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Capabilities.md#ontology-property-centric-visualization"
+    },
+    {
+      "name": "Ontology Symbol and Badge Vocabulary",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Capabilities.md#ontology-symbol-and-badge-vocabulary"
+    },
+    {
+      "name": "OWL Semantic Ontology Projection",
+      "type": "requirement",
+      "link": "requirements/Interfaces/WebInterface/Capabilities.md#owl-semantic-ontology-projection"
+    },
+    {
       "name": "Serve Command Verification",
       "type": "verification",
       "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.md#serve-command-verification"
@@ -1951,13 +2503,8 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Reserved Subsections Support",
+      "source": "CLI Interface Structure",
       "target": "Attachment Commands",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
@@ -2011,16 +2558,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Reserved Subsections Support",
-      "value": 1
-    },
-    {
-      "source": "Validating Structures",
-      "target": "Validate Internal Consistency",
-      "value": 1
-    },
-    {
       "source": "CLI Search Command",
       "target": "Attachment Search Filters Verification",
       "value": 1
@@ -2031,23 +2568,8 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Change Impact Detection",
       "target": "Attachments Change Impact Verification",
-      "value": 1
-    },
-    {
-      "source": "Element Identity Model",
-      "target": "Change Impact Detection",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
@@ -2101,13 +2623,8 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Reserved Subsections Support",
+      "source": "CLI Interface Structure",
       "target": "Attachment Commands",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
@@ -2121,8 +2638,43 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
+      "source": "Ontology and Semantic Contract Model",
+      "target": "Ontology and Contract Attachment Verification",
+      "value": 1
+    },
+    {
+      "source": "Capability Model Structure",
+      "target": "Ontology and Semantic Contract Model",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Attachment Scope Validation",
+      "target": "Ontology and Contract Attachment Verification",
+      "value": 1
+    },
+    {
+      "source": "Attachment Target Validation",
+      "target": "Attachment Scope Validation",
+      "value": 1
+    },
+    {
+      "source": "Attachment Target Validation",
+      "target": "Ontology and Contract Attachment Verification",
+      "value": 1
+    },
+    {
+      "source": "Validate Internal Consistency",
+      "target": "Attachment Target Validation",
       "value": 1
     },
     {
@@ -2136,18 +2688,18 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
+      "source": "Opt-In Element Size Estimate Model Build",
+      "target": "Element Size Estimate Model Build Verification",
+      "value": 1
+    },
+    {
+      "source": "Efficient Processing",
+      "target": "Opt-In Element Size Estimate Model Build",
       "value": 1
     },
     {
       "source": "Default Requirement Type Assignment",
       "target": "Element Subsection Parsing Test",
-      "value": 1
-    },
-    {
-      "source": "Operating on Model Elements",
-      "target": "Default Requirement Type Assignment",
       "value": 1
     },
     {
@@ -2211,11 +2763,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
       "source": "Refinement Element Structure Constraints",
       "target": "Refinement Relations Rejection Test",
       "value": 1
@@ -2231,8 +2778,23 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
+      "source": "Refinement Element Structure Constraints",
+      "target": "Requirement Governance Metadata Verification",
+      "value": 1
+    },
+    {
+      "source": "Relation Types and behaviors",
+      "target": "Refinement Element Structure Constraints",
+      "value": 1
+    },
+    {
+      "source": "Element Identity Model",
+      "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Requirement Governance Metadata",
+      "target": "Requirement Governance Metadata Verification",
       "value": 1
     },
     {
@@ -2241,8 +2803,33 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Specification File Identification",
+      "source": "Capability Model Structure",
+      "target": "Capability Element Relation Compatibility Test",
+      "value": 1
+    },
+    {
+      "source": "Relation Types and behaviors",
+      "target": "Capability Model Structure",
+      "value": 1
+    },
+    {
+      "source": "Element Identity Model",
+      "target": "Identifiers and Relations",
+      "value": 1
+    },
+    {
+      "source": "Element Type Relation Compatibility",
+      "target": "Capability Element Relation Compatibility Test",
+      "value": 1
+    },
+    {
+      "source": "Relation Types and behaviors",
+      "target": "Element Type Relation Compatibility",
+      "value": 1
+    },
+    {
+      "source": "Element Identity Model",
+      "target": "Identifiers and Relations",
       "value": 1
     },
     {
@@ -2256,23 +2843,23 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Element Identity Model",
-      "value": 1
-    },
-    {
-      "source": "Validating Structures",
-      "target": "Validate Internal Consistency",
-      "value": 1
-    },
-    {
       "source": "Default Requirement Type Assignment",
       "target": "Default Element Type Assignment Test",
       "value": 1
     },
     {
-      "source": "Operating on Model Elements",
-      "target": "Default Requirement Type Assignment",
+      "source": "Specification File Identification",
+      "target": "Document Refinement Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Relation Element Type Validator",
+      "target": "Document Refinement Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Validate Relation Types",
+      "target": "Relation Element Type Validator",
       "value": 1
     },
     {
@@ -2291,11 +2878,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
       "source": "Relation Element Type Validator",
       "target": "Element Type Relation Compatibility Test",
       "value": 1
@@ -2303,16 +2885,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Validate Relation Types",
       "target": "Relation Element Type Validator",
-      "value": 1
-    },
-    {
-      "source": "Identifiers and Relations",
-      "target": "Relation Types and behaviors",
-      "value": 1
-    },
-    {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Element Identity Model",
       "value": 1
     },
     {
@@ -2326,33 +2898,8 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Coexistence of Structured and Unstructured Documents",
-      "value": 1
-    },
-    {
-      "source": "Reserved Repository Files Exclusion",
-      "target": "File Exclusion Test",
-      "value": 1
-    },
-    {
-      "source": "Ignoring Unstructured Documents",
-      "target": "Reserved Repository Files Exclusion",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Coexistence of Structured and Unstructured Documents",
-      "value": 1
-    },
-    {
       "source": "Structure and Addressing in Markdown Documents",
       "target": "Invalid Header Structure Test",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
@@ -2381,16 +2928,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Element Identity Model",
-      "target": "Internal Consistency Validator",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
       "source": "Validate Internal Consistency",
       "target": "Internal Consistency Validator",
       "value": 1
@@ -2411,33 +2948,8 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Element Type Relation Compatibility",
-      "target": "Relation Element Type Validator",
-      "value": 1
-    },
-    {
-      "source": "Identifiers and Relations",
-      "target": "Relation Types and behaviors",
-      "value": 1
-    },
-    {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Element Identity Model",
-      "value": 1
-    },
-    {
       "source": "Validate Relation Types",
       "target": "Relation Element Type Validator",
-      "value": 1
-    },
-    {
-      "source": "Identifiers and Relations",
-      "target": "Relation Types and behaviors",
-      "value": 1
-    },
-    {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Element Identity Model",
       "value": 1
     },
     {
@@ -2446,7 +2958,7 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Enhanced Validation Error Reporting",
+      "source": "Validate Internal Consistency",
       "target": "Relation Type Validation",
       "value": 1
     },
@@ -2456,7 +2968,7 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Enhanced Validation Error Reporting",
+      "source": "Validate Internal Consistency",
       "target": "Validation Error Handling",
       "value": 1
     },
@@ -2476,11 +2988,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
       "source": "Validate Command",
       "target": "Invalid Relations Test",
       "value": 1
@@ -2488,11 +2995,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "Validate Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -2531,28 +3033,138 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Coexistence of Structured and Unstructured Documents",
-      "value": 1
-    },
-    {
       "source": "Relation Type Validation",
       "target": "Same-File Fragment Relations Test",
       "value": 1
     },
     {
-      "source": "Enhanced Validation Error Reporting",
+      "source": "Validate Internal Consistency",
       "target": "Relation Type Validation",
+      "value": 1
+    },
+    {
+      "source": "Ontology and Semantic Contract Model",
+      "target": "Semantic Contract Ontology Declaration Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Capability Model Structure",
+      "target": "Ontology and Semantic Contract Model",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Ontology and Semantic Contract Model",
+      "target": "Semantic Contract Ownership Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Capability Model Structure",
+      "target": "Ontology and Semantic Contract Model",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Ontology and Semantic Contract Model",
+      "target": "Semantic Contract SHACL Sanity Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Capability Model Structure",
+      "target": "Ontology and Semantic Contract Model",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Semantic Contract Reference Context Validation",
+      "target": "Semantic Contract SHACL Sanity Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Ontology and Semantic Contract Model",
+      "target": "Semantic Contract Section Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Capability Model Structure",
+      "target": "Ontology and Semantic Contract Model",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Ontology and Semantic Contract Model",
+      "target": "Semantic Query Contract Section Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Capability Model Structure",
+      "target": "Ontology and Semantic Contract Model",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Semantic Query Contract Element Semantic Contract",
+      "target": "Semantic Query Contract Section Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Single Root Hierarchy Ownership",
+      "target": "Single Root Hierarchy Ownership Validation Test",
+      "value": 1
+    },
+    {
+      "source": "Validate Internal Consistency",
+      "target": "Single Root Hierarchy Ownership",
       "value": 1
     },
     {
       "source": "Git Repository as Project Root",
       "target": "Subdirectory Processing Verification",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Git Repository as Project Root",
       "value": 1
     },
     {
@@ -2566,11 +3178,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "CLI Move File Command",
       "target": "Subdirectory Processing Verification",
       "value": 1
@@ -2581,17 +3188,12 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Type Validation Error Requirement",
       "target": "Type Validation Errors Test",
       "value": 1
     },
     {
-      "source": "Enhanced Validation Error Reporting",
+      "source": "Validate Internal Consistency",
       "target": "Type Validation Error Requirement",
       "value": 1
     },
@@ -2621,21 +3223,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
-      "source": "Enhanced Validation Error Reporting",
-      "target": "Add Command Error Messages Test",
-      "value": 1
-    },
-    {
-      "source": "Validating Structures",
-      "target": "Enhanced Validation Error Reporting",
-      "value": 1
-    },
-    {
       "source": "Markdown Structure Validator",
       "target": "Add Command Error Messages Test",
       "value": 1
@@ -2646,6 +3233,16 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
+      "source": "Validation Error Handling",
+      "target": "Add Command Error Messages Test",
+      "value": 1
+    },
+    {
+      "source": "Validate Internal Consistency",
+      "target": "Validation Error Handling",
+      "value": 1
+    },
+    {
       "source": "CLI Add Element Command",
       "target": "Add Command Error Messages Test",
       "value": 1
@@ -2653,11 +3250,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "CLI Add Element Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -2671,8 +3263,23 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
+      "source": "Atomic Relation Relink Operation",
+      "target": "Atomic Relation Relink Test",
+      "value": 1
+    },
+    {
+      "source": "Element Manipulation Operations",
+      "target": "Atomic Relation Relink Operation",
+      "value": 1
+    },
+    {
+      "source": "CLI Relink Command",
+      "target": "Atomic Relation Relink Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Relink Command",
       "value": 1
     },
     {
@@ -2686,11 +3293,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "CLI Move Element Command",
       "target": "CLI Move Element Test",
       "value": 1
@@ -2698,11 +3300,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "CLI Move Element Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -2716,11 +3313,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "CLI Remove Element Command",
       "target": "CLI Remove Element Test",
       "value": 1
@@ -2728,11 +3320,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "CLI Remove Element Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -2746,11 +3333,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Create Element Operation",
       "target": "Create Element Override Test",
       "value": 1
@@ -2758,16 +3340,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Element Manipulation Operations",
       "target": "Create Element Operation",
-      "value": 1
-    },
-    {
-      "source": "Reserved Subsections Support",
-      "target": "Create Element Operation",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
@@ -2781,13 +3353,13 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Reserved Subsections Support",
-      "target": "Create Element Operation",
+      "source": "CRUD Semantic Contract Mutation Validation",
+      "target": "Delete Element Test",
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
+      "source": "Element Manipulation Operations",
+      "target": "CRUD Semantic Contract Mutation Validation",
       "value": 1
     },
     {
@@ -2821,11 +3393,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Relation Management Operations",
       "target": "Link Command Verification",
       "value": 1
@@ -2841,11 +3408,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
       "source": "Relation Commands",
       "target": "Link Command Verification",
       "value": 1
@@ -2853,11 +3415,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "Relation Commands",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -2906,22 +3463,7 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Ignore Files Integration",
-      "target": "Target Location Validation and Auto-Creation",
-      "value": 1
-    },
-    {
-      "source": "Coexistence of Structured and Unstructured Documents",
-      "target": "Ignoring Unstructured Documents",
-      "value": 1
-    },
-    {
       "source": "Element Manipulation Operations",
-      "target": "Target Location Validation and Auto-Creation",
-      "value": 1
-    },
-    {
-      "source": "Git Repository as Project Root",
       "target": "Target Location Validation and Auto-Creation",
       "value": 1
     },
@@ -2941,11 +3483,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
       "source": "Relation Commands",
       "target": "Unlink Command Verification",
       "value": 1
@@ -2953,11 +3490,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "Relation Commands",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -2981,11 +3513,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Formatting Model Documents",
-      "target": "Model Formatting",
-      "value": 1
-    },
-    {
       "source": "Format Command",
       "target": "Element Ordering Verification",
       "value": 1
@@ -2996,18 +3523,8 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Structure and Addressing in Markdown Documents",
       "target": "Format Command Requirements Verification",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
       "value": 1
     },
     {
@@ -3021,18 +3538,8 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Formatting Model Documents",
-      "target": "Model Formatting",
-      "value": 1
-    },
-    {
       "source": "Format Consistency Enforcement",
       "target": "Format Command Requirements Verification",
-      "value": 1
-    },
-    {
-      "source": "Model Formatting",
-      "target": "Format Consistency Enforcement",
       "value": 1
     },
     {
@@ -3046,18 +3553,8 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Formatting Model Documents",
-      "target": "Model Formatting",
-      "value": 1
-    },
-    {
       "source": "Replace Absolute Links with Relative Links",
       "target": "Format Command Requirements Verification",
-      "value": 1
-    },
-    {
-      "source": "Model Formatting",
-      "target": "Replace Absolute Links with Relative Links",
       "value": 1
     },
     {
@@ -3068,11 +3565,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "Format Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -3086,18 +3578,8 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Formatting Model Documents",
-      "target": "Model Formatting",
-      "value": 1
-    },
-    {
       "source": "Full Relations Insertion",
       "target": "Full Relations Insertion Verification",
-      "value": 1
-    },
-    {
-      "source": "Model Formatting",
-      "target": "Full Relations Insertion",
       "value": 1
     },
     {
@@ -3111,11 +3593,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Relation Ordering Normalization",
       "target": "Relation Ordering Verification",
       "value": 1
@@ -3126,8 +3603,23 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Formatting Model Documents",
-      "target": "Model Formatting",
+      "source": "Requirement Governance Metadata",
+      "target": "Requirement Governance Metadata Formatting Verification",
+      "value": 1
+    },
+    {
+      "source": "Format Consistency Enforcement",
+      "target": "Requirement Governance Metadata Formatting Verification",
+      "value": 1
+    },
+    {
+      "source": "Cross-Submodel Hierarchical Relation Detection",
+      "target": "Lint Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Linting",
+      "target": "Cross-Submodel Hierarchical Relation Detection",
       "value": 1
     },
     {
@@ -3141,18 +3633,13 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Model Linting",
-      "target": "Lint Command Verification",
-      "value": 1
-    },
-    {
-      "source": "Linting Model Quality",
-      "target": "Model Linting",
-      "value": 1
-    },
-    {
       "source": "Multi-Branch Convergence Detection",
       "target": "Lint Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Linting",
+      "target": "Multi-Branch Convergence Detection",
       "value": 1
     },
     {
@@ -3161,8 +3648,18 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
+      "source": "Model Linting",
+      "target": "Redundant Hierarchical Relations Detection and Auto-Removal",
+      "value": 1
+    },
+    {
       "source": "Redundant Verify Relations Detection",
       "target": "Lint Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Linting",
+      "target": "Redundant Verify Relations Detection",
       "value": 1
     },
     {
@@ -3176,21 +3673,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Promote Automation and Efficiency",
-      "target": "Integrate with GitHub Workflows",
-      "value": 1
-    },
-    {
-      "source": "Automate Pull Request Validations",
-      "target": "Automated Documentation Export on PR Merge",
-      "value": 1
-    },
-    {
-      "source": "Promote Automation and Efficiency",
-      "target": "Integrate with GitHub Workflows",
-      "value": 1
-    },
-    {
       "source": "Diagram Generation",
       "target": "Diagram Generation Test",
       "value": 1
@@ -3201,11 +3683,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Provide Reports",
-      "target": "Model Reports",
-      "value": 1
-    },
-    {
       "source": "Diagram Generation",
       "target": "Diagram Relation Filtering Verification",
       "value": 1
@@ -3213,11 +3690,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Interactive Mermaid Diagrams",
       "target": "Diagram Generation",
-      "value": 1
-    },
-    {
-      "source": "Provide Reports",
-      "target": "Model Reports",
       "value": 1
     },
     {
@@ -3236,11 +3708,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Generate Diagrams",
-      "target": "Interactive Mermaid Diagrams",
-      "value": 1
-    },
-    {
       "source": "Diagram Generation",
       "target": "Visualize Model Relationships Verification",
       "value": 1
@@ -3248,11 +3715,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Interactive Mermaid Diagrams",
       "target": "Diagram Generation",
-      "value": 1
-    },
-    {
-      "source": "Provide Reports",
-      "target": "Model Reports",
       "value": 1
     },
     {
@@ -3266,8 +3728,63 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
+      "source": "CLI JSON File Output Option",
+      "target": "CLI JSON File Output Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI JSON File Output Option",
+      "value": 1
+    },
+    {
+      "source": "Capability Collect Traversal",
+      "target": "Capability Collect Traversal Test",
+      "value": 1
+    },
+    {
+      "source": "Capability Model Structure",
+      "target": "Capability Collect Traversal",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Capability Coverage Rollup",
+      "target": "Capability Coverage Rollup Test",
+      "value": 1
+    },
+    {
+      "source": "Capability Model Structure",
+      "target": "Capability Coverage Rollup",
+      "value": 1
+    },
+    {
+      "source": "Identifiers and Relations",
+      "target": "Relation Types and behaviors",
+      "value": 1
+    },
+    {
+      "source": "Structure and Addressing in Markdown Documents",
+      "target": "Element Identity Model",
+      "value": 1
+    },
+    {
+      "source": "Containment View Report",
+      "target": "Containment Hierarchy Extraction Test",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Containment View Report",
       "value": 1
     },
     {
@@ -3281,8 +3798,73 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Provide Reports",
-      "target": "Model Reports",
+      "source": "Containment View Report",
+      "target": "Containment View JSON Output Test",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Containment View Report",
+      "value": 1
+    },
+    {
+      "source": "Containment View Report",
+      "target": "Containment View Mermaid Diagram Test",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Containment View Report",
+      "value": 1
+    },
+    {
+      "source": "Containment View Report",
+      "target": "Containment View Text Output Test",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Containment View Report",
+      "value": 1
+    },
+    {
+      "source": "Search Report Generator",
+      "target": "Custom Element Type Tracking Test",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Search Report Generator",
+      "value": 1
+    },
+    {
+      "source": "Containment View Report",
+      "target": "HTML Export Containment View Integration Test",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Containment View Report",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "HTML Export Containment View Integration Test",
+      "value": 1
+    },
+    {
+      "source": "Web Interface",
+      "target": "HTML Export",
+      "value": 1
+    },
+    {
+      "source": "JSON Element Size Estimate Exposure",
+      "target": "JSON Element Size Estimate Output Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Reports",
+      "target": "JSON Element Size Estimate Exposure",
       "value": 1
     },
     {
@@ -3311,8 +3893,13 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Provide Reports",
-      "target": "Model Reports",
+      "source": "CLI Model Diagram Command",
+      "target": "Model Command Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Model Diagram Command",
       "value": 1
     },
     {
@@ -3328,11 +3915,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Model Structure and Summaries",
       "target": "Search Report Generator",
-      "value": 1
-    },
-    {
-      "source": "Provide Reports",
-      "target": "Model Reports",
       "value": 1
     },
     {
@@ -3353,11 +3935,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "CLI Resources Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -3386,11 +3963,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Provide Reports",
-      "target": "Model Reports",
-      "value": 1
-    },
-    {
       "source": "CLI Search Command",
       "target": "Search Command Tests",
       "value": 1
@@ -3401,8 +3973,43 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
+      "source": "Search Report Generator",
+      "target": "Semantic Contract Search JSON Test",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Search Report Generator",
+      "value": 1
+    },
+    {
+      "source": "CLI Search Command",
+      "target": "Semantic Contract Search JSON Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Search Command",
+      "value": 1
+    },
+    {
+      "source": "Search Report Generator",
+      "target": "Semantic Query Contract Search JSON Test",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Search Report Generator",
+      "value": 1
+    },
+    {
+      "source": "CLI Search Command",
+      "target": "Semantic Query Contract Search JSON Test",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Search Command",
       "value": 1
     },
     {
@@ -3421,6 +4028,26 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
+      "source": "Requirement Submodels Report",
+      "target": "Submodels Report Verification",
+      "value": 1
+    },
+    {
+      "source": "Model Structure and Summaries",
+      "target": "Requirement Submodels Report",
+      "value": 1
+    },
+    {
+      "source": "CLI Submodels Command",
+      "target": "Submodels Report Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Submodels Command",
+      "value": 1
+    },
+    {
       "source": "TraceFlow View Report Generation",
       "target": "TraceFlow View Test",
       "value": 1
@@ -3428,11 +4055,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Verification Coverage Report",
       "target": "TraceFlow View Report Generation",
-      "value": 1
-    },
-    {
-      "source": "Provide Reports",
-      "target": "Model Reports",
       "value": 1
     },
     {
@@ -3446,11 +4068,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "CLI Traces Command",
       "target": "Verification Traces Filter Options Test",
       "value": 1
@@ -3458,11 +4075,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "CLI Traces Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -3476,8 +4088,18 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
+      "source": "Change Impact Detection",
+      "target": "Capability Ontology and Semantic Contract Change Impact Test",
+      "value": 1
+    },
+    {
+      "source": "Tracing Structural Changes",
+      "target": "Change Impact Detection",
+      "value": 1
+    },
+    {
+      "source": "Requirements Change Propagation",
+      "target": "Capability Ontology and Semantic Contract Change Impact Test",
       "value": 1
     },
     {
@@ -3491,11 +4113,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Requirements Change Propagation",
       "target": "Change Impact Detection Test",
       "value": 1
@@ -3503,16 +4120,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Change Impact Detection",
       "target": "Requirements Change Propagation",
-      "value": 1
-    },
-    {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Element Identity Model",
-      "value": 1
-    },
-    {
-      "source": "Trace Changes in System Model",
-      "target": "Tracing Structural Changes",
       "value": 1
     },
     {
@@ -3526,11 +4133,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Requirements Change Propagation",
       "target": "Change Impact Relations Test",
       "value": 1
@@ -3541,16 +4143,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Element Identity Model",
-      "value": 1
-    },
-    {
-      "source": "Trace Changes in System Model",
-      "target": "Tracing Structural Changes",
-      "value": 1
-    },
-    {
       "source": "CLI Change Impact Report Command",
       "target": "Change Impact Relations Test",
       "value": 1
@@ -3558,11 +4150,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "CLI Change Impact Report Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -3576,16 +4163,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Element Identity Model",
-      "value": 1
-    },
-    {
-      "source": "Trace Changes in System Model",
-      "target": "Tracing Structural Changes",
-      "value": 1
-    },
-    {
       "source": "Requirements Processing",
       "target": "Element Content Extraction Test",
       "value": 1
@@ -3593,11 +4170,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Ignoring Unstructured Documents",
       "target": "Requirements Processing",
-      "value": 1
-    },
-    {
-      "source": "Defining Model Structure",
-      "target": "Coexistence of Structured and Unstructured Documents",
       "value": 1
     },
     {
@@ -3611,23 +4183,18 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Structure and Addressing in Markdown Documents",
-      "target": "Element Identity Model",
+      "source": "Change Impact Detection",
+      "target": "Impact Scope Summary Test",
       "value": 1
     },
     {
-      "source": "Trace Changes in System Model",
-      "target": "Tracing Structural Changes",
+      "source": "Tracing Structural Changes",
+      "target": "Change Impact Detection",
       "value": 1
     },
     {
       "source": "Tracing Structural Changes",
       "target": "Structural Change Reports Verification",
-      "value": 1
-    },
-    {
-      "source": "Trace Changes in System Model",
-      "target": "Tracing Structural Changes",
       "value": 1
     },
     {
@@ -3646,11 +4213,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "Defining Model Structure",
-      "target": "Structure and Addressing in Markdown Documents",
-      "value": 1
-    },
-    {
       "source": "CLI Change Impact Report Command",
       "target": "CLI Git Commit Hash Flag Test",
       "value": 1
@@ -3661,11 +4223,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "CLI Change Impact Report Command",
       "target": "CLI Help Structure Verification",
       "value": 1
@@ -3673,11 +4230,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "CLI Change Impact Report Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -3691,8 +4243,33 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
+      "source": "CLI JSON File Output Option",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI JSON File Output Option",
+      "value": 1
+    },
+    {
+      "source": "CLI Model Diagram Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Model Diagram Command",
+      "value": 1
+    },
+    {
+      "source": "CLI Ontologies Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Ontologies Command",
       "value": 1
     },
     {
@@ -3706,8 +4283,13 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
+      "source": "CLI Submodels Command",
+      "target": "CLI Help Structure Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Submodels Command",
       "value": 1
     },
     {
@@ -3721,11 +4303,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "Format Command",
       "target": "CLI Help Structure Verification",
       "value": 1
@@ -3733,11 +4310,6 @@ window.addEventListener('resize', function() {
     {
       "source": "CLI Interface Structure",
       "target": "Format Command",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
       "value": 1
     },
     {
@@ -3751,11 +4323,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "CLI interface",
-      "value": 1
-    },
-    {
       "source": "HTML Export",
       "target": "CLI Help Structure Verification",
       "value": 1
@@ -3763,6 +4330,46 @@ window.addEventListener('resize', function() {
     {
       "source": "Web Interface",
       "target": "HTML Export",
+      "value": 1
+    },
+    {
+      "source": "Ontology and Shapes Collection",
+      "target": "CLI Ontologies Command Verification",
+      "value": 1
+    },
+    {
+      "source": "Ontology Projection Subgraph Materialization",
+      "target": "CLI Ontologies Command Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Ontologies Command",
+      "target": "CLI Ontologies Command Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Ontologies Command",
+      "value": 1
+    },
+    {
+      "source": "CLI Size Estimate JSON Option",
+      "target": "CLI Size Estimate JSON Option Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "CLI Size Estimate JSON Option",
+      "value": 1
+    },
+    {
+      "source": "Explicit Workspace Selection",
+      "target": "Explicit Workspace Selection Verification",
+      "value": 1
+    },
+    {
+      "source": "CLI Interface Structure",
+      "target": "Explicit Workspace Selection",
       "value": 1
     },
     {
@@ -3781,6 +4388,356 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
+      "source": "MCP Access Control Baseline",
+      "target": "MCP Access Control Baseline Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Access Control Baseline",
+      "value": 1
+    },
+    {
+      "source": "MCP Adapter Boundary",
+      "target": "MCP Contract Layer Boundary Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Adapter Boundary",
+      "value": 1
+    },
+    {
+      "source": "MCP Compatibility Versioning",
+      "target": "MCP Contract Versioning Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Compatibility Versioning",
+      "value": 1
+    },
+    {
+      "source": "MCP Mutation Concurrency Control",
+      "target": "MCP HTTP Transport End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Mutation Concurrency Control",
+      "value": 1
+    },
+    {
+      "source": "MCP Streamable HTTP Transport",
+      "target": "MCP HTTP Transport End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Streamable HTTP Transport",
+      "value": 1
+    },
+    {
+      "source": "MCP Streamable HTTP Transport Safety",
+      "target": "MCP HTTP Transport End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Streamable HTTP Transport Safety",
+      "value": 1
+    },
+    {
+      "source": "MCP Model Evidence Tools",
+      "target": "MCP Model Evidence Tools Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Model Evidence Tools",
+      "value": 1
+    },
+    {
+      "source": "MCP Mutation Execution Flow",
+      "target": "MCP Mutation Execution Flow Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Mutation Execution Flow",
+      "value": 1
+    },
+    {
+      "source": "MCP Mutation Tool Safety",
+      "target": "MCP Mutation Tool Safety Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Mutation Tool Safety",
+      "value": 1
+    },
+    {
+      "source": "MCP Protocol Standard Conformance",
+      "target": "MCP Protocol Standard Conformance Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Protocol Standard Conformance",
+      "value": 1
+    },
+    {
+      "source": "MCP Quality Traceability Tools",
+      "target": "MCP Quality Traceability Tools Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Quality Traceability Tools",
+      "value": 1
+    },
+    {
+      "source": "MCP Resource Interface",
+      "target": "MCP Resource Interface Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Resource Interface",
+      "value": 1
+    },
+    {
+      "source": "MCP Server Command",
+      "target": "MCP Server Command Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Server Command",
+      "value": 1
+    },
+    {
+      "source": "MCP Access Control Baseline",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Access Control Baseline",
+      "value": 1
+    },
+    {
+      "source": "MCP Compatibility Versioning",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Compatibility Versioning",
+      "value": 1
+    },
+    {
+      "source": "MCP Model Evidence Tools",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Model Evidence Tools",
+      "value": 1
+    },
+    {
+      "source": "MCP Mutation Execution Flow",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Mutation Execution Flow",
+      "value": 1
+    },
+    {
+      "source": "MCP Mutation Tool Safety",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Mutation Tool Safety",
+      "value": 1
+    },
+    {
+      "source": "MCP Protocol Standard Conformance",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Protocol Standard Conformance",
+      "value": 1
+    },
+    {
+      "source": "MCP Quality Traceability Tools",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Quality Traceability Tools",
+      "value": 1
+    },
+    {
+      "source": "MCP Resource Interface",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Resource Interface",
+      "value": 1
+    },
+    {
+      "source": "MCP Server Command",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Server Command",
+      "value": 1
+    },
+    {
+      "source": "MCP Shared Operation Interfaces",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Shared Operation Interfaces",
+      "value": 1
+    },
+    {
+      "source": "MCP Structured Payload Interfaces",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Structured Payload Interfaces",
+      "value": 1
+    },
+    {
+      "source": "MCP Tool Exposure Scope",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Tool Exposure Scope",
+      "value": 1
+    },
+    {
+      "source": "MCP Tool Side Effect Classification",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Tool Side Effect Classification",
+      "value": 1
+    },
+    {
+      "source": "MCP Workspace Session Tools",
+      "target": "MCP Server End-to-End Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Workspace Session Tools",
+      "value": 1
+    },
+    {
+      "source": "MCP Server State and Cache",
+      "target": "MCP Server State and Cache Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Server State and Cache",
+      "value": 1
+    },
+    {
+      "source": "MCP Shared Operation Interfaces",
+      "target": "MCP Shared Operation Contracts Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Shared Operation Interfaces",
+      "value": 1
+    },
+    {
+      "source": "MCP Server Command",
+      "target": "MCP Size Estimate Startup Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Server Command",
+      "value": 1
+    },
+    {
+      "source": "MCP Structured Payload Interfaces",
+      "target": "MCP Structured Payload Contracts Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Structured Payload Interfaces",
+      "value": 1
+    },
+    {
+      "source": "MCP Shared Operation Interfaces",
+      "target": "MCP Tool Call Contracts Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Shared Operation Interfaces",
+      "value": 1
+    },
+    {
+      "source": "MCP Tool Exposure Scope",
+      "target": "MCP Tool Exposure Scope Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Tool Exposure Scope",
+      "value": 1
+    },
+    {
+      "source": "MCP Tool Side Effect Classification",
+      "target": "MCP Tool Side Effect Classification Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Tool Side Effect Classification",
+      "value": 1
+    },
+    {
+      "source": "MCP Workspace Session Tools",
+      "target": "MCP Workspace Session Tools Verification",
+      "value": 1
+    },
+    {
+      "source": "MCP Interface",
+      "target": "MCP Workspace Session Tools",
+      "value": 1
+    },
+    {
       "source": "Component-Based HTML Architecture",
       "target": "Component Reuse Verification",
       "value": 1
@@ -3788,11 +4745,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Mobile-Friendly Documentation",
       "target": "Component-Based HTML Architecture",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "Web Interface",
       "value": 1
     },
     {
@@ -3806,8 +4758,13 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "Web Interface",
+      "source": "Project Knowledge Graph View",
+      "target": "Integration Test Verification",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "Project Knowledge Graph View",
       "value": 1
     },
     {
@@ -3821,11 +4778,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "Web Interface",
-      "value": 1
-    },
-    {
       "source": "Responsive HTML Generation",
       "target": "Integration Test Verification",
       "value": 1
@@ -3833,11 +4785,6 @@ window.addEventListener('resize', function() {
     {
       "source": "Mobile-Friendly Documentation",
       "target": "Responsive HTML Generation",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "Web Interface",
       "value": 1
     },
     {
@@ -3881,11 +4828,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "Web Interface",
-      "value": 1
-    },
-    {
       "source": "Attachment Export",
       "target": "Attachment Export Verification",
       "value": 1
@@ -3893,11 +4835,6 @@ window.addEventListener('resize', function() {
     {
       "source": "HTML Export",
       "target": "Attachment Export",
-      "value": 1
-    },
-    {
-      "source": "System Model Interfaces",
-      "target": "Web Interface",
       "value": 1
     },
     {
@@ -3911,11 +4848,6 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "Web Interface",
-      "value": 1
-    },
-    {
       "source": "Diagram Attachment Display",
       "target": "Diagram Attachment Display Verification",
       "value": 1
@@ -3926,8 +4858,13 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
-      "source": "System Model Interfaces",
-      "target": "Web Interface",
+      "source": "Local Linked File Export",
+      "target": "HTML Export Local Linked Files Verification",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "Local Linked File Export",
       "value": 1
     },
     {
@@ -3956,6 +4893,41 @@ window.addEventListener('resize', function() {
       "value": 1
     },
     {
+      "source": "Ontology Projection Subgraph Materialization",
+      "target": "Ontology Model Viewer Analysis Verification",
+      "value": 1
+    },
+    {
+      "source": "Ontologies View Generation",
+      "target": "Ontology Model Viewer Analysis Verification",
+      "value": 1
+    },
+    {
+      "source": "HTML Export",
+      "target": "Ontologies View Generation",
+      "value": 1
+    },
+    {
+      "source": "Ontology Construct Grouping",
+      "target": "Ontology Model Viewer Analysis Verification",
+      "value": 1
+    },
+    {
+      "source": "Ontology Property-Centric Visualization",
+      "target": "Ontology Model Viewer Analysis Verification",
+      "value": 1
+    },
+    {
+      "source": "Ontology Symbol and Badge Vocabulary",
+      "target": "Ontology Model Viewer Analysis Verification",
+      "value": 1
+    },
+    {
+      "source": "OWL Semantic Ontology Projection",
+      "target": "Ontology Model Viewer Analysis Verification",
+      "value": 1
+    },
+    {
       "source": "Serve Command",
       "target": "Serve Command Verification",
       "value": 1
@@ -3967,7 +4939,7 @@ window.addEventListener('resize', function() {
     }
   ]
 };
-    const container = document.getElementById("d3sankey_6153941ae2a0");
+    const container = document.getElementById("d3sankey_5f11ceadaaa0");
     const svg = d3.select(container).select("svg");
 
     // Configuration
@@ -3983,7 +4955,8 @@ window.addEventListener('resize', function() {
 
     // Colors matching Reqvire theme
     const colors = {
-        "user-requirement": "#7E57C2",
+        "capability": "#BBDEFB",
+        "ontology": "#B08A00",
         "system-requirement": "#673AB7",
         "requirement": "#673AB7",
         "verification": "#4CAF50",
@@ -4085,9 +5058,25 @@ window.addEventListener('resize', function() {
 }
 </style>
 </p>
-<footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">TraceFlow</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Supporting report artifact that visualizes verification traceability flow as a Sankey diagram.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

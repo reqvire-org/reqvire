@@ -45,10 +45,8 @@ BATTERY_SAVER_CONTENT=$(sed -n '/^### Battery Saver$/,/^---$/p' "${TEST_DIR}/spe
 sed -i '/^### Battery Saver$/,/^---$/d' "${TEST_DIR}/specifications/FirstFile.md"
 echo "" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 echo "$BATTERY_SAVER_CONTENT" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
-# Add derive relation from Battery Saver to Battery Monitoring (after Metadata section, before the ---)
-sed -i '/^#### Metadata/,/^---$/ { /^  \* type: user-requirement/a\
-\
-#### Relations\
+# Add derive relation from Battery Saver to Battery Monitoring.
+sed -i '/^### Battery Saver$/,/^---$/ { /specify:/a\
   * derive: [Battery Monitoring](#battery-monitoring)
 }' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 
@@ -64,7 +62,10 @@ DISPLAY_SETTINGS_CONTENT=$(sed -n '/^### Display Settings$/,/^---$/p' "${TEST_DI
 sed -i '/^### Display Settings$/,/^---$/d' "${TEST_DIR}/specifications/FirstFile.md"
 echo "" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 echo "$DISPLAY_SETTINGS_CONTENT" >> "${TEST_DIR}/specifications/SecondFile/Requirements.md"
-sed -i '/satisfiedBy: display_impl.py/a\  * verifiedBy: display_test.py' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+sed -i '/satisfiedBy: display_impl.py/a\  * satisfiedBy: display_test.py' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
+
+# Relocated root requirements still belong to the capability that remains in FirstFile.md.
+sed -i 's@(#test-capability-test-change-impact-element-relocation-specifications-firstfile-md)@(../FirstFile.md#test-capability-test-change-impact-element-relocation-specifications-firstfile-md)@g' "${TEST_DIR}/specifications/SecondFile/Requirements.md"
 
 # Run change impact detection
 echo "Running: reqvire change-impact" >> "${TEST_DIR}/test_results.log"

@@ -361,24 +361,15 @@ impl ElementType {
     }
 
     pub fn is_capability_refinement(&self) -> bool {
-        matches!(
-            self,
-            ElementType::Refinement(
-                RefinementType::Source
-                    | RefinementType::Constraint
-                    | RefinementType::Behavior
-                    | RefinementType::Specification
-                    | RefinementType::State
-                    | RefinementType::InputOutput
-            )
-        )
+        false
     }
 
     pub fn is_requirement_refinement(&self) -> bool {
         matches!(
             self,
             ElementType::Refinement(
-                RefinementType::Constraint
+                RefinementType::Source
+                    | RefinementType::Constraint
                     | RefinementType::SemanticContract
                     | RefinementType::SemanticQueryContract
                     | RefinementType::Behavior

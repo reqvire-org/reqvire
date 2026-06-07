@@ -41,10 +41,13 @@ impl ContainmentElement {
             element_type: element.element_type.clone(),
             file_path: element.file_path.clone(),
             identifier: element.identifier.clone(),
-            attachments: element.attachments.iter()
+            attachments: element
+                .attachments
+                .iter()
                 .map(|a| match &a.target {
                     crate::element::AttachmentTarget::FilePath(path) => {
-                        let file_name = path.file_name()
+                        let file_name = path
+                            .file_name()
                             .map(|n| n.to_string_lossy().into_owned())
                             .unwrap_or_else(|| path.to_string_lossy().into_owned());
                         ContainmentAttachment {
@@ -52,10 +55,11 @@ impl ContainmentElement {
                             is_element: false,
                             link: Some(path.to_string_lossy().into_owned()),
                         }
-                    },
+                    }
                     crate::element::AttachmentTarget::ElementIdentifier(id) => {
                         // Look up element name from registry using the identifier
-                        let name = registry.get_element(id)
+                        let name = registry
+                            .get_element(id)
                             .map(|e| e.name.clone())
                             .unwrap_or_else(|| id.clone());
                         ContainmentAttachment {
@@ -63,7 +67,7 @@ impl ContainmentElement {
                             is_element: true,
                             link: Some(id.clone()),
                         }
-                    },
+                    }
                 })
                 .collect(),
         }
@@ -110,8 +114,9 @@ impl ContainmentHierarchy {
         // Group elements by file
         let mut files_map: BTreeMap<String, Vec<&Element>> = BTreeMap::new();
         for element in registry.get_all_elements() {
-            files_map.entry(element.file_path.clone())
-                .or_insert_with(Vec::new)
+            files_map
+                .entry(element.file_path.clone())
+                .or_default()
                 .push(element);
         }
 
@@ -126,7 +131,8 @@ impl ContainmentHierarchy {
                     .collect()
             } else {
                 // Full mode: all elements
-                elements.iter()
+                elements
+                    .iter()
                     .map(|e| ContainmentElement::from_element(e, registry))
                     .collect()
             };
@@ -151,9 +157,7 @@ fn filter_top_level_elements<'a>(elements: &[&'a Element]) -> Vec<&'a Element> {
     let hierarchical_types = crate::relation::get_hierarchical_relation_types();
 
     // Collect all element IDs (fragments) in this file
-    let element_ids: HashSet<String> = elements.iter()
-        .map(|e| e.id.clone())
-        .collect();
+    let element_ids: HashSet<String> = elements.iter().map(|e| e.id.clone()).collect();
 
     // Find elements that have derivedFrom relations pointing to elements in the same file
     let mut child_elements: HashSet<String> = HashSet::new();
@@ -172,24 +176,29 @@ fn filter_top_level_elements<'a>(elements: &[&'a Element]) -> Vec<&'a Element> {
     }
 
     // Return only elements that are NOT children (i.e., top-level)
-    elements.iter()
+    elements
+        .iter()
         .filter(|e| !child_elements.contains(&e.identifier))
         .copied()
         .collect()
 }
 
 /// Scan for design documents in DesignDocuments folders
-fn scan_design_documents(files_map: &BTreeMap<String, Vec<ContainmentElement>>) -> BTreeMap<Vec<String>, Vec<DesignDocument>> {
+fn scan_design_documents(
+    files_map: &BTreeMap<String, Vec<ContainmentElement>>,
+) -> BTreeMap<Vec<String>, Vec<DesignDocument>> {
     use std::fs;
 
     let mut design_docs: BTreeMap<Vec<String>, Vec<DesignDocument>> = BTreeMap::new();
 
     // Get all unique parent folders from the files map
-    let mut parent_folders: std::collections::HashSet<Vec<String>> = std::collections::HashSet::new();
+    let mut parent_folders: std::collections::HashSet<Vec<String>> =
+        std::collections::HashSet::new();
     for file_path in files_map.keys() {
         let path = Path::new(file_path);
         if let Some(parent) = path.parent() {
-            let folder_path: Vec<String> = parent.components()
+            let folder_path: Vec<String> = parent
+                .components()
                 .filter_map(|c| c.as_os_str().to_str())
                 .map(String::from)
                 .collect();
@@ -202,7 +211,8 @@ fn scan_design_documents(files_map: &BTreeMap<String, Vec<ContainmentElement>>) 
 
     // For each folder, check if it has a DesignDocuments subfolder
     for folder_path in parent_folders {
-        let design_docs_path = folder_path.iter()
+        let design_docs_path = folder_path
+            .iter()
             .cloned()
             .chain(std::iter::once("DesignDocuments".to_string()))
             .collect::<Vec<_>>();
@@ -215,11 +225,13 @@ fn scan_design_documents(files_map: &BTreeMap<String, Vec<ContainmentElement>>) 
                 if entry_path.is_file() {
                     if let Some(ext) = entry_path.extension() {
                         if ext == "md" {
-                            let file_name = entry_path.file_name()
+                            let file_name = entry_path
+                                .file_name()
                                 .and_then(|n| n.to_str())
                                 .unwrap_or("")
                                 .to_string();
-                            let relative_path = design_docs_path.iter()
+                            let relative_path = design_docs_path
+                                .iter()
                                 .cloned()
                                 .chain(std::iter::once(file_name.clone()))
                                 .collect::<Vec<_>>()
@@ -246,21 +258,25 @@ fn scan_design_documents(files_map: &BTreeMap<String, Vec<ContainmentElement>>) 
 /// Build folder structure from files map
 fn build_folder_structure(
     files_map: &BTreeMap<String, Vec<ContainmentElement>>,
-    design_docs: &BTreeMap<Vec<String>, Vec<DesignDocument>>
+    design_docs: &BTreeMap<Vec<String>, Vec<DesignDocument>>,
 ) -> ContainmentFolder {
     // Build intermediate structure: folder_path -> files in that folder
     let mut folder_files: BTreeMap<Vec<String>, Vec<ContainmentFile>> = BTreeMap::new();
 
     // Track all folder paths (including intermediate folders without direct files)
-    let mut all_folder_paths: std::collections::HashSet<Vec<String>> = std::collections::HashSet::new();
+    let mut all_folder_paths: std::collections::HashSet<Vec<String>> =
+        std::collections::HashSet::new();
 
     for (file_path, elements) in files_map {
         let path = Path::new(file_path);
-        let folder_path: Vec<String> = path.parent()
-            .map(|p| p.components()
-                .filter_map(|c| c.as_os_str().to_str())
-                .map(String::from)
-                .collect())
+        let folder_path: Vec<String> = path
+            .parent()
+            .map(|p| {
+                p.components()
+                    .filter_map(|c| c.as_os_str().to_str())
+                    .map(String::from)
+                    .collect()
+            })
             .unwrap_or_default();
 
         // Add all intermediate folder paths (e.g., for "a/b/c", add "", "a", "a/b", "a/b/c")
@@ -268,7 +284,8 @@ fn build_folder_structure(
             all_folder_paths.insert(folder_path[..i].to_vec());
         }
 
-        let file_name = path.file_name()
+        let file_name = path
+            .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("")
             .to_string();
@@ -279,9 +296,7 @@ fn build_folder_structure(
             elements: elements.clone(),
         };
 
-        folder_files.entry(folder_path)
-            .or_insert_with(Vec::new)
-            .push(file);
+        folder_files.entry(folder_path).or_default().push(file);
     }
 
     // Add design document folder paths
@@ -300,21 +315,18 @@ fn build_folder_recursive(
     current_path: &[String],
     folder_files: &BTreeMap<Vec<String>, Vec<ContainmentFile>>,
     all_folder_paths: &std::collections::HashSet<Vec<String>>,
-    design_docs: &BTreeMap<Vec<String>, Vec<DesignDocument>>
+    design_docs: &BTreeMap<Vec<String>, Vec<DesignDocument>>,
 ) -> ContainmentFolder {
-    let folder_name = current_path.last()
-        .map(|s| s.clone())
+    let folder_name = current_path
+        .last()
+        .cloned()
         .unwrap_or_else(|| "Reqvire root".to_string());
 
     // Get files directly in this folder
-    let files = folder_files.get(current_path)
-        .cloned()
-        .unwrap_or_default();
+    let files = folder_files.get(current_path).cloned().unwrap_or_default();
 
     // Get design documents directly in this folder
-    let folder_design_docs = design_docs.get(current_path)
-        .cloned()
-        .unwrap_or_default();
+    let folder_design_docs = design_docs.get(current_path).cloned().unwrap_or_default();
 
     // Find all immediate subfolders (using all_folder_paths to include intermediate folders)
     let mut subfolders = Vec::new();
@@ -325,14 +337,20 @@ fn build_folder_recursive(
     for folder_path in all_folder_paths.iter() {
         if folder_path.len() == current_depth + 1 {
             // Check if this is an immediate child
-            let is_child = current_path.iter()
+            let is_child = current_path
+                .iter()
                 .zip(folder_path.iter())
                 .all(|(a, b)| a == b);
 
             if is_child {
                 if let Some(subfolder_name) = folder_path.last() {
                     if seen_subfolders.insert(subfolder_name.clone()) {
-                        let subfolder = build_folder_recursive(folder_path, folder_files, all_folder_paths, design_docs);
+                        let subfolder = build_folder_recursive(
+                            folder_path,
+                            folder_files,
+                            all_folder_paths,
+                            design_docs,
+                        );
                         subfolders.push(subfolder);
                     }
                 }
@@ -402,8 +420,10 @@ fn folder_to_d3_node(folder: &ContainmentFolder) -> D3TreeNode {
         // Add elements as children of file
         for element in &file.elements {
             let element_type = match &element.element_type {
-                ElementType::Requirement(crate::element::RequirementType::User) => "user-requirement",
-                ElementType::Requirement(crate::element::RequirementType::System) => "system-requirement",
+                ElementType::Capability => "capability",
+                ElementType::Requirement(crate::element::RequirementType::System) => {
+                    "system-requirement"
+                }
                 ElementType::Verification(_) => "verification",
                 ElementType::Refinement(_) => "refinement",
                 _ => "element",
@@ -416,7 +436,10 @@ fn folder_to_d3_node(folder: &ContainmentFolder) -> D3TreeNode {
             for attachment in &element.attachments {
                 let (node_type, link) = if attachment.is_element {
                     // Element attachment - show as refinement with link
-                    ("attachment-element".to_string(), attachment.link.as_ref().map(|l| md_to_html_link(l)))
+                    (
+                        "attachment-element".to_string(),
+                        attachment.link.as_ref().map(|l| md_to_html_link(l)),
+                    )
                 } else {
                     // File attachment - show path without conversion
                     ("attachment-file".to_string(), attachment.link.clone())

@@ -88,8 +88,20 @@ if [ "$HTTP_CODE" != "200" ]; then
     exit 1
 fi
 
-if ! echo "$CONTENT" | grep -q "<!DOCTYPE html>"; then
+if ! echo "$CONTENT" | grep -qi "<!doctype html>"; then
     echo "❌ FAILED: Root URL did not return HTML content"
+    exit 1
+fi
+
+# Root URL must serve the compiled React Explorer SPA bundle.
+if ! echo "$CONTENT" | grep -q '<div id="root"></div>' || ! echo "$CONTENT" | grep -q "assets/explorer.js"; then
+    echo "❌ FAILED: Root URL did not return the Explorer SPA bundle"
+    exit 1
+fi
+
+# The SPA bundle must boot from the injected, browser-local Project Store seed.
+if ! echo "$CONTENT" | grep -q "reqvireProjectStore"; then
+    echo "❌ FAILED: Root URL did not return the seeded Project Store"
     exit 1
 fi
 

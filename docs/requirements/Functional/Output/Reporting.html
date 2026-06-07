@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,19 +447,51 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
   classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
 
+  subgraph 68908f1dbfe487c0["📁 requirements"]
+    subgraph 922090a32bce0711["📄 Refinements.md"]
+      d3d2eb1636d763ca["Traceability Reporting Specification"];
+      class d3d2eb1636d763ca default;
+      click d3d2eb1636d763ca "../../Refinements.html#traceability-reporting-specification";
+      a7802cc8074affd0["Verification Coverage Specification"];
+      class a7802cc8074affd0 default;
+      click a7802cc8074affd0 "../../Refinements.html#verification-coverage-specification";
+    end
+  end
+  subgraph bbcd64366752f8c2["📁 requirements/Capabilities"]
+    subgraph b68ed0f4380d8e73["📄 RelationsAndImpact.md"]
+      c4c21d7d7e15e25f["Reqvire Change Impact Ontology Shape Profile"];
+      class c4c21d7d7e15e25f default;
+      click c4c21d7d7e15e25f "../../Capabilities/RelationsAndImpact.html#reqvire-change-impact-ontology-shape-profile";
+    end
+    subgraph bc5f0c7693f98040["📄 ReportsAndQuery.md"]
+      4db1ddc8d8c6b9d2["Reqvire Report Ontology Shape Profile"];
+      class 4db1ddc8d8c6b9d2 default;
+      click 4db1ddc8d8c6b9d2 "../../Capabilities/ReportsAndQuery.html#reqvire-report-ontology-shape-profile";
+      114e824cae791a67["Reqvire Semantic Export Ontology Shape Profile"];
+      class 114e824cae791a67 default;
+      click 114e824cae791a67 "../../Capabilities/ReportsAndQuery.html#reqvire-semantic-export-ontology-shape-profile";
+    end
+  end
   subgraph e6e9a42ade18cb0e["📁 requirements/Functional/Output"]
     subgraph 7ac75a27d422080f["📄 Behaviors.md"]
+      3f130f01f90de9d8["Forward-Only Relation Traversal Behavior"];
+      class 3f130f01f90de9d8 default;
+      click 3f130f01f90de9d8 "Behaviors.html#forward-only-relation-traversal-behavior";
+      d495c85e42dc5e23["Implementation Coverage Behavior"];
+      class d495c85e42dc5e23 default;
+      click d495c85e42dc5e23 "Behaviors.html#implementation-coverage-behavior";
       5c87b81c1c498514["Reverse Relation Traversal Behavior"];
       class 5c87b81c1c498514 default;
       click 5c87b81c1c498514 "Behaviors.html#reverse-relation-traversal-behavior";
@@ -374,60 +504,78 @@
     end
     subgraph a1762b6e181c2fd0["📄 DiagramGeneration.md"]
       ee0d244ddc9aac8f["Interactive Mermaid Diagrams"];
-      class ee0d244ddc9aac8f userRequirement;
+      class ee0d244ddc9aac8f systemRequirement;
       click ee0d244ddc9aac8f "DiagramGeneration.html#interactive-mermaid-diagrams";
     end
     subgraph 2bc3d3f246abf2de["📄 Reporting.md"]
-      3136e3195e243669["Collect Content from Requirement Chain"];
-      class 3136e3195e243669 systemRequirement;
-      click 3136e3195e243669 "Reporting.html#collect-content-from-requirement-chain";
+      134a318099fd065e["Change Impact Semantic Contract"];
+      class 134a318099fd065e systemRequirement;
+      click 134a318099fd065e "Reporting.html#change-impact-semantic-contract";
+      1ca78759c9aa733b["Collect Capability and Requirement Context"];
+      class 1ca78759c9aa733b systemRequirement;
+      click 1ca78759c9aa733b "Reporting.html#collect-capability-and-requirement-context";
       eeeef3e5049982b8["Comma-Separated Type Filter Parsing"];
       class eeeef3e5049982b8 systemRequirement;
       click eeeef3e5049982b8 "Reporting.html#comma-separated-type-filter-parsing";
-      2a8c9ba9fd932aba["Containment View Report<br/>📎 ContainmentView.md<br/>📎 requirements/Refinements.md#containment-specification<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#resources-report-format-specification"];
-      class 2a8c9ba9fd932aba userRequirement;
+      2a8c9ba9fd932aba["Containment View Report<br/>📎 Containment Specification<br/>📎 Mermaid Diagram Generation Specification<br/>📎 Resources Report Format Specification"];
+      class 2a8c9ba9fd932aba systemRequirement;
       click 2a8c9ba9fd932aba "Reporting.html#containment-view-report";
       5aa1c66a1962bbcf["Flexible Search Type Filtering"];
-      class 5aa1c66a1962bbcf userRequirement;
+      class 5aa1c66a1962bbcf systemRequirement;
       click 5aa1c66a1962bbcf "Reporting.html#flexible-search-type-filtering";
       98610608d81a8fde["Forward-Only Relation Traversal"];
       class 98610608d81a8fde systemRequirement;
       click 98610608d81a8fde "Reporting.html#forward-only-relation-traversal";
-      f8301585b3d30631["Model Diagram Output Formats<br/>📎 requirements/Functional/Output/Specifications.md#mermaid-diagram-generation-specification<br/>📎 requirements/Functional/Output/Specifications.md#diagram-relation-filtering-specification"];
+      98234c8b461c1693["JSON Element Size Estimate Exposure"];
+      class 98234c8b461c1693 systemRequirement;
+      click 98234c8b461c1693 "Reporting.html#json-element-size-estimate-exposure";
+      f8301585b3d30631["Model Diagram Output Formats<br/>📎 Mermaid Diagram Generation Specification<br/>📎 Diagram Relation Filtering Specification"];
       class f8301585b3d30631 systemRequirement;
       click f8301585b3d30631 "Reporting.html#model-diagram-output-formats";
-      40dc720d7c510af0["Model Reports<br/>📎 requirements/Refinements.md#traceability-reporting-specification"];
-      class 40dc720d7c510af0 userRequirement;
+      40dc720d7c510af0["Model Reports"];
+      class 40dc720d7c510af0 systemRequirement;
       click 40dc720d7c510af0 "Reporting.html#model-reports";
       b7ae73612502c3fb["Model Structure and Summaries"];
-      class b7ae73612502c3fb userRequirement;
+      class b7ae73612502c3fb systemRequirement;
       click b7ae73612502c3fb "Reporting.html#model-structure-and-summaries";
+      fc455638cd2d8bcb["Ontology and Shapes Collection<br/>📎 Semantic Contract Structure Specification"];
+      class fc455638cd2d8bcb systemRequirement;
+      click fc455638cd2d8bcb "Reporting.html#ontology-and-shapes-collection";
+      ea7fae7d6ef5a5ab["Ontology Projection Subgraph Materialization<br/>📎 Ontology Collection Output Specification<br/>📎 Semantic Query Contract Structure Specification"];
+      class ea7fae7d6ef5a5ab systemRequirement;
+      click ea7fae7d6ef5a5ab "Reporting.html#ontology-projection-subgraph-materialization";
       c17deaee6f88323a["Provide Validation Reports"];
-      class c17deaee6f88323a userRequirement;
+      class c17deaee6f88323a systemRequirement;
       click c17deaee6f88323a "Reporting.html#provide-validation-reports";
+      35d9a04261052210["Requirement Implementation Coverage Report"];
+      class 35d9a04261052210 systemRequirement;
+      click 35d9a04261052210 "Reporting.html#requirement-implementation-coverage-report";
+      abc801f565bc3648["Requirement Submodels Report<br/>📎 RelationTypes"];
+      class abc801f565bc3648 systemRequirement;
+      click abc801f565bc3648 "Reporting.html#requirement-submodels-report";
       a0f7724a2ceac1ec["Resources Report"];
-      class a0f7724a2ceac1ec userRequirement;
+      class a0f7724a2ceac1ec systemRequirement;
       click a0f7724a2ceac1ec "Reporting.html#resources-report";
       6a3c5a7153a49a89["Reverse Relation Traversal"];
       class 6a3c5a7153a49a89 systemRequirement;
       click 6a3c5a7153a49a89 "Reporting.html#reverse-relation-traversal";
-      f484430652f48bac["Search Report Generator<br/>📎 SearchFiltering.md<br/>📎 requirements/Refinements.md#supported-element-types-specification<br/>📎 requirements/Functional/Output/Specifications.md#resources-report-format-specification"];
+      f484430652f48bac["Search Report Generator<br/>📎 Requirement Governance Metadata Specification<br/>📎 Supported Element Types Specification<br/>📎 Resources Report Format Specification"];
       class f484430652f48bac systemRequirement;
       click f484430652f48bac "Reporting.html#search-report-generator";
       f941bbbbf5db2d8c["Start Element Type Filtering"];
       class f941bbbbf5db2d8c systemRequirement;
       click f941bbbbf5db2d8c "Reporting.html#start-element-type-filtering";
-      c52fdde1821f5cf2["TraceFlow View Report Generation<br/>📎 TraceFlowView.md<br/>📎 requirements/Functional/Processing/Specifications.md#verification-trace-tree-construction"];
+      c52fdde1821f5cf2["TraceFlow View Report Generation<br/>📎 Verification Trace Tree Construction"];
       class c52fdde1821f5cf2 systemRequirement;
       click c52fdde1821f5cf2 "Reporting.html#traceflow-view-report-generation";
-      9acde25d23600635["Tracing Structural Changes<br/>📎 requirements/Refinements.md#traceability-reporting-specification"];
-      class 9acde25d23600635 userRequirement;
+      9acde25d23600635["Tracing Structural Changes<br/>📎 Traceability Reporting Specification"];
+      class 9acde25d23600635 systemRequirement;
       click 9acde25d23600635 "Reporting.html#tracing-structural-changes";
       c988fb8451de7d2d["Validation Report Generator"];
       class c988fb8451de7d2d systemRequirement;
       click c988fb8451de7d2d "Reporting.html#validation-report-generator";
-      befd27abaf2aae8b["Verification Coverage Report<br/>📎 requirements/Refinements.md#verification-coverage-specification<br/>📎 requirements/Functional/Processing/Specifications.md#verification-roll-up-specification<br/>📎 requirements/Functional/Core/Specifications.md#verification-type-selection-guidelines"];
-      class befd27abaf2aae8b userRequirement;
+      befd27abaf2aae8b["Verification Coverage Report<br/>📎 Verification Roll-up Specification<br/>📎 Verification Type Selection Guidelines"];
+      class befd27abaf2aae8b systemRequirement;
       click befd27abaf2aae8b "Reporting.html#verification-coverage-report";
     end
     subgraph 7799005208c6c9c1["📄 Specifications.md"]
@@ -437,21 +585,51 @@
       9bce1082c475cb0d["Collect Output Format Specification"];
       class 9bce1082c475cb0d default;
       click 9bce1082c475cb0d "Specifications.html#collect-output-format-specification";
+      9e63e52686f5f2ec["Comma-Separated Type Filter Parsing Refinement Specification"];
+      class 9e63e52686f5f2ec default;
+      click 9e63e52686f5f2ec "Specifications.html#comma-separated-type-filter-parsing-refinement-specification";
+      951ef493ea5bab60["Containment View Report Refinement Specification"];
+      class 951ef493ea5bab60 default;
+      click 951ef493ea5bab60 "Specifications.html#containment-view-report-refinement-specification";
       d415e0f99fc5ad0c["Deterministic Output Specification"];
       class d415e0f99fc5ad0c default;
       click d415e0f99fc5ad0c "Specifications.html#deterministic-output-specification";
-      e8918fd8f69a1f0a["Diff Output Format Specification"];
-      class e8918fd8f69a1f0a default;
-      click e8918fd8f69a1f0a "Specifications.html#diff-output-format-specification";
-      38c3e6e7692e0875["Error Message Format Specification"];
-      class 38c3e6e7692e0875 default;
-      click 38c3e6e7692e0875 "Specifications.html#error-message-format-specification";
+      615e49b5798b4db5["Flexible Search Type Filtering Refinement Specification"];
+      class 615e49b5798b4db5 default;
+      click 615e49b5798b4db5 "Specifications.html#flexible-search-type-filtering-refinement-specification";
+      e956f793fcd5db76["Implementation Coverage Output Structure Specification"];
+      class e956f793fcd5db76 default;
+      click e956f793fcd5db76 "Specifications.html#implementation-coverage-output-structure-specification";
+      1b9d287b72fba69f["JSON Element Size Estimate Output Specification"];
+      class 1b9d287b72fba69f default;
+      click 1b9d287b72fba69f "Specifications.html#json-element-size-estimate-output-specification";
       64319236fb27fe2["JSON Output Structure"];
       class 64319236fb27fe2 default;
       click 64319236fb27fe2 "Specifications.html#json-output-structure";
       d55aca455bf08f76["Markdown Report Style Specification"];
       class d55aca455bf08f76 default;
       click d55aca455bf08f76 "Specifications.html#markdown-report-style-specification";
+      23f6cb5c582f2aa7["Model Diagram Output Formats Refinement Specification"];
+      class 23f6cb5c582f2aa7 default;
+      click 23f6cb5c582f2aa7 "Specifications.html#model-diagram-output-formats-refinement-specification";
+      c8125c3f52a01fb2["Ontology Collection Output Specification"];
+      class c8125c3f52a01fb2 default;
+      click c8125c3f52a01fb2 "Specifications.html#ontology-collection-output-specification";
+      7ccb0078e923a146["Ontology Projection Subgraph Materialization Specification"];
+      class 7ccb0078e923a146 default;
+      click 7ccb0078e923a146 "Specifications.html#ontology-projection-subgraph-materialization-specification";
+      ce05eef9508b039c["Report Command Catalog Specification"];
+      class ce05eef9508b039c default;
+      click ce05eef9508b039c "Specifications.html#report-command-catalog-specification";
+      eaab99e36d13c58a["Requirement Governance Metadata JSON Output Specification"];
+      class eaab99e36d13c58a default;
+      click eaab99e36d13c58a "Specifications.html#requirement-governance-metadata-json-output-specification";
+      f10c668613f3aa5b["Requirement Implementation Coverage Logic Specification"];
+      class f10c668613f3aa5b default;
+      click f10c668613f3aa5b "Specifications.html#requirement-implementation-coverage-logic-specification";
+      155b550dd1881116["Requirement Submodels Report Specification"];
+      class 155b550dd1881116 default;
+      click 155b550dd1881116 "Specifications.html#requirement-submodels-report-specification";
       1006dcaf287c0eec["Resources Report Format Specification"];
       class 1006dcaf287c0eec default;
       click 1006dcaf287c0eec "Specifications.html#resources-report-format-specification";
@@ -463,11 +641,49 @@
       click 65ef0c6018cc1dc4 "Specifications.html#verification-trace-diagram-specification";
     end
   end
+  subgraph ccd3efc95e7fc7c5["📁 requirements/Functional/Output/DesignDocuments"]
+    subgraph 8c9e6ca8ebe49d49["📄 ContainmentView.md"]
+      2bdbb3bf1991c689["ContainmentView"];
+      class 2bdbb3bf1991c689 default;
+      click 2bdbb3bf1991c689 "DesignDocuments/ContainmentView.html#containmentview";
+    end
+    subgraph c2d34264c3044618["📄 SearchFiltering.md"]
+      7c2c88bc3ab0e2c1["SearchFiltering"];
+      class 7c2c88bc3ab0e2c1 default;
+      click 7c2c88bc3ab0e2c1 "DesignDocuments/SearchFiltering.html#searchfiltering";
+    end
+    subgraph da9f36052ef2a570["📄 TraceFlowView.md"]
+      1a68912d82132949["TraceFlowView"];
+      class 1a68912d82132949 default;
+      click 1a68912d82132949 "DesignDocuments/TraceFlowView.html#traceflowview";
+    end
+  end
   subgraph 6ac6c5ebccc78d5e["📁 requirements/Functional/Output/Verifications"]
     subgraph d02aea5a4453b115["📄 ReportingVerifications.md"]
+      bc78456032f9b90e["Containment Hierarchy Extraction Test"];
+      class bc78456032f9b90e verification;
+      click bc78456032f9b90e "Verifications/ReportingVerifications.html#containment-hierarchy-extraction-test";
       8ce2510b23f2d68e["Containment View Design Documents Test"];
       class 8ce2510b23f2d68e verification;
       click 8ce2510b23f2d68e "Verifications/ReportingVerifications.html#containment-view-design-documents-test";
+      d7ac71b6958efe8b["Containment View JSON Output Test"];
+      class d7ac71b6958efe8b verification;
+      click d7ac71b6958efe8b "Verifications/ReportingVerifications.html#containment-view-json-output-test";
+      759572e71fd760ec["Containment View Mermaid Diagram Test"];
+      class 759572e71fd760ec verification;
+      click 759572e71fd760ec "Verifications/ReportingVerifications.html#containment-view-mermaid-diagram-test";
+      951cc27d889a1768["Containment View Text Output Test"];
+      class 951cc27d889a1768 verification;
+      click 951cc27d889a1768 "Verifications/ReportingVerifications.html#containment-view-text-output-test";
+      2cbfdf7a597a6c6f["Custom Element Type Tracking Test"];
+      class 2cbfdf7a597a6c6f verification;
+      click 2cbfdf7a597a6c6f "Verifications/ReportingVerifications.html#custom-element-type-tracking-test";
+      f0e08fab6460a234["HTML Export Containment View Integration Test"];
+      class f0e08fab6460a234 verification;
+      click f0e08fab6460a234 "Verifications/ReportingVerifications.html#html-export-containment-view-integration-test";
+      d5f47e3a609815a9["JSON Element Size Estimate Output Verification"];
+      class d5f47e3a609815a9 verification;
+      click d5f47e3a609815a9 "Verifications/ReportingVerifications.html#json-element-size-estimate-output-verification";
       f1434402b83d319["Model Command Verification"];
       class f1434402b83d319 verification;
       click f1434402b83d319 "Verifications/ReportingVerifications.html#model-command-verification";
@@ -477,15 +693,24 @@
       3c9f85ce80e7b0c["Resources Report Verification"];
       class 3c9f85ce80e7b0c verification;
       click 3c9f85ce80e7b0c "Verifications/ReportingVerifications.html#resources-report-verification";
-      6535b833e5ffb628["Reverse Model Traversal Test<br/>📎 requirements/Functional/Output/Behaviors.md#reverse-relation-traversal-behavior"];
+      6535b833e5ffb628["Reverse Model Traversal Test<br/>📎 Reverse Relation Traversal Behavior"];
       class 6535b833e5ffb628 verification;
       click 6535b833e5ffb628 "Verifications/ReportingVerifications.html#reverse-model-traversal-test";
       246afbd94e01647b["Search Command Tests"];
       class 246afbd94e01647b verification;
       click 246afbd94e01647b "Verifications/ReportingVerifications.html#search-command-tests";
-      8f4c9f9feba8e8f1["Start Type Filter Test<br/>📎 requirements/Functional/Output/Behaviors.md#start-element-type-filter-behavior"];
+      ce9d1013350fc8e["Semantic Contract Search JSON Test"];
+      class ce9d1013350fc8e verification;
+      click ce9d1013350fc8e "Verifications/ReportingVerifications.html#semantic-contract-search-json-test";
+      777ac3cbda264394["Semantic Query Contract Search JSON Test"];
+      class 777ac3cbda264394 verification;
+      click 777ac3cbda264394 "Verifications/ReportingVerifications.html#semantic-query-contract-search-json-test";
+      8f4c9f9feba8e8f1["Start Type Filter Test<br/>📎 Start Element Type Filter Behavior"];
       class 8f4c9f9feba8e8f1 verification;
       click 8f4c9f9feba8e8f1 "Verifications/ReportingVerifications.html#start-type-filter-test";
+      b32babb6538c47ce["Submodels Report Verification"];
+      class b32babb6538c47ce verification;
+      click b32babb6538c47ce "Verifications/ReportingVerifications.html#submodels-report-verification";
       17252f3552f2567a["TraceFlow View Test"];
       class 17252f3552f2567a verification;
       click 17252f3552f2567a "Verifications/ReportingVerifications.html#traceflow-view-test";
@@ -505,19 +730,28 @@
       click 129e024331e2ae9e "../Processing/Verifications/ChangeImpactVerifications.html#structural-change-reports-verification";
     end
   end
-  subgraph cfe1eea0278796bc["📁 requirements/Interfaces/CLI"]
-    subgraph 43307c569ff89429["📄 Commands.md"]
-      ee7ad64abb668237["CLI Resources Command"];
-      class ee7ad64abb668237 systemRequirement;
-      click ee7ad64abb668237 "../../Interfaces/CLI/Commands.html#cli-resources-command";
+  subgraph e258363212a98952["📁 requirements/Interfaces/CLI/Verifications"]
+    subgraph 81d836bf8ae49ad4["📄 CLIVerifications.md"]
+      725e45a9cfd0052f["CLI Ontologies Command Verification"];
+      class 725e45a9cfd0052f verification;
+      click 725e45a9cfd0052f "../../Interfaces/CLI/Verifications/CLIVerifications.html#cli-ontologies-command-verification";
     end
   end
+  subgraph 7b06d045a68fb066["📁 requirements/Interfaces/WebInterface/Verifications"]
+    subgraph 560467e65835f4b0["📄 WebInterfaceVerifications.md"]
+      d57772c444d5d34b["Ontology Model Viewer Analysis Verification"];
+      class d57772c444d5d34b verification;
+      click d57772c444d5d34b "../../Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#ontology-model-viewer-analysis-verification";
+    end
+  end
+  134a318099fd065e -->|refinedBy| c4c21d7d7e15e25f;
+  1ca78759c9aa733b -->|refinedBy| 8891df8e827d960c;
+  1ca78759c9aa733b -->|refinedBy| 9bce1082c475cb0d;
   4ada1b79f43485ee["report_collect.rs"];
   class 4ada1b79f43485ee default;
   click 4ada1b79f43485ee "../../../core/src/report_collect.rs";
-  3136e3195e243669 -->|satisfiedBy| 4ada1b79f43485ee;
-  3136e3195e243669 -->|satisfiedBy| 8891df8e827d960c;
-  3136e3195e243669 -->|satisfiedBy| 9bce1082c475cb0d;
+  1ca78759c9aa733b -->|satisfiedBy| 4ada1b79f43485ee;
+  eeeef3e5049982b8 -->|refinedBy| 9e63e52686f5f2ec;
   25bf5cc42f41e395["cli.rs"];
   class 25bf5cc42f41e395 default;
   click 25bf5cc42f41e395 "../../../cli/src/cli.rs";
@@ -527,67 +761,110 @@
   click 399c3564599787ff "../../../core/src/search.rs";
   eeeef3e5049982b8 -->|satisfiedBy| 399c3564599787ff;
   eeeef3e5049982b8 -.->|verifiedBy| 334b4046f4e15671;
-  4a8772cb0c75593a["containment.rs"];
-  class 4a8772cb0c75593a default;
-  click 4a8772cb0c75593a "../../../core/src/containment.rs";
-  2a8c9ba9fd932aba -->|satisfiedBy| 4a8772cb0c75593a;
+  2a8c9ba9fd932aba -->|refinedBy| 2bdbb3bf1991c689;
+  2a8c9ba9fd932aba -->|refinedBy| 951ef493ea5bab60;
+  2a8c9ba9fd932aba -.->|verifiedBy| bc78456032f9b90e;
   2a8c9ba9fd932aba -.->|verifiedBy| 8ce2510b23f2d68e;
+  2a8c9ba9fd932aba -.->|verifiedBy| d7ac71b6958efe8b;
+  2a8c9ba9fd932aba -.->|verifiedBy| 759572e71fd760ec;
+  2a8c9ba9fd932aba -.->|verifiedBy| 951cc27d889a1768;
+  2a8c9ba9fd932aba -.->|verifiedBy| f0e08fab6460a234;
   5aa1c66a1962bbcf -.->|deriveReqT| eeeef3e5049982b8;
+  5aa1c66a1962bbcf -->|refinedBy| 615e49b5798b4db5;
+  98610608d81a8fde -->|refinedBy| 3f130f01f90de9d8;
   d4166762363eb31d["diagrams.rs"];
   class d4166762363eb31d default;
   click d4166762363eb31d "../../../core/src/diagrams.rs";
   98610608d81a8fde -->|satisfiedBy| d4166762363eb31d;
   98610608d81a8fde -.->|verifiedBy| f1434402b83d319;
-  f8301585b3d30631 -.->|deriveReqT| 98610608d81a8fde;
-  f8301585b3d30631 -.->|deriveReqT| 6a3c5a7153a49a89;
-  f8301585b3d30631 -.->|deriveReqT| f941bbbbf5db2d8c;
-  f8301585b3d30631 -->|satisfiedBy| d4166762363eb31d;
-  f8301585b3d30631 -.->|verifiedBy| f1434402b83d319;
-  40dc720d7c510af0 -.->|deriveReqT| ee0d244ddc9aac8f;
-  40dc720d7c510af0 -.->|deriveReqT| 3136e3195e243669;
-  40dc720d7c510af0 -.->|deriveReqT| b7ae73612502c3fb;
-  40dc720d7c510af0 -.->|deriveReqT| c17deaee6f88323a;
-  40dc720d7c510af0 -.->|deriveReqT| a0f7724a2ceac1ec;
-  40dc720d7c510af0 -.->|deriveReqT| befd27abaf2aae8b;
-  40dc720d7c510af0 -->|satisfiedBy| d415e0f99fc5ad0c;
-  40dc720d7c510af0 -->|satisfiedBy| e8918fd8f69a1f0a;
-  40dc720d7c510af0 -->|satisfiedBy| 38c3e6e7692e0875;
-  40dc720d7c510af0 -->|satisfiedBy| 64319236fb27fe2;
-  40dc720d7c510af0 -->|satisfiedBy| d55aca455bf08f76;
-  40dc720d7c510af0 -->|satisfiedBy| 934223a89d4e2022;
-  b7ae73612502c3fb -.->|deriveReqT| 2a8c9ba9fd932aba;
-  b7ae73612502c3fb -.->|deriveReqT| f8301585b3d30631;
-  b7ae73612502c3fb -.->|deriveReqT| f484430652f48bac;
-  c17deaee6f88323a -.->|deriveReqT| c988fb8451de7d2d;
-  a0f7724a2ceac1ec -.->|deriveReqT| ee7ad64abb668237;
-  c0849dfe7867fd66["report_resources.rs"];
-  class c0849dfe7867fd66 default;
-  click c0849dfe7867fd66 "../../../core/src/report_resources.rs";
-  a0f7724a2ceac1ec -->|satisfiedBy| c0849dfe7867fd66;
-  a0f7724a2ceac1ec -->|satisfiedBy| 1006dcaf287c0eec;
-  a0f7724a2ceac1ec -.->|verifiedBy| 3c9f85ce80e7b0c;
+  98234c8b461c1693 -->|refinedBy| 1b9d287b72fba69f;
+  e068cb8b03a77b4d["element.rs"];
+  class e068cb8b03a77b4d default;
+  click e068cb8b03a77b4d "../../../core/src/element.rs";
+  98234c8b461c1693 -->|satisfiedBy| e068cb8b03a77b4d;
   b2113c1b9405a723["report_model.rs"];
   class b2113c1b9405a723 default;
   click b2113c1b9405a723 "../../../core/src/report_model.rs";
+  98234c8b461c1693 -->|satisfiedBy| b2113c1b9405a723;
+  98234c8b461c1693 -.->|verifiedBy| d5f47e3a609815a9;
+  f8301585b3d30631 -.->|deriveReqT| 98610608d81a8fde;
+  f8301585b3d30631 -.->|deriveReqT| 6a3c5a7153a49a89;
+  f8301585b3d30631 -.->|deriveReqT| f941bbbbf5db2d8c;
+  f8301585b3d30631 -->|refinedBy| 23f6cb5c582f2aa7;
+  f8301585b3d30631 -->|satisfiedBy| d4166762363eb31d;
+  f8301585b3d30631 -.->|verifiedBy| f1434402b83d319;
+  40dc720d7c510af0 -.->|deriveReqT| ee0d244ddc9aac8f;
+  40dc720d7c510af0 -.->|deriveReqT| 1ca78759c9aa733b;
+  40dc720d7c510af0 -.->|deriveReqT| 98234c8b461c1693;
+  40dc720d7c510af0 -.->|deriveReqT| b7ae73612502c3fb;
+  40dc720d7c510af0 -.->|deriveReqT| c17deaee6f88323a;
+  40dc720d7c510af0 -.->|deriveReqT| 35d9a04261052210;
+  40dc720d7c510af0 -.->|deriveReqT| a0f7724a2ceac1ec;
+  40dc720d7c510af0 -.->|deriveReqT| befd27abaf2aae8b;
+  40dc720d7c510af0 -->|refinedBy| 4db1ddc8d8c6b9d2;
+  40dc720d7c510af0 -->|refinedBy| d415e0f99fc5ad0c;
+  40dc720d7c510af0 -->|refinedBy| 64319236fb27fe2;
+  40dc720d7c510af0 -->|refinedBy| d55aca455bf08f76;
+  40dc720d7c510af0 -->|refinedBy| ce05eef9508b039c;
+  40dc720d7c510af0 -->|refinedBy| 934223a89d4e2022;
+  40dc720d7c510af0 -->|refinedBy| d3d2eb1636d763ca;
+  b7ae73612502c3fb -.->|deriveReqT| 2a8c9ba9fd932aba;
+  b7ae73612502c3fb -.->|deriveReqT| f8301585b3d30631;
+  b7ae73612502c3fb -.->|deriveReqT| abc801f565bc3648;
+  b7ae73612502c3fb -.->|deriveReqT| f484430652f48bac;
+  fc455638cd2d8bcb -->|refinedBy| 114e824cae791a67;
+  fc455638cd2d8bcb -->|refinedBy| c8125c3f52a01fb2;
+  bd747195bcfe94dd["export.rs"];
+  class bd747195bcfe94dd default;
+  click bd747195bcfe94dd "../../../core/src/export.rs";
+  fc455638cd2d8bcb -->|satisfiedBy| bd747195bcfe94dd;
+  242ec6a051230b63["semantic_contract.rs"];
+  class 242ec6a051230b63 default;
+  click 242ec6a051230b63 "../../../core/src/semantic_contract.rs";
+  fc455638cd2d8bcb -->|satisfiedBy| 242ec6a051230b63;
+  fc455638cd2d8bcb -.->|verifiedBy| 725e45a9cfd0052f;
+  ea7fae7d6ef5a5ab -->|refinedBy| 7ccb0078e923a146;
+  ea7fae7d6ef5a5ab -.->|verifiedBy| 725e45a9cfd0052f;
+  ea7fae7d6ef5a5ab -.->|verifiedBy| d57772c444d5d34b;
+  c17deaee6f88323a -.->|deriveReqT| c988fb8451de7d2d;
+  35d9a04261052210 -->|refinedBy| d495c85e42dc5e23;
+  35d9a04261052210 -->|refinedBy| e956f793fcd5db76;
+  35d9a04261052210 -->|refinedBy| f10c668613f3aa5b;
+  f0b66f65c95dfaa2["report_coverage.rs"];
+  class f0b66f65c95dfaa2 default;
+  click f0b66f65c95dfaa2 "../../../core/src/report_coverage.rs";
+  35d9a04261052210 -->|satisfiedBy| f0b66f65c95dfaa2;
+  abc801f565bc3648 -->|refinedBy| 155b550dd1881116;
+  debdb337032547f1["report_submodels.rs"];
+  class debdb337032547f1 default;
+  click debdb337032547f1 "../../../core/src/report_submodels.rs";
+  abc801f565bc3648 -->|satisfiedBy| debdb337032547f1;
+  abc801f565bc3648 -.->|verifiedBy| b32babb6538c47ce;
+  a0f7724a2ceac1ec -->|refinedBy| 1006dcaf287c0eec;
+  a0f7724a2ceac1ec -.->|verifiedBy| 3c9f85ce80e7b0c;
+  6a3c5a7153a49a89 -->|refinedBy| 5c87b81c1c498514;
   6a3c5a7153a49a89 -->|satisfiedBy| b2113c1b9405a723;
-  6a3c5a7153a49a89 -->|satisfiedBy| 5c87b81c1c498514;
   6a3c5a7153a49a89 -.->|verifiedBy| 6535b833e5ffb628;
   f484430652f48bac -.->|deriveReqT| 5aa1c66a1962bbcf;
+  f484430652f48bac -->|refinedBy| 7c2c88bc3ab0e2c1;
+  f484430652f48bac -->|refinedBy| eaab99e36d13c58a;
   20029702488622b["filters.rs"];
   class 20029702488622b default;
   click 20029702488622b "../../../core/src/filters.rs";
   f484430652f48bac -->|satisfiedBy| 20029702488622b;
   f484430652f48bac -->|satisfiedBy| 399c3564599787ff;
+  f484430652f48bac -.->|verifiedBy| 2cbfdf7a597a6c6f;
   f484430652f48bac -.->|verifiedBy| 246afbd94e01647b;
+  f484430652f48bac -.->|verifiedBy| ce9d1013350fc8e;
+  f484430652f48bac -.->|verifiedBy| 777ac3cbda264394;
+  f941bbbbf5db2d8c -->|refinedBy| c722f86eb2eb252f;
   f941bbbbf5db2d8c -->|satisfiedBy| b2113c1b9405a723;
-  f941bbbbf5db2d8c -->|satisfiedBy| c722f86eb2eb252f;
   f941bbbbf5db2d8c -.->|verifiedBy| 8f4c9f9feba8e8f1;
-  bd747195bcfe94dd["export.rs"];
-  class bd747195bcfe94dd default;
-  click bd747195bcfe94dd "../../../core/src/export.rs";
+  c52fdde1821f5cf2 -->|refinedBy| 1a68912d82132949;
+  c52fdde1821f5cf2 -->|refinedBy| 65ef0c6018cc1dc4;
   c52fdde1821f5cf2 -->|satisfiedBy| bd747195bcfe94dd;
-  c52fdde1821f5cf2 -->|satisfiedBy| 65ef0c6018cc1dc4;
   c52fdde1821f5cf2 -.->|verifiedBy| 17252f3552f2567a;
+  9acde25d23600635 -.->|deriveReqT| 134a318099fd065e;
   9acde25d23600635 -.->|deriveReqT| a27cb4ff2637ed4a;
   9acde25d23600635 -.->|verifiedBy| 129e024331e2ae9e;
   499d48218b73f571["model.rs"];
@@ -595,11 +872,8 @@
   click 499d48218b73f571 "../../../core/src/model.rs";
   c988fb8451de7d2d -->|satisfiedBy| 499d48218b73f571;
   befd27abaf2aae8b -.->|deriveReqT| c52fdde1821f5cf2;
-  f0b66f65c95dfaa2["report_coverage.rs"];
-  class f0b66f65c95dfaa2 default;
-  click f0b66f65c95dfaa2 "../../../core/src/report_coverage.rs";
-  befd27abaf2aae8b -->|satisfiedBy| f0b66f65c95dfaa2;
-  befd27abaf2aae8b -->|satisfiedBy| 8244c27e5a9f5023;
+  befd27abaf2aae8b -->|refinedBy| 8244c27e5a9f5023;
+  befd27abaf2aae8b -->|refinedBy| a7802cc8074affd0;
   80aab4c106444560["test.sh"];
   class 80aab4c106444560 default;
   click 80aab4c106444560 "../../../tests/test-multi-type-search/test.sh";
@@ -607,37 +881,67 @@
   ea79f4f1551d1df1["test.sh"];
   class ea79f4f1551d1df1 default;
   click ea79f4f1551d1df1 "../../../tests/test-containment-view/test.sh";
+  bc78456032f9b90e -->|satisfiedBy| ea79f4f1551d1df1;
   8ce2510b23f2d68e -->|satisfiedBy| ea79f4f1551d1df1;
+  d7ac71b6958efe8b -->|satisfiedBy| ea79f4f1551d1df1;
+  759572e71fd760ec -->|satisfiedBy| ea79f4f1551d1df1;
+  951cc27d889a1768 -->|satisfiedBy| ea79f4f1551d1df1;
+  f0e08fab6460a234 -->|satisfiedBy| ea79f4f1551d1df1;
   df92bf508f2f7295["test.sh"];
   class df92bf508f2f7295 default;
   click df92bf508f2f7295 "../../../tests/test-model-command/test.sh";
   f1434402b83d319 -->|satisfiedBy| df92bf508f2f7295;
+  67a04a713073a1c1["test.sh"];
+  class 67a04a713073a1c1 default;
+  click 67a04a713073a1c1 "../../../tests/test-mcp-server/test.sh";
+  d5f47e3a609815a9 -->|satisfiedBy| 67a04a713073a1c1;
+  d5f47e3a609815a9 -->|satisfiedBy| df92bf508f2f7295;
   ee0d244ddc9aac8f -.->|deriveReqT| b1a0db26e90f239f;
-  ee0d244ddc9aac8f -->|satisfiedBy| 4804d27a20a41dfb;
-  ee0d244ddc9aac8f -->|satisfiedBy| ac522a615450fded;
-  ee0d244ddc9aac8f -->|satisfiedBy| b214580f5133dc42;
-  ee0d244ddc9aac8f -->|satisfiedBy| ec385316ac867c67;
-  ee7ad64abb668237 -->|satisfiedBy| 25bf5cc42f41e395;
-  ee7ad64abb668237 -.->|verifiedBy| 3c9f85ce80e7b0c;
+  ee0d244ddc9aac8f -->|refinedBy| 4804d27a20a41dfb;
+  ee0d244ddc9aac8f -->|refinedBy| ac522a615450fded;
+  ee0d244ddc9aac8f -->|refinedBy| b214580f5133dc42;
+  ee0d244ddc9aac8f -->|refinedBy| fc350fc9c653a2f8;
+  a7e44dc2dcda3f["test.sh"];
+  class a7e44dc2dcda3f default;
+  click a7e44dc2dcda3f "../../../tests/test-ontologies-command/test.sh";
+  725e45a9cfd0052f -->|satisfiedBy| a7e44dc2dcda3f;
+  7a9a1f5f9dde1b47["test.sh"];
+  class 7a9a1f5f9dde1b47 default;
+  click 7a9a1f5f9dde1b47 "../../../tests/test-submodels-command/test.sh";
+  b32babb6538c47ce -->|satisfiedBy| 7a9a1f5f9dde1b47;
   c326a5f02f65c781["test.sh"];
   class c326a5f02f65c781 default;
   click c326a5f02f65c781 "../../../tests/test-resources-report/test.sh";
   3c9f85ce80e7b0c -->|satisfiedBy| c326a5f02f65c781;
-  ea6a90c3d551dae4["test.sh"];
-  class ea6a90c3d551dae4 default;
-  click ea6a90c3d551dae4 "../../../tests/test-search-all-capabilities/test.sh";
-  246afbd94e01647b -->|satisfiedBy| ea6a90c3d551dae4;
+  6535b833e5ffb628 -->|satisfiedBy| df92bf508f2f7295;
+  164ab977539aaf34["test.sh"];
+  class 164ab977539aaf34 default;
+  click 164ab977539aaf34 "../../../tests/test-search-all-capabilities/test.sh";
+  2cbfdf7a597a6c6f -->|satisfiedBy| 164ab977539aaf34;
+  246afbd94e01647b -->|satisfiedBy| 164ab977539aaf34;
+  980257c30300b5aa["test.sh"];
+  class 980257c30300b5aa default;
+  click 980257c30300b5aa "../../../tests/test-semantic-contract-json/test.sh";
+  ce9d1013350fc8e -->|satisfiedBy| 980257c30300b5aa;
+  6e45b4e97ce264de["test.sh"];
+  class 6e45b4e97ce264de default;
+  click 6e45b4e97ce264de "../../../tests/test-semantic-query-contracts/test.sh";
+  777ac3cbda264394 -->|satisfiedBy| 6e45b4e97ce264de;
+  8f4c9f9feba8e8f1 -->|satisfiedBy| df92bf508f2f7295;
   b14852fd8c912f44["test.sh"];
   class b14852fd8c912f44 default;
   click b14852fd8c912f44 "../../../tests/test-traceflow-view/test.sh";
   17252f3552f2567a -->|satisfiedBy| b14852fd8c912f44;
   a27cb4ff2637ed4a -.->|deriveReqT| 1868da177a2e8ffd;
   a27cb4ff2637ed4a -.->|deriveReqT| 27ee21b54c142739;
+  a27cb4ff2637ed4a -->|refinedBy| 36a78e8abf126164;
   4391424e97bc407a["change_impact.rs"];
   class 4391424e97bc407a default;
   click 4391424e97bc407a "../../../core/src/change_impact.rs";
   a27cb4ff2637ed4a -->|satisfiedBy| 4391424e97bc407a;
   a27cb4ff2637ed4a -.->|verifiedBy| 3758f5f1c504cd42;
+  a27cb4ff2637ed4a -.->|verifiedBy| 1671dffae8c8b861;
+  a27cb4ff2637ed4a -.->|verifiedBy| 5cb5ec4aa9b53fba;
   c2377a15dab54ba5["test.sh"];
   class c2377a15dab54ba5 default;
   click c2377a15dab54ba5 "../../../tests/test-change-impact-detection/test.sh";
@@ -647,36 +951,36 @@
 <p>When requested the system shall provide human readable and machine readable System model reports with deterministic output and consistent ordering.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
-</ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="../../Refinements.html#traceability-reporting-specification">Traceability Reporting Specification</a></li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
-<li>derive: <a href="#collect-content-from-requirement-chain">Collect Content from Requirement Chain</a></li>
+<li>derive: <a href="#collect-capability-and-requirement-context">Collect Capability and Requirement Context</a></li>
+<li>derive: <a href="#json-element-size-estimate-exposure">JSON Element Size Estimate Exposure</a></li>
 <li>derive: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
 <li>derive: <a href="#provide-validation-reports">Provide Validation Reports</a></li>
+<li>derive: <a href="#requirement-implementation-coverage-report">Requirement Implementation Coverage Report</a></li>
 <li>derive: <a href="#resources-report">Resources Report</a></li>
 <li>derive: <a href="#verification-coverage-report">Verification Coverage Report</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#provide-reports">Provide Reports</a></li>
-<li>satisfiedBy: <a href="Specifications.html#deterministic-output-specification">Deterministic Output Specification</a></li>
-<li>satisfiedBy: <a href="Specifications.html#diff-output-format-specification">Diff Output Format Specification</a></li>
-<li>satisfiedBy: <a href="Specifications.html#error-message-format-specification">Error Message Format Specification</a></li>
-<li>satisfiedBy: <a href="Specifications.html#json-output-structure">JSON Output Structure</a></li>
-<li>satisfiedBy: <a href="Specifications.html#markdown-report-style-specification">Markdown Report Style Specification</a></li>
-<li>satisfiedBy: <a href="Specifications.html#text-output-formatting">Text Output Formatting</a></li>
+<li>refinedBy: <a href="../../Capabilities/ReportsAndQuery.html#reqvire-report-ontology-shape-profile">Reqvire Report Ontology Shape Profile</a></li>
+<li>refinedBy: <a href="Specifications.html#deterministic-output-specification">Deterministic Output Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#json-output-structure">JSON Output Structure</a></li>
+<li>refinedBy: <a href="Specifications.html#markdown-report-style-specification">Markdown Report Style Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#report-command-catalog-specification">Report Command Catalog Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#text-output-formatting">Text Output Formatting</a></li>
+<li>refinedBy: <a href="../../Refinements.html#traceability-reporting-specification">Traceability Reporting Specification</a></li>
+<li>specify: <a href="../../Capabilities/ReportsAndQuery.html#provide-reports">Provide Reports</a></li>
 </ul>
 <hr />
-<h3 id="collect-content-from-requirement-chain">Collect Content from Requirement Chain</h3>
-<p>The system shall collect and consolidate all content from a requirement element and its ancestors via derivedFrom relations, including attachment contents, and output with source citations in text or JSON format.</p>
+<h3 id="collect-capability-and-requirement-context">Collect Capability and Requirement Context</h3>
+<p>The system shall collect and consolidate context from a capability or requirement element, including directional capability and requirement traversal, inherited capability ontology context, requirement-owned <code>refinedBy</code> targets, attached requirement contract contents, and source citations in text or JSON format.</p>
 <h4>Details</h4>
 <p>The system shall define:</p>
 <ul>
-<li>Content collection rules for elements and attachments</li>
+<li>Content collection rules for elements, refinedBy targets, and attachments</li>
 <li>Output format specifications for text and JSON modes</li>
+<li>Direction-based traversal over capability hierarchy, requirement hierarchy, and the <code>specify</code>/<code>specifiedBy</code> bridge where defined by the collect traversal specification</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -685,21 +989,44 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
+<li>refinedBy: <a href="Specifications.html#collect-content-specification">Collect Content Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#collect-output-format-specification">Collect Output Format Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/report_collect.rs">report_collect.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#collect-content-specification">Collect Content Specification</a></li>
-<li>satisfiedBy: <a href="Specifications.html#collect-output-format-specification">Collect Output Format Specification</a></li>
+</ul>
+<hr />
+<h3 id="json-element-size-estimate-exposure">JSON Element Size Estimate Exposure</h3>
+<p>The system shall expose element-level <code>size_estimate</code> records in JSON model evidence outputs when the model was built with size estimates enabled.</p>
+<h4>Details</h4>
+<ul>
+<li>JSON outputs that serialize model elements shall include <code>size_estimate</code> when element size estimates are enabled.</li>
+<li>Non-JSON outputs shall not include size-estimate fields and shall remain unchanged.</li>
+<li>Report-level aggregate size summaries are out of scope.</li>
+<li>The initial JSON evidence outputs in scope are model evidence outputs that serialize elements directly or as nested relation targets.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
+<li>refinedBy: <a href="Specifications.html#json-element-size-estimate-output-specification">JSON Element Size Estimate Output Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/element.rs">element.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/report_model.rs">report_model.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#json-element-size-estimate-output-verification">JSON Element Size Estimate Output Verification</a></li>
 </ul>
 <hr />
 <h3 id="model-structure-and-summaries">Model Structure and Summaries</h3>
-<p>When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections also supporting json output.</p>
+<p>When requested the system shall generate reports summarizing the structure and relationships in the System model, including counts and types of connections, ontology-root and capability-root starting contexts, and JSON output.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#containment-view-report">Containment View Report</a></li>
 <li>derive: <a href="#model-diagram-output-formats">Model Diagram Output Formats</a></li>
+<li>derive: <a href="#requirement-submodels-report">Requirement Submodels Report</a></li>
 <li>derive: <a href="#search-report-generator">Search Report Generator</a></li>
 <li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
 </ul>
@@ -707,30 +1034,13 @@
 <h3 id="containment-view-report">Containment View Report</h3>
 <p>The system shall generate containment view reports showing the physical hierarchical structure of the model.</p>
 <h4>Details</h4>
-<p>The containment view shows the physical organization of the model:</p>
-<ul>
-<li>Root folder → Subfolders → Files → Elements</li>
-<li>Sections skipped (elements shown directly under files)</li>
-</ul>
-<p>The system shall generate reports in multiple formats:</p>
-<ul>
-<li>Mermaid diagrams for visualization</li>
-<li>JSON for programmatic access</li>
-<li>HTML export integration</li>
-</ul>
-<p>The system shall include design documents:</p>
-<ul>
-<li>Files in DesignDocuments folders displayed alongside specifications</li>
-<li>Design documents visually distinguished from specification elements</li>
-<li>Clickable navigation to document files</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="DesignDocuments/ContainmentView.html">ContainmentView.html</a></li>
 <li><a href="../../Refinements.html#containment-specification">Containment Specification</a></li>
 <li><a href="Specifications.html#mermaid-diagram-generation-specification">Mermaid Diagram Generation Specification</a></li>
 <li><a href="Specifications.html#resources-report-format-specification">Resources Report Format Specification</a></li>
@@ -738,21 +1048,20 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
-<li>satisfiedBy: <a href="../../../core/src/containment.rs">containment.rs</a></li>
+<li>refinedBy: <a href="DesignDocuments/ContainmentView.html#containmentview">ContainmentView</a></li>
+<li>refinedBy: <a href="Specifications.html#containment-view-report-refinement-specification">Containment View Report Refinement Specification</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#containment-hierarchy-extraction-test">Containment Hierarchy Extraction Test</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#containment-view-design-documents-test">Containment View Design Documents Test</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#containment-view-json-output-test">Containment View JSON Output Test</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#containment-view-mermaid-diagram-test">Containment View Mermaid Diagram Test</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#containment-view-text-output-test">Containment View Text Output Test</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#html-export-containment-view-integration-test">HTML Export Containment View Integration Test</a></li>
 </ul>
 <hr />
 <h3 id="model-diagram-output-formats">Model Diagram Output Formats</h3>
-<p>System shall support markdown and JSON output formats.</p>
+<p>System shall support Markdown, pure Mermaid, and JSON output formats.</p>
 <h4>Details</h4>
-<ul>
-<li>Markdown format shall include embedded Mermaid diagram with model structure</li>
-<li>Markdown shall show hierarchical structure using containment subgraphs (folders &gt; files &gt; elements)</li>
-<li>Mermaid diagrams shall use folder and file subgraphs to visually group elements by their physical location</li>
-<li>JSON format shall use structured data with folders, files, sections, elements, relations, and attachments</li>
-<li>Both formats shall represent the same filtered or complete model data</li>
-<li>Element attachments shall be included as an array of strings in both formats (file paths and element identifiers)</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -768,6 +1077,7 @@
 <li>derive: <a href="#reverse-relation-traversal">Reverse Relation Traversal</a></li>
 <li>derive: <a href="#start-element-type-filtering">Start Element Type Filtering</a></li>
 <li>derivedFrom: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
+<li>refinedBy: <a href="Specifications.html#model-diagram-output-formats-refinement-specification">Model Diagram Output Formats Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#model-command-verification">Model Command Verification</a></li>
 </ul>
@@ -775,13 +1085,7 @@
 <h3 id="forward-only-relation-traversal">Forward-Only Relation Traversal</h3>
 <p>When filtering by root element, system shall traverse only forward relations down to leaf elements.</p>
 <h4>Details</h4>
-<ul>
-<li>Shall follow only forward relations (derive, satisfiedBy, verifiedBy, trace)</li>
-<li>Shall start from specified root element (looked up by name)</li>
-<li>Shall recursively traverse outgoing relations to leaf elements</li>
-<li>Shall NOT traverse backward (no bidirectional traversal)</li>
-<li>Unfiltered diagrams (no –from) shall show complete model with all elements</li>
-</ul>
+<p>Traversal behavior shall follow the associated behavior refinement.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -789,6 +1093,7 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-diagram-output-formats">Model Diagram Output Formats</a></li>
+<li>refinedBy: <a href="Behaviors.html#forward-only-relation-traversal-behavior">Forward-Only Relation Traversal Behavior</a></li>
 <li>satisfiedBy: <a href="../../../core/src/diagrams.rs">diagrams.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#model-command-verification">Model Command Verification</a></li>
 </ul>
@@ -802,8 +1107,8 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-diagram-output-formats">Model Diagram Output Formats</a></li>
+<li>refinedBy: <a href="Behaviors.html#reverse-relation-traversal-behavior">Reverse Relation Traversal Behavior</a></li>
 <li>satisfiedBy: <a href="../../../core/src/report_model.rs">report_model.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#reverse-relation-traversal-behavior">Reverse Relation Traversal Behavior</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#reverse-model-traversal-test">Reverse Model Traversal Test</a></li>
 </ul>
 <hr />
@@ -816,36 +1121,72 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#model-diagram-output-formats">Model Diagram Output Formats</a></li>
+<li>refinedBy: <a href="Behaviors.html#start-element-type-filter-behavior">Start Element Type Filter Behavior</a></li>
 <li>satisfiedBy: <a href="../../../core/src/report_model.rs">report_model.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#start-element-type-filter-behavior">Start Element Type Filter Behavior</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#start-type-filter-test">Start Type Filter Test</a></li>
 </ul>
 <hr />
-<h3 id="search-report-generator">Search Report Generator</h3>
-<p>The system shall implement a search report generator with comprehensive filtering and element type tracking.</p>
+<h3 id="requirement-submodels-report">Requirement Submodels Report</h3>
+<p>The system shall provide a submodels report that identifies independent capability-root subgraphs and cross-submodel requirement couplings.</p>
 <h4>Details</h4>
-<p>The search report must include file-level, section-level, and element-level information.</p>
-<p>The system shall define comprehensive search filtering capabilities:</p>
+<p>The report shall support:</p>
 <ul>
-<li>By file path patterns</li>
-<li>By element name patterns</li>
-<li>By element type</li>
-<li>By element content patterns</li>
-<li>By presence/absence of relations</li>
-<li>By presence/absence of attachments</li>
+<li>Full model view listing all discovered capability-rooted submodels and cross-submodel couplings</li>
+<li>Filtered view scoped to one capability or requirement subtree by element name</li>
+<li>Scope filtering follows transitive descendants via capability hierarchy, <code>specifiedBy</code>, and requirement hierarchy in downstream direction.</li>
+<li>When filtered from a capability, the selected capability is reported as the scoped capability submodel and requirement counts include requirements in that capability subtree.</li>
+<li>When filtered from a requirement, the selected requirement is a boundary and is not counted as a reported submodel entry; first-level child requirement branches are reported as scoped requirement submodels.</li>
+<li>When a selected requirement subtree has no child submodels, the filtered report contains zero scoped submodels.</li>
+<li>The report summary includes deterministic counts for total submodels, total requirements represented in scope, and total cross-submodel couplings; in scoped mode, counts are computed from the scoped submodels and couplings only.</li>
+<li>Summary content follows the report paragraph: <code>Submodels</code>, <code>Requirements</code>, and <code>Cross-Submodel Couplings</code>.</li>
 </ul>
-<p>The system shall define custom element type tracking:</p>
-<ul>
-<li>Identify types not in standard categories</li>
-<li>Report custom types with counts</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="DesignDocuments/SearchFiltering.html">SearchFiltering.html</a></li>
+<li><a href="../Core/DesignDocuments/RelationTypes.html#relationtypes">RelationTypes</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
+<li>refinedBy: <a href="Specifications.html#requirement-submodels-report-specification">Requirement Submodels Report Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/report_submodels.rs">report_submodels.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#submodels-report-verification">Submodels Report Verification</a></li>
+</ul>
+<hr />
+<h3 id="search-report-generator">Search Report Generator</h3>
+<p>The system shall implement a search report generator with comprehensive filtering and element type tracking.</p>
+<h4>Details</h4>
+<p>The search report must include file-level, section-level, and element-level information.</p>
+<p>Search JSON shall expose parsed semantic model fields when present. Ontology elements expose <code>ontology</code>; semantic-contract elements expose <code>semantic_contract</code>; semantic-query-contract elements expose <code>semantic_query_contract</code> with derived identity and Query fenced block details. Short mode may omit these parsed semantic fields.</p>
+<p>The system shall define comprehensive search filtering capabilities:</p>
+<ul>
+<li>By file path patterns</li>
+<li>By element name patterns</li>
+<li>By element type</li>
+<li>By requirement governance metadata values</li>
+<li>By element content patterns</li>
+<li>By presence/absence of relations</li>
+<li>By presence/absence of attachments</li>
+</ul>
+<p>Search result element evidence shall include effective requirement governance metadata when applicable.
+Search result summaries shall include effective governance metadata counts for matched governance-bearing elements.</p>
+<p>The system shall define custom element type tracking:</p>
+<ul>
+<li>Identify types not in standard categories</li>
+<li>Report custom types with counts</li>
+</ul>
+<p>Search report kinds, search filter kinds, collect source types, coverage source types, and submodel concepts are defined by the Reqvire report ontology.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Core/Specifications.html#requirement-governance-metadata-specification">Requirement Governance Metadata Specification</a></li>
 <li><a href="../../Refinements.html#supported-element-types-specification">Supported Element Types Specification</a></li>
 <li><a href="Specifications.html#resources-report-format-specification">Resources Report Format Specification</a></li>
 </ul>
@@ -853,48 +1194,35 @@
 <ul>
 <li>derive: <a href="#flexible-search-type-filtering">Flexible Search Type Filtering</a></li>
 <li>derivedFrom: <a href="#model-structure-and-summaries">Model Structure and Summaries</a></li>
+<li>refinedBy: <a href="DesignDocuments/SearchFiltering.html#searchfiltering">SearchFiltering</a></li>
+<li>refinedBy: <a href="Specifications.html#requirement-governance-metadata-json-output-specification">Requirement Governance Metadata JSON Output Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/filters.rs">filters.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/search.rs">search.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#custom-element-type-tracking-test">Custom Element Type Tracking Test</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#search-command-tests">Search Command Tests</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#semantic-contract-search-json-test">Semantic Contract Search JSON Test</a></li>
+<li>verifiedBy: <a href="Verifications/ReportingVerifications.html#semantic-query-contract-search-json-test">Semantic Query Contract Search JSON Test</a></li>
 </ul>
 <hr />
 <h3 id="flexible-search-type-filtering">Flexible Search Type Filtering</h3>
 <p>The system shall support filtering search results by multiple element types simultaneously to enable flexible querying across type categories.</p>
 <h4>Details</h4>
-<p>Users shall be able to specify multiple element types in a single search operation using comma-separated values (e.g., <code>requirement,test-verification,behavior</code>).</p>
-<p>This capability enables:</p>
-<ul>
-<li>Searching across related type categories (all requirement types, all verification types)</li>
-<li>Building complex queries without multiple search invocations</li>
-<li>Improved workflow efficiency for model analysis and reporting</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derive: <a href="#comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</a></li>
 <li>derivedFrom: <a href="#search-report-generator">Search Report Generator</a></li>
+<li>refinedBy: <a href="Specifications.html#flexible-search-type-filtering-refinement-specification">Flexible Search Type Filtering Refinement Specification</a></li>
 </ul>
 <hr />
 <h3 id="comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</h3>
 <p>The system shall parse comma-separated element type values in the <code>--filter-type</code> flag, validating each type and applying OR logic to match elements.</p>
 <h4>Details</h4>
-<p>When parsing the <code>--filter-type</code> argument:</p>
-<ul>
-<li>Split input by comma delimiter</li>
-<li>Trim whitespace from each type value</li>
-<li>Convert to lowercase for case-insensitive matching</li>
-<li>Validate each type against the valid element types list</li>
-<li>Return clear error messages for invalid types</li>
-</ul>
-<p>When filtering elements:</p>
-<ul>
-<li>Element matches if it matches ANY of the specified types (OR logic)</li>
-<li>Support for custom types using <code>other-TYPENAME</code> syntax</li>
-<li>Maintain backward compatibility with single-type queries</li>
-</ul>
+<p>Implementation details shall follow the associated refinement specifications.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
@@ -902,6 +1230,7 @@
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#flexible-search-type-filtering">Flexible Search Type Filtering</a></li>
+<li>refinedBy: <a href="Specifications.html#comma-separated-type-filter-parsing-refinement-specification">Comma-Separated Type Filter Parsing Refinement Specification</a></li>
 <li>satisfiedBy: <a href="../../../cli/src/cli.rs">cli.rs</a></li>
 <li>satisfiedBy: <a href="../../../core/src/search.rs">search.rs</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#multi-type-search-filter-test">Multi-Type Search Filter Test</a></li>
@@ -913,7 +1242,7 @@
 <p>Validation shall be performed automatically when any command requires the parsed model, eliminating the need for a separate validation command. Commands that operate on raw files shall skip validation to allow operation on potentially invalid documents.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
@@ -933,18 +1262,48 @@
 <li>satisfiedBy: <a href="../../../core/src/model.rs">model.rs</a></li>
 </ul>
 <hr />
+<h3 id="requirement-implementation-coverage-report">Requirement Implementation Coverage Report</h3>
+<p>The system shall generate requirement implementation coverage reports that identify which requirements are implemented using direct <code>satisfiedBy</code> evidence and refinement-contract consumption evidence.</p>
+<h4>Details</h4>
+<p>The implementation coverage report shall provide:</p>
+<ul>
+<li>Total count of requirements in scope (<code>requirement</code> only; excludes direct capability rows)</li>
+<li>Count and percentage of implementation-covered requirements</li>
+<li>Count and percentage of implementation-uncovered requirements</li>
+<li>Coverage source classification for covered requirements:
+<ul>
+<li>direct <code>satisfiedBy</code> on the requirement</li>
+<li>refinement-contract coverage through owned refinement elements attached by directly satisfied requirements</li>
+<li>refinement-contract coverage when a requirement that owns refinement has directly satisfied derived descendants</li>
+</ul>
+</li>
+<li>Detailed lists grouped by file and section, including coverage source and evidence references</li>
+<li>Output in both human-readable text and machine-readable JSON formats</li>
+<li>Coverage percentages shall be reported with at most 2 decimal places</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
+<li>refinedBy: <a href="Behaviors.html#implementation-coverage-behavior">Implementation Coverage Behavior</a></li>
+<li>refinedBy: <a href="Specifications.html#implementation-coverage-output-structure-specification">Implementation Coverage Output Structure Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#requirement-implementation-coverage-logic-specification">Requirement Implementation Coverage Logic Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/report_coverage.rs">report_coverage.rs</a></li>
+</ul>
+<hr />
 <h3 id="resources-report">Resources Report</h3>
 <p>The system shall provide a resources report showing all files referenced by the model through relations and attachments in text, JSON, and HTML formats.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>derive: <a href="../../Interfaces/CLI/Commands.html#cli-resources-command">CLI Resources Command</a></li>
 <li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
-<li>satisfiedBy: <a href="../../../core/src/report_resources.rs">report_resources.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#resources-report-format-specification">Resources Report Format Specification</a></li>
+<li>refinedBy: <a href="Specifications.html#resources-report-format-specification">Resources Report Format Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#resources-report-verification">Resources Report Verification</a></li>
 </ul>
 <hr />
@@ -965,11 +1324,10 @@
 <p>The report helps track verification completeness and identify gaps in requirement verification coverage.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="../../Refinements.html#verification-coverage-specification">Verification Coverage Specification</a></li>
 <li><a href="../Processing/Specifications.html#verification-roll-up-specification">Verification Roll-up Specification</a></li>
 <li><a href="../Core/Specifications.html#verification-type-selection-guidelines">Verification Type Selection Guidelines</a></li>
 </ul>
@@ -977,34 +1335,92 @@
 <ul>
 <li>derive: <a href="#traceflow-view-report-generation">TraceFlow View Report Generation</a></li>
 <li>derivedFrom: <a href="#model-reports">Model Reports</a></li>
-<li>satisfiedBy: <a href="../../../core/src/report_coverage.rs">report_coverage.rs</a></li>
-<li>satisfiedBy: <a href="Behaviors.html#verification-coverage-philosophy-behavior">Verification Coverage Philosophy Behavior</a></li>
+<li>refinedBy: <a href="Behaviors.html#verification-coverage-philosophy-behavior">Verification Coverage Philosophy Behavior</a></li>
+<li>refinedBy: <a href="../../Refinements.html#verification-coverage-specification">Verification Coverage Specification</a></li>
 </ul>
 <hr />
 <h3 id="traceflow-view-report-generation">TraceFlow View Report Generation</h3>
-<p>The system shall generate a TraceFlow view page showing the verification traceability flow using an interactive D3.js Sankey diagram visualization. The view displays how requirements flow from user requirements through system requirements to verifications.</p>
+<p>The system shall generate a TraceFlow view page showing the verification traceability flow using an interactive D3.js Sankey diagram visualization. The view displays how capabilities are specified by requirements, how requirements flow to verifications, and how capabilities may be directly verified.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
-<li><a href="DesignDocuments/TraceFlowView.html">TraceFlowView.html</a></li>
 <li><a href="../Processing/Specifications.html#verification-trace-tree-construction">Verification Trace Tree Construction</a></li>
 </ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#verification-coverage-report">Verification Coverage Report</a></li>
+<li>refinedBy: <a href="DesignDocuments/TraceFlowView.html#traceflowview">TraceFlowView</a></li>
+<li>refinedBy: <a href="Specifications.html#verification-trace-diagram-specification">Verification Trace Diagram Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/export.rs">export.rs</a></li>
-<li>satisfiedBy: <a href="Specifications.html#verification-trace-diagram-specification">Verification Trace Diagram Specification</a></li>
 <li>verifiedBy: <a href="Verifications/ReportingVerifications.html#traceflow-view-test">TraceFlow View Test</a></li>
+</ul>
+<hr />
+<h3 id="ontology-projection-subgraph-materialization">Ontology Projection Subgraph Materialization</h3>
+<p>The system shall materialize generated ontology construct facts as a subgraph of the existing in-memory RDF projection so semantic exports and HTML ontology exploration consume the same ontology construct facts.</p>
+<h4>Details</h4>
+<p>The ontology projection subgraph shall:</p>
+<ul>
+<li>Extend the existing in-memory RDF projection used by full semantic export; it is not a separate database, persistent store, or HTML-only model.</li>
+<li>Be attached to the reusable <code>SemanticIndex</code> as structured generated projection data so semantic export, JSON-LD export, and HTML rendering share one authoritative projection source.</li>
+<li>Be generated from authored ontology and semantic-contract RDF quads during semantic index processing or immediately after parsing.</li>
+<li>Materialize direct-authored OWL/RDFS/SHACL constructs into Reqvire ontology projection facts without changing authored Markdown ontology or semantic-contract blocks.</li>
+<li>Preserve source element identifier, source name, source file, source line, source block kind, construct subject, construct object, construct members, construct property, ordered sequence index when relevant, symbol code point, rendered symbol, and derivation mode.</li>
+<li>Derive normalized SHACL slot/facet projection records from node-shape target classes and property-shape paths so target class inspectors and named property inspectors can share the same source-backed semantic evidence.</li>
+<li>Include constructs for property domain/range, subclass or inclusion, class membership, disjointness, equivalence, inverse properties, property chains, property characteristics, restrictions, intersections, unions, complement or difference-style expressions when authored, and SHACL shape overlays when present.</li>
+<li>Use semantic-query-contract refinements as declarative pattern contracts for the generated projection facts. The implementation may use native Rust projection over the parsed RDF graph as long as the materialized facts satisfy the same pattern intent.</li>
+<li>Distinguish direct-authored projection from inferred projection. Direct-authored projection is in scope; OWL reasoning, SHACL-AF rule execution, and inferred materialization require separate inference requirements before they can contribute generated facts.</li>
+<li>Feed generated facts into <code>reqvire ontologies --full</code>, <code>reqvire ontologies --full --jsonld</code>, and the Ontologies HTML explorer through the same in-memory projection context. The default <code>reqvire ontologies</code> and exported <code>ontologies.ttl</code> artifact remain authored ontology/SHACL collection outputs unless full export is requested.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Specifications.html#ontology-collection-output-specification">Ontology Collection Output Specification</a></li>
+<li><a href="../Core/Specifications.html#semantic-query-contract-structure-specification">Semantic Query Contract Structure Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refinedBy: <a href="Specifications.html#ontology-projection-subgraph-materialization-specification">Ontology Projection Subgraph Materialization Specification</a></li>
+<li>specify: <a href="../../Capabilities/ReportsAndQuery.html#semantic-model-export">Semantic Model Export</a></li>
+<li>verifiedBy: <a href="../../Interfaces/CLI/Verifications/CLIVerifications.html#cli-ontologies-command-verification">CLI Ontologies Command Verification</a></li>
+<li>verifiedBy: <a href="../../Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#ontology-model-viewer-analysis-verification">Ontology Model Viewer Analysis Verification</a></li>
+</ul>
+<hr />
+<h3 id="ontology-and-shapes-collection">Ontology and Shapes Collection</h3>
+<p>The system shall collect ontology <code>#### Ontology</code> and semantic-contract <code>#### Shapes</code> RDF blocks from the graph registry into a reusable semantic export context, and shall optionally project Reqvire model context and generated ontology construct facts into the same RDF export.</p>
+<h4>Details</h4>
+<p>The default collection shall expose authored ontology RDF content and semantic-contract SHACL RDF content without changing the Markdown model as the source of truth.</p>
+<p>When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, capability-to-ontology attachments, requirement-to-capability specification relations, requirement-to-semantic-contract refinement relations, ontology hierarchy relations, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts materialized from direct-authored OWL/RDFS/SHACL constructs.</p>
+<p>Semantic-query-contract <code>#### Query</code> content and query metadata are not part of ontology collection, full semantic export, or <code>ontologies.ttl</code>. Generated ontology projection facts may cite the semantic-query-contract IRI that defines the intended construct pattern, but raw query text remains exposed through search JSON until a dedicated query-export command is specified and implemented.</p>
+<p>The collection shall preserve source element identifiers, source file paths, section kind, and line numbers so CLI, HTML export, and downstream semantic tooling can cite the model source of each RDF block.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="../Core/Specifications.html#semantic-contract-structure-specification">Semantic Contract Structure Specification</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refinedBy: <a href="../../Capabilities/ReportsAndQuery.html#reqvire-semantic-export-ontology-shape-profile">Reqvire Semantic Export Ontology Shape Profile</a></li>
+<li>refinedBy: <a href="Specifications.html#ontology-collection-output-specification">Ontology Collection Output Specification</a></li>
+<li>satisfiedBy: <a href="../../../core/src/export.rs">export.rs</a></li>
+<li>satisfiedBy: <a href="../../../core/src/semantic_contract.rs">semantic_contract.rs</a></li>
+<li>specify: <a href="../../Capabilities/ReportsAndQuery.html#semantic-model-export">Semantic Model Export</a></li>
+<li>verifiedBy: <a href="../../Interfaces/CLI/Verifications/CLIVerifications.html#cli-ontologies-command-verification">CLI Ontologies Command Verification</a></li>
 </ul>
 <hr />
 <h3 id="tracing-structural-changes">Tracing Structural Changes</h3>
 <p>When tracing structural changes, the system shall analyze the System model and diffs to identify affected components and generate a report of impacted elements and structures, so that the user can review the changes and decide on further actions.</p>
 <h4>Metadata</h4>
 <ul>
-<li>type: user-requirement</li>
+<li>type: requirement</li>
 </ul>
 <h4>Attachments</h4>
 <ul>
@@ -1012,9 +1428,22 @@
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>derive: <a href="#change-impact-semantic-contract">Change Impact Semantic Contract</a></li>
 <li>derive: <a href="../Processing/ChangeImpact.html#change-impact-detection">Change Impact Detection</a></li>
-<li>derivedFrom: <a href="../../UserStories.html#trace-changes-in-system-model">Trace Changes in System Model</a></li>
+<li>specify: <a href="../../Capabilities/RelationsAndImpact.html#trace-changes-in-system-model">Trace Changes in System Model</a></li>
 <li>verifiedBy: <a href="../Processing/Verifications/ChangeImpactVerifications.html#structural-change-reports-verification">Structural Change Reports Verification</a></li>
+</ul>
+<hr />
+<h3 id="change-impact-semantic-contract">Change Impact Semantic Contract</h3>
+<p>The system shall define SHACL constraints for change-impact analysis records, impact edges, semantic dependencies, and review-routing metadata.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: requirement</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>derivedFrom: <a href="#tracing-structural-changes">Tracing Structural Changes</a></li>
+<li>refinedBy: <a href="../../Capabilities/RelationsAndImpact.html#reqvire-change-impact-ontology-shape-profile">Reqvire Change Impact Ontology Shape Profile</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -1063,7 +1492,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -1072,10 +1502,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -1088,7 +1521,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -1106,6 +1539,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1498,9 +1936,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

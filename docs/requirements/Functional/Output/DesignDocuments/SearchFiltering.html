@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,10 +447,21 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../../coverage.html" class="nav-link">Coverage</a><a href="../../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../../model.html" class="mobile-nav-link">Model</a><a href="../../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="search-filtering-specification">Search Filtering Specification</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="documents">Documents</h1>
+<h2 id="metadata">Metadata</h2>
+<ul>
+<li>type: specification</li>
+</ul>
+<h2 id="relations">Relations</h2>
+<ul>
+<li>refine: <a href="../Reporting.html#search-report-generator">Search Report Generator</a></li>
+</ul>
+<h2 id="searchfiltering">SearchFiltering</h2>
+<h1 id="search-filtering-specification">Search Filtering Specification</h1>
 <h2 id="summary">Summary</h2>
 <p>This specification defines the functional requirements for a filtering subsystem used within the <code>search</code> reporting capability. The system must allow clients to selectively include or exclude elements from the search output based on metadata, content, and traceability properties.</p>
 <p>The filters shall be composable and applied conjunctively (i.e., all active filters must match for an element to be included). The filtering system must support both human-readable text output and structured machine-readable output (e.g., JSON), as well as abbreviated short mode output.</p>
+<p>Full search summaries include governance metadata counters for matched governance-bearing elements (<code>capability</code> and <code>requirement</code>). The counters use effective metadata after explicit, inherited, and default resolution.</p>
 <hr />
 <h2 id="filtering-scope">Filtering Scope</h2>
 <p>Filtering shall operate on the level of individual <code>Element</code> objects in the model registry. Each <code>Element</code> has the following relevant properties:</p>
@@ -360,6 +469,7 @@
 <li><code>file_path: String</code></li>
 <li><code>name: String</code></li>
 <li><code>element_type: ElementType</code></li>
+<li>effective requirement governance metadata (status, priority, risk, owner) when applicable</li>
 <li><code>content: String</code></li>
 <li><code>relations: Vec&lt;Relation&gt;</code></li>
 <li><code>page_content: String</code> (from parent file)</li>
@@ -383,40 +493,58 @@
 <p><strong>Purpose:</strong> Include only elements of a specific type.</p>
 <p><strong>Input:</strong> One of the following valid string identifiers:</p>
 <ul>
+<li><code>"capability"</code> - Capability element</li>
 <li><code>"requirement"</code> - System requirement (default type)</li>
-<li><code>"user-requirement"</code> - User requirement</li>
 <li><code>"verification"</code> / <code>"test-verification"</code> - Test verification</li>
 <li><code>"analysis-verification"</code> - Analysis verification</li>
 <li><code>"inspection-verification"</code> - Inspection verification</li>
 <li><code>"demonstration-verification"</code> - Demonstration verification</li>
-<li><code>"constraint"</code> - Refinement documenting constraints</li>
-<li><code>"behavior"</code> - Refinement documenting behavior details</li>
-<li><code>"specification"</code> - Refinement documenting specifications</li>
+<li><code>"formal-proof-verification"</code> - Formal proof/model-checking/theorem verification</li>
+<li><code>"source"</code> - Requirement-owned source refinement</li>
+<li><code>"semantic-contract"</code> - Requirement-owned SHACL semantic contract refinement</li>
+<li><code>"semantic-query-contract"</code> - Requirement-owned semantic query contract refinement</li>
+<li><code>"constraint"</code> - Requirement-owned constraint refinement</li>
+<li><code>"behavior"</code> - Requirement-owned behavior refinement</li>
+<li><code>"specification"</code> - Requirement-owned specification refinement</li>
+<li><code>"state"</code> - Requirement-owned lifecycle state refinement</li>
+<li><code>"input-output"</code> - Requirement-owned payload, message, fixture, or data contract refinement</li>
 <li><code>"file"</code> - File element</li>
 <li>Any user-defined type (e.g., <code>"interface"</code>, <code>"design"</code>)</li>
 </ul>
 <p><strong>Match Target:</strong> <code>Element.element_type</code></p>
 <p><strong>Behavior:</strong> Matching must be exact. Internally, the filter string shall be mapped to an <code>ElementType</code> via a deterministic lookup function.</p>
 <hr />
-<h3 id="4.-content-filter-(regex)">4. Content Filter (Regex)</h3>
+<h3 id="4.-governance-metadata-filters">4. Governance Metadata Filters</h3>
+<p><strong>Purpose:</strong> Include only governance-bearing elements whose effective governance metadata matches the requested values.</p>
+<p><strong>Inputs:</strong></p>
+<ul>
+<li><code>filter-status</code>: comma-separated list of accepted status values (<code>draft</code>, <code>review</code>, <code>approved</code>)</li>
+<li><code>filter-priority</code>: comma-separated list of accepted priority values (<code>low</code>, <code>medium</code>, <code>high</code>, <code>critical</code>)</li>
+<li><code>filter-risk</code>: comma-separated list of accepted risk values (<code>low</code>, <code>medium</code>, <code>high</code>, <code>critical</code>)</li>
+<li><code>filter-owner</code>: Rust-compatible regular expression applied to effective owner value</li>
+</ul>
+<p><strong>Match Target:</strong> Effective governance metadata after explicit, inherited, and default resolution.</p>
+<p><strong>Behavior:</strong> Status, priority, and risk filters apply exact OR matching within each comma-separated filter. Owner filtering applies regex matching. Invalid governance enum values and invalid owner regex patterns must cause an immediate user-facing error. Elements that are not governance-bearing elements are excluded when any governance metadata filter is active.</p>
+<hr />
+<h3 id="5.-content-filter-(regex)">5. Content Filter (Regex)</h3>
 <p><strong>Purpose:</strong> Include only elements whose body content matches a regular expression.</p>
 <p><strong>Input:</strong> A valid regex pattern applied to the element’s <code>content</code>.</p>
 <p><strong>Match Target:</strong> <code>Element.content</code></p>
 <p><strong>Behavior:</strong> Case-sensitive regex match. Invalid patterns must cause an immediate user-facing error.</p>
 <hr />
-<h3 id="5.-page-content-filter-(regex)">5. Page Content Filter (Regex)</h3>
+<h3 id="6.-page-content-filter-(regex)">6. Page Content Filter (Regex)</h3>
 <p><strong>Purpose:</strong> Include only elements whose parent file’s page content (frontmatter) matches a regular expression.</p>
 <p><strong>Input:</strong> A valid regex pattern applied to the file’s page content.</p>
 <p><strong>Match Target:</strong> Page content (frontmatter) of the element’s parent file</p>
 <p><strong>Behavior:</strong> Case-sensitive regex match. Invalid patterns must cause an immediate user-facing error.</p>
 <hr />
-<h3 id="6.-have-relations-filter-(comma-separated-list)">6. Have Relations Filter (Comma-separated list)</h3>
+<h3 id="7.-have-relations-filter-(comma-separated-list)">7. Have Relations Filter (Comma-separated list)</h3>
 <p><strong>Purpose:</strong> Include only elements that have ALL specified relation types.</p>
 <p><strong>Input:</strong> Comma-separated list of relation type names (e.g., <code>"verifiedBy,satisfiedBy"</code>)</p>
 <p><strong>Match Target:</strong> <code>Element.relations</code></p>
 <p><strong>Behavior:</strong> When specified, element must have at least one relation of each specified type to be included. Invalid relation type names shall cause an error with a list of valid relation types.</p>
 <hr />
-<h3 id="7.-not-have-relations-filter-(comma-separated-list)">7. Not Have Relations Filter (Comma-separated list)</h3>
+<h3 id="8.-not-have-relations-filter-(comma-separated-list)">8. Not Have Relations Filter (Comma-separated list)</h3>
 <p><strong>Purpose:</strong> Include only elements that do NOT have ALL specified relation types.</p>
 <p><strong>Input:</strong> Comma-separated list of relation type names (e.g., <code>"verifiedBy"</code>)</p>
 <p><strong>Match Target:</strong> <code>Element.relations</code></p>
@@ -430,6 +558,7 @@
 <li>Invalid regular expressions must produce a fatal error with a descriptive message.</li>
 <li>Invalid glob patterns should fail at startup with appropriate feedback.</li>
 <li>Unknown or malformed <code>type</code> filters should be rejected with a list of accepted values.</li>
+<li>Unknown or malformed governance metadata enum filters should be rejected with a list of accepted values for that property.</li>
 <li>Invalid relation type names in <code>--have-relations</code> or <code>--not-have-relations</code> shall produce an error listing valid relation types.</li>
 </ul>
 <hr />
@@ -445,14 +574,34 @@
 <tr><td><code>type = constraint</code></td><td>Only constraint refinement elements</td></tr>
 <tr><td><code>type = behavior</code></td><td>Only behavior refinement elements</td></tr>
 <tr><td><code>type = specification</code></td><td>Only specification refinement elements</td></tr>
+<tr><td><code>status = approved</code></td><td>Capability and requirement elements whose effective status is approved</td></tr>
+<tr><td><code>priority = high,critical</code></td><td>Capability and requirement elements whose effective priority is high or critical</td></tr>
+<tr><td><code>risk = critical</code></td><td>Capability and requirement elements whose effective risk is critical</td></tr>
+<tr><td><code>owner = "Platform.*"</code></td><td>Capability and requirement elements whose effective owner matches the regex</td></tr>
 <tr><td><code>filter-file = "System*"</code> + <code>name = ".*GPS.*"</code></td><td>Elements in System files with GPS in name</td></tr>
 <tr><td><code>have-relations = verifiedBy,satisfiedBy</code></td><td>Elements that have both verifiedBy AND satisfiedBy relations</td></tr>
 <tr><td><code>not-have-relations = verifiedBy</code></td><td>Elements that do NOT have any verifiedBy relations</td></tr>
 <tr><td><code>filter-page-content = "architecture"</code></td><td>Elements in files whose frontmatter contains “architecture”</td></tr>
 </tbody></table>
-<footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

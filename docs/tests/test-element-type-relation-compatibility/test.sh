@@ -11,6 +11,7 @@
 # - invalid-satisfiedby/ - Invalid satisfiedBy usages (should FAIL)
 # - invalid-verifiedby/  - Invalid verifiedBy/verify usages (should FAIL)
 # - invalid-refinement/  - Refinement types with relations (should FAIL)
+# - invalid-capability-refinements/ - Capability-owned refinements (should FAIL)
 # - valid-trace/         - Valid trace relations for all types (should PASS)
 #
 # See TEST_MATRIX.md for complete test case documentation.
@@ -83,6 +84,13 @@ if ! echo "$OUTPUT_SATISFIEDBY" | grep -qi "satisfiedBy\|non-test-verification\|
   exit 1
 fi
 
+# Check capability specific satisfiedBy restriction
+if ! echo "$OUTPUT_SATISFIEDBY" | grep -qi "capability"; then
+  echo "FAILED: Expected error message mentioning capability satisfiedBy restriction"
+  echo "Output: $OUTPUT_SATISFIEDBY"
+  exit 1
+fi
+
 # Test 4: Invalid verifiedBy cases should fail
 echo "Test 4: Invalid verifiedBy/verify relations"
 
@@ -126,7 +134,28 @@ if ! echo "$OUTPUT_REFINEMENT" | grep -qi "refinement\|constraint\|behavior\|spe
 fi
 
 # Test 6: Valid trace relations should pass
-echo "Test 6: Valid trace relations"
+# Test 6: Capability-owned refinements should fail
+echo "Test 6: Capability-owned refinements"
+
+set +e
+OUTPUT_CAPABILITY_REFINEMENTS=$(cd "${TEST_DIR}/invalid-capability-refinements" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_CAPABILITY_REFINEMENTS=$?
+set -e
+
+if [ $EXIT_CODE_CAPABILITY_REFINEMENTS -eq 0 ]; then
+  echo "FAILED: Capability-owned refinements should fail validation but returned success"
+  echo "Output: $OUTPUT_CAPABILITY_REFINEMENTS"
+  exit 1
+fi
+
+if ! echo "$OUTPUT_CAPABILITY_REFINEMENTS" | grep -qi "requirement-owned only"; then
+  echo "FAILED: Expected error message about capability-owned refinement restrictions"
+  echo "Output: $OUTPUT_CAPABILITY_REFINEMENTS"
+  exit 1
+fi
+
+# Test 7: Valid trace relations should pass
+echo "Test 7: Valid trace relations"
 
 set +e
 OUTPUT_TRACE=$(cd "${TEST_DIR}/valid-trace" && "$REQVIRE_BIN" validate 2>&1)
@@ -140,8 +169,8 @@ if [ $EXIT_CODE_TRACE -ne 0 ]; then
   exit 1
 fi
 
-# Test 7: Valid refinement satisfy relations should pass
-echo "Test 7: Valid refinement satisfy relations"
+# Test 8: Valid refinement refine relations should pass
+echo "Test 8: Valid refinement refine relations"
 
 set +e
 OUTPUT_REFINEMENT_SATISFY=$(cd "${TEST_DIR}/valid-refinement-satisfy" && "$REQVIRE_BIN" validate 2>&1)
@@ -149,14 +178,14 @@ EXIT_CODE_REFINEMENT_SATISFY=$?
 set -e
 
 if [ $EXIT_CODE_REFINEMENT_SATISFY -ne 0 ]; then
-  echo "FAILED: Valid refinement satisfy relations should pass validation"
+  echo "FAILED: Valid refinement refine relations should pass validation"
   echo "Exit code: $EXIT_CODE_REFINEMENT_SATISFY"
   echo "Output: $OUTPUT_REFINEMENT_SATISFY"
   exit 1
 fi
 
-# Test 8: Refinement types with attachments should fail
-echo "Test 8: Refinement types with attachments"
+# Test 9: Refinement types with attachments should fail
+echo "Test 9: Refinement types with attachments"
 
 set +e
 OUTPUT_REFINEMENT_ATTACH=$(cd "${TEST_DIR}/invalid-refinement-attachment" && "$REQVIRE_BIN" validate 2>&1)

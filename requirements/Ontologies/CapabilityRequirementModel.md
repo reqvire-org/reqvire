@@ -4,7 +4,7 @@
 
 The Reqvire capability ontology defines capability elements as first-class operational, product, business, regulatory, or system abilities.
 
-Capabilities decompose into child capabilities, attach ontology elements from the ontology plane, derive implementation-facing requirements through `specifiedBy`/`specify`, own compatible refinements, and may be directly verified. Requirements specify capabilities; they do not replace capability ownership of operational meaning, ontology attachment context, refinement context, or direct verification context.
+Capabilities decompose into child capabilities, attach ontology elements from the ontology plane, derive implementation-facing requirements through `specifiedBy`/`specify`, and may be directly verified. Requirements specify capabilities and own subordinate refinement details/contracts; they do not replace capability ownership of operational meaning, ontology attachment context, or direct verification context.
 
 #### Ontology
 ```turtle
@@ -13,17 +13,14 @@ Capabilities decompose into child capabilities, attach ontology elements from th
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:CapabilityOwnedRefinement a owl:Class ;
-  rdfs:subClassOf reqvire:Refinement ;
-  rdfs:comment "Refinement class whose instances are owned by capability elements through refine/refinedBy." .
 reqvire:Source a owl:Class ;
-  rdfs:subClassOf reqvire:CapabilityOwnedRefinement ;
-  rdfs:comment "Capability-owned source refinement for stakeholder, regulatory, contractual, policy, or other source context that explains why a capability exists." .
+  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
+  rdfs:comment "Requirement-owned source refinement for stakeholder, regulatory, contractual, policy, or other source context that explains why a requirement exists." .
 
 reqvire:sourceType a reqvire:RefinementElementType ;
   reqvire:elementTypeName "source" ;
-  reqvire:elementTypeCategory "capability-refinement" ;
-  rdfs:comment "Capability-owned source context such as stakeholder statements, regulations, policies, standards, contracts, or external obligations." ;
+  reqvire:elementTypeCategory "refinement" ;
+  rdfs:comment "Requirement-owned source context such as stakeholder statements, regulations, policies, standards, contracts, or external obligations." ;
   reqvire:defaultElementType false .
 ```
 
@@ -36,9 +33,9 @@ reqvire:sourceType a reqvire:RefinementElementType ;
 
 ### Reqvire Requirement Ontology
 
-The Reqvire requirement ontology defines requirement obligations and refinement types that can be owned by compatible capabilities or requirements.
+The Reqvire requirement ontology defines requirement obligations and requirement-owned refinement types.
 
-Requirements are implementation-facing obligations. They can own specifications, constraints, behavior descriptions, state contracts, input-output contracts, shapes-only semantic contracts, and query-backed semantic contracts. Capabilities can own compatible refinements when the detail describes capability-level operational meaning. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
+Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, input-output contracts, shapes-only semantic contracts, and query-backed semantic contracts. Capabilities attach ontology, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own refinement elements through `refinedBy`/`refine`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
 
 #### Ontology
 ```turtle
@@ -51,25 +48,21 @@ reqvire:RequirementOwnedRefinement a owl:Class ;
   rdfs:subClassOf reqvire:Refinement ;
   rdfs:comment "Refinement class whose instances are owned by requirement elements through refine/refinedBy." .
 reqvire:Specification a owl:Class ;
-  rdfs:subClassOf reqvire:Refinement ;
-  rdfs:comment "Capability-owned or requirement-owned refinement for detailed specifications and technical descriptions." .
+  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
+  rdfs:comment "Requirement-owned refinement for detailed specifications and technical descriptions." .
 reqvire:Constraint a owl:Class ;
-  rdfs:subClassOf reqvire:Refinement ;
-  rdfs:comment "Capability-owned or requirement-owned refinement that limits or bounds valid system behavior." .
+  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
+  rdfs:comment "Requirement-owned refinement that limits or bounds valid system behavior." .
 reqvire:Behavior a owl:Class ;
-  rdfs:subClassOf reqvire:Refinement ;
-  rdfs:comment "Capability-owned or requirement-owned refinement that describes behavior details, operational rules, or scenario-specific behavior." .
+  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
+  rdfs:comment "Requirement-owned refinement that describes behavior details, operational rules, or scenario-specific behavior." .
 reqvire:State a owl:Class ;
-  rdfs:subClassOf reqvire:Refinement ;
-  rdfs:comment "Capability-owned or requirement-owned refinement for lifecycle states, state machines, transitions, terminal states, and state-dependent contract behavior." .
+  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
+  rdfs:comment "Requirement-owned refinement for lifecycle states, state machines, transitions, terminal states, and state-dependent contract behavior." .
 reqvire:InputOutput a owl:Class ;
-  rdfs:subClassOf reqvire:Refinement ;
-  rdfs:comment "Capability-owned or requirement-owned refinement for payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries." .
+  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
+  rdfs:comment "Requirement-owned refinement for payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries." .
 
-reqvire:ownedByCapability a owl:ObjectProperty ;
-  rdfs:domain reqvire:Refinement ;
-  rdfs:range reqvire:Capability ;
-  rdfs:comment "Links a capability-owned refinement to the capability that owns it." .
 reqvire:ownedByRequirement a owl:ObjectProperty ;
   rdfs:domain reqvire:Refinement ;
   rdfs:range reqvire:Requirement ;
@@ -90,27 +83,27 @@ reqvire:requirementObligationText a owl:DatatypeProperty ;
 reqvire:specificationType a reqvire:RefinementElementType ;
   reqvire:elementTypeName "specification" ;
   reqvire:elementTypeCategory "refinement" ;
-  rdfs:comment "Capability-owned or requirement-owned detailed specification or technical description." ;
+  rdfs:comment "Requirement-owned detailed specification or technical description." ;
   reqvire:defaultElementType false .
 reqvire:constraintType a reqvire:RefinementElementType ;
   reqvire:elementTypeName "constraint" ;
   reqvire:elementTypeCategory "refinement" ;
-  rdfs:comment "Capability-owned or requirement-owned limit or boundary on valid system behavior." ;
+  rdfs:comment "Requirement-owned limit or boundary on valid system behavior." ;
   reqvire:defaultElementType false .
 reqvire:behaviorType a reqvire:RefinementElementType ;
   reqvire:elementTypeName "behavior" ;
   reqvire:elementTypeCategory "refinement" ;
-  rdfs:comment "Capability-owned or requirement-owned behavior detail, operational rule, or scenario-specific behavior." ;
+  rdfs:comment "Requirement-owned behavior detail, operational rule, or scenario-specific behavior." ;
   reqvire:defaultElementType false .
 reqvire:stateType a reqvire:RefinementElementType ;
   reqvire:elementTypeName "state" ;
   reqvire:elementTypeCategory "refinement" ;
-  rdfs:comment "Capability-owned or requirement-owned lifecycle state, state machine, transition, terminal state, or state-dependent contract behavior." ;
+  rdfs:comment "Requirement-owned lifecycle state, state machine, transition, terminal state, or state-dependent contract behavior." ;
   reqvire:defaultElementType false .
 reqvire:inputOutputType a reqvire:RefinementElementType ;
   reqvire:elementTypeName "input-output" ;
   reqvire:elementTypeCategory "refinement" ;
-  rdfs:comment "Capability-owned or requirement-owned payload, message, document, schema, fixture, or data contract crossing a system or component boundary." ;
+  rdfs:comment "Requirement-owned payload, message, document, schema, fixture, or data contract crossing a system or component boundary." ;
   reqvire:defaultElementType false .
 ```
 

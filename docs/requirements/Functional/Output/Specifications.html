@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -362,6 +461,9 @@
 
   subgraph e6e9a42ade18cb0e["📁 requirements/Functional/Output"]
     subgraph 7799005208c6c9c1["📄 Specifications.md"]
+      44edd20d6499d54b["Capability Collect Traversal Specification"];
+      class 44edd20d6499d54b default;
+      click 44edd20d6499d54b "Specifications.html#capability-collect-traversal-specification";
       8891df8e827d960c["Collect Content Specification"];
       class 8891df8e827d960c default;
       click 8891df8e827d960c "Specifications.html#collect-content-specification";
@@ -371,18 +473,33 @@
       faac557edc3096ee["Color Scheme Specification"];
       class faac557edc3096ee default;
       click faac557edc3096ee "Specifications.html#color-scheme-specification";
+      9e63e52686f5f2ec["Comma-Separated Type Filter Parsing Refinement Specification"];
+      class 9e63e52686f5f2ec default;
+      click 9e63e52686f5f2ec "Specifications.html#comma-separated-type-filter-parsing-refinement-specification";
+      951ef493ea5bab60["Containment View Report Refinement Specification"];
+      class 951ef493ea5bab60 default;
+      click 951ef493ea5bab60 "Specifications.html#containment-view-report-refinement-specification";
       d415e0f99fc5ad0c["Deterministic Output Specification"];
       class d415e0f99fc5ad0c default;
       click d415e0f99fc5ad0c "Specifications.html#deterministic-output-specification";
       4804d27a20a41dfb["Diagram Relation Filtering Specification"];
       class 4804d27a20a41dfb default;
       click 4804d27a20a41dfb "Specifications.html#diagram-relation-filtering-specification";
-      e8918fd8f69a1f0a["Diff Output Format Specification"];
-      class e8918fd8f69a1f0a default;
-      click e8918fd8f69a1f0a "Specifications.html#diff-output-format-specification";
-      38c3e6e7692e0875["Error Message Format Specification"];
-      class 38c3e6e7692e0875 default;
-      click 38c3e6e7692e0875 "Specifications.html#error-message-format-specification";
+      9b7c68cfa4d1686d["File Diagram Attachment Display Refinement Specification"];
+      class 9b7c68cfa4d1686d default;
+      click 9b7c68cfa4d1686d "Specifications.html#file-diagram-attachment-display-refinement-specification";
+      615e49b5798b4db5["Flexible Search Type Filtering Refinement Specification"];
+      class 615e49b5798b4db5 default;
+      click 615e49b5798b4db5 "Specifications.html#flexible-search-type-filtering-refinement-specification";
+      e956f793fcd5db76["Implementation Coverage Output Structure Specification"];
+      class e956f793fcd5db76 default;
+      click e956f793fcd5db76 "Specifications.html#implementation-coverage-output-structure-specification";
+      efd26cf82abe5ba9["Interactive Mermaid Diagram Node Behavior Refinement Specification"];
+      class efd26cf82abe5ba9 default;
+      click efd26cf82abe5ba9 "Specifications.html#interactive-mermaid-diagram-node-behavior-refinement-specification";
+      1b9d287b72fba69f["JSON Element Size Estimate Output Specification"];
+      class 1b9d287b72fba69f default;
+      click 1b9d287b72fba69f "Specifications.html#json-element-size-estimate-output-specification";
       64319236fb27fe2["JSON Output Structure"];
       class 64319236fb27fe2 default;
       click 64319236fb27fe2 "Specifications.html#json-output-structure";
@@ -395,9 +512,30 @@
       b214580f5133dc42["Mermaid Diagram Style Specification"];
       class b214580f5133dc42 default;
       click b214580f5133dc42 "Specifications.html#mermaid-diagram-style-specification";
-      ec385316ac867c67["Mermaid Interactive Capabilities Specification"];
-      class ec385316ac867c67 default;
-      click ec385316ac867c67 "Specifications.html#mermaid-interactive-capabilities-specification";
+      fc350fc9c653a2f8["Mermaid Interactive Capabilities Specification"];
+      class fc350fc9c653a2f8 default;
+      click fc350fc9c653a2f8 "Specifications.html#mermaid-interactive-capabilities-specification";
+      23f6cb5c582f2aa7["Model Diagram Output Formats Refinement Specification"];
+      class 23f6cb5c582f2aa7 default;
+      click 23f6cb5c582f2aa7 "Specifications.html#model-diagram-output-formats-refinement-specification";
+      c8125c3f52a01fb2["Ontology Collection Output Specification"];
+      class c8125c3f52a01fb2 default;
+      click c8125c3f52a01fb2 "Specifications.html#ontology-collection-output-specification";
+      7ccb0078e923a146["Ontology Projection Subgraph Materialization Specification"];
+      class 7ccb0078e923a146 default;
+      click 7ccb0078e923a146 "Specifications.html#ontology-projection-subgraph-materialization-specification";
+      ce05eef9508b039c["Report Command Catalog Specification"];
+      class ce05eef9508b039c default;
+      click ce05eef9508b039c "Specifications.html#report-command-catalog-specification";
+      eaab99e36d13c58a["Requirement Governance Metadata JSON Output Specification"];
+      class eaab99e36d13c58a default;
+      click eaab99e36d13c58a "Specifications.html#requirement-governance-metadata-json-output-specification";
+      f10c668613f3aa5b["Requirement Implementation Coverage Logic Specification"];
+      class f10c668613f3aa5b default;
+      click f10c668613f3aa5b "Specifications.html#requirement-implementation-coverage-logic-specification";
+      155b550dd1881116["Requirement Submodels Report Specification"];
+      class 155b550dd1881116 default;
+      click 155b550dd1881116 "Specifications.html#requirement-submodels-report-specification";
       1006dcaf287c0eec["Resources Report Format Specification"];
       class 1006dcaf287c0eec default;
       click 1006dcaf287c0eec "Specifications.html#resources-report-format-specification";
@@ -407,12 +545,46 @@
       934223a89d4e2022["Text Output Formatting"];
       class 934223a89d4e2022 default;
       click 934223a89d4e2022 "Specifications.html#text-output-formatting";
+      c9dc7f61cf808a53["Trace Relation Non-Directional Behavior Refinement Specification"];
+      class c9dc7f61cf808a53 default;
+      click c9dc7f61cf808a53 "Specifications.html#trace-relation-non-directional-behavior-refinement-specification";
       65ef0c6018cc1dc4["Verification Trace Diagram Specification"];
       class 65ef0c6018cc1dc4 default;
       click 65ef0c6018cc1dc4 "Specifications.html#verification-trace-diagram-specification";
     end
   end
 </div>
+<h3 id="capability-collect-traversal-specification">Capability Collect Traversal Specification</h3>
+<h4>Details</h4>
+<p>Collect supports <code>capability</code> and <code>requirement</code> start elements.</p>
+<p>Default collection excludes implementation/evidence relations (<code>satisfiedBy</code>, <code>verify</code>, <code>verifiedBy</code>) and generic <code>trace</code> relations.</p>
+<p>When starting from a <code>requirement</code>:</p>
+<ul>
+<li>UPSTREAM traverses requirement parents through <code>derivedFrom</code>, then crosses to the owning capability through <code>specify</code> or inherited capability ownership, then traverses parent capabilities through <code>derivedFrom</code>.</li>
+<li>DOWNSTREAM traverses child requirements through <code>derive</code> only and does not cross to capabilities.</li>
+<li>The collected content includes ontology context inherited from the owning capability path, plus each traversed requirement’s requirement-detail refinements and requirement-owned contract attachments.</li>
+</ul>
+<p>When starting from a <code>capability</code>:</p>
+<ul>
+<li>UPSTREAM traverses parent capabilities through <code>derivedFrom</code> only and does not include requirements that specify those capabilities.</li>
+<li>DOWNSTREAM traverses child capabilities through <code>derive</code>, requirements through <code>specifiedBy</code>, and requirement descendants through <code>derive</code>.</li>
+<li>The collected content includes attached ontology context for capability elements, inherited ontology context for descendant capability and requirement elements, and requirement-owned semantic contracts, semantic query contracts, requirement-detail refinements, and attachments for requirement elements.</li>
+</ul>
+<p>The <code>specifiedBy</code>/<code>specify</code> bridge is therefore directional:</p>
+<ul>
+<li>Requirement UPSTREAM uses the bridge to add capability context.</li>
+<li>Capability DOWNSTREAM uses the bridge to add specified requirement context.</li>
+<li>Capability UPSTREAM and requirement DOWNSTREAM do not use the bridge.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="../Core/ModelManagement.html#capability-collect-traversal">Capability Collect Traversal</a></li>
+</ul>
+<hr />
 <h3 id="collect-content-specification">Collect Content Specification</h3>
 <p>Technical specification for content collection from requirement chains.</p>
 <h4>Details</h4>
@@ -420,38 +592,46 @@
 <ul>
 <li>Element name is required positional argument</li>
 <li>Element must exist in the model</li>
-<li>Element must be a requirement type (requirement or user-requirement)</li>
+<li>Element must be a capability or requirement element</li>
 <li>Error with non-zero exit if element not found or invalid type</li>
 </ul>
 <p><strong>Traversal Rules:</strong></p>
 <ul>
-<li>Start from specified requirement element</li>
-<li>Traverse derivedFrom relations in reverse direction (child to parents)</li>
-<li>Continue until root ancestors reached (elements with no derivedFrom)</li>
+<li>Start from specified capability or requirement element</li>
+<li>When direction is UPSTREAM from a requirement:</li>
+<li>Traverse requirement <code>derivedFrom</code> parents, cross to the owning capability through <code>specify</code> or inherited ownership, then traverse capability <code>derivedFrom</code> parents</li>
+<li>When direction is UPSTREAM from a capability:</li>
+<li>Traverse capability <code>derivedFrom</code> parents only</li>
+<li>When direction is DOWNSTREAM from a requirement:</li>
+<li>Traverse child requirements through <code>derive</code> only</li>
+<li>When direction is DOWNSTREAM from a capability:</li>
+<li>Traverse child capabilities through <code>derive</code>, requirements through <code>specifiedBy</code>, and requirement descendants through <code>derive</code></li>
 <li>Include the starting element in output</li>
 </ul>
 <p><strong>Content Collection:</strong></p>
 <ul>
 <li>Collect element content field (main body text including Details section)</li>
-<li>For each attachment:
-<ul>
+<li>For each refinedBy target:</li>
+<li>ElementIdentifier (refinement element): Include element’s content</li>
+<li>FilePath pointing to .md file: Read and include file content</li>
+<li>FilePath pointing to other file types: Include as markdown link</li>
+<li>For each attachment:</li>
 <li>FilePath pointing to .md file: Read and include file content</li>
 <li>FilePath pointing to other file types: Include as markdown link</li>
 <li>ElementIdentifier: Include referenced element’s content</li>
-</ul>
-</li>
 <li>Skip external URL attachments</li>
 </ul>
 <p><strong>Output Ordering:</strong></p>
 <ul>
 <li>Flat list structure (no nesting)</li>
-<li>Ancestors first (depth 0 = root), then descendants</li>
-<li>Same-level elements sorted alphabetically by name or file path</li>
+<li>When direction is UPSTREAM: ancestors first (depth 0 = root), then starting element</li>
+<li>When direction is DOWNSTREAM: starting element first (depth 0), then descendants at increasing depth</li>
+<li>Same-depth elements sorted alphabetically by name or file path</li>
 </ul>
 <p><strong>Error Handling:</strong></p>
 <ul>
 <li>Element not found: Error with message</li>
-<li>Element not a requirement type: Error with message</li>
+<li>Element not a capability or requirement type: Error with message</li>
 <li>Attachment file not found: Warning, continue with other content</li>
 <li>Circular reference: Detect and break cycle</li>
 </ul>
@@ -461,7 +641,7 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#collect-content-from-requirement-chain">Collect Content from Requirement Chain</a></li>
+<li>refine: <a href="Reporting.html#collect-capability-and-requirement-context">Collect Capability and Requirement Context</a></li>
 </ul>
 <hr />
 <h3 id="collect-output-format-specification">Collect Output Format Specification</h3>
@@ -478,53 +658,50 @@ Each collected content block followed by source citation and separator:</p>
 <p><strong>Citation Formats:</strong></p>
 <table><thead><tr><th>Source Type</th><th>Citation Format</th></tr></thead><tbody>
 <tr><td>Element</td><td><code>— Source: [Element Name](file.html#element-id)</code></td></tr>
-<tr><td>Attachment File</td><td><code>— Source: [filename.html](path/to/file.html) attached to [Element Name](file.html#element-id)</code></td></tr>
-<tr><td>Refinement Element</td><td><code>— Source: [Refinement Name](file.html#refinement-id) satisfying [Element Name](file.html#element-id)</code></td></tr>
+<tr><td>Refinement Element (via refinedBy)</td><td><code>— Source: [Refinement Name](file.html#refinement-id) refining [Element Name](file.html#element-id)</code></td></tr>
+<tr><td>Attachment Element</td><td><code>— Source: [Refinement Name](file.html#refinement-id) attached to [Element Name](file.html#element-id)</code></td></tr>
 </tbody></table>
 <p><strong>JSON Format:</strong></p>
 <pre><code class="language-json">{
-  "starting_element": "file.md#element-id",
-  "items": [
-    {
-      "name": "Element Name",
-      "identifier": "file.md#element-id",
-      "file_path": "path/to/file.md",
-      "element_type": "requirement",
-      "content": "The collected content...",
-      "depth": 0,
-      "source_type": "element"
-    },
-    {
-      "name": "Attached File",
-      "identifier": "path/to/attachment.md",
-      "file_path": "path/to/attachment.md",
-      "element_type": "attachment",
-      "content": "Content from attachment file...",
-      "depth": 0,
-      "source_type": "attachment_file",
-      "attached_to": "file.md#element-id"
-    }
-  ],
-  "metadata": {
-    "element_count": 5,
-    "attachment_count": 2,
-    "total_items": 7
-  }
+ "starting_element": "file.md#element-id",
+ "items": [
+ {
+ "name": "Element Name",
+ "identifier": "file.md#element-id",
+ "file_path": "path/to/file.md",
+ "element_type": "requirement",
+ "content": "The collected content...",
+ "depth": 0,
+ "source_type": "element"
+ },
+ {
+ "name": "Attached Refinement",
+ "identifier": "Refinements.md#deterministic-output-specification",
+ "file_path": "Refinements.md",
+ "element_type": "specification",
+ "content": "Technical refinement details...",
+ "depth": 0,
+ "source_type": "attachment_element",
+ "attached_to": "file.md#element-id"
+ }
+ ],
+ "metadata": {
+ "element_count": 5,
+ "refinement_count": 3,
+ "attachment_count": 1,
+ "total_items": 9
+ }
 }
 </code></pre>
-<p><strong>Source Type Values:</strong></p>
-<ul>
-<li><code>element</code> - Content from model element</li>
-<li><code>attachment_file</code> - Content from attached file</li>
-<li><code>attachment_element</code> - Content from attached refinement element</li>
-</ul>
+<p><strong>Source Type Values:</strong>
+Collect source type vocabulary is defined by the Reqvire report ontology.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#collect-content-from-requirement-chain">Collect Content from Requirement Chain</a></li>
+<li>refine: <a href="Reporting.html#collect-capability-and-requirement-context">Collect Capability and Requirement Context</a></li>
 </ul>
 <hr />
 <h3 id="color-scheme-specification">Color Scheme Specification</h3>
@@ -548,8 +725,9 @@ Each collected content block followed by source citation and separator:</p>
 </tbody></table>
 <p><strong>Element Type Colors:</strong></p>
 <table><thead><tr><th>Element Type</th><th>Color Name</th><th>Hex Code</th><th>Usage</th></tr></thead><tbody>
+<tr><td>Capability</td><td>Capability Blue</td><td>#BBDEFB</td><td>Capability roots</td></tr>
+<tr><td>Ontology</td><td>Muted Sunflower</td><td>#F4E3A1</td><td>First-class ontology vocabulary/model terms</td></tr>
 <tr><td>Requirement</td><td>Deep Purple</td><td>#673AB7</td><td>Core requirements, goals</td></tr>
-<tr><td>User Requirement</td><td>Light Purple</td><td>#7E57C2</td><td>User-level requirements</td></tr>
 <tr><td>Verification</td><td>Emerald Green</td><td>#4CAF50</td><td>Validation criteria, testing</td></tr>
 <tr><td>Refinement</td><td>Orange</td><td>#FF9800</td><td>Behaviors, constraints, specifications</td></tr>
 <tr><td>Other</td><td>Cool Gray</td><td>#9E9E9E</td><td>Other element types</td></tr>
@@ -570,12 +748,12 @@ Each collected content block followed by source citation and separator:</p>
 <table><thead><tr><th>Node Type</th><th>Hex Code</th><th>Icon</th></tr></thead><tbody>
 <tr><td>folder</td><td>#9E9E9E</td><td>📁</td></tr>
 <tr><td>file</td><td>#FFCA28</td><td>📄</td></tr>
-<tr><td>user-requirement</td><td>#7E57C2</td><td>👤</td></tr>
+<tr><td>capability</td><td>#BBDEFB</td><td>◆</td></tr>
 <tr><td>requirement</td><td>#673AB7</td><td>📐</td></tr>
 <tr><td>verification</td><td>#4CAF50</td><td>✅</td></tr>
 <tr><td>refinement</td><td>#FF9800</td><td>🔧</td></tr>
 <tr><td>design-document</td><td>#8D6E63</td><td>📝</td></tr>
-<tr><td>attachment-file</td><td>#607D8B</td><td>📎</td></tr>
+<tr><td>attachment-element</td><td>#607D8B</td><td>📎</td></tr>
 </tbody></table>
 <h4>Metadata</h4>
 <ul>
@@ -583,19 +761,72 @@ Each collected content block followed by source citation and separator:</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="../../Interfaces/WebInterface/Capabilities.html#web-interface-color-scheme">Web Interface Color Scheme</a></li>
+<li>refine: <a href="../../Interfaces/WebInterface/Capabilities.html#web-interface-color-scheme">Web Interface Color Scheme</a></li>
+</ul>
+<hr />
+<h3 id="comma-separated-type-filter-parsing-refinement-specification">Comma-Separated Type Filter Parsing Refinement Specification</h3>
+<h4>Details</h4>
+<p><code>--filter-type</code> parsing behavior:</p>
+<ul>
+<li>Splits input by comma delimiter.</li>
+<li>Trims whitespace around each token.</li>
+<li>Normalizes type tokens to lowercase for case-insensitive matching.</li>
+<li>Validates each parsed type against supported element types.</li>
+<li>Reports clear errors for invalid type tokens.</li>
+</ul>
+<p>Filtering behavior:</p>
+<ul>
+<li>Matches elements when any parsed type matches (OR semantics).</li>
+<li>Supports custom type syntax using <code>other-TYPENAME</code>.</li>
+<li>Preserves single-type query behavior as a compatible subset.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</a></li>
+</ul>
+<hr />
+<h3 id="containment-view-report-refinement-specification">Containment View Report Refinement Specification</h3>
+<h4>Details</h4>
+<p>The containment view shows the physical organization of the model:</p>
+<ul>
+<li>Root folder → Subfolders → Files → Elements</li>
+<li>Sections skipped (elements shown directly under files)</li>
+</ul>
+<p>The system is expected to generate reports in multiple formats:</p>
+<ul>
+<li>Mermaid diagrams for visualization</li>
+<li>JSON for programmatic access</li>
+<li>HTML export integration</li>
+</ul>
+<p>The system is expected to include design documents:</p>
+<ul>
+<li>Files in DesignDocuments folders displayed alongside specifications</li>
+<li>Design documents visually distinguished from specification elements</li>
+<li>Clickable navigation to document files</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#containment-view-report">Containment View Report</a></li>
 </ul>
 <hr />
 <h3 id="deterministic-output-specification">Deterministic Output Specification</h3>
 <p>Technical specification for ensuring deterministic, reproducible output across all report generation operations.</p>
 <h4>Details</h4>
-<p>All generated reports shall produce deterministic output with consistent ordering to enable reliable testing, version control, and reproducible builds.</p>
+<p>All generated reports is expected to produce deterministic output with consistent ordering to enable reliable testing, version control, and reproducible builds.</p>
 <p><strong>Ordering Rules:</strong></p>
 <ol>
-<li><strong>Element Ordering</strong>: Elements shall be sorted by identifier before iteration to ensure consistent processing order across all operations</li>
-<li><strong>Relation Ordering</strong>: Relations within each element shall be sorted by relation type name and then by target identifier before rendering</li>
-<li><strong>Section Ordering</strong>: Sections within files shall be sorted alphabetically when order is not semantically significant</li>
-<li><strong>File Ordering</strong>: Files within folders shall be sorted alphabetically</li>
+<li><strong>Element Ordering</strong>: Elements is expected to be sorted by identifier before iteration to ensure consistent processing order across all operations</li>
+<li><strong>Relation Ordering</strong>: Relations within each element is expected to be sorted by relation type name and then by target identifier before rendering</li>
+<li><strong>Section Ordering</strong>: Sections within files is expected to be sorted alphabetically when order is not semantically significant</li>
+<li><strong>File Ordering</strong>: Files within folders is expected to be sorted alphabetically</li>
 </ol>
 <p><strong>Benefits of Determinism:</strong></p>
 <ul>
@@ -619,14 +850,14 @@ Each collected content block followed by source citation and separator:</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
+<li>refine: <a href="Reporting.html#model-reports">Model Reports</a></li>
 </ul>
 <hr />
 <h3 id="diagram-relation-filtering-specification">Diagram Relation Filtering Specification</h3>
 <p>Technical specification for relation filtering in diagram generation to render only forward relations while ensuring complete element hierarchy representation.</p>
 <h4>Details</h4>
 <p><strong>Auto-Generated Diagram Identification:</strong>
-The system shall embed a unique identification marker “REQVIRE-AUTOGENERATED-DIAGRAM” as a comment within all auto-generated mermaid diagrams to distinguish them from user-created diagrams.</p>
+The system is expected to embed a unique identification marker “REQVIRE-AUTOGENERATED-DIAGRAM” as a comment within all auto-generated mermaid diagrams to distinguish them from user-created diagrams.</p>
 <p>The marker must be:</p>
 <ul>
 <li>Embedded as a mermaid comment line using the <code>%% REQVIRE-AUTOGENERATED-DIAGRAM</code> format</li>
@@ -639,11 +870,11 @@ The system shall embed a unique identification marker “REQVIRE-AUTOGENERATED-D
 <li>Support mixed documents containing both auto-generated and custom diagrams</li>
 </ul>
 <p><strong>Diagram Relation Filtering Rules:</strong>
-When generating diagrams, the system shall apply the following relation filtering rules:</p>
+When generating diagrams, the system is expected to apply the following relation filtering rules:</p>
 <ol>
-<li><strong>Diagram Relation Filtering</strong>: Only relations specified in the DIAGRAM_RELATIONS list shall be rendered to prevent duplicate arrows representing the same logical relationship</li>
+<li><strong>Diagram Relation Filtering</strong>: Only relations specified in the DIAGRAM_RELATIONS list is expected to be rendered to prevent duplicate arrows representing the same logical relationship</li>
 <li><strong>Complete Hierarchy Inclusion</strong>: Start with file-local parent requirements but include all children even if they are defined outside of the file</li>
-<li><strong>List-Based Rendering</strong>: Relations shall be rendered according to the DIAGRAM_RELATIONS list which defines which relation from each opposite pair should be shown</li>
+<li><strong>List-Based Rendering</strong>: Relations is expected to be rendered according to the DIAGRAM_RELATIONS list which defines which relation from each opposite pair should be shown</li>
 </ol>
 <p><strong>Filtering Benefits:</strong>
 The filtering ensures that:</p>
@@ -658,33 +889,39 @@ The filtering ensures that:</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="DiagramGeneration.html#diagram-generation">Diagram Generation</a></li>
-<li>satisfy: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+<li>refine: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
 </ul>
 <hr />
-<h3 id="diff-output-format-specification">Diff Output Format Specification</h3>
-<p>Git-style diff format for change previews.</p>
+<h3 id="file-diagram-attachment-display-refinement-specification">File Diagram Attachment Display Refinement Specification</h3>
 <h4>Details</h4>
-<p><strong>Used by commands:</strong> format, lint, add, rm, mv, rename, mv-file, change-impact</p>
-<p><strong>Format:</strong></p>
-<pre><code class="language-diff">--- a/&lt;file_path&gt;
-+++ b/&lt;file_path&gt;
-@@ -&lt;old_start&gt;,&lt;old_count&gt; +&lt;new_start&gt;,&lt;new_count&gt; @@
--&lt;removed line&gt;
-+&lt;added line&gt;
- &lt;context line&gt;
-</code></pre>
-<p><strong>Colors:</strong></p>
+<p>File-diagram attachment rendering behavior:</p>
 <ul>
-<li>Red: Removed lines (-)</li>
-<li>Green: Added lines (+)</li>
-<li>Cyan: Hunk headers (@@)</li>
-<li>White: Context lines</li>
+<li>Renders attachments below the element name using <code>&lt;br/&gt;</code> separators.</li>
+<li>Prefixes each attachment entry with <code>📎</code>.</li>
+<li>Displays attached refinement element names.</li>
+<li>Emits clickable attachment links to refinement identifier targets.</li>
+<li>Renders each attachment on its own line.</li>
+<li>For elements without attachments, renders only the element name.</li>
 </ul>
-<p><strong>Context:</strong></p>
+<p>Label format example:
+<code>Element Name&lt;br/&gt;📎 Deterministic Output Specification&lt;br/&gt;📎 Rate Limits</code></p>
+<h4>Metadata</h4>
 <ul>
-<li>Show 3 lines before and after changes</li>
-<li>Collapse large unchanged sections</li>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="DiagramGeneration.html#file-diagram-attachment-display">File Diagram Attachment Display</a></li>
+</ul>
+<hr />
+<h3 id="flexible-search-type-filtering-refinement-specification">Flexible Search Type Filtering Refinement Specification</h3>
+<h4>Details</h4>
+<p>Users is expected to be able to specify multiple element types in a single search operation using comma-separated values (e.g., <code>requirement,test-verification,behavior</code>).</p>
+<p>This capability enables:</p>
+<ul>
+<li>Searching across related type categories (capabilities, requirements, verification types, and refinement types)</li>
+<li>Building complex queries without multiple search invocations</li>
+<li>Improved workflow efficiency for model analysis and reporting</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -692,30 +929,33 @@ The filtering ensures that:</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
+<li>refine: <a href="Reporting.html#flexible-search-type-filtering">Flexible Search Type Filtering</a></li>
 </ul>
 <hr />
-<h3 id="error-message-format-specification">Error Message Format Specification</h3>
-<p>Structure for error and warning messages.</p>
+<h3 id="implementation-coverage-output-structure-specification">Implementation Coverage Output Structure Specification</h3>
+<p>Technical specification for implementation coverage report output structure.</p>
 <h4>Details</h4>
-<p><strong>Format:</strong></p>
-<pre><code>&lt;file_path&gt;:&lt;line_number&gt;: &lt;level&gt;: &lt;message&gt;
-  &lt;context_line&gt;
-  ^--- &lt;pointer to issue&gt;
-</code></pre>
-<p><strong>Fields:</strong></p>
+<p><strong>Output Requirements (Text):</strong></p>
 <ul>
-<li><code>file_path</code>: Git-root-relative path</li>
-<li><code>line_number</code>: 1-based line number</li>
-<li><code>level</code>: error | warning | info</li>
-<li><code>message</code>: Concise description</li>
-<li><code>context_line</code>: Source line (optional)</li>
-<li><code>suggestion</code>: How to fix (optional)</li>
+<li>Summary subsection with totals, covered/uncovered counts, and percentage.</li>
+<li>Covered requirements list grouped by file with source classification and evidence identifiers.</li>
+<li>Uncovered requirements list grouped by file.</li>
 </ul>
-<p><strong>Grouping:</strong></p>
+<p><strong>Output Requirements (JSON):</strong></p>
 <ul>
-<li>Group errors by file</li>
-<li>Sort by line number within file</li>
+<li><code>summary</code> includes:</li>
+<li><code>total_requirements_in_scope</code></li>
+<li><code>covered_requirements</code></li>
+<li><code>uncovered_requirements</code></li>
+<li><code>implementation_coverage_percentage</code></li>
+<li><code>coverage_sources</code> object keyed by implementation coverage source names defined by the Reqvire report ontology</li>
+<li><code>covered_requirements</code> contains per-element:</li>
+<li><code>identifier</code>, <code>name</code></li>
+<li><code>coverage_source</code></li>
+<li><code>evidence</code> (identifier list)</li>
+<li><code>uncovered_requirements</code> contains per-element:</li>
+<li><code>identifier</code>, <code>name</code></li>
+<li>Coverage percentage values in summary is expected to be emitted with at most 2 decimal places.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -723,7 +963,56 @@ The filtering ensures that:</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
+<li>refine: <a href="Reporting.html#requirement-implementation-coverage-report">Requirement Implementation Coverage Report</a></li>
+</ul>
+<hr />
+<h3 id="interactive-mermaid-diagram-node-behavior-refinement-specification">Interactive Mermaid Diagram Node Behavior Refinement Specification</h3>
+<h4>Details</h4>
+<p>Clickable mermaid diagrams links by default must use relative links to the git repository.</p>
+<p>CLI flag options must be provided that can change default behavior to use stable github repository links:</p>
+<ul>
+<li>diagrams click links are not working on Github if not using stable github repository links</li>
+<li>from another side that pollutes PR diffs thus choice must be given to the user</li>
+<li>Commands that generate diagrams (<code>generate-diagrams</code>, <code>export</code>, <code>serve</code>) must expose <code>--links-with-blobs</code> CLI flag for that purpose</li>
+<li>The flag defaults to <code>false</code> (use relative paths)</li>
+</ul>
+<p>When generating diagram node links and when <code>--links-with-blobs</code> flag is set to <code>true</code>, the system is expected to:</p>
+<ul>
+<li>Use stable git repository links (<code>{repository-url}/blob/{commit-hash}/{file-path}</code>) when git repository information is available</li>
+<li>Fallback to relative markdown links when git repository information is not available</li>
+<li>Use the current commit hash to ensure links remain stable even as the repository evolves</li>
+<li>Match the same link format used in traceability matrices and change impact reports</li>
+<li>Preserve interactive behavior across all generated diagrams</li>
+</ul>
+<p>The <code>traces</code> command is expected to always use relative paths (hardcoded to <code>false</code>, no flag needed).</p>
+<p>The <code>change-impact</code> command is expected to continue to use GitHub blob URLs by default (unchanged behavior).</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="DiagramGeneration.html#interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</a></li>
+</ul>
+<hr />
+<h3 id="json-element-size-estimate-output-specification">JSON Element Size Estimate Output Specification</h3>
+<p>JSON report outputs are expected to preserve element size-estimate metadata when the parsed model contains it.</p>
+<h4>Details</h4>
+<ul>
+<li>JSON output serializers that include model elements shall include the element <code>size_estimate</code> field when present.</li>
+<li>JSON output serializers shall omit <code>size_estimate</code> when the model was not built with size estimates enabled.</li>
+<li>Text, Markdown, Mermaid, D3, HTML, and other non-JSON outputs shall not display size-estimate metadata.</li>
+<li>The initial output scope is element payloads in <code>model --json</code> and equivalent structured model evidence.</li>
+<li>Nested relation element targets in model JSON shall preserve their own <code>size_estimate</code> fields when present.</li>
+<li>Aggregate report-level <code>size_estimate</code> records are deferred and shall not be added by this specification.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#json-element-size-estimate-exposure">JSON Element Size Estimate Exposure</a></li>
 </ul>
 <hr />
 <h3 id="json-output-structure">JSON Output Structure</h3>
@@ -744,7 +1033,7 @@ The filtering ensures that:</p>
 <li><code>type</code>: Element type string</li>
 <li><code>file_path</code>: Relative path from git root</li>
 <li><code>relations</code>: Array of relation objects with <code>type</code> and <code>target</code> fields</li>
-<li><code>attachments</code>: Array of attachment strings (file paths or element identifiers)</li>
+<li><code>attachments</code>: Array of refinement element identifier strings</li>
 </ul>
 <p><strong>Error Handling:</strong></p>
 <ul>
@@ -752,13 +1041,19 @@ The filtering ensures that:</p>
 <li>Successful responses omit error field entirely</li>
 <li>Exit code accompanies JSON (0=success, non-zero=error)</li>
 </ul>
+<p><strong>File Output:</strong></p>
+<ul>
+<li>When <code>--output &lt;FILE&gt;</code> is provided alongside <code>--json</code>, write JSON to file instead of stdout</li>
+<li>Print confirmation message to stdout: <code>✅ Output saved to &lt;filepath&gt;</code></li>
+<li><code>--output</code> without <code>--json</code> is an error</li>
+</ul>
 <h4>Metadata</h4>
 <ul>
 <li>type: specification</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
+<li>refine: <a href="Reporting.html#model-reports">Model Reports</a></li>
 </ul>
 <hr />
 <h3 id="markdown-report-style-specification">Markdown Report Style Specification</h3>
@@ -802,7 +1097,7 @@ The filtering ensures that:</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
+<li>refine: <a href="Reporting.html#model-reports">Model Reports</a></li>
 </ul>
 <hr />
 <h3 id="mermaid-diagram-generation-specification">Mermaid Diagram Generation Specification</h3>
@@ -816,7 +1111,7 @@ Diagram generation follows a file-based approach:</p>
 <li>External related resources are displayed as linked boxes to the actual resource</li>
 </ul>
 <p><strong>Diagram Styling:</strong>
-The system shall implement diagram styling including:</p>
+The system is expected to implement diagram styling including:</p>
 <ul>
 <li>Containment structure with nested subgraphs for physical organization</li>
 <li>Element type-specific CSS classes for visual differentiation</li>
@@ -825,7 +1120,7 @@ The system shall implement diagram styling including:</p>
 <li>Consistent background and border styling</li>
 </ul>
 <p><strong>Model Structure Visualization:</strong>
-The system shall provide visualization of the complete model structure showing an element-centric view with nested relations:</p>
+The system is expected to provide visualization of the complete model structure showing an element-centric view with nested relations:</p>
 <ul>
 <li>Display elements with their properties (identifier, name, type, file location)</li>
 <li>Show relations nested inside elements with full target details</li>
@@ -840,7 +1135,7 @@ The system shall provide visualization of the complete model structure showing a
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+<li>refine: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
 </ul>
 <hr />
 <h3 id="mermaid-diagram-style-specification">Mermaid Diagram Style Specification</h3>
@@ -862,7 +1157,8 @@ The system shall provide visualization of the complete model structure showing a
 </tbody></table>
 <p><strong>Diagram Node Classes (CSS):</strong></p>
 <table><thead><tr><th>Class Name</th><th>Fill Color</th><th>Stroke Color</th><th>Usage</th></tr></thead><tbody>
-<tr><td>userRequirement</td><td>#D1C4E9</td><td>#7E57C2</td><td>Top-level user requirements</td></tr>
+<tr><td>capability</td><td>#BBDEFB</td><td>#1976D2</td><td>Product/stakeholder capability elements</td></tr>
+<tr><td>ontology</td><td>#F4E3A1</td><td>#B08A00</td><td>First-class ontology elements</td></tr>
 <tr><td>systemRequirement</td><td>#E1D8EE</td><td>#673AB7</td><td>System-level requirements</td></tr>
 <tr><td>requirement</td><td>#ECEFF1</td><td>#673AB7</td><td>Generic requirements</td></tr>
 <tr><td>verified</td><td>#D1C4E9</td><td>#7E57C2</td><td>Directly verified requirements</td></tr>
@@ -873,6 +1169,17 @@ The system shall provide visualization of the complete model structure showing a
 <tr><td>impacted</td><td>#FFAAAA</td><td>-</td><td>Change impact nodes</td></tr>
 <tr><td>changed</td><td>#FFDD57</td><td>-</td><td>Changed nodes</td></tr>
 </tbody></table>
+<p><strong>Color Scheme Contract:</strong></p>
+<ul>
+<li>Mermaid diagrams that render capability elements shall emit <code>classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px</code>.</li>
+<li>Mermaid diagrams that render ontology elements shall emit <code>classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px</code>.</li>
+<li>Mermaid diagrams that render requirements shall emit <code>classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px</code>.</li>
+<li>Mermaid diagrams that render generic requirements shall emit <code>classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px</code> when the diagram format uses a generic requirement class.</li>
+<li>Mermaid diagrams that render verification elements shall emit <code>classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px</code>.</li>
+<li>Capability styling shall be visually distinct from requirement styling; capability elements shall not reuse the purple requirement color family.</li>
+<li>Ontology styling shall be visually distinct from capability, requirement, verification, and subordinate refinement-detail styling; ontology elements use a muted sunflower color family.</li>
+<li>The same capability and ontology color contracts apply to containment diagrams, model diagrams, verification trace diagrams, generated Markdown, and HTML export Mermaid blocks.</li>
+</ul>
 <p><strong>Relation Line Styles:</strong></p>
 <table><thead><tr><th>Relation Type</th><th>Color</th><th>Line Style</th></tr></thead><tbody>
 <tr><td>Derive/DerivedFrom</td><td>#673AB7</td><td>Dashed</td></tr>
@@ -896,22 +1203,22 @@ The system shall provide visualization of the complete model structure showing a
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+<li>refine: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
 </ul>
 <hr />
 <h3 id="mermaid-interactive-capabilities-specification">Mermaid Interactive Capabilities Specification</h3>
 <p>Technical specification for interactive Mermaid diagram navigation and filtering capabilities.</p>
 <h4>Details</h4>
 <p><strong>Model Navigation and Filtering:</strong>
-Users shall be able to generate and view model structure diagrams from any starting point:</p>
+Users is expected to be able to generate and view model structure diagrams from any starting point:</p>
 <ul>
-<li>Default view shows root requirements (no hierarchical parent)</li>
+<li>Default view shows ontology roots and capability roots according to model hierarchy traversal rules</li>
 <li>Filter from specific element using –from flag</li>
 <li>Generate complete model structure with nested relations showing element details recursively</li>
 <li>Mermaid diagrams display all nested relations recursively</li>
 </ul>
 <p><strong>Diagram Output:</strong>
-The system shall generate Mermaid diagrams embedded in markdown format for visual representation of the model structure.</p>
+The system is expected to generate Mermaid diagrams embedded in markdown format for visual representation of the model structure. When pure Mermaid output is requested, the system emits Mermaid text only, without Markdown prose or fenced code blocks.</p>
 <p><strong>Interactive Capabilities:</strong>
 The visualization helps users:</p>
 <ul>
@@ -926,14 +1233,337 @@ The visualization helps users:</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+<li>refine: <a href="DiagramGeneration.html#interactive-mermaid-diagrams">Interactive Mermaid Diagrams</a></li>
+</ul>
+<hr />
+<h3 id="model-diagram-output-formats-refinement-specification">Model Diagram Output Formats Refinement Specification</h3>
+<h4>Details</h4>
+<p>Model output format rules:</p>
+<ul>
+<li>Markdown format includes embedded Mermaid diagram with model structure.</li>
+<li>Pure Mermaid format includes only Mermaid flowchart text with no Markdown wrapper.</li>
+<li>Markdown shows hierarchical structure using containment subgraphs (folders &gt; files &gt; elements).</li>
+<li>Mermaid diagrams use folder and file subgraphs to visually group elements by physical location.</li>
+<li>JSON format uses structured data with folders, files, sections, elements, relations, and attachments.</li>
+<li>Both formats represent the same filtered or complete model data.</li>
+<li>Element attachments are included as an array of refinement element identifier strings in both formats.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#model-diagram-output-formats">Model Diagram Output Formats</a></li>
+</ul>
+<hr />
+<h3 id="ontology-collection-output-specification">Ontology Collection Output Specification</h3>
+<p>The ontology collection output defines how Reqvire exposes ontology and SHACL content for export, serve, and downstream semantic tooling.</p>
+<h4>Details</h4>
+<p>The output shall:</p>
+<ul>
+<li>Collect all ontology <code>#### Ontology</code> and semantic-contract <code>#### Shapes</code> fenced Turtle blocks from the graph registry.</li>
+<li>Use the reusable semantic index built for ontology and semantic-contract validation so Turtle parsing is performed once per block.</li>
+<li>Emit RDF/Turtle by default, preserving collected block content with source comments.</li>
+<li>Emit JSON-LD when requested by the CLI <code>--jsonld</code> option.</li>
+<li>Support full semantic model export when requested by the CLI <code>--full</code> option or MCP <code>full: true</code> argument.</li>
+<li>In full semantic model export mode, append RDF triples for Reqvire model context:
+<ul>
+<li>all parsed capability, requirement, ontology, semantic-contract, verification, and refinement elements</li>
+<li>element id, identifier, name, type, file path, and source line</li>
+<li>internal model relations, including <code>derive</code>, <code>derivedFrom</code>, <code>specify</code>, <code>specifiedBy</code>, <code>refine</code>, <code>refinedBy</code>, <code>verify</code>, <code>verifiedBy</code>, <code>satisfy</code>, <code>satisfiedBy</code>, and <code>trace</code></li>
+<li>element attachments, including capability-to-ontology attachments and requirement-to-contract attachments</li>
+<li>concept references from model elements to ontology terms</li>
+<li>ontology term declaration edges from ontology elements to declared terms</li>
+<li>semantic-contract shape reference edges from semantic contracts to referenced ontology terms</li>
+<li>generated ontology projection facts for direct-authored OWL/RDFS/SHACL constructs</li>
+</ul>
+</li>
+<li>Include source element identifier, source name, file path, section kind, and line number in the semantic index used by rendering/export.</li>
+<li>Do not emit semantic-query-contract <code>#### Query</code> content or query metadata from ontology collection, including full semantic export. Generated ontology projection facts may cite semantic-query-contract IRIs as pattern-contract provenance, but raw query text remains searchable through search JSON; a dedicated query-export command may be specified later.</li>
+<li>Avoid requiring a persistent RDF store for this collection path; full export uses the existing in-memory RDF projection over the graph registry and semantic index, extended with a generated ontology construct subprojection. Persistent RDF stores, SPARQL-backed search, general query execution, query export, and inferred reasoning are reserved for later query support.</li>
+</ul>
+<p><strong>HTML Export:</strong></p>
+<ul>
+<li>HTML export shall include <code>ontologies.ttl</code>.</li>
+<li>HTML export shall include an Ontologies page that opens directly on an OWL-aware ontology model viewer derived from parsed semantic-index quads, uses a dense full-width/full-height canvas below the fixed navigation bar, places the <code>ontologies.ttl</code> download link in the viewer sidebar, renders collected ontology/shape/RDF summary counts as a compact single-line sidebar footer, suppresses raw RDF serialization artifacts from the primary user-facing visualization, provides semantic search and inspection, preserves source citations as linked inspector/search evidence pointing to exported source HTML fragments, and does not render a page header, shared content-card footer, or raw Turtle/source-block list in the page.</li>
+<li>The Ontologies page shall separate passive type-color and construct-notation legend entries from active visibility controls. Detailed semantic kinds such as classes, properties, individuals, datatypes, restrictions, class expressions, SHACL shapes, and resources shall remain visible through color, property link labels, inspector kind, and search badges, while active filters shall use grouped layers such as ontology terms, SHACL shapes, resources, external references, and WebVOWL-style visibility controls for datatype properties, object properties, class membership, class disjointness, restrictions, class expressions, and SHACL slot overlays. Equivalence, inverse properties, property chains, and property characteristics shall remain passive notation/inspector evidence until represented by direct canvas-visible elements. Datatype-property literal values shall remain searchable and visible as inspector predicate/value evidence on their subject nodes, not as graph nodes or filter layers.</li>
+<li>The Ontologies page shall treat built-in XSD, RDF, RDFS, OWL, and SHACL namespace terms as external references that can be enabled for datatype/range audit but are hidden by default so built-in datatypes such as <code>xsd:string</code> do not dominate the primary ontology graph.</li>
+<li>The Ontologies page shall render ontology properties as labeled domain/range links and inspector evidence rather than standalone graph nodes, and keep Reqvire’s richer type and construct legends available.</li>
+<li>The Ontologies page shall derive target-class and property-usage slot/facet inspector sections from SHACL node shapes and property shapes, including path, datatype/class range evidence, node kind, cardinality, pattern, allowed values, and source-shape evidence. Target-class sections shall describe slots of the selected class; property-usage sections shall describe each target-class usage of the selected property.</li>
+<li>The Ontologies page shall render anonymous OWL class-expression blank nodes as structural constructs, not as primary domain concepts. The inspector shall show expression kind, ordered members, and usage context such as domain/range or subclass participation, while moving raw blank-node identifiers into collapsible raw details.</li>
+<li>The exported navigation shall include an Ontologies link.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#ontology-and-shapes-collection">Ontology and Shapes Collection</a></li>
+</ul>
+<hr />
+<h3 id="ontology-projection-subgraph-materialization-specification">Ontology Projection Subgraph Materialization Specification</h3>
+<h4>Details</h4>
+<p>Projection subgraph generation behavior:</p>
+<ul>
+<li>Extend the existing full semantic export in-memory RDF projection with a generated <code>reqvire:OntologyProjectionGraph</code> subprojection after RDF/Turtle and SHACL parsing has produced semantic-index quads.</li>
+<li>Attach generated projection data to <code>SemanticIndex</code> as structured Rust data, not as a renderer-local object. The <code>SemanticIndex</code> projection data is the authoritative in-process source for full Turtle export, full JSON-LD export, and Ontologies HTML rendering.</li>
+<li>Store generated construct facts in the existing semantic export context as in-memory RDF statements derived from <code>SemanticIndex</code> projection data. Generated facts are not written back to authored Markdown ontology or semantic-contract blocks.</li>
+<li>Keep projection data deterministic and serializable from <code>SemanticIndex</code> without reparsing raw Turtle in the HTML renderer.</li>
+<li>Use stable generated IRIs or blank-node identifiers derived from canonical source evidence and construct membership so repeated exports remain deterministic.</li>
+<li>Materialize one <code>reqvire:OntologyConstructProjection</code> record per projection pass or construct family and one or more <code>reqvire:OntologyConstruct</code> records for extracted constructs.</li>
+<li>Record <code>reqvire:projectionDerivationMode "direct-authored"</code> for facts derived only from authored quads without reasoning.</li>
+<li>Record <code>reqvire:constructSourceBlock</code>, source element metadata, source line, construct subject, construct object, construct property, construct member, and <code>reqvire:constructSequenceIndex</code> where order matters.</li>
+<li>Attach <code>reqvire:OntologySymbol</code> facts for rendered symbols with <code>reqvire:symbolConceptName</code>, <code>reqvire:rawUnicodeCodePoint</code>, and <code>reqvire:renderedUnicodeCharacter</code>.</li>
+<li>Cite the semantic-query-contract IRI that defines the construct pattern when the generated fact is governed by a requirement-owned semantic query contract. The projection subgraph must not embed the raw query text.</li>
+</ul>
+<p>Direct-authored construct families:</p>
+<ul>
+<li><code>rdfs:domain</code> and <code>rdfs:range</code> become property-domain and property-range constructs.</li>
+<li><code>rdfs:subClassOf</code> becomes inclusion constructs using <code>U+2286</code> / <code>⊆</code> unless strictness is separately proven.</li>
+<li><code>rdf:type</code> assertions for named individuals or typed resources may become membership constructs using <code>U+2208</code> / <code>∈</code>.</li>
+<li><code>owl:disjointWith</code> becomes disjointness constructs using <code>U+27C2</code> / <code>⟂</code>.</li>
+<li><code>owl:equivalentClass</code>, <code>owl:equivalentProperty</code>, and <code>owl:sameAs</code> become equivalence-group constructs using stable connected components.</li>
+<li><code>owl:inverseOf</code> becomes inverse-property constructs using <code>U+27F2</code> / <code>⟲</code>.</li>
+<li><code>owl:propertyChainAxiom</code> RDF lists become ordered property-chain constructs preserving list member order.</li>
+<li><code>rdf:type</code> declarations of OWL property characteristics become property-characteristic constructs for functional, inverse-functional, symmetric, asymmetric, reflexive, irreflexive, and transitive properties.</li>
+<li><code>owl:Restriction</code> with <code>owl:onProperty</code>, <code>owl:allValuesFrom</code>, <code>owl:someValuesFrom</code>, cardinality predicates, <code>owl:hasValue</code>, or similar authored restriction predicates becomes restriction constructs using the matching symbol vocabulary.</li>
+<li><code>owl:intersectionOf</code>, <code>owl:unionOf</code>, and <code>owl:complementOf</code> RDF list or expression structures become class-expression constructs. Set difference uses <code>U+2216</code> / <code>∖</code> only when represented by an explicit supported class-expression pattern.</li>
+<li>SHACL node shapes and property shapes become shape-overlay constructs over their target classes, paths, datatypes, class constraints, node kinds, cardinality constraints, and allowed-value lists.</li>
+<li>SHACL node-shape target classes plus property-shape paths and facets become viewer-facing slot/facet records attached to the target class and, when present, the named property node. On target classes these records define normalized class slots; on named properties they define source-backed usages of that property as a slot by each target class.</li>
+<li>Class-expression projection records shall preserve list members in RDF list order and expose usage evidence so consumers can distinguish the expression itself from the property, subclass, or restriction construct that references it.</li>
+</ul>
+<p>Consumer behavior:</p>
+<ul>
+<li><code>reqvire ontologies --full</code> and <code>reqvire ontologies --full --jsonld</code> include generated ontology projection subgraph facts.</li>
+<li>Default <code>reqvire ontologies</code> and exported <code>ontologies.ttl</code> keep authored ontology and SHACL blocks only.</li>
+<li><code>ontologies.html</code> must build its ontology explorer from the same generated projection facts used by full semantic export instead of maintaining a separate HTML-only construct model.</li>
+<li>The projection subgraph is a reusable semantic data product for later SPARQL-backed search, semantic validation, or inferred-materialization work, but those later features require their own execution requirements.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#ontology-projection-subgraph-materialization">Ontology Projection Subgraph Materialization</a></li>
+</ul>
+<hr />
+<h3 id="report-command-catalog-specification">Report Command Catalog Specification</h3>
+<p>Report command catalog for model reporting capabilities.</p>
+<h4>Details</h4>
+<p>Report commands:</p>
+<ul>
+<li><code>collect</code>: capability-or-requirement context collection, with upstream or downstream traversal and source citations.</li>
+<li><code>coverage</code>: requirement verification coverage, evidence-backed verification satisfaction, implementation coverage, and capability coverage rollup.</li>
+<li><code>traces</code>: verification-to-capability-root traceability trees.</li>
+<li><code>search</code>: model element search with relations, attachments, semantic-contract fields, semantic-query-contract fields, and effective governance metadata.</li>
+<li><code>submodels</code>: independent capability-rooted subgraphs, cross-submodel couplings, and summary totals.</li>
+<li><code>resources</code>: relation file targets and attachment identifier targets grouped by resource.</li>
+<li><code>ontologies</code>: collected ontology <code>Ontology</code> and semantic-contract <code>Shapes</code> Turtle blocks.</li>
+<li><code>model</code>: logical model graph traversal with optional direction and type filtering.</li>
+<li><code>lint</code>: model quality findings grouped for auto-fix or manual review.</li>
+<li><code>change-impact</code>: changed, added, removed, relocated, and impacted model elements with propagation evidence.</li>
+<li><code>containment</code>: folder, file, and element containment.</li>
+<li><code>export</code>: static HTML documentation.</li>
+<li><code>serve</code>: local browsable documentation server.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="requirement-governance-metadata-json-output-specification">Requirement Governance Metadata JSON Output Specification</h3>
+<p>Structured model evidence outputs are expected to expose effective requirement governance metadata with stable source information.</p>
+<h4>Details</h4>
+<ul>
+<li>Full search JSON output and equivalent MCP structured search results shall include <code>governance_metadata</code> for governance-bearing element payloads (<code>capability</code> and <code>requirement</code>).</li>
+<li>Non-governance-bearing element payloads shall omit <code>governance_metadata</code>.</li>
+<li>The <code>governance_metadata</code> object shall contain <code>status</code>, <code>priority</code>, <code>risk</code>, and <code>owner</code> entries.</li>
+<li>Each entry shall contain:</li>
+<li><code>value</code>: the effective value after explicit, inherited, and default resolution.</li>
+<li><code>source</code>: one of <code>explicit</code>, <code>inherited</code>, or <code>default</code>.</li>
+<li><code>source_identifier</code>: the requirement ancestor identifier that supplied the value when <code>source</code> is <code>inherited</code>.</li>
+<li><code>source_identifier</code> shall be omitted when <code>source</code> is <code>explicit</code> or <code>default</code>.</li>
+<li><code>owner.value</code> shall be a string and shall be empty when the effective owner is unassigned.</li>
+<li>Enum values and defaults shall match the Requirement Governance Metadata Specification.</li>
+<li>Full search JSON output shall include global governance summary counters under <code>global_counters.total_governance_metadata</code>.</li>
+<li>Governance summary counters shall be computed from effective metadata for matched governance-bearing elements only.</li>
+<li>Governance summary counters shall include <code>status</code>, <code>priority</code>, <code>risk</code>, and <code>owner</code> maps.</li>
+<li>Status, priority, and risk summary maps shall include all accepted enum values with zero counts when no matched requirement has that value.</li>
+<li>Owner summary maps shall count effective owner values and represent empty/unassigned owner as <code>unassigned</code>.</li>
+<li>Full text search output shall render equivalent governance summary counts in the summary section.</li>
+<li>Short search output shall omit global counters, including governance summary counters.</li>
+</ul>
+<p>Example:</p>
+<pre><code class="language-json">{
+ "governance_metadata": {
+ "status": {
+ "value": "approved",
+ "source": "inherited",
+ "source_identifier": "requirements/System.md#parent-requirement"
+ },
+ "priority": {
+ "value": "high",
+ "source": "explicit"
+ },
+ "risk": {
+ "value": "low",
+ "source": "default"
+ },
+ "owner": {
+ "value": "Platform Team",
+ "source": "inherited",
+ "source_identifier": "requirements/System.md#parent-requirement"
+ }
+ }
+}
+</code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#search-report-generator">Search Report Generator</a></li>
+</ul>
+<hr />
+<h3 id="requirement-implementation-coverage-logic-specification">Requirement Implementation Coverage Logic Specification</h3>
+<p>Technical specification for requirement implementation coverage classification logic.</p>
+<h4>Details</h4>
+<p>Implementation coverage source vocabulary is defined by the Reqvire report ontology.</p>
+<p>Implementation coverage scope includes only elements of type <code>requirement</code>. Elements of type <code>capability</code> are excluded from direct implementation coverage and receive implementation coverage through capability roll-up.</p>
+<p>The report shall classify each requirement using the semantic coverage source vocabulary and the available <code>satisfiedBy</code>, <code>refinedBy</code>, attachment, and child requirement evidence.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#requirement-implementation-coverage-report">Requirement Implementation Coverage Report</a></li>
+</ul>
+<hr />
+<h3 id="requirement-submodels-report-specification">Requirement Submodels Report Specification</h3>
+<p>Technical specification for submodels report structure and deterministic ordering.</p>
+<h4>Details</h4>
+<p><strong>Submodel Boundary Principle:</strong>
+Canonical submodel, capability-root submodel, scoped submodel, and cross-submodel coupling concepts are defined by the Reqvire report ontology.</p>
+<p><strong>Refactor Rule:</strong>
+When a relation crosses intended submodel boundaries, either:</p>
+<ol>
+<li>Move/reparent to restore hierarchical ownership, or</li>
+<li>Replace cross-boundary hierarchy links with attachment-based refinement contracts.</li>
+</ol>
+<p><strong>Refactor Procedure:</strong>
+Apply boundary refactoring recursively, top-down:</p>
+<ol>
+<li>Start from each capability root and inspect its first-level capability and requirement children.</li>
+<li>For each first-level child, inspect all direct children and relation edges.</li>
+<li>Continue recursively for each descendant branch until leaf requirements.</li>
+<li>At each level, enforce:</li>
+</ol>
+<ul>
+<li>hierarchical relations remain internal to that branch/submodel,</li>
+<li>cross-branch dependencies are attachment contracts.</li>
+</ul>
+<ol start="5">
+<li>If a cross-boundary hierarchical relation is found, either:</li>
+</ol>
+<ul>
+<li>move/reparent to restore ownership, or</li>
+<li>replace with attachment-based refinement contract.</li>
+</ul>
+<ol start="6">
+<li>Re-run validation and submodel analysis after each boundary slice before continuing recursion.</li>
+</ol>
+<p><strong>Internal Sub-Boundaries:</strong>
+A submodel may contain internal sub-boundaries (nested domains) with separate ownership and lifecycle.
+Cross-internal-boundary dependencies should be modeled as explicit attachment contracts when they represent contractual dependency, not hierarchical ownership.</p>
+<p><strong>Submodel Resolution Rules:</strong></p>
+<ul>
+<li>A submodel root is a capability element with no capability parent relation.</li>
+<li>Capability submodel membership is resolved through capability <code>derivedFrom</code>/<code>derive</code> hierarchy.</li>
+<li>Requirement membership is resolved through <code>specify</code>/<code>specifiedBy</code> and requirement hierarchy.</li>
+<li>Each requirement is expected to be assigned to one resolved capability root for report grouping.</li>
+<li>For full report generation, submodel entries are capability roots, not requirement roots.</li>
+<li>For capability-scoped report generation, the selected capability is reported as the scoped submodel and its requirement count includes requirements that specify the selected capability or descendant capabilities, including descendant requirements.</li>
+<li>For requirement-scoped report generation, the selected requirement defines a scope boundary; it is not itself reported as a submodel entry.</li>
+</ul>
+<p><strong>Report Content:</strong></p>
+<ul>
+<li>List all discovered submodels with:</li>
+<li>root identifier and display name</li>
+<li>root element type</li>
+<li>requirement count in that submodel</li>
+<li>List cross-submodel requirement couplings:</li>
+<li>source requirement</li>
+<li>relation type</li>
+<li>target requirement</li>
+<li>source and target root context</li>
+</ul>
+<p><strong>Cross-Submodel Coupling Scope:</strong></p>
+<ul>
+<li>Include requirement-to-requirement relations where source and target belong to different capability roots.</li>
+<li>Use explicit relation targets only (no inferred transitive links).</li>
+<li>For scope-scoped report generation, include only couplings where the source or target requirement is inside the selected scope.</li>
+</ul>
+<p><strong>Scope Resolution Rules:</strong></p>
+<ul>
+<li>In scope mode, select a capability or requirement by name.</li>
+<li>Capability scope computes the selected capability subtree through capability hierarchy, then includes requirements that specify those capabilities and their requirement descendants. The selected capability appears as the scoped submodel entry.</li>
+<li>Requirement scope computes the selected requirement subtree through requirement hierarchy. The selected requirement is excluded from the <code>submodels</code> output, and first-level child requirement branches are reported as scoped requirement submodels.</li>
+<li>If a selected requirement boundary has no children in the induced subtree, <code>submodels</code> output is empty.</li>
+</ul>
+<p><strong>Output Formats:</strong>
+<em>Text/Markdown Format:</em></p>
+<ul>
+<li>Human-readable sectioned report with deterministic ordering</li>
+<li>Introductory text states that submodels are independent capability-rooted subgraphs resolved through capability ownership relations.</li>
+<li>Markdown links for source/target/root identifiers</li>
+<li>Summary section with totals</li>
+<li>When filtered by scope:</li>
+<li>output submodels discovered within selected scope</li>
+<li>output the selected capability when filtering by capability</li>
+<li>do not output the selected requirement when filtering by requirement</li>
+<li>summary counts are computed from filtered output only</li>
+</ul>
+<p><em>JSON Format:</em></p>
+<ul>
+<li>Structured arrays for <code>submodels</code> and <code>cross_submodel_couplings</code></li>
+<li>Summary object with deterministic count fields</li>
+<li>Stable sort order for reproducible automation output</li>
+<li>When filtered by scope:</li>
+<li>JSON includes only filtered-scope submodel data and relevant couplings</li>
+<li>selected capability scope appears in <code>submodels</code> array</li>
+<li>selected requirement scope is excluded from <code>submodels</code> array</li>
+</ul>
+<p><strong>Summary Section Semantics:</strong></p>
+<ul>
+<li>Summary reports:</li>
+<li><code>Submodels</code>: number of scoped top-level submodel roots returned</li>
+<li><code>Requirements</code>: number of requirements counted across returned scoped submodels</li>
+<li><code>Cross-Submodel Couplings</code>: number of qualifying couplings for the active scope</li>
+<li>In scoped mode, all summary fields are derived from scoped submodel and coupling sets only.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Reporting.html#requirement-submodels-report">Requirement Submodels Report</a></li>
 </ul>
 <hr />
 <h3 id="resources-report-format-specification">Resources Report Format Specification</h3>
 <p>Technical specification for resources report structure and output formats.</p>
 <h4>Details</h4>
 <p><strong>Report Structure:</strong>
-The resources report shall consist of two sections:</p>
+The resources report is expected to consist of two sections:</p>
 <ol>
 <li>Relations section</li>
 <li>Attachments section</li>
@@ -947,16 +1577,16 @@ The resources report shall consist of two sections:</p>
 </ul>
 <p><strong>Attachments Section:</strong></p>
 <ul>
-<li>Files from FilePath attachment targets</li>
+<li>Refinement element identifiers from attachment targets</li>
 <li>Shows source element for each reference</li>
 <li>Sorted by element identifier</li>
-<li>Each file lists all elements that attach it</li>
+<li>Each refinement identifier lists all elements that attach it</li>
 </ul>
 <p><strong>Output Formats:</strong></p>
 <p><em>Text/Markdown Format:</em></p>
 <ul>
 <li>Human-readable with markdown links</li>
-<li>Files listed alphabetically by path</li>
+<li>Entries listed alphabetically by path (relations) and identifier (attachments)</li>
 <li>Element references shown as clickable markdown links</li>
 <li>Clear section headers separating Relations and Attachments</li>
 </ul>
@@ -980,7 +1610,7 @@ The resources report shall consist of two sections:</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#resources-report">Resources Report</a></li>
+<li>refine: <a href="Reporting.html#resources-report">Resources Report</a></li>
 </ul>
 <hr />
 <h3 id="sysml-rendering-specification">SysML Rendering Specification</h3>
@@ -1014,7 +1644,7 @@ All relation types use open (hollow) arrowheads per SysML specification.</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="DiagramGeneration.html#sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</a></li>
+<li>refine: <a href="DiagramGeneration.html#sysml-compatible-relationship-rendering">SysML-Compatible Relationship Rendering</a></li>
 </ul>
 <hr />
 <h3 id="text-output-formatting">Text Output Formatting</h3>
@@ -1032,7 +1662,7 @@ All relation types use open (hollow) arrowheads per SysML specification.</p>
 <li>Full element name and identifier</li>
 <li>Element type in brackets: <code>[requirement]</code>, <code>[test-verification]</code></li>
 <li>Relations listed with target identifiers</li>
-<li>Attachments listed as file paths or element names</li>
+<li>Attachments listed as refinement element identifiers</li>
 </ul>
 <p><strong>Formatting:</strong></p>
 <ul>
@@ -1052,18 +1682,68 @@ All relation types use open (hollow) arrowheads per SysML specification.</p>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#model-reports">Model Reports</a></li>
+<li>refine: <a href="Reporting.html#model-reports">Model Reports</a></li>
+</ul>
+<hr />
+<h3 id="trace-relation-non-directional-behavior-refinement-specification">Trace Relation Non-Directional Behavior Refinement Specification</h3>
+<h4>Details</h4>
+<p>Canonical trace relation meaning, direction, and change-impact propagation semantics are defined by the Reqvire relation ontology.</p>
+<p>The implementation behavior is expected to include:</p>
+<ol>
+<li><strong>Circular Dependency Exclusion</strong>:</li>
+</ol>
+<ul>
+<li>Trace relations is expected to not be traversed during circular dependency detection</li>
+<li>The cycle detection algorithm is expected to skip trace relations to prevent false positive cycles</li>
+<li>Trace relations exist solely for traceability and documentation purposes</li>
+</ul>
+<ol start="2">
+<li><strong>Non-Propagation Behavior</strong>:</li>
+</ol>
+<ul>
+<li>Changes is expected to not propagate through trace relations</li>
+<li>Trace relations is expected to not be included in change impact analysis</li>
+<li>Impact trees is expected to not traverse trace relation connections</li>
+</ul>
+<ol start="3">
+<li><strong>Bidirectional Traceability</strong>:</li>
+</ol>
+<ul>
+<li>Trace relations is expected to provide bidirectional navigational capability</li>
+<li>Users can navigate from source to target and target to source</li>
+<li>Both directions are semantically equivalent for traceability purposes</li>
+</ul>
+<ol start="4">
+<li><strong>Validation Behavior</strong>:</li>
+</ol>
+<ul>
+<li>Trace relations is expected to be validated for target existence</li>
+<li>Trace relations is expected to not require type compatibility validation</li>
+<li>Trace relations can connect any element type to any other element type</li>
+</ul>
+<p>This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a></li>
 </ul>
 <hr />
 <h3 id="verification-trace-diagram-specification">Verification Trace Diagram Specification</h3>
 <p>Visual styling rules for verification trace diagrams.</p>
 <h4>Details</h4>
 <p><strong>Diagram Output:</strong>
-Verification trace diagrams shall use the same visual styling as other mermaid diagrams:</p>
+Verification trace diagrams is expected to use the same visual styling as other mermaid diagrams:</p>
 <ul>
 <li>Containment structure with folder and file subgraphs showing physical location of elements</li>
-<li>Element type-based CSS classes (userRequirement, systemRequirement, verification) for consistent coloring</li>
+<li>Element type-based CSS classes (capability, ontology, systemRequirement, verification) for consistent coloring</li>
+<li>Capability nodes use the canonical capability color contract from Mermaid Diagram Style Specification</li>
+<li>Ontology nodes use the canonical muted sunflower ontology color contract from Mermaid Diagram Style Specification</li>
 <li>Directly verified requirements highlighted with appropriate styling</li>
+<li>Requirement attachments shown in verification trace diagrams use the referenced element display name, not the full attachment identifier path; full identifiers remain available as link targets or structured report data.</li>
+<li>Verification trace pages may contain many Mermaid diagrams, so the HTML renderer sizes and initializes every diagram independently and must not leave the final diagram clipped, blank, or hidden behind a fixed-height viewport assumption.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -1071,7 +1751,7 @@ Verification trace diagrams shall use the same visual styling as other mermaid d
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Reporting.html#traceflow-view-report-generation">TraceFlow View Report Generation</a></li>
+<li>refine: <a href="Reporting.html#traceflow-view-report-generation">TraceFlow View Report Generation</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -1120,7 +1800,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -1129,10 +1810,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -1145,7 +1829,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -1163,6 +1847,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1555,9 +2244,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

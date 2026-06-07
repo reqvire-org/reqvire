@@ -9,7 +9,7 @@ set -euo pipefail
 # - System shall assign type 'requirement' to elements without explicit type metadata
 # - Default type assignment shall be location-independent (same behavior for all directories)
 # - System shall NOT use file location to determine element type
-# - System shall NOT support user_requirements_root_folder configuration parameter
+# - System shall NOT support location-based requirement root folder configuration parameter
 # - System shall allow explicit type specification via Metadata subsection
 # - System shall respect explicit type metadata when present
 #
@@ -20,6 +20,14 @@ set -euo pipefail
 # - Location independence is verified across root, specifications/, and nested directories
 
 echo "Starting Default Element Type Assignment Test..." > "${TEST_DIR}/test_results.log"
+
+# Identifier normalization uses repository-relative paths.
+(
+    cd "${TEST_DIR}" &&
+    git init >/dev/null 2>&1 &&
+    git config user.email test@example.com &&
+    git config user.name "Test User"
+)
 
 # Track overall test result
 OVERALL_RESULT=0
@@ -39,26 +47,29 @@ mkdir -p "${TEST_DIR}/specifications/nested/deeper"
 cat > "${TEST_DIR}/specifications/RootRequirements.md" << 'EOF'
 # Elements
 
-### Root User Requirement
+### Root Capability
 
-This is a root user requirement that all others derive from.
+This is a root capability that specifies root requirements.
 
 #### Metadata
-  * type: user-requirement
+  * type: capability
+
+#### Relations
+  * specifiedBy: #root-requirement-without-type
 
 ### Root Requirement Without Type
 
 This element has NO type metadata and is in the specifications root.
 
 #### Relations
-  * derivedFrom: #root-user-requirement
+  * specify: #root-capability
 
-### Root Requirement With User Type
+### Root Capability With Explicit Type
 
-This element has explicit user-requirement type metadata.
+This element has explicit capability type metadata.
 
 #### Metadata
-  * type: user-requirement
+  * type: capability
 EOF
 
 # 2. Subdirectory specifications/root/
@@ -70,7 +81,7 @@ cat > "${TEST_DIR}/specifications/root/SubfolderRequirements.md" << 'EOF'
 This element has NO type metadata and is in a subfolder.
 
 #### Relations
-  * derivedFrom: ../RootRequirements.md#root-user-requirement
+  * specify: ../RootRequirements.md#root-capability
 
 ### Subfolder Requirement With Verification Type
 
@@ -80,7 +91,7 @@ This element has explicit verification type metadata.
   * type: verification
 
 #### Relations
-  * verify: ../RootRequirements.md#root-user-requirement
+  * verify: ../RootRequirements.md#root-requirement-without-type
 EOF
 
 # 3. Deeper nested directory specifications/nested/deeper/
@@ -92,7 +103,7 @@ cat > "${TEST_DIR}/specifications/nested/deeper/NestedRequirements.md" << 'EOF'
 This element has NO type metadata and is deeply nested.
 
 #### Relations
-  * derivedFrom: ../../RootRequirements.md#root-user-requirement
+  * specify: ../../RootRequirements.md#root-capability
 
 ### Nested Requirement With Test Type
 
@@ -102,7 +113,7 @@ This element has explicit test-verification type metadata.
   * type: test-verification
 
 #### Relations
-  * verify: ../../RootRequirements.md#root-user-requirement
+  * verify: ../../RootRequirements.md#root-requirement-without-type
 EOF
 
 # Run reqvire search --json to extract element types
@@ -117,6 +128,8 @@ printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 # Check that command succeeded
 if [ $EXIT_CODE -ne 0 ]; then
     echo "FAILED: Command failed with exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+    cat "${TEST_DIR}/test_results.log"
+    exit 1
     OVERALL_RESULT=1
 fi
 
@@ -149,12 +162,12 @@ else
 fi
 
 # Verify elements WITH explicit type metadata use the specified type
-ROOT_USER_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/RootRequirements.md"].elements[] | select(.name == "Root Requirement With User Type") | .type')
-if [ "$ROOT_USER_TYPE" != "user-requirement" ]; then
-    echo "FAILED: Element with explicit user-requirement type should be 'user-requirement', got '$ROOT_USER_TYPE'" >> "${TEST_DIR}/test_results.log"
+ROOT_CAPABILITY_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/RootRequirements.md"].elements[] | select(.name == "Root Capability With Explicit Type") | .type')
+if [ "$ROOT_CAPABILITY_TYPE" != "capability" ]; then
+    echo "FAILED: Element with explicit capability type should be 'capability', got '$ROOT_CAPABILITY_TYPE'" >> "${TEST_DIR}/test_results.log"
     OVERALL_RESULT=1
 else
-    echo "PASSED: Element with explicit type metadata has type 'user-requirement'" >> "${TEST_DIR}/test_results.log"
+    echo "PASSED: Element with explicit type metadata has type 'capability'" >> "${TEST_DIR}/test_results.log"
 fi
 
 SUBFOLDER_VERIF_TYPE=$(echo "$OUTPUT" | jq -r '.files["specifications/root/SubfolderRequirements.md"].elements[] | select(.name == "Subfolder Requirement With Verification Type") | .type')
@@ -191,19 +204,22 @@ mkdir -p "${TEST_DIR}/specifications"
 cat > "${TEST_DIR}/specifications/AllTypes.md" << 'EOF'
 # Elements
 
-### Root User Requirement
+### Root Capability
 
 This is the root requirement for testing all types.
 
 #### Metadata
-  * type: user-requirement
+  * type: capability
+
+#### Attachments
+  * [Ontology Element](#ontology-element)
 
 ### Default Requirement
 
 No type metadata - should default to requirement.
 
 #### Relations
-  * derivedFrom: #root-user-requirement
+  * specify: #root-capability
 
 ### Explicit Requirement
 
@@ -211,12 +227,58 @@ No type metadata - should default to requirement.
   * type: requirement
 
 #### Relations
-  * derivedFrom: #root-user-requirement
+  * specify: #root-capability
+  * refinedBy: [Source Refinement](#source-refinement)
+  * refinedBy: [State Refinement](#state-refinement)
+  * refinedBy: [Input Output Refinement](#input-output-refinement)
+  * refinedBy: [Semantic Contract Refinement](#semantic-contract-refinement)
 
-### User Requirement
+### Capability
 
 #### Metadata
-  * type: user-requirement
+  * type: capability
+
+#### Attachments
+  * [Ontology Element](#ontology-element)
+
+### Source Refinement
+
+#### Metadata
+  * type: source
+
+#### Relations
+  * refine: #explicit-requirement
+
+### Semantic Contract Refinement
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * refine: #explicit-requirement
+
+#### Shapes
+```turtle
+@prefix reqvire: <urn:reqvire:test#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+reqvire:DefaultTypeShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:DefaultTypeContract .
+```
+
+### Ontology Element
+
+#### Metadata
+  * type: ontology
+
+#### Ontology
+```turtle
+@prefix reqvire: <urn:reqvire:test#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+reqvire:DefaultTypeContract a owl:Class .
+```
 
 ### Verification
 
@@ -224,7 +286,7 @@ No type metadata - should default to requirement.
   * type: verification
 
 #### Relations
-  * verify: #root-user-requirement
+  * verify: #explicit-requirement
 
 ### Test Verification
 
@@ -232,7 +294,16 @@ No type metadata - should default to requirement.
   * type: test-verification
 
 #### Relations
-  * verify: #root-user-requirement
+  * verify: #explicit-requirement
+
+### Formal Proof Verification
+
+#### Metadata
+  * type: formal-proof-verification
+
+#### Relations
+  * verify: #explicit-requirement
+  * satisfiedBy: [proof-report.txt](proof-report.txt)
 
 ### Analysis Verification
 
@@ -240,7 +311,7 @@ No type metadata - should default to requirement.
   * type: analysis-verification
 
 #### Relations
-  * verify: #root-user-requirement
+  * verify: #explicit-requirement
 
 ### Inspection Verification
 
@@ -248,7 +319,7 @@ No type metadata - should default to requirement.
   * type: inspection-verification
 
 #### Relations
-  * verify: #root-user-requirement
+  * verify: #explicit-requirement
 
 ### Demonstration Verification
 
@@ -256,16 +327,34 @@ No type metadata - should default to requirement.
   * type: demonstration-verification
 
 #### Relations
-  * verify: #root-user-requirement
+  * verify: #explicit-requirement
+
+### State Refinement
+
+#### Metadata
+  * type: state
+
+#### Relations
+  * refine: #explicit-requirement
+
+### Input Output Refinement
+
+#### Metadata
+  * type: input-output
+
+#### Relations
+  * refine: #explicit-requirement
 
 ### Other Type
 
 #### Metadata
-  * type: other
+  * type: other-custom
 
 #### Relations
-  * trace: #root-user-requirement
+  * trace: #explicit-requirement
 EOF
+
+printf "formal proof evidence placeholder\n" > "${TEST_DIR}/specifications/proof-report.txt"
 
 # Run reqvire search --json
 set +e
@@ -278,6 +367,8 @@ printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
 
 if [ $EXIT_CODE -ne 0 ]; then
     echo "FAILED: Command failed when processing all element types" >> "${TEST_DIR}/test_results.log"
+    cat "${TEST_DIR}/test_results.log"
+    exit 1
     OVERALL_RESULT=1
 fi
 
@@ -285,13 +376,19 @@ fi
 TYPES_TO_CHECK=(
     "Default Requirement:requirement"
     "Explicit Requirement:requirement"
-    "User Requirement:user-requirement"
+    "Capability:capability"
+    "Ontology Element:ontology"
+    "Source Refinement:source"
+    "Semantic Contract Refinement:semantic-contract"
     "Verification:test-verification"
     "Test Verification:test-verification"
+    "Formal Proof Verification:formal-proof-verification"
     "Analysis Verification:analysis-verification"
     "Inspection Verification:inspection-verification"
     "Demonstration Verification:demonstration-verification"
-    "Other Type:other"
+    "State Refinement:state"
+    "Input Output Refinement:input-output"
+    "Other Type:custom"
 )
 
 for type_check in "${TYPES_TO_CHECK[@]}"; do

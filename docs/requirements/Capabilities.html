@@ -1,0 +1,1239 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Capabilities</title><link rel="icon" type="image/x-icon" href="../assets/favicon.ico"><link rel="apple-touch-icon" href="../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
+                :root {
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
+
+                    /* Element Type Colors */
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
+
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
+
+                    /* Interactive Colors */
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
+
+                    /* Text Colors */
+                    --color-text-primary: #212121;
+                    --color-text-secondary: #424242;
+                    --color-text-muted: #757575;
+                    --color-background: #ececea;
+                    --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
+                }
+
+                /* Ensure body takes full height */
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 0;
+                    background-color: var(--color-background);
+                    color: var(--color-text-secondary);
+                }
+
+                /* Navigation bar */
+                .reqvire-nav {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    background-color: var(--color-nav);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 20px;
+                }
+
+                .reqvire-nav a {
+                    color: white;
+                    text-decoration: none;
+                    padding: 0 15px;
+                    font-weight: 500;
+                    transition: background-color 0.2s;
+                }
+
+                .reqvire-nav a:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: none;
+                }
+
+                .nav-logo {
+                    margin-right: 16px;
+                }
+
+                .nav-logo:hover {
+                    background-color: transparent !important;
+                    text-decoration: none !important;
+                }
+
+                .nav-logo img {
+                    height: 24px;
+                    width: auto;
+                    vertical-align: middle;
+                }
+
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 7px 10px;
+                    margin-right: 0;
+                    border-radius: 3px;
+                    font-size: 14px;
+                    transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
+                }
+
+                .nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .nav-link:active {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
+
+                .mobile-nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 20px;
+                    display: block;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: background-color 0.2s;
+                }
+
+                .mobile-nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    color: white;
+                }
+
+                .reqvire-nav-spacer {
+                    height: 50px;
+                }
+
+                /* Content container */
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+
+                .content {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
+                }
+
+                /* Content area typography and styling - matches old template exactly */
+                /* Use higher specificity to override Tailwind reset */
+                .bg-white h1, .content h1, h1 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 2px solid #EEEEEE !important;
+                    padding-bottom: 10px !important;
+                    margin-top: 0 !important;
+                    font-size: 2em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h2, .content h2, h2 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 1px solid #EEEEEE !important;
+                    padding-bottom: 5px !important;
+                    font-size: 1.5em !important;
+                    font-weight: bold !important;
+                    margin-top: 20px !important;
+                }
+
+                .bg-white h3, .content h3, h3 {
+                    color: var(--color-text-primary) !important;
+                    margin-top: 25px !important;
+                    font-size: 1.17em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h4, .content h4, h4 {
+                    color: var(--color-text-secondary) !important;
+                    font-weight: 600 !important;
+                    font-size: 1em !important;
+                    margin-top: 15px !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                .content a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                div.bg-white > a {
+                    color: var(--color-primary) !important;
+                    text-decoration: none !important;
+                    font-weight: 500 !important;
+                    transition: text-decoration 0.15s ease !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):hover,
+                .content a:not(.nav-link):not(.mobile-nav-link):hover {
+                    text-decoration: underline !important;
+                }
+
+                .bg-white a:focus, .content a:focus {
+                    outline: 2px solid var(--color-primary);
+                    outline-offset: 2px;
+                }
+
+                .bg-white table, .content table, table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    margin: 20px 0 !important;
+                }
+
+                .bg-white table, .bg-white th, .bg-white td,
+                .content table, .content th, .content td {
+                    border: 1px solid #EEEEEE !important;
+                }
+
+                .bg-white th, .bg-white td,
+                .content th, .content td {
+                    padding: 8px 12px !important;
+                    text-align: left !important;
+                }
+
+                .bg-white th, .content th {
+                    background-color: #F5F5F5 !important;
+                    color: #212121 !important;
+                    font-weight: 600 !important;
+                }
+
+                .bg-white tr:hover td, .content tr:hover td {
+                    background-color: #FFF8E1 !important;
+                }
+
+                .bg-white code, .content code, code {
+                    background: #f6f8fa !important;
+                    padding: 2px 4px !important;
+                    border-radius: 3px !important;
+                    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+                    font-size: 90% !important;
+                }
+
+                .bg-white pre, .content pre, pre {
+                    background: #f6f8fa !important;
+                    border-radius: 3px !important;
+                    padding: 16px !important;
+                    overflow: auto !important;
+                }
+
+                .bg-white pre code, .content pre code {
+                    background: transparent !important;
+                    padding: 0 !important;
+                }
+
+                .bg-white blockquote, .content blockquote, blockquote {
+                    margin: 0 !important;
+                    padding: 0 15px !important;
+                    color: var(--color-text-muted) !important;
+                    border-left: 4px solid var(--color-primary) !important;
+                }
+
+                .bg-white p, .content p {
+                    margin: 10px 0 !important;
+                    line-height: 1.6 !important;
+                }
+
+                .bg-white ul, .content ul,
+                .bg-white ol, .content ol {
+                    margin: 10px 0 !important;
+                    padding-left: 30px !important;
+                }
+
+                .bg-white li, .content li {
+                    margin: 5px 0 !important;
+                }
+
+                /* Custom Mermaid diagram styles - matches old template */
+                .mermaid {
+                    margin: 20px 0;
+                    text-align: center;
+                    height: auto;
+                    min-height: 280px;
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    border: 1px solid #EEEEEE;
+                    border-radius: 3px;
+                    background-color: #FAFAFA;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: center;
+                    /* Hide raw markdown text until rendered */
+                    color: transparent;
+                }
+
+                .mermaid svg {
+                    /* Show rendered diagram */
+                    color: initial;
+                }
+
+                .mermaid svg {
+                    width: 100%;
+                    height: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                /* Diagram navigation buttons */
+                .diagram-nav-buttons {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    z-index: 999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    background-color: rgba(255, 255, 255, 0.85);
+                    padding: 3px;
+                    border-radius: 3px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+                }
+
+                .diagram-nav-row {
+                    display: flex;
+                    gap: 2px;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn {
+                    width: 22px;
+                    height: 22px;
+                    background-color: var(--color-primary);
+                    color: white;
+                    border: none;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn:hover {
+                    background-color: var(--color-primary-hover);
+                }
+
+                .diagram-nav-btn:active {
+                    background-color: var(--color-primary-active);
+                }
+
+                /* Smooth transitions for interactive elements */
+                a, button {
+                    transition: all 0.2s ease-in-out;
+                }
+
+                /* Responsive typography */
+                @media (max-width: 640px) {
+                    h1 { font-size: 1.5rem; }
+                    h2 { font-size: 1.25rem; }
+                    h3 { font-size: 1.125rem; }
+                }
+
+                /* Print styles */
+                @media print {
+                    nav, .no-print { display: none; }
+                }
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../index.html" class="nav-logo flex items-center pr-4"><img src="../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../index.html" class="nav-link">Containment</a><a href="../model.html" class="nav-link">Model</a><a href="../traces.html" class="nav-link">Traces</a><a href="../ontologies.html" class="nav-link">Ontologies</a><a href="../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph 68908f1dbfe487c0["📁 requirements"]
+    subgraph a8b22e0cbd5624d6["📄 Capabilities.md"]
+      7a81357b1d657f3a["Defining Model Structure<br/>📎 Reqvire Core Element Ontology<br/>📎 Reqvire Capability Ontology<br/>📎 Reqvire Requirement Ontology<br/>📎 Reqvire Semantic Contract Ontology<br/>📎 Reqvire Relation Ontology<br/>📎 Reqvire Verification Ontology<br/>📎 Reqvire Governance Ontology"];
+      class 7a81357b1d657f3a capability;
+      click 7a81357b1d657f3a "Capabilities.html#defining-model-structure";
+      1d4327c51e6056ec["Defining Model Structure Source"];
+      class 1d4327c51e6056ec default;
+      click 1d4327c51e6056ec "Capabilities.html#defining-model-structure-source";
+      3ebf6415286f8172["Reqvire Core Element Ontology Shape Profile"];
+      class 3ebf6415286f8172 default;
+      click 3ebf6415286f8172 "Capabilities.html#reqvire-core-element-ontology-shape-profile";
+    end
+  end
+  subgraph 8735c0a811307e57["📁 requirements/Functional/Core"]
+    subgraph ce194c8f6727a221["📄 Configuration.md"]
+      f02dac6e75313544["Coexistence of Structured and Unstructured Documents<br/>📎 Refinement Specification"];
+      class f02dac6e75313544 systemRequirement;
+      click f02dac6e75313544 "Functional/Core/Configuration.html#coexistence-of-structured-and-unstructured-documents";
+    end
+    subgraph 193cce1f294b91c8["📄 ModelManagement.md"]
+      43eafdd22a501023["Git Repository as Project Root"];
+      class 43eafdd22a501023 systemRequirement;
+      click 43eafdd22a501023 "Functional/Core/ModelManagement.html#git-repository-as-project-root";
+    end
+    subgraph b88b5e4ef23c0883["📄 StructureAndParsing.md"]
+      c1fde7d1c17c2acb["Specification File Identification"];
+      class c1fde7d1c17c2acb systemRequirement;
+      click c1fde7d1c17c2acb "Functional/Core/StructureAndParsing.html#specification-file-identification";
+      625bdde09d955477["Structure and Addressing in Markdown Documents"];
+      class 625bdde09d955477 systemRequirement;
+      click 625bdde09d955477 "Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents";
+    end
+  end
+  7a81357b1d657f3a -.->|specifiedBy| f02dac6e75313544;
+  7a81357b1d657f3a -.->|specifiedBy| 43eafdd22a501023;
+  7a81357b1d657f3a -.->|specifiedBy| c1fde7d1c17c2acb;
+  7a81357b1d657f3a -.->|specifiedBy| 625bdde09d955477;
+  f02dac6e75313544 -.->|deriveReqT| a1795409a371f481;
+  43eafdd22a501023 -->|refinedBy| c7a7113c11f9175d;
+  43eafdd22a501023 -->|refinedBy| f95149e7369cd429;
+  43eafdd22a501023 -->|refinedBy| e3505bdf96f2e996;
+  43eafdd22a501023 -.->|verifiedBy| c40e17e0f8f2b5ec;
+  c1fde7d1c17c2acb -->|refinedBy| 1051bcc3484f3543;
+  499d48218b73f571["model.rs"];
+  class 499d48218b73f571 default;
+  click 499d48218b73f571 "../core/src/model.rs";
+  c1fde7d1c17c2acb -->|satisfiedBy| 499d48218b73f571;
+  35bd98d101f36b62["parser.rs"];
+  class 35bd98d101f36b62 default;
+  click 35bd98d101f36b62 "../core/src/parser.rs";
+  c1fde7d1c17c2acb -->|satisfiedBy| 35bd98d101f36b62;
+  c1fde7d1c17c2acb -.->|verifiedBy| 6cf270efbdc5a78;
+  c1fde7d1c17c2acb -.->|verifiedBy| 576cfeab198c03b2;
+  625bdde09d955477 -.->|deriveReqT| 136749f37a361991;
+  625bdde09d955477 -.->|deriveReqT| 9e793aabc302d0d5;
+  625bdde09d955477 -->|refinedBy| f80cd6900c516b48;
+  625bdde09d955477 -->|refinedBy| 21bb1a85358e322b;
+  e068cb8b03a77b4d["element.rs"];
+  class e068cb8b03a77b4d default;
+  click e068cb8b03a77b4d "../core/src/element.rs";
+  625bdde09d955477 -->|satisfiedBy| e068cb8b03a77b4d;
+  625bdde09d955477 -->|satisfiedBy| 499d48218b73f571;
+  625bdde09d955477 -->|satisfiedBy| 35bd98d101f36b62;
+  1cfe88f8d3cc7aac["relation.rs"];
+  class 1cfe88f8d3cc7aac default;
+  click 1cfe88f8d3cc7aac "../core/src/relation.rs";
+  625bdde09d955477 -->|satisfiedBy| 1cfe88f8d3cc7aac;
+  bfee2085e3bb9f2b["subsection.rs"];
+  class bfee2085e3bb9f2b default;
+  click bfee2085e3bb9f2b "../core/src/subsection.rs";
+  625bdde09d955477 -->|satisfiedBy| bfee2085e3bb9f2b;
+  625bdde09d955477 -.->|verifiedBy| 83d989f6ea529f74;
+  625bdde09d955477 -.->|verifiedBy| ccbfdf0d74ac48bf;
+</div>
+<h3 id="defining-model-structure">Defining Model Structure</h3>
+<p>As a <strong>System Engineer</strong>, I want a well-defined Reqvire model structure and addressing language, so that I can organize capabilities, requirements, refinements, semantic contracts, semantic query contracts, verifications, and traceability links consistently across a repository.</p>
+<h4>Details</h4>
+<p>Defining model structure is the capability root for the Reqvire model vocabulary. It attaches the authoritative ontology set for elements, capability abilities, requirement obligations, requirement-owned semantic contracts, requirement-owned semantic query contracts, refinements, governance metadata, and traceability relations.</p>
+<p>This capability answers how Reqvire structures system models in Markdown, which concepts are part of the modeling language, and which ontology elements define the language before implementation-facing requirements are written.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: capability</li>
+<li>owner: syseng</li>
+<li>priority: high</li>
+<li>risk: high</li>
+<li>status: approved</li>
+</ul>
+<h4>Attachments</h4>
+<ul>
+<li><a href="Ontologies/Core.html#reqvire-core-element-ontology">Reqvire Core Element Ontology</a></li>
+<li><a href="Ontologies/CapabilityRequirementModel.html#reqvire-capability-ontology">Reqvire Capability Ontology</a></li>
+<li><a href="Ontologies/CapabilityRequirementModel.html#reqvire-requirement-ontology">Reqvire Requirement Ontology</a></li>
+<li><a href="Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology">Reqvire Semantic Contract Ontology</a></li>
+<li><a href="Ontologies/RelationsAndImpact.html#reqvire-relation-ontology">Reqvire Relation Ontology</a></li>
+<li><a href="Ontologies/Verification.html#reqvire-verification-ontology">Reqvire Verification Ontology</a></li>
+<li><a href="Ontologies/Governance.html#reqvire-governance-ontology">Reqvire Governance Ontology</a></li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>specifiedBy: <a href="Functional/Core/Configuration.html#coexistence-of-structured-and-unstructured-documents">Coexistence of Structured and Unstructured Documents</a></li>
+<li>specifiedBy: <a href="Functional/Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+<li>specifiedBy: <a href="Functional/Core/StructureAndParsing.html#specification-file-identification">Specification File Identification</a></li>
+<li>specifiedBy: <a href="Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+</ul>
+<hr />
+<h3 id="defining-model-structure-source">Defining Model Structure Source</h3>
+<p>The Reqvire model structure distinguishes implementation-independent capabilities from implementation-facing obligations.</p>
+<p>Capability elements answer:</p>
+<ul>
+<li>What coherent operational, product, business, regulatory, or system ability is this?</li>
+<li>Why does this area exist in the product model?</li>
+<li>What stakeholder need, feature context, operational context, regulatory driver, mission objective, service context, AI context, source context, and ontology define its meaning?</li>
+<li>Which requirements specify this capability?</li>
+<li>Which verification evidence directly verifies this capability when capability-level evidence is appropriate?</li>
+</ul>
+<p>Requirement elements answer:</p>
+<ul>
+<li>What must the system do?</li>
+<li>Under what condition, interface, state, or scope?</li>
+<li>What implementation or evidence can satisfy it?</li>
+<li>What verification proves it?</li>
+</ul>
+<p>Ontology elements hold stable domain and model-language meaning. They live in the dedicated <code>requirements/Ontologies</code> folder so the ontology plane stays orthogonal to capability-root subgraphs. Capability elements attach ontology to define the semantic context for the capability and for requirements that specify the capability. Requirement-owned semantic contracts define SHACL shape profiles that apply already reachable capability ontology to one obligation. Requirement-owned semantic query contracts define declarative semantic queries over the same reachable context without a query-kind classification.</p>
+<p>Requirements should not duplicate ontology content and should not attach ontology directly. A requirement that needs shared meaning should specify the capability that attaches the relevant ontology; child requirements inherit that ontology context through the owning requirement and capability hierarchy. If the requirement needs closed-world constraints for its own obligation, it may own a shapes-only semantic contract.</p>
+<p>The Reqvire model is intentionally split into separate capability-root subgraphs. A top capability should be used when requirements truly specify the same capability. Child capabilities should be used only when the capability has independently verifiable operational, product, interface, stakeholder, regulatory, or domain slices that need separate ownership, lifecycle, architecture impact, or collection. Shared ontology lives in <code>requirements/Ontologies</code>; capability roots attach the ontology they consume instead of becoming children of another capability just to reuse vocabulary. Requirements specify their local capability unless they are actually implementing the shared capability.</p>
+<p>Shared terms come from explicit capability-level ontology attachments, not from one universal capability hierarchy and not from direct requirement ontology attachments. This keeps each model concern independently collectible, reviewable, and impact-analyzable while preserving auditable dependencies between contracts.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: source</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Functional/Core/ModelManagement.html#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+</ul>
+<hr />
+<h3 id="reqvire-core-element-ontology-shape-profile">Reqvire Core Element Ontology Shape Profile</h3>
+<p>Defines SHACL constraints for shared Reqvire element identity, type, file location, and structural metadata.</p>
+<h4>Shapes</h4>
+<pre><code class="language-turtle">@prefix reqvire: &lt;https://www.reqvire.org/ontology#&gt; .
+@prefix sh: &lt;http://www.w3.org/ns/shacl#&gt; .
+@prefix xsd: &lt;http://www.w3.org/2001/XMLSchema#&gt; .
+
+reqvire:ElementShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Element ;
+  sh:property [
+    sh:path reqvire:identifier ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:name ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:elementType ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:id ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:filePath ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:fragment ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:content ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ArtifactShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Artifact ;
+  sh:property [
+    sh:path reqvire:externalUrl ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:anyURI ;
+  ] .
+
+reqvire:ElementTypeShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ElementType ;
+  sh:property [
+    sh:path reqvire:elementTypeName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:elementTypeCategory ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:defaultElementType ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] .
+
+reqvire:CustomElementTypeShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:CustomElementType ;
+  sh:property [
+    sh:path reqvire:customElementTypePattern ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ReservedSubsectionShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ReservedSubsection ;
+  sh:property [
+    sh:path reqvire:subsectionName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ElementIdentityShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ElementIdentity ;
+  sh:property [
+    sh:path reqvire:identitySource ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:identityStability ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ReferenceTargetKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ReferenceTargetKind ;
+  sh:property [
+    sh:path reqvire:referenceTargetKindName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+</code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: semantic-contract</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Functional/Core/ModelManagement.html#core-element-semantic-contract">Core Element Semantic Contract</a></li>
+</ul>
+<hr />
+</div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+// Register ELK layout for large diagrams
+mermaid.registerLayoutLoaders(elkLayouts);
+
+// Capture Mermaid errors
+mermaid.parseError = function(err, hash) {
+    console.error('Mermaid Parse Error:', err);
+    console.error('Error details:', {
+        str: err.str,
+        hash: err.hash,
+        message: err.message,
+        stack: err.stack
+    });
+};
+
+mermaid.initialize({
+    startOnLoad: false,
+    theme: 'neutral',
+    maxTextSize: 5000000,
+    maxEdges: 50000,
+    flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis',
+        defaultRenderer: 'elk'
+    },
+    layout: 'elk',
+    elk: {
+        mergeEdges: true,
+        nodePlacementStrategy: 'SIMPLE'
+    },
+    securityLevel: 'loose',
+    logLevel: 'error'
+});
+
+// Store original mermaid content before rendering (for resize refreshes)
+document.querySelectorAll('.mermaid').forEach(el => {
+    el.setAttribute('data-original-content', el.textContent);
+});
+
+await mermaid.run();
+window.mermaid = mermaid;
+
+// Wait for SVGs to be fully rendered, then initialize
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
+    var containers = document.querySelectorAll('.mermaid');
+    var allReady = true;
+    containers.forEach(function(c) {
+        var svg = c.querySelector('svg');
+        if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+            allReady = false;
+        }
+    });
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
+        callback();
+    } else {
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
+    }
+}
+
+// Function to initialize pan/zoom on all Mermaid diagrams
+function initializePanZoom() {
+    document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+            var svg = mermaidContainer.querySelector('svg');
+            if (!svg) return;
+
+            // Get the natural size of the diagram
+            var bbox = svg.getBBox();
+            var containerWidth = mermaidContainer.clientWidth;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
+
+            // Check if diagram fits within container (with some padding)
+            var padding = 40;
+            var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+            if (fitsInContainer) {
+                // Diagram fits - use natural size, shrink container to fit content
+                svg.style.width = 'auto';
+                svg.style.height = 'auto';
+                mermaidContainer.style.height = 'auto';
+                mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                // No pan/zoom needed for small diagrams
+                return;
+            }
+
+            // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
+            svg.style.maxWidth = 'none';
+            svg.style.maxHeight = 'none';
+
+            var eventsHandler = {
+                haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                init: function(options) {
+                    var instance = options.instance;
+                    var initialScale = 1;
+                    var pannedX = 0;
+                    var pannedY = 0;
+
+                    this.hammer = Hammer(options.svgElement, {
+                        inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                    });
+
+                    this.hammer.get('pinch').set({enable: true});
+
+                    this.hammer.on('doubletap', function(ev){
+                        instance.zoomIn();
+                    });
+
+                    this.hammer.on('panstart panmove', function(ev){
+                        if (ev.type === 'panstart') {
+                            pannedX = 0;
+                            pannedY = 0;
+                        }
+                        instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                        pannedX = ev.deltaX;
+                        pannedY = ev.deltaY;
+                    });
+
+                    this.hammer.on('pinchstart pinchmove', function(ev){
+                        if (ev.type === 'pinchstart') {
+                            initialScale = instance.getZoom();
+                        }
+                        instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                    });
+
+                    options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                },
+                destroy: function(){
+                    this.hammer.destroy();
+                }
+            };
+
+            // Diagrams with default zoom (no auto-fit)
+            var panZoomInstance = svgPanZoom(svg, {
+                zoomEnabled: true,
+                controlIconsEnabled: true,
+                fit: false,
+                center: false,
+                contain: false,
+                minZoom: 0.5,
+                maxZoom: 10,
+                zoomScaleSensitivity: 0.3,
+                customEventsHandler: eventsHandler
+            });
+
+            // Add navigation buttons
+            var navButtons = document.createElement('div');
+            navButtons.className = 'diagram-nav-buttons';
+            navButtons.innerHTML = `
+                <div class="diagram-nav-row">
+                    <button class="diagram-nav-btn" data-action="up">▲</button>
+                </div>
+                <div class="diagram-nav-row">
+                    <button class="diagram-nav-btn" data-action="left">◀</button>
+                    <button class="diagram-nav-btn" data-action="down">▼</button>
+                    <button class="diagram-nav-btn" data-action="right">▶</button>
+                </div>
+            `;
+            mermaidContainer.appendChild(navButtons);
+
+            // Wire up navigation buttons
+            var panStep = 100;
+            navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var action = this.getAttribute('data-action');
+                    switch(action) {
+                        case 'up':
+                            panZoomInstance.panBy({x: 0, y: panStep});
+                            break;
+                        case 'down':
+                            panZoomInstance.panBy({x: 0, y: -panStep});
+                            break;
+                        case 'left':
+                            panZoomInstance.panBy({x: panStep, y: 0});
+                            break;
+                        case 'right':
+                            panZoomInstance.panBy({x: -panStep, y: 0});
+                            break;
+                    }
+                });
+            });
+    });
+
+    // Add CSS for edge highlighting (high specificity for SVG)
+    var style = document.createElement('style');
+    style.textContent = `
+        path.edge-highlighted,
+        .edge-highlighted path,
+        svg path.edge-highlighted {
+            stroke: #FFAB91 !important;
+            stroke-width: 3px !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Add edge highlighting on node hover
+    document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+        var nodes = svg.querySelectorAll('.node');
+
+        // Find flowchart-link paths (actual edges)
+        var edgePaths = svg.querySelectorAll('path.flowchart-link');
+        // Fallback: find paths in .edges group
+        if (edgePaths.length === 0) {
+            var edgesGroup = svg.querySelector('.edges');
+            if (edgesGroup) {
+                edgePaths = edgesGroup.querySelectorAll('path');
+            }
+        }
+
+        // Get SVG point for coordinate transforms
+        var svgPoint = svg.createSVGPoint();
+
+        // Helper: transform point through element's CTM
+        function getTransformedBBox(element) {
+            var bbox = element.getBBox();
+            var ctm = element.getCTM();
+            if (!ctm) return bbox;
+
+            // Transform all four corners
+            var corners = [
+                {x: bbox.x, y: bbox.y},
+                {x: bbox.x + bbox.width, y: bbox.y},
+                {x: bbox.x, y: bbox.y + bbox.height},
+                {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+            ];
+
+            var transformed = corners.map(function(c) {
+                svgPoint.x = c.x;
+                svgPoint.y = c.y;
+                var tp = svgPoint.matrixTransform(ctm);
+                return {x: tp.x, y: tp.y};
+            });
+
+            var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+            var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+            var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+            var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+            return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+        }
+
+        // Helper: get all points from path
+        function getPathPoints(path) {
+            var d = path.getAttribute('d') || '';
+            var points = [];
+            var ctm = path.getCTM();
+
+            // Match all coordinate pairs in the path
+            var regex = /([ML])\s*([\d.-]+)[,\s]+([\d.-]+)|([CQ])[^MLCQZ]*/gi;
+            var match;
+
+            // Get M (start) point
+            var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+            if (startMatch) {
+                var sx = parseFloat(startMatch[1]);
+                var sy = parseFloat(startMatch[2]);
+                if (ctm) {
+                    svgPoint.x = sx; svgPoint.y = sy;
+                    var tp = svgPoint.matrixTransform(ctm);
+                    points.push({x: tp.x, y: tp.y});
+                } else {
+                    points.push({x: sx, y: sy});
+                }
+            }
+
+            // Get last point - find last number pair before Z or end
+            var allNums = d.match(/[\d.-]+/g);
+            if (allNums && allNums.length >= 2) {
+                var ex = parseFloat(allNums[allNums.length - 2]);
+                var ey = parseFloat(allNums[allNums.length - 1]);
+                if (ctm) {
+                    svgPoint.x = ex; svgPoint.y = ey;
+                    var tp = svgPoint.matrixTransform(ctm);
+                    points.push({x: tp.x, y: tp.y});
+                } else {
+                    points.push({x: ex, y: ey});
+                }
+            }
+
+            return points;
+        }
+
+        // Build node bounding boxes with transforms
+        var nodeData = {};
+        nodes.forEach(function(node) {
+            var nodeId = node.id || '';
+            var parts = nodeId.split('-');
+            var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+            nodeData[hashId] = {
+                node: node,
+                bbox: getTransformedBBox(node)
+            };
+        });
+
+        // Calculate distance from point to bbox center
+        function distToBboxCenter(pt, bbox) {
+            var centerX = bbox.x + bbox.width / 2;
+            var centerY = bbox.y + bbox.height / 2;
+            return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+        }
+
+        // Check if point is near bbox
+        function isNearBbox(pt, bbox, margin) {
+            margin = margin || 10;
+            return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                   pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+        }
+
+        // Build edge connections with direction tracking
+        var edgeConnections = []; // [{path, source, target}]
+        var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+        var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+        Object.keys(nodeData).forEach(function(hashId) {
+            upstreamOf[hashId] = [];
+            downstreamOf[hashId] = [];
+        });
+
+        edgePaths.forEach(function(path) {
+            var points = getPathPoints(path);
+            if (points.length < 2) return;
+
+            var startPt = points[0];
+            var endPt = points[points.length - 1];
+
+            var sourceNode = null;
+            var targetNode = null;
+            var sourceMinDist = Infinity;
+            var targetMinDist = Infinity;
+
+            // Find closest source and target nodes for this edge
+            Object.keys(nodeData).forEach(function(hashId) {
+                var bbox = nodeData[hashId].bbox;
+
+                // Find closest node to start point (source)
+                if (isNearBbox(startPt, bbox, 30)) {
+                    var dist = distToBboxCenter(startPt, bbox);
+                    if (dist < sourceMinDist) {
+                        sourceMinDist = dist;
+                        sourceNode = hashId;
+                    }
+                }
+
+                // Find closest node to end point (target)
+                if (isNearBbox(endPt, bbox, 30)) {
+                    var dist = distToBboxCenter(endPt, bbox);
+                    if (dist < targetMinDist) {
+                        targetMinDist = dist;
+                        targetNode = hashId;
+                    }
+                }
+            });
+
+            if (sourceNode && targetNode && sourceNode !== targetNode) {
+                edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                // source -> target means: target's upstream includes source
+                if (!upstreamOf[targetNode].includes(sourceNode)) {
+                    upstreamOf[targetNode].push(sourceNode);
+                }
+                // source -> target means: source's downstream includes target
+                if (!downstreamOf[sourceNode].includes(targetNode)) {
+                    downstreamOf[sourceNode].push(targetNode);
+                }
+            }
+        });
+
+        // Traverse only upstream (to parents/ancestors)
+        function findUpstream(startNodeId) {
+            var visited = {};
+            var queue = [startNodeId];
+            visited[startNodeId] = true;
+
+            while (queue.length > 0) {
+                var current = queue.shift();
+                var parents = upstreamOf[current] || [];
+                parents.forEach(function(parent) {
+                    if (!visited[parent]) {
+                        visited[parent] = true;
+                        queue.push(parent);
+                    }
+                });
+            }
+            return visited;
+        }
+
+        // Traverse only downstream (to children/descendants)
+        function findDownstream(startNodeId) {
+            var visited = {};
+            var queue = [startNodeId];
+            visited[startNodeId] = true;
+
+            while (queue.length > 0) {
+                var current = queue.shift();
+                var children = downstreamOf[current] || [];
+                children.forEach(function(child) {
+                    if (!visited[child]) {
+                        visited[child] = true;
+                        queue.push(child);
+                    }
+                });
+            }
+            return visited;
+        }
+
+        // Get edges for connected nodes
+        function getChainEdges(nodeSet) {
+            var edges = [];
+            edgeConnections.forEach(function(conn) {
+                if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                    edges.push(conn.path);
+                }
+            });
+            return edges;
+        }
+
+        // Attach hover handlers
+        nodes.forEach(function(node) {
+            var nodeId = node.id || '';
+            var parts = nodeId.split('-');
+            var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+            node.style.cursor = 'pointer';
+
+            node.addEventListener('mouseenter', function(e) {
+                e.stopPropagation();
+                nodes.forEach(function(n) { n.style.filter = ''; });
+                node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                // Find upstream (ancestors) and downstream (descendants) separately
+                var upstream = findUpstream(hashId);
+                var downstream = findDownstream(hashId);
+                // Merge both sets
+                var allConnected = {};
+                Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                var chainEdges = getChainEdges(allConnected);
+                chainEdges.forEach(function(path) {
+                    path.classList.add('edge-highlighted');
+                });
+            });
+
+            node.addEventListener('mouseleave', function() {
+                node.style.filter = '';
+                // Remove highlight from all edges
+                edgePaths.forEach(function(path) {
+                    path.classList.remove('edge-highlighted');
+                });
+            });
+        });
+    });
+}
+
+// Initialize pan/zoom after page load
+waitForSvgs(initializePanZoom);
+
+// Refresh diagrams on window resize (debounced to avoid performance issues)
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(async function() {
+        // Re-run mermaid on all diagrams
+        const mermaidElements = document.querySelectorAll('.mermaid');
+        mermaidElements.forEach(el => {
+            // Restore original markdown content
+            const originalContent = el.getAttribute('data-original-content');
+            if (originalContent) {
+                el.innerHTML = originalContent;
+                el.removeAttribute('data-processed');
+            }
+        });
+        // Re-render diagrams
+        await mermaid.run();
+        // Re-initialize pan-zoom after re-render
+        waitForSvgs(initializePanZoom);
+    }, 250); // Wait 250ms after resize stops before re-rendering
+});
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

@@ -81,21 +81,76 @@ echo "✓ Element added successfully"
 echo ""
 
 # ==================================
+# Test 1a: Add Element via --content flag
+# ==================================
+echo "Test 1a: Add element via --content flag..."
+
+CONTENT_ELEMENT='### Capability F
+
+This capability was added via --content flag.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Capability A](#capability-a)
+'
+
+set +e
+ADD_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" add specifications/Requirements.md --content "$CONTENT_ELEMENT" 2>&1)
+ADD_CONTENT_EXIT=$?
+set -e
+
+if [ $ADD_CONTENT_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Add with --content flag failed with exit code $ADD_CONTENT_EXIT"
+  echo "$ADD_CONTENT_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "### Capability F" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "❌ FAILED: Element was not added via --content flag"
+  exit 1
+fi
+
+set +e
+VALIDATION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+VALIDATION_EXIT=$?
+set -e
+
+if [ $VALIDATION_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Model validation failed after --content add"
+  echo "$VALIDATION_OUTPUT"
+  exit 1
+fi
+
+# Clean up: remove the element to keep file state consistent for subsequent tests
+set +e
+RM_CONTENT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "Capability F" 2>&1)
+RM_CONTENT_EXIT=$?
+set -e
+
+if [ $RM_CONTENT_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Cleanup rm of Capability F failed with exit code $RM_CONTENT_EXIT"
+  echo "$RM_CONTENT_OUTPUT"
+  exit 1
+fi
+
+echo "✓ Element added via --content flag successfully"
+echo ""
+
+# ==================================
 # Test 1b: Add Element with Attachments
 # ==================================
 echo "Test 1b: Add element with attachments..."
 
 # First add a refinement element (constraint) that will be attached
-# The constraint must satisfy a requirement, and Capability E must be outside that hierarchy
+# The constraint must be owned by a requirement (via refinedBy), and Capability E must be outside that hierarchy
 CONSTRAINT_ELEMENT='### Capability D Constraint
 
 Rate limiting constraint for Capability D.
 
 #### Metadata
   * type: constraint
-
-#### Relations
-  * satisfy: [Separate Requirement Branch](#separate-requirement-branch)
 '
 
 set +e
@@ -106,6 +161,18 @@ set -e
 if [ $ADD_CONSTRAINT_EXIT -ne 0 ]; then
   echo "❌ FAILED: Add constraint element failed with exit code $ADD_CONSTRAINT_EXIT"
   echo "$ADD_CONSTRAINT_OUTPUT"
+  exit 1
+fi
+
+# Link the constraint to its owning requirement via refinedBy
+set +e
+LINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Separate Requirement Branch" refinedBy "Capability D Constraint" 2>&1)
+LINK_EXIT=$?
+set -e
+
+if [ $LINK_EXIT -ne 0 ]; then
+  echo "❌ FAILED: Link refinedBy failed with exit code $LINK_EXIT"
+  echo "$LINK_OUTPUT"
   exit 1
 fi
 

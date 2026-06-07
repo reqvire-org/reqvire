@@ -153,9 +153,10 @@ cat > "$TEST_DIR/specifications/FormatTestDuplicateRelations.md" << 'EOF'
 This element has a single relation.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Relations
+  * specify: [Test Capability Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-capability-test-duplicate-detection-specifications-requirements-md)
   * derivedFrom: [Base Requirement](Requirements.md#base-requirement)
   * trace: [Target Element](Requirements.md#target-element)
 ---
@@ -170,7 +171,10 @@ cat > "$TEST_DIR/specifications/FormatTestDuplicateAttachments.md" << 'EOF'
 This element has a single attachment.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
+
+#### Relations
+  * specify: [Test Capability Test Duplicate Detection Specifications Requirements Md](Requirements.md#test-capability-test-duplicate-detection-specifications-requirements-md)
 
 #### Attachments
   * [Refinement Element](Requirements.md#refinement-element)
@@ -196,7 +200,7 @@ fi
 
 # Add an attachment to Base Requirement
 set +e
-OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" attaching "Refinement Element" 2>&1)
+OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Base Requirement" attaching "#refinement-element" 2>&1)
 EXIT_CODE=$?
 set -e
 

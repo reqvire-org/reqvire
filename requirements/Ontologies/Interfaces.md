@@ -21,6 +21,27 @@ reqvire:CliInterfaceContract a owl:Class ;
 reqvire:WebInterfaceContract a owl:Class ;
   rdfs:subClassOf reqvire:InterfaceContract ;
   rdfs:comment "Interface contract vocabulary for generated web documentation and browser-oriented model exploration." .
+reqvire:BrowserLocalProjectStore a owl:Class ;
+  rdfs:subClassOf reqvire:WebInterfaceContract ;
+  rdfs:comment "Browser-local generated store snapshot hosted by the Reqvire Explorer shell for all routed Explorer views." .
+reqvire:ExplorerShell a owl:Class ;
+  rdfs:subClassOf reqvire:WebInterfaceContract ;
+  rdfs:comment "Single-page browser shell that hosts routed Reqvire Explorer views and initializes the Project Store." .
+reqvire:ExplorerRoute a owl:Class ;
+  rdfs:subClassOf reqvire:WebInterfaceContract ;
+  rdfs:comment "Hash-route contract for navigating generated Reqvire Explorer views from index.html." .
+reqvire:ElementDetailModal a owl:Class ;
+  rdfs:subClassOf reqvire:WebInterfaceContract ;
+  rdfs:comment "Scrollable in-shell Explorer dialog for inspecting a Project Store element record without navigating away from the active view." .
+reqvire:FileContainer a owl:Class ;
+  rdfs:subClassOf reqvire:WebInterfaceContract ;
+  rdfs:comment "Exported filesystem or source-document container used for containment, source links, file navigation, and breadcrumbs." .
+reqvire:ModeledResource a owl:Class ;
+  rdfs:subClassOf reqvire:WebInterfaceContract ;
+  rdfs:comment "Modeled resource, implementation target, evidence file, local asset, or external URL referenced by Reqvire facts." .
+reqvire:StoreProjection a owl:Class ;
+  rdfs:subClassOf reqvire:BrowserLocalProjectStore ;
+  rdfs:comment "View-neutral normalized store section consumed by one or more Explorer routes." .
 reqvire:McpInterfaceContract a owl:Class ;
   rdfs:subClassOf reqvire:InterfaceContract ;
   rdfs:comment "Interface contract vocabulary for MCP tool, resource, payload, and safety behavior." .
@@ -64,6 +85,18 @@ reqvire:mcpSideEffectClassName a owl:DatatypeProperty ;
   rdfs:domain reqvire:McpToolSideEffectClass ;
   rdfs:range xsd:string ;
   rdfs:comment "Canonical MCP side-effect class token consumed by interface contracts and MCP tool discovery expectations." .
+reqvire:storeSectionName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:StoreProjection ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical top-level Project Store section name consumed by Explorer views." .
+reqvire:routePattern a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ExplorerRoute ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Hash-route pattern supported by the index.html Explorer shell." .
+reqvire:resourceReferenceKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ModeledResource ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Resource reference classification such as implementation, evidence, local-file, external-url, or asset." .
 
 reqvire:mcpReadOnlySideEffectClass a reqvire:McpReadOnlyToolClass ;
   reqvire:mcpSideEffectClassName "read_only" ;

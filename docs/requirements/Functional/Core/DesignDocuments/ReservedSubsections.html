@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,7 +447,18 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../../coverage.html" class="nav-link">Coverage</a><a href="../../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../../model.html" class="mobile-nav-link">Model</a><a href="../../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="reserved-subsections-specification">Reserved Subsections Specification</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="documents">Documents</h1>
+<h2 id="metadata">Metadata</h2>
+<ul>
+<li>type: specification</li>
+</ul>
+<h2 id="relations">Relations</h2>
+<ul>
+<li>refine: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+</ul>
+<h2 id="reservedsubsections">ReservedSubsections</h2>
+<h1 id="reserved-subsections-specification">Reserved Subsections Specification</h1>
+<p>Reserved subsection vocabulary is defined by the Reqvire core element ontology. This specification defines parser-facing syntax, validation, and serialization behavior for those ontology-defined subsection concepts.</p>
 <h2 id="relations-subsection">Relations Subsection</h2>
 <p>Must be defined with a level 4 header: <code>#### Relations</code>.</p>
 <p>The Relations subsection defines relationships between elements using markdown bullet list syntax.</p>
@@ -363,17 +472,18 @@
 <pre><code class="language-markdown">#### Relations
 * derivedFrom: [Parent Requirement](../path/file.html#parent)
 * satisfiedBy: [Implementation](../../src/module.rs)
-* verifies: [Target Requirement](file.html#target)
+* verify: [Target Requirement](file.html#target)
 </code></pre>
 <h2 id="details-subsection">Details Subsection</h2>
 <p>Must be defined with a level 4 header: <code>#### Details</code>.</p>
-<p>The Details subsection provides additional information directly related to the main requirement text.</p>
+<p>The Details subsection provides supporting requirement context and intent-level clarification.</p>
 <p><strong>Parsing Rules:</strong></p>
 <ul>
 <li>When parsing <code>#### Details</code> subsections, any markdown headers or elements within <code>&lt;details&gt;...&lt;/details&gt;</code> tags are skipped</li>
-<li>Content within the Details subsection is considered an <strong>extension of the requirement text</strong></li>
-<li>It serves the same purpose as refinement relation in other MBSE tools and SysML</li>
-<li>Any statements in the Details subsection hold the same validity as the main requirement text</li>
+<li>Content within the Details subsection is part of the requirement narrative context</li>
+<li>Details subsection does <strong>not</strong> replace refinement relations</li>
+<li>Technical specifications, constraints, and behaviors that define implementation contracts should be captured in explicit refinement elements linked via <code>refinedBy</code></li>
+<li>Any normative statements in the Details subsection are interpreted as requirement-level statements unless moved to dedicated refinement elements</li>
 </ul>
 <p><strong>Examples:</strong></p>
 <pre><code class="language-markdown">### My Requirement
@@ -381,24 +491,25 @@
 The system shall perform action X.
 
 #### Details
+Implementation details shall follow associated refinement specifications.
 Additional context about action X:
-- Constraint 1
-- Constraint 2
-- Performance requirement
+- Operational assumption 1
+- Clarification 2
 </code></pre>
 <h2 id="metadata-subsection">Metadata Subsection</h2>
 <p>Must be defined with a level 4 header: <code>#### Metadata</code>.</p>
-<p>The Metadata subsection stores element properties including type and custom attributes.</p>
+<p>The Metadata subsection stores element properties including type, requirement governance metadata where valid, and custom attributes.</p>
 <p><strong>Parsing Rules:</strong></p>
 <ul>
 <li>Contains properties in list format: <code>* property_name: property_value</code></li>
 <li>Property entries are listed as bullet points (<code>*</code>), with <strong>two spaces</strong> (<code>  *</code>) of indentation followed by property_name + ’: ’ + property_value</li>
-<li>May include any custom properties, not just <code>type</code></li>
+<li>May include custom properties, but reserved property names have the constraints defined by their owning specifications</li>
 </ul>
 <p><strong>Reserved Properties:</strong></p>
 <p>The following properties have special meaning:</p>
 <ul>
 <li><code>type</code>: Defines the element type (supported types are defined in <a href="../Specifications.html#supported-element-types-specification">Supported Element Types Specification</a>)</li>
+<li><code>status</code>, <code>priority</code>, <code>risk</code>, <code>owner</code>: Define governance metadata for capability and requirement elements only (defined in <a href="../Specifications.html#requirement-governance-metadata-specification">Requirement Governance Metadata Specification</a>)</li>
 <li>Additional reserved properties may be defined in future releases</li>
 </ul>
 <p><strong>Examples:</strong></p>
@@ -408,11 +519,11 @@ This is a verification element.
 
 #### Metadata
   * type: verification
-  * priority: high
-  * owner: team-a
+  * domain: safety
+  * review_method: inspection
 
 #### Relations
-* verifies: [Some Requirement](#some-requirement)
+* verify: [Some Requirement](#some-requirement)
 </code></pre>
 <pre><code class="language-markdown">### My Element
 
@@ -423,46 +534,17 @@ Some details.
 
 #### Metadata
   * type: verification
-  * priority: high
-  * owner: team-a
+  * domain: safety
+  * review_method: inspection
 
 #### Relations
-  * verifies: [Some Requirement](#some-requirement)
+  * verify: [Some Requirement](#some-requirement)
 </code></pre>
 <h2 id="attachments-subsection">Attachments Subsection</h2>
 <p>Must be defined with a level 4 header: <code>#### Attachments</code>.</p>
-<p>The Attachments subsection links external resources to elements. Attachments support two target types:</p>
-<ol>
-<li><strong>File Paths</strong>: Links to external documents (PDFs, spreadsheets, images, etc.)</li>
-<li><strong>Element Identifiers</strong>: Links to Refinement elements within the model</li>
-</ol>
-<h3 id="file-path-attachments">File Path Attachments</h3>
-<p><strong>Parsing Rules:</strong></p>
-<ul>
-<li>Support markdown link syntax: <code>* [path](path)</code></li>
-<li>Link text equals path (git-root-relative)</li>
-<li>Many-to-many relationship (multiple requirements can link same document)</li>
-<li>Never parse attachment files (treat as opaque)</li>
-<li>Auto-cleanup: remove subsection when empty</li>
-</ul>
-<p><strong>Validation Rules:</strong></p>
-<ul>
-<li>Verify file existence on filesystem</li>
-<li>Validate markdown link format: <code>[path](path)</code></li>
-<li>Detect duplicate attachments within element</li>
-<li>Report missing attachment targets as validation errors</li>
-</ul>
-<p><strong>Examples:</strong></p>
-<pre><code class="language-markdown">### System Performance Requirements
-
-The system shall meet defined performance criteria.
-
-#### Attachments
-* [docs/SLO.pdf](docs/SLO.pdf)
-* [docs/benchmarks.xlsx](docs/benchmarks.xlsx)
-</code></pre>
+<p>The Attachments subsection links an element to explicit dependency elements. Capability attachments consume ontology context. Requirement attachments consume reusable requirement-owned contracts.</p>
 <h3 id="element-identifier-attachments">Element Identifier Attachments</h3>
-<p>Element identifier attachments link to Refinement elements (constraint, behavior, specification types) within the model.</p>
+<p>Element identifier attachments link to model elements that are attachable under the Reqvire relation and attachment compatibility model.</p>
 <p><strong>Parsing Rules:</strong></p>
 <ul>
 <li>Support markdown link syntax with fragment identifiers: <code>* [Element Name](path#element-id)</code></li>
@@ -474,25 +556,46 @@ The system shall meet defined performance criteria.
 <p><strong>Validation Rules:</strong></p>
 <ul>
 <li>Target element must exist in the model</li>
-<li>Target element must be a Refinement type (constraint, behavior, specification)</li>
-<li>Non-Refinement element identifiers are rejected with a validation error</li>
-<li>Target refinement must have at least one <code>satisfy</code> relation (no orphan refinements)</li>
-<li>Attaching requirement must be outside the refinement’s defining hierarchy (hierarchical independence)</li>
+<li>Capability attachment targets must be ontology elements.</li>
+<li>Requirement attachment targets must be requirement-owned <code>semantic-contract</code>, <code>semantic-query-contract</code>, <code>constraint</code>, <code>behavior</code>, <code>specification</code>, <code>state</code>, or <code>input-output</code> elements.</li>
+<li>Requirement-owned refinement targets must have exactly one compatible <code>refine</code> relation before they are attachable.</li>
+<li>Non-attachable element identifiers are rejected with a validation error.</li>
+<li>Redundant same-hierarchy attachments and invalid cross-subgraph attachment flow are rejected by attachment validation.</li>
 </ul>
 <p><strong>Examples:</strong></p>
-<pre><code class="language-markdown">### System Performance Requirements
+<pre><code class="language-markdown">### API Capability
 
-The system shall meet defined performance criteria.
+Capability context.
 
 #### Attachments
-* [docs/SLO.pdf](docs/SLO.pdf)
-* [Response Time Constraint](Constraints.html#response-time-constraint)
-* [Timeout Behavior](Behaviors.html#timeout-behavior)
+* [API Ontology](../Ontologies/Interfaces.html#api-ontology)
 </code></pre>
-<p>See <a href="RefinementElements.html">Refinement Elements Specification</a> for details on refinement element types.</p>
-<footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+<pre><code class="language-markdown">### API Requirement
+
+The system shall expose an API contract.
+
+#### Attachments
+* [Reusable Payload Shape](Contracts.html#reusable-payload-shape)
+</code></pre>
+</div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

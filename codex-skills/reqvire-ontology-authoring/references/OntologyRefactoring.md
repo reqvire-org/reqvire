@@ -185,7 +185,7 @@ ex:EmployeeShape a sh:NodeShape ;
 
 ### Align Ownership Classes
 
-If prose says a class is requirement-owned or capability-owned, the OWL hierarchy should reflect that when the owner class exists.
+If prose says a class is owned by a specific model element type, the OWL hierarchy should reflect that when the owner class exists.
 
 For example, requirement-owned semantic refinements should subclass `reqvire:RequirementOwnedRefinement`, not only generic `reqvire:Refinement`.
 

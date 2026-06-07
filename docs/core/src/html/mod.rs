@@ -4,22 +4,21 @@
 /// - Type-safe HTML via Maud macros (compile-time validation)
 /// - Responsive design with Tailwind CSS
 /// - Reusable components (navigation, layouts)
-/// - Mobile-first approach with hamburger menu
+/// - Compact Explorer view switcher and contextual help modal
 ///
 /// # Architecture
 ///
 /// - `layouts`: Base layouts (standard page, diagram page)
-/// - `components`: Reusable components (head, navigation, footer)
+/// - `components`: Reusable components (head, navigation)
 /// - `styles`: CSS generation (Tailwind CDN + custom overrides)
-/// - `scripts`: JavaScript utilities (mobile menu toggle)
+/// - `scripts`: JavaScript utilities
 /// - `pages`: Page-specific generators (to be implemented in Phase 2/3)
 /// - `visualizations`: Visualization components (to be implemented in Phase 2/3)
-
 mod components;
 mod layouts;
+pub mod markdown;
 mod scripts;
 mod styles;
-pub mod markdown;
 
 pub mod pages;
 pub mod visualizations;
@@ -29,10 +28,12 @@ pub use layouts::{base, diagram_layout};
 pub use maud::Markup;
 
 // Re-export page generators for external use
-pub use pages::{coverage, index, model, resources, traces, traceflow};
+pub use pages::{
+    coverage, index, kn2, knowledgegraph, model, ontologies, resources, traceflow, traces,
+};
 
 use crate::error::ReqvireError;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 /// Convert markdown file to HTML using component-based architecture
 ///
@@ -54,40 +55,24 @@ pub fn convert_to_html(
     base_folder: &PathBuf,
 ) -> Result<String, ReqvireError> {
     // Process markdown to HTML content
-    let html_content = markdown::markdown_to_html_content(
-        file_path,
-        markdown_content,
-        base_folder,
-    )?;
+    let html_content =
+        markdown::markdown_to_html_content(file_path, markdown_content, base_folder)?;
 
     // Calculate relative path prefix for navigation links
     let nav_prefix = calculate_nav_prefix(file_path, base_folder);
 
     // Determine which page template to use based on filename
-    let filename = file_path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or("");
+    let filename = file_path.file_name().and_then(|n| n.to_str()).unwrap_or("");
 
     let html_document = match filename {
         "SpecificationIndex.md" | "index.md" => {
             pages::index::render(&html_content, &nav_prefix).into_string()
         }
-        "model.md" => {
-            pages::model::render(&html_content, &nav_prefix).into_string()
-        }
-        "traces.md" => {
-            pages::traces::render(&html_content, &nav_prefix).into_string()
-        }
-        "traceflow.md" => {
-            pages::traceflow::render(&html_content, &nav_prefix).into_string()
-        }
-        "coverage.md" => {
-            pages::coverage::render(&html_content, &nav_prefix).into_string()
-        }
-        "resources.md" => {
-            pages::resources::render(&html_content, &nav_prefix).into_string()
-        }
+        "model.md" => pages::model::render(&html_content, &nav_prefix).into_string(),
+        "traces.md" => pages::traces::render(&html_content, &nav_prefix).into_string(),
+        "traceflow.md" => pages::traceflow::render(&html_content, &nav_prefix).into_string(),
+        "coverage.md" => pages::coverage::render(&html_content, &nav_prefix).into_string(),
+        "resources.md" => pages::resources::render(&html_content, &nav_prefix).into_string(),
         _ => {
             // Default: standard page for specification files
             // Check if content contains diagrams and include appropriate scripts
@@ -127,7 +112,7 @@ pub fn convert_to_html(
 
 /// Calculate the relative path prefix needed for navigation links
 /// based on the depth of the current file relative to base_folder
-fn calculate_nav_prefix(file_path: &PathBuf, base_folder: &PathBuf) -> String {
+fn calculate_nav_prefix(file_path: &Path, base_folder: &Path) -> String {
     // Get relative path from base_folder
     let relative_path = match file_path.strip_prefix(base_folder) {
         Ok(rel) => rel,
@@ -156,18 +141,6 @@ fn calculate_nav_prefix(file_path: &PathBuf, base_folder: &PathBuf) -> String {
 /// * `content` - HTML content markup to display in the page
 /// * `nav_prefix` - Relative path prefix for navigation links (e.g., "../" for nested pages)
 ///
-/// # Example
-/// ```ignore
-/// use reqvire_core::html;
-/// use maud::html;
-///
-/// let content = html! {
-///     h1 { "Welcome" }
-///     p { "This is a test page" }
-/// };
-///
-/// let page = html::generate_page("Test Page", content, "");
-/// ```
 pub fn generate_page(title: &str, content: Markup, nav_prefix: &str) -> String {
     layouts::base(title, content, nav_prefix).into_string()
 }
@@ -187,7 +160,7 @@ pub fn generate_diagram_page(title: &str, diagram: Markup, nav_prefix: &str) -> 
 /// # Arguments
 /// * `html_content` - Pre-converted HTML content from markdown
 /// * `nav_prefix` - Relative path prefix for navigation links
-/// Generate coverage page with new component system
+///   Generate coverage page with new component system
 pub fn generate_coverage_page(html_content: &str, nav_prefix: &str) -> String {
     pages::coverage::render(html_content, nav_prefix).into_string()
 }
@@ -195,6 +168,22 @@ pub fn generate_coverage_page(html_content: &str, nav_prefix: &str) -> String {
 /// Generate model page with new component system and Mermaid support
 pub fn generate_model_page(html_content: &str, nav_prefix: &str) -> String {
     pages::model::render(html_content, nav_prefix).into_string()
+}
+
+/// Generate project knowledge graph page with new component system
+pub fn generate_knowledge_graph_page(
+    registry: &crate::graph_registry::GraphRegistry,
+    nav_prefix: &str,
+) -> String {
+    pages::knowledgegraph::render(registry, nav_prefix).into_string()
+}
+
+/// Generate experimental Cytoscape project graph page.
+pub fn generate_kn2_page(
+    registry: &crate::graph_registry::GraphRegistry,
+    nav_prefix: &str,
+) -> String {
+    pages::kn2::render(registry, nav_prefix).into_string()
 }
 
 /// Generate index/containment page with new component system
@@ -215,6 +204,14 @@ pub fn generate_traceflow_page(html_content: &str, nav_prefix: &str) -> String {
 /// Generate resources page with new component system
 pub fn generate_resources_page(html_content: &str, nav_prefix: &str) -> String {
     pages::resources::render(html_content, nav_prefix).into_string()
+}
+
+/// Generate ontologies page with new component system
+pub fn generate_ontologies_page(
+    report: &crate::semantic_contract::SemanticIndex,
+    nav_prefix: &str,
+) -> String {
+    pages::ontologies::render(report, nav_prefix).into_string()
 }
 
 #[cfg(test)]
@@ -249,13 +246,16 @@ mod tests {
         let content = html! { p { "Content" } };
         let page = generate_page("Test", content, "");
 
-        // Check all navigation items present
+        // The Explorer shell keeps a compact primary view switcher only.
+        assert!(page.contains("reqvire-nav"));
+        assert!(page.contains("href=\"index.html\""));
         assert!(page.contains("Containment"));
         assert!(page.contains("Model"));
         assert!(page.contains("Traces"));
-        assert!(page.contains("TraceFlow"));
-        assert!(page.contains("Coverage"));
-        assert!(page.contains("Resources"));
+        assert!(page.contains("Ontologies"));
+        assert!(!page.contains("traceflow.html"));
+        assert!(!page.contains("coverage.html"));
+        assert!(!page.contains("resources.html"));
     }
 
     #[test]
@@ -274,10 +274,9 @@ mod tests {
         let content = html! { p { "Content" } };
         let page = generate_page("Test", content, "");
 
-        // Check viewport meta tag and footer present
+        // Check viewport meta tag is present and no generated footer wastes space.
         assert!(page.contains("viewport"));
-        assert!(page.contains("Generated by"));
-        assert!(page.contains("Reqvire"));
+        assert!(!page.contains("Generated by"));
     }
 
     #[test]

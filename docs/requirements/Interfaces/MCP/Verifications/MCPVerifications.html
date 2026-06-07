@@ -1,0 +1,1484 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MCPVerifications</title><link rel="icon" type="image/x-icon" href="../../../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
+                :root {
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
+
+                    /* Element Type Colors */
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
+
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
+
+                    /* Interactive Colors */
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
+
+                    /* Text Colors */
+                    --color-text-primary: #212121;
+                    --color-text-secondary: #424242;
+                    --color-text-muted: #757575;
+                    --color-background: #ececea;
+                    --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
+                }
+
+                /* Ensure body takes full height */
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 0;
+                    background-color: var(--color-background);
+                    color: var(--color-text-secondary);
+                }
+
+                /* Navigation bar */
+                .reqvire-nav {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    background-color: var(--color-nav);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 20px;
+                }
+
+                .reqvire-nav a {
+                    color: white;
+                    text-decoration: none;
+                    padding: 0 15px;
+                    font-weight: 500;
+                    transition: background-color 0.2s;
+                }
+
+                .reqvire-nav a:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: none;
+                }
+
+                .nav-logo {
+                    margin-right: 16px;
+                }
+
+                .nav-logo:hover {
+                    background-color: transparent !important;
+                    text-decoration: none !important;
+                }
+
+                .nav-logo img {
+                    height: 24px;
+                    width: auto;
+                    vertical-align: middle;
+                }
+
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 7px 10px;
+                    margin-right: 0;
+                    border-radius: 3px;
+                    font-size: 14px;
+                    transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
+                }
+
+                .nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .nav-link:active {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
+
+                .mobile-nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 20px;
+                    display: block;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: background-color 0.2s;
+                }
+
+                .mobile-nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    color: white;
+                }
+
+                .reqvire-nav-spacer {
+                    height: 50px;
+                }
+
+                /* Content container */
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+
+                .content {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
+                }
+
+                /* Content area typography and styling - matches old template exactly */
+                /* Use higher specificity to override Tailwind reset */
+                .bg-white h1, .content h1, h1 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 2px solid #EEEEEE !important;
+                    padding-bottom: 10px !important;
+                    margin-top: 0 !important;
+                    font-size: 2em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h2, .content h2, h2 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 1px solid #EEEEEE !important;
+                    padding-bottom: 5px !important;
+                    font-size: 1.5em !important;
+                    font-weight: bold !important;
+                    margin-top: 20px !important;
+                }
+
+                .bg-white h3, .content h3, h3 {
+                    color: var(--color-text-primary) !important;
+                    margin-top: 25px !important;
+                    font-size: 1.17em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h4, .content h4, h4 {
+                    color: var(--color-text-secondary) !important;
+                    font-weight: 600 !important;
+                    font-size: 1em !important;
+                    margin-top: 15px !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                .content a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                div.bg-white > a {
+                    color: var(--color-primary) !important;
+                    text-decoration: none !important;
+                    font-weight: 500 !important;
+                    transition: text-decoration 0.15s ease !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):hover,
+                .content a:not(.nav-link):not(.mobile-nav-link):hover {
+                    text-decoration: underline !important;
+                }
+
+                .bg-white a:focus, .content a:focus {
+                    outline: 2px solid var(--color-primary);
+                    outline-offset: 2px;
+                }
+
+                .bg-white table, .content table, table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    margin: 20px 0 !important;
+                }
+
+                .bg-white table, .bg-white th, .bg-white td,
+                .content table, .content th, .content td {
+                    border: 1px solid #EEEEEE !important;
+                }
+
+                .bg-white th, .bg-white td,
+                .content th, .content td {
+                    padding: 8px 12px !important;
+                    text-align: left !important;
+                }
+
+                .bg-white th, .content th {
+                    background-color: #F5F5F5 !important;
+                    color: #212121 !important;
+                    font-weight: 600 !important;
+                }
+
+                .bg-white tr:hover td, .content tr:hover td {
+                    background-color: #FFF8E1 !important;
+                }
+
+                .bg-white code, .content code, code {
+                    background: #f6f8fa !important;
+                    padding: 2px 4px !important;
+                    border-radius: 3px !important;
+                    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+                    font-size: 90% !important;
+                }
+
+                .bg-white pre, .content pre, pre {
+                    background: #f6f8fa !important;
+                    border-radius: 3px !important;
+                    padding: 16px !important;
+                    overflow: auto !important;
+                }
+
+                .bg-white pre code, .content pre code {
+                    background: transparent !important;
+                    padding: 0 !important;
+                }
+
+                .bg-white blockquote, .content blockquote, blockquote {
+                    margin: 0 !important;
+                    padding: 0 15px !important;
+                    color: var(--color-text-muted) !important;
+                    border-left: 4px solid var(--color-primary) !important;
+                }
+
+                .bg-white p, .content p {
+                    margin: 10px 0 !important;
+                    line-height: 1.6 !important;
+                }
+
+                .bg-white ul, .content ul,
+                .bg-white ol, .content ol {
+                    margin: 10px 0 !important;
+                    padding-left: 30px !important;
+                }
+
+                .bg-white li, .content li {
+                    margin: 5px 0 !important;
+                }
+
+                /* Custom Mermaid diagram styles - matches old template */
+                .mermaid {
+                    margin: 20px 0;
+                    text-align: center;
+                    height: auto;
+                    min-height: 280px;
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    border: 1px solid #EEEEEE;
+                    border-radius: 3px;
+                    background-color: #FAFAFA;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: center;
+                    /* Hide raw markdown text until rendered */
+                    color: transparent;
+                }
+
+                .mermaid svg {
+                    /* Show rendered diagram */
+                    color: initial;
+                }
+
+                .mermaid svg {
+                    width: 100%;
+                    height: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                /* Diagram navigation buttons */
+                .diagram-nav-buttons {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    z-index: 999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    background-color: rgba(255, 255, 255, 0.85);
+                    padding: 3px;
+                    border-radius: 3px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+                }
+
+                .diagram-nav-row {
+                    display: flex;
+                    gap: 2px;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn {
+                    width: 22px;
+                    height: 22px;
+                    background-color: var(--color-primary);
+                    color: white;
+                    border: none;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn:hover {
+                    background-color: var(--color-primary-hover);
+                }
+
+                .diagram-nav-btn:active {
+                    background-color: var(--color-primary-active);
+                }
+
+                /* Smooth transitions for interactive elements */
+                a, button {
+                    transition: all 0.2s ease-in-out;
+                }
+
+                /* Responsive typography */
+                @media (max-width: 640px) {
+                    h1 { font-size: 1.5rem; }
+                    h2 { font-size: 1.25rem; }
+                    h3 { font-size: 1.125rem; }
+                }
+
+                /* Print styles */
+                @media print {
+                    nav, .no-print { display: none; }
+                }
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph deb54ff1b035e9f8["📁 requirements/Interfaces/MCP/Verifications"]
+    subgraph ee7b4b2d4bb9dcdb["📄 MCPVerifications.md"]
+      b052bbe8556b8c5["MCP Access Control Baseline Verification"];
+      class b052bbe8556b8c5 verification;
+      click b052bbe8556b8c5 "MCPVerifications.html#mcp-access-control-baseline-verification";
+      4f523cf9dc143348["MCP Contract Layer Boundary Verification"];
+      class 4f523cf9dc143348 verification;
+      click 4f523cf9dc143348 "MCPVerifications.html#mcp-contract-layer-boundary-verification";
+      b2942ba5a2b2a89b["MCP Contract Versioning Verification"];
+      class b2942ba5a2b2a89b verification;
+      click b2942ba5a2b2a89b "MCPVerifications.html#mcp-contract-versioning-verification";
+      7105e6806384d90f["MCP HTTP Transport End-to-End Verification"];
+      class 7105e6806384d90f verification;
+      click 7105e6806384d90f "MCPVerifications.html#mcp-http-transport-end-to-end-verification";
+      ca3d33b1b63743c5["MCP Model Evidence Tools Verification"];
+      class ca3d33b1b63743c5 verification;
+      click ca3d33b1b63743c5 "MCPVerifications.html#mcp-model-evidence-tools-verification";
+      4f70df0082b4c982["MCP Mutation Execution Flow Verification"];
+      class 4f70df0082b4c982 verification;
+      click 4f70df0082b4c982 "MCPVerifications.html#mcp-mutation-execution-flow-verification";
+      87cbe2079514bb05["MCP Mutation Tool Safety Verification"];
+      class 87cbe2079514bb05 verification;
+      click 87cbe2079514bb05 "MCPVerifications.html#mcp-mutation-tool-safety-verification";
+      c4c71224d9c1067["MCP Protocol Standard Conformance Verification"];
+      class c4c71224d9c1067 verification;
+      click c4c71224d9c1067 "MCPVerifications.html#mcp-protocol-standard-conformance-verification";
+      1d91791cf726407f["MCP Quality Traceability Tools Verification"];
+      class 1d91791cf726407f verification;
+      click 1d91791cf726407f "MCPVerifications.html#mcp-quality-traceability-tools-verification";
+      fac8002b618be747["MCP Resource Interface Verification"];
+      class fac8002b618be747 verification;
+      click fac8002b618be747 "MCPVerifications.html#mcp-resource-interface-verification";
+      2abb5d98db3bba93["MCP Server Command Verification"];
+      class 2abb5d98db3bba93 verification;
+      click 2abb5d98db3bba93 "MCPVerifications.html#mcp-server-command-verification";
+      3440cf3ef576cfad["MCP Server End-to-End Verification"];
+      class 3440cf3ef576cfad verification;
+      click 3440cf3ef576cfad "MCPVerifications.html#mcp-server-end-to-end-verification";
+      1e3eb280b915a449["MCP Server State and Cache Verification"];
+      class 1e3eb280b915a449 verification;
+      click 1e3eb280b915a449 "MCPVerifications.html#mcp-server-state-and-cache-verification";
+      969370cf4231d3a0["MCP Shared Operation Contracts Verification"];
+      class 969370cf4231d3a0 verification;
+      click 969370cf4231d3a0 "MCPVerifications.html#mcp-shared-operation-contracts-verification";
+      50f19a13fbc0fcf9["MCP Size Estimate Startup Verification"];
+      class 50f19a13fbc0fcf9 verification;
+      click 50f19a13fbc0fcf9 "MCPVerifications.html#mcp-size-estimate-startup-verification";
+      6cdf9343969bbbbb["MCP Structured Payload Contracts Verification"];
+      class 6cdf9343969bbbbb verification;
+      click 6cdf9343969bbbbb "MCPVerifications.html#mcp-structured-payload-contracts-verification";
+      ee824fed0a8b64d4["MCP Tool Call Contracts Verification"];
+      class ee824fed0a8b64d4 verification;
+      click ee824fed0a8b64d4 "MCPVerifications.html#mcp-tool-call-contracts-verification";
+      5f825912aca1dcf9["MCP Tool Exposure Scope Verification"];
+      class 5f825912aca1dcf9 verification;
+      click 5f825912aca1dcf9 "MCPVerifications.html#mcp-tool-exposure-scope-verification";
+      7c378d24c3a50773["MCP Tool Side Effect Classification Verification"];
+      class 7c378d24c3a50773 verification;
+      click 7c378d24c3a50773 "MCPVerifications.html#mcp-tool-side-effect-classification-verification";
+      81a576be8906dc15["MCP Workspace Session Tools Verification"];
+      class 81a576be8906dc15 verification;
+      click 81a576be8906dc15 "MCPVerifications.html#mcp-workspace-session-tools-verification";
+    end
+  end
+  67a04a713073a1c1["test.sh"];
+  class 67a04a713073a1c1 default;
+  click 67a04a713073a1c1 "../../../../tests/test-mcp-server/test.sh";
+  4f523cf9dc143348 -->|satisfiedBy| 67a04a713073a1c1;
+  7105e6806384d90f -->|satisfiedBy| 67a04a713073a1c1;
+  2abb5d98db3bba93 -->|satisfiedBy| 67a04a713073a1c1;
+  3440cf3ef576cfad -->|satisfiedBy| 67a04a713073a1c1;
+  969370cf4231d3a0 -->|satisfiedBy| 67a04a713073a1c1;
+</div>
+<h3 id="mcp-access-control-baseline-verification">MCP Access Control Baseline Verification</h3>
+<p>This verification shall prove that MCP does not expose arbitrary shell execution, arbitrary filesystem reads, or mutation tools unless mutation capability is enabled.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-access-control-baseline">MCP Access Control Baseline</a></li>
+</ul>
+<hr />
+<h3 id="mcp-contract-layer-boundary-verification">MCP Contract Layer Boundary Verification</h3>
+<p>This verification shall prove that shared Reqvire MCP contracts are protocol-neutral below the MCP adapter.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Verify shared request/result/error/evidence/diff/version types do not depend on MCP SDK runtime types.</li>
+<li>Verify an in-process Rust application can discover and call Reqvire tools through the public Reqvire library without starting MCP HTTP transport.</li>
+<li>Verify the MCP adapter maps shared contracts to MCP <code>tools/list</code>, <code>tools/call</code>, resources, <code>structuredContent</code>, text <code>content</code>, and MCP error shapes.</li>
+<li>Verify CLI and MCP can reuse shared operation contracts without MCP requirements deriving from CLI command requirements.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-mcp-server/test.sh">test.sh</a></li>
+<li>verify: <a href="../Tools.html#mcp-adapter-boundary">MCP Adapter Boundary</a></li>
+</ul>
+<hr />
+<h3 id="mcp-contract-versioning-verification">MCP Contract Versioning Verification</h3>
+<p>This verification shall prove that MCP startup/tool discovery reports the negotiated MCP protocol revision, Reqvire version, Reqvire tool contract version, schema revision, and Reqvire capability flags.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-compatibility-versioning">MCP Compatibility Versioning</a></li>
+</ul>
+<hr />
+<h3 id="mcp-http-transport-end-to-end-verification">MCP HTTP Transport End-to-End Verification</h3>
+<p>This verification shall prove that the Reqvire MCP HTTP transport preserves MCP tool semantics, local HTTP safety, and serialized workspace mutation behavior.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Start <code>reqvire mcp</code> and verify the server binds to <code>127.0.0.1</code> by default.</li>
+<li>Start <code>reqvire mcp --host 127.0.0.1 --port &lt;PORT&gt;</code> and verify standard MCP streamable HTTP requests are accepted at fixed endpoint <code>/mcp</code>.</li>
+<li>Verify <code>reqvire mcp --transport stdio</code> is rejected because stdio compatibility mode is not supported.</li>
+<li>Verify HTTP <code>tools/list</code>, <code>resources/list</code>, and representative <code>tools/call</code> responses expose the expected tool names, schemas, annotations, mutation gating, and structured result semantics.</li>
+<li>Verify HTTP requests without an <code>Origin</code> header are accepted.</li>
+<li>Verify HTTP requests with loopback <code>Origin</code> headers are accepted.</li>
+<li>Verify HTTP requests with non-loopback, <code>null</code>, file, or malformed <code>Origin</code> headers are rejected before tool execution.</li>
+<li>Verify HTTP mutation tools are absent unless the server is started with <code>--enable-mutations</code>.</li>
+<li>Verify mutation-capable HTTP mode still requires explicit <code>--enable-mutations</code> and does not become enabled by selecting HTTP transport.</li>
+<li>Verify concurrent HTTP mutation requests for the same workspace are serialized so filesystem writes and post-mutation model refresh cannot interleave.</li>
+<li>Verify a read after an HTTP mutation observes the refreshed model state and reports the observed model revision or fingerprint.</li>
+<li>Verify HTTP transport behavior is provided by RMCP rather than a Reqvire-owned HTTP JSON-RPC parser.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-mcp-server/test.sh">test.sh</a></li>
+<li>verify: <a href="../Tools.html#mcp-mutation-concurrency-control">MCP Mutation Concurrency Control</a></li>
+<li>verify: <a href="../Tools.html#mcp-streamable-http-transport">MCP Streamable HTTP Transport</a></li>
+<li>verify: <a href="../Tools.html#mcp-streamable-http-transport-safety">MCP Streamable HTTP Transport Safety</a></li>
+</ul>
+<hr />
+<h3 id="mcp-model-evidence-tools-verification">MCP Model Evidence Tools Verification</h3>
+<p>This verification shall prove that model evidence tools return authoritative Reqvire model data with revision metadata.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Search, read element, model, containment, collect, and submodels tools return data matching Reqvire core reports.</li>
+<li>Search supports <code>filter_type=ontology</code> and returns parsed ontology ADT content.</li>
+<li>Read element returns <code>concept_references</code> for elements that author <code>#### Concept References</code>.</li>
+<li>Collect returns reachable ontology context for capability and requirement elements using Reqvire core capability-attached ontology inheritance traversal.</li>
+<li>Results include evidence references for relevant files, elements, relations, and attachments.</li>
+<li>Read tools are allowed on dirty worktrees only when the result marks dirty state.</li>
+<li>Read tools do not mutate the filesystem.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-model-evidence-tools">MCP Model Evidence Tools</a></li>
+</ul>
+<hr />
+<h3 id="mcp-mutation-execution-flow-verification">MCP Mutation Execution Flow Verification</h3>
+<p>This verification shall prove that MCP mutation tools follow deterministic Reqvire-core-backed preview and execution behavior.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Verify CRUD, relation, and asset mutation preview requests use <code>dry_run</code> where provided by the shared Reqvire operation contract.</li>
+<li>Verify formatting preview uses <code>fix: false</code> and formatting execution uses <code>fix: true</code>.</li>
+<li>Verify preview requests execute through Reqvire core and do not modify the filesystem.</li>
+<li>Verify preview results include diffs or equivalent change descriptions, changed files when known, validation risks, and affected scope.</li>
+<li>Verify execution requests execute only when mutation mode is enabled.</li>
+<li>Verify execution requests update the Reqvire core graph and persist filesystem changes before success is reported.</li>
+<li>Verify post-mutation diagnostics run according to the tool contract.</li>
+<li>Verify subsequent MCP reads observe the refreshed core graph state.</li>
+<li>Verify mutation results include changed files, diffs, diagnostics, refreshed model revision, and affected elements/submodels.</li>
+<li>Verify attempts to bypass Reqvire model semantics or perform arbitrary file writes are rejected.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-mutation-execution-flow">MCP Mutation Execution Flow</a></li>
+</ul>
+<hr />
+<h3 id="mcp-mutation-tool-safety-verification">MCP Mutation Tool Safety Verification</h3>
+<p>This verification shall prove that mutation tools enforce operation-specific preview behavior, Reqvire core semantics, filesystem persistence, internal graph refresh, and post-mutation diagnostics.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Mutation tools are absent from MCP <code>tools/list</code> when the server was not started with <code>--enable-mutations</code>.</li>
+<li>Mutation tools are present in MCP <code>tools/list</code> and accept execution requests only when the server was started with <code>--enable-mutations</code>.</li>
+<li>Operation-specific preview mutation requests, such as <code>dry_run: true</code>, return changed files and diffs or equivalent change descriptions without filesystem changes.</li>
+<li>Non-dry-run requests use Reqvire core mutation logic and flush filesystem changes before reporting success.</li>
+<li>Non-dry-run mutation requests that would break capability-only ontology attachment compatibility, semantic-contract SHACL reference reachability, concept-reference resolution, or single ontology-root validation are rejected before persistence.</li>
+<li>After successful mutation, subsequent MCP reads observe the refreshed internal graph state.</li>
+<li>Post-mutation results include validation summary, refreshed model revision, and affected element/submodel metadata.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-mutation-tool-safety">MCP Mutation Tool Safety</a></li>
+</ul>
+<hr />
+<h3 id="mcp-protocol-standard-conformance-verification">MCP Protocol Standard Conformance Verification</h3>
+<p>This verification shall prove that Reqvire MCP initialization, capabilities, tool discovery, resources, and tool metadata conform to the supported MCP protocol revision.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Initialize the server using MCP protocol revision <code>2025-11-25</code> and verify the response includes <code>protocolVersion</code>, standard MCP <code>capabilities</code>, and <code>serverInfo</code>.</li>
+<li>Send a request with an unsupported <code>Mcp-Protocol-Version</code> HTTP header and verify RMCP rejects it before tool execution.</li>
+<li>Verify the server declares MCP <code>tools</code> capability when tool calls are available.</li>
+<li>Verify the server declares MCP <code>resources</code> capability only when resources are available.</li>
+<li>Verify MVP capability objects do not advertise prompts, logging, completions, or tasks unless those capabilities are implemented.</li>
+<li>Verify <code>tools.listChanged</code>, <code>resources.listChanged</code>, and <code>resources.subscribe</code> are omitted or false in MVP.</li>
+<li>Verify Reqvire-specific fields such as workspace status, model revision, Reqvire tool contract version, and mutation mode are returned through Reqvire tools/resources, not custom top-level MCP capabilities.</li>
+<li>Verify <code>tools/list</code> returns concrete tool definitions with valid <code>inputSchema</code> and expected annotations.</li>
+<li>Verify read/report tools include read-only annotations.</li>
+<li>Verify mutation tools are absent from <code>tools/list</code> by default and present only with <code>--enable-mutations</code>.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-protocol-standard-conformance">MCP Protocol Standard Conformance</a></li>
+</ul>
+<hr />
+<h3 id="mcp-quality-traceability-tools-verification">MCP Quality Traceability Tools Verification</h3>
+<p>This verification shall prove that quality and traceability tools return structured diagnostics and evidence matching Reqvire core reports.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Lint, coverage, traces, resources, ontologies, and change-impact tools match shared Reqvire operation contracts.</li>
+<li>Ontologies tool returns collected ontology <code>Ontology</code> blocks and semantic-contract <code>Shapes</code> blocks in Turtle by default.</li>
+<li>Ontologies tool supports JSON-LD output through a typed MCP argument.</li>
+<li>Ontologies tool supports <code>full: true</code> and returns Reqvire model context triples alongside ontology and SHACL content.</li>
+<li>Startup validation failures are returned before the MCP server starts.</li>
+<li>Git comparison tools include compared commit and current <code>HEAD</code> metadata.</li>
+<li>Diagnostics are structured and machine-actionable.</li>
+<li>Tools do not require clients to parse human-oriented terminal output.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-quality-traceability-tools">MCP Quality Traceability Tools</a></li>
+</ul>
+<hr />
+<h3 id="mcp-resource-interface-verification">MCP Resource Interface Verification</h3>
+<p>This verification shall prove that MCP resources expose read-only, revision-tagged views.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Workspace, model, element, file, and report resources include revision metadata.</li>
+<li><code>resources/list</code> returns stable resource identifiers.</li>
+<li><code>resources/read</code> returns contents for listed resources.</li>
+<li>Resource reads do not mutate the filesystem.</li>
+<li>Resource payloads match authoritative Reqvire core data for the same revision.</li>
+<li>Resource identifiers are stable and safely encoded.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-resource-interface">MCP Resource Interface</a></li>
+</ul>
+<hr />
+<h3 id="mcp-server-command-verification">MCP Server Command Verification</h3>
+<p>This verification shall prove that <code>reqvire mcp</code> starts protocol service mode and reports startup diagnostics without exposing itself as an MCP tool.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Start <code>reqvire mcp</code> in a fixture workspace.</li>
+<li>Verify startup metadata includes Reqvire version and supported MCP protocol revision.</li>
+<li>Verify tool discovery does not include <code>reqvire.mcp</code>.</li>
+<li>Verify startup validation failures are forwarded from Reqvire diagnostics and prevent the server from accepting protocol requests.</li>
+<li>Verify default startup returns read/report tools only from MCP <code>tools/list</code>.</li>
+<li>Verify startup with <code>--enable-mutations</code> returns mutation tools from MCP <code>tools/list</code>.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-mcp-server/test.sh">test.sh</a></li>
+<li>verify: <a href="../Tools.html#mcp-server-command">MCP Server Command</a></li>
+</ul>
+<hr />
+<h3 id="mcp-server-end-to-end-verification">MCP Server End-to-End Verification</h3>
+<p>This verification shall prove the Reqvire MCP server behavior through the external RMCP Streamable HTTP protocol boundary.</p>
+<h4>Details</h4>
+<p>The e2e test starts <code>reqvire mcp</code> in a fixture workspace and verifies MCP initialization, capabilities, tool discovery, resource discovery and reads, structured tool calls including ontology semantic collection, protocol error handling, stdio transport rejection, default mutation-tool omission, mutation-mode tool exposure, dry-run mutation behavior, persisted mutation behavior, post-mutation reads, and startup validation failure handling.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-mcp-server/test.sh">test.sh</a></li>
+<li>verify: <a href="../Tools.html#mcp-access-control-baseline">MCP Access Control Baseline</a></li>
+<li>verify: <a href="../Tools.html#mcp-compatibility-versioning">MCP Compatibility Versioning</a></li>
+<li>verify: <a href="../Tools.html#mcp-model-evidence-tools">MCP Model Evidence Tools</a></li>
+<li>verify: <a href="../Tools.html#mcp-mutation-execution-flow">MCP Mutation Execution Flow</a></li>
+<li>verify: <a href="../Tools.html#mcp-mutation-tool-safety">MCP Mutation Tool Safety</a></li>
+<li>verify: <a href="../Tools.html#mcp-protocol-standard-conformance">MCP Protocol Standard Conformance</a></li>
+<li>verify: <a href="../Tools.html#mcp-quality-traceability-tools">MCP Quality Traceability Tools</a></li>
+<li>verify: <a href="../Tools.html#mcp-resource-interface">MCP Resource Interface</a></li>
+<li>verify: <a href="../Tools.html#mcp-server-command">MCP Server Command</a></li>
+<li>verify: <a href="../Tools.html#mcp-shared-operation-interfaces">MCP Shared Operation Interfaces</a></li>
+<li>verify: <a href="../Tools.html#mcp-structured-payload-interfaces">MCP Structured Payload Interfaces</a></li>
+<li>verify: <a href="../Tools.html#mcp-tool-exposure-scope">MCP Tool Exposure Scope</a></li>
+<li>verify: <a href="../Tools.html#mcp-tool-side-effect-classification">MCP Tool Side Effect Classification</a></li>
+<li>verify: <a href="../Tools.html#mcp-workspace-session-tools">MCP Workspace Session Tools</a></li>
+</ul>
+<hr />
+<h3 id="mcp-server-state-and-cache-verification">MCP Server State and Cache Verification</h3>
+<p>This verification shall prove that MCP cached state is subordinate to Reqvire source files and Reqvire core parsing.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Verify workspace status reports workspace root, git <code>HEAD</code>, dirty state, Reqvire version, MCP protocol revision, Reqvire tool contract version, model fingerprint, and last diagnostics.</li>
+<li>Verify source file, git state, excluded-pattern, Reqvire version, or Reqvire tool contract changes invalidate cached model state.</li>
+<li>Verify controlled MCP mutations refresh MCP internal state from the updated Reqvire core graph.</li>
+<li>Verify external filesystem drift triggers invalidation/reparse before serving stale model data.</li>
+<li>Verify dirty worktree state is reported in metadata and does not block tools when the equivalent Reqvire core operation can run.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-server-state-and-cache">MCP Server State and Cache</a></li>
+</ul>
+<hr />
+<h3 id="mcp-shared-operation-contracts-verification">MCP Shared Operation Contracts Verification</h3>
+<p>This verification shall prove that MCP tools use shared Reqvire operation contracts.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Run representative Reqvire operations through MCP tools.</li>
+<li>Run representative Reqvire operations through an external Rust fixture using the public Reqvire tool registry API.</li>
+<li>Verify result schemas match shared contract definitions.</li>
+<li>Verify transport-only options such as JSON stdout/file output are not exposed as MCP request fields.</li>
+<li>Verify no-argument tools use valid MCP object input schemas.</li>
+<li>Verify stable structured results are returned in <code>structuredContent</code> and conform to the declared <code>outputSchema</code>.</li>
+<li>Verify unknown tool calls and malformed requests return standard MCP/JSON-RPC protocol errors.</li>
+<li>Verify Reqvire parse, validation, and business-logic failures are forwarded as MCP tool execution errors with structured Reqvire error data where available.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-mcp-server/test.sh">test.sh</a></li>
+<li>verify: <a href="../Tools.html#mcp-shared-operation-interfaces">MCP Shared Operation Interfaces</a></li>
+</ul>
+<hr />
+<h3 id="mcp-size-estimate-startup-verification">MCP Size Estimate Startup Verification</h3>
+<p>This verification shall prove that MCP size estimates are controlled by server startup configuration.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Start <code>reqvire mcp</code> without <code>--with-size-estimates</code> and verify model element tool responses omit <code>size_estimate</code>.</li>
+<li>Start <code>reqvire mcp --with-size-estimates</code> and verify model element tool responses include <code>size_estimate</code>.</li>
+<li>Verify <code>reqvire.read_element</code> includes element <code>size_estimate</code> when enabled.</li>
+<li>Verify <code>reqvire.model</code> includes element <code>size_estimate</code> for top-level and nested relation elements when enabled.</li>
+<li>Verify workspace status or tool contract reports size-estimate enabled state.</li>
+<li>Verify <code>--with-size-estimates</code> is a startup option and is not accepted as a per-tool MCP argument.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-server-command">MCP Server Command</a></li>
+</ul>
+<hr />
+<h3 id="mcp-structured-payload-contracts-verification">MCP Structured Payload Contracts Verification</h3>
+<p>This verification shall prove that MCP structured payloads are consistent with shared Reqvire operation result contracts.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Verify each MCP <code>outputSchema</code> is generated from or explicitly checked against its shared Reqvire operation result contract.</li>
+<li>Verify successful tool calls return <code>structuredContent</code> conforming to the declared <code>outputSchema</code>.</li>
+<li>Verify structured results identify relevant workspace/model revision and dirty state when model state affects interpretation.</li>
+<li>Verify structured results expose evidence references when the underlying Reqvire operation produces file, element, relation, attachment, report, or diff evidence.</li>
+<li>Verify element-shaped results preserve semantic model ADT fields when present, including <code>ontology</code>, <code>semantic_contract</code>, and <code>concept_references</code>.</li>
+<li>Verify element/model/mutation/error-shaped results preserve the semantic obligations of the corresponding shared Reqvire result contract without requiring terminal-output parsing.</li>
+<li>Verify removing or renaming stable structured fields requires a Reqvire tool contract version change.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-structured-payload-interfaces">MCP Structured Payload Interfaces</a></li>
+</ul>
+<hr />
+<h3 id="mcp-tool-call-contracts-verification">MCP Tool Call Contracts Verification</h3>
+<p>This verification shall prove that every advertised MCP tool has a complete tool definition and call contract.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>For every tool returned by <code>tools/list</code>, verify <code>name</code>, <code>description</code>, <code>inputSchema</code>, annotations, and any declared <code>outputSchema</code>.</li>
+<li>Verify every <code>inputSchema</code> is a JSON object schema and rejects unsupported arguments.</li>
+<li>Verify <code>reqvire.search</code> inputSchema advertises governance metadata filter fields <code>filter_status</code>, <code>filter_priority</code>, <code>filter_risk</code>, and <code>filter_owner</code>.</li>
+<li>Verify <code>reqvire.search</code> rejects unsupported governance metadata filter values with accepted-value diagnostics.</li>
+<li>Verify no-argument tools use an empty object schema.</li>
+<li>Verify every successful tool call that declares <code>outputSchema</code> returns <code>structuredContent</code> conforming to that schema.</li>
+<li>Verify every successful tool call includes compatible text <code>content</code> for clients that do not consume structured content.</li>
+<li>Verify read/report tools declare <code>readOnlyHint: true</code>, <code>destructiveHint: false</code>, and <code>openWorldHint: false</code>.</li>
+<li>Verify mutation tools are absent from default <code>tools/list</code>.</li>
+<li>Verify mutation tools appear only when started with <code>--enable-mutations</code> and declare non-read-only annotations.</li>
+<li>Verify <code>reqvire.format</code> is read-only when <code>fix</code> is false and mutation-gated when <code>fix</code> is true.</li>
+<li>Verify <code>reqvire.lint</code> does not accept mutating <code>fix</code> arguments in read/report mode.</li>
+<li>Verify unknown tools, malformed MCP requests, and schema-invalid arguments produce standard MCP/JSON-RPC protocol errors.</li>
+<li>Verify Reqvire parse, validation, and operation failures produce MCP tool execution errors with structured Reqvire error data where available.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-shared-operation-interfaces">MCP Shared Operation Interfaces</a></li>
+</ul>
+<hr />
+<h3 id="mcp-tool-exposure-scope-verification">MCP Tool Exposure Scope Verification</h3>
+<p>This verification shall prove that MCP exposes only supported Reqvire model operations.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Verify <code>tools/list</code> does not include a generic shell or <code>reqvire.command</code> tool.</li>
+<li>Verify <code>tools/list</code> does not include hidden/internal <code>shell</code> or <code>sout</code> commands.</li>
+<li>Verify <code>tools/list</code> does not include <code>reqvire.mcp</code>, <code>reqvire.serve</code>, <code>reqvire.export</code>, or <code>reqvire.validate</code> in MVP.</li>
+<li>Verify no MCP prompts are advertised in MVP.</li>
+<li>Verify CLI-only transport flags such as <code>--json</code> and <code>--output</code> are absent from MCP input schemas.</li>
+<li>Verify CLI flags, modes, and sub-options are represented as typed request fields rather than nested tool names.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-tool-exposure-scope">MCP Tool Exposure Scope</a></li>
+</ul>
+<hr />
+<h3 id="mcp-tool-side-effect-classification-verification">MCP Tool Side Effect Classification Verification</h3>
+<p>This verification shall prove that MCP tool discovery and tool annotations match the declared side-effect classification.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li>Verify every advertised tool has exactly one declared side-effect class.</li>
+<li>Verify default <code>tools/list</code> advertises all <code>read_only</code> tools and omits all <code>mutation</code> tools.</li>
+<li>Verify default <code>tools/list</code> advertises <code>conditional_mutation</code> tools only with read-only argument schemas.</li>
+<li>Verify mutation-mode <code>tools/list</code> advertises mutation tools and mutation-capable schemas for conditional mutation tools.</li>
+<li>Verify read-only tools declare <code>readOnlyHint: true</code>, <code>destructiveHint: false</code>, and <code>openWorldHint: false</code>.</li>
+<li>Verify mutation tools declare <code>readOnlyHint: false</code>, <code>openWorldHint: false</code>, and the expected conservative <code>destructiveHint</code>.</li>
+<li>Verify <code>reqvire.lint</code> does not expose mutating fix behavior until a separate mutation contract is specified.</li>
+<li>Verify operation-specific preview requests for mutation-class tools are available only through mutation-class tools in mutation mode, except conditional mutation tools that explicitly expose read-only preview behavior.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-tool-side-effect-classification">MCP Tool Side Effect Classification</a></li>
+</ul>
+<hr />
+<h3 id="mcp-workspace-session-tools-verification">MCP Workspace Session Tools Verification</h3>
+<p>This verification shall prove that workspace/session tools return correct read-only metadata.</p>
+<h4>Details</h4>
+<p>Expected checks:</p>
+<ul>
+<li><code>reqvire.workspace_status</code> reports workspace root, <code>HEAD</code>, dirty state, Reqvire version, supported MCP protocol revision, and Reqvire tool contract version.</li>
+<li><code>reqvire.tool_contract</code> reports supported tools and schema versions for the current startup mode.</li>
+<li><code>reqvire.model_revision</code> changes when model source files change.</li>
+<li>Workspace/session tools do not modify the filesystem.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>verify: <a href="../Tools.html#mcp-workspace-session-tools">MCP Workspace Session Tools</a></li>
+</ul>
+<hr />
+</div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+// Register ELK layout for large diagrams
+mermaid.registerLayoutLoaders(elkLayouts);
+
+// Capture Mermaid errors
+mermaid.parseError = function(err, hash) {
+    console.error('Mermaid Parse Error:', err);
+    console.error('Error details:', {
+        str: err.str,
+        hash: err.hash,
+        message: err.message,
+        stack: err.stack
+    });
+};
+
+mermaid.initialize({
+    startOnLoad: false,
+    theme: 'neutral',
+    maxTextSize: 5000000,
+    maxEdges: 50000,
+    flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis',
+        defaultRenderer: 'elk'
+    },
+    layout: 'elk',
+    elk: {
+        mergeEdges: true,
+        nodePlacementStrategy: 'SIMPLE'
+    },
+    securityLevel: 'loose',
+    logLevel: 'error'
+});
+
+// Store original mermaid content before rendering (for resize refreshes)
+document.querySelectorAll('.mermaid').forEach(el => {
+    el.setAttribute('data-original-content', el.textContent);
+});
+
+await mermaid.run();
+window.mermaid = mermaid;
+
+// Wait for SVGs to be fully rendered, then initialize
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
+    var containers = document.querySelectorAll('.mermaid');
+    var allReady = true;
+    containers.forEach(function(c) {
+        var svg = c.querySelector('svg');
+        if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+            allReady = false;
+        }
+    });
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
+        callback();
+    } else {
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
+    }
+}
+
+// Function to initialize pan/zoom on all Mermaid diagrams
+function initializePanZoom() {
+    document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+            var svg = mermaidContainer.querySelector('svg');
+            if (!svg) return;
+
+            // Get the natural size of the diagram
+            var bbox = svg.getBBox();
+            var containerWidth = mermaidContainer.clientWidth;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
+
+            // Check if diagram fits within container (with some padding)
+            var padding = 40;
+            var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+            if (fitsInContainer) {
+                // Diagram fits - use natural size, shrink container to fit content
+                svg.style.width = 'auto';
+                svg.style.height = 'auto';
+                mermaidContainer.style.height = 'auto';
+                mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                // No pan/zoom needed for small diagrams
+                return;
+            }
+
+            // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
+            svg.style.maxWidth = 'none';
+            svg.style.maxHeight = 'none';
+
+            var eventsHandler = {
+                haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                init: function(options) {
+                    var instance = options.instance;
+                    var initialScale = 1;
+                    var pannedX = 0;
+                    var pannedY = 0;
+
+                    this.hammer = Hammer(options.svgElement, {
+                        inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                    });
+
+                    this.hammer.get('pinch').set({enable: true});
+
+                    this.hammer.on('doubletap', function(ev){
+                        instance.zoomIn();
+                    });
+
+                    this.hammer.on('panstart panmove', function(ev){
+                        if (ev.type === 'panstart') {
+                            pannedX = 0;
+                            pannedY = 0;
+                        }
+                        instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                        pannedX = ev.deltaX;
+                        pannedY = ev.deltaY;
+                    });
+
+                    this.hammer.on('pinchstart pinchmove', function(ev){
+                        if (ev.type === 'pinchstart') {
+                            initialScale = instance.getZoom();
+                        }
+                        instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                    });
+
+                    options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                },
+                destroy: function(){
+                    this.hammer.destroy();
+                }
+            };
+
+            // Diagrams with default zoom (no auto-fit)
+            var panZoomInstance = svgPanZoom(svg, {
+                zoomEnabled: true,
+                controlIconsEnabled: true,
+                fit: false,
+                center: false,
+                contain: false,
+                minZoom: 0.5,
+                maxZoom: 10,
+                zoomScaleSensitivity: 0.3,
+                customEventsHandler: eventsHandler
+            });
+
+            // Add navigation buttons
+            var navButtons = document.createElement('div');
+            navButtons.className = 'diagram-nav-buttons';
+            navButtons.innerHTML = `
+                <div class="diagram-nav-row">
+                    <button class="diagram-nav-btn" data-action="up">▲</button>
+                </div>
+                <div class="diagram-nav-row">
+                    <button class="diagram-nav-btn" data-action="left">◀</button>
+                    <button class="diagram-nav-btn" data-action="down">▼</button>
+                    <button class="diagram-nav-btn" data-action="right">▶</button>
+                </div>
+            `;
+            mermaidContainer.appendChild(navButtons);
+
+            // Wire up navigation buttons
+            var panStep = 100;
+            navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var action = this.getAttribute('data-action');
+                    switch(action) {
+                        case 'up':
+                            panZoomInstance.panBy({x: 0, y: panStep});
+                            break;
+                        case 'down':
+                            panZoomInstance.panBy({x: 0, y: -panStep});
+                            break;
+                        case 'left':
+                            panZoomInstance.panBy({x: panStep, y: 0});
+                            break;
+                        case 'right':
+                            panZoomInstance.panBy({x: -panStep, y: 0});
+                            break;
+                    }
+                });
+            });
+    });
+
+    // Add CSS for edge highlighting (high specificity for SVG)
+    var style = document.createElement('style');
+    style.textContent = `
+        path.edge-highlighted,
+        .edge-highlighted path,
+        svg path.edge-highlighted {
+            stroke: #FFAB91 !important;
+            stroke-width: 3px !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Add edge highlighting on node hover
+    document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+        var nodes = svg.querySelectorAll('.node');
+
+        // Find flowchart-link paths (actual edges)
+        var edgePaths = svg.querySelectorAll('path.flowchart-link');
+        // Fallback: find paths in .edges group
+        if (edgePaths.length === 0) {
+            var edgesGroup = svg.querySelector('.edges');
+            if (edgesGroup) {
+                edgePaths = edgesGroup.querySelectorAll('path');
+            }
+        }
+
+        // Get SVG point for coordinate transforms
+        var svgPoint = svg.createSVGPoint();
+
+        // Helper: transform point through element's CTM
+        function getTransformedBBox(element) {
+            var bbox = element.getBBox();
+            var ctm = element.getCTM();
+            if (!ctm) return bbox;
+
+            // Transform all four corners
+            var corners = [
+                {x: bbox.x, y: bbox.y},
+                {x: bbox.x + bbox.width, y: bbox.y},
+                {x: bbox.x, y: bbox.y + bbox.height},
+                {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+            ];
+
+            var transformed = corners.map(function(c) {
+                svgPoint.x = c.x;
+                svgPoint.y = c.y;
+                var tp = svgPoint.matrixTransform(ctm);
+                return {x: tp.x, y: tp.y};
+            });
+
+            var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+            var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+            var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+            var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+            return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+        }
+
+        // Helper: get all points from path
+        function getPathPoints(path) {
+            var d = path.getAttribute('d') || '';
+            var points = [];
+            var ctm = path.getCTM();
+
+            // Match all coordinate pairs in the path
+            var regex = /([ML])\s*([\d.-]+)[,\s]+([\d.-]+)|([CQ])[^MLCQZ]*/gi;
+            var match;
+
+            // Get M (start) point
+            var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+            if (startMatch) {
+                var sx = parseFloat(startMatch[1]);
+                var sy = parseFloat(startMatch[2]);
+                if (ctm) {
+                    svgPoint.x = sx; svgPoint.y = sy;
+                    var tp = svgPoint.matrixTransform(ctm);
+                    points.push({x: tp.x, y: tp.y});
+                } else {
+                    points.push({x: sx, y: sy});
+                }
+            }
+
+            // Get last point - find last number pair before Z or end
+            var allNums = d.match(/[\d.-]+/g);
+            if (allNums && allNums.length >= 2) {
+                var ex = parseFloat(allNums[allNums.length - 2]);
+                var ey = parseFloat(allNums[allNums.length - 1]);
+                if (ctm) {
+                    svgPoint.x = ex; svgPoint.y = ey;
+                    var tp = svgPoint.matrixTransform(ctm);
+                    points.push({x: tp.x, y: tp.y});
+                } else {
+                    points.push({x: ex, y: ey});
+                }
+            }
+
+            return points;
+        }
+
+        // Build node bounding boxes with transforms
+        var nodeData = {};
+        nodes.forEach(function(node) {
+            var nodeId = node.id || '';
+            var parts = nodeId.split('-');
+            var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+            nodeData[hashId] = {
+                node: node,
+                bbox: getTransformedBBox(node)
+            };
+        });
+
+        // Calculate distance from point to bbox center
+        function distToBboxCenter(pt, bbox) {
+            var centerX = bbox.x + bbox.width / 2;
+            var centerY = bbox.y + bbox.height / 2;
+            return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+        }
+
+        // Check if point is near bbox
+        function isNearBbox(pt, bbox, margin) {
+            margin = margin || 10;
+            return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                   pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+        }
+
+        // Build edge connections with direction tracking
+        var edgeConnections = []; // [{path, source, target}]
+        var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+        var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+        Object.keys(nodeData).forEach(function(hashId) {
+            upstreamOf[hashId] = [];
+            downstreamOf[hashId] = [];
+        });
+
+        edgePaths.forEach(function(path) {
+            var points = getPathPoints(path);
+            if (points.length < 2) return;
+
+            var startPt = points[0];
+            var endPt = points[points.length - 1];
+
+            var sourceNode = null;
+            var targetNode = null;
+            var sourceMinDist = Infinity;
+            var targetMinDist = Infinity;
+
+            // Find closest source and target nodes for this edge
+            Object.keys(nodeData).forEach(function(hashId) {
+                var bbox = nodeData[hashId].bbox;
+
+                // Find closest node to start point (source)
+                if (isNearBbox(startPt, bbox, 30)) {
+                    var dist = distToBboxCenter(startPt, bbox);
+                    if (dist < sourceMinDist) {
+                        sourceMinDist = dist;
+                        sourceNode = hashId;
+                    }
+                }
+
+                // Find closest node to end point (target)
+                if (isNearBbox(endPt, bbox, 30)) {
+                    var dist = distToBboxCenter(endPt, bbox);
+                    if (dist < targetMinDist) {
+                        targetMinDist = dist;
+                        targetNode = hashId;
+                    }
+                }
+            });
+
+            if (sourceNode && targetNode && sourceNode !== targetNode) {
+                edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                // source -> target means: target's upstream includes source
+                if (!upstreamOf[targetNode].includes(sourceNode)) {
+                    upstreamOf[targetNode].push(sourceNode);
+                }
+                // source -> target means: source's downstream includes target
+                if (!downstreamOf[sourceNode].includes(targetNode)) {
+                    downstreamOf[sourceNode].push(targetNode);
+                }
+            }
+        });
+
+        // Traverse only upstream (to parents/ancestors)
+        function findUpstream(startNodeId) {
+            var visited = {};
+            var queue = [startNodeId];
+            visited[startNodeId] = true;
+
+            while (queue.length > 0) {
+                var current = queue.shift();
+                var parents = upstreamOf[current] || [];
+                parents.forEach(function(parent) {
+                    if (!visited[parent]) {
+                        visited[parent] = true;
+                        queue.push(parent);
+                    }
+                });
+            }
+            return visited;
+        }
+
+        // Traverse only downstream (to children/descendants)
+        function findDownstream(startNodeId) {
+            var visited = {};
+            var queue = [startNodeId];
+            visited[startNodeId] = true;
+
+            while (queue.length > 0) {
+                var current = queue.shift();
+                var children = downstreamOf[current] || [];
+                children.forEach(function(child) {
+                    if (!visited[child]) {
+                        visited[child] = true;
+                        queue.push(child);
+                    }
+                });
+            }
+            return visited;
+        }
+
+        // Get edges for connected nodes
+        function getChainEdges(nodeSet) {
+            var edges = [];
+            edgeConnections.forEach(function(conn) {
+                if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                    edges.push(conn.path);
+                }
+            });
+            return edges;
+        }
+
+        // Attach hover handlers
+        nodes.forEach(function(node) {
+            var nodeId = node.id || '';
+            var parts = nodeId.split('-');
+            var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+            node.style.cursor = 'pointer';
+
+            node.addEventListener('mouseenter', function(e) {
+                e.stopPropagation();
+                nodes.forEach(function(n) { n.style.filter = ''; });
+                node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                // Find upstream (ancestors) and downstream (descendants) separately
+                var upstream = findUpstream(hashId);
+                var downstream = findDownstream(hashId);
+                // Merge both sets
+                var allConnected = {};
+                Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                var chainEdges = getChainEdges(allConnected);
+                chainEdges.forEach(function(path) {
+                    path.classList.add('edge-highlighted');
+                });
+            });
+
+            node.addEventListener('mouseleave', function() {
+                node.style.filter = '';
+                // Remove highlight from all edges
+                edgePaths.forEach(function(path) {
+                    path.classList.remove('edge-highlighted');
+                });
+            });
+        });
+    });
+}
+
+// Initialize pan/zoom after page load
+waitForSvgs(initializePanZoom);
+
+// Refresh diagrams on window resize (debounced to avoid performance issues)
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(async function() {
+        // Re-run mermaid on all diagrams
+        const mermaidElements = document.querySelectorAll('.mermaid');
+        mermaidElements.forEach(el => {
+            // Restore original markdown content
+            const originalContent = el.getAttribute('data-original-content');
+            if (originalContent) {
+                el.innerHTML = originalContent;
+                el.removeAttribute('data-processed');
+            }
+        });
+        // Re-render diagrams
+        await mermaid.run();
+        // Re-initialize pan-zoom after re-render
+        waitForSvgs(initializePanZoom);
+    }, 250); // Wait 250ms after resize stops before re-rendering
+});
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,7 +447,7 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="index.html" class="nav-logo flex items-center pr-4"><img src="assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="index.html" class="nav-link">Containment</a><a href="model.html" class="nav-link">Model</a><a href="traces.html" class="nav-link">Traces</a><a href="traceflow.html" class="nav-link">TraceFlow</a><a href="coverage.html" class="nav-link">Coverage</a><a href="resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="index.html" class="mobile-nav-link">Containment</a><a href="model.html" class="mobile-nav-link">Model</a><a href="traces.html" class="mobile-nav-link">Traces</a><a href="traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="coverage.html" class="mobile-nav-link">Coverage</a><a href="resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="resources">Resources</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="index.html" class="nav-logo flex items-center pr-4"><img src="assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="index.html" class="nav-link">Containment</a><a href="model.html" class="nav-link">Model</a><a href="traces.html" class="nav-link">Traces</a><a href="ontologies.html" class="nav-link">Ontologies</a><a href="knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><h1 id="resources">Resources</h1>
 <p>The resources view shows all files referenced by the model through relations and attachments. This includes implementation files (via satisfiedBy relations), traced documents (via trace relations), and attachment files like design specifications and images. Use this view to understand the implementation landscape and identify which elements reference each file.</p>
 <h2 id="relations">Relations</h2>
 <p>Files referenced via relations (satisfiedBy, trace, etc.):</p>
@@ -359,35 +457,59 @@
 <li><a href="requirements/Functional/Output/Verifications/DiagramVerifications.html#automated-documentation-export-on-pr-merge-verification">Automated Documentation Export on PR Merge Verification</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="claude-plugins/commands/analyze-coverage.md">claude-plugins/commands/analyze-coverage.md</h3>
+<ul>
+<li><a href="requirements/Functional/Integration/AISkills.html#ai-skills-markdown-implementation-artifacts">AI Skills Markdown Implementation Artifacts</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="claude-plugins/skills/ontology-authoring/skill.md">claude-plugins/skills/ontology-authoring/SKILL.md</h3>
+<ul>
+<li><a href="requirements/Functional/Integration/AISkills.html#ai-skills-markdown-implementation-artifacts">AI Skills Markdown Implementation Artifacts</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="claude-plugins/skills/syseng/skill.md">claude-plugins/skills/syseng/SKILL.md</h3>
+<ul>
+<li><a href="requirements/Functional/Integration/AISkills.html#ai-skills-markdown-implementation-artifacts">AI Skills Markdown Implementation Artifacts</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="cli/src/cli.rs">cli/src/cli.rs</h3>
 <ul>
 <li><a href="requirements/Functional/Core/Validation.html#integrated-validation">Integrated Validation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/ElementManipulation.html#move-file-operation">Move File Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagram-node-behavior">Interactive Mermaid Diagram Node Behavior</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Reporting.html#comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Commands.html#attachment-commands">Attachment Commands</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-add-element-command">CLI Add Element Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-change-impact-report-command">CLI Change Impact Report Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-collect-command">CLI Collect Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-containment-command">CLI Containment Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-coverage-command">CLI Coverage Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-interface-structure">CLI Interface Structure</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Commands.html#cli-json-file-output-option">CLI JSON File Output Option</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-lint-command">CLI Lint Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-merge-element-command">CLI Merge Element Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-model-diagram-command">CLI Model Diagram Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-move-asset-command">CLI Move Asset Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-move-element-command">CLI Move Element Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-move-file-command">CLI Move File Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Commands.html#cli-ontologies-command">CLI Ontologies Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-remove-asset-command">CLI Remove Asset Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-remove-element-command">CLI Remove Element Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-rename-element-command">CLI Rename Element Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-resources-command">CLI Resources Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-search-command">CLI Search Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Commands.html#cli-size-estimate-json-option">CLI Size Estimate JSON Option</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Commands.html#cli-submodels-command">CLI Submodels Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-traces-command">CLI Traces Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Commands.html#explicit-workspace-selection">Explicit Workspace Selection</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#format-command">Format Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#relation-commands">Relation Commands</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#validate-command">Validate Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-server-command">MCP Server Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-streamable-http-transport">MCP Streamable HTTP Transport</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#html-export">HTML Export</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#serve-command">Serve Command</a> (via satisfiedBy)</li>
 </ul>
@@ -396,12 +518,49 @@
 <ul>
 <li><a href="requirements/Functional/Core/Configuration.html#ignore-files-integration">Ignore Files Integration</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Configuration.html#ignoring-unstructured-documents">Ignoring Unstructured Documents</a> (via satisfiedBy)</li>
-<li><a href="requirements/Functional/Core/Configuration.html#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="cli/src/main.rs">cli/src/main.rs</h3>
+<ul>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-server-command">MCP Server Command</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="cli/src/mcp.rs">cli/src/mcp.rs</h3>
+<ul>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-access-control-baseline">MCP Access Control Baseline</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-adapter-boundary">MCP Adapter Boundary</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-compatibility-versioning">MCP Compatibility Versioning</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-model-evidence-tools">MCP Model Evidence Tools</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-mutation-concurrency-control">MCP Mutation Concurrency Control</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-mutation-execution-flow">MCP Mutation Execution Flow</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-mutation-tool-safety">MCP Mutation Tool Safety</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-protocol-standard-conformance">MCP Protocol Standard Conformance</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-quality-traceability-tools">MCP Quality Traceability Tools</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-resource-interface">MCP Resource Interface</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-server-command">MCP Server Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-server-state-and-cache">MCP Server State and Cache</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-shared-operation-interfaces">MCP Shared Operation Interfaces</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-streamable-http-transport">MCP Streamable HTTP Transport</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-streamable-http-transport-safety">MCP Streamable HTTP Transport Safety</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-structured-payload-interfaces">MCP Structured Payload Interfaces</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-tool-exposure-scope">MCP Tool Exposure Scope</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-tool-side-effect-classification">MCP Tool Side Effect Classification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-workspace-session-tools">MCP Workspace Session Tools</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="cli/src/serve.rs">cli/src/serve.rs</h3>
 <ul>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#serve-command">Serve Command</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="codex-skills/reqvire-ontology-authoring/skill.md">codex-skills/reqvire-ontology-authoring/SKILL.md</h3>
+<ul>
+<li><a href="requirements/Functional/Integration/AISkills.html#ai-skills-markdown-implementation-artifacts">AI Skills Markdown Implementation Artifacts</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="codex-skills/reqvire-syseng/skill.md">codex-skills/reqvire-syseng/SKILL.md</h3>
+<ul>
+<li><a href="requirements/Functional/Integration/AISkills.html#ai-skills-markdown-implementation-artifacts">AI Skills Markdown Implementation Artifacts</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/change_impact.rs">core/src/change_impact.rs</h3>
@@ -413,7 +572,6 @@
 <hr />
 <h3 id="core/src/containment.rs">core/src/containment.rs</h3>
 <ul>
-<li><a href="requirements/Functional/Output/Reporting.html#containment-view-report">Containment View Report</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#cli-containment-command">CLI Containment Command</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#containment-view-attachment-links">Containment View Attachment Links</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#web-interface-color-scheme">Web Interface Color Scheme</a> (via satisfiedBy)</li>
@@ -423,12 +581,18 @@
 <ul>
 <li><a href="requirements/Functional/Core/ModelManagement.html#attachment-identifier-updates">Attachment Identifier Updates</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/ElementManipulation.html#atomic-relation-relink-operation">Atomic Relation Relink Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/ElementManipulation.html#crud-semantic-contract-mutation-validation">CRUD Semantic Contract Mutation Validation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#merge-element-operation">Merge Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/ElementManipulation.html#move-file-operation">Move File Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Commands.html#attachment-commands">Attachment Commands</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-mutation-execution-flow">MCP Mutation Execution Flow</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-mutation-tool-safety">MCP Mutation Tool Safety</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/diagrams.rs">core/src/diagrams.rs</h3>
@@ -450,30 +614,36 @@
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#merge-element-operation">Merge Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/ElementManipulation.html#move-file-operation">Move File Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a> (via satisfiedBy)</li>
-<li><a href="requirements/Functional/Operations/Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Formatting.html#formatting-output">Formatting Output</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Commands.html#cli-diff-output">CLI Diff Output</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/element.rs">core/src/element.rs</h3>
 <ul>
+<li><a href="requirements/Functional/Core/ModelManagement.html#opt-in-element-size-estimate-model-build">Opt-In Element Size Estimate Model Build</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/ModelManagement.html#requirement-governance-metadata">Requirement Governance Metadata</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/StructureAndParsing.html#element-identity-model">Element Identity Model</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Validation.html#type-validation-error-requirement">Type Validation Error Requirement</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Reporting.html#json-element-size-estimate-exposure">JSON Element Size Estimate Exposure</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/error.rs">core/src/error.rs</h3>
 <ul>
-<li><a href="requirements/Functional/Core/Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Validation.html#validation-error-handling">Validation Error Handling</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/CLI/Commands.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/export.rs">core/src/export.rs</h3>
 <ul>
+<li><a href="requirements/Functional/Output/Reporting.html#ontology-and-shapes-collection">Ontology and Shapes Collection</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Reporting.html#traceflow-view-report-generation">TraceFlow View Report Generation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#attachment-export">Attachment Export</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#html-export">HTML Export</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/WebInterface/Capabilities.html#local-linked-file-export">Local Linked File Export</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#model-centric-view-generation">Model-Centric View Generation</a> (via satisfiedBy)</li>
 </ul>
 <hr />
@@ -486,29 +656,43 @@
 <ul>
 <li><a href="requirements/Functional/Operations/Formatting.html#format-consistency-enforcement">Format Consistency Enforcement</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/Formatting.html#format-duplicate-removal">Format Duplicate Removal</a> (via satisfiedBy)</li>
-<li><a href="requirements/Functional/Operations/Formatting.html#git-style-diff-output-for-format">Git-Style Diff Output for Format</a> (via satisfiedBy)</li>
-</ul>
-<hr />
-<h3 id="core/src/git_commands.rs">core/src/git_commands.rs</h3>
-<ul>
-<li><a href="requirements/Functional/Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Formatting.html#formatting-output">Formatting Output</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Formatting.html#full-relations-insertion">Full Relations Insertion</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-mutation-execution-flow">MCP Mutation Execution Flow</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-mutation-tool-safety">MCP Mutation Tool Safety</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/graph_registry.rs">core/src/graph_registry.rs</h3>
 <ul>
+<li><a href="requirements/Functional/Core/ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/ModelManagement.html#opt-in-element-size-estimate-model-build">Opt-In Element Size Estimate Model Build</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/ModelManagement.html#relation-management-operations">Relation Management Operations</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/ModelManagement.html#requirement-governance-metadata">Requirement Governance Metadata</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Validation.html#relation-element-type-validator">Relation Element Type Validator</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/Validation.html#semantic-contract-reference-context-validation">Semantic Contract Reference Context Validation</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/Validation.html#single-root-hierarchy-ownership">Single Root Hierarchy Ownership</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/ElementManipulation.html#atomic-relation-relink-operation">Atomic Relation Relink Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/ElementManipulation.html#crud-semantic-contract-mutation-validation">CRUD Semantic Contract Mutation Validation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#delete-element-operation">Delete Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#element-manipulation-file-persistence">Element Manipulation File Persistence</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#merge-element-operation">Merge Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#move-element-operation">Move Element Operation</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/ElementManipulation.html#move-file-operation">Move File Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#relation-consistency-maintenance">Relation Consistency Maintenance</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#rename-element-operation">Rename Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/Formatting.html#document-structure-normalization">Document Structure Normalization</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Formatting.html#full-relations-insertion">Full Relations Insertion</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/Formatting.html#relation-ordering-normalization">Relation Ordering Normalization</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Formatting.html#replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="core/src/html/components.rs">core/src/html/components.rs</h3>
+<ul>
+<li><a href="requirements/Interfaces/WebInterface/HTMLGeneration.html#component-based-html-architecture">Component-Based HTML Architecture</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/html/layouts.rs">core/src/html/layouts.rs</h3>
@@ -520,16 +704,37 @@
 <h3 id="core/src/html/mod.rs">core/src/html/mod.rs</h3>
 <ul>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#html-export">HTML Export</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/WebInterface/HTMLGeneration.html#type-safe-html-generation">Type-Safe HTML Generation</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="core/src/html/pages/kn2.rs">core/src/html/pages/kn2.rs</h3>
+<ul>
+<li><a href="requirements/Interfaces/WebInterface/Capabilities.html#project-knowledge-graph-view">Project Knowledge Graph View</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="core/src/html/pages/knowledgegraph.rs">core/src/html/pages/knowledgegraph.rs</h3>
+<ul>
+<li><a href="requirements/Interfaces/WebInterface/Capabilities.html#html-export">HTML Export</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/WebInterface/Capabilities.html#project-knowledge-graph-view">Project Knowledge Graph View</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="core/src/html/pages/ontologies.rs">core/src/html/pages/ontologies.rs</h3>
+<ul>
+<li><a href="requirements/Interfaces/WebInterface/Capabilities.html#html-export">HTML Export</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/html/styles.rs">core/src/html/styles.rs</h3>
 <ul>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#web-interface-color-scheme">Web Interface Color Scheme</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/WebInterface/HTMLGeneration.html#css-framework-integration">CSS Framework Integration</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/WebInterface/HTMLGeneration.html#responsive-html-generation">Responsive HTML Generation</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/html_export.rs">core/src/html_export.rs</h3>
 <ul>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#html-export">HTML Export</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/WebInterface/Capabilities.html#local-linked-file-export">Local Linked File Export</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/WebInterface/HTMLGeneration.html#responsive-html-generation">Responsive HTML Generation</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/index_generator.rs">core/src/index_generator.rs</h3>
@@ -539,14 +744,18 @@
 <hr />
 <h3 id="core/src/lint.rs">core/src/lint.rs</h3>
 <ul>
+<li><a href="requirements/Functional/Operations/Linting.html#cross-submodel-hierarchical-relation-detection">Cross-Submodel Hierarchical Relation Detection</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Linting.html#lint-auto-fix-capability">Lint Auto-fix Capability</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/Linting.html#multi-branch-convergence-detection">Multi-Branch Convergence Detection</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/Linting.html#redundant-hierarchical-relations-detection-and-auto-removal">Redundant Hierarchical Relations Detection and Auto-Removal</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Linting.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/model.rs">core/src/model.rs</h3>
 <ul>
 <li><a href="requirements/Functional/Core/Configuration.html#requirements-processing">Requirements Processing</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Configuration.html#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/ModelManagement.html#opt-in-element-size-estimate-model-build">Opt-In Element Size Estimate Model Build</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/ModelManagement.html#refinement-element-structure-constraints">Refinement Element Structure Constraints</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/StructureAndParsing.html#specification-file-identification">Specification File Identification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a> (via satisfiedBy)</li>
@@ -582,40 +791,51 @@
 <hr />
 <h3 id="core/src/relation.rs">core/src/relation.rs</h3>
 <ul>
+<li><a href="requirements/Functional/Core/ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Validation.html#relation-type-validation">Relation Type Validation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Validation.html#type-validation-error-requirement">Type Validation Error Requirement</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/DiagramGeneration.html#trace-relation-non-directional-behavior">Trace Relation Non-Directional Behavior</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/report_collect.rs">core/src/report_collect.rs</h3>
 <ul>
-<li><a href="requirements/Functional/Output/Reporting.html#collect-content-from-requirement-chain">Collect Content from Requirement Chain</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Reporting.html#collect-capability-and-requirement-context">Collect Capability and Requirement Context</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/report_coverage.rs">core/src/report_coverage.rs</h3>
 <ul>
-<li><a href="requirements/Functional/Output/Reporting.html#verification-coverage-report">Verification Coverage Report</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Reporting.html#requirement-implementation-coverage-report">Requirement Implementation Coverage Report</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Processing/VerificationTraces.html#verification-roll-up-strategy">Verification Roll-up Strategy</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/report_model.rs">core/src/report_model.rs</h3>
 <ul>
+<li><a href="requirements/Functional/Output/Reporting.html#json-element-size-estimate-exposure">JSON Element Size Estimate Exposure</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Reporting.html#reverse-relation-traversal">Reverse Relation Traversal</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Reporting.html#start-element-type-filtering">Start Element Type Filtering</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#model-centric-view-generation">Model-Centric View Generation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Capabilities.html#model-view-element-navigation">Model View Element Navigation</a> (via satisfiedBy)</li>
 </ul>
 <hr />
-<h3 id="core/src/report_resources.rs">core/src/report_resources.rs</h3>
+<h3 id="core/src/report_submodels.rs">core/src/report_submodels.rs</h3>
 <ul>
-<li><a href="requirements/Functional/Output/Reporting.html#resources-report">Resources Report</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Reporting.html#requirement-submodels-report">Requirement Submodels Report</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/search.rs">core/src/search.rs</h3>
 <ul>
+<li><a href="requirements/Functional/Core/ModelManagement.html#requirement-governance-metadata">Requirement Governance Metadata</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Reporting.html#comma-separated-type-filter-parsing">Comma-Separated Type Filter Parsing</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Reporting.html#search-report-generator">Search Report Generator</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="core/src/semantic_contract.rs">core/src/semantic_contract.rs</h3>
+<ul>
+<li><a href="requirements/Functional/Output/Reporting.html#ontology-and-shapes-collection">Ontology and Shapes Collection</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Commands.html#cli-ontologies-command">CLI Ontologies Command</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="core/src/subsection.rs">core/src/subsection.rs</h3>
@@ -623,11 +843,24 @@
 <li><a href="requirements/Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="core/src/tool_interface.rs">core/src/tool_interface.rs</h3>
+<ul>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-adapter-boundary">MCP Adapter Boundary</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-server-command">MCP Server Command</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Tools.html#mcp-shared-operation-interfaces">MCP Shared Operation Interfaces</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="core/src/trace_tree_builder.rs">core/src/trace_tree_builder.rs</h3>
+<ul>
+<li><a href="requirements/Functional/Operations/Linting.html#redundant-verify-relations-detection">Redundant Verify Relations Detection</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="core/src/utils.rs">core/src/utils.rs</h3>
 <ul>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#create-element-operation">Create Element Operation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/ElementManipulation.html#target-location-validation-and-auto-creation">Target Location Validation and Auto-Creation</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/Formatting.html#file-pattern-exclusion-for-format">File Pattern Exclusion for Format</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Formatting.html#replace-absolute-links-with-relative-links">Replace Absolute Links with Relative Links</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/DiagramGeneration.html#diagram-generation">Diagram Generation</a> (via satisfiedBy)</li>
 </ul>
 <hr />
@@ -650,7 +883,6 @@
 <h3 id="tests/test-assets/test.sh">tests/test-assets/test.sh</h3>
 <ul>
 <li><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html#attach-command-verification">Attach Command Verification</a> (via satisfiedBy)</li>
-<li><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html#attachment-output-rendering-verification">Attachment Output Rendering Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html#attachment-search-filters-verification">Attachment Search Filters Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html#attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html#attachments-validation-verification">Attachments Validation Verification</a> (via satisfiedBy)</li>
@@ -666,10 +898,32 @@
 <hr />
 <h3 id="tests/test-attachment-export/test.sh">tests/test-attachment-export/test.sh</h3>
 <ul>
+<li><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html#attachment-output-rendering-verification">Attachment Output Rendering Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Verifications/DiagramVerifications.html#file-diagram-attachment-test">File Diagram Attachment Test</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#attachment-export-verification">Attachment Export Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#containment-attachment-links-verification">Containment Attachment Links Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#diagram-attachment-display-verification">Diagram Attachment Display Verification</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-capability-attachments/test.sh">tests/test-capability-attachments/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html#ontology-and-contract-attachment-verification">Ontology and Contract Attachment Verification</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-capability-change-impact/test.sh">tests/test-capability-change-impact/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#capability-ontology-and-semantic-contract-change-impact-test">Capability Ontology and Semantic Contract Change Impact Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-capability-model/test.sh">tests/test-capability-model/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#capability-element-relation-compatibility-test">Capability Element Relation Compatibility Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-capability-refinements/test.sh">tests/test-capability-refinements/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-ownership-validation-test">Semantic Contract Ownership Validation Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-section-validation-test">Semantic Contract Section Validation Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="tests/test-change-impact-attachments/test.sh">tests/test-change-impact-attachments/test.sh</h3>
@@ -691,6 +945,11 @@
 <li><a href="requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#change-impact-detection-test">Change Impact Detection Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-change-impact-scope/test.sh">tests/test-change-impact-scope/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#impact-scope-summary-test">Impact Scope Summary Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-change-impact-smart-filtering/test.sh">tests/test-change-impact-smart-filtering/test.sh</h3>
 <ul>
 <li><a href="requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test">Change Impact Smart Filtering Test</a> (via satisfiedBy)</li>
@@ -703,6 +962,7 @@
 <hr />
 <h3 id="tests/test-collect-command/test.sh">tests/test-collect-command/test.sh</h3>
 <ul>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#capability-collect-traversal-test">Capability Collect Traversal Test</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#cli-collect-command-test">CLI Collect Command Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
@@ -718,6 +978,7 @@
 <hr />
 <h3 id="tests/test-coverage-report/test.sh">tests/test-coverage-report/test.sh</h3>
 <ul>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#capability-coverage-rollup-test">Capability Coverage Rollup Test</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#verification-coverage-report-test">Verification Coverage Report Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
@@ -748,6 +1009,11 @@
 <li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#move-file-squash-test">Move File Squash Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-crud-override/test.sh">tests/test-crud-override/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#create-element-override-test">Create Element Override Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-crud-relation-consistency/test.sh">tests/test-crud-relation-consistency/test.sh</h3>
 <ul>
 <li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#relation-consistency-test">Relation Consistency Test</a> (via satisfiedBy)</li>
@@ -761,6 +1027,18 @@
 <h3 id="tests/test-default-type-assignment/test.sh">tests/test-default-type-assignment/test.sh</h3>
 <ul>
 <li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test">Default Element Type Assignment Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-document-operation-constraints/test.sh">tests/test-document-operation-constraints/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#merge-elements-test">Merge Elements Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#move-element-test">Move Element Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#move-file-squash-test">Move File Squash Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-document-refinement-format/test.sh">tests/test-document-refinement-format/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#document-refinement-validation-test">Document Refinement Validation Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="tests/test-duplicate-detection/test.sh">tests/test-duplicate-detection/test.sh</h3>
@@ -807,8 +1085,16 @@
 <li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#file-exclusion-test">File Exclusion Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-html-export-local-images/test.sh">tests/test-html-export-local-images/test.sh</h3>
+<ul>
+<li><a href="requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#html-export-local-linked-files-verification">HTML Export Local Linked Files Verification</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-html-export/test.sh">tests/test-html-export/test.sh</h3>
 <ul>
+<li><a href="requirements/Functional/Output/Verifications/DiagramVerifications.html#diagram-generation-test">Diagram Generation Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Verifications/DiagramVerifications.html#diagram-relation-filtering-verification">Diagram Relation Filtering Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Verifications/DiagramVerifications.html#visualize-model-relationships-verification">Visualize Model Relationships Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#html-export-verification">HTML Export Verification</a> (via satisfiedBy)</li>
 </ul>
 <hr />
@@ -826,6 +1112,11 @@
 <li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#invalid-relations-test">Invalid Relations Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-json-file-output/test.sh">tests/test-json-file-output/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#cli-json-file-output-test">CLI JSON File Output Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-link-unlink/test.sh">tests/test-link-unlink/test.sh</h3>
 <ul>
 <li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#link-command-verification">Link Command Verification</a> (via satisfiedBy)</li>
@@ -837,9 +1128,29 @@
 <li><a href="requirements/Functional/Operations/Verifications/LintingVerifications.html#lint-command-verification">Lint Command Verification</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-mcp-server/test.sh">tests/test-mcp-server/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#json-element-size-estimate-output-verification">JSON Element Size Estimate Output Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-contract-layer-boundary-verification">MCP Contract Layer Boundary Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-http-transport-end-to-end-verification">MCP HTTP Transport End-to-End Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-server-command-verification">MCP Server Command Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-server-end-to-end-verification">MCP Server End-to-End Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-shared-operation-contracts-verification">MCP Shared Operation Contracts Verification</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-merge-elements/test.sh">tests/test-merge-elements/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#merge-elements-test">Merge Elements Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-model-command/test.sh">tests/test-model-command/test.sh</h3>
 <ul>
+<li><a href="requirements/Functional/Core/Verifications/ParsingVerifications.html#element-size-estimate-model-build-verification">Element Size Estimate Model Build Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#json-element-size-estimate-output-verification">JSON Element Size Estimate Output Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#model-command-verification">Model Command Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#reverse-model-traversal-test">Reverse Model Traversal Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#start-type-filter-test">Start Type Filter Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Interfaces/CLI/Verifications/CLIVerifications.html#cli-size-estimate-json-option-verification">CLI Size Estimate JSON Option Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#model-view-element-navigation-test">Model View Element Navigation Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
@@ -848,10 +1159,33 @@
 <li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#multi-type-search-filter-test">Multi-Type Search Filter Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-ontologies-command/test.sh">tests/test-ontologies-command/test.sh</h3>
+<ul>
+<li><a href="requirements/Interfaces/CLI/Verifications/CLIVerifications.html#cli-ontologies-command-verification">CLI Ontologies Command Verification</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-parsing-functionality/test.sh">tests/test-parsing-functionality/test.sh</h3>
 <ul>
 <li><a href="requirements/Functional/Core/Verifications/ParsingVerifications.html#element-subsection-parsing-test">Element Subsection Parsing Test</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Core/Verifications/ParsingVerifications.html#fragment-normalization-test">Fragment Normalization Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-refinement-elements/test.sh">tests/test-refinement-elements/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Core/Verifications/AttachmentsVerifications.html#attachment-identifier-crud-verification">Attachment Identifier CRUD Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/Verifications/ParsingVerifications.html#refinement-element-type-parsing-test">Refinement Element Type Parsing Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/Verifications/ParsingVerifications.html#refinement-relations-rejection-test">Refinement Relations Rejection Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-relink-command/test.sh">tests/test-relink-command/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#atomic-relation-relink-test">Atomic Relation Relink Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-requirement-governance-metadata/test.sh">tests/test-requirement-governance-metadata/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Core/Verifications/ParsingVerifications.html#requirement-governance-metadata-verification">Requirement Governance Metadata Verification</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Operations/Verifications/FormattingVerifications.html#requirement-governance-metadata-formatting-verification">Requirement Governance Metadata Formatting Verification</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="tests/test-resources-report/test.sh">tests/test-resources-report/test.sh</h3>
@@ -866,15 +1200,43 @@
 <li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#search-command-tests">Search Command Tests</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-semantic-contract-json/test.sh">tests/test-semantic-contract-json/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#semantic-contract-search-json-test">Semantic Contract Search JSON Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-semantic-contract-sanity/test.sh">tests/test-semantic-contract-sanity/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-ontology-declaration-validation-test">Semantic Contract Ontology Declaration Validation Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-ownership-validation-test">Semantic Contract Ownership Validation Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-shacl-sanity-validation-test">Semantic Contract SHACL Sanity Validation Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-semantic-query-contracts/test.sh">tests/test-semantic-query-contracts/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-query-contract-section-validation-test">Semantic Query Contract Section Validation Test</a> (via satisfiedBy)</li>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#semantic-query-contract-search-json-test">Semantic Query Contract Search JSON Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h3 id="tests/test-serve-command/test.sh">tests/test-serve-command/test.sh</h3>
 <ul>
 <li><a href="requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#serve-command-verification">Serve Command Verification</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-single-root-hierarchy-validation/test.sh">tests/test-single-root-hierarchy-validation/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#single-root-hierarchy-ownership-validation-test">Single Root Hierarchy Ownership Validation Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="tests/test-subdirectory-functionality/test.sh">tests/test-subdirectory-functionality/test.sh</h3>
 <ul>
 <li><a href="requirements/Functional/Core/Verifications/ValidationVerifications.html#subdirectory-processing-verification">Subdirectory Processing Verification</a> (via satisfiedBy)</li>
 <li><a href="requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#cli-move-file-test">CLI Move File Test</a> (via satisfiedBy)</li>
+</ul>
+<hr />
+<h3 id="tests/test-submodels-command/test.sh">tests/test-submodels-command/test.sh</h3>
+<ul>
+<li><a href="requirements/Functional/Output/Verifications/ReportingVerifications.html#submodels-report-verification">Submodels Report Verification</a> (via satisfiedBy)</li>
 </ul>
 <hr />
 <h3 id="tests/test-trace-no-cycles/test.sh">tests/test-trace-no-cycles/test.sh</h3>
@@ -904,64 +1266,38 @@
 <li><a href="requirements/Interfaces/CLI/Verifications/CLIVerifications.html#verification-traces-element-navigation-test">Verification Traces Element Navigation Test</a> (via satisfiedBy)</li>
 </ul>
 <hr />
+<h3 id="tests/test-workspace-flag/test.sh">tests/test-workspace-flag/test.sh</h3>
+<ul>
+<li><a href="requirements/Interfaces/CLI/Verifications/CLIVerifications.html#explicit-workspace-selection-verification">Explicit Workspace Selection Verification</a> (via satisfiedBy)</li>
+</ul>
+<hr />
 <h2 id="attachments">Attachments</h2>
 <p>Files referenced via attachments:</p>
-<h3 id="requirements/functional/core/designdocuments/elementidentity.md">requirements/Functional/Core/DesignDocuments/ElementIdentity.md</h3>
-<ul>
-<li><a href="requirements/Functional/Core/StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
-</ul>
-<hr />
-<h3 id="requirements/functional/core/designdocuments/identifiersandrelations.md">requirements/Functional/Core/DesignDocuments/IdentifiersAndRelations.md</h3>
-<ul>
-<li><a href="requirements/Functional/Core/StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a></li>
-</ul>
-<hr />
-<h3 id="requirements/functional/core/designdocuments/markdownstructure.md">requirements/Functional/Core/DesignDocuments/MarkdownStructure.md</h3>
-<ul>
-<li><a href="requirements/Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
-</ul>
-<hr />
-<h3 id="requirements/functional/core/designdocuments/relationtypes.md">requirements/Functional/Core/DesignDocuments/RelationTypes.md</h3>
-<ul>
-<li><a href="requirements/Functional/Core/ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
-<li><a href="requirements/Functional/Operations/Formatting.html#full-relations-insertion">Full Relations Insertion</a></li>
-<li><a href="requirements/Interfaces/CLI/Commands.html#relation-commands">Relation Commands</a></li>
-</ul>
-<hr />
-<h3 id="requirements/functional/core/designdocuments/reservedsubsections.md">requirements/Functional/Core/DesignDocuments/ReservedSubsections.md</h3>
-<ul>
-<li><a href="requirements/Functional/Core/StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
-</ul>
-<hr />
-<h3 id="requirements/functional/output/designdocuments/containmentview.md">requirements/Functional/Output/DesignDocuments/ContainmentView.md</h3>
-<ul>
-<li><a href="requirements/Functional/Output/Reporting.html#containment-view-report">Containment View Report</a></li>
-<li><a href="requirements/Interfaces/CLI/Commands.html#cli-containment-command">CLI Containment Command</a></li>
-</ul>
-<hr />
-<h3 id="requirements/functional/output/designdocuments/searchfiltering.md">requirements/Functional/Output/DesignDocuments/SearchFiltering.md</h3>
-<ul>
-<li><a href="requirements/Functional/Output/Reporting.html#search-report-generator">Search Report Generator</a></li>
-</ul>
-<hr />
-<h3 id="requirements/functional/output/designdocuments/traceflowview.md">requirements/Functional/Output/DesignDocuments/TraceFlowView.md</h3>
-<ul>
-<li><a href="requirements/Functional/Output/Reporting.html#traceflow-view-report-generation">TraceFlow View Report Generation</a></li>
-</ul>
-<hr />
-<h3 id="requirements/functional/processing/designdocuments/changepropagation.md">requirements/Functional/Processing/DesignDocuments/ChangePropagation.md</h3>
-<ul>
-<li><a href="requirements/Functional/Processing/ChangeImpact.html#requirements-change-propagation">Requirements Change Propagation</a></li>
-</ul>
-<hr />
+<p><em>No files referenced via attachments.</em></p>
 <h2 id="summary">Summary</h2>
 <ul>
-<li><strong>Relation Files:</strong> 78 (239 references)</li>
-<li><strong>Attachment Files:</strong> 9 (12 references)</li>
+<li><strong>Relation Files:</strong> 113 (368 references)</li>
+<li><strong>Attachment Files:</strong> 0 (0 references)</li>
 </ul>
-<footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Resources</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Supporting report artifact that lists files referenced by relations and attachments.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

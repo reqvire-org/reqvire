@@ -37,7 +37,7 @@ Apply these boundaries:
 - Requirement: implementable, testable system obligation.
 - `semantic-contract`: requirement-owned SHACL `Shapes` profile over reachable ontology context.
 
-Ontology attached by capabilities should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible `specification`, `behavior`, `state`, and `input-output` refinements owned by the relevant capability or requirement. Shape-only `semantic-contract` refinements are requirement-owned checks.
+Ontology attached by capabilities should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Shape-only `semantic-contract` refinements are requirement-owned checks.
 
 ## Procedure
 
@@ -76,12 +76,12 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 
 For each candidate, classify each sentence:
 
-- Capability/source context goes to capability or capability-owned refinements.
+- Capability/source context goes to capability text or requirement-owned source refinements.
 - Stable semantic meaning goes to `ontology`.
 - System obligation stays in requirement.
 - Local SHACL profile goes to a requirement-owned `semantic-contract`.
 - Verification criteria stays in verification elements.
-- Exact commands, fields, URI patterns, workflow steps, output formats, file paths, persistence behavior, and reject/write/emit behavior stay in compatible refinements owned by the relevant capability or requirement, not ontology.
+- Exact commands, fields, URI patterns, workflow steps, output formats, file paths, persistence behavior, and reject/write/emit behavior stay in compatible requirement-owned refinements, not ontology.
 
 Do not delete content until it has a new owner.
 

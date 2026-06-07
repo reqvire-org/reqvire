@@ -3,14 +3,16 @@
 /// This module provides linting functionality to detect issues in requirements relations:
 /// - Redundant verify relations (auto-fixable)
 /// - Redundant hierarchical relations (auto-fixable)
-
 use crate::element::ElementType;
 use crate::error::ReqvireError;
 use crate::graph_registry::GraphRegistry;
-use crate::relation::{VERIFY_RELATION, VERIFICATION_TRACES_RELATIONS};
+use crate::relation::{
+    get_hierarchical_relation_types, LinkType, VERIFICATION_TRACES_RELATIONS, VERIFY_RELATION,
+};
 use crate::trace_tree_builder;
+use crate::utils;
 use serde::Serialize;
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 
 #[derive(Debug, Serialize, Clone)]
 pub struct LintReport {
@@ -44,6 +46,17 @@ pub enum ManualReviewIssue {
         potentially_redundant_relations: Vec<RelationInfo>,
         rationale: String,
     },
+    #[serde(rename = "cross_submodel_hierarchical_relation")]
+    CrossSubmodelHierarchicalRelation {
+        source: ElementInfo,
+        target: ElementInfo,
+        relation_type: String,
+        source_root: String,
+        source_root_name: String,
+        target_root: String,
+        target_root_name: String,
+        rationale: String,
+    },
     #[serde(rename = "multi_branch_convergence")]
     MultiBranchConvergence {
         element: ElementInfo,
@@ -67,24 +80,29 @@ pub struct RelationInfo {
 }
 
 impl LintReport {
+    pub fn to_json_string(&self, show_only_fixable: bool, show_only_auditable: bool) -> String {
+        let filtered_report = if show_only_fixable {
+            LintReport {
+                auto_fixable: self.auto_fixable.clone(),
+                needs_manual_review: vec![],
+            }
+        } else if show_only_auditable {
+            LintReport {
+                auto_fixable: vec![],
+                needs_manual_review: self.needs_manual_review.clone(),
+            }
+        } else {
+            self.clone()
+        };
+        serde_json::to_string_pretty(&filtered_report).unwrap()
+    }
+
     pub fn print(&self, json: bool, show_only_fixable: bool, show_only_auditable: bool) {
         if json {
-            // Filter the report based on flags before serializing
-            let filtered_report = if show_only_fixable {
-                LintReport {
-                    auto_fixable: self.auto_fixable.clone(),
-                    needs_manual_review: vec![],
-                }
-            } else if show_only_auditable {
-                LintReport {
-                    auto_fixable: vec![],
-                    needs_manual_review: self.needs_manual_review.clone(),
-                }
-            } else {
-                // Show both
-                self.clone()
-            };
-            println!("{}", serde_json::to_string_pretty(&filtered_report).unwrap());
+            println!(
+                "{}",
+                self.to_json_string(show_only_fixable, show_only_auditable)
+            );
         } else {
             self.print_text(show_only_fixable, show_only_auditable);
         }
@@ -106,10 +124,18 @@ impl LintReport {
                     } => {
                         println!("### Redundant Verify Relations\n");
                         println!("**Verification: {}**", verification.name);
-                        println!("File: [{}]({})\n", verification.identifier, verification.identifier);
-                        println!("Redundant verify relations (these can be automatically removed):");
+                        println!(
+                            "File: [{}]({})\n",
+                            verification.identifier, verification.identifier
+                        );
+                        println!(
+                            "Redundant verify relations (these can be automatically removed):"
+                        );
                         for rel in redundant_relations {
-                            println!("  * {}: [{}]({})", rel.relation_type, rel.target, rel.target);
+                            println!(
+                                "  * {}: [{}]({})",
+                                rel.relation_type, rel.target, rel.target
+                            );
                         }
                         println!("\nReason: {}\n", rationale);
                         println!("---\n");
@@ -122,7 +148,8 @@ impl LintReport {
                         println!("### Safe Redundant Hierarchical Relations\n");
                         println!("**Element: {}**", element.name);
                         println!("File: [{}]({})\n", element.identifier, element.identifier);
-                        println!("Safe redundant {} relations (these can be automatically removed):",
+                        println!(
+                            "Safe redundant {} relations (these can be automatically removed):",
                             if redundant_relations.len() == 1 {
                                 redundant_relations[0].relation_type.as_str()
                             } else {
@@ -130,7 +157,10 @@ impl LintReport {
                             }
                         );
                         for rel in redundant_relations {
-                            println!("  * {}: [{}]({})", rel.relation_type, rel.target, rel.target);
+                            println!(
+                                "  * {}: [{}]({})",
+                                rel.relation_type, rel.target, rel.target
+                            );
                         }
                         println!("\nReason: {}\n", rationale);
                         println!("---\n");
@@ -152,7 +182,8 @@ impl LintReport {
                         println!("### Maybe-Redundant Hierarchical Relations\n");
                         println!("**Element: {}**", element.name);
                         println!("File: [{}]({})\n", element.identifier, element.identifier);
-                        println!("Potentially redundant {} relations detected:",
+                        println!(
+                            "Potentially redundant {} relations detected:",
                             if potentially_redundant_relations.len() == 1 {
                                 potentially_redundant_relations[0].relation_type.as_str()
                             } else {
@@ -160,9 +191,36 @@ impl LintReport {
                             }
                         );
                         for rel in potentially_redundant_relations {
-                            println!("  * {}: [{}]({})", rel.relation_type, rel.target, rel.target);
+                            println!(
+                                "  * {}: [{}]({})",
+                                rel.relation_type, rel.target, rel.target
+                            );
                         }
                         println!("\nReason: {}\n", rationale);
+                        println!("---\n");
+                    }
+                    ManualReviewIssue::CrossSubmodelHierarchicalRelation {
+                        source,
+                        target,
+                        relation_type,
+                        source_root,
+                        source_root_name,
+                        target_root,
+                        target_root_name,
+                        rationale,
+                    } => {
+                        println!("### Cross-Submodel Hierarchical Relation");
+                        println!("**Source: {}**", source.name);
+                        println!("Source root: {} ({})", source_root_name, source_root);
+                        println!("Target: {} ({})", target.name, target.identifier);
+                        println!("Target root: {} ({})", target_root_name, target_root);
+                        println!(
+                            "Relation: {} -> [{}]({})",
+                            relation_type, target.identifier, target.identifier
+                        );
+                        println!("File: [{}]({})\n", source.identifier, source.identifier);
+                        println!("Reason: {}", rationale);
+                        println!("\n");
                         println!("---\n");
                     }
                     ManualReviewIssue::MultiBranchConvergence {
@@ -175,7 +233,10 @@ impl LintReport {
                         println!("**Element: {}**", element.name);
                         println!("File: [{}]({})\n", element.identifier, element.identifier);
                         println!("This element reaches a common ancestor through multiple distinct branch paths:");
-                        println!("  * Common ancestor: [{}]({})", common_ancestor, common_ancestor);
+                        println!(
+                            "  * Common ancestor: [{}]({})",
+                            common_ancestor, common_ancestor
+                        );
                         println!("  * Branch paths:");
                         for path in branch_paths {
                             println!("    - Via: {}", path);
@@ -267,38 +328,279 @@ pub fn analyze_model(registry: &GraphRegistry) -> LintReport {
     auto_fixable.extend(safe_issues);
     needs_manual_review.extend(unsafe_issues);
 
+    // Detect cross-submodel hierarchical relations (manual review only)
+    needs_manual_review.extend(detect_cross_submodel_hierarchical_relations(registry));
+
     // Detect multi-branch convergence (needs manual review)
     needs_manual_review.extend(detect_multi_branch_convergence(registry));
 
     // Sort issues by element identifier for deterministic output
     auto_fixable.sort_by(|a, b| {
         let id_a = match a {
-            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => &verification.identifier,
-            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => {
+                &verification.identifier
+            }
+            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => {
+                &element.identifier
+            }
         };
         let id_b = match b {
-            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => &verification.identifier,
-            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => &element.identifier,
+            AutoFixableIssue::RedundantVerifyRelations { verification, .. } => {
+                &verification.identifier
+            }
+            AutoFixableIssue::SafeRedundantHierarchicalRelations { element, .. } => {
+                &element.identifier
+            }
         };
         id_a.cmp(id_b)
     });
 
     needs_manual_review.sort_by(|a, b| {
-        let id_a = match a {
-            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
-            ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
+        let key_a = match a {
+            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => {
+                element.identifier.clone()
+            }
+            ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => {
+                source.identifier.clone()
+            }
+            ManualReviewIssue::MultiBranchConvergence { element, .. } => element.identifier.clone(),
         };
-        let id_b = match b {
-            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => &element.identifier,
-            ManualReviewIssue::MultiBranchConvergence { element, .. } => &element.identifier,
+        let key_b = match b {
+            ManualReviewIssue::MaybeRedundantHierarchicalRelations { element, .. } => {
+                element.identifier.clone()
+            }
+            ManualReviewIssue::CrossSubmodelHierarchicalRelation { source, .. } => {
+                source.identifier.clone()
+            }
+            ManualReviewIssue::MultiBranchConvergence { element, .. } => element.identifier.clone(),
         };
-        id_a.cmp(id_b)
+        key_a.cmp(&key_b)
     });
 
     LintReport {
         auto_fixable,
         needs_manual_review,
     }
+}
+
+fn detect_cross_submodel_hierarchical_relations(
+    registry: &GraphRegistry,
+) -> Vec<ManualReviewIssue> {
+    let mut issues = Vec::new();
+    let hierarchical_relation_types = get_hierarchical_relation_types();
+    let (root_assignment, requirement_ids) =
+        build_requirement_root_assignment(registry, &hierarchical_relation_types);
+    let mut seen = HashSet::new();
+
+    for source_id in requirement_ids {
+        let Some(source_root_id) = root_assignment.get(&source_id) else {
+            continue;
+        };
+
+        let Some(source_root) = registry.get_element(source_root_id) else {
+            continue;
+        };
+
+        let Some(source_elem) = registry.get_element(&source_id) else {
+            continue;
+        };
+
+        for relation in &source_elem.relations {
+            if !hierarchical_relation_types.contains(&relation.relation_type.name) {
+                continue;
+            }
+
+            if !relation.user_created {
+                continue;
+            }
+
+            let LinkType::Identifier(target_identifier) = &relation.target.link else {
+                continue;
+            };
+
+            let Some(target_id) =
+                resolve_lint_target_identifier(registry, &source_elem.file_path, target_identifier)
+            else {
+                continue;
+            };
+
+            let Some(target_root_id) = root_assignment.get(&target_id) else {
+                continue;
+            };
+
+            if target_root_id == source_root_id {
+                continue;
+            }
+
+            let Some(target_elem) = registry.get_element(&target_id) else {
+                continue;
+            };
+
+            let Some(target_root) = registry.get_element(target_root_id) else {
+                continue;
+            };
+
+            let key = (
+                source_elem.identifier.clone(),
+                relation.relation_type.name,
+                target_id.clone(),
+            );
+            if !seen.insert(key) {
+                continue;
+            }
+
+            issues.push(ManualReviewIssue::CrossSubmodelHierarchicalRelation {
+                source: ElementInfo {
+                    identifier: source_elem.identifier.clone(),
+                    name: source_elem.name.clone(),
+                    file: source_elem.file_path.clone(),
+                },
+                target: ElementInfo {
+                    identifier: target_id.clone(),
+                    name: target_elem.name.clone(),
+                    file: target_elem.file_path.clone(),
+                },
+                relation_type: relation.relation_type.name.to_string(),
+                source_root: source_root_id.clone(),
+                source_root_name: source_root.name.clone(),
+                target_root: target_root_id.clone(),
+                target_root_name: target_root.name.clone(),
+                rationale: format!(
+                    "Hierarchical relation '{}' from '{}' crosses from submodel '{}' to '{}'. \
+                    Hierarchical structure should remain internal to a single ownership boundary. \
+                    Replace this relation with an explicit attachment contract.",
+                    relation.relation_type.name,
+                    source_elem.identifier,
+                    source_root_id,
+                    target_root_id
+                ),
+            });
+        }
+    }
+
+    issues
+}
+
+fn build_requirement_root_assignment(
+    registry: &GraphRegistry,
+    hierarchical_relation_types: &[&str],
+) -> (HashMap<String, String>, Vec<String>) {
+    let mut requirement_ids: Vec<String> = registry
+        .get_all_elements()
+        .into_iter()
+        .filter_map(|e| {
+            if matches!(e.element_type, crate::element::ElementType::Requirement(_)) {
+                Some(e.identifier.clone())
+            } else {
+                None
+            }
+        })
+        .collect();
+    requirement_ids.sort();
+
+    let requirement_set: HashSet<String> = requirement_ids.iter().cloned().collect();
+    let mut parent_map: HashMap<String, Vec<String>> = HashMap::new();
+
+    for requirement_id in &requirement_ids {
+        let mut parents = HashSet::new();
+        let Some(source_elem) = registry.get_element(requirement_id) else {
+            continue;
+        };
+
+        for relation in &source_elem.relations {
+            if !hierarchical_relation_types.contains(&relation.relation_type.name) {
+                continue;
+            }
+
+            let LinkType::Identifier(target_identifier) = &relation.target.link else {
+                continue;
+            };
+
+            let Some(parent_id) =
+                resolve_lint_target_identifier(registry, &source_elem.file_path, target_identifier)
+            else {
+                continue;
+            };
+
+            if requirement_set.contains(&parent_id) {
+                parents.insert(parent_id);
+            }
+        }
+
+        parent_map.insert(requirement_id.clone(), parents.into_iter().collect());
+    }
+
+    let mut memo = HashMap::new();
+    let mut root_assignment = HashMap::new();
+
+    for requirement_id in &requirement_ids {
+        let roots =
+            resolve_root_candidates(requirement_id, &parent_map, &mut memo, &mut HashSet::new());
+        if let Some(root_id) = roots.first().cloned() {
+            root_assignment.insert(requirement_id.clone(), root_id);
+        }
+    }
+
+    (root_assignment, requirement_ids)
+}
+
+fn resolve_root_candidates(
+    requirement_id: &str,
+    parent_map: &HashMap<String, Vec<String>>,
+    memo: &mut HashMap<String, BTreeSet<String>>,
+    visiting: &mut HashSet<String>,
+) -> BTreeSet<String> {
+    if let Some(cached) = memo.get(requirement_id) {
+        return cached.clone();
+    }
+
+    if visiting.contains(requirement_id) {
+        return BTreeSet::new();
+    }
+    visiting.insert(requirement_id.to_string());
+
+    let mut roots = BTreeSet::new();
+    let parents = parent_map.get(requirement_id).cloned().unwrap_or_default();
+
+    if parents.is_empty() {
+        roots.insert(requirement_id.to_string());
+    } else {
+        for parent_id in parents {
+            for root in resolve_root_candidates(&parent_id, parent_map, memo, visiting) {
+                roots.insert(root);
+            }
+        }
+    }
+
+    visiting.remove(requirement_id);
+    memo.insert(requirement_id.to_string(), roots.clone());
+    roots
+}
+
+fn resolve_lint_target_identifier(
+    registry: &GraphRegistry,
+    source_file_path: &str,
+    target_identifier: &str,
+) -> Option<String> {
+    if registry.get_element(target_identifier).is_some() {
+        return Some(target_identifier.to_string());
+    }
+
+    if target_identifier.starts_with('#') {
+        let full_identifier = format!("{}{}", source_file_path, target_identifier);
+        if registry.get_element(&full_identifier).is_some() {
+            return Some(full_identifier);
+        }
+    }
+
+    let (_, fragment) = utils::extract_path_and_fragment(target_identifier);
+    if let Some(fragment) = fragment {
+        if registry.get_element(fragment).is_some() {
+            return Some(fragment.to_string());
+        }
+    }
+
+    None
 }
 
 /// Detect redundant verify relations in verifications
@@ -327,7 +629,8 @@ fn detect_redundant_verify_relations(registry: &GraphRegistry) -> Vec<AutoFixabl
             }
 
             // Use shared trace tree builder to find redundant relations
-            let redundant_ids = trace_tree_builder::find_redundant_relations(&directly_verified, registry);
+            let redundant_ids =
+                trace_tree_builder::find_redundant_relations(&directly_verified, registry);
 
             if !redundant_ids.is_empty() {
                 // Find the leaf requirement(s) for rationale
@@ -656,7 +959,7 @@ fn detect_multi_branch_convergence(registry: &GraphRegistry) -> Vec<ManualReview
 
                 ancestor_counts
                     .entry(ancestor_id.clone())
-                    .or_insert_with(Vec::new)
+                    .or_default()
                     .push(parent_id.clone());
             }
         }
@@ -706,7 +1009,7 @@ fn detect_multi_branch_convergence(registry: &GraphRegistry) -> Vec<ManualReview
                     // Must NOT be an ancestor of the common ancestor
                     // (check if this branch appears in the common ancestor's ancestors)
                     if ancestor_ancestors.contains(*branch) {
-                        return false;  // Skip this branch - it's an ancestor of the common ancestor
+                        return false; // Skip this branch - it's an ancestor of the common ancestor
                     }
                     true
                 })
@@ -725,19 +1028,21 @@ fn detect_multi_branch_convergence(registry: &GraphRegistry) -> Vec<ManualReview
                 if let Some(branch_element) = registry.get_element(branch_path) {
                     for rel in &branch_element.relations {
                         if VERIFICATION_TRACES_RELATIONS.contains(&rel.relation_type.name) {
-                            if let crate::relation::LinkType::Identifier(parent_id) = &rel.target.link {
+                            if let crate::relation::LinkType::Identifier(parent_id) =
+                                &rel.target.link
+                            {
                                 if parent_id == ancestor_id {
-                                    return true;  // This branch has the ancestor as a direct parent
+                                    return true; // This branch has the ancestor as a direct parent
                                 }
                             }
                         }
                     }
                 }
-                false  // This branch does NOT have the ancestor as a direct parent
+                false // This branch does NOT have the ancestor as a direct parent
             });
 
             if !all_branches_are_direct_children {
-                continue;  // Skip this candidate - not all branches are direct children
+                continue; // Skip this candidate - not all branches are direct children
             }
 
             // This is a valid multi-branch convergence - report it

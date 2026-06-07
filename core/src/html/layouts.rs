@@ -1,6 +1,6 @@
-use maud::{html, Markup, PreEscaped, DOCTYPE};
+use maud::{html, Markup, DOCTYPE};
 
-/// Base layout for standard pages with Tailwind responsive design
+/// Base layout for generated source/specification pages with responsive design
 pub fn base(title: &str, content: Markup, nav_prefix: &str) -> Markup {
     html! {
         (DOCTYPE)
@@ -12,87 +12,45 @@ pub fn base(title: &str, content: Markup, nav_prefix: &str) -> Markup {
                 link rel="icon" type="image/x-icon" href={(nav_prefix)"assets/favicon.ico"};
                 link rel="apple-touch-icon" href={(nav_prefix)"assets/apple-touch-icon.png"};
 
-                // Tailwind CSS CDN
+                // Source/specification pages use Tailwind from CDN; the native Explorer SPA uses compiled local CSS.
                 script src="https://cdn.tailwindcss.com" {}
 
                 // Custom CSS for Mermaid, content styling, and color scheme
                 (super::styles::custom())
             }
-            body class="bg-gray-50" {
-                // Navigation bar with responsive mobile menu
+            body class="reqvire-html-body" {
+                // Fixed source-page route header
                 nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;" {
                     // Logo
-                    a href={(nav_prefix)"index.html"} class="nav-logo flex items-center pr-4" {
+                    a href={(nav_prefix)"index.html#/model"} class="nav-logo flex items-center pr-4" {
                         img src={(nav_prefix)"assets/logo.png"} alt="Reqvire" height="24";
                     }
-
-                    // Desktop navigation (hidden on mobile)
-                    div class="hidden md:flex md:items-center md:gap-1" {
-                        a href={(nav_prefix)"index.html"} class="nav-link" { "Containment" }
-                        a href={(nav_prefix)"model.html"} class="nav-link" { "Model" }
-                        a href={(nav_prefix)"traces.html"} class="nav-link" { "Traces" }
-                        a href={(nav_prefix)"traceflow.html"} class="nav-link" { "TraceFlow" }
-                        a href={(nav_prefix)"coverage.html"} class="nav-link" { "Coverage" }
-                        a href={(nav_prefix)"resources.html"} class="nav-link" { "Resources" }
-                        a href={(nav_prefix)"ontologies.html"} class="nav-link" { "Ontologies" }
+                    div class="reqvire-route-links" aria-label="Explorer routes" {
+                        a href={(nav_prefix)"index.html#/model"} class="nav-link" { "Model" }
+                        a href={(nav_prefix)"index.html#/traces"} class="nav-link" { "Traces" }
+                        a href={(nav_prefix)"index.html#/ontologies"} class="nav-link" { "Ontologies" }
+                        a href={(nav_prefix)"index.html#/kn2"} class="nav-link" { "KN2" }
                     }
-
-                    // Mobile menu button (visible on mobile only)
-                    button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded"
-                            style="transition: background-color 0.2s;"
-                            onmouseover="this.style.backgroundColor='#2a2a2a'"
-                            onmouseout="this.style.backgroundColor='transparent'"
-                            aria-label="Toggle menu" {
-                        // Hamburger icon
-                        svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" {
-                            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M4 6h16M4 12h16M4 18h16" {}
-                        }
-                    }
+                    button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()" { "?" }
                 }
 
-                // Mobile menu (hidden by default, shown when hamburger clicked)
-                div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;" {
-                    div class="flex flex-col" {
-                        a href={(nav_prefix)"index.html"} class="mobile-nav-link" { "Containment" }
-                        a href={(nav_prefix)"model.html"} class="mobile-nav-link" { "Model" }
-                        a href={(nav_prefix)"traces.html"} class="mobile-nav-link" { "Traces" }
-                        a href={(nav_prefix)"traceflow.html"} class="mobile-nav-link" { "TraceFlow" }
-                        a href={(nav_prefix)"coverage.html"} class="mobile-nav-link" { "Coverage" }
-                        a href={(nav_prefix)"resources.html"} class="mobile-nav-link" { "Resources" }
-                        a href={(nav_prefix)"ontologies.html"} class="mobile-nav-link" { "Ontologies" }
-                    }
-                }
-
-                // Spacer for fixed nav
+                // Spacer for fixed source-page route header
                 div class="h-[50px]" {}
 
                 // Main content with responsive fluid width
-                div class="w-full max-w-[95%] mx-auto p-5" {
-                    div class="bg-white p-8 rounded shadow-sm border border-gray-200" {
+                div class="reqvire-page-outer w-full max-w-[95%] mx-auto p-5" {
+                    div class="reqvire-page-card bg-white p-8 rounded shadow-sm border border-gray-200" {
                         (content)
-                        footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm" {
-                            "Generated by "
-                            a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline" { "Reqvire" }
-                        }
                     }
                 }
 
-                // Mobile menu toggle script
-                script {
-                    (PreEscaped(r#"
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    "#))
-                }
+                (help_modal(title))
             }
         }
     }
 }
 
-/// Diagram layout for full-height visualizations with Tailwind responsive design
+/// Diagram layout for full-height source/specification visualizations
 pub fn diagram_layout(title: &str, diagram: Markup, nav_prefix: &str) -> Markup {
     html! {
         (DOCTYPE)
@@ -104,7 +62,7 @@ pub fn diagram_layout(title: &str, diagram: Markup, nav_prefix: &str) -> Markup 
                 link rel="icon" type="image/x-icon" href={(nav_prefix)"assets/favicon.ico"};
                 link rel="apple-touch-icon" href={(nav_prefix)"assets/apple-touch-icon.png"};
 
-                // Tailwind CSS CDN
+                // Source/specification pages use Tailwind from CDN; the native Explorer SPA uses compiled local CSS.
                 script src="https://cdn.tailwindcss.com" {}
 
                 // Custom CSS for Mermaid, content styling, and color scheme
@@ -113,76 +71,115 @@ pub fn diagram_layout(title: &str, diagram: Markup, nav_prefix: &str) -> Markup 
                 // Include Mermaid scripts for diagrams
                 (super::visualizations::mermaid::scripts())
             }
-            body class="bg-gray-50" {
-                // Navigation bar with responsive mobile menu
+            body class="reqvire-html-body" {
+                // Fixed source-page route header
                 nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;" {
                     // Logo
-                    a href={(nav_prefix)"index.html"} class="nav-logo flex items-center pr-4" {
+                    a href={(nav_prefix)"index.html#/model"} class="nav-logo flex items-center pr-4" {
                         img src={(nav_prefix)"assets/logo.png"} alt="Reqvire" height="24";
                     }
-
-                    // Desktop navigation (hidden on mobile)
-                    div class="hidden md:flex md:items-center md:gap-1" {
-                        a href={(nav_prefix)"index.html"} class="nav-link" { "Containment" }
-                        a href={(nav_prefix)"model.html"} class="nav-link" { "Model" }
-                        a href={(nav_prefix)"traces.html"} class="nav-link" { "Traces" }
-                        a href={(nav_prefix)"traceflow.html"} class="nav-link" { "TraceFlow" }
-                        a href={(nav_prefix)"coverage.html"} class="nav-link" { "Coverage" }
-                        a href={(nav_prefix)"resources.html"} class="nav-link" { "Resources" }
-                        a href={(nav_prefix)"ontologies.html"} class="nav-link" { "Ontologies" }
+                    div class="reqvire-route-links" aria-label="Explorer routes" {
+                        a href={(nav_prefix)"index.html#/model"} class="nav-link" { "Model" }
+                        a href={(nav_prefix)"index.html#/traces"} class="nav-link" { "Traces" }
+                        a href={(nav_prefix)"index.html#/ontologies"} class="nav-link" { "Ontologies" }
+                        a href={(nav_prefix)"index.html#/kn2"} class="nav-link" { "KN2" }
                     }
-
-                    // Mobile menu button (visible on mobile only)
-                    button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded"
-                            style="transition: background-color 0.2s;"
-                            onmouseover="this.style.backgroundColor='#2a2a2a'"
-                            onmouseout="this.style.backgroundColor='transparent'"
-                            aria-label="Toggle menu" {
-                        // Hamburger icon
-                        svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" {
-                            path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M4 6h16M4 12h16M4 18h16" {}
-                        }
-                    }
+                    button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()" { "?" }
                 }
 
-                // Mobile menu (hidden by default, shown when hamburger clicked)
-                div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;" {
-                    div class="flex flex-col" {
-                        a href={(nav_prefix)"index.html"} class="mobile-nav-link" { "Containment" }
-                        a href={(nav_prefix)"model.html"} class="mobile-nav-link" { "Model" }
-                        a href={(nav_prefix)"traces.html"} class="mobile-nav-link" { "Traces" }
-                        a href={(nav_prefix)"traceflow.html"} class="mobile-nav-link" { "TraceFlow" }
-                        a href={(nav_prefix)"coverage.html"} class="mobile-nav-link" { "Coverage" }
-                        a href={(nav_prefix)"resources.html"} class="mobile-nav-link" { "Resources" }
-                        a href={(nav_prefix)"ontologies.html"} class="mobile-nav-link" { "Ontologies" }
-                    }
-                }
-
-                // Spacer for fixed nav
+                // Spacer for fixed source-page route header
                 div class="h-[50px]" {}
 
                 // Main content with responsive fluid width
-                div class="w-full max-w-[95%] mx-auto p-5" {
-                    div class="bg-white p-8 rounded shadow-sm border border-gray-200" {
+                div class="reqvire-page-outer w-full max-w-[95%] mx-auto p-5" {
+                    div class="reqvire-page-card bg-white p-8 rounded shadow-sm border border-gray-200" {
                         (diagram)
-                        footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm" {
-                            "Generated by "
-                            a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline" { "Reqvire" }
-                        }
                     }
                 }
 
-                // Mobile menu toggle script
-                script {
-                    (PreEscaped(r#"
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    "#))
-                }
+                (help_modal(title))
             }
+        }
+    }
+}
+
+fn help_text(title: &str) -> (&'static str, &'static str) {
+    match title {
+        "Containment View" => (
+            "Containment",
+            "Shows repository/file containment so you can zoom into folders, files, elements, and attachments. Use Sunburst or Icicle depending on whether radial or rectangular hierarchy scanning is easier.",
+        ),
+        "Model View" => (
+            "Model",
+            "Shows the project model browser with List, Grid, Sunburst, and Icicle modes over files, folders, and modeled elements.",
+        ),
+        "KN2" => (
+            "KN2",
+            "Experimental Cytoscape.js project graph page for comparing layouts, centrality sizing, subgraph clustering, and compound-node rendering against the current Knowledge Graph view.",
+        ),
+        "Verification Traces" => (
+            "Traces",
+            "Shows upward verification traceability from verification elements through requirement hierarchy and capability context, including direct and rolled-up verification paths.",
+        ),
+        "Ontologies" => (
+            "Ontologies",
+            "Shows authored ontology and SHACL terms as an interactive semantic graph. Use search, filters, graph focus, and the inspector to explore classes, properties, individuals, constraints, and generated ontology constructs.",
+        ),
+        "TraceFlow" => (
+            "TraceFlow",
+            "Supporting report artifact that visualizes verification traceability flow as a Sankey diagram.",
+        ),
+        "Coverage" => (
+            "Coverage",
+            "Supporting report artifact that summarizes verification and implementation coverage.",
+        ),
+        "Resources" => (
+            "Resources",
+            "Supporting report artifact that lists files referenced by relations and attachments.",
+        ),
+        _ => (
+            "Reqvire Explorer",
+            "Use the Explorer shell to move between Model, Knowledge Graph, Traces, Ontologies, and KN2. Supporting report artifact pages may still exist but are not primary Explorer destinations.",
+        ),
+    }
+}
+
+fn help_modal(title: &str) -> Markup {
+    let (help_title, help_body) = help_text(title);
+
+    html! {
+        div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true" {
+            div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title" {
+                div class="reqvire-help-header" {
+                    h2 id="reqvire-help-title" { (help_title) }
+                    button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()" { "x" }
+                }
+                p { (help_body) }
+            }
+        }
+        script {
+            (maud::PreEscaped(r#"
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            "#))
         }
     }
 }

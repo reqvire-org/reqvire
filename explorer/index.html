@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reqvire Explorer</title>
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+    <!--
+      The Rust HTML export injects the immutable Project Store seed script
+      immediately before the Explorer bundle below. In local `npm run dev`
+      there is no Rust export, so a dev fixture seed is loaded by
+      src/store/loadStore.ts. See explorer/README.md for the seed contract.
+    -->
+    <script type="module" src="/src/main.tsx"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>

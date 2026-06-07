@@ -34,6 +34,12 @@ api:Request a owl:Class .
 api:Response a owl:Class .
 api:ServiceEndpointAlias a owl:Class ;
   owl:equivalentClass api:ServiceEndpoint .
+api:VerifiedEndpoint a owl:Class ;
+  rdfs:subClassOf [
+    a owl:Restriction ;
+    owl:onProperty api:produces ;
+    owl:someValuesFrom api:Response
+  ] .
 
 # Individuals
 api:ProductionEndpoint a owl:NamedIndividual ;

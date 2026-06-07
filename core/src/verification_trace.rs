@@ -54,7 +54,7 @@ struct RequirementNodeWithRelation {
     pub name: String,
     pub element_type: String, // CSS class name based on element type
     pub children: Vec<(String, RequirementNodeWithRelation)>, // (relation_type, node)
-    pub attachments: Vec<String>,
+    pub attachment_labels: Vec<String>,
 }
 
 pub struct VerificationTraceGenerator<'a> {
@@ -276,7 +276,7 @@ impl<'a> VerificationTraceGenerator<'a> {
         }
 
         // Collect all elements that will be in the diagram
-        // (id, name, element_type, attachments) - element_type is used for CSS class
+        // (id, name, element_type, attachment_labels) - element_type is used for CSS class
         let mut all_elements: Vec<(String, String, String, Vec<String>)> = Vec::new();
         let mut collected_ids: HashSet<String> = HashSet::new();
 
@@ -381,13 +381,14 @@ impl<'a> VerificationTraceGenerator<'a> {
                     file_elements.iter().collect();
                 sorted_elements.sort_by(|a, b| a.0.cmp(&b.0));
 
-                for (elem_id, elem_name, elem_type, attachments) in sorted_elements {
+                for (elem_id, elem_name, elem_type, attachment_labels) in sorted_elements {
                     let node_id = utils::hash_identifier(elem_id);
 
                     // Build label with attachments
-                    let mut node_label = elem_name.to_string();
-                    for attachment in attachments {
-                        node_label.push_str(&format!("<br/>📎 {}", attachment));
+                    let mut node_label = escape_mermaid_label(elem_name);
+                    for attachment in attachment_labels {
+                        node_label
+                            .push_str(&format!("<br/>📎 {}", escape_mermaid_label(attachment)));
                     }
 
                     // Use the element type directly for CSS class
@@ -460,7 +461,7 @@ impl<'a> VerificationTraceGenerator<'a> {
                     node.id.clone(),
                     node.name.clone(),
                     node.element_type.clone(),
-                    node.attachments.clone(),
+                    node.attachment_labels.clone(),
                 ));
             }
             // Recursively collect children
@@ -577,7 +578,7 @@ impl<'a> VerificationTraceGenerator<'a> {
             name: requirement.name.clone(),
             element_type: element_type.to_string(),
             children,
-            attachments: requirement
+            attachment_labels: requirement
                 .attachments
                 .iter()
                 .map(|a| match &a.target {
@@ -585,7 +586,11 @@ impl<'a> VerificationTraceGenerator<'a> {
                         .file_name()
                         .map(|n| n.to_string_lossy().into_owned())
                         .unwrap_or_else(|| path.to_string_lossy().into_owned()),
-                    crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+                    crate::element::AttachmentTarget::ElementIdentifier(id) => self
+                        .registry
+                        .get_element(id)
+                        .map(|target| target.name.clone())
+                        .unwrap_or_else(|| attachment_target_label(id)),
                 })
                 .collect(),
         })
@@ -629,6 +634,26 @@ impl<'a> VerificationTraceGenerator<'a> {
 
         markdown
     }
+}
+
+fn attachment_target_label(target: &str) -> String {
+    let fragment_or_path = target.rsplit('#').next().unwrap_or(target);
+    let basename = fragment_or_path
+        .rsplit('/')
+        .next()
+        .unwrap_or(fragment_or_path);
+    if basename.is_empty() {
+        target.to_string()
+    } else {
+        basename.to_string()
+    }
+}
+
+fn escape_mermaid_label(label: &str) -> String {
+    label
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"")
+        .replace('\n', " ")
 }
 
 /// Valid verification types for --filter-type in traces command

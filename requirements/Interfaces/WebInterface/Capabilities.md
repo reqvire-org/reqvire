@@ -8,11 +8,13 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * type: requirement
 
 #### Relations
+  * derive: [SPA Explorer Shell and Project Store](#spa-explorer-shell-and-project-store)
   * derive: [Attachment Export](#attachment-export)
   * derive: [Containment View Attachment Links](#containment-view-attachment-links)
   * derive: [Diagram Attachment Display](#diagram-attachment-display)
   * derive: [Local Linked File Export](#local-linked-file-export)
   * derive: [Model-Centric View Generation](#model-centric-view-generation)
+  * derive: [Project Knowledge Graph View](#project-knowledge-graph-view)
   * derive: [Ontologies View Generation](#ontologies-view-generation)
   * derive: [Web Interface Color Scheme](#web-interface-color-scheme)
   * derivedFrom: [Web Interface](../Interfaces.md#web-interface)
@@ -26,6 +28,7 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * satisfiedBy: [export.rs](../../../core/src/export.rs)
   * satisfiedBy: [layouts.rs](../../../core/src/html/layouts.rs)
   * satisfiedBy: [mod.rs](../../../core/src/html/mod.rs)
+  * satisfiedBy: [knowledgegraph.rs](../../../core/src/html/pages/knowledgegraph.rs)
   * satisfiedBy: [ontologies.rs](../../../core/src/html/pages/ontologies.rs)
   * satisfiedBy: [html_export.rs](../../../core/src/html_export.rs)
   * satisfiedBy: [index_generator.rs](../../../core/src/index_generator.rs)
@@ -33,22 +36,81 @@ The system SHALL generate comprehensive HTML documentation with all model artifa
   * verifiedBy: [HTML Export Verification](Verifications/WebInterfaceVerifications.md#html-export-verification)
 ---
 
-### Ontologies View Generation
+### SPA Explorer Shell and Project Store
 
-The system shall generate an Ontologies HTML page during export and serve workflows that presents ontology and SHACL semantics through an OWL-aware model viewer instead of a raw RDF triple graph.
+The system shall generate `index.html` as the single-page Reqvire Explorer shell and seed it with a normalized browser-local Project Store that supports the primary Explorer routes and supporting report/detail views as the canonical browser experience.
 
 #### Details
-The Ontologies page shall:
+The SPA Explorer shell shall:
+- Be a native static single-page application built with Vite, TypeScript, and React, using Radix Themes 3 with `@radix-ui/react-icons` and compiled Tailwind, exported as `index.html` plus deterministic `assets/explorer.js` and `assets/explorer.css` bundles with no CDN-loaded framework or stylesheet and no runtime Tailwind compiler.
+- Treat `index.html` as the primary browser entry point and central Project Store host.
+- Render the primary Model route as a native SPA view module reading from the Project Store. The Model route shall host List, Grid, Sunburst, and Icicle modes over the Project Store filesystem/model and containment projections.
+- Render specialist Knowledge Graph, Ontologies, Traces, and KN2 routed views from right vertical tool-rail icons, and render supporting Search, file deep links, Coverage, Resources, and element-detail workflows from the same Project Store without making them primary left-pane navigation modes.
+- Open element-detail routes in an in-shell scrollable modal backed by Project Store element records, preserving the current Explorer view context behind the modal.
+- Do not generate standalone Explorer/report HTML entry points.
+- Seed a normalized project snapshot that distinguishes exported filesystem/source file containers from modeled resource and evidence-file targets.
+- Keep containment, model, knowledge graph, verification traces, coverage, resources, ontology, search, summaries, and route state as view-neutral store projections rather than separate page-local data models.
+- Preserve the current relation model: capabilities attach ontology and are specified/verified; requirements own refinements, satisfaction evidence, verification evidence, and reusable refinement attachments.
+
+#### Metadata
+  * type: requirement
+
+#### Concept References
+  * Project Store: reqvire:BrowserLocalProjectStore
+  * Explorer Route: reqvire:ExplorerRoute
+  * File Container: reqvire:FileContainer
+  * Resource Reference: reqvire:ModeledResource
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * refinedBy: [SPA Explorer Store Contract Refinement Specification](Specifications.md#spa-explorer-store-contract-refinement-specification)
+  * refinedBy: [Explorer Store Seed Data Output Specification](../../Functional/Output/Specifications.md#explorer-store-seed-data-output-specification)
+  * verifiedBy: [SPA Explorer Store Contract Verification](Verifications/WebInterfaceVerifications.md#spa-explorer-store-contract-verification)
+---
+
+### Project Knowledge Graph View
+
+The system shall expose a Knowledge Graph view during export and serve workflows as a specialist Explorer route. The view presents the actual parsed project graph as current elements and facts.
+
+#### Details
+The Knowledge Graph view shall:
+- Answer what actual project elements and facts exist right now.
+- Be reached through the canonical `index.html#/knowledge-graph` Explorer route from the right vertical tool rail; a separate Knowledge Graph HTML entry point shall not be generated as standalone Explorer output.
+- Render the four system-model layers as first-class graph nodes: ontologies, capabilities, requirements, and verifications. Requirement-owned refinements may appear as subordinate requirement detail/contract nodes when actual project facts reference them, but they are not a separate system-model layer.
+- Render actual relation facts, attachment facts, concept-reference facts, file targets, and external targets as graph edges or resource nodes.
+- Use Reqvire capability-root submodels as the structural graph partitioning contract; attachments, concept references, verification/satisfaction, and trace facts are overlays rather than submodel boundaries.
+- Treat structural ownership/backbone relations separately from cross-layer evidence relations: `derive` and `specify` organize the capability/requirement submodel backbone, while requirement-owned `refine`, `attach`, `satisfiedBy`, `verifiedBy`, `trace`, and concept-reference facts connect subordinate details or layers as inspectable overlays.
+- Reuse the dense Explorer graph-and-inspector interaction pattern used by the ontology viewer, while focusing on project instances rather than ontology vocabulary definitions.
+- Provide inspector evidence for element type, identifier, source location, governance, metadata, incoming facts, outgoing facts, attachments, and concept references.
+- Keep ontology vocabulary exploration in the Ontologies view; the Knowledge Graph view may show ontology terms only when they are referenced by actual project elements.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [HTML Export](#html-export)
+  * refinedBy: [Project Knowledge Graph View Refinement Specification](Specifications.md#project-knowledge-graph-view-refinement-specification)
+  * satisfiedBy: [knowledgegraph.rs](../../../core/src/html/pages/knowledgegraph.rs)
+  * satisfiedBy: [kn2.rs](../../../core/src/html/pages/kn2.rs)
+  * verifiedBy: [HTML Generation Integration Verification](Verifications/HTMLGenerationVerifications.md#integration-test-verification)
+---
+
+### Ontologies View Generation
+
+The system shall expose an Ontologies Explorer view during export and serve workflows that presents ontology and SHACL semantics through an OWL-aware model viewer instead of a raw RDF triple graph.
+
+#### Details
+The Ontologies view shall:
 - Use RDF/Turtle and SHACL blocks as the parsed semantic source, while avoiding raw RDF serialization artifacts as the primary user-facing visualization.
-- Present ontology concepts as typed visual entities such as classes, object properties, datatype properties, named individuals, SHACL shapes, and datatypes, while keeping literal constraints and datatype-property literal values as inspector/search evidence rather than primary graph nodes.
-- Treat ontology properties as first-class visual nodes with domain, range, inverse, equivalence, chain, and characteristic information when those axioms are present.
+- Present ontology concepts as typed visual entities such as classes, named individuals, SHACL shapes, datatypes, restrictions, and class expressions, while keeping literal constraints and datatype-property literal values as inspector/search evidence rather than primary graph nodes.
+- Treat ontology properties as labeled relationship semantics between their domain/range terms, not as standalone graph nodes, while retaining domain, range, inverse, equivalence, chain, and characteristic information as inspector/search evidence when those axioms are present.
 - Derive class slots and slot facets from SHACL target-class/property-shape constraints so users can inspect datatype or object range, cardinality, pattern, node-kind, and allowed-value constraints without navigating raw SHACL blank nodes.
-- Show named property nodes as reusable slots, including each target class and source shape that uses that property as a `sh:path`, so repeated property usages are understandable rather than presented as duplicate property definitions.
+- Show named properties as reusable slots in the selected class or term inspector, including each target class and source shape that uses that property as a `sh:path`, so repeated property usages are understandable rather than presented as duplicate property definitions.
 - Use a defined ontology symbol and badge vocabulary so rendered symbols are stable, documented, and accessible.
 - Consume generated ontology projection facts from the semantic export context so the HTML explorer and `reqvire ontologies --full` describe the same ontology constructs.
-- Prioritize graph canvas space by using a dense full-height viewer layout with a scroll-contained inspector sidebar.
+- Prioritize graph canvas space by using a dense full-height viewer layout with a scroll-contained shared `Inspector` lane.
 - Separate normalized ontology constructs and SHACL-derived slots/facets from optional raw SHACL evidence; empty raw-evidence sections shall not be shown.
-- Apply viewer filters as explicit visibility contracts: role and origin filters determine node visibility, while construct filters determine construct overlays, badges, slot/facet sections, and construct evidence for nodes that remain visible.
+- Apply viewer filters as explicit visibility contracts: the single `Show` control group determines coarse node/resource visibility and relation visibility, the SHACL shapes control governs both SHACL shape nodes and SHACL overlay relations, datatype/object property controls are named as property-link controls, and other construct notation remains available as passive legend and inspector evidence.
 - Keep linked source citations in the viewer and the exported `ontologies.ttl` artifact available for traceability and downstream tooling without rendering raw Turtle blocks as the primary page content.
 
 #### Metadata
@@ -65,7 +127,7 @@ The Ontologies page shall:
   * derivedFrom: [HTML Export](#html-export)
   * trace: [Ontology Projection Subgraph Materialization](../../Functional/Output/Reporting.md#ontology-projection-subgraph-materialization)
   * refinedBy: [Ontologies View Generation Refinement Specification](Specifications.md#ontologies-view-generation-refinement-specification)
-  * verifiedBy: [Ontology Model Viewer Analysis Verification](Verifications/WebInterfaceVerifications.md#ontology-model-viewer-analysis-verification)
+  * refinedBy: [Ontology Rendering Details](OntologyRenderingDetails.md#ontology-rendering-details)
 ---
 
 ### OWL Semantic Ontology Projection
@@ -86,10 +148,10 @@ The projection shall classify terms by semantic role, preserve source traceabili
 
 ### Ontology Property-Centric Visualization
 
-The system shall render OWL object properties and datatype properties as first-class visual entities rather than only as repeated arcs between domain and range classes.
+The system shall render OWL object properties and datatype properties as first-class relationship semantics: properties appear as labeled domain/range edges and inspector evidence, rather than standalone graph boxes.
 
 #### Details
-The property visualization shall aggregate many domain and range classes without multiplying identical property arcs, distinguish object-property ranges from datatype-property ranges, and show property semantics through compact labels, compartments, badges, or inspector sections. When a named property is used by multiple SHACL property shapes, the property inspector shall present those as target-class usages with source-shape evidence rather than as duplicate property definitions.
+The property visualization shall aggregate many domain and range classes without multiplying identical property arcs, distinguish object-property ranges from datatype-property ranges, and show property semantics through compact edge labels, badges, or inspector sections on selected classes, individuals, and terms. When a named property is used by multiple SHACL property shapes, the inspector shall present those as target-class usages with source-shape evidence rather than as duplicate property definitions.
 
 #### Metadata
   * type: requirement

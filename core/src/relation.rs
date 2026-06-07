@@ -430,8 +430,8 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// - verify: Source must be verification, target must be capability or requirement
 /// - satisfiedBy: Source must be system requirement (requirement) or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
-/// - refinedBy: Source must be capability or requirement, target must be compatible refinement element
-/// - refine: Source must be refinement element, target must be compatible owner
+/// - refinedBy: Source must be requirement, target must be compatible refinement element
+/// - refine: Source must be refinement element, target must be requirement
 /// - trace: Any non-refinement element type can use trace
 /// - Refinement types (constraint, behavior, specification): Can only have refine relations
 /// - Other type: Can only use trace relations
@@ -531,11 +531,11 @@ pub fn validate_relation_element_types(
             source_valid && target_valid
         }
         "refinedBy" => match (source_type, target_type) {
-            (ElementType::Capability, refinement) if refinement.is_capability_refinement() => true,
             (
                 ElementType::Requirement(_),
                 ElementType::Refinement(
-                    RefinementType::SemanticContract
+                    RefinementType::Source
+                    | RefinementType::SemanticContract
                     | RefinementType::SemanticQueryContract
                     | RefinementType::Constraint
                     | RefinementType::Behavior
@@ -547,10 +547,10 @@ pub fn validate_relation_element_types(
             _ => false,
         },
         "refine" => match (source_type, target_type) {
-            (refinement, ElementType::Capability) if refinement.is_capability_refinement() => true,
             (
                 ElementType::Refinement(
-                    RefinementType::SemanticContract
+                    RefinementType::Source
+                    | RefinementType::SemanticContract
                     | RefinementType::SemanticQueryContract
                     | RefinementType::Constraint
                     | RefinementType::Behavior
@@ -584,8 +584,8 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "verify" => Some("'verify' should connect a verification element to a capability or requirement".to_string()),
         "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; capability is not allowed".to_string()),
         "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; capability is not allowed".to_string()),
-        "refinedBy" => Some("'refinedBy' should connect a capability or requirement to a compatible refinement element; semantic-contract is requirement-owned only".to_string()),
-        "refine" => Some("'refine' should connect a compatible refinement element to its owner; semantic-contract must refine a requirement".to_string()),
+        "refinedBy" => Some("'refinedBy' should connect a requirement to a compatible refinement element. Refinements are requirement-owned only; capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.".to_string()),
+        "refine" => Some("'refine' should connect a compatible refinement element to a requirement. Refinements are requirement-owned only; capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }

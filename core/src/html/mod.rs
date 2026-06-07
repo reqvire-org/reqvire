@@ -2,22 +2,23 @@
 ///
 /// This module provides component-based HTML generation with:
 /// - Type-safe HTML via Maud macros (compile-time validation)
-/// - Responsive design with Tailwind CSS
-/// - Reusable components (navigation, layouts)
-/// - Mobile-first approach with hamburger menu
+/// - Responsive source/specification document design with Tailwind CSS
+/// - Reusable components (source-page route links, layouts)
+/// - Compact source-page route links and contextual help modal
 ///
 /// # Architecture
 ///
 /// - `layouts`: Base layouts (standard page, diagram page)
-/// - `components`: Reusable components (head, navigation, footer)
-/// - `styles`: CSS generation (Tailwind CDN + custom overrides)
-/// - `scripts`: JavaScript utilities (mobile menu toggle)
+/// - `components`: Reusable components (head, navigation)
+/// - `styles`: source/specification page CSS generation (Tailwind CDN + custom overrides)
+/// - `scripts`: JavaScript utilities
 /// - `pages`: Page-specific generators (to be implemented in Phase 2/3)
 /// - `visualizations`: Visualization components (to be implemented in Phase 2/3)
 mod components;
 mod layouts;
 pub mod markdown;
 mod scripts;
+pub mod store;
 mod styles;
 
 pub mod pages;
@@ -26,9 +27,6 @@ pub mod visualizations;
 // Re-export commonly used items
 pub use layouts::{base, diagram_layout};
 pub use maud::Markup;
-
-// Re-export page generators for external use
-pub use pages::{coverage, index, model, ontologies, resources, traceflow, traces};
 
 use crate::error::ReqvireError;
 use std::path::{Path, PathBuf};
@@ -66,11 +64,6 @@ pub fn convert_to_html(
         "SpecificationIndex.md" | "index.md" => {
             pages::index::render(&html_content, &nav_prefix).into_string()
         }
-        "model.md" => pages::model::render(&html_content, &nav_prefix).into_string(),
-        "traces.md" => pages::traces::render(&html_content, &nav_prefix).into_string(),
-        "traceflow.md" => pages::traceflow::render(&html_content, &nav_prefix).into_string(),
-        "coverage.md" => pages::coverage::render(&html_content, &nav_prefix).into_string(),
-        "resources.md" => pages::resources::render(&html_content, &nav_prefix).into_string(),
         _ => {
             // Default: standard page for specification files
             // Check if content contains diagrams and include appropriate scripts
@@ -153,49 +146,6 @@ pub fn generate_diagram_page(title: &str, diagram: Markup, nav_prefix: &str) -> 
     layouts::diagram_layout(title, diagram, nav_prefix).into_string()
 }
 
-/// Generate coverage page from HTML content
-///
-/// # Arguments
-/// * `html_content` - Pre-converted HTML content from markdown
-/// * `nav_prefix` - Relative path prefix for navigation links
-///   Generate coverage page with new component system
-pub fn generate_coverage_page(html_content: &str, nav_prefix: &str) -> String {
-    pages::coverage::render(html_content, nav_prefix).into_string()
-}
-
-/// Generate model page with new component system and Mermaid support
-pub fn generate_model_page(html_content: &str, nav_prefix: &str) -> String {
-    pages::model::render(html_content, nav_prefix).into_string()
-}
-
-/// Generate index/containment page with new component system
-pub fn generate_index_page(html_content: &str, nav_prefix: &str) -> String {
-    pages::index::render(html_content, nav_prefix).into_string()
-}
-
-/// Generate verification traces page with new component system and Mermaid support
-pub fn generate_traces_page(html_content: &str, nav_prefix: &str) -> String {
-    pages::traces::render(html_content, nav_prefix).into_string()
-}
-
-/// Generate TraceFlow page with new component system
-pub fn generate_traceflow_page(html_content: &str, nav_prefix: &str) -> String {
-    pages::traceflow::render(html_content, nav_prefix).into_string()
-}
-
-/// Generate resources page with new component system
-pub fn generate_resources_page(html_content: &str, nav_prefix: &str) -> String {
-    pages::resources::render(html_content, nav_prefix).into_string()
-}
-
-/// Generate ontologies page with new component system
-pub fn generate_ontologies_page(
-    report: &crate::semantic_contract::SemanticIndex,
-    nav_prefix: &str,
-) -> String {
-    pages::ontologies::render(report, nav_prefix).into_string()
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -220,7 +170,7 @@ mod tests {
         assert!(page.contains("<!DOCTYPE html>"));
         assert!(page.contains("<title>Model</title>"));
         assert!(page.contains("Diagram"));
-        assert!(page.contains("href=\"../index.html\""));
+        assert!(page.contains("href=\"../index.html#/model\""));
     }
 
     #[test]
@@ -228,13 +178,17 @@ mod tests {
         let content = html! { p { "Content" } };
         let page = generate_page("Test", content, "");
 
-        // Check all navigation items present
-        assert!(page.contains("Containment"));
+        // Source-page navigation targets canonical SPA views, not standalone Explorer pages.
+        assert!(page.contains("reqvire-nav"));
+        assert!(page.contains("href=\"index.html#/model\""));
         assert!(page.contains("Model"));
         assert!(page.contains("Traces"));
-        assert!(page.contains("TraceFlow"));
-        assert!(page.contains("Coverage"));
-        assert!(page.contains("Resources"));
+        assert!(page.contains("Ontologies"));
+        assert!(page.contains("KN2"));
+        assert!(!page.contains("href=\"index.html#/knowledge-graph\""));
+        assert!(!page.contains("#/traceflow"));
+        assert!(!page.contains("#/coverage"));
+        assert!(!page.contains("#/resources"));
     }
 
     #[test]
@@ -253,10 +207,9 @@ mod tests {
         let content = html! { p { "Content" } };
         let page = generate_page("Test", content, "");
 
-        // Check viewport meta tag and footer present
+        // Check viewport meta tag is present and no generated footer wastes space.
         assert!(page.contains("viewport"));
-        assert!(page.contains("Generated by"));
-        assert!(page.contains("Reqvire"));
+        assert!(!page.contains("Generated by"));
     }
 
     #[test]
@@ -265,7 +218,6 @@ mod tests {
         let page = generate_page("Test", content, "../../");
 
         // Check navigation links use prefix
-        assert!(page.contains("href=\"../../index.html\""));
-        assert!(page.contains("href=\"../../model.html\""));
+        assert!(page.contains("href=\"../../index.html#/model\""));
     }
 }

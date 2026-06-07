@@ -24,7 +24,7 @@ ${1:-The user will provide capability details.}
 
 This command orchestrates the complete workflow:
 1. Define the coherent operational/system ability.
-2. Add source, ontology, or capability-owned refinement elements when shared domain language or capability-level contracts matter.
+2. Attach ontology when shared domain language matters.
 3. Create requirements that `specify` the capability.
 4. Create verifications for the capability or leaf requirements.
 5. Validate and check coverage.
@@ -58,8 +58,8 @@ This command orchestrates the complete workflow:
 
 3. **Add ontology context when needed:**
 
-   Use source, compatible refinements, or `ontology` elements when the capability needs reusable vocabulary, ontology terms, source authority, or shared SHACL/OWL contract language. Add ontology elements under `requirements/Ontologies`, then attach them from the consuming capability.
-   Ontology attached by capabilities should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible refinements owned by the relevant capability or requirement; semantic contracts are requirement-owned only.
+   Use `ontology` elements when the capability needs reusable vocabulary, ontology terms, source authority, or shared OWL contract language. Add ontology elements under `requirements/Ontologies`, then attach them from the consuming capability.
+   Ontology attached by capabilities should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible refinements owned by the relevant requirement; semantic contracts are requirement-owned only.
 
    For broader semantic contract refactoring, use:
    ```bash
@@ -105,7 +105,7 @@ This command orchestrates the complete workflow:
 ```
 /reqvire:add-capability
   ├─> create capability graph node
-  ├─> add source/refinement ownership and ontology attachments when needed
+  ├─> add ontology attachments when needed
   ├─> /reqvire:add-requirement (specifies capability)
   ├─> /reqvire:add-requirement (child requirement, if needed)
   ├─> /reqvire:add-verification (for leaf requirement)

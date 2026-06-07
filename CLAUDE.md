@@ -119,10 +119,18 @@ cli/src/
 - Document all public APIs with rustdoc
 - Organize code in modules by functionality
 
+## Model Contract
+
+The Reqvire system model has four first-class layers: ontology, capability, requirement, and verification. Refinements are requirement-owned subordinate details/contracts only, not a system-model layer.
+
+Capabilities may derive child capabilities, attach ontology, be specified by requirements, and be verified. Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, `semantic-contract`, or `semantic-query-contract` refinements through `refinedBy`/`refine`.
+
+Requirement-owned refinement types are `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, `semantic-contract`, and `semantic-query-contract`.
+
 ## Important Notes
 
 - Use the `/tmp` directory to store JSON outputs for further analysis
 - ALWAYS prefer editing existing files in the codebase over creating new ones
 - NEVER proactively create documentation files (*.md) or README files unless explicitly requested
 - Only use emojis if the user explicitly requests it
-- **CRITICAL**: always update www.reqvire.org/docs documentation when reqvire capabilities and functionality changes.
+- Update generated docs/www only when the task explicitly asks for generated documentation updates.

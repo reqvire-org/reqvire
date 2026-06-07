@@ -50,7 +50,7 @@ An attachment target is valid only when it matches the attaching element family:
 - Requirements must not attach ontology directly.
 - Requirement attachments target requirement-owned refinements only: `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output`.
 - Requirement-owned refinements must have a `refine` relation to exactly one compatible requirement owner before they can be attached.
-- Capability-owned refinements are not cross-subgraph attachment contracts.
+- Capabilities must not own refinements; invalid capability refinement ownership edges are not cross-subgraph attachment contracts.
 - Refinements without a valid `refine` relation cannot be attached anywhere.
 
 Attachment compatibility is defined by the Reqvire relation, capability, requirement, ontology, semantic-contract, and semantic-query-contract model contracts.
@@ -90,7 +90,7 @@ Canonical relation compatibility is defined by the Reqvire relation ontology, co
 Validation shall enforce those model contracts so that:
 - hierarchy relations stay within capability, requirement, or ontology hierarchy families
 - `specify`/`specifiedBy` is the requirement-to-capability bridge
-- `refine`/`refinedBy` follows subtype-compatible refinement ownership
+- `refine`/`refinedBy` is limited to requirement-owned subordinate refinement details and contracts
 - `satisfiedBy`/`satisfy` is limited to requirement and evidence-backed verification satisfaction
 - `trace` remains trace-only for custom element types
 

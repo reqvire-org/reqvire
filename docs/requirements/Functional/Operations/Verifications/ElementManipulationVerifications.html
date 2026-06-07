@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../../coverage.html" class="nav-link">Coverage</a><a href="../../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../../model.html" class="mobile-nav-link">Model</a><a href="../../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -368,10 +467,13 @@
       f7d422af274a64cf["Add Command Error Messages Test"];
       class f7d422af274a64cf verification;
       click f7d422af274a64cf "ElementManipulationVerifications.html#add-command-error-messages-test";
-      868e15205b620ba2["CLI Add Element Test<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      65f1ed4cf8dab788["Atomic Relation Relink Test"];
+      class 65f1ed4cf8dab788 verification;
+      click 65f1ed4cf8dab788 "ElementManipulationVerifications.html#atomic-relation-relink-test";
+      868e15205b620ba2["CLI Add Element Test<br/>📎 Element Ordering Behavior"];
       class 868e15205b620ba2 verification;
       click 868e15205b620ba2 "ElementManipulationVerifications.html#cli-add-element-test";
-      d4a6f578d691e888["CLI Move Element Test<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      d4a6f578d691e888["CLI Move Element Test<br/>📎 Element Ordering Behavior"];
       class d4a6f578d691e888 verification;
       click d4a6f578d691e888 "ElementManipulationVerifications.html#cli-move-element-test";
       7d317f5d862a0785["CLI Move File Test"];
@@ -383,7 +485,7 @@
       7701c4bcfa966fe6["CLI Rename Element Test"];
       class 7701c4bcfa966fe6 verification;
       click 7701c4bcfa966fe6 "ElementManipulationVerifications.html#cli-rename-element-test";
-      221f6c008823a4d0["Create Element Override Test<br/>📎 requirements/Functional/Operations/Behaviors.md#create-element-override-behavior"];
+      221f6c008823a4d0["Create Element Override Test<br/>📎 Create Element Override Behavior"];
       class 221f6c008823a4d0 verification;
       click 221f6c008823a4d0 "ElementManipulationVerifications.html#create-element-override-test";
       d5bf7d0addaf6d19["Create Element Test"];
@@ -392,7 +494,7 @@
       bfd28e1e74918526["Delete Element Test"];
       class bfd28e1e74918526 verification;
       click bfd28e1e74918526 "ElementManipulationVerifications.html#delete-element-test";
-      362774efb36e2279["File Persistence Test<br/>📎 requirements/Functional/Operations/Behaviors.md#element-ordering-behavior"];
+      362774efb36e2279["File Persistence Test<br/>📎 Element Ordering Behavior"];
       class 362774efb36e2279 verification;
       click 362774efb36e2279 "ElementManipulationVerifications.html#file-persistence-test";
       410dbe84dc2c3481["Link Command Cross-Section Detection Test"];
@@ -429,6 +531,10 @@
   class fe0a74a2cd2af425 default;
   click fe0a74a2cd2af425 "../../../../tests/test-add-command-error-messages/test.sh";
   f7d422af274a64cf -->|satisfiedBy| fe0a74a2cd2af425;
+  8f3780989fe6dbaf["test.sh"];
+  class 8f3780989fe6dbaf default;
+  click 8f3780989fe6dbaf "../../../../tests/test-relink-command/test.sh";
+  65f1ed4cf8dab788 -->|satisfiedBy| 8f3780989fe6dbaf;
   7f91546dcec3d680["test.sh"];
   class 7f91546dcec3d680 default;
   click 7f91546dcec3d680 "../../../../tests/test-crud-manipulation/test.sh";
@@ -441,6 +547,10 @@
   7d317f5d862a0785 -->|satisfiedBy| 661275cf7a337c0e;
   c5f295328df58029 -->|satisfiedBy| 7f91546dcec3d680;
   7701c4bcfa966fe6 -->|satisfiedBy| 7f91546dcec3d680;
+  f10c783b357e0e6f["test.sh"];
+  class f10c783b357e0e6f default;
+  click f10c783b357e0e6f "../../../../tests/test-crud-override/test.sh";
+  221f6c008823a4d0 -->|satisfiedBy| f10c783b357e0e6f;
   d5bf7d0addaf6d19 -->|satisfiedBy| 7f91546dcec3d680;
   bfd28e1e74918526 -->|satisfiedBy| 7f91546dcec3d680;
   3ca44151e0210bb1["test.sh"];
@@ -452,15 +562,25 @@
   class e2ae1addbaec6335 default;
   click e2ae1addbaec6335 "../../../../tests/test-link-unlink/test.sh";
   ea3a2bf2fbe74057 -->|satisfiedBy| e2ae1addbaec6335;
+  1713fb38fd4be4bf["test.sh"];
+  class 1713fb38fd4be4bf default;
+  click 1713fb38fd4be4bf "../../../../tests/test-document-operation-constraints/test.sh";
+  c7b35d6963f1017 -->|satisfiedBy| 1713fb38fd4be4bf;
+  80a06703e90d8ba1["test.sh"];
+  class 80a06703e90d8ba1 default;
+  click 80a06703e90d8ba1 "../../../../tests/test-merge-elements/test.sh";
+  c7b35d6963f1017 -->|satisfiedBy| 80a06703e90d8ba1;
   99e20055749fc61e["test.sh"];
   class 99e20055749fc61e default;
   click 99e20055749fc61e "../../../../tests/test-crud-empty-file-cleanup/test.sh";
   9ae2cd53e62b6a33 -->|satisfiedBy| 99e20055749fc61e;
   9ae2cd53e62b6a33 -->|satisfiedBy| 7f91546dcec3d680;
+  9ae2cd53e62b6a33 -->|satisfiedBy| 1713fb38fd4be4bf;
   6d7253e029455f50["test.sh"];
   class 6d7253e029455f50 default;
   click 6d7253e029455f50 "../../../../tests/test-crud-mv-file-squash/test.sh";
   af599fec38b8c0bf -->|satisfiedBy| 6d7253e029455f50;
+  af599fec38b8c0bf -->|satisfiedBy| 1713fb38fd4be4bf;
   87a76fd329b99a81["test.sh"];
   class 87a76fd329b99a81 default;
   click 87a76fd329b99a81 "../../../../tests/test-crud-relation-consistency/test.sh";
@@ -555,10 +675,74 @@
 <h4>Relations</h4>
 <ul>
 <li>satisfiedBy: <a href="../../../../tests/test-add-command-error-messages/test.sh">test.sh</a></li>
-<li>verify: <a href="../../Core/Validation.html#enhanced-validation-error-reporting">Enhanced Validation Error Reporting</a></li>
 <li>verify: <a href="../../Core/Validation.html#markdown-structure-validator">Markdown Structure Validator</a></li>
+<li>verify: <a href="../../Core/Validation.html#validation-error-handling">Validation Error Handling</a></li>
 <li>verify: <a href="../../../Interfaces/CLI/Commands.html#cli-add-element-command">CLI Add Element Command</a></li>
 <li>verify: <a href="../../../Interfaces/CLI/Commands.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></li>
+</ul>
+<hr />
+<h3 id="atomic-relation-relink-test">Atomic Relation Relink Test</h3>
+<p>This test verifies atomic relation relink behavior, including hierarchical subgraph relinks and rollback on validation failures.</p>
+<h4>Details</h4>
+<h5>Acceptance Criteria</h5>
+<ul>
+<li>Relink rewires relation targets atomically with no partial persistence on failure.</li>
+<li>Hierarchical relink supports subgraph boundary use cases.</li>
+<li>Candidate relink state is validated before persistence.</li>
+<li>Relink rejects operations that would create circular dependencies.</li>
+<li>Relink rejects operations that violate single-root ownership.</li>
+<li>Relink rejects operations that violate single-root ownership with deterministic command error output.</li>
+</ul>
+<h5>Test Criteria</h5>
+<ol>
+<li>
+<p><strong>Successful relink:</strong></p>
+<ul>
+<li>Command: <code>reqvire relink &lt;source&gt; &lt;relation-type&gt; &lt;old-target&gt; &lt;new-target&gt;</code></li>
+<li>Relink an existing relation from old target to new target.</li>
+<li>Assert success exit code and deterministic diff output.</li>
+</ul>
+</li>
+<li>
+<p><strong>Circular dependency rejection:</strong></p>
+<ul>
+<li>Attempt relink that introduces cycle.</li>
+<li>Assert non-zero exit and no persisted changes.</li>
+</ul>
+</li>
+<li>
+<p><strong>Single-root rejection:</strong></p>
+<ul>
+<li>Attempt hierarchical relink producing multi-root ownership.</li>
+<li>Assert non-zero exit, deterministic single-root ownership error output, and no persisted changes.</li>
+</ul>
+</li>
+<li>
+<p><strong>Dry-run behavior:</strong></p>
+<ul>
+<li>Run <code>reqvire relink ... --dry-run</code>.</li>
+<li>Assert reported changes with no file persistence.</li>
+</ul>
+</li>
+<li>
+<p><strong>JSON output behavior:</strong></p>
+<ul>
+<li>Run <code>reqvire relink ... --dry-run --json</code>.</li>
+<li>Assert valid JSON using the shared CRUD result structure.</li>
+<li>Run <code>reqvire relink ... --dry-run --json --output &lt;FILE&gt;</code>.</li>
+<li>Assert the output file is written and contains valid JSON.</li>
+</ul>
+</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-relink-command/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#atomic-relation-relink-operation">Atomic Relation Relink Operation</a></li>
+<li>verify: <a href="../../../Interfaces/CLI/Commands.html#cli-relink-command">CLI Relink Command</a></li>
 </ul>
 <hr />
 <h3 id="cli-add-element-test">CLI Add Element Test</h3>
@@ -579,10 +763,10 @@
 <li>Verify git-style diff is output showing changes</li>
 <li>Verify file is modified on disk</li>
 </ol>
-<p><strong>Test Steps - Inline String:</strong></p>
+<p><strong>Test Steps - Content Flag:</strong></p>
 <ol>
-<li>Run <code>reqvire add &lt;file&gt; "### Element..."</code></li>
-<li>Verify element is read from inline argument</li>
+<li>Run <code>reqvire add &lt;file&gt; --content "### Element..."</code></li>
+<li>Verify element is read from –content argument</li>
 <li>Verify element is validated and inserted</li>
 <li>Verify git-style diff is output</li>
 </ol>
@@ -615,7 +799,7 @@
 <p><strong>Success Criteria:</strong></p>
 <ul>
 <li>Reads from stdin when piped</li>
-<li>Reads from inline argument when provided</li>
+<li>Reads from –content argument when provided</li>
 <li>Validates before insertion</li>
 <li>Inserts following Element Ordering Behavior</li>
 <li>Shows git-style diff by default</li>
@@ -926,13 +1110,23 @@
 </ul>
 <hr />
 <h3 id="create-element-override-test">Create Element Override Test</h3>
-<p>Test verifies that create element with override mode correctly replaces existing elements:</p>
+<p>Test verifies <code>add --override</code> behavior as asserted by the override E2E script.</p>
+<h4>Details</h4>
+<p>Test cases:</p>
 <ol>
-<li>Create initial element “Test Element” in target file</li>
-<li>Run create element with override for “Test Element” with new content</li>
-<li>Verify old element content is replaced with new content</li>
-<li>Verify operation reports as “Update”</li>
-<li>Verify element relations are preserved from new content only</li>
+<li>Override existing element content and assert command output contains <code>Updated</code>.</li>
+<li>Compare resulting file content to expected fixture after override.</li>
+<li>Verify model validation succeeds after successful override.</li>
+<li>Attempt duplicate add without <code>--override</code> and assert command fails.</li>
+<li>Run <code>--override</code> for a non-existent element and assert operation succeeds (acts as add).</li>
+<li>Attempt override that would orphan children and assert failure:
+<ul>
+<li>error mentions orphaning</li>
+<li>error names <code>Capability B</code></li>
+<li>error includes remediation guidance</li>
+</ul>
+</li>
+<li>Override an element without children and assert success with <code>Updated</code> output.</li>
 </ol>
 <h4>Metadata</h4>
 <ul>
@@ -944,6 +1138,7 @@
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>satisfiedBy: <a href="../../../../tests/test-crud-override/test.sh">test.sh</a></li>
 <li>verify: <a href="../ElementManipulation.html#create-element-operation">Create Element Operation</a></li>
 </ul>
 <hr />
@@ -1084,6 +1279,27 @@
 <li>Delete the last remaining parent</li>
 <li>Verify the operation is rejected (child would be orphaned)</li>
 </ol>
+<p><strong>Test Steps - Semantic Reference Deletion Prevention:</strong></p>
+<ol>
+<li>Create an ontology element that declares an ontology term.</li>
+<li>Create another semantic contract whose Shapes section references that ontology term.</li>
+<li>Attempt to delete the declaring ontology element.</li>
+<li>Verify the operation is rejected before persistence.</li>
+<li>Verify the error includes the referencing semantic-contract identifier, reference kind, missing IRI, and the removed ontology identifier.</li>
+<li>Verify the declaring ontology remains in the source file.</li>
+</ol>
+<p><strong>Test Steps - Centralized Semantic Mutation Validation:</strong></p>
+<ol>
+<li>Attempt to add a semantic contract with a Shapes reference to an undeclared IRI.</li>
+<li>Verify <code>add</code> is rejected before persistence and reports the referencing contract, reference kind, missing IRI, and fix guidance.</li>
+<li>Attempt to add a semantic contract with a Shapes reference to an IRI declared outside reachable capability ontology context.</li>
+<li>Verify <code>add</code> is rejected before persistence and reports the referencing contract, reference kind, referenced IRI, declaring ontology, owner context, and guidance to attach the ontology to the owning or consuming capability.</li>
+<li>Attempt to unlink a capability ontology attachment that is required to make a semantic reference reachable.</li>
+<li>Verify <code>unlink</code> is rejected before persistence and the attachment remains in the source file.</li>
+<li>Attempt to override an ontology element that declares an ontology term referenced elsewhere with replacement content that no longer declares that term.</li>
+<li>Verify <code>add --override</code> is rejected before persistence and reports the removed declaration source.</li>
+<li>Verify the original declaring ontology remains in the source file after the failed override.</li>
+</ol>
 <p><strong>Success Criteria:</strong></p>
 <ul>
 <li>Element is completely removed from the source file</li>
@@ -1097,6 +1313,8 @@
 <li>Deletion of parent elements with orphaned children is rejected</li>
 <li>Error message clearly lists orphaned children with resolution guidance</li>
 <li>Deletion succeeds when children have other parent relations</li>
+<li>Deletion that would leave dangling semantic-contract SHACL references is rejected with actionable references before files are written</li>
+<li>Add, unlink, and override mutations that would leave dangling or outside-context semantic-contract SHACL references are rejected by the shared pre-persistence mutation validation</li>
 </ul>
 <p><strong>Test Coverage:</strong></p>
 <ul>
@@ -1110,6 +1328,11 @@
 <li>Delete parent element with children (single parent - rejected)</li>
 <li>Delete parent element with children having multiple parents (allowed)</li>
 <li>Error message validation for orphaned children prevention</li>
+<li>Delete ontology that would leave dangling semantic references (rejected)</li>
+<li>Add semantic contract with dangling semantic references (rejected)</li>
+<li>Add semantic contract with outside-context semantic references (rejected)</li>
+<li>Unlink capability ontology attachment required for ontology context reachability (rejected)</li>
+<li>Override ontology declaration source with replacement that drops the declaration (rejected)</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -1118,6 +1341,7 @@
 <h4>Relations</h4>
 <ul>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+<li>verify: <a href="../ElementManipulation.html#crud-semantic-contract-mutation-validation">CRUD Semantic Contract Mutation Validation</a></li>
 <li>verify: <a href="../ElementManipulation.html#delete-element-operation">Delete Element Operation</a></li>
 </ul>
 <hr />
@@ -1240,6 +1464,13 @@
 <li>Verify diff is shown</li>
 <li>Verify no changes are applied</li>
 </ol>
+<p><strong>Test Steps - JSON Output:</strong></p>
+<ol>
+<li>Run <code>reqvire link &lt;source&gt; &lt;relation-type&gt; &lt;target&gt; --dry-run --json</code></li>
+<li>Verify output is valid JSON using the shared CRUD result structure</li>
+<li>Run <code>reqvire link &lt;source&gt; &lt;relation-type&gt; &lt;target&gt; --dry-run --json --output &lt;FILE&gt;</code></li>
+<li>Verify output file is written and contains valid JSON</li>
+</ol>
 <p><strong>Test Steps - Validation:</strong></p>
 <ol>
 <li>Link with invalid relation type</li>
@@ -1250,6 +1481,8 @@
 <li>Verify error is reported</li>
 <li>Link from non-existent source</li>
 <li>Verify error is reported</li>
+<li>Link that introduces multi-root ownership in hierarchy</li>
+<li>Verify operation is rejected with deterministic single-root ownership error output and unchanged files</li>
 </ol>
 <p><strong>Test Steps - External URL Handling:</strong></p>
 <ol>
@@ -1257,7 +1490,7 @@
 <li>Verify relation is added with URL as target</li>
 <li>Attempt to attach external URL using ‘attaching’ keyword</li>
 <li>Verify operation fails with clear error message</li>
-<li>Verify error message mentions “external URL” and suggests using ‘trace’ relation</li>
+<li>Verify error message states that <code>attaching</code> requires a refinement element identifier target</li>
 </ol>
 <p><strong>Success Criteria:</strong></p>
 <ul>
@@ -1271,9 +1504,11 @@
 <li>Validates relation type against supported types</li>
 <li>Validates element type compatibility</li>
 <li>Supports –dry-run preview</li>
+<li>Supports –json structured output and –json –output file output</li>
 <li>Reports errors for invalid inputs</li>
+<li>Enforces single-root ownership: violating links are rejected with deterministic single-root ownership error output</li>
 <li>External URLs allowed for relations (trace, satisfiedBy, etc.)</li>
-<li>External URLs rejected for ‘attaching’ with helpful error message</li>
+<li>Non-identifier targets rejected for ‘attaching’ with clear identifier-target error message</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -1291,16 +1526,18 @@
 <h4>Details</h4>
 <p>Test cases:</p>
 <ol>
-<li><strong>Basic merge</strong>: Merge two requirements, verify content consolidation</li>
-<li><strong>Multi-element merge</strong>: Merge 3+ elements into target</li>
-<li><strong>Cross-file merge</strong>: Merge elements from different files</li>
-<li><strong>Relation merging</strong>: Verify relations are merged and deduplicated</li>
-<li><strong>Attachment merging</strong>: Verify attachments are merged and deduplicated</li>
-<li><strong>Type compatibility</strong>: Verify error when merging incompatible types</li>
-<li><strong>Cross-section duplicate</strong>: Verify error when merged result has cross-section duplicate</li>
-<li><strong>Relation redirection</strong>: Verify relations pointing to source are updated to target</li>
-<li><strong>Source deletion</strong>: Verify source elements are removed after merge</li>
-<li><strong>Dry-run mode</strong>: Verify no changes when –dry-run is used</li>
+<li><strong>Basic merge</strong>: merge two requirements and compare resulting file with expected fixture.</li>
+<li><strong>Source deletion</strong>: verify merged source element no longer appears in search results.</li>
+<li><strong>Relation redirection</strong>: verify relations that pointed to source now point to target.</li>
+<li><strong>Multi-element merge</strong>: merge multiple sources and compare resulting file with expected fixture.</li>
+<li><strong>Type compatibility error</strong>: merging incompatible types fails with type-mismatch message.</li>
+<li><strong>Merge into self error</strong>: merging an element into itself fails.</li>
+<li><strong>Non-existent source error</strong>: merge with missing source fails.</li>
+<li><strong>Dry-run mode</strong>: <code>--dry-run</code> does not modify files.</li>
+<li><strong>Relation deduplication</strong>: duplicate merged relation appears once.</li>
+<li><strong>Regression scenario</strong>: multi-source merge keeps target element present and model validates.</li>
+<li><strong>Document-to-elements rejection</strong>: merging a source from <code># Documents</code> into a target in <code># Elements</code> fails with explicit manual-migration guidance.</li>
+<li><strong>Single-root rejection</strong>: merge that would create multi-root hierarchy ownership fails with deterministic single-root ownership error output and persists no changes.</li>
 </ol>
 <h4>Metadata</h4>
 <ul>
@@ -1308,6 +1545,8 @@
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>satisfiedBy: <a href="../../../../tests/test-document-operation-constraints/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-merge-elements/test.sh">test.sh</a></li>
 <li>verify: <a href="../ElementManipulation.html#merge-element-operation">Merge Element Operation</a></li>
 </ul>
 <hr />
@@ -1374,6 +1613,7 @@
 <li>Move last element from file (triggers source file deletion)</li>
 <li>Move element leaving other elements (source file preserved)</li>
 <li>Verify element ordering after move (parent before children)</li>
+<li>Reject move into existing <code># Documents</code> target that would create multiple elements</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -1383,6 +1623,7 @@
 <ul>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-empty-file-cleanup/test.sh">test.sh</a></li>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-manipulation/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-document-operation-constraints/test.sh">test.sh</a></li>
 <li>verify: <a href="../ElementManipulation.html#move-element-operation">Move Element Operation</a></li>
 </ul>
 <hr />
@@ -1457,6 +1698,7 @@
 <li>Dry run mode with –squash</li>
 <li>JSON output mode with –squash</li>
 <li>Error: target file exists without –squash flag</li>
+<li>Error: <code>mv-file --squash</code> target is existing <code># Documents</code> file</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -1465,6 +1707,7 @@
 <h4>Relations</h4>
 <ul>
 <li>satisfiedBy: <a href="../../../../tests/test-crud-mv-file-squash/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-document-operation-constraints/test.sh">test.sh</a></li>
 <li>verify: <a href="../ElementManipulation.html#move-file-operation">Move File Operation</a></li>
 </ul>
 <hr />
@@ -1621,6 +1864,13 @@
 <li>Verify diff is shown</li>
 <li>Verify no changes are applied</li>
 </ol>
+<p><strong>Test Steps - JSON Output:</strong></p>
+<ol>
+<li>Run <code>reqvire unlink &lt;source&gt; &lt;target&gt; --dry-run --json</code></li>
+<li>Verify output is valid JSON using the shared CRUD result structure</li>
+<li>Run <code>reqvire unlink &lt;source&gt; &lt;target&gt; --dry-run --json --output &lt;FILE&gt;</code></li>
+<li>Verify output file is written and contains valid JSON</li>
+</ol>
 <p><strong>Test Steps - Error Cases:</strong></p>
 <ol>
 <li>Unlink non-existent relation</li>
@@ -1640,6 +1890,7 @@
 <li>Source resolves by file path first, then element name</li>
 <li>Target must be existing element name</li>
 <li>Supports –dry-run preview</li>
+<li>Supports –json structured output and –json –output file output</li>
 <li>Reports errors for non-existent relations</li>
 <li>Reports errors for invalid source/target</li>
 </ul>
@@ -1700,7 +1951,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -1709,10 +1961,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -1725,7 +1980,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -1743,6 +1998,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -2135,9 +2395,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

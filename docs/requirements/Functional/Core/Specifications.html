@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -362,33 +461,198 @@
 
   subgraph 8735c0a811307e57["📁 requirements/Functional/Core"]
     subgraph 525b4b735cf204bb["📄 Specifications.md"]
+      8720635a1cd26404["Attachment Scope Validation Refinement Specification"];
+      class 8720635a1cd26404 default;
+      click 8720635a1cd26404 "Specifications.html#attachment-scope-validation-refinement-specification";
+      61c0c91f5d9011b["Attachment Target Validation Refinement Specification"];
+      class 61c0c91f5d9011b default;
+      click 61c0c91f5d9011b "Specifications.html#attachment-target-validation-refinement-specification";
+      1353efe23a00f376["Capability Model Structure Specification"];
+      class 1353efe23a00f376 default;
+      click 1353efe23a00f376 "Specifications.html#capability-model-structure-specification";
+      d3a4af0c7830e650["Default Requirement Type Assignment Refinement Specification"];
+      class d3a4af0c7830e650 default;
+      click d3a4af0c7830e650 "Specifications.html#default-requirement-type-assignment-refinement-specification";
+      df10773d499c69c1["Element Size Estimate Model Build Specification"];
+      class df10773d499c69c1 default;
+      click df10773d499c69c1 "Specifications.html#element-size-estimate-model-build-specification";
       ad64383b5bdb4b7b["Element Type Metadata Specification"];
       class ad64383b5bdb4b7b default;
       click ad64383b5bdb4b7b "Specifications.html#element-type-metadata-specification";
+      fb486bf104caf606["Excluded File Relation Validation Refinement Specification"];
+      class fb486bf104caf606 default;
+      click fb486bf104caf606 "Specifications.html#excluded-file-relation-validation-refinement-specification";
       f95149e7369cd429["Git Repository Scope Specification"];
       class f95149e7369cd429 default;
       click f95149e7369cd429 "Specifications.html#git-repository-scope-specification";
+      6a217868a7f39318["Identifiers and Relations Refinement Specification"];
+      class 6a217868a7f39318 default;
+      click 6a217868a7f39318 "Specifications.html#identifiers-and-relations-refinement-specification";
       bce2fe8ffb765797["Ignore Files Specification"];
       class bce2fe8ffb765797 default;
       click bce2fe8ffb765797 "Specifications.html#ignore-files-specification";
+      1430d7b60ec1c791["Ignoring Unstructured Documents Refinement Specification"];
+      class 1430d7b60ec1c791 default;
+      click 1430d7b60ec1c791 "Specifications.html#ignoring-unstructured-documents-refinement-specification";
+      9b081d653b7c6fb3["Integrated Validation Refinement Specification"];
+      class 9b081d653b7c6fb3 default;
+      click 9b081d653b7c6fb3 "Specifications.html#integrated-validation-refinement-specification";
+      17cc29ccff3fb41d["Internal Consistency Validator Refinement Specification"];
+      class 17cc29ccff3fb41d default;
+      click 17cc29ccff3fb41d "Specifications.html#internal-consistency-validator-refinement-specification";
+      cd8a9af591fa197e["Ontology Annotation Convention Specification"];
+      class cd8a9af591fa197e default;
+      click cd8a9af591fa197e "Specifications.html#ontology-annotation-convention-specification";
+      d1b07b356a99eb61["Refinement Element Structure Constraints Refinement Specification"];
+      class d1b07b356a99eb61 default;
+      click d1b07b356a99eb61 "Specifications.html#refinement-element-structure-constraints-refinement-specification";
+      d688486d96aa9bfc["Relation Element Type Validator Refinement Specification"];
+      class d688486d96aa9bfc default;
+      click d688486d96aa9bfc "Specifications.html#relation-element-type-validator-refinement-specification";
+      76d641164354982e["Relation Types and behaviors Refinement Specification"];
+      class 76d641164354982e default;
+      click 76d641164354982e "Specifications.html#relation-types-and-behaviors-refinement-specification";
+      7aec12d2bfda4f69["Requirement Governance Metadata Specification"];
+      class 7aec12d2bfda4f69 default;
+      click 7aec12d2bfda4f69 "Specifications.html#requirement-governance-metadata-specification";
+      5daa4f3c15187fd5["Requirements Processing Refinement Specification"];
+      class 5daa4f3c15187fd5 default;
+      click 5daa4f3c15187fd5 "Specifications.html#requirements-processing-refinement-specification";
       bfa72151f513d464["Requirements Processing Specification"];
       class bfa72151f513d464 default;
       click bfa72151f513d464 "Specifications.html#requirements-processing-specification";
-      973db75b41c8556d["Reserved Files Specification"];
-      class 973db75b41c8556d default;
-      click 973db75b41c8556d "Specifications.html#reserved-files-specification";
+      f76de08278324f68["Semantic Contract Reference Context Validation Specification"];
+      class f76de08278324f68 default;
+      click f76de08278324f68 "Specifications.html#semantic-contract-reference-context-validation-specification";
+      91a719c39b871cd0["Semantic Contract Structure Specification"];
+      class 91a719c39b871cd0 default;
+      click 91a719c39b871cd0 "Specifications.html#semantic-contract-structure-specification";
+      6aa697deba497bde["Semantic Query Contract Structure Specification"];
+      class 6aa697deba497bde default;
+      click 6aa697deba497bde "Specifications.html#semantic-query-contract-structure-specification";
+      1051bcc3484f3543["Specification File Identification Refinement Specification"];
+      class 1051bcc3484f3543 default;
+      click 1051bcc3484f3543 "Specifications.html#specification-file-identification-refinement-specification";
+      21bb1a85358e322b["Structure and Addressing in Markdown Documents Refinement Specification"];
+      class 21bb1a85358e322b default;
+      click 21bb1a85358e322b "Specifications.html#structure-and-addressing-in-markdown-documents-refinement-specification";
+      d1493aad1b134797["Structured Markdown Files Search and Detection Refinement Specification"];
+      class d1493aad1b134797 default;
+      click d1493aad1b134797 "Specifications.html#structured-markdown-files-search-and-detection-refinement-specification";
       75dfb35477f838d5["Verification Type Selection Guidelines"];
       class 75dfb35477f838d5 default;
       click 75dfb35477f838d5 "Specifications.html#verification-type-selection-guidelines";
     end
   end
 </div>
+<h3 id="attachment-scope-validation-refinement-specification">Attachment Scope Validation Refinement Specification</h3>
+<h4>Details</h4>
+<p>When validating attachments, the system is expected to enforce attachment scope constraints for refinement-element identifier targets and report errors with clear messages indicating the attaching element, the attachment target, and the reason for the violation.</p>
+<p>Attachment scope validation is expected to enforce:</p>
+<ul>
+<li>Hierarchical independence from the refinement’s defining hierarchy</li>
+<li>Upstream propagation within a hierarchy branch</li>
+<li>One-direction attachment flow between capability-root subgraphs</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Validation.html#attachment-scope-validation">Attachment Scope Validation</a></li>
+</ul>
+<hr />
+<h3 id="attachment-target-validation-refinement-specification">Attachment Target Validation Refinement Specification</h3>
+<h4>Details</h4>
+<p>Attachment targets support model element identifier references with family-specific compatibility rules.</p>
+<p><strong>Identifier Targets:</strong></p>
+<ul>
+<li>Capability attachments must point to <code>ontology</code> elements only</li>
+<li>Requirement attachments must point to requirement-owned refinement element types only (<code>semantic-contract</code>, <code>semantic-query-contract</code>, <code>constraint</code>, <code>behavior</code>, <code>specification</code>, <code>state</code>, <code>input-output</code>)</li>
+<li>Requirement attachment to <code>ontology</code> is invalid; requirements inherit ontology context from their owning capability path</li>
+<li>Normalized like relation targets (resolved to full identifier path)</li>
+<li>Validation is expected to reject identifiers pointing to non-attachable element types</li>
+<li>Validation is expected to reject unresolved identifiers</li>
+<li>Provides clear error message indicating the expected element type</li>
+</ul>
+<p>This validation ensures that ontology context is owned by capabilities and that requirement attachments reference reusable requirement-owned contracts.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Validation.html#attachment-target-validation">Attachment Target Validation</a></li>
+</ul>
+<hr />
+<h3 id="capability-model-structure-specification">Capability Model Structure Specification</h3>
+<h4>Details</h4>
+<p>Capability and requirement meanings are defined by the Reqvire core element, capability, requirement, relation, governance, and verification ontologies.</p>
+<p>The validator shall enforce the structural rules derived from those contracts:</p>
+<ul>
+<li>Capability hierarchy may use <code>derive</code>/<code>derivedFrom</code> only between capability elements.</li>
+<li>Requirement hierarchy may use <code>derive</code>/<code>derivedFrom</code> only between requirement elements.</li>
+<li>Requirements specify capabilities through <code>specify</code>; the inverse relation is <code>specifiedBy</code>.</li>
+<li>A top-level requirement must have <code>specify</code> pointing to exactly one capability.</li>
+<li>A child requirement may omit <code>specify</code> when it has <code>derivedFrom</code> pointing to another requirement; the owning capability is inherited through the requirement hierarchy.</li>
+<li>If a requirement has both <code>derivedFrom</code> and <code>specify</code>, the explicit <code>specify</code> capability must match the inherited capability.</li>
+<li>Capabilities may be directly verified but are not directly satisfied; implementation coverage rolls up from requirements that specify them.</li>
+<li>Governance metadata is valid on capability and requirement elements only and inherits through the nearest parent in the same family or through the owning capability when a top-level requirement specifies a capability.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ModelManagement.html#capability-model-structure">Capability Model Structure</a></li>
+</ul>
+<hr />
+<h3 id="default-requirement-type-assignment-refinement-specification">Default Requirement Type Assignment Refinement Specification</h3>
+<h4>Details</h4>
+<p>When an element does not have a <code>#### Metadata</code> subsection with a <code>type</code> property, the system assigns the default type <code>requirement</code>.</p>
+<p>This behavior is location-independent: all elements default to type <code>requirement</code> regardless of their folder location within the Git repository.</p>
+<p>To use other element types, users must explicitly specify the type in the element’s Metadata subsection, for example: <code>type: capability</code>.</p>
+<p>Supported element types, type categories, refinement ownership semantics, and evidence-backed verification semantics are defined by the Reqvire ontology and semantic-contract model plus the Supported Element Types Specification.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ModelManagement.html#default-requirement-type-assignment">Default Requirement Type Assignment</a></li>
+</ul>
+<hr />
+<h3 id="element-size-estimate-model-build-specification">Element Size Estimate Model Build Specification</h3>
+<p>Element size estimates are expected to be optional model-build metadata.</p>
+<h4>Details</h4>
+<ul>
+<li>The model build option is named <code>with_size_estimates</code>.</li>
+<li>The default value is <code>false</code>.</li>
+<li>When <code>with_size_estimates</code> is <code>true</code>, each parsed model element includes an optional <code>size_estimate</code> record.</li>
+<li>The <code>size_estimate</code> record contains <code>content_bytes</code>, <code>rendered_context_bytes</code>, and <code>estimated_tokens</code>.</li>
+<li><code>content_bytes</code> is derived from authoritative element content.</li>
+<li><code>rendered_context_bytes</code> is derived from the JSON evidence payload for the element, excluding the <code>size_estimate</code> field itself.</li>
+<li><code>estimated_tokens</code> is a deterministic approximation derived from <code>rendered_context_bytes</code>.</li>
+<li>The size estimate is not part of the Markdown model source and must not be persisted into requirement files.</li>
+<li>Report-level aggregate estimates are not part of this specification.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ModelManagement.html#opt-in-element-size-estimate-model-build">Opt-In Element Size Estimate Model Build</a></li>
+</ul>
+<hr />
 <h3 id="element-type-metadata-specification">Element Type Metadata Specification</h3>
 <p>Specification for declaring element types in markdown documents through the Metadata subsection.</p>
 <h4>Details</h4>
 <p>Element types are identified through a reserved <code>type</code> metadata property in the Metadata subsection.</p>
 <p><strong>Declaration Format:</strong>
-<code>  * type: &lt;element-type&gt;</code> within the Metadata subsection.</p>
+<code> * type: &lt;element-type&gt;</code> within the Metadata subsection.</p>
 <p><strong>Default Type Assignment:</strong></p>
 <ul>
 <li>When no <code>type</code> property is specified, elements default to type <code>requirement</code></li>
@@ -400,7 +664,24 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+<li>refine: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+</ul>
+<hr />
+<h3 id="excluded-file-relation-validation-refinement-specification">Excluded File Relation Validation Refinement Specification</h3>
+<h4>Details</h4>
+<p>Excluded-file relation validation behavior:</p>
+<ol>
+<li>Registers files matching exclusion patterns in registry context for relation-target validation.</li>
+<li>Skips internal element parsing/validation for excluded files.</li>
+<li>Preserves ability to validate references that point to excluded file paths.</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Validation.html#excluded-file-relation-validation">Excluded File Relation Validation</a></li>
 </ul>
 <hr />
 <h3 id="git-repository-scope-specification">Git Repository Scope Specification</h3>
@@ -435,7 +716,19 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+<li>refine: <a href="ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
+</ul>
+<hr />
+<h3 id="identifiers-and-relations-refinement-specification">Identifiers and Relations Refinement Specification</h3>
+<h4>Details</h4>
+<p>The system is expected to implement <strong>Identifiers</strong> and <strong>Relations</strong> following clearly defined specifications to ensure consistency, validity, and efficient querying and manipulation of these entities.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="StructureAndParsing.html#identifiers-and-relations">Identifiers and Relations</a></li>
 </ul>
 <hr />
 <h3 id="ignore-files-specification">Ignore Files Specification</h3>
@@ -448,11 +741,11 @@
 </ul>
 <p><strong>Processing Rules:</strong></p>
 <ul>
-<li>ONLY the root .gitignore file shall be used (not nested .gitignore files in subdirectories)</li>
-<li>ONLY the root .reqvireignore file shall be used (not nested .reqvireignore files in subdirectories)</li>
-<li>.reqvireignore shall use the same format and syntax as .gitignore</li>
-<li>Patterns from .gitignore and .reqvireignore shall be combined</li>
-<li>Files matching ANY exclusion pattern shall be excluded from parsing as requirements</li>
+<li>ONLY the root .gitignore file is expected to be used (not nested .gitignore files in subdirectories)</li>
+<li>ONLY the root .reqvireignore file is expected to be used (not nested .reqvireignore files in subdirectories)</li>
+<li>.reqvireignore is expected to use the same format and syntax as .gitignore</li>
+<li>Patterns from .gitignore and .reqvireignore is expected to be combined</li>
+<li>Files matching ANY exclusion pattern is expected to be excluded from parsing as requirements</li>
 </ul>
 <p><strong>Exclusion Behavior Differences:</strong></p>
 <ul>
@@ -470,7 +763,195 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
+<li>refine: <a href="Configuration.html#ignore-files-integration">Ignore Files Integration</a></li>
+</ul>
+<hr />
+<h3 id="ignoring-unstructured-documents-refinement-specification">Ignoring Unstructured Documents Refinement Specification</h3>
+<h4>Details</h4>
+<p>Unstructured document exclusion behavior:</p>
+<ul>
+<li>Uses <code>.reqvireignore</code> at repository root with <code>.gitignore</code>-compatible syntax.</li>
+<li>Supports glob patterns for structured-document processing exclusions.</li>
+<li>Keeps excluded files in repository scope while excluding them from structured parsing flow.</li>
+<li>Provides Reqvire-specific exclusions distinct from Git tracking behavior.</li>
+</ul>
+<p>Example <code>.reqvireignore</code> patterns:</p>
+<pre><code class="language-.reqvireignore"># Example patterns to exclude from structured documents processing
+**/Logical*.md
+**/Physical*.md
+**/draft-*.md
+examples/**
+</code></pre>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Configuration.html#ignoring-unstructured-documents">Ignoring Unstructured Documents</a></li>
+</ul>
+<hr />
+<h3 id="integrated-validation-refinement-specification">Integrated Validation Refinement Specification</h3>
+<h4>Details</h4>
+<p>Integrated validation execution behavior:</p>
+<ul>
+<li>Commands are split into model-dependent commands and raw-file commands.</li>
+<li>Model-dependent commands invoke two-pass validation before execution and stop on validation failures.</li>
+<li>Raw-file commands skip model validation when their behavior operates directly on file content.</li>
+<li>Validation gating ensures commands needing graph consistency do not run with invalid model state.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Validation.html#integrated-validation">Integrated Validation</a></li>
+</ul>
+<hr />
+<h3 id="internal-consistency-validator-refinement-specification">Internal Consistency Validator Refinement Specification</h3>
+<h4>Details</h4>
+<p>The consistency validator is expected to verify:</p>
+<ul>
+<li><strong>Global Element Name Uniqueness</strong>: Element names are globally unique across all files in the model</li>
+<li><strong>Duplicate Detection</strong>: Detect and report when multiple elements in different files share the same name</li>
+<li><strong>Location Reporting</strong>: Report both file locations where duplicate element names occur</li>
+<li><strong>Clear Error Messages</strong>: Error messages clearly indicate that element names must be globally unique</li>
+<li><strong>Circular Dependencies</strong>: Detect and report circular dependency chains in requirements</li>
+<li><strong>Orphaned Elements</strong>: Identify elements without proper traceability connections</li>
+<li><strong>Inconsistent Patterns</strong>: Detect relationship patterns that violate model constraints</li>
+</ul>
+<p>Rationale: Element names serve as stable IDs for element identity, independent of file location. Global uniqueness is essential for proper element identification and change tracking across the model.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Validation.html#internal-consistency-validator">Internal Consistency Validator</a></li>
+</ul>
+<hr />
+<h3 id="ontology-annotation-convention-specification">Ontology Annotation Convention Specification</h3>
+<h4>Details</h4>
+<p>Authored ontology vocabulary shall use standard RDF/RDFS annotation properties for generic presentation metadata:</p>
+<ul>
+<li>Use <code>rdfs:label</code> for optional human-readable presentation labels when no more specific domain slot is needed.</li>
+<li>Use <code>rdfs:comment</code> for optional explanatory annotations on classes, properties, individuals, and axioms.</li>
+<li>Do not replace domain slots with annotations. A value that is a canonical authored token, parser field, export field, interface enum value, report kind, rule condition, queryable attribute, or controlled-vocabulary payload remains a declared ontology property even if its local name ends with <code>Name</code> or <code>Meaning</code>.</li>
+<li>Controlled-vocabulary individuals shall carry their formal semantics through IRI identity, typed class membership, hierarchy, and axioms. Their literal tokens or definitions shall be modeled with domain properties when those literals are part of the system contract.</li>
+<li>Do not introduce custom <code>*Name</code> or <code>*Meaning</code> datatype properties for purely generic labels or descriptions that have no separate domain semantics. If SHACL currently validates such a presentation-only field, refactor the SHACL path to <code>rdfs:label</code> or <code>rdfs:comment</code>; keep a custom token property only when the literal is consumed by parser, CLI/API, report, query, validation, or payload contracts.</li>
+<li>Do not keep deprecated presentation-only ontology properties in authored Reqvire ontology source. Refactoring history belongs in version control; the active ontology vocabulary should expose only current semantic terms and current contract tokens.</li>
+<li>SHACL shapes may require <code>rdfs:label</code> and <code>rdfs:comment</code> when the annotation itself is the intended contract. Those built-in RDFS annotation paths are treated as external vocabulary and do not require declaration by a Reqvire ontology element.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ModelManagement.html#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+</ul>
+<hr />
+<h3 id="refinement-element-structure-constraints-refinement-specification">Refinement Element Structure Constraints Refinement Specification</h3>
+<h4>Details</h4>
+<p>Refinement elements serve as requirement-owned subordinate details or contracts that drive implementation. Their relation usage is restricted because:</p>
+<ul>
+<li>They represent atomic pieces of information focused on documenting requirements</li>
+<li>They are primarily referenced through the Attachments subsection of other elements</li>
+<li>Their <code>refine</code> relation links back to the requirement they refine, establishing ownership</li>
+<li>Each refinement can only be owned by one compatible requirement according to its subtype</li>
+<li>They do not define requirement governance metadata; governance context for a refinement is obtained from its owning requirement</li>
+</ul>
+<p>When a Refinement element contains relations other than <code>refine</code>, the validator is expected to report an error indicating that only <code>refine</code> relations are allowed for refinement types.</p>
+<p>When a Refinement element declares requirement governance metadata keys (<code>status</code>, <code>priority</code>, <code>risk</code>, or <code>owner</code>), the validator is expected to report an error indicating that governance metadata is only valid on capability and requirement elements.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ModelManagement.html#refinement-element-structure-constraints">Refinement Element Structure Constraints</a></li>
+</ul>
+<hr />
+<h3 id="relation-element-type-validator-refinement-specification">Relation Element Type Validator Refinement Specification</h3>
+<h4>Details</h4>
+<p>The validator enforces the Reqvire relation ontology together with the canonical element type vocabulary.</p>
+<p>Validation shall check:</p>
+<ul>
+<li>relation endpoint families and inverse relation compatibility from the relation ontology</li>
+<li>ontology, capability, requirement, and refinement compatibility from the ontology, capability, requirement, and semantic-contract contracts</li>
+<li>evidence-backed verification compatibility from the verification contracts</li>
+<li>trace-only behavior for custom <code>other</code> and <code>other-TYPENAME</code> element types</li>
+<li>refinement restrictions: refinement elements use only <code>refine</code> relations and cannot have Attachments subsections</li>
+<li><code>refinedBy</code> targets resolve to element identifiers, not plain file paths or <code># Documents</code> file links without element fragments</li>
+</ul>
+<p>This validation occurs:</p>
+<ul>
+<li>During model parsing and validation (model.rs, parser.rs)</li>
+<li>During link operations at CRUD time (graph_registry.rs)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Validation.html#relation-element-type-validator">Relation Element Type Validator</a></li>
+</ul>
+<hr />
+<h3 id="relation-types-and-behaviors-refinement-specification">Relation Types and behaviors Refinement Specification</h3>
+<h4>Details</h4>
+<p>The system is expected to implement relations following clearly defined specifications for types and behaviors.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
+</ul>
+<hr />
+<h3 id="requirement-governance-metadata-specification">Requirement Governance Metadata Specification</h3>
+<p>Specification for declaring requirement governance metadata keys and values through the Metadata subsection.</p>
+<h4>Details</h4>
+<p>Requirement governance metadata is declared in the <code>#### Metadata</code> subsection of governance-bearing elements (<code>capability</code> and <code>requirement</code>).</p>
+<p>Requirement governance metadata covers requirement management accountability and decision context: <code>status</code> represents the requirement lifecycle state, <code>priority</code> represents planning importance, <code>risk</code> represents realization risk, and <code>owner</code> represents maintenance accountability.</p>
+<p>Elements outside the governance-bearing family are not requirement governance metadata authors and must not declare <code>status</code>, <code>priority</code>, <code>risk</code>, or <code>owner</code> metadata. Refinement elements (<code>source</code>, <code>constraint</code>, <code>behavior</code>, <code>specification</code>, <code>state</code>, <code>input-output</code>, <code>semantic-contract</code>, and <code>semantic-query-contract</code>) obtain governance context from their owning requirement instead of authored metadata.</p>
+<p>When any non-governance-bearing element declares requirement governance metadata keys, the validator is expected to report an error indicating that governance metadata is only valid on capability and requirement elements.</p>
+<p>Allowed values, default values, value meanings, inheritance source order, and persistence semantics are defined by the Reqvire governance ontology.</p>
+<p><strong>Declaration Format:</strong></p>
+<ul>
+<li><code> * status: &lt;status-value&gt;</code></li>
+<li><code> * priority: &lt;priority-value&gt;</code></li>
+<li><code> * risk: &lt;risk-value&gt;</code></li>
+<li><code> * owner: &lt;owner-value&gt;</code></li>
+</ul>
+<p>Only explicit <code>status: approved</code> metadata indicates that the element itself has been approved. Inherited or default status values are effective model context and must not be treated as approval evidence.</p>
+<p>Risk represents requirement realization risk in the systems engineering sense: uncertainty and exposure associated with implementing, integrating, changing, or verifying the requirement. Risk is distinct from priority and does not by itself define hazard severity.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
+</ul>
+<hr />
+<h3 id="requirements-processing-refinement-specification">Requirements Processing Refinement Specification</h3>
+<h4>Details</h4>
+<p>Requirements-processing scope behavior:</p>
+<ul>
+<li>Applies <code>.gitignore</code> exclusions for files not in version-control processing scope.</li>
+<li>Applies <code>.reqvireignore</code> exclusions for files excluded from requirements parsing.</li>
+<li>Parses remaining in-scope files through the structured model pipeline.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Configuration.html#requirements-processing">Requirements Processing</a></li>
 </ul>
 <hr />
 <h3 id="requirements-processing-specification">Requirements Processing Specification</h3>
@@ -480,7 +961,6 @@
 <ul>
 <li>Parse all .md files from git repository root</li>
 <li>Apply .gitignore and .reqvireignore exclusions</li>
-<li>Reserved files (README.md, LICENSE.md) are excluded</li>
 </ul>
 <p><strong>Processing Pipeline:</strong></p>
 <ul>
@@ -494,36 +974,39 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a></li>
+<li>refine: <a href="Validation.html#graphregistry-as-primary-registry">GraphRegistry as Primary Registry</a></li>
 </ul>
 <hr />
-<h3 id="reserved-files-specification">Reserved Files Specification</h3>
-<p>Reserved repository documentation filenames automatically excluded from structured markdown processing.</p>
+<h3 id="semantic-contract-reference-context-validation-specification">Semantic Contract Reference Context Validation Specification</h3>
+<p>Technical specification for validating requirement-owned semantic-contract SHACL references against reachable ontology context.</p>
 <h4>Details</h4>
-<p>The following filenames are reserved for general repository documentation and are automatically excluded from requirements parsing:</p>
-<p><strong>Reserved Filenames:</strong></p>
+<p>Semantic-contract SHACL references must resolve through reachable ontology context. Semantic reference validation issue kinds are defined by the Reqvire validation ontology. Missing references and references declared outside reachable ontology context are validation errors, not lint issues.</p>
+<p>The validation rule is scoped through the semantic-contract owner:</p>
 <ul>
-<li><code>README.md</code> - Project overview and documentation</li>
-<li><code>CHANGELOG.md</code>, <code>CHANGES.md</code> - Version history and release notes</li>
-<li><code>CONTRIBUTING.md</code> - Contribution guidelines</li>
-<li><code>LICENSE.md</code> - License information</li>
-<li><code>CODE_OF_CONDUCT.md</code> - Community conduct standards</li>
-<li><code>SECURITY.md</code> - Security policies and vulnerability reporting</li>
-<li><code>AUTHORS.md</code> - Project contributors and credits</li>
-<li><code>ROADMAP.md</code> - Project roadmap and future plans</li>
+<li>A semantic-contract must refine exactly one requirement.</li>
+<li>The owning requirement resolves exactly one owning capability through <code>specify</code>/<code>specifiedBy</code> and requirement hierarchy inheritance.</li>
+<li>The requirement ontology context is inherited from the owning capability and ancestor capabilities in the capability hierarchy.</li>
+<li>Ontology hierarchy reachable from capability-attached ontology is part of the inherited context.</li>
+<li>Ontology elements outside inherited capability context or reachable ontology hierarchy are not considered reachable.</li>
 </ul>
-<p><strong>Exclusion Rules:</strong></p>
+<p>The validation rule inspects semantic-contract <code>#### Shapes</code> sections and checks these SHACL IRI references:</p>
 <ul>
-<li>Reserved filenames are excluded from structured markdown parsing across the entire repository</li>
-<li>Reserved files can be referenced in file relations to elements (excluded from parsing but linkable)</li>
-<li>Exclusion is combined with .gitignore and .reqvireignore patterns</li>
-<li>Files matching reserved filenames are excluded regardless of ignore file configuration</li>
+<li><code>sh:targetClass</code></li>
+<li><code>sh:path</code></li>
+<li><code>sh:class</code></li>
 </ul>
-<p><strong>Scope:</strong></p>
+<p>For each referenced IRI, validation determines whether the IRI is declared by an ontology element and reachable from the semantic-contract owner context:</p>
 <ul>
-<li>Applies to exact filename matches (case-sensitive on case-sensitive filesystems)</li>
-<li>Applies at all directory levels in the repository</li>
-<li>Takes precedence before ignore pattern evaluation</li>
+<li>If the IRI is not declared anywhere in Reqvire ontology elements, validation reports a missing semantic declaration and CRUD operations that would create that condition are blocked.</li>
+<li>If the IRI is declared by an ontology element outside the reachable owner context, validation reports an outside-context semantic reference and CRUD operations that would create that condition are blocked.</li>
+<li>Outside-context errors include the declaring ontology identifier and guidance to attach the declaring ontology to the owning or consuming capability when that dependency is intentional.</li>
+</ul>
+<p>The rule is intentionally strict:</p>
+<ul>
+<li>It does not infer or create attachments.</li>
+<li>It does not rewrite Turtle.</li>
+<li>It enforces ontology hierarchy and capability-level ontology attachments as the only valid semantic dependency paths.</li>
+<li>It prevents model changes that would bypass change-impact traceability.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -531,7 +1014,146 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Configuration.html#reserved-repository-files-exclusion">Reserved Repository Files Exclusion</a></li>
+<li>refine: <a href="Validation.html#semantic-contract-reference-context-validation">Semantic Contract Reference Context Validation</a></li>
+</ul>
+<hr />
+<h3 id="semantic-contract-structure-specification">Semantic Contract Structure Specification</h3>
+<h4>Details</h4>
+<p>Semantic vocabulary and shape profile meaning are defined by the Reqvire ontology and semantic-contract model.</p>
+<p>The implementation shall enforce the ontology and semantic-contract structure:</p>
+<ul>
+<li>Ontology elements define reusable vocabulary and model meaning.</li>
+<li><code>semantic-contract</code> must not refine a capability.</li>
+<li><code>semantic-contract</code> refining a requirement means a SHACL profile.</li>
+<li><code>source</code>, <code>constraint</code>, <code>behavior</code>, <code>specification</code>, <code>state</code>, and <code>input-output</code> must not refine a capability; they are requirement-owned subordinate details or contracts.</li>
+<li>Requirement-owned shape contracts define closed-world SHACL profiles over terms reachable from the owning requirement context and must not define local ontology terms.</li>
+<li>Ontology and semantic-contract elements use reserved type-specific subsections:
+<ul>
+<li><code>ontology</code>: <code>#### Ontology</code> is required with exactly one fenced Turtle block; <code>#### Shapes</code> is forbidden.</li>
+<li><code>semantic-contract</code>: <code>#### Ontology</code> is forbidden; <code>#### Shapes</code> is required with exactly one fenced Turtle block.</li>
+</ul>
+</li>
+<li>These reserved subsections are stored as ontology and semantic-contract ADT fields, not only as generic content.</li>
+<li>Reqvire derives ontology IRIs as <code>urn:reqvire:ontology:&lt;element.id&gt;</code>.</li>
+<li>Reqvire derives the semantic contract IRI as <code>urn:reqvire:semantic-contract:&lt;element.id&gt;</code>.</li>
+<li>The graph registry indexes ontology elements by <code>element.id</code>, <code>element.identifier</code>, derived IRI, ontology hierarchy, attachment consumers, and parsed <code>Ontology</code> content.</li>
+<li>The graph registry indexes semantic contracts by <code>element.id</code>, <code>element.identifier</code>, derived IRI, owning requirement, reachable ontology context, and parsed <code>Shapes</code> content.</li>
+<li>Reqvire builds a reusable semantic index from the graph registry for ontology validation, semantic-contract validation, ontology export, parsing each Turtle block once and reusing the parsed RDF quads for diagnostics, ontology term declarations, SHACL references, Turtle export, and JSON-LD export.</li>
+<li><code>reqvire validate</code> parses <code>Ontology</code> and <code>Shapes</code> Turtle content with Oxigraph and inspects the parsed RDF graph instead of using raw text matching.</li>
+<li><code>reqvire validate</code> treats ontology term declarations as globally owned by one ontology element:
+<ul>
+<li>The same ontology term IRI must not be declared by multiple ontology elements.</li>
+<li>The same ontology term IRI must not be declared with conflicting roles, such as both <code>owl:Class</code> and <code>owl:DatatypeProperty</code>.</li>
+<li>This validation applies to declared ontology terms, not to derived ontology element IRIs.</li>
+<li>Duplicate and conflicting declaration issue kinds are defined by the Reqvire validation ontology.</li>
+</ul>
+</li>
+<li>When <code>Shapes</code> exists, validation performs lightweight SHACL sanity checks:
+<ul>
+<li>The shapes graph contains at least one <code>sh:NodeShape</code> or <code>sh:PropertyShape</code>.</li>
+<li>Each <code>sh:NodeShape</code> has at least one IRI <code>sh:targetClass</code>.</li>
+<li><code>sh:targetClass</code> values are declared by at least one ontology element in the Reqvire model.</li>
+<li>Referenced <code>sh:property</code> shapes define exactly one IRI <code>sh:path</code>.</li>
+<li><code>sh:path</code> values are declared by at least one ontology element in the Reqvire model.</li>
+<li><code>sh:class</code> values are declared by at least one ontology element in the Reqvire model.</li>
+<li>Missing declarations are validation errors because they create dangling semantic references.</li>
+<li>Built-in RDFS annotation paths <code>rdfs:label</code> and <code>rdfs:comment</code> are allowed as external annotation properties in <code>sh:path</code> and do not require local ontology declarations.</li>
+<li>Validation errors for missing semantic declarations must include the referencing semantic-contract identifier, reference kind, referenced IRI, and guidance to define the term or update/remove the SHACL reference before deleting or editing the declaring contract.</li>
+<li>Declared references must also be reachable from the referencing semantic contract’s owner context.</li>
+<li>A capability context contains ontology elements attached by the capability and inherited through valid capability hierarchy traversal, plus ontology hierarchy reachable from those ontology elements.</li>
+<li>A requirement-owned shape contract resolves its owner context through the owning requirement’s capability context. Child requirements inherit the same capability context through requirement hierarchy.</li>
+<li>A SHACL reference to a term declared outside reachable ontology context is a validation error, not a lint issue.</li>
+<li>Validation errors for outside-context semantic references must include the referencing semantic-contract identifier, reference kind, referenced IRI, declaring ontology identifier, owning requirement, owning capability context, and guidance to attach the declaring ontology to the owning or consuming capability or move the declaration into reachable ontology context.</li>
+<li>Supported constraint terms are checked for basic shape validity: <code>sh:minCount</code>, <code>sh:maxCount</code>, <code>sh:datatype</code>, <code>sh:class</code>, <code>sh:nodeKind</code>, <code>sh:pattern</code>, and <code>sh:in</code>.</li>
+<li><code>sh:maxCount</code> must be greater than or equal to <code>sh:minCount</code> when both are present.</li>
+<li><code>sh:in</code> must point to a valid RDF list.</li>
+</ul>
+</li>
+<li>OWL reasoning and full SHACL conformance execution are not required for the initial semantic contract validator; they may be added later through optional adapters once the dependency footprint is acceptable.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ModelManagement.html#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+</ul>
+<hr />
+<h3 id="semantic-query-contract-structure-specification">Semantic Query Contract Structure Specification</h3>
+<h4>Details</h4>
+<p>Semantic query contracts define declarative semantic questions over the graph-shaped model without baking the query technology into the element type name.</p>
+<p>The implementation shall enforce the semantic-query-contract structure:</p>
+<ul>
+<li><code>semantic-query-contract</code> must refine exactly one requirement.</li>
+<li><code>semantic-query-contract</code> is requirement-owned and may be attached by other requirements only when attachment ownership rules are satisfied.</li>
+<li><code>semantic-query-contract</code> must use a <code>#### Query</code> reserved subsection with exactly one fenced code block.</li>
+<li>The subsection heading remains generic: use <code>#### Query</code>, not <code>#### SPARQL Query</code>.</li>
+<li>The fenced code block must use info string <code>sparql</code>; this is the only initial supported query language.</li>
+<li><code>#### Ontology</code> and <code>#### Shapes</code> are forbidden on <code>semantic-query-contract</code> elements.</li>
+<li>Query contracts must not define ontology vocabulary or SHACL shape profiles; they consume reachable semantic model context.</li>
+<li>Reqvire derives the semantic query contract IRI as <code>urn:reqvire:semantic-query-contract:&lt;element.id&gt;</code>.</li>
+<li>The graph registry indexes semantic query contracts by <code>element.id</code>, <code>element.identifier</code>, derived IRI, owning requirement, reachable ontology context, query language, and raw query text.</li>
+<li>Search JSON shall expose semantic query contract identity and Query fenced block details; ontology collection and semantic export shall not emit query contract text or query metadata until a dedicated query-export command is specified. Generated ontology projection facts may cite semantic-query-contract IRIs as provenance without embedding raw query text.</li>
+<li>Query kind, diagnostics, execution results, inference strategy, and persistent RDF store integration are not part of the initial semantic-query-contract model; they may be added later only through dedicated query-export or query-execution contracts.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ModelManagement.html#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+</ul>
+<hr />
+<h3 id="specification-file-identification-refinement-specification">Specification File Identification Refinement Specification</h3>
+<h4>Details</h4>
+<ul>
+<li>Supported first H1 headings:</li>
+<li><code># Elements</code>: parse as multi-element model file</li>
+<li><code># Documents</code>: parse as single-element model file with <code>## Metadata</code>, <code>## Relations</code> (optional), and <code>## &lt;Actual Element Name&gt;</code> body section where the section heading text defines the element name</li>
+<li>Leading whitespace, blank lines, or frontmatter before the heading are allowed</li>
+<li>Files without a supported first H1 are silently skipped (no error)</li>
+<li>This rule applies in addition to <code>.gitignore</code> and <code>.reqvireignore</code> exclusions</li>
+<li>The page title is not stored or tracked by the system</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="StructureAndParsing.html#specification-file-identification">Specification File Identification</a></li>
+</ul>
+<hr />
+<h3 id="structure-and-addressing-in-markdown-documents-refinement-specification">Structure and Addressing in Markdown Documents Refinement Specification</h3>
+<h4>Details</h4>
+<p>The system is expected to implement semi-structured markdown format specifications that defines the structure, rules, and usage of <strong>Elements</strong>, <strong>Subsections</strong>, <strong>Relations</strong>, and <strong>Identifiers</strong> in Markdown (<code>.md</code>) documents following clearly defined specifications.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="StructureAndParsing.html#structure-and-addressing-in-markdown-documents">Structure and Addressing in Markdown Documents</a></li>
+</ul>
+<hr />
+<h3 id="structured-markdown-files-search-and-detection-refinement-specification">Structured Markdown Files Search and Detection Refinement Specification</h3>
+<h4>Details</h4>
+<p>Structured markdown detection behavior:</p>
+<ol>
+<li>Scans files in repository root and subfolders.</li>
+<li>Marks files matching configured exclusion patterns as non-structured targets.</li>
+<li>Marks non-<code>.md</code> files as non-structured targets.</li>
+<li>Retains only eligible markdown files for structured parsing passes.</li>
+</ol>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Configuration.html#structured-markdown-files-search-and-detection">Structured Markdown Files Search and Detection</a></li>
 </ul>
 <hr />
 <h3 id="verification-type-selection-guidelines">Verification Type Selection Guidelines</h3>
@@ -554,7 +1176,7 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ModelManagement.html#verification-type-categories">Verification Type Categories</a></li>
+<li>refine: <a href="ModelManagement.html#verification-type-categories">Verification Type Categories</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -603,7 +1225,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -612,10 +1235,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -628,7 +1254,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -646,6 +1272,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1038,9 +1669,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

@@ -6,7 +6,7 @@
 # all registered relations (user-created and auto-generated) into elements.
 #
 # Test cases:
-# 1. Basic inverse relation insertion (satisfy -> satisfiedBy)
+# 1. Basic inverse relation insertion (refinedBy -> refine)
 # 2. Multiple inverse relation types (derivedFrom -> derive, verifiedBy -> verify)
 # 3. Idempotency (running twice produces same result)
 # 4. Default behavior unchanged (without flag, no auto-generated relations)
@@ -58,9 +58,9 @@ if [ $EXIT_CODE -ne 0 ]; then
   exit 1
 fi
 
-# Check that Target Requirement does NOT have satisfiedBy (auto-generated)
-if grep -q "satisfiedBy:" "$TEST_DIR/specifications/Requirements.md"; then
-  echo "FAILED: Default format should NOT insert auto-generated satisfiedBy relations"
+# Check that Test Constraint does NOT have refine: (auto-generated)
+if grep -q "  \* refine:" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "FAILED: Default format should NOT insert auto-generated refine relations"
   cat "$TEST_DIR/specifications/Requirements.md"
   exit 1
 fi

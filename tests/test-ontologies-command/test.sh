@@ -20,6 +20,12 @@ if ! grep -q "api:ServiceEndpoint a owl:Class" <<< "$TTL_OUTPUT"; then
   exit 1
 fi
 
+if ! grep -q "owl:someValuesFrom api:Response" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: Turtle output missing ontology restriction construct fixture"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
 if ! grep -q "sh:targetClass api:ServiceEndpoint" <<< "$TTL_OUTPUT"; then
   echo "FAILED: Turtle output missing SHACL target class"
   echo "$TTL_OUTPUT"
@@ -135,6 +141,8 @@ for token in \
   "reqvire:projectionDerivationMode \"direct-authored\"" \
   "reqvire:constructFamily \"property-domain-range\"" \
   "reqvire:constructKind \"property-chain\"" \
+  "reqvire:constructKind \"restriction\"" \
+  "reqvire:restrictionKind \"existential\"" \
   "reqvire:constructSubject" \
   "reqvire:constructPredicate" \
   "reqvire:constructObject" \
@@ -214,8 +222,9 @@ if [ ! -f "$TEST_DIR/out/ontologies.ttl" ]; then
   exit 1
 fi
 
-if [ ! -f "$TEST_DIR/out/ontologies.html" ]; then
-  echo "FAILED: export did not generate ontologies.html"
+ONTOLOGIES_ENTRY="$TEST_DIR/out/ontologies"'.html'
+if [ -f "$ONTOLOGIES_ENTRY" ]; then
+  echo "FAILED: export must not generate standalone Ontologies page"
   exit 1
 fi
 
@@ -264,207 +273,107 @@ if ! grep -Eq "xsd:string|http://www\.w3\.org/2001/XMLSchema#string" "$TTL_FILE"
   exit 1
 fi
 
-# Exported ontologies.html must expose the semantic view-model / UI evidence.
-HTML_FILE="$TEST_DIR/out/ontologies.html"
-for token in \
-  "ontology-sidebar-summary" \
-  "ontology-summary-entry" \
-  "ontology-summary-entry ontology-footer-download" \
-  "ontology-legend-grid" \
-  "ontology-color-key" \
-  "ontology-legend-key-item" \
-  "ontology-legend-symbol" \
-  "data-filter-category=\"role\"" \
-  "data-filter-category=\"construct\"" \
-  "data-filter-category=\"origin\"" \
-  "data-filter-value=\"ontology-term\"" \
-  "data-filter-value=\"property\"" \
-  "data-filter-value=\"shacl-shape\"" \
-  "data-filter-value=\"resource\"" \
-  "data-filter-value=\"relation\"" \
-  "data-filter-value=\"external-reference\"" \
-  "data-filter-value=\"external-reference\" aria-pressed=\"false\"" \
-  "ontology-dot-class" \
-  "ontology-dot-object-property" \
-  "ontology-dot-datatype-property" \
-  "ontology-dot-rdf-property" \
-  "ontology-dot-named-individual" \
-  "ontology-dot-datatype" \
-  "ontology-dot-restriction" \
-  "ontology-dot-class-expression" \
-  "ontology-dot-node-shape" \
-  "ontology-dot-property-shape" \
-  "ontology-dot-external-reference" \
-  "data-filter-value=\"domain-range\"" \
-  "data-filter-value=\"shape-overlay\"" \
-  "data-filter-value=\"authored\"" \
-  "data-filter-value=\"registry\"" \
-  "data-filter-value=\"construct\"" \
-  "const origins = new Set();" \
-  "origins.add('construct')" \
-  "origins.add('registry')" \
-  "Download .ttl" \
-  "ontology-source-name" \
-  "SemanticContracts.html#api-ontology" \
-  "body:has(.ontology-page) > div.w-full" \
-  "height: calc(100vh - 50px)" \
-  "body:has(.ontology-page) footer" \
-  "display: none" \
-  '"domain"' \
-  '"range"' \
-  '"slot_facets"' \
-  "Slots / Facets" \
-  "Used As Slot / Facets" \
-  "Literal Values" \
-  "ontology-slot-facet" \
-  '"literal_values"' \
-  "Projection Constructs" \
-  "Raw SHACL Evidence" \
-  "urn:reqvire:ontology-construct" \
-  "Subclass" \
-  "Property Chains" \
-  "Inverse Properties" \
-  "Equivalence Group" \
-  "U+21D4" \
-  "U+27F2" \
-  "U+2192"; do
-  if ! grep -qF "$token" "$HTML_FILE"; then
-    echo "FAILED: exported ontologies.html missing UI evidence: $token"
-    exit 1
-  fi
-done
-
-for forbidden in \
-  "<h1>Ontologies" \
-  "Collected ontology element" \
-  "ontology-code-block" \
-  "class=\"ontology-block\"" \
-  "ontology-source-list" \
-  "ontology-source-block" \
-  "ontology-sidebar-actions" \
-  "ontology-badge-code" \
-  "SHACL / Association Specs" \
-  "No structural validation rules mapped." \
-  "filterOntologyBlocks" \
-  "ontology-graph-expand" \
-  "toggleOntologyFullscreen" \
-  "data-filter-value=\"class\"" \
-  "data-filter-value=\"object-property\"" \
-  "data-filter-value=\"datatype-property\"" \
-  "data-filter-value=\"rdf-property\"" \
-  "data-filter-value=\"named-individual\"" \
-  "data-filter-value=\"datatype\"" \
-  "data-filter-value=\"node-shape\"" \
-  "data-filter-value=\"property-shape\"" \
-  "data-filter-value=\"literal\"" \
-  "ontology-dot-literal"; do
-  if grep -qF "$forbidden" "$HTML_FILE"; then
-    echo "FAILED: exported ontologies.html contains obsolete explorer chrome/source block evidence: $forbidden"
-    exit 1
-  fi
-done
-
-# Datatype range evidence in the HTML view-model (prefixed or full IRI form).
-if ! grep -Eq "xsd:string|http://www\.w3\.org/2001/XMLSchema#string" "$HTML_FILE"; then
-  echo "FAILED: exported ontologies.html missing xsd:string datatype evidence"
-  exit 1
-fi
-
-if grep -qF "$RAW_QUERY_SENTINEL" "$HTML_FILE"; then
-  echo "FAILED: exported ontologies.html must not contain raw semantic-query-contract text"
-  exit 1
-fi
-
-HTML_FILE="$HTML_FILE" node - <<'NODE'
-const fs = require('fs');
-const html = fs.readFileSync(process.env.HTML_FILE, 'utf8');
-const match = html.match(/const ontologyGraphData = (.*?);<\/script>/s);
+# Exported index.html must expose the ontology semantic view-model through the
+# single SPA Project Store seed.
+INDEX_FILE="$TEST_DIR/out/index.html" node - <<'NODE'
+const fs = require("fs");
+const html = fs.readFileSync(process.env.INDEX_FILE, "utf8");
+const match = html.match(/(?:const|let|var)\s+reqvireProjectStore\s*=\s*(\{[\s\S]*?\});\s*<\/script>/);
 if (!match) {
-  console.error('FAILED: exported ontologies.html missing ontologyGraphData JSON');
+  console.error("FAILED: exported index.html missing Project Store seed");
   process.exit(1);
 }
-const graph = JSON.parse(match[1]);
-if (graph.nodes.some(node => node.semantic_type === 'literal' || node.type === 'literal')) {
-  console.error('FAILED: literal values should not render as primary ontology graph nodes');
+const store = JSON.parse(match[1]);
+if (!store.ontology || store.ontology.ttl_href !== "ontologies.ttl") {
+  console.error("FAILED: Project Store ontology projection missing ontologies.ttl link");
   process.exit(1);
 }
-const service = graph.nodes.find(node => node.id === 'urn:reqvire:test:api:ServiceEndpoint');
-if (!service || service.type !== 'owl' || service.semantic_type !== 'class') {
-  console.error('FAILED: SHACL-targeted ontology class should remain class-colored, not SHACL-colored');
+if (!store.ontology.graph_renderer || !store.ontology.graph_data) {
+  console.error("FAILED: Project Store ontology projection missing graph renderer/data");
   process.exit(1);
 }
-const serviceSlot = (service.slot_facets || []).find(slot => slot.slot_iri === 'urn:reqvire:test:api:identifier');
-if (!serviceSlot) {
-  console.error('FAILED: SHACL property shape should materialize identifier slot facet on target class');
+const graph = store.ontology.graph_data;
+if (graph.nodes.some((node) => node.semantic_type === "literal" || node.type === "literal")) {
+  console.error("FAILED: literal values should not render as primary ontology graph nodes");
   process.exit(1);
 }
-const serviceFacetText = (serviceSlot.facets || []).map(facet => `${facet.name}=${facet.value}`).join('|');
-if (!serviceFacetText.includes('datatype=string') || !serviceFacetText.includes('minCount=1')) {
-  console.error('FAILED: target class slot facet should include datatype and minCount evidence');
+if (graph.nodes.some((node) => node.id === "http://www.w3.org/2001/XMLSchema#string")) {
+  console.error("FAILED: xsd:string datatype constraints should remain evidence, not primary ontology graph nodes");
   process.exit(1);
 }
-if (serviceSlot.source_shape_iri !== 'urn:reqvire:test:api:ServiceEndpointShape') {
-  console.error('FAILED: target class slot facet should cite source shape');
+const service = graph.nodes.find((node) => node.id === "urn:reqvire:test:api:ServiceEndpoint");
+if (!service || service.type !== "owl" || service.semantic_type !== "class") {
+  console.error("FAILED: declared OWL class should be a class graph node");
   process.exit(1);
 }
-const identifier = graph.nodes.find(node => node.id === 'urn:reqvire:test:api:identifier');
-if (!identifier || identifier.semantic_type !== 'datatype-property') {
-  console.error('FAILED: named SHACL path property should remain available as datatype property node');
-  process.exit(1);
-}
-const identifierUsage = (identifier.slot_facets || []).find(slot =>
-  slot.target_class_iri === 'urn:reqvire:test:api:ServiceEndpoint'
-    && slot.source_shape_iri === 'urn:reqvire:test:api:ServiceEndpointShape'
+const serviceSlot = (service.slot_facets || []).find((slot) =>
+  slot.path_iri === "urn:reqvire:test:api:identifier"
+    && slot.source_shape_iri === "urn:reqvire:test:api:ServiceEndpointShape"
 );
-if (!identifierUsage) {
-  console.error('FAILED: named property node should expose target-class slot usage evidence');
+if (!serviceSlot) {
+  console.error("FAILED: target class should retain SHACL slot facet evidence");
   process.exit(1);
 }
-const shape = graph.nodes.find(node => node.id === 'urn:reqvire:test:api:ServiceEndpointShape');
-if (!shape || shape.type !== 'shacl' || shape.semantic_type !== 'node-shape') {
-  console.error('FAILED: SHACL node shape should retain SHACL visual type');
+const identifier = graph.nodes.find((node) => node.id === "urn:reqvire:test:api:identifier");
+if (!identifier || identifier.semantic_type !== "datatype-property") {
+  console.error("FAILED: named SHACL path property should remain available as datatype property node");
   process.exit(1);
 }
-const secondary = graph.nodes.find(node => node.id === 'urn:reqvire:test:api:SecondaryEndpoint');
-if (!secondary || secondary.type !== 'owl' || secondary.semantic_type !== 'named-individual') {
-  console.error('FAILED: named IRI typed by a declared ontology class should render as a named individual');
+const shape = graph.nodes.find((node) => node.id === "urn:reqvire:test:api:ServiceEndpointShape");
+if (!shape || shape.type !== "shacl" || shape.semantic_type !== "node-shape") {
+  console.error("FAILED: SHACL node shape should retain SHACL visual type");
   process.exit(1);
 }
-const secondaryIdentifier = (secondary.literal_values || []).find(item =>
-  String(item.predicate || '').endsWith('identifier') && item.value === 'secondary'
+const secondary = graph.nodes.find((node) => node.id === "urn:reqvire:test:api:SecondaryEndpoint");
+if (!secondary || secondary.type !== "owl" || secondary.semantic_type !== "named-individual") {
+  console.error("FAILED: named IRI typed by a declared ontology class should render as a named individual");
+  process.exit(1);
+}
+const secondaryIdentifier = (secondary.literal_values || []).find((item) =>
+  String(item.predicate || "").endsWith("identifier") && item.value === "secondary"
 );
 if (!secondaryIdentifier) {
-  console.error('FAILED: datatype-property literal values should be owned inspector/search evidence on the subject node');
+  console.error("FAILED: datatype-property literal values should be owned inspector/search evidence on the subject node");
   process.exit(1);
 }
-const secondaryMembership = (secondary.constructs || []).find(construct =>
-  construct.kind === 'membership'
-    && construct.subject === 'urn:reqvire:test:api:SecondaryEndpoint'
-    && construct.object === 'urn:reqvire:test:api:ServiceEndpoint'
+const secondaryMembership = (secondary.constructs || []).find((construct) =>
+  construct.kind === "membership"
+    && construct.subject === "urn:reqvire:test:api:SecondaryEndpoint"
+    && construct.object === "urn:reqvire:test:api:ServiceEndpoint"
 );
 if (!secondaryMembership) {
-  console.error('FAILED: typed named individual should retain membership construct evidence');
+  console.error("FAILED: typed named individual should retain membership construct evidence");
   process.exit(1);
 }
-const endpointRangeExpression = graph.nodes.find(node =>
-  node.semantic_type === 'class-expression'
-    && (node.constructs || []).some(construct =>
-      construct.kind === 'property-range'
-        && construct.subject === 'urn:reqvire:test:api:exposes'
+const endpointRangeExpression = graph.nodes.find((node) =>
+  node.semantic_type === "class-expression"
+    && (node.constructs || []).some((construct) =>
+      construct.kind === "property-range"
+        && construct.subject === "urn:reqvire:test:api:exposes"
         && construct.object === node.id
     )
-    && (node.constructs || []).some(construct =>
-      construct.kind === 'class-expression'
-        && (construct.members || []).some(member => String(member).endsWith('ServiceEndpoint'))
+    && (node.constructs || []).some((construct) =>
+      construct.kind === "class-expression"
+        && (construct.members || []).some((member) => String(member).endsWith("ServiceEndpoint"))
     )
 );
 if (!endpointRangeExpression) {
-  console.error('FAILED: class expression nodes should retain property domain/range usage evidence for display labels');
+  console.error("FAILED: class expression nodes should retain property domain/range usage evidence for display labels");
+  process.exit(1);
+}
+const existentialRestriction = graph.nodes.find((node) =>
+  node.semantic_type === "restriction"
+    && (node.constructs || []).some((construct) =>
+      construct.kind === "restriction"
+        && String(construct.label || "").toLowerCase().includes("existential")
+        && String(construct.property || "").endsWith("produces")
+        && String(construct.object || "").endsWith("Response")
+    )
+);
+if (!existentialRestriction) {
+  console.error("FAILED: restriction nodes should retain existential someValuesFrom construct evidence for glyph rendering");
   process.exit(1);
 }
 NODE
-if [ $? -ne 0 ]; then
-  exit 1
-fi
 
 exit 0

@@ -19,9 +19,26 @@ fn prepare_output_folder(output_folder: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
+/// Compiled Explorer SPA bundle, embedded at compile time by `build.rs`.
+///
+/// The exported/served `index.html` is this Vite/React/Radix bundle with the
+/// immutable Project Store seed injected before the bundle script — not a
+/// runtime-assembled page. Tailwind is compiled into `EXPLORER_BUNDLE_CSS`
+/// (no CDN / runtime Tailwind). See `build.rs`.
+const EXPLORER_INDEX_HTML: &str =
+    include_str!(concat!(env!("OUT_DIR"), "/explorer_bundle/index.html"));
+const EXPLORER_BUNDLE_JS: &[u8] =
+    include_bytes!(concat!(env!("OUT_DIR"), "/explorer_bundle/explorer.js"));
+const EXPLORER_BUNDLE_CSS: &[u8] =
+    include_bytes!(concat!(env!("OUT_DIR"), "/explorer_bundle/explorer.css"));
+
 /// Assets folder embedded at compile time
 const ASSETS: &[(&str, &[u8])] = &[
     ("logo.png", include_bytes!("../templates/assets/logo.png")),
+    (
+        "logo-long.png",
+        include_bytes!("../templates/assets/logo-long.png"),
+    ),
     (
         "favicon.ico",
         include_bytes!("../templates/assets/favicon.ico"),
@@ -36,41 +53,6 @@ const ASSETS: &[(&str, &[u8])] = &[
     ),
 ];
 
-/// Page descriptions for HTML export pages
-const PAGE_DESCRIPTION_CONTAINMENT: &str = r#"# Containment
-
-The containment view shows the physical organization of the model—how requirements, verifications, and other elements are structured within folders and files. This hierarchical view helps you understand the model's file structure and navigate to specific elements."#;
-
-const PAGE_DESCRIPTION_MODEL: &str = r#"# Model
-
-The model view displays the logical structure starting from ontology roots and capability roots. Ontology roots show reusable vocabulary context, and each capability shows its complete relation tree: specified requirements, derived child requirements, refinements, verifications, and implementations. This follows MBSE principles where product capabilities own requirement obligations and trace down to verifiable, implementable specifications."#;
-
-// NOTE: Whole model generation is currently disabled but the functionality is preserved
-// for potential future use. The generate_model_diagram function in diagrams.rs can still
-// generate complete model diagrams when needed.
-#[allow(dead_code)]
-const PAGE_DESCRIPTION_WHOLE_MODEL: &str = r#"# Whole Model
-
-This diagram visualizes the complete model as a single interconnected graph showing all elements and their relationships. Hover over any node to highlight its connected elements—ancestors (upstream) and descendants (downstream). Use this bird's-eye view to understand the overall requirements architecture and identify traceability chains across the model."#;
-
-const PAGE_DESCRIPTION_TRACES: &str = r#"# Verification Traces
-
-Verification traces show upward traceability from each verification through the requirement hierarchy. Using the **roll-up strategy**, verifying a leaf requirement automatically provides coverage to all its ancestors through derivedFrom relations—you don't need to verify every level. Each diagram marks directly verified requirements, helping identify redundant verify relations where both a requirement and its ancestor are explicitly verified."#;
-
-const PAGE_DESCRIPTION_COVERAGE: &str = r#"# Verification Coverage
-
-Coverage analysis focuses on **leaf requirements**—the lowest-level requirements that don't derive others. In MBSE, these are the implementable specifications. The **roll-up strategy** means verifying leaves provides automatic coverage to their ancestors through derivedFrom chains. This report shows verified vs. unverified leaf percentages by file and type, identifying where verification effort is needed."#;
-
-const PAGE_DESCRIPTION_TRACEFLOW: &str = r#"# TraceFlow
-
-The TraceFlow view visualizes the verification traceability flow as an interactive Sankey diagram. It shows how requirements flow from capability-level product capabilities through system requirements to verifications. Link width indicates the number of connections between elements. Use this view to understand the overall traceability architecture and identify gaps in requirement coverage.
-
-**Instructions:** Use mouse wheel to zoom, drag to pan. Click on nodes to navigate to element definitions. Use the +/-/reset buttons for precise control."#;
-
-const PAGE_DESCRIPTION_RESOURCES: &str = r#"# Resources
-
-The resources view shows all files referenced by the model through relations and attachments. This includes implementation files (via satisfiedBy relations), traced documents (via trace relations), and attachment files like design specifications and images. Use this view to understand the implementation landscape and identify which elements reference each file."#;
-
 /// Copies assets folder to output directory
 fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
     let assets_dir = output_dir.join("assets");
@@ -83,6 +65,41 @@ fn copy_assets_folder(output_dir: &Path) -> Result<(), ReqvireError> {
     }
 
     info!("✅ Copied {} assets", ASSETS.len());
+    Ok(())
+}
+
+/// Writes the exported `index.html` as the compiled Explorer SPA bundle with
+/// the Project Store seed injected immediately before the bundle script, and
+/// emits the bundle's `assets/explorer.{js,css}`.
+///
+/// Explorer views render as native SPA routes from the browser-local Project
+/// Store seed. Export does not emit standalone Explorer/report pages.
+fn write_explorer_index(
+    output_dir: &Path,
+    store: &crate::html::store::ExplorerProjectStore,
+) -> Result<(), ReqvireError> {
+    let seed = crate::html::store::project_store_script(store)?;
+
+    // Insert the seed script right before the Explorer bundle's module script so
+    // `window`/`#reqvire-project-store` is present before the SPA boots.
+    let bundle_marker = "<script type=\"module\"";
+    let html = match EXPLORER_INDEX_HTML.find(bundle_marker) {
+        Some(pos) => format!(
+            "{}{}\n    {}",
+            &EXPLORER_INDEX_HTML[..pos],
+            seed,
+            &EXPLORER_INDEX_HTML[pos..]
+        ),
+        None => format!("{seed}\n{EXPLORER_INDEX_HTML}"),
+    };
+
+    fs::write(output_dir.join("index.html"), html).map_err(ReqvireError::IoError)?;
+
+    let assets_dir = output_dir.join("assets");
+    fs::create_dir_all(&assets_dir).map_err(ReqvireError::IoError)?;
+    fs::write(assets_dir.join("explorer.js"), EXPLORER_BUNDLE_JS).map_err(ReqvireError::IoError)?;
+    fs::write(assets_dir.join("explorer.css"), EXPLORER_BUNDLE_CSS)
+        .map_err(ReqvireError::IoError)?;
     Ok(())
 }
 
@@ -349,14 +366,7 @@ fn copy_html_and_assets(src: &Path, dst: &Path, temp_root: &Path) -> Result<(), 
 fn post_process_html_files(temp_dir: &Path) -> Result<(), ReqvireError> {
     use regex::Regex;
 
-    let html_files = vec![
-        "index.html",
-        "traces.html",
-        "traceflow.html",
-        "coverage.html",
-        "containment.html",
-        "ontologies.html",
-    ];
+    let html_files = vec!["index.html"];
 
     // Only convert .md to .html in heading id attributes and heading text content
     // IMPORTANT: Do NOT convert .md in script tags - D3 JSON data and JS code need .md preserved
@@ -473,261 +483,29 @@ pub fn generate_artifacts_in_temp(
     info!("Generating diagrams...");
     crate::diagrams::process_diagrams(&temp_model_manager.graph_registry, diagrams_with_blobs)?;
 
-    // Generate model-centric view (capability roots with nested relations)
-    info!("Generating model.md...");
-    let model_report = crate::report_model::generate_model_report(
-        &temp_model_manager.graph_registry,
-        None,  // No filtering - use capability roots
-        false, // Not reverse - forward traversal
-        None,  // No type filter
-        false, // Markdown output
-        "TD",  // Top-down diagrams for HTML export
-    )?;
-    let model_content = format!("{}\n\n{}", PAGE_DESCRIPTION_MODEL, model_report);
-    filesystem::write_file("model.md", model_content.as_bytes())?;
-
-    // NOTE: Whole model generation is disabled - the model.md view provides similar
-    // functionality with better organization. The code is preserved for potential future use.
-    // To re-enable, uncomment the following block:
-    //
-    // info!("Generating whole-model.md...");
-    // let whole_model_mermaid = crate::diagrams::generate_model_diagram(&temp_model_manager.graph_registry, None)?;
-    // let whole_model_content = format!(
-    //     "{}\n\n{}",
-    //     PAGE_DESCRIPTION_WHOLE_MODEL,
-    //     whole_model_mermaid
-    // );
-    // filesystem::write_file("whole-model.md", whole_model_content.as_bytes())?;
-
-    info!("Generating traces.md...");
-    let trace_generator = crate::verification_trace::VerificationTraceGenerator::new(
-        &temp_model_manager.graph_registry,
-        false, // Always use relative links for traces in HTML export
-        None,
-    );
-    let trace_report = trace_generator.generate();
-    let traces_markdown = trace_generator.generate_markdown(&trace_report);
-    let sankey_markdown = crate::verification_trace::generate_sankey_markdown(&trace_report);
-    let traces_content = format!("{}\n\n{}", PAGE_DESCRIPTION_TRACES, traces_markdown);
-    filesystem::write_file("traces.md", traces_content.as_bytes())?;
-
-    // Generate traceflow.md (dedicated TraceFlow page with just Sankey diagram)
-    info!("Generating traceflow.md...");
-    let traceflow_content = format!("{}\n\n{}", PAGE_DESCRIPTION_TRACEFLOW, sankey_markdown);
-    filesystem::write_file("traceflow.md", traceflow_content.as_bytes())?;
-
-    info!("Generating coverage.md...");
-    let coverage_report =
-        crate::report_coverage::generate_coverage_report(&temp_model_manager.graph_registry);
-    let coverage_text = coverage_report.format_text();
-    let coverage_content = format!("{}\n\n{}", PAGE_DESCRIPTION_COVERAGE, coverage_text);
-    filesystem::write_file("coverage.md", coverage_content.as_bytes())?;
-
-    // Generate containment.md (D3 visualizations - containment view with toggle)
-    info!("Generating containment.md (D3 visualizations - containment view)...");
-    let d3_sunburst_content = crate::diagrams::generate_containment_d3_sunburst(
-        &temp_model_manager.graph_registry,
-        false,
-    )?;
-    let d3_icicle_content =
-        crate::diagrams::generate_containment_d3_icicle(&temp_model_manager.graph_registry, false)?;
-
-    // Create containment page with view toggle
-    let containment_content = format!(
-        r#"{description}
-
-<div class="view-toggle">
-    <button id="btn-sunburst" class="view-btn active" onclick="showView('sunburst')">Sunburst</button>
-    <button id="btn-icicle" class="view-btn" onclick="showView('icicle')">Icicle</button>
-</div>
-
-<div id="view-sunburst" class="containment-view">
-
-<p class="view-instructions">Click on segments to zoom in. Click center circle to zoom out. Click the center name link to navigate to the element.</p>
-
-{sunburst}
-
-</div>
-
-<div id="view-icicle" class="containment-view">
-
-<p class="view-instructions">Click on bars to zoom in. Click breadcrumb path to navigate back. Click the element link to open it.</p>
-
-{icicle}
-
-</div>
-
-<script>
-// Hide icicle view after page loads (both render first so D3 can calculate dimensions)
-document.addEventListener('DOMContentLoaded', function() {{
-    document.getElementById('view-icicle').style.display = 'none';
-}});
-
-function showView(view) {{
-    // Hide all views
-    document.querySelectorAll('.containment-view').forEach(el => el.style.display = 'none');
-    // Remove active from all buttons
-    document.querySelectorAll('.view-btn').forEach(btn => btn.classList.remove('active'));
-    // Show selected view
-    document.getElementById('view-' + view).style.display = 'block';
-    // Mark button as active
-    document.getElementById('btn-' + view).classList.add('active');
-}}
-</script>
-
-<style>
-.view-toggle {{
-    display: flex;
-    gap: 8px;
-    margin-bottom: 16px;
-}}
-.view-btn {{
-    padding: 8px 20px;
-    border: 1px solid #BDBDBD;
-    background: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: all 0.2s;
-}}
-.view-btn:hover {{
-    background: #F5F5F5;
-}}
-.view-btn.active {{
-    background: var(--color-primary, #3F51B5);
-    color: #fff;
-    border-color: var(--color-primary, #3F51B5);
-}}
-.view-instructions {{
-    color: #757575;
-    font-size: 13px;
-    margin: 0 0 12px 0;
-    font-style: italic;
-}}
-</style>
-"#,
-        description = PAGE_DESCRIPTION_CONTAINMENT,
-        sunburst = d3_sunburst_content,
-        icicle = d3_icicle_content
-    );
-    filesystem::write_file("containment.md", containment_content.as_bytes())?;
-
-    // Generate resources.md (files referenced by relations and attachments)
-    info!("Generating resources.md...");
-    let resources_report =
-        crate::report_resources::generate_resources_report(&temp_model_manager.graph_registry);
-    let resources_text = resources_report.format_text();
-    let resources_content = format!("{}\n\n{}", PAGE_DESCRIPTION_RESOURCES, resources_text);
-    filesystem::write_file("resources.md", resources_content.as_bytes())?;
-
-    // Generate ontology artifacts from the same graph-registry collector used by the CLI.
-    info!("Generating ontologies.ttl and ontologies.html...");
+    // Generate ontology data artifact from the same graph-registry collector used by the CLI.
+    info!("Generating ontologies.ttl...");
     let ontologies_report =
         crate::semantic_contract::build_semantic_index(&temp_model_manager.graph_registry);
     filesystem::write_file(
         "ontologies.ttl",
         ontologies_report.to_turtle_string().as_bytes(),
     )?;
-    let ontologies_page = crate::html::generate_ontologies_page(&ontologies_report, "");
-    fs::write(temp_dir.join("ontologies.html"), ontologies_page)?;
-    info!("✅ Generated ontologies.html and ontologies.ttl");
+    info!("✅ Generated ontologies.ttl");
+    let explorer_project_store = crate::html::store::build_project_store(
+        &temp_model_manager.graph_registry,
+        &ontologies_report,
+    );
 
     // Step 6: Convert markdown to HTML
     info!("Converting remaining markdown to HTML...");
     let html_count = html_export::export_markdown_to_html(&temp_dir, &temp_dir)?;
     info!("✅ Converted {} markdown files to HTML", html_count);
 
-    // Step 6.5: Generate responsive HTML for migrated pages (overwrites old templates)
-    info!("Generating responsive HTML pages...");
-
-    // Generate coverage.html with responsive design
-    let coverage_md_path = temp_dir.join("coverage.md");
-    if coverage_md_path.exists() {
-        let coverage_md = fs::read_to_string(&coverage_md_path)?;
-        let coverage_html_content = crate::html::markdown::markdown_to_html_content(
-            &coverage_md_path,
-            &coverage_md,
-            &temp_dir,
-        )?;
-        let coverage_page = crate::html::generate_coverage_page(&coverage_html_content, "");
-        fs::write(temp_dir.join("coverage.html"), coverage_page)?;
-        info!("✅ Generated coverage.html");
-    }
-
-    // Generate model.html with responsive design
-    let model_md_path = temp_dir.join("model.md");
-    if model_md_path.exists() {
-        let model_md = fs::read_to_string(&model_md_path)?;
-        let model_html_content =
-            crate::html::markdown::markdown_to_html_content(&model_md_path, &model_md, &temp_dir)?;
-        let model_page = crate::html::generate_model_page(&model_html_content, "");
-        fs::write(temp_dir.join("model.html"), model_page)?;
-        info!("✅ Generated model.html");
-    }
-
-    // Generate containment.html with responsive design (will be renamed to index.html later)
-    let containment_md_path = temp_dir.join("containment.md");
-    if containment_md_path.exists() {
-        let containment_md = fs::read_to_string(&containment_md_path)?;
-        let containment_html_content = crate::html::markdown::markdown_to_html_content(
-            &containment_md_path,
-            &containment_md,
-            &temp_dir,
-        )?;
-        let containment_page = crate::html::generate_index_page(&containment_html_content, "");
-        fs::write(temp_dir.join("containment.html"), containment_page)?;
-        info!("✅ Generated containment.html");
-    }
-
-    // Generate traces.html with responsive design
-    let traces_md_path = temp_dir.join("traces.md");
-    if traces_md_path.exists() {
-        let traces_md = fs::read_to_string(&traces_md_path)?;
-        let traces_html_content = crate::html::markdown::markdown_to_html_content(
-            &traces_md_path,
-            &traces_md,
-            &temp_dir,
-        )?;
-        let traces_page = crate::html::generate_traces_page(&traces_html_content, "");
-        fs::write(temp_dir.join("traces.html"), traces_page)?;
-        info!("✅ Generated traces.html");
-    }
-
-    // Generate traceflow.html with responsive design
-    let traceflow_md_path = temp_dir.join("traceflow.md");
-    if traceflow_md_path.exists() {
-        let traceflow_md = fs::read_to_string(&traceflow_md_path)?;
-        let traceflow_html_content = crate::html::markdown::markdown_to_html_content(
-            &traceflow_md_path,
-            &traceflow_md,
-            &temp_dir,
-        )?;
-        let traceflow_page = crate::html::generate_traceflow_page(&traceflow_html_content, "");
-        fs::write(temp_dir.join("traceflow.html"), traceflow_page)?;
-        info!("✅ Generated traceflow.html");
-    }
-
-    // Generate resources.html with responsive design
-    let resources_md_path = temp_dir.join("resources.md");
-    if resources_md_path.exists() {
-        let resources_md = fs::read_to_string(&resources_md_path)?;
-        let resources_html_content = crate::html::markdown::markdown_to_html_content(
-            &resources_md_path,
-            &resources_md,
-            &temp_dir,
-        )?;
-        let resources_page = crate::html::generate_resources_page(&resources_html_content, "");
-        fs::write(temp_dir.join("resources.html"), resources_page)?;
-        info!("✅ Generated resources.html");
-    }
-
-    // Step 6.4: Rename containment.html to index.html (for web server compatibility)
-    let containment_html = temp_dir.join("containment.html");
-    let index_html = temp_dir.join("index.html");
-    if containment_html.exists() {
-        fs::rename(&containment_html, &index_html).map_err(ReqvireError::IoError)?;
-        info!("✅ Renamed containment.html to index.html");
-    }
+    // Step 6.4: Write index.html as the compiled Explorer SPA bundle seeded with
+    // the Project Store. Explorer/report views are canonical SPA routes.
+    write_explorer_index(&temp_dir, &explorer_project_store)?;
+    info!("✅ Wrote Explorer SPA bundle to index.html");
 
     // Step 6.5: Copy assets folder for HTML pages
     info!("Copying assets...");

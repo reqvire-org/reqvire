@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../../coverage.html" class="nav-link">Coverage</a><a href="../../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../../model.html" class="mobile-nav-link">Model</a><a href="../../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../../index.html" class="nav-link">Containment</a><a href="../../../../model.html" class="nav-link">Model</a><a href="../../../../traces.html" class="nav-link">Traces</a><a href="../../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -392,6 +491,9 @@
       2f4e61e9544880a6["Move Asset Command Verification"];
       class 2f4e61e9544880a6 verification;
       click 2f4e61e9544880a6 "AttachmentsVerifications.html#move-asset-command-verification";
+      bddfad77c89d5e71["Ontology and Contract Attachment Verification"];
+      class bddfad77c89d5e71 verification;
+      click bddfad77c89d5e71 "AttachmentsVerifications.html#ontology-and-contract-attachment-verification";
       9ae645d347d4b31a["Remove Asset Command Verification"];
       class 9ae645d347d4b31a verification;
       click 9ae645d347d4b31a "AttachmentsVerifications.html#remove-asset-command-verification";
@@ -401,7 +503,14 @@
   class d882e7ff8e1ffe95 default;
   click d882e7ff8e1ffe95 "../../../../tests/test-assets/test.sh";
   1c80039ebf669864 -->|satisfiedBy| d882e7ff8e1ffe95;
-  43a55500f0bebfda -->|satisfiedBy| d882e7ff8e1ffe95;
+  5c31e20a1da9bc6e["test.sh"];
+  class 5c31e20a1da9bc6e default;
+  click 5c31e20a1da9bc6e "../../../../tests/test-refinement-elements/test.sh";
+  2b94b4f8deb0b47d -->|satisfiedBy| 5c31e20a1da9bc6e;
+  6da864fbba49def6["test.sh"];
+  class 6da864fbba49def6 default;
+  click 6da864fbba49def6 "../../../../tests/test-attachment-export/test.sh";
+  43a55500f0bebfda -->|satisfiedBy| 6da864fbba49def6;
   63f4742e633e3986["test.sh"];
   class 63f4742e633e3986 default;
   click 63f4742e633e3986 "../../../../tests/test-attachment-constraints/test.sh";
@@ -415,28 +524,28 @@
   ff62a0266193ee63 -->|satisfiedBy| d882e7ff8e1ffe95;
   285be0a87e4eada0 -->|satisfiedBy| d882e7ff8e1ffe95;
   2f4e61e9544880a6 -->|satisfiedBy| d882e7ff8e1ffe95;
+  81ef20c82035bea6["test.sh"];
+  class 81ef20c82035bea6 default;
+  click 81ef20c82035bea6 "../../../../tests/test-capability-attachments/test.sh";
+  bddfad77c89d5e71 -->|satisfiedBy| 81ef20c82035bea6;
   9ae645d347d4b31a -->|satisfiedBy| d882e7ff8e1ffe95;
 </div>
 <h3 id="attach-command-verification">Attach Command Verification</h3>
 <p>Verify attach command creates Attachments subsection and adds links.</p>
 <h4>Details</h4>
-<p>Test cases for file attachments:</p>
+<p>Test cases for identifier attachments:</p>
 <ul>
 <li>Create Attachments subsection if missing</li>
-<li>Add link with format <code>[filename](path)</code></li>
+<li>Add link with format <code>[Name](file.html#id)</code> or <code>[Name](#id)</code> for same-file references</li>
 <li>Idempotent: duplicate attach doesn’t create duplicate entry</li>
-<li>Many-to-many: same file attaches to multiple elements</li>
+<li>Many-to-many: same refinement identifier attaches to multiple elements</li>
 <li>Dry-run mode makes no changes</li>
-<li>Validation passes after attach</li>
-</ul>
-<p>Test cases for element attachments:</p>
-<ul>
-<li>Attach Refinement element by display name</li>
-<li>Auto-detect: file path takes priority over element name when file exists</li>
-<li>Element identifier format: <code>[Name](#id)</code> for same-file, <code>[Name](file.html#id)</code> for cross-file</li>
-<li>Only Refinement types allowed (constraint, behavior, specification)</li>
+<li>Attach Refinement element by identifier target</li>
+<li>Only Refinement types allowed (constraint, behavior, specification, state, input-output)</li>
 <li>Error when attaching non-Refinement element (requirement, verification, etc.)</li>
-<li>Error when neither file nor element found</li>
+<li>Error when identifier target is unresolved</li>
+<li>Error when target is not a valid refinement identifier</li>
+<li>Error when target is a file path (identifier-only attachments)</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -451,23 +560,21 @@
 <h3 id="attachment-identifier-crud-verification">Attachment Identifier CRUD Verification</h3>
 <p>Verify that moving or renaming Refinement elements updates attachment identifiers throughout the model.</p>
 <h4>Details</h4>
-<p>Test cases for move operations:</p>
-<ul>
-<li>Moving a Refinement element updates all attachment identifiers referencing it</li>
-<li>All files with referencing attachments are modified</li>
-<li>Attachment format remains valid after move</li>
-</ul>
 <p>Test cases for rename operations:</p>
 <ul>
-<li>Renaming a Refinement element updates all attachment identifiers referencing it</li>
-<li>All files with referencing attachments are modified</li>
-<li>Attachment format remains valid after rename</li>
+<li>Renaming <code>Test Constraint Element</code> to <code>Renamed Constraint</code> updates attachment links in <code>specifications/Requirements.md</code> to <code>#renamed-constraint</code></li>
+<li>Renaming <code>Test Constraint Element</code> updates attachment links in all referencing files used by the fixture (including <code>specifications/AdditionalRequirements.md</code>)</li>
+<li>Model validation succeeds after rename</li>
+</ul>
+<p>Test cases for move operations:</p>
+<ul>
+<li>Moving <code>Test Constraint Element</code> to <code>specifications/Refinements.md</code> updates attachment links in <code>specifications/Requirements.md</code> to <code>Refinements.md#test-constraint-element</code></li>
+<li>Moving <code>Test Constraint Element</code> updates attachment links in all referencing files used by the fixture (including <code>specifications/AdditionalRequirements.md</code>)</li>
+<li>Model validation succeeds after move</li>
 </ul>
 <p>Test cases for consistency:</p>
 <ul>
-<li>Behavior matches relation target updates (same update logic)</li>
-<li>Validation passes after CRUD operations</li>
-<li>No orphaned or broken attachment references</li>
+<li>Attachment identifiers remain resolvable after rename/move operations exercised by the test script</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -475,26 +582,22 @@
 </ul>
 <h4>Relations</h4>
 <ul>
+<li>satisfiedBy: <a href="../../../../tests/test-refinement-elements/test.sh">test.sh</a></li>
 <li>verify: <a href="../ModelManagement.html#attachment-identifier-updates">Attachment Identifier Updates</a></li>
 </ul>
 <hr />
 <h3 id="attachment-output-rendering-verification">Attachment Output Rendering Verification</h3>
 <p>Verify attachments render correctly in all output formats.</p>
 <h4>Details</h4>
-<p>Test cases for file paths:</p>
+<p>Test cases for identifier attachments:</p>
 <ul>
 <li>Markdown output preserves format</li>
 <li>HTML export renders clickable links</li>
 <li>JSON includes attachments array</li>
-<li>JSON file_path field contains git-root-relative path</li>
-<li>Consistent indentation in markdown</li>
-</ul>
-<p>Test cases for element identifiers:</p>
-<ul>
 <li>JSON includes element identifiers in attachments array as strings</li>
 <li>Element identifier format: <code>"file.md#element-name"</code></li>
-<li>HTML export renders clickable links to Refinement elements</li>
-<li>Mixed file path and element identifier attachments display correctly</li>
+<li>Consistent indentation in markdown</li>
+<li>Mixed same-file and cross-file identifier attachments display correctly</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -502,53 +605,52 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfiedBy: <a href="../../../../tests/test-assets/test.sh">test.sh</a></li>
+<li>satisfiedBy: <a href="../../../../tests/test-attachment-export/test.sh">test.sh</a></li>
 <li>verify: <a href="../StructureAndParsing.html#reserved-subsections-support">Reserved Subsections Support</a></li>
 </ul>
 <hr />
 <h3 id="attachment-scope-constraints-test">Attachment Scope Constraints Test</h3>
-<p>Verify that attachment scope constraints (hierarchical independence, satisfy requirement, and upstream propagation) are enforced for both refinement elements and file assets.</p>
+<p>Verify that attachment scope constraints (hierarchical independence, refine requirement, upstream propagation, and one-direction subgraph flow) are enforced for refinement-element identifier attachments.</p>
 <h4>Details</h4>
 <p><strong>Test cases for refinement hierarchical independence:</strong></p>
 <ul>
 <li>Model with attachment to refinement from same hierarchy causes <code>validate</code> to fail</li>
-<li>Error when attaching requirement has <code>satisfiedBy</code> to the refinement</li>
+<li>Error when attaching requirement has <code>refinedBy</code> to the refinement</li>
 <li>Error when attaching requirement is parent of the defining requirement</li>
 <li>Error when attaching requirement is child/grandchild of the defining requirement</li>
 <li>Accept attachment when attaching requirement is in a separate branch</li>
 </ul>
-<p><strong>Test cases for file attachment hierarchical independence:</strong></p>
-<ul>
-<li>Error when attaching file that is owned via <code>satisfiedBy</code> by the same requirement</li>
-<li>Error when attaching file owned by parent requirement in hierarchy</li>
-<li>Error when attaching file owned by child requirement in hierarchy</li>
-<li>Accept file attachment when attaching requirement is in a separate branch from owner</li>
-</ul>
 <p><strong>Test cases for upstream attachment propagation:</strong></p>
 <ul>
-<li>Error when ancestor requirement already has the same attachment (refinement or file)</li>
+<li>Error when ancestor requirement already has the same refinement identifier attachment</li>
 <li>Error when descendant requirement already has the same attachment (suggest move)</li>
 <li>Attachments propagate downstream - descendants cannot re-attach</li>
 <li>Accept attachment when no ancestor or descendant has the same attachment</li>
 </ul>
+<p><strong>Test cases for one-direction subgraph flow:</strong></p>
+<ul>
+<li>Error when a subgraph tries to attach a refinement owned by a subgraph that already attaches refinements owned by the first subgraph</li>
+<li>Link command rejects reverse-direction cross-subgraph attachment creation</li>
+<li>Merge command rejects merged attachments that would introduce reverse-direction subgraph flow</li>
+</ul>
 <p><strong>Error message formats:</strong></p>
 <ul>
 <li>Refinement hierarchy: <code>'&lt;refinement&gt;' cannot be attached to '&lt;element&gt;' because it is within the refinement's defining hierarchy</code></li>
-<li>File ownership: <code>'&lt;file&gt;' cannot be attached to '&lt;element&gt;' because it is within the file owner's hierarchy (owned by '&lt;owner&gt;')</code></li>
 <li>Ancestor propagation: <code>'&lt;attachment&gt;' is already attached at '&lt;ancestor&gt;' which is an ancestor. Attachments propagate downstream.</code></li>
 <li>Descendant conflict: <code>'&lt;attachment&gt;' is already attached at '&lt;descendant&gt;' which is a descendant. Move attachment to '&lt;element&gt;' if you want it at higher level.</code></li>
+<li>Direction conflict: <code>'&lt;attachment&gt;' cannot be attached to '&lt;element&gt;' because subgraph '&lt;root&gt;' already receives attachment contracts from subgraph '&lt;other-root&gt;'</code></li>
 </ul>
-<p><strong>Test cases for satisfy requirement:</strong></p>
+<p><strong>Test cases for refine owner requirement:</strong></p>
 <ul>
-<li>Model with attachment to orphan refinement (no satisfy relations) causes <code>validate</code> to fail</li>
-<li>Error message indicates refinement must satisfy a requirement</li>
-<li>Accept attachment to refinement with satisfy relations</li>
+<li>Model with attachment to orphan refinement (no refine relations) causes <code>validate</code> to fail</li>
+<li>Error message indicates refinement must refine a capability or requirement</li>
+<li>Accept attachment to refinement with refine relations</li>
 </ul>
 <p><strong>Test cases for attach command:</strong></p>
 <ul>
 <li><code>link REQ attaching REFINEMENT</code> fails when REQ is in same hierarchy</li>
-<li><code>link REQ attaching ORPHAN-REFINEMENT</code> fails when refinement has no satisfy</li>
-<li><code>link REQ attaching FILE</code> fails when FILE is owned by requirement in same hierarchy</li>
+<li><code>link REQ attaching ORPHAN-REFINEMENT</code> fails when refinement has no refine</li>
+<li><code>link REQ attaching TARGET</code> fails when TARGET is not a valid refinement identifier</li>
 <li>Error messages are consistent with validate error format</li>
 </ul>
 <p><strong>Test cases for merge command:</strong></p>
@@ -574,9 +676,6 @@
 <p>Test cases:</p>
 <ul>
 <li><code>--has-attachments</code> finds only elements with attachments</li>
-<li><code>--filter-attachment</code> with glob pattern matches correctly</li>
-<li>Pattern <code>*.pdf</code> matches PDF files only</li>
-<li>Pattern <code>docs/*</code> matches all files in docs directory</li>
 <li>No false positives or false negatives</li>
 </ul>
 <h4>Metadata</h4>
@@ -618,23 +717,16 @@
 </ul>
 <hr />
 <h3 id="attachments-subsection-parsing-verification">Attachments Subsection Parsing Verification</h3>
-<p>Verify the system correctly parses Attachments subsections including both file paths and element identifiers.</p>
+<p>Verify the system correctly parses Attachments subsections using refinement element identifiers.</p>
 <h4>Details</h4>
-<p>Test cases for file paths:</p>
-<ul>
-<li>Parse markdown links in Attachments subsection</li>
-<li>Extract paths where link text equals href</li>
-<li>Normalize paths to git-root-relative</li>
-<li>Handle multiple attachments in single element</li>
-<li>Reject links where text ≠ href (for file paths)</li>
-</ul>
 <p>Test cases for element identifiers:</p>
 <ul>
-<li>Parse markdown links to Refinement elements (constraint, behavior, specification)</li>
+<li>Parse markdown links to Refinement elements (constraint, behavior, specification, state, input-output)</li>
 <li>Normalize element identifiers like relation targets</li>
 <li>Support full identifier format <code>file.md#element-name</code></li>
 <li>Support same-file format <code>#element-name</code></li>
-<li>Handle mixed file path and element identifier attachments</li>
+<li>Handle multiple identifier attachments in single element</li>
+<li>Reject file-path attachment syntax</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -648,21 +740,16 @@
 </ul>
 <hr />
 <h3 id="attachments-validation-verification">Attachments Validation Verification</h3>
-<p>Verify the system validates attachment targets including file existence and element identifier validity.</p>
+<p>Verify the system validates attachment targets as refinement element identifiers.</p>
 <h4>Details</h4>
-<p>Test cases for file paths:</p>
-<ul>
-<li>Validation passes when attachment files exist</li>
-<li>Validation fails for missing attachment files</li>
-<li>Error message includes element identifier and missing path</li>
-<li>Validation occurs in Pass 2</li>
-</ul>
 <p>Test cases for element identifiers:</p>
 <ul>
-<li>Accept Refinement element identifiers (constraint, behavior, specification)</li>
-<li>Reject non-Refinement element identifiers (requirement, user-requirement, verification)</li>
+<li>Accept Refinement element identifiers (constraint, behavior, specification, state, input-output)</li>
+<li>Reject non-Refinement element identifiers (capability, requirement, verification)</li>
+<li>Reject file-path attachment syntax</li>
 <li>Error message indicates expected Refinement type</li>
 <li>Validation fails for non-existent element identifiers</li>
+<li>Validation occurs in Pass 2</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -676,22 +763,16 @@
 </ul>
 <hr />
 <h3 id="detach-command-verification">Detach Command Verification</h3>
-<p>Verify detach command removes links and cleans up empty subsections.</p>
+<p>Verify detach command removes identifier links and cleans up empty subsections.</p>
 <h4>Details</h4>
-<p>CRITICAL: Must verify detach triggers change impact.</p>
-<p>Test cases for file attachments:</p>
+<p>Test cases for identifier attachments:</p>
 <ul>
 <li>Remove link from Attachments subsection</li>
 <li>Remove subsection when no attachments remain</li>
 <li>Detach from one element doesn’t affect others</li>
 <li>Dry-run mode makes no changes</li>
-<li>Change impact analysis shows element as changed</li>
-</ul>
-<p>Test cases for element attachments:</p>
-<ul>
-<li>Detach Refinement element by display name</li>
-<li>Auto-detect: match element name against existing attachments</li>
-<li>Works for both same-file and cross-file element attachments</li>
+<li>Detach Refinement element by identifier target</li>
+<li>Works for both same-file and cross-file refinement identifiers</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -704,14 +785,12 @@
 </ul>
 <hr />
 <h3 id="move-asset-command-verification">Move Asset Command Verification</h3>
-<p>Verify mv-asset moves InternalPath files and updates all references across the model.</p>
+<p>Verify mv-asset moves InternalPath files and updates path-based relations while leaving refinement-identifier attachments unchanged.</p>
 <h4>Details</h4>
-<p>Test cases for Attachments subsection updates:</p>
+<p>Test cases for attachment behavior:</p>
 <ul>
-<li>Find all elements with InternalPath attachment matching old path</li>
-<li>Update link text to new path</li>
-<li>Update link href to new path</li>
-<li>Handle relative path resolution from element’s file location</li>
+<li>Existing refinement-identifier attachments remain unchanged after mv-asset</li>
+<li>No attachment entries are rewritten due to path moves</li>
 </ul>
 <p>Test cases for Relations updates:</p>
 <ul>
@@ -724,10 +803,11 @@
 <p>Test cases for filesystem and reporting:</p>
 <ul>
 <li>Move/rename physical file on filesystem</li>
-<li>Report count of affected Attachments</li>
 <li>Report count of affected Relations</li>
 <li>Report list of modified specification files</li>
 <li>Dry-run mode: show changes without applying (file not moved)</li>
+<li>JSON mode: emit valid structured CRUD result output</li>
+<li>JSON file mode: write valid structured CRUD result output to <code>--output &lt;FILE&gt;</code></li>
 <li>Validation passes after move</li>
 </ul>
 <h4>Metadata</h4>
@@ -740,14 +820,38 @@
 <li>verify: <a href="../../../Interfaces/CLI/Commands.html#cli-move-asset-command">CLI Move Asset Command</a></li>
 </ul>
 <hr />
-<h3 id="remove-asset-command-verification">Remove Asset Command Verification</h3>
-<p>Verify rm-asset deletes InternalPath files and removes all references from the model.</p>
+<h3 id="ontology-and-contract-attachment-verification">Ontology and Contract Attachment Verification</h3>
+<p>Verify attachment rules for ontology elements and requirement-owned semantic-contract elements.</p>
 <h4>Details</h4>
-<p>Test cases for Attachments subsection updates:</p>
+<p>Test cases:</p>
 <ul>
-<li>Find all elements with InternalPath attachment matching path</li>
-<li>Remove attachment link from Attachments subsection</li>
-<li>Remove empty Attachments subsection if no attachments remain</li>
+<li>Capability attachment to an <code>ontology</code> element validates.</li>
+<li>Capability attachment to a requirement-owned <code>semantic-contract</code> fails.</li>
+<li>Capability attachment to a requirement-detail refinement such as <code>input-output</code> fails.</li>
+<li>Requirement attachment to an <code>ontology</code> element fails.</li>
+<li>Requirement attachment to a requirement-owned <code>semantic-contract</code> validates.</li>
+<li>Requirement attachment to ontology is forbidden because ontology context is inherited from the owning capability path.</li>
+<li>Requirement attachment to semantic contracts is limited to requirement-owned semantic contracts.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: test-verification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>satisfiedBy: <a href="../../../../tests/test-capability-attachments/test.sh">test.sh</a></li>
+<li>verify: <a href="../ModelManagement.html#ontology-and-semantic-contract-model">Ontology and Semantic Contract Model</a></li>
+<li>verify: <a href="../Validation.html#attachment-scope-validation">Attachment Scope Validation</a></li>
+<li>verify: <a href="../Validation.html#attachment-target-validation">Attachment Target Validation</a></li>
+</ul>
+<hr />
+<h3 id="remove-asset-command-verification">Remove Asset Command Verification</h3>
+<p>Verify rm-asset deletes InternalPath files and removes path-based relations while leaving refinement-identifier attachments unchanged.</p>
+<h4>Details</h4>
+<p>Test cases for attachment behavior:</p>
+<ul>
+<li>Existing refinement-identifier attachments remain unchanged after rm-asset</li>
+<li>No attachment entries are removed by rm-asset</li>
 </ul>
 <p>Test cases for Relations updates:</p>
 <ul>
@@ -759,10 +863,11 @@
 <p>Test cases for filesystem and reporting:</p>
 <ul>
 <li>Delete physical file from filesystem</li>
-<li>Report count of removed Attachments</li>
 <li>Report count of removed Relations</li>
 <li>Report list of modified specification files</li>
 <li>Dry-run mode: show changes without applying (file not deleted)</li>
+<li>JSON mode: emit valid structured CRUD result output</li>
+<li>JSON file mode: write valid structured CRUD result output to <code>--output &lt;FILE&gt;</code></li>
 <li>Validation passes after removal</li>
 </ul>
 <h4>Metadata</h4>
@@ -821,7 +926,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -830,10 +936,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -846,7 +955,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -864,6 +973,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1256,9 +1370,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

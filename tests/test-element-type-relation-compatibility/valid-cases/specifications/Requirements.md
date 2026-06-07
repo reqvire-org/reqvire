@@ -9,7 +9,6 @@ Test capability root for migrated requirement fixtures.
   * type: capability
 
 #### Relations
-  * refinedBy: [Capability Behavior Element](#capability-behavior-element)
   * verifiedBy: [Capability Level Verification](#capability-level-verification)
 ---
 
@@ -169,15 +168,6 @@ A behavior element describing system behavior.
 
 ---
 
-### Capability Behavior Element
-
-A behavior refinement owned by a capability.
-
-#### Metadata
-  * type: behavior
-
----
-
 ### Specification Element
 
 A specification element describing detailed specifications.
@@ -193,6 +183,15 @@ A constraint element describing system constraints.
 
 #### Metadata
   * type: constraint
+
+---
+
+### Source Element
+
+A source element describing requirement-owned source material.
+
+#### Metadata
+  * type: source
 
 ---
 
@@ -232,5 +231,18 @@ Requirement that asks for constraint definition, refined by a constraint element
 #### Relations
   * derivedFrom: [Capability Parent](#capability-parent)
   * refinedBy: [Constraint Element](#constraint-element)
+
+---
+
+### Requirement Refined By Source
+
+Requirement that traces source material through a requirement-owned source refinement.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Capability Parent](#capability-parent)
+  * refinedBy: [Source Element](#source-element)
 
 ---

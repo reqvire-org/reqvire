@@ -1,11 +1,11 @@
 use crate::element::{Element, ElementType};
 use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
-use crate::relation::{VERIFY_RELATION, VERIFICATION_TRACES_RELATIONS};
+use crate::relation::{VERIFICATION_TRACES_RELATIONS, VERIFY_RELATION};
 use crate::utils;
 use serde::Serialize;
 use std::collections::{BTreeMap, HashSet};
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[derive(Debug, Serialize)]
 pub struct VerificationTracesReport {
@@ -54,7 +54,7 @@ struct RequirementNodeWithRelation {
     pub name: String,
     pub element_type: String, // CSS class name based on element type
     pub children: Vec<(String, RequirementNodeWithRelation)>, // (relation_type, node)
-    pub attachments: Vec<String>,
+    pub attachment_labels: Vec<String>,
 }
 
 pub struct VerificationTraceGenerator<'a> {
@@ -64,8 +64,16 @@ pub struct VerificationTraceGenerator<'a> {
 }
 
 impl<'a> VerificationTraceGenerator<'a> {
-    pub fn new(registry: &'a GraphRegistry, diagrams_with_blobs: bool, from_folder: Option<String>) -> Self {
-        Self { registry, diagrams_with_blobs, from_folder }
+    pub fn new(
+        registry: &'a GraphRegistry,
+        diagrams_with_blobs: bool,
+        from_folder: Option<String>,
+    ) -> Self {
+        Self {
+            registry,
+            diagrams_with_blobs,
+            from_folder,
+        }
     }
 
     /// Generate verification traces report
@@ -87,7 +95,9 @@ impl<'a> VerificationTraceGenerator<'a> {
                 verification.directly_verified_requirements.sort();
             }
             // Sort verifications by file_order_index for document order
-            file_verifications.verifications.sort_by_key(|v| v.file_order_index);
+            file_verifications
+                .verifications
+                .sort_by_key(|v| v.file_order_index);
         }
 
         VerificationTracesReport { files }
@@ -185,11 +195,9 @@ impl<'a> VerificationTraceGenerator<'a> {
                     if let Some(parent) = self.registry.get_element(parent_id) {
                         // Clone visited set for this branch to allow multiple paths
                         let mut branch_visited = visited.clone();
-                        if let Some(parent_node) = self.build_requirement_node(
-                            parent,
-                            false,
-                            &mut branch_visited,
-                        ) {
+                        if let Some(parent_node) =
+                            self.build_requirement_node(parent, false, &mut branch_visited)
+                        {
                             children.push(parent_node);
                         }
                     }
@@ -206,7 +214,6 @@ impl<'a> VerificationTraceGenerator<'a> {
         })
     }
 
-
     /// Count total requirements in tree
     fn count_requirements_in_tree(&self, tree: &TraceTree) -> usize {
         let mut count = 0;
@@ -220,7 +227,11 @@ impl<'a> VerificationTraceGenerator<'a> {
     }
 
     /// Count node and its children recursively
-    fn count_node_and_children(&self, node: &RequirementNode, visited: &mut HashSet<String>) -> usize {
+    fn count_node_and_children(
+        &self,
+        node: &RequirementNode,
+        visited: &mut HashSet<String>,
+    ) -> usize {
         if visited.contains(&node.id) {
             return 0;
         }
@@ -245,19 +256,12 @@ impl<'a> VerificationTraceGenerator<'a> {
             Err(_) => PathBuf::from(""),
         };
 
-        let base_url = match git_commands::get_repository_base_url() {
-            Ok(url) => url,
-            Err(_) => String::new(),
-        };
+        let base_url = git_commands::get_repository_base_url().unwrap_or_default();
 
-        let commit_hash = match git_commands::get_commit_hash() {
-            Ok(hash) => hash,
-            Err(_) => String::new(),
-        };
+        let commit_hash = git_commands::get_commit_hash().unwrap_or_default();
 
-        let has_git_info = !repo_root.as_os_str().is_empty()
-            && !base_url.is_empty()
-            && !commit_hash.is_empty();
+        let has_git_info =
+            !repo_root.as_os_str().is_empty() && !base_url.is_empty() && !commit_hash.is_empty();
 
         // Build tree with relation information first to collect all elements
         let mut visited = HashSet::new();
@@ -272,19 +276,32 @@ impl<'a> VerificationTraceGenerator<'a> {
         }
 
         // Collect all elements that will be in the diagram
-        // (id, name, element_type, attachments) - element_type is used for CSS class
+        // (id, name, element_type, attachment_labels) - element_type is used for CSS class
         let mut all_elements: Vec<(String, String, String, Vec<String>)> = Vec::new();
         let mut collected_ids: HashSet<String> = HashSet::new();
 
         // Add verification element
-        all_elements.push((trace.identifier.clone(), trace.name.clone(), "verification".to_string(), vec![]));
+        all_elements.push((
+            trace.identifier.clone(),
+            trace.name.clone(),
+            "verification".to_string(),
+            vec![],
+        ));
         collected_ids.insert(trace.identifier.clone());
 
         // Collect all requirements from tree
-        self.collect_elements_from_tree(&tree_with_relations, &mut all_elements, &mut collected_ids);
+        self.collect_elements_from_tree(
+            &tree_with_relations,
+            &mut all_elements,
+            &mut collected_ids,
+        );
 
         // Group elements by folder -> file for containment structure
-        let mut folders: HashMap<String, HashMap<String, Vec<(String, String, String, Vec<String>)>>> = HashMap::new();
+        #[allow(clippy::type_complexity)]
+        let mut folders: HashMap<
+            String,
+            HashMap<String, Vec<(String, String, String, Vec<String>)>>,
+        > = HashMap::new();
 
         for (elem_id, elem_name, elem_type, attachments) in all_elements {
             // Extract folder and file from identifier (format: path/to/File.md#element-name)
@@ -299,28 +316,35 @@ impl<'a> VerificationTraceGenerator<'a> {
                 .file_name()
                 .and_then(|n| n.to_str())
                 .unwrap_or_else(|| {
-                    id_without_fragment.rsplit('/').next().unwrap_or(id_without_fragment)
+                    id_without_fragment
+                        .rsplit('/')
+                        .next()
+                        .unwrap_or(id_without_fragment)
                 })
                 .to_string();
 
-            folders.entry(folder)
-                .or_insert_with(HashMap::new)
+            folders
+                .entry(folder)
+                .or_default()
                 .entry(file_name)
-                .or_insert_with(Vec::new)
+                .or_default()
                 .push((elem_id, elem_name, elem_type, attachments));
         }
 
         // Header with CSS classes (MBSE color scheme - matching other diagrams)
         diagram.push_str("```mermaid\n");
         diagram.push_str("graph TD\n");
-        diagram.push_str("  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;\n");
-        diagram.push_str("  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n");
-        diagram.push_str("  classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;\n");
+        diagram.push_str("  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;\n");
+        diagram.push_str(
+            "  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;\n",
+        );
+        diagram
+            .push_str("  classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px;\n");
         diagram.push_str("  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;\n");
         diagram.push_str("  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;\n");
         diagram.push_str("  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;\n");
         diagram.push_str("  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;\n");
-        diagram.push_str("\n");
+        diagram.push('\n');
 
         // Sort folders for deterministic output
         let mut folder_names: Vec<&String> = folders.keys().collect();
@@ -330,9 +354,16 @@ impl<'a> VerificationTraceGenerator<'a> {
         for folder_name in folder_names {
             let files = &folders[folder_name];
             let folder_id = utils::hash_identifier(&format!("folder:{}", folder_name));
-            let folder_display = if folder_name.is_empty() { "root" } else { folder_name };
+            let folder_display = if folder_name.is_empty() {
+                "root"
+            } else {
+                folder_name
+            };
 
-            diagram.push_str(&format!("  subgraph {}[\"📁 {}\"]\n", folder_id, folder_display));
+            diagram.push_str(&format!(
+                "  subgraph {}[\"📁 {}\"]\n",
+                folder_id, folder_display
+            ));
 
             // Sort files for deterministic output
             let mut file_names: Vec<&String> = files.keys().collect();
@@ -340,21 +371,24 @@ impl<'a> VerificationTraceGenerator<'a> {
 
             for file_name in file_names {
                 let file_elements = &files[file_name];
-                let file_id = utils::hash_identifier(&format!("file:{}:{}", folder_name, file_name));
+                let file_id =
+                    utils::hash_identifier(&format!("file:{}:{}", folder_name, file_name));
 
                 diagram.push_str(&format!("    subgraph {}[\"📄 {}\"]\n", file_id, file_name));
 
                 // Sort elements for deterministic output
-                let mut sorted_elements: Vec<&(String, String, String, Vec<String>)> = file_elements.iter().collect();
+                let mut sorted_elements: Vec<&(String, String, String, Vec<String>)> =
+                    file_elements.iter().collect();
                 sorted_elements.sort_by(|a, b| a.0.cmp(&b.0));
 
-                for (elem_id, elem_name, elem_type, attachments) in sorted_elements {
+                for (elem_id, elem_name, elem_type, attachment_labels) in sorted_elements {
                     let node_id = utils::hash_identifier(elem_id);
 
                     // Build label with attachments
-                    let mut node_label = elem_name.to_string();
-                    for attachment in attachments {
-                        node_label.push_str(&format!("<br/>📎 {}", attachment));
+                    let mut node_label = escape_mermaid_label(elem_name);
+                    for attachment in attachment_labels {
+                        node_label
+                            .push_str(&format!("<br/>📎 {}", escape_mermaid_label(attachment)));
                     }
 
                     // Use the element type directly for CSS class
@@ -366,7 +400,13 @@ impl<'a> VerificationTraceGenerator<'a> {
                     ));
 
                     // Add click handler
-                    let click_target = self.get_click_target(elem_id, &repo_root, &base_url, &commit_hash, has_git_info);
+                    let click_target = self.get_click_target(
+                        elem_id,
+                        &repo_root,
+                        &base_url,
+                        &commit_hash,
+                        has_git_info,
+                    );
                     diagram.push_str(&format!("      click {} \"{}\";\n", node_id, click_target));
                 }
 
@@ -383,16 +423,17 @@ impl<'a> VerificationTraceGenerator<'a> {
         // Add verify relations from verification to directly verified requirements
         for req_id in &trace.directly_verified_requirements {
             let req_node_id = utils::hash_identifier(req_id);
-            let edge_key = (verification_id.clone(), VERIFY_RELATION.to_string(), req_node_id.clone());
+            let edge_key = (
+                verification_id.clone(),
+                VERIFY_RELATION.to_string(),
+                req_node_id.clone(),
+            );
             if !visited_edges.contains(&edge_key) {
                 visited_edges.insert(edge_key);
                 if let Some(info) = crate::relation::RELATION_TYPES.get(VERIFY_RELATION) {
                     diagram.push_str(&format!(
                         "  {} {}|{}| {};\n",
-                        verification_id,
-                        info.arrow,
-                        info.label,
-                        req_node_id,
+                        verification_id, info.arrow, info.label, req_node_id,
                     ));
                 }
             }
@@ -416,10 +457,16 @@ impl<'a> VerificationTraceGenerator<'a> {
             // Only add if not already collected (avoid duplicates from multiple paths)
             if !collected_ids.contains(&node.id) {
                 collected_ids.insert(node.id.clone());
-                all_elements.push((node.id.clone(), node.name.clone(), node.element_type.clone(), node.attachments.clone()));
+                all_elements.push((
+                    node.id.clone(),
+                    node.name.clone(),
+                    node.element_type.clone(),
+                    node.attachment_labels.clone(),
+                ));
             }
             // Recursively collect children
-            let children: Vec<RequirementNodeWithRelation> = node.children.iter().map(|(_, n)| n.clone()).collect();
+            let children: Vec<RequirementNodeWithRelation> =
+                node.children.iter().map(|(_, n)| n.clone()).collect();
             self.collect_elements_from_tree(&children, all_elements, collected_ids);
         }
     }
@@ -440,19 +487,17 @@ impl<'a> VerificationTraceGenerator<'a> {
 
                 if !visited_edges.contains(&edge_key) {
                     visited_edges.insert(edge_key);
-                    if let Some(info) = crate::relation::RELATION_TYPES.get(relation_type.as_str()) {
+                    if let Some(info) = crate::relation::RELATION_TYPES.get(relation_type.as_str())
+                    {
                         diagram.push_str(&format!(
                             "  {} {}|{}| {};\n",
-                            node_id,
-                            info.arrow,
-                            info.label,
-                            child_id,
+                            node_id, info.arrow, info.label, child_id,
                         ));
                     }
                 }
 
                 // Recursively add relations for children
-                self.add_relations_from_tree(&[child.clone()], diagram, visited_edges);
+                self.add_relations_from_tree(std::slice::from_ref(child), diagram, visited_edges);
             }
         }
     }
@@ -461,7 +506,7 @@ impl<'a> VerificationTraceGenerator<'a> {
     fn get_click_target(
         &self,
         elem_id: &str,
-        repo_root: &PathBuf,
+        repo_root: &Path,
         base_url: &str,
         commit_hash: &str,
         has_git_info: bool,
@@ -520,10 +565,12 @@ impl<'a> VerificationTraceGenerator<'a> {
 
         // Determine CSS class based on element type (matching other diagrams)
         let element_type = match &requirement.element_type {
-            ElementType::Requirement(crate::element::RequirementType::User) => "userRequirement",
-            ElementType::Requirement(crate::element::RequirementType::System) => "systemRequirement",
+            ElementType::Capability => "capability",
+            ElementType::Requirement(crate::element::RequirementType::System) => {
+                "systemRequirement"
+            }
             ElementType::Verification(_) => "verification",
-            _ => "requirement"
+            _ => "requirement",
         };
 
         Some(RequirementNodeWithRelation {
@@ -531,12 +578,19 @@ impl<'a> VerificationTraceGenerator<'a> {
             name: requirement.name.clone(),
             element_type: element_type.to_string(),
             children,
-            attachments: requirement.attachments.iter()
+            attachment_labels: requirement
+                .attachments
+                .iter()
                 .map(|a| match &a.target {
-                    crate::element::AttachmentTarget::FilePath(path) => path.file_name()
+                    crate::element::AttachmentTarget::FilePath(path) => path
+                        .file_name()
                         .map(|n| n.to_string_lossy().into_owned())
                         .unwrap_or_else(|| path.to_string_lossy().into_owned()),
-                    crate::element::AttachmentTarget::ElementIdentifier(id) => id.clone(),
+                    crate::element::AttachmentTarget::ElementIdentifier(id) => self
+                        .registry
+                        .get_element(id)
+                        .map(|target| target.name.clone())
+                        .unwrap_or_else(|| attachment_target_label(id)),
                 })
                 .collect(),
         })
@@ -553,11 +607,15 @@ impl<'a> VerificationTraceGenerator<'a> {
             // Verifications are already sorted by file_order_index in generate()
             for trace in &file_verifications.verifications {
                 // Make element name a clickable link to its definition
-                let element_fragment = trace.identifier
+                let element_fragment = trace
+                    .identifier
                     .rfind('#')
                     .map(|pos| &trace.identifier[pos..])
                     .unwrap_or("");
-                markdown.push_str(&format!("### [{}]({}{})\n\n", trace.name, trace.file, element_fragment));
+                markdown.push_str(&format!(
+                    "### [{}]({}{})\n\n",
+                    trace.name, trace.file, element_fragment
+                ));
                 markdown.push_str(&format!("- **Type**: {}\n", trace.verification_type));
                 markdown.push_str(&format!(
                     "- **Directly Verified**: {} requirements\n",
@@ -578,9 +636,30 @@ impl<'a> VerificationTraceGenerator<'a> {
     }
 }
 
+fn attachment_target_label(target: &str) -> String {
+    let fragment_or_path = target.rsplit('#').next().unwrap_or(target);
+    let basename = fragment_or_path
+        .rsplit('/')
+        .next()
+        .unwrap_or(fragment_or_path);
+    if basename.is_empty() {
+        target.to_string()
+    } else {
+        basename.to_string()
+    }
+}
+
+fn escape_mermaid_label(label: &str) -> String {
+    label
+        .replace('\\', "\\\\")
+        .replace('"', "\\\"")
+        .replace('\n', " ")
+}
+
 /// Valid verification types for --filter-type in traces command
 pub const VERIFICATION_TYPES: &[&str] = &[
     "test-verification",
+    "formal-proof-verification",
     "analysis-verification",
     "inspection-verification",
     "demonstration-verification",
@@ -608,8 +687,10 @@ pub fn apply_filters(
 
     // Compile regex if name filter is provided
     let name_regex = if let Some(pattern) = filter_name {
-        Some(Regex::new(pattern)
-            .map_err(|e| crate::error::ReqvireError::InvalidRegex(e.to_string()))?)
+        Some(
+            Regex::new(pattern)
+                .map_err(|e| crate::error::ReqvireError::InvalidRegex(e.to_string()))?,
+        )
     } else {
         None
     };
@@ -692,7 +773,13 @@ pub fn generate_sankey_data(report: &VerificationTracesReport) -> SankeyData {
             }
 
             // Add requirement nodes and links from trace tree
-            add_requirements_from_tree(&trace.trace_tree.requirements, &trace.name, &mut nodes, &mut links, &mut node_names);
+            add_requirements_from_tree(
+                &trace.trace_tree.requirements,
+                &trace.name,
+                &mut nodes,
+                &mut links,
+                &mut node_names,
+            );
         }
     }
 
@@ -746,7 +833,13 @@ fn add_requirements_from_tree(
             });
 
             // Recursively process grandchildren
-            add_requirements_from_tree(&child.children, verification_name, nodes, links, node_names);
+            add_requirements_from_tree(
+                &child.children,
+                verification_name,
+                nodes,
+                links,
+                node_names,
+            );
         }
     }
 }
@@ -755,8 +848,7 @@ fn add_requirements_from_tree(
 pub fn generate_sankey_markdown(report: &VerificationTracesReport) -> String {
     let sankey_data = generate_sankey_data(report);
 
-    let json = serde_json::to_string_pretty(&sankey_data)
-        .unwrap_or_else(|_| "{}".to_string());
+    let json = serde_json::to_string_pretty(&sankey_data).unwrap_or_else(|_| "{}".to_string());
 
     format!("```d3-sankey\n{}\n```\n", json)
 }

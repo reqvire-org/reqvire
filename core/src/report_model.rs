@@ -34,6 +34,8 @@ pub struct ModelCentricElement {
     pub size_estimate: Option<SizeEstimate>,
     pub relations: Vec<ModelCentricRelation>,
     pub attachments: Vec<String>,
+    #[serde(skip)]
+    pub attachment_labels: Vec<String>,
 }
 
 /// Relation in model-centric view with target details
@@ -346,6 +348,17 @@ fn build_element_recursive(
         .iter()
         .map(|a| a.target.as_str())
         .collect();
+    let attachment_labels: Vec<String> = element
+        .attachments
+        .iter()
+        .map(|a| {
+            let target_id = a.target.as_str();
+            registry
+                .get_element(&target_id)
+                .map(|target| target.name.clone())
+                .unwrap_or_else(|| attachment_target_label(&target_id))
+        })
+        .collect();
 
     Some(ModelCentricElement {
         identifier: element.identifier.clone(),
@@ -356,7 +369,21 @@ fn build_element_recursive(
         size_estimate: element.size_estimate.clone(),
         relations,
         attachments,
+        attachment_labels,
     })
+}
+
+fn attachment_target_label(target: &str) -> String {
+    let fragment_or_path = target.rsplit('#').next().unwrap_or(target);
+    let basename = fragment_or_path
+        .rsplit('/')
+        .next()
+        .unwrap_or(fragment_or_path);
+    if basename.is_empty() {
+        target.to_string()
+    } else {
+        basename.to_string()
+    }
 }
 
 /// Count total relations from starting elements
@@ -763,7 +790,7 @@ fn generate_mermaid_for_element(element: &ModelCentricElement, indent: &str) -> 
 
                 // Build label with attachments
                 let mut elem_label = escape_label(&elem.name);
-                for attachment in &elem.attachments {
+                for attachment in &elem.attachment_labels {
                     elem_label.push_str(&format!("<br/>📎 {}", escape_label(attachment)));
                 }
 

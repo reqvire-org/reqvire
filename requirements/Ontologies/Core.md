@@ -23,7 +23,7 @@ reqvire:Requirement a owl:Class ;
   rdfs:comment "Implementation-facing obligation that can be verified and satisfied by implementation or evidence." .
 reqvire:Refinement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
-  rdfs:comment "Detail element that refines a capability or requirement with source, semantic, behavioral, structural, or contract information." .
+  rdfs:comment "Requirement-owned detail element that refines a requirement with source, semantic, behavioral, structural, or contract information." .
 reqvire:Verification a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "Evidence or method used to verify a capability or requirement." .
@@ -45,7 +45,7 @@ reqvire:RequirementElementType a owl:Class ;
   rdfs:comment "Element type category for requirement obligations." .
 reqvire:RefinementElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
-  rdfs:comment "Element type category for capability-owned and requirement-owned refinements." .
+  rdfs:comment "Element type category for requirement-owned refinements." .
 reqvire:VerificationElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for verification methods and evidence records." .
@@ -147,7 +147,7 @@ reqvire:referenceTargetKindName a owl:DatatypeProperty ;
 reqvire:capabilityType a reqvire:CapabilityElementType ;
   reqvire:elementTypeName "capability" ;
   reqvire:elementTypeCategory "capability" ;
-  rdfs:comment "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, refined by contracts, and verified by evidence." ;
+  rdfs:comment "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, connected to ontology through attachments, and verified by evidence." ;
   reqvire:defaultElementType false .
 
 reqvire:requirementType a reqvire:RequirementElementType ;

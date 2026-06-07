@@ -213,12 +213,26 @@ pub fn render(report: &SemanticIndex, nav_prefix: &str) -> Markup {
                 section class="ontology-graph-panel" aria-label="Ontology graph explorer" {
                     div class="ontology-graph-canvas" {
                         div class="ontology-graph-legend" aria-label="Ontology graph legend and filters" {
-                            div class="ontology-legend-title" { "Types" }
+                            div class="ontology-legend-title" { "View" }
+                            div class="ontology-control-grid" {
+                                button type="button" class="ontology-control-button" onclick="resetOntologyGraphLayout()" { "Reset" }
+                            }
+                            div class="ontology-legend-title" { "Show" }
+                            div class="ontology-legend-grid" {
+                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="role" data-filter-value="ontology-term" aria-pressed="true" { span class="ontology-dot ontology-dot-class" {} "Terms" }
+                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="relation" data-filter-value="datatype-properties" aria-pressed="true" { span class="ontology-dot ontology-dot-datatype-property" {} "Datatype property links" }
+                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="relation" data-filter-value="object-properties" aria-pressed="true" { span class="ontology-dot ontology-dot-object-property" {} "Object property links" }
+                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="relation" data-filter-value="class-membership" aria-pressed="true" { span class="ontology-legend-symbol" { "∈" } "Class membership" }
+                                button type="button" class="ontology-legend-item ontology-filter-toggle" data-filter-category="relation" data-filter-value="class-disjointness" aria-pressed="false" { span class="ontology-legend-symbol" { "⟂" } "Class disjointness" }
+                                button type="button" class="ontology-legend-item ontology-filter-toggle" data-filter-category="relation" data-filter-value="restrictions" aria-pressed="false" { span class="ontology-legend-symbol" { "∀" } "Restrictions" }
+                                button type="button" class="ontology-legend-item ontology-filter-toggle" data-filter-category="relation" data-filter-value="class-expressions" aria-pressed="false" { span class="ontology-legend-symbol" { "∩" } "Class expressions" }
+                                button type="button" class="ontology-legend-item ontology-filter-toggle" data-filter-category="role" data-filter-value="shacl-shape" aria-pressed="false" { span class="ontology-dot ontology-dot-node-shape" {} "SHACL shapes" }
+                                button type="button" class="ontology-legend-item ontology-filter-toggle" data-filter-category="role" data-filter-value="resource" aria-pressed="false" { span class="ontology-dot ontology-dot-resource" {} "Resources" }
+                                button type="button" class="ontology-legend-item ontology-filter-toggle" data-filter-category="role" data-filter-value="external-reference" aria-pressed="false" { span class="ontology-dot ontology-dot-external-reference" {} "External refs" }
+                            }
+                            div class="ontology-legend-title ontology-legend-title-secondary" { "Types" }
                             div class="ontology-legend-grid ontology-color-key" {
                                 div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-class" {} "Class" }
-                                div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-object-property" {} "Object prop." }
-                                div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-datatype-property" {} "Datatype prop." }
-                                div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-rdf-property" {} "RDF prop." }
                                 div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-named-individual" {} "Individual" }
                                 div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-datatype" {} "Datatype" }
                                 div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-restriction" {} "Restriction" }
@@ -226,38 +240,24 @@ pub fn render(report: &SemanticIndex, nav_prefix: &str) -> Markup {
                                 div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-node-shape" {} "Node shape" }
                                 div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-property-shape" {} "Property shape" }
                                 div class="ontology-legend-key-item" { span class="ontology-dot ontology-dot-resource" {} "Resource" }
+                                div class="ontology-legend-key-item" { span class="ontology-edge-sample" {} "Relation" }
                             }
-                            div class="ontology-legend-title ontology-legend-title-secondary" { "Show" }
+                            div class="ontology-legend-title ontology-legend-title-secondary" { "Notation" }
                             div class="ontology-legend-grid" {
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="role" data-filter-value="ontology-term" aria-pressed="true" { span class="ontology-dot ontology-dot-class" {} "Terms" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="role" data-filter-value="property" aria-pressed="true" { span class="ontology-dot ontology-dot-object-property" {} "Properties" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="role" data-filter-value="shacl-shape" aria-pressed="true" { span class="ontology-dot ontology-dot-node-shape" {} "SHACL shapes" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="role" data-filter-value="resource" aria-pressed="true" { span class="ontology-dot ontology-dot-resource" {} "Resources" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="role" data-filter-value="relation" aria-pressed="true" { span class="ontology-edge-sample" {} "Relation" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle" data-filter-category="role" data-filter-value="external-reference" aria-pressed="false" { span class="ontology-dot ontology-dot-external-reference" {} "External refs" }
-                            }
-                            div class="ontology-legend-title ontology-legend-title-secondary" { "Constructs" }
-                            div class="ontology-legend-grid" {
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="domain-range" aria-pressed="true" { span class="ontology-legend-symbol" { "D/R" } "Domain/range" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="subclass" aria-pressed="true" { span class="ontology-legend-symbol" { "⊆" } "Subclass" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="membership" aria-pressed="true" { span class="ontology-legend-symbol" { "∈" } "Membership" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="disjoint" aria-pressed="true" { span class="ontology-legend-symbol" { "⟂" } "Disjoint" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="equivalence" aria-pressed="true" { span class="ontology-legend-symbol" { "⇔" } "Equivalence" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="inverse" aria-pressed="true" { span class="ontology-legend-symbol" { "⟲" } "Inverse" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="property-chain" aria-pressed="true" { span class="ontology-legend-symbol" { "∘" } "Property chain" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="property-characteristic" aria-pressed="true" { span class="ontology-legend-symbol" { "→" } "Property char." }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="restriction" aria-pressed="true" { span class="ontology-legend-symbol" { "∀" } "Restriction" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="class-expression" aria-pressed="true" { span class="ontology-legend-symbol" { "∩" } "Class expr." }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="construct" data-filter-value="shape-overlay" aria-pressed="true" { span class="ontology-legend-symbol" { "SH" } "SHACL overlay" }
-                            }
-                            div class="ontology-legend-title ontology-legend-title-secondary" { "Origin" }
-                            div class="ontology-legend-grid ontology-legend-origin-grid" {
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="origin" data-filter-value="authored" aria-pressed="true" { span class="ontology-origin-dot ontology-origin-authored" {} "Defined" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="origin" data-filter-value="registry" aria-pressed="true" { span class="ontology-origin-dot ontology-origin-registry" {} "Registry" }
-                                button type="button" class="ontology-legend-item ontology-filter-toggle is-active" data-filter-category="origin" data-filter-value="construct" aria-pressed="true" { span class="ontology-origin-dot ontology-origin-construct" {} "Constructs" }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "D/R" } "Domain/range" }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "⊆" } "Subclass" }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "∈" } "Membership" }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "⟂" } "Disjoint" }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "⇔" } "Equivalence" }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "⟲" } "Inverse" }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "∘" } "Property chain" }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "→" } "Property char." }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "∀" } "Restriction" }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "∩" } "Class expr." }
+                                div class="ontology-legend-key-item" { span class="ontology-legend-symbol" { "SH" } "SHACL overlay" }
                             }
                         }
-                        svg id="ontology-graph-svg" role="img" aria-label="Ontology and SHACL relationship graph" {}
+                        div id="ontology-graph-container" role="img" aria-label="Ontology and SHACL relationship graph" {}
                     }
                     aside class="ontology-graph-sidebar" {
                         div class="ontology-search-panel" {
@@ -290,18 +290,33 @@ pub fn render(report: &SemanticIndex, nav_prefix: &str) -> Markup {
                 }
             }
         }
-        script src="https://d3js.org/d3.v7.min.js" {}
         script {
             "const ontologyGraphData = ";
             (PreEscaped(graph_json));
             ";"
         }
-        script {
+        script type="module" {
             (PreEscaped(ONTOLOGY_GRAPH_JS))
         }
     };
 
     crate::html::layouts::base("Ontologies", content, nav_prefix)
+}
+
+pub(crate) fn graph_data_json(report: &SemanticIndex) -> serde_json::Value {
+    serde_json::to_value(build_graph_data(report)).unwrap_or_else(|_| {
+        serde_json::json!({
+            "nodes": [],
+            "edges": []
+        })
+    })
+}
+
+pub(crate) fn graph_renderer_assets_json() -> serde_json::Value {
+    serde_json::json!({
+        "css": ONTOLOGY_GRAPH_CSS,
+        "js": ONTOLOGY_GRAPH_JS,
+    })
 }
 
 fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
@@ -381,6 +396,7 @@ fn build_graph_data(report: &SemanticIndex) -> OntologyGraphData {
                         value,
                     });
                 }
+                continue;
             }
 
             if is_projection_construct_predicate(predicate) {
@@ -1788,13 +1804,13 @@ fn upgrade_semantic_type_string(current: &mut String, candidate: &'static str) {
 
 fn semantic_type_rank(semantic_type: &str) -> u8 {
     match semantic_type {
-        "literal" => 9,
-        "node-shape" | "property-shape" => 8,
+        "literal" => 10,
+        "node-shape" | "property-shape" => 9,
+        "restriction" | "class-expression" => 8,
         "object-property" | "datatype-property" => 7,
         "class" => 6,
         "rdf-property" => 5,
         "named-individual" => 4,
-        "restriction" | "class-expression" => 4,
         "datatype" => 3,
         "resource" => 1,
         _ => 0,
@@ -1919,6 +1935,10 @@ fn is_primary_graph_node(node: &OntologyGraphNode) -> bool {
         return false;
     }
 
+    if is_datatype_iri(&node.id) {
+        return false;
+    }
+
     if is_blank_node_id(&node.id)
         && !matches!(
             node.semantic_type.as_str(),
@@ -1991,14 +2011,14 @@ body:has(.ontology-page) footer {
     border: 0;
     border-radius: 0;
     overflow: hidden;
-    background: #fff;
+    background: var(--reqvire-surface-base);
 }
 .ontology-graph-canvas {
     position: relative;
     min-width: 0;
-    background: #f8fafc;
+    background: var(--reqvire-surface-canvas);
 }
-#ontology-graph-svg {
+#ontology-graph-container {
     width: 100%;
     height: 100%;
     display: block;
@@ -2008,14 +2028,15 @@ body:has(.ontology-page) footer {
     top: 12px;
     left: 12px;
     z-index: 1;
-    max-width: 190px;
+    box-sizing: border-box;
+    width: 220px;
     max-height: calc(100% - 24px);
     overflow-y: auto;
-    padding: 8px 10px;
-    border: 1px solid #cbd5e1;
+    padding: 10px;
+    border: 1px solid #c7c7bf;
     border-radius: 6px;
-    background: rgba(248, 250, 252, 0.94);
-    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
+    background: var(--reqvire-surface-card);
+    box-shadow: 0 2px 6px rgba(28, 28, 28, 0.10);
     color: #334155;
     font-size: 11px;
     line-height: 1.25;
@@ -2027,6 +2048,68 @@ body:has(.ontology-page) footer {
     font-size: 12px;
     font-weight: 700;
 }
+.ontology-control-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    margin-bottom: 9px;
+}
+.ontology-control-button {
+    min-width: 0;
+    border: 1px solid #a9b5aa;
+    border-radius: 4px;
+    background: var(--reqvire-surface-muted);
+    color: #172027;
+    padding: 3px 5px;
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+    cursor: pointer;
+}
+.ontology-control-button:hover {
+    background: var(--reqvire-surface-hover);
+}
+.ontology-control-button:focus-visible {
+    outline: 2px solid #2563eb;
+    outline-offset: 1px;
+}
+.ontology-webvowl-filter-list {
+    display: grid;
+    gap: 0;
+    margin-bottom: 8px;
+    border: 1px solid #c7c7bf;
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--reqvire-surface-card);
+}
+.ontology-webvowl-filter-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    padding: 5px 6px;
+    border-bottom: 1px solid #d7d7cf;
+    color: #334155;
+    cursor: pointer;
+}
+.ontology-webvowl-filter-item:last-child {
+    border-bottom: 0;
+}
+.ontology-webvowl-filter-item:hover {
+    background: var(--reqvire-surface-hover);
+}
+.ontology-webvowl-filter-item input {
+    flex: 0 0 auto;
+    width: 13px;
+    height: 13px;
+    margin: 0;
+    accent-color: #48692d;
+}
+.ontology-webvowl-filter-item span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 .ontology-legend-title-secondary {
     margin-top: 8px;
 }
@@ -2035,9 +2118,6 @@ body:has(.ontology-page) footer {
     grid-template-columns: minmax(0, 1fr);
     gap: 4px;
     align-items: center;
-}
-.ontology-legend-origin-grid {
-    grid-template-columns: minmax(0, 1fr);
 }
 .ontology-legend-item,
 .ontology-legend-key-item {
@@ -2061,16 +2141,26 @@ body:has(.ontology-page) footer {
     color: #475569;
 }
 .ontology-legend-item:hover {
-    background: #e2e8f0;
+    background: var(--reqvire-surface-hover);
 }
 .ontology-legend-item:focus-visible {
     outline: 2px solid #2563eb;
     outline-offset: 1px;
 }
 .ontology-legend-item.is-active {
-    border-color: #bfdbfe;
-    background: #eff6ff;
-    color: #1e3a8a;
+    border-color: var(--reqvire-surface-active);
+    background: var(--reqvire-surface-active);
+    color: var(--reqvire-surface-active-text);
+    font-weight: 800;
+}
+.ontology-legend-item.is-active::before {
+    content: "✓";
+    display: inline-block;
+    flex: 0 0 10px;
+    width: 10px;
+    color: inherit;
+    font-weight: 900;
+    line-height: 1;
 }
 .ontology-legend-item:not(.is-active) {
     opacity: 0.45;
@@ -2082,17 +2172,17 @@ body:has(.ontology-page) footer {
     height: 11px;
     border-radius: 3px;
 }
-.ontology-dot-class { background: #f59e0b; border: 1px solid #b45309; }
-.ontology-dot-object-property { background: #2563eb; }
-.ontology-dot-datatype-property { background: #0891b2; }
-.ontology-dot-rdf-property { background: #0f766e; }
-.ontology-dot-named-individual { background: #7c3aed; }
-.ontology-dot-datatype { background: #e0f2fe; border: 1px solid #0284c7; }
-.ontology-dot-restriction { background: #f5d0fe; border: 1px solid #a21caf; }
-.ontology-dot-class-expression { background: #fce7f3; border: 1px solid #be185d; }
-.ontology-dot-node-shape { background: #dc2626; }
-.ontology-dot-property-shape { background: #be123c; }
-.ontology-dot-resource { background: #ccfbf1; border: 1px solid #0f766e; }
+.ontology-dot-class { background: #8fb6e8; border: 1px solid #1f2937; }
+.ontology-dot-object-property { background: #9fbde3; border: 1px solid #3f5f83; }
+.ontology-dot-datatype-property { background: #8bbd62; border: 1px solid #48692d; }
+.ontology-dot-rdf-property { background: #76aa59; border: 1px solid #3f6231; }
+.ontology-dot-named-individual { background: #6b48b8; border: 1px solid #4c2f92; }
+.ontology-dot-datatype { background: #d6a43f; border: 1px solid #7c5a16; }
+.ontology-dot-restriction { background: #335aa5; border: 1px solid #172f63; }
+.ontology-dot-class-expression { background: #d8dde6; border: 1px dashed #1f2937; }
+.ontology-dot-node-shape { background: #bf4c4c; border: 1px solid #7f1d1d; }
+.ontology-dot-property-shape { background: #c76969; border: 1px solid #8f2929; }
+.ontology-dot-resource { background: var(--reqvire-surface-hover); border: 1px solid #7a7166; }
 .ontology-dot-external-reference { background: #f8fafc; border: 1px dashed #64748b; }
 .ontology-edge-sample {
     display: inline-flex;
@@ -2111,16 +2201,6 @@ body:has(.ontology-page) footer {
     font-weight: 700;
     line-height: 1;
 }
-.ontology-origin-dot {
-    display: inline-flex;
-    flex: 0 0 auto;
-    width: 10px;
-    height: 10px;
-    border-radius: 999px;
-}
-.ontology-origin-authored { background: #14b8a6; }
-.ontology-origin-registry { background: #64748b; }
-.ontology-origin-construct { background: #8b5cf6; }
 .ontology-filtered-out {
     display: none;
 }
@@ -2129,8 +2209,8 @@ body:has(.ontology-page) footer {
     min-width: 0;
     flex-direction: column;
     overflow: hidden;
-    border-left: 1px solid #d1d5db;
-    background: #fff;
+    border-left: 1px solid #c7c7bf;
+    background: var(--reqvire-surface-base);
 }
 .ontology-empty-download-link {
     color: #334155;
@@ -2142,22 +2222,26 @@ body:has(.ontology-page) footer {
 .ontology-sidebar-summary {
     flex: 0 0 auto;
     display: flex;
+    box-sizing: border-box;
+    width: 100%;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
+    gap: 2px 0;
     min-width: 0;
-    overflow: hidden;
-    border-top: 1px solid #e5e7eb;
-    background: #f8fafc;
+    overflow: visible;
+    border-top: 1px solid #d8d8d2;
+    background: var(--reqvire-surface-muted);
     color: #64748b;
     padding: 5px 8px;
     font-size: 10px;
     line-height: 1.2;
-    white-space: nowrap;
+    white-space: normal;
 }
 .ontology-summary-entry + .ontology-summary-entry::before {
     content: "|";
     color: #cbd5e1;
-    padding: 0 6px;
+    padding: 0 5px;
 }
 .ontology-summary-entry strong {
     color: #111827;
@@ -2176,13 +2260,13 @@ body:has(.ontology-page) footer {
     text-decoration: underline;
 }
 .ontology-search-panel {
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #d8d8d2;
     padding: 14px;
 }
 .ontology-graph-search {
     width: 100%;
     box-sizing: border-box;
-    border: 1px solid #cbd5e1;
+    border: 1px solid #bfc3c7;
     border-radius: 4px;
     padding: 8px 10px;
     font-size: 13px;
@@ -2199,7 +2283,7 @@ body:has(.ontology-page) footer {
     margin: 10px 0 0;
     padding: 0;
     list-style: none;
-    border: 1px solid #e5e7eb;
+    border: 1px solid #d8d8d2;
     border-radius: 4px;
 }
 .ontology-graph-result {
@@ -2208,7 +2292,7 @@ body:has(.ontology-page) footer {
     justify-content: space-between;
     gap: 8px;
     padding: 8px 10px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid #e3e3de;
     cursor: pointer;
     font-size: 13px;
 }
@@ -2216,7 +2300,7 @@ body:has(.ontology-page) footer {
     border-bottom: 0;
 }
 .ontology-graph-result:hover {
-    background: #f8fafc;
+    background: var(--reqvire-surface-hover);
 }
 .ontology-graph-badge {
     flex: 0 0 auto;
@@ -2227,35 +2311,51 @@ body:has(.ontology-page) footer {
     font-weight: 700;
 }
 .ontology-inspector-header {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     gap: 8px;
     padding: 14px;
-    border-bottom: 1px solid #e5e7eb;
-    background: #f8fafc;
+    border-bottom: 1px solid var(--reqvire-surface-active);
+    background: var(--reqvire-surface-active);
+    color: var(--reqvire-surface-active-text);
 }
 .ontology-inspector-header h2 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1 1 auto;
     margin: 0;
-    padding: 0;
-    border: 0;
-    color: #111827;
+    padding: 0 32px;
+    border: 0 !important;
+    color: var(--reqvire-surface-active-text) !important;
     font-size: 16px;
     line-height: 1.3;
+    text-align: center;
+    text-decoration: none;
 }
 #ontology-inspector-clear {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
     display: none;
     border: 0;
     background: transparent;
-    color: #6b7280;
+    color: var(--reqvire-surface-active-text);
     cursor: pointer;
     font-size: 18px;
+}
+#ontology-inspector-clear:hover {
+    color: #ffffff;
 }
 .ontology-inspector-body {
     flex: 1;
     min-height: 0;
     overflow: auto;
     padding: 14px;
+    background: var(--reqvire-surface-base);
     color: #374151;
     font-size: 13px;
     line-height: 1.5;
@@ -2282,7 +2382,7 @@ body:has(.ontology-page) footer {
     overflow-wrap: anywhere;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
-    background: #f8fafc;
+    background: var(--reqvire-surface-muted);
     color: #1d4ed8;
     padding: 8px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
@@ -2319,7 +2419,7 @@ body:has(.ontology-page) footer {
     margin-bottom: 4px;
     border: 1px solid #cbd5e1;
     border-radius: 4px;
-    background: #f8fafc;
+    background: var(--reqvire-surface-muted);
     color: #334155;
     padding: 4px 7px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
@@ -2331,9 +2431,9 @@ body:has(.ontology-page) footer {
 }
 .ontology-slot-facet {
     margin-bottom: 7px;
-    border: 1px solid #bae6fd;
+    border: 1px solid var(--reqvire-surface-border);
     border-radius: 4px;
-    background: #f0f9ff;
+    background: var(--reqvire-surface-muted);
     color: #0c4a6e;
     padding: 7px 8px;
     font-size: 11px;
@@ -2387,9 +2487,9 @@ body:has(.ontology-page) footer {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    border: 1px solid #c7d2fe;
+    border: 1px solid var(--reqvire-surface-border);
     border-radius: 999px;
-    background: #eef2ff;
+    background: var(--reqvire-surface-muted);
     color: #3730a3;
     padding: 2px 8px;
     font-size: 11px;
@@ -2404,7 +2504,7 @@ body:has(.ontology-page) footer {
     margin: 2px 4px 2px 0;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
-    background: #f8fafc;
+    background: var(--reqvire-surface-muted);
     color: #334155;
     padding: 2px 6px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
@@ -2412,9 +2512,9 @@ body:has(.ontology-page) footer {
 }
 .ontology-kind-pill {
     display: inline-block;
-    border: 1px solid #bfdbfe;
+    border: 1px solid var(--reqvire-surface-border);
     border-radius: 999px;
-    background: #eff6ff;
+    background: var(--reqvire-surface-muted);
     color: #1e40af;
     padding: 2px 9px;
     font-size: 11px;
@@ -2427,7 +2527,7 @@ body:has(.ontology-page) footer {
     margin: 2px 4px 2px 0;
     border: 1px solid #e5e7eb;
     border-radius: 4px;
-    background: #f8fafc;
+    background: var(--reqvire-surface-muted);
     color: #334155;
     padding: 2px 4px 2px 7px;
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
@@ -2435,8 +2535,8 @@ body:has(.ontology-page) footer {
 }
 .ontology-term-kind {
     border-radius: 3px;
-    background: #e2e8f0;
-    color: #475569;
+    background: var(--reqvire-surface-active);
+    color: var(--reqvire-surface-active-text);
     padding: 0 4px;
     font-size: 9px;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -2444,8 +2544,8 @@ body:has(.ontology-page) footer {
     text-transform: uppercase;
 }
 .ontology-term-class .ontology-term-kind {
-    background: #dbeafe;
-    color: #1e40af;
+    background: var(--reqvire-surface-active);
+    color: var(--reqvire-surface-active-text);
 }
 .ontology-term-datatype .ontology-term-kind,
 .ontology-term-literal .ontology-term-kind {
@@ -2488,9 +2588,9 @@ body:has(.ontology-page) footer {
 }
 .ontology-chain {
     margin-bottom: 6px;
-    border: 1px solid #ddd6fe;
+    border: 1px solid var(--reqvire-surface-border);
     border-radius: 4px;
-    background: #f5f3ff;
+    background: var(--reqvire-surface-muted);
     color: #5b21b6;
     padding: 6px 8px;
     font-size: 11px;
@@ -2507,11 +2607,48 @@ body:has(.ontology-page) footer {
     font-size: 10px;
     overflow-wrap: anywhere;
 }
+.ontology-property-usage {
+    margin-bottom: 7px;
+    border: 1px solid var(--reqvire-surface-border);
+    border-radius: 4px;
+    background: var(--reqvire-surface-muted);
+    color: #172027;
+    padding: 7px 8px;
+    font-size: 11px;
+    line-height: 1.45;
+}
+.ontology-property-usage-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+.ontology-property-usage-title strong {
+    color: #0f172a;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+.ontology-property-kind {
+    border-radius: 3px;
+    background: var(--reqvire-surface-active);
+    color: var(--reqvire-surface-active-text);
+    padding: 0 5px;
+    font-size: 9px;
+    text-transform: uppercase;
+}
+.ontology-property-usage-body {
+    color: #475569;
+    overflow-wrap: anywhere;
+}
+.ontology-property-usage-body span {
+    color: #1e40af;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
 .ontology-construct {
     margin-bottom: 6px;
-    border: 1px solid #c7d2fe;
+    border: 1px solid var(--reqvire-surface-border);
     border-radius: 4px;
-    background: #eef2ff;
+    background: var(--reqvire-surface-muted);
     color: #312e81;
     padding: 6px 8px;
     font-size: 11px;
@@ -2541,9 +2678,9 @@ body:has(.ontology-page) footer {
 }
 .ontology-construct-member,
 .ontology-construct-usage {
-    border: 1px solid #dbeafe;
+    border: 1px solid var(--reqvire-surface-border);
     border-radius: 4px;
-    background: #f8fafc;
+    background: var(--reqvire-surface-muted);
     color: #1e3a8a;
     padding: 5px 7px;
     font-size: 11px;
@@ -2567,33 +2704,6 @@ body:has(.ontology-page) footer {
 .ontology-raw-details .ontology-uri-block {
     margin-top: 8px;
 }
-.ontology-node-badges {
-    font-size: 12px;
-    fill: #1e293b;
-    pointer-events: none;
-}
-.ontology-node rect,
-.ontology-node ellipse {
-    stroke-width: 1.5px;
-    cursor: pointer;
-}
-.ontology-node text {
-    pointer-events: none;
-    font-size: 11px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-}
-.ontology-edge {
-    stroke: #cbd5e1;
-    stroke-width: 1.4px;
-    fill: none;
-}
-.ontology-edge-label {
-    fill: #475569;
-    font-size: 9px;
-    paint-order: stroke;
-    stroke: #fff;
-    stroke-width: 3px;
-}
 @media (max-width: 900px) {
     .ontology-graph-panel {
         grid-template-columns: 1fr;
@@ -2610,39 +2720,383 @@ body:has(.ontology-page) footer {
 }
 "#;
 
-const ONTOLOGY_GRAPH_JS: &str = r#"
+const ONTOLOGY_GRAPH_JS: &str = r##"
+import Graph from 'https://cdn.jsdelivr.net/npm/graphology@0.25.4/+esm';
+import { Sigma } from 'https://esm.sh/sigma@3.0.0';
+import forceAtlas2 from 'https://cdn.jsdelivr.net/npm/graphology-layout-forceatlas2@0.10.1/+esm';
+import { createDrawCurvedEdgeLabel, createEdgeCurveProgram, indexParallelEdgesIndex } from 'https://esm.sh/@sigma/edge-curve@3.1.0?deps=sigma@3.0.0';
+import { createNodeImageProgram } from 'https://esm.sh/@sigma/node-image@3.0.0?deps=sigma@3.0.0';
+import { EdgeProgram } from 'https://esm.sh/sigma@3.0.0/rendering';
+import { floatColor } from 'https://esm.sh/sigma@3.0.0/utils';
+
+function createOntologyNotationEdgeProgram({ drawLabel, marker = 'diamond' } = {}) {
+    const { UNSIGNED_BYTE, FLOAT } = WebGLRenderingContext;
+    const markerKind = marker === 'hollowTriangle' ? 2 : 1;
+    const targetArrowFill = marker === 'diamond' ? 1 : 0;
+    const dashLength = 8.0;
+    const dashPeriod = 16.0;
+    const vertexShader = `
+attribute vec4 a_id;
+attribute vec4 a_color;
+attribute float a_direction;
+attribute float a_thickness;
+attribute vec2 a_source;
+attribute vec2 a_target;
+attribute float a_current;
+attribute float a_curvature;
+attribute float a_sourceSize;
+attribute float a_targetSize;
+
+uniform mat3 u_matrix;
+uniform float u_sizeRatio;
+uniform float u_pixelRatio;
+uniform vec2 u_dimensions;
+uniform float u_minEdgeThickness;
+uniform float u_feather;
+uniform float u_widenessToThicknessRatio;
+
+varying vec4 v_color;
+varying float v_thickness;
+varying float v_feather;
+varying vec2 v_cpA;
+varying vec2 v_cpB;
+varying vec2 v_cpC;
+varying vec2 v_sourcePoint;
+varying vec2 v_targetPoint;
+varying float v_sourceSize;
+varying float v_targetSize;
+
+const float bias = 255.0 / 254.0;
+const float epsilon = 0.7;
+
+vec2 clipspaceToViewport(vec2 pos, vec2 dimensions) {
+  return vec2((pos.x + 1.0) * dimensions.x / 2.0, (pos.y + 1.0) * dimensions.y / 2.0);
+}
+
+vec2 viewportToClipspace(vec2 pos, vec2 dimensions) {
+  return vec2(pos.x / dimensions.x * 2.0 - 1.0, pos.y / dimensions.y * 2.0 - 1.0);
+}
+
+void main() {
+  vec2 position = a_source * max(0.0, a_current) + a_target * max(0.0, 1.0 - a_current);
+  position = (u_matrix * vec3(position, 1)).xy;
+
+  vec2 source = (u_matrix * vec3(a_source, 1)).xy;
+  vec2 target = (u_matrix * vec3(a_target, 1)).xy;
+
+  vec2 viewportPosition = clipspaceToViewport(position, u_dimensions);
+  vec2 viewportSource = clipspaceToViewport(source, u_dimensions);
+  vec2 viewportTarget = clipspaceToViewport(target, u_dimensions);
+
+  vec2 delta = viewportTarget.xy - viewportSource.xy;
+  float len = max(1.0, length(delta));
+  vec2 normal = vec2(-delta.y, delta.x) * a_direction;
+  vec2 unitNormal = normal / len;
+  float boundingBoxThickness = len * a_curvature;
+
+  float curveThickness = max(u_minEdgeThickness, a_thickness);
+  v_thickness = curveThickness * u_pixelRatio;
+  v_feather = u_feather;
+
+  v_cpA = viewportSource;
+  v_cpB = 0.5 * (viewportSource + viewportTarget) + unitNormal * a_direction * boundingBoxThickness;
+  v_cpC = viewportTarget;
+  v_sourcePoint = viewportSource;
+  v_targetPoint = viewportTarget;
+  v_sourceSize = a_sourceSize * u_pixelRatio / u_sizeRatio;
+  v_targetSize = a_targetSize * u_pixelRatio / u_sizeRatio;
+
+  vec2 viewportOffsetPosition = (
+    viewportPosition +
+    unitNormal * (boundingBoxThickness / 2.0 + sign(boundingBoxThickness) * (curveThickness * u_widenessToThicknessRatio + 28.0 + epsilon)) *
+    max(0.0, a_direction)
+  );
+
+  position = viewportToClipspace(viewportOffsetPosition, u_dimensions);
+  gl_Position = vec4(position, 0, 1);
+
+  #ifdef PICKING_MODE
+  v_color = a_id;
+  #else
+  v_color = a_color;
+  #endif
+  v_color.a *= bias;
+}
+`;
+    const fragmentShader = `
+precision highp float;
+
+varying vec4 v_color;
+varying float v_thickness;
+varying float v_feather;
+varying vec2 v_cpA;
+varying vec2 v_cpB;
+varying vec2 v_cpC;
+varying vec2 v_sourcePoint;
+varying vec2 v_targetPoint;
+varying float v_sourceSize;
+varying float v_targetSize;
+
+uniform float u_lengthToThicknessRatio;
+uniform float u_widenessToThicknessRatio;
+uniform float u_markerKind;
+uniform float u_targetArrowFill;
+uniform float u_dashLength;
+uniform float u_dashPeriod;
+uniform float u_pixelRatio;
+
+const vec4 transparent = vec4(0.0, 0.0, 0.0, 0.0);
+
+float det(vec2 a, vec2 b) {
+  return a.x * b.y - b.x * a.y;
+}
+
+vec2 getDistanceVector(vec2 b0, vec2 b1, vec2 b2) {
+  float a = det(b0, b2), b = 2.0 * det(b1, b0), d = 2.0 * det(b2, b1);
+  float f = b * d - a * a;
+  vec2 d21 = b2 - b1, d10 = b1 - b0, d20 = b2 - b0;
+  vec2 gf = 2.0 * (b * d21 + d * d10 + a * d20);
+  gf = vec2(gf.y, -gf.x);
+  vec2 pp = -f * gf / dot(gf, gf);
+  vec2 d0p = b0 - pp;
+  float ap = det(d0p, d20), bp = 2.0 * det(d10, d0p);
+  float t = clamp((ap + bp) / (2.0 * a + b + d), 0.0, 1.0);
+  return mix(mix(b0, b1, t), mix(b1, b2, t), t);
+}
+
+float distToQuadraticBezierCurve(vec2 p, vec2 b0, vec2 b1, vec2 b2) {
+  return length(getDistanceVector(b0 - p, b1 - p, b2 - p));
+}
+
+float distToSegment(vec2 p, vec2 a, vec2 b) {
+  vec2 pa = p - a;
+  vec2 ba = b - a;
+  float h = clamp(dot(pa, ba) / max(dot(ba, ba), 1.0), 0.0, 1.0);
+  return length(pa - ba * h);
+}
+
+float approximateCurveT(vec2 p) {
+  vec2 chord = v_cpC - v_cpA;
+  float chordLength = max(1.0, dot(chord, chord));
+  return clamp(dot(p - v_cpA, chord) / chordLength, 0.0, 1.0);
+}
+
+void main(void) {
+  vec2 p = gl_FragCoord.xy;
+  vec2 sourceTangentSeed = mix(v_cpB - v_cpA, v_cpC - v_cpB, 0.08);
+  if (length(sourceTangentSeed) < 0.5) sourceTangentSeed = v_cpC - v_cpA;
+  vec2 sourceTangent = normalize(sourceTangentSeed);
+  vec2 sourceNormal = vec2(-sourceTangent.y, sourceTangent.x);
+  vec2 targetTangentSeed = mix(v_cpB - v_cpA, v_cpC - v_cpB, 0.92);
+  if (length(targetTangentSeed) < 0.5) targetTangentSeed = v_cpC - v_cpA;
+  vec2 targetTangent = normalize(targetTangentSeed);
+  vec2 targetNormal = vec2(-targetTangent.y, targetTangent.x);
+
+  float diamondRadius = 7.5 * u_pixelRatio;
+  float diamondStroke = max(1.15 * u_pixelRatio, v_thickness * 0.45);
+  vec2 diamondCenter = v_sourcePoint + sourceTangent * (v_sourceSize + diamondRadius + 3.0 * u_pixelRatio);
+  vec2 diamondRel = p - diamondCenter;
+  float diamondSignedDistance = abs(dot(diamondRel, sourceTangent)) + abs(dot(diamondRel, sourceNormal)) - diamondRadius;
+  bool diamondStrokeHit = u_markerKind < 1.5 && abs(diamondSignedDistance) <= diamondStroke;
+
+  float triangleLength = 11.0 * u_pixelRatio;
+  float triangleWidth = 6.6 * u_pixelRatio;
+  float triangleStroke = max(1.05 * u_pixelRatio, v_thickness * 0.4);
+  vec2 triangleTip = v_targetPoint - targetTangent * (v_targetSize + 3.0 * u_pixelRatio);
+  vec2 triangleBase = triangleTip - targetTangent * triangleLength;
+  vec2 triangleLeft = triangleBase + targetNormal * triangleWidth;
+  vec2 triangleRight = triangleBase - targetNormal * triangleWidth;
+  float triangleDistance = min(
+    distToSegment(p, triangleTip, triangleLeft),
+    min(distToSegment(p, triangleTip, triangleRight), distToSegment(p, triangleLeft, triangleRight))
+  );
+  bool triangleStrokeHit = u_markerKind > 1.5 && triangleDistance <= triangleStroke;
+
+  float dist = distToQuadraticBezierCurve(p, v_cpA, v_cpB, v_cpC);
+  float thickness = v_thickness;
+  float distToTarget = length(p - v_targetPoint);
+  float targetArrowLength = v_targetSize + thickness * u_lengthToThicknessRatio;
+  if (u_targetArrowFill > 0.5 && distToTarget < targetArrowLength) {
+    thickness = (distToTarget - v_targetSize) / (targetArrowLength - v_targetSize) * u_widenessToThicknessRatio * thickness;
+  }
+
+  float t = approximateCurveT(p);
+  float dashPosition = mod(t * length(v_cpC - v_cpA), u_dashPeriod);
+  bool dashVisible = dashPosition < u_dashLength || (u_targetArrowFill > 0.5 && distToTarget < targetArrowLength);
+  float halfThickness = thickness / 2.0;
+
+  if (diamondStrokeHit || triangleStrokeHit || (dashVisible && dist < halfThickness)) {
+    #ifdef PICKING_MODE
+    gl_FragColor = v_color;
+    #else
+    float edgeAlpha = 1.0 - smoothstep(max(halfThickness - v_feather, 0.0), halfThickness, dist);
+    float diamondAlpha = 1.0 - smoothstep(max(diamondStroke - v_feather, 0.0), diamondStroke, abs(diamondSignedDistance));
+    float triangleAlpha = 1.0 - smoothstep(max(triangleStroke - v_feather, 0.0), triangleStroke, triangleDistance);
+    gl_FragColor = vec4(v_color.rgb, v_color.a * max(edgeAlpha, max(diamondAlpha, triangleAlpha)));
+    #endif
+  } else {
+    gl_FragColor = transparent;
+  }
+}
+`;
+
+    return class OntologyNotationEdgeProgram extends EdgeProgram {
+        drawLabel = drawLabel;
+
+        getDefinition() {
+            return {
+                VERTICES: 6,
+                VERTEX_SHADER_SOURCE: vertexShader,
+                FRAGMENT_SHADER_SOURCE: fragmentShader,
+                METHOD: WebGLRenderingContext.TRIANGLES,
+                UNIFORMS: [
+                    'u_matrix',
+                    'u_sizeRatio',
+                    'u_dimensions',
+                    'u_pixelRatio',
+                    'u_feather',
+                    'u_minEdgeThickness',
+                    'u_lengthToThicknessRatio',
+                    'u_widenessToThicknessRatio',
+                    'u_markerKind',
+                    'u_targetArrowFill',
+                    'u_dashLength',
+                    'u_dashPeriod'
+                ],
+                ATTRIBUTES: [
+                    { name: 'a_source', size: 2, type: FLOAT },
+                    { name: 'a_target', size: 2, type: FLOAT },
+                    { name: 'a_sourceSize', size: 1, type: FLOAT },
+                    { name: 'a_targetSize', size: 1, type: FLOAT },
+                    { name: 'a_thickness', size: 1, type: FLOAT },
+                    { name: 'a_curvature', size: 1, type: FLOAT },
+                    { name: 'a_color', size: 4, type: UNSIGNED_BYTE, normalized: true },
+                    { name: 'a_id', size: 4, type: UNSIGNED_BYTE, normalized: true }
+                ],
+                CONSTANT_ATTRIBUTES: [
+                    { name: 'a_current', size: 1, type: FLOAT },
+                    { name: 'a_direction', size: 1, type: FLOAT }
+                ],
+                CONSTANT_DATA: [
+                    [0, 1],
+                    [0, -1],
+                    [1, 1],
+                    [0, -1],
+                    [1, 1],
+                    [1, -1]
+                ]
+            };
+        }
+
+        processVisibleItem(edgeIndex, startIndex, sourceData, targetData, data) {
+            const color = floatColor(data.color);
+            const curvature = Number(data.curvature ?? 0.25);
+            const thickness = Number(data.size || 1);
+            const array = this.array;
+
+            array[startIndex++] = sourceData.x;
+            array[startIndex++] = sourceData.y;
+            array[startIndex++] = targetData.x;
+            array[startIndex++] = targetData.y;
+            array[startIndex++] = sourceData.size;
+            array[startIndex++] = targetData.size;
+            array[startIndex++] = thickness;
+            array[startIndex++] = curvature;
+            array[startIndex++] = color;
+            array[startIndex++] = edgeIndex;
+        }
+
+        setUniforms(params, { gl, uniformLocations }) {
+            gl.uniformMatrix3fv(uniformLocations.u_matrix, false, params.matrix);
+            gl.uniform1f(uniformLocations.u_pixelRatio, params.pixelRatio);
+            gl.uniform1f(uniformLocations.u_sizeRatio, params.sizeRatio);
+            gl.uniform1f(uniformLocations.u_feather, params.antiAliasingFeather);
+            gl.uniform2f(uniformLocations.u_dimensions, params.width * params.pixelRatio, params.height * params.pixelRatio);
+            gl.uniform1f(uniformLocations.u_minEdgeThickness, params.minEdgeThickness);
+            gl.uniform1f(uniformLocations.u_lengthToThicknessRatio, 3.2);
+            gl.uniform1f(uniformLocations.u_widenessToThicknessRatio, 2.1);
+            gl.uniform1f(uniformLocations.u_markerKind, markerKind);
+            gl.uniform1f(uniformLocations.u_targetArrowFill, targetArrowFill);
+            gl.uniform1f(uniformLocations.u_dashLength, dashLength * params.pixelRatio);
+            gl.uniform1f(uniformLocations.u_dashPeriod, dashPeriod * params.pixelRatio);
+        }
+    };
+}
+
+function createConstructDiamondEdgeProgram(options = {}) {
+    return createOntologyNotationEdgeProgram({ ...options, marker: 'diamond' });
+}
+
+function createSubclassTriangleEdgeProgram(options = {}) {
+    return createOntologyNotationEdgeProgram({ ...options, marker: 'hollowTriangle' });
+}
+
 (function () {
-    if (!window.d3 || !ontologyGraphData || !ontologyGraphData.nodes.length) {
+    if (!ontologyGraphData || !ontologyGraphData.nodes.length) {
         return;
     }
 
+    const reqvireSurfaceBase = getComputedStyle(document.documentElement)
+        .getPropertyValue('--reqvire-surface-base')
+        .trim();
+    const reqvireSurfaceHover = getComputedStyle(document.documentElement)
+        .getPropertyValue('--reqvire-surface-hover')
+        .trim();
     const colorBySemanticType = {
-        class: { fill: '#f59e0b', stroke: '#b45309', text: '#111827' },
-        'object-property': { fill: '#2563eb', stroke: '#1d4ed8', text: '#ffffff' },
-        'datatype-property': { fill: '#0891b2', stroke: '#0e7490', text: '#ffffff' },
-        'rdf-property': { fill: '#0f766e', stroke: '#115e59', text: '#ffffff' },
-        'named-individual': { fill: '#7c3aed', stroke: '#6d28d9', text: '#ffffff' },
-        datatype: { fill: '#e0f2fe', stroke: '#0284c7', text: '#0c4a6e' },
-        restriction: { fill: '#f5d0fe', stroke: '#a21caf', text: '#581c87' },
-        'class-expression': { fill: '#fce7f3', stroke: '#be185d', text: '#831843' },
-        'node-shape': { fill: '#dc2626', stroke: '#b91c1c', text: '#ffffff' },
-        'property-shape': { fill: '#be123c', stroke: '#9f1239', text: '#ffffff' },
-        resource: { fill: '#ccfbf1', stroke: '#0f766e', text: '#134e4a' }
+        class: { fill: '#8fb6e8', stroke: '#1f2937', text: '#111827' },
+        'object-property': { fill: '#9fbde3', stroke: '#3f5f83', text: '#111827' },
+        'datatype-property': { fill: '#8bbd62', stroke: '#48692d', text: '#111827' },
+        'rdf-property': { fill: '#76aa59', stroke: '#3f6231', text: '#111827' },
+        'named-individual': { fill: '#6b48b8', stroke: '#4c2f92', text: '#ffffff' },
+        datatype: { fill: '#d6a43f', stroke: '#7c5a16', text: '#111827' },
+        restriction: { fill: '#a9c9f5', stroke: '#111827', text: '#111827' },
+        'class-expression': { fill: '#a9c9f5', stroke: '#111827', text: '#111827' },
+        'node-shape': { fill: '#bf4c4c', stroke: '#7f1d1d', text: '#ffffff' },
+        'property-shape': { fill: '#c76969', stroke: '#8f2929', text: '#ffffff' },
+        resource: { fill: reqvireSurfaceHover, stroke: '#7a7166', text: '#111827' }
     };
+    const ontologyZIndex = {
+        mutedNode: -10,
+        base: 0,
+        focusedEdge: 100,
+        focusedNeighborNode: 200,
+        focusedNode: 300
+    };
+    const drawSigmaCurvedEdgeLabel = createDrawCurvedEdgeLabel({
+        curvatureAttribute: 'curvature',
+        defaultCurvature: 0.08,
+        keepLabelUpright: true
+    });
     function nodePalette(nodeData) {
         return colorBySemanticType[nodeData.semantic_type] || colorBySemanticType.resource;
     }
-    const nodes = ontologyGraphData.nodes.map(node => {
+    const rawConnectionCounts = new Map();
+    ontologyGraphData.edges.forEach(edge => {
+        rawConnectionCounts.set(edge.source, (rawConnectionCounts.get(edge.source) || 0) + 1);
+        rawConnectionCounts.set(edge.target, (rawConnectionCounts.get(edge.target) || 0) + 1);
+    });
+    const rawNodes = ontologyGraphData.nodes.map(node => {
         const displayLabel = graphNodeDisplayLabel(node);
+        const shape = nodeShapeType(node);
+        const labelLength = String(displayLabel || '').length;
+        const connectionCount = rawConnectionCounts.get(node.id) || 0;
+        const diameter = Math.max(46, Math.min(92, 46 + Math.sqrt(connectionCount) * 9));
+        const boxWidth = Math.max(86, Math.min(238, labelLength * 6.5 + 26));
         return {
             ...node,
             display_label: displayLabel,
-            width: Math.max(92, Math.min(260, String(displayLabel || '').length * 7 + 28)),
-            height: 36
+            shape,
+            width: shape === 'class-anchor' ? diameter : boxWidth,
+            height: shape === 'class-anchor' ? diameter : 34
         };
     });
-    const links = ontologyGraphData.edges.map(edge => ({ ...edge }));
+    const rawNodeById = new Map(rawNodes.map(node => [node.id, node]));
+    const propertyNodes = rawNodes.filter(isOntologyPropertyNode);
+    const propertyNodeById = new Map(propertyNodes.map(node => [node.id, node]));
+    const nodes = rawNodes.filter(node => !isOntologyPropertyNode(node));
+    const links = buildRenderedOntologyLinks(ontologyGraphData.edges, rawNodeById, propertyNodes);
     const nodeById = new Map(nodes.map(node => [node.id, node]));
+    const connectionCounts = computeRenderedNodeConnections(nodes, links);
     const adjacency = new Map(nodes.map(node => [node.id, new Set([node.id])]));
     links.forEach(link => {
         const source = typeof link.source === 'string' ? link.source : link.source.id;
@@ -2653,10 +3107,7 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
     const filterState = {
         role: new Set([
             'ontology-term',
-            'property',
-            'shacl-shape',
-            'resource',
-            'relation'
+            'property'
         ]),
         construct: new Set([
             'domain-range',
@@ -2670,161 +3121,851 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
             'restriction',
             'class-expression',
             'shape-overlay'
-        ]),
-        origin: new Set(['authored', 'registry', 'construct'])
+        ])
     };
-    nodes.forEach(node => {
+    const relationFilterState = new Set([
+        'datatype-properties',
+        'object-properties',
+        'class-membership'
+    ]);
+    rawNodes.forEach(node => {
         node._ontologyRoles = nodeRoleValues(node);
         node._ontologyConstructs = nodeConstructValues(node);
-        node._ontologyOrigins = nodeOriginValues(node);
     });
     links.forEach(link => {
-        link._ontologyRoles = edgeRoleValues(link);
         link._ontologyConstructs = edgeConstructValues(link);
-        link._ontologyOrigins = edgeOriginValues(link);
     });
     let visibleNodeIds = new Set(nodes.map(node => node.id));
     let selectedNodeId = null;
 
-    const svg = d3.select('#ontology-graph-svg');
-    const canvas = document.querySelector('.ontology-graph-canvas');
-    let width = 0;
-    let height = 0;
-    let simulation;
+    const container = document.getElementById('ontology-graph-container');
+    let graph = null;
+    let renderer = null;
+    let hoveredNodeId = null;
+    let draggedNodeId = null;
+    let isDraggingNode = false;
+    let dragMovedNode = false;
+    let suppressNextStageClear = false;
+    let suppressNextNodeClick = false;
+    let graphFilterRevision = 0;
+    let focusNeighborhoodCacheKey = '';
+    let focusNeighborhoodCache = new Set();
 
-    function measureGraph() {
-        width = Math.max(480, canvas.clientWidth || 900);
-        height = Math.max(420, canvas.clientHeight || 640);
-        svg.attr('viewBox', [0, 0, width, height]);
-    }
-    measureGraph();
+    renderOntologyGraph();
 
-    svg.append('defs').append('marker')
-        .attr('id', 'ontology-arrow')
-        .attr('viewBox', '0 -5 10 10')
-        .attr('refX', 9)
-        .attr('refY', 0)
-        .attr('markerWidth', 7)
-        .attr('markerHeight', 7)
-        .attr('orient', 'auto')
-        .append('path')
-        .attr('d', 'M0,-5L10,0L0,5')
-        .attr('fill', '#cbd5e1');
-
-    const viewport = svg.append('g');
-    const edgeLayer = viewport.append('g');
-    const labelLayer = viewport.append('g');
-    const nodeLayer = viewport.append('g');
-
-    const zoomBehavior = d3.zoom()
-        .scaleExtent([0.25, 3])
-        .on('zoom', event => viewport.attr('transform', event.transform));
-    svg.call(zoomBehavior);
-
-    const edge = edgeLayer.selectAll('path')
-        .data(links)
-        .join('path')
-        .attr('class', 'ontology-edge')
-        .attr('marker-end', 'url(#ontology-arrow)');
-
-    const edgeLabel = labelLayer.selectAll('text')
-        .data(links)
-        .join('text')
-        .attr('class', 'ontology-edge-label')
-        .attr('text-anchor', 'middle')
-            .text(d => d.display_label || graphNodeDisplayLabel(d));
-
-    const node = nodeLayer.selectAll('g')
-        .data(nodes)
-        .join('g')
-        .attr('class', 'ontology-node')
-        .call(d3.drag()
-            .on('start', dragStarted)
-            .on('drag', dragged)
-            .on('end', dragEnded))
-        .on('click', (event, d) => {
-            event.stopPropagation();
-            focusOntologyNode(d.id);
-        })
-        .on('mouseenter', (event, d) => highlightNeighborhood(d.id))
-        .on('mouseleave', clearHighlight);
-
-    node.each(function (d) {
-        const palette = nodePalette(d);
-        const group = d3.select(this);
-        group.append('rect')
-            .attr('x', -d.width / 2)
-            .attr('y', -d.height / 2)
-            .attr('width', d.width)
-            .attr('height', d.height)
-            .attr('rx', 4)
-            .attr('fill', palette.fill)
-            .attr('stroke', palette.stroke);
-        group.append('text')
-            .attr('fill', palette.text)
-            .attr('text-anchor', 'middle')
-            .attr('dominant-baseline', 'central')
-            .text(truncateLabel(d.display_label || graphNodeDisplayLabel(d), d.width));
-        const badgeSymbols = visibleBadgeSymbols(d);
-        if (badgeSymbols) {
-            group.append('text')
-                .attr('class', 'ontology-node-badges')
-                .attr('text-anchor', 'middle')
-                .attr('x', 0)
-                .attr('y', -d.height / 2 - 5)
-                .text(badgeSymbols);
+    function renderOntologyGraph() {
+        if (!container) {
+            return;
         }
-        group.append('title').text(nodeAccessibleSummary(d));
-    });
-
-    simulation = d3.forceSimulation(nodes)
-        .force('link', d3.forceLink(links).id(d => d.id).distance(d => {
-            const labelWeight = Math.min(80, String(d.label || d.id || '').length * 5);
-            return 120 + labelWeight;
-        }))
-        .force('charge', d3.forceManyBody().strength(-520))
-        .force('center', d3.forceCenter(width / 2, height / 2))
-        .force('collision', d3.forceCollide().radius(d => Math.max(d.width, d.height) / 2 + 18))
-        .on('tick', ticked);
-
-    function resizeGraph(restart) {
-        measureGraph();
-        simulation.force('center', d3.forceCenter(width / 2, height / 2));
-        if (restart) {
-            simulation.alpha(0.35).restart();
-        }
-    }
-
-    function ticked() {
-        edge.attr('d', d => {
-            const source = d.source;
-            const target = d.target;
-            const dx = target.x - source.x;
-            const dy = target.y - source.y;
-            const dr = Math.sqrt(dx * dx + dy * dy) * 0.8;
-            return `M${source.x},${source.y}A${dr},${dr} 0 0,1 ${target.x},${target.y}`;
+        ensureOntologyCanvasSize();
+        graph = new Graph({ type: 'directed', multi: true, allowSelfLoops: true });
+        assignInitialSigmaPositions(nodes);
+        nodes.forEach(nodeData => {
+            const palette = nodePalette(nodeData);
+            const constructGlyph = isConstructGlyphNode(nodeData);
+            graph.addNode(nodeData.id, {
+                ...nodeData,
+                type: constructGlyph ? 'constructGlyph' : 'circle',
+                image: constructGlyph ? constructGlyphImage(nodeData) : undefined,
+                mutedImage: constructGlyph ? constructGlyphImage(nodeData, true) : undefined,
+                label: sigmaNodeLabel(nodeData),
+                fullLabel: fullSigmaNodeLabel(nodeData),
+                x: nodeData.x,
+                y: nodeData.y,
+                size: sigmaNodeSize(nodeData),
+                color: palette.fill,
+                borderColor: palette.stroke,
+                hidden: !nodePassesOwnFilters(nodeData)
+            });
         });
-        edgeLabel
-            .attr('x', d => (d.source.x + d.target.x) / 2)
-            .attr('y', d => (d.source.y + d.target.y) / 2);
-        node.attr('transform', d => `translate(${d.x},${d.y})`);
+        links.forEach((linkData, index) => {
+            const source = endpointId(linkData.source);
+            const target = endpointId(linkData.target);
+            if (!graph.hasNode(source) || !graph.hasNode(target)) {
+                return;
+            }
+            graph.addDirectedEdgeWithKey(`o${index}`, source, target, {
+                ...linkData,
+                source,
+                target,
+                type: ontologyEdgeProgramType(linkData),
+                label: edgeDisplayLabel(linkData),
+                size: sigmaEdgeSize(linkData),
+                color: sigmaEdgeColor(linkData),
+                hidden: !isEdgeVisible(linkData)
+            });
+        });
+        applySigmaParallelEdgeCurvature();
+        applyOntologyLayout();
+        renderer = new Sigma(graph, container, {
+            allowInvalidContainer: true,
+            defaultEdgeType: 'curvedArrow',
+            zIndex: true,
+            nodeProgramClasses: {
+                constructGlyph: createNodeImageProgram({
+                    objectFit: 'contain',
+                    keepWithinCircle: true,
+                    correctCentering: true,
+                    padding: 0.08,
+                    drawingMode: 'background',
+                    size: { mode: 'force', value: 256 }
+                })
+            },
+            edgeProgramClasses: {
+                curvedArrow: createEdgeCurveProgram({
+                    arrowHead: {
+                        extremity: 'target',
+                        lengthToThicknessRatio: 2.5,
+                        widenessToThicknessRatio: 2
+                    },
+                    drawLabel: renderOntologySigmaEdgeLabel
+                }),
+                subclassTriangleArrow: createSubclassTriangleEdgeProgram({
+                    drawLabel: renderOntologySigmaEdgeLabel
+                }),
+                restrictionConnectorArrow: createEdgeCurveProgram({
+                    arrowHead: {
+                        extremity: 'target',
+                        lengthToThicknessRatio: 2.8,
+                        widenessToThicknessRatio: 1.8
+                    },
+                    drawLabel: renderOntologySigmaEdgeLabel
+                }),
+                constructDiamondArrow: createConstructDiamondEdgeProgram({
+                    drawLabel: renderOntologySigmaEdgeLabel
+                })
+            },
+            renderEdgeLabels: true,
+            edgeLabelSize: 12,
+            edgeLabelWeight: '600',
+            edgeLabelColor: { color: '#172027' },
+            labelDensity: 0.14,
+            labelGridCellSize: 88,
+            labelRenderedSizeThreshold: 8,
+            nodeReducer: (nodeId, attributes) => {
+                const result = { ...attributes };
+                const focusIds = activeOntologyFocusIds();
+                const focusNeighborhoodIds = activeOntologyFocusNeighborhoodIds();
+                const constructGlyph = isConstructGlyphNode(attributes);
+                result.focused = focusIds.includes(nodeId);
+                result.inFocusNeighborhood = focusNeighborhoodIds.has(nodeId);
+                const dragged = draggedNodeId === nodeId;
+                const muted = focusIds.length > 0 && !result.inFocusNeighborhood && !dragged;
+                result.highlighted = result.inFocusNeighborhood || dragged;
+                result.zIndex = result.focused || dragged
+                    ? ontologyZIndex.focusedNode
+                    : result.inFocusNeighborhood
+                        ? ontologyZIndex.focusedNeighborNode
+                        : ontologyZIndex.base;
+                if (result.focused || dragged) {
+                    result.label = attributes.fullLabel || attributes.label || '';
+                    result.forceLabel = true;
+                }
+                if (muted) {
+                    result.color = dimColor(attributes.color || '#8da0ae', 0.18);
+                    result.label = '';
+                    result.forceLabel = false;
+                    result.zIndex = ontologyZIndex.mutedNode;
+                }
+                if (result.inFocusNeighborhood) {
+                    result.forceLabel = true;
+                }
+                if (constructGlyph) {
+                    result.image = muted
+                        ? attributes.mutedImage || constructGlyphImage(attributes, true)
+                        : attributes.image || constructGlyphImage(attributes);
+                    result.color = muted
+                        ? result.color
+                        : attributes.color || nodePalette(attributes).fill;
+                    if (!muted && !result.label) {
+                        result.label = attributes.label || constructNodeDisplayLabel(attributes);
+                    }
+                }
+                return result;
+            },
+            edgeReducer: (_edgeId, attributes) => {
+                const result = { ...attributes };
+                const focusIds = activeOntologyFocusIds();
+                const focusNeighborhoodIds = activeOntologyFocusNeighborhoodIds();
+                result.hidden = focusIds.length === 0
+                    || !isEdgeVisible(attributes)
+                    || !isEdgeInFocusNeighborhood(attributes, focusIds, focusNeighborhoodIds);
+                result.zIndex = result.hidden ? ontologyZIndex.base : ontologyZIndex.focusedEdge;
+                if (result.hidden) {
+                    result.label = '';
+                    result.forceLabel = false;
+                    return result;
+                }
+                result.color = focusSigmaEdgeColor(attributes);
+                result.size = Math.max(0.8, Number(attributes.size || sigmaEdgeSize(attributes)));
+                result.label = edgeDisplayLabel(attributes);
+                result.forceLabel = true;
+                return result;
+            }
+        });
+        renderer.on('clickNode', event => {
+            if (suppressNextNodeClick) {
+                suppressNextNodeClick = false;
+                suppressNextStageClear = true;
+                return;
+            }
+            suppressNextStageClear = true;
+            window.focusOntologyNode(event.node);
+        });
+        renderer.on('clickStage', () => {
+            if (suppressNextStageClear) {
+                suppressNextStageClear = false;
+                return;
+            }
+            window.clearOntologySelection();
+        });
+        renderer.on('enterNode', event => {
+            hoveredNodeId = event.node;
+            renderer.refresh();
+        });
+        renderer.on('leaveNode', event => {
+            if (hoveredNodeId === event.node) {
+                hoveredNodeId = null;
+                renderer.refresh();
+            }
+        });
+        initializeOntologyNodeDragging();
     }
 
-    function dragStarted(event, d) {
-        if (!event.active) simulation.alphaTarget(0.25).restart();
-        d.fx = d.x;
-        d.fy = d.y;
+    function initializeOntologyNodeDragging() {
+        if (!renderer || !graph) {
+            return;
+        }
+        renderer.on('downNode', event => {
+            if (!visibleNodeIds.has(event.node)) {
+                return;
+            }
+            isDraggingNode = true;
+            draggedNodeId = event.node;
+            dragMovedNode = false;
+            suppressNextStageClear = true;
+            if (!renderer.getCustomBBox()) {
+                renderer.setCustomBBox(renderer.getBBox());
+            }
+            refreshOntologyRenderer();
+        });
+        renderer.on('moveBody', ({ event }) => {
+            if (!isDraggingNode || !draggedNodeId || !graph.hasNode(draggedNodeId)) {
+                return;
+            }
+            const position = renderer.viewportToGraph(event);
+            graph.mergeNodeAttributes(draggedNodeId, {
+                x: position.x,
+                y: position.y
+            });
+            dragMovedNode = true;
+            refreshOntologyRenderer();
+            if (event.preventSigmaDefault) {
+                event.preventSigmaDefault();
+            }
+            if (event.original) {
+                event.original.preventDefault();
+                event.original.stopPropagation();
+            }
+        });
+        const handleOntologyNodeDragEnd = () => {
+            if (!isDraggingNode && !draggedNodeId) {
+                return;
+            }
+            if (dragMovedNode) {
+                suppressNextNodeClick = true;
+                suppressNextStageClear = true;
+            }
+            isDraggingNode = false;
+            draggedNodeId = null;
+            dragMovedNode = false;
+            refreshOntologyRenderer();
+        };
+        renderer.on('upNode', handleOntologyNodeDragEnd);
+        renderer.on('upStage', handleOntologyNodeDragEnd);
     }
 
-    function dragged(event, d) {
-        d.fx = event.x;
-        d.fy = event.y;
+    function ensureOntologyCanvasSize() {
+        const minimumHeight = Math.max(window.innerHeight - 50, 520);
+        if (!container.clientHeight || container.clientHeight < 20) {
+            container.style.height = `${minimumHeight}px`;
+        }
     }
 
-    function dragEnded(event, d) {
-        if (!event.active) simulation.alphaTarget(0);
-        d.fx = null;
-        d.fy = null;
+    function assignInitialSigmaPositions(renderedNodes) {
+        const buckets = new Map();
+        renderedNodes.forEach(nodeData => {
+            const bucket = nodeLayoutBand(nodeData);
+            if (!buckets.has(bucket)) {
+                buckets.set(bucket, []);
+            }
+            buckets.get(bucket).push(nodeData);
+        });
+        const centers = {
+            shacl: [-7, -5],
+            concept: [-1, 0],
+            value: [6, 2],
+            construct: [2, 6]
+        };
+        for (const [bucketName, bucket] of buckets.entries()) {
+            const [cx, cy] = centers[bucketName] || centers.concept;
+            const radius = Math.max(2.5, Math.sqrt(bucket.length) * 0.85);
+            bucket.forEach((nodeData, index) => {
+                const angle = (index / Math.max(bucket.length, 1)) * Math.PI * 2;
+                const ring = radius * (0.42 + (index % 13) / 13);
+                nodeData.x = cx + Math.cos(angle) * ring;
+                nodeData.y = cy + Math.sin(angle) * ring;
+            });
+        }
+    }
+
+    function applyOntologyLayout() {
+        try {
+            const settings = forceAtlas2.inferSettings(graph);
+            forceAtlas2.assign(graph, {
+                iterations: graph.order > 650 ? 280 : 190,
+                settings: {
+                    ...settings,
+                    adjustSizes: true,
+                    barnesHutOptimize: true,
+                    gravity: 1.45,
+                    scalingRatio: 16,
+                    slowDown: 2
+                }
+            });
+            separateOverlappingSigmaNodes();
+        } catch (_) {
+            // Keep deterministic initial positions if layout cannot run.
+        }
+    }
+
+    function separateOverlappingSigmaNodes() {
+        const seen = new Map();
+        graph.forEachNode((nodeId, attributes) => {
+            const key = `${Math.round(attributes.x * 10)}:${Math.round(attributes.y * 10)}`;
+            const count = seen.get(key) || 0;
+            seen.set(key, count + 1);
+            if (count > 0) {
+                graph.mergeNodeAttributes(nodeId, {
+                    x: attributes.x + Math.cos(count) * count * 0.12,
+                    y: attributes.y + Math.sin(count) * count * 0.12
+                });
+            }
+        });
+    }
+
+    function sigmaNodeSize(nodeData) {
+        const connectionCount = connectionCounts.get(nodeData.id) || 0;
+        const base = nodeData.shape === 'class-anchor' ? 8 : 6;
+        return Math.max(5, Math.min(18, base + Math.sqrt(connectionCount) * 1.7));
+    }
+
+    function sigmaLabelWidth(nodeData) {
+        return nodeData.shape === 'class-anchor' ? 120 : 160;
+    }
+
+    function sigmaEdgeSize(edgeData) {
+        if (edgeData.rendered_kind === 'property') {
+            return 1.55;
+        }
+        if (isSetOperatorEdge(edgeData)) {
+            return 1.35;
+        }
+        if (edgeHasConstruct(edgeData, 'subclass')) {
+            return 1.35;
+        }
+        if (edgeHasConstruct(edgeData, 'disjoint')) {
+            return 1.2;
+        }
+        return 1;
+    }
+
+    function sigmaEdgeColor(edgeData) {
+        if (edgeData.rendered_kind === 'property') {
+            return '#1f2937';
+        }
+        if (isSetOperatorEdge(edgeData)) {
+            return '#111827';
+        }
+        if (edgeHasConstruct(edgeData, 'subclass')) {
+            return '#111827';
+        }
+        if (edgeHasConstruct(edgeData, 'disjoint')) {
+            return '#7f1d1d';
+        }
+        if (edgeHasConstruct(edgeData, 'inverse')) {
+            return '#4c2f92';
+        }
+        return '#334155';
+    }
+
+    function focusSigmaEdgeColor(edgeData) {
+        if (isSetOperatorEdge(edgeData)) {
+            return '#111827';
+        }
+        if (edgeData.rendered_kind === 'property') {
+            return '#1f2937';
+        }
+        if (edgeHasConstruct(edgeData, 'subclass')) {
+            return '#111827';
+        }
+        if (edgeHasConstruct(edgeData, 'disjoint')) {
+            return '#7f1d1d';
+        }
+        return '#53636b';
+    }
+
+    function ontologyEdgeProgramType(edgeData) {
+        if (isClassExpressionMemberEdge(edgeData)) return 'constructDiamondArrow';
+        if (edgeHasConstruct(edgeData, 'subclass')) return 'subclassTriangleArrow';
+        if (edgeHasConstruct(edgeData, 'restriction')) return 'restrictionConnectorArrow';
+        return 'curvedArrow';
+    }
+
+    function isSetOperatorEdge(edgeData) {
+        return isClassExpressionMemberEdge(edgeData);
+    }
+
+    function isClassExpressionMemberEdge(edgeData) {
+        return edgeHasConstruct(edgeData, 'class-expression');
+    }
+
+    function sigmaEdgeCurvature(edgeData) {
+        const index = Number(edgeData.parallelIndex);
+        if (!Number.isFinite(index)) {
+            return 0.22;
+        }
+        const max = Math.max(
+            1,
+            Math.abs(Number(edgeData.parallelMaxIndex) || 0),
+            Math.abs(Number(edgeData.parallelMinIndex) || 0)
+        );
+        const normalized = index / max;
+        if (Math.abs(normalized) < 0.01) {
+            return 0.08;
+        }
+        return Math.max(-0.48, Math.min(0.48, normalized * 0.28));
+    }
+
+    function applySigmaParallelEdgeCurvature() {
+        indexParallelEdgesIndex(graph);
+        graph.forEachEdge((edgeId, attributes) => {
+            graph.setEdgeAttribute(edgeId, 'curvature', sigmaEdgeCurvature(attributes));
+        });
+    }
+
+    function renderOntologySigmaEdgeLabel(context, data, source, target, settings) {
+        if (!data.label) return;
+        const label = ontologyEdgeLabelText(data);
+        if (!label) return;
+
+        const size = settings.edgeLabelSize || 12;
+        const font = settings.edgeLabelFont || settings.labelFont || 'Arial';
+        const weight = data.rendered_kind === 'property' ? '700' : (settings.edgeLabelWeight || '600');
+        context.font = `${weight} ${size}px ${font}`;
+        const point = curvedEdgeLabelPoint(data, source, target);
+
+        if (data.rendered_kind === 'property') {
+            const palette = edgeLabelPalette(data);
+            const metrics = context.measureText(label);
+            const paddingX = 8;
+            const paddingY = 4;
+            const width = metrics.width + paddingX * 2;
+            const height = size + paddingY * 2;
+            const left = Math.round(point.x - width / 2);
+            const top = Math.round(point.y - height / 2);
+            roundedRect(context, left, top, width, height, 2);
+            context.fillStyle = palette.fill;
+            context.fill();
+            context.strokeStyle = palette.stroke;
+            context.lineWidth = 1;
+            context.stroke();
+            context.fillStyle = palette.text;
+            context.fillText(label, left + paddingX, Math.round(point.y + size * 0.34));
+            return;
+        }
+
+        drawSigmaCurvedEdgeLabel(
+            context,
+            { ...data, label },
+            source,
+            target,
+            {
+                ...settings,
+                edgeLabelColor: {
+                    color: edgeHasConstruct(data, 'subclass') ? '#64748b' : '#334155'
+                }
+            }
+        );
+    }
+
+    function constructGlyphImage(nodeData, muted = false) {
+        const symbol = constructNodeSymbolLabel(nodeData);
+        const isRestriction = nodeHasConstructClass(nodeData, 'restriction');
+        const fill = muted ? '#64748b' : '#0f172a';
+        const opacity = muted ? '0.38' : '1';
+        const body = isRestriction
+            ? restrictionGlyphSvg(symbol, fill, opacity)
+            : classExpressionGlyphSvg(setOperatorSymbol({ label: symbol }), fill, opacity);
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+${body}
+</svg>`;
+        return `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
+    }
+
+    function classExpressionGlyphSvg(symbol, fill, opacity) {
+        const safeSymbol = escapeXml(symbol || 'U');
+        return `<text x="128" y="142" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="800" text-anchor="middle" fill="${escapeXml(fill)}" fill-opacity="${escapeXml(opacity)}">${safeSymbol}</text>`;
+    }
+
+    function restrictionGlyphSvg(symbol, fill, opacity) {
+        const safeSymbol = escapeXml(symbol || 'R');
+        return `<text x="128" y="142" font-family="Arial, Helvetica, sans-serif" font-size="112" font-weight="800" text-anchor="middle" fill="${escapeXml(fill)}" fill-opacity="${escapeXml(opacity)}">${safeSymbol}</text>`;
+    }
+
+    function isConstructGlyphNode(nodeData) {
+        return nodeHasConstructClass(nodeData, 'class-expression')
+            || nodeHasConstructClass(nodeData, 'restriction');
+    }
+
+    function nodeHasConstructClass(nodeData, constructClass) {
+        return nodeConstructClasses(nodeData).has(constructClass);
+    }
+
+    function nodeConstructClasses(nodeData) {
+        const classes = new Set();
+        if (!nodeData) return classes;
+        const semanticType = String(nodeData.semantic_type || '');
+        if (semanticType === 'restriction') classes.add('restriction');
+        if (semanticType === 'class-expression') classes.add('class-expression');
+        (nodeData.constructs || []).forEach(item => {
+            constructFilterValues(item).forEach(value => classes.add(value));
+        });
+        return classes;
+    }
+
+    function constructNodeSymbolLabel(nodeData) {
+        if (nodeHasConstructClass(nodeData, 'restriction')) {
+            return restrictionNodeSymbolLabel(nodeData);
+        }
+        return classExpressionEdgeSymbolLabel(nodeData);
+    }
+
+    function constructNodeDisplayLabel(nodeData) {
+        if (nodeHasConstructClass(nodeData, 'restriction')) {
+            return restrictionNodeDisplayLabel(nodeData);
+        }
+        const label = String(classExpressionEdgeSymbolLabel(nodeData) || '').toLowerCase();
+        if (label.includes('intersection')) return 'Intersection';
+        if (label.includes('complement')) return 'Complement';
+        if (label.includes('union')) return 'Union';
+        return 'Class expression';
+    }
+
+    function classExpressionEdgeSymbolLabel(nodeData) {
+        const expression = (nodeData.constructs || []).find(item => {
+            const kind = String(item.kind || '');
+            const family = String(item.family || '');
+            const label = String(item.label || item.class_expression_kind || item.classExpressionKind || '').toLowerCase();
+            return kind === 'class-expression'
+                || family === 'class-expression'
+                || label === 'union'
+                || label === 'intersection'
+                || label === 'complement';
+        });
+        return expression
+            ? expression.label || expression.class_expression_kind || expression.classExpressionKind || ''
+            : graphNodeDisplayLabel(nodeData);
+    }
+
+    function restrictionNodeSymbolLabel(nodeData) {
+        const restriction = (nodeData.constructs || []).find(item => {
+            const kind = String(item.kind || '');
+            const family = String(item.family || '');
+            return kind === 'restriction' || family === 'restriction';
+        });
+        const label = String(
+            (restriction && (restriction.label || restriction.restriction_kind || restriction.restrictionKind))
+            || graphNodeDisplayLabel(nodeData)
+            || ''
+        ).toLowerCase();
+        if (label.includes('universal')) return '∀';
+        if (label.includes('existential')) return '∃';
+        if (label.includes('min')) return '≥';
+        if (label.includes('max')) return '≤';
+        if (label.includes('cardinality')) return '=';
+        return 'R';
+    }
+
+    function restrictionNodeDisplayLabel(nodeData) {
+        const restriction = (nodeData.constructs || []).find(item => {
+            const kind = String(item.kind || '');
+            const family = String(item.family || '');
+            return kind === 'restriction' || family === 'restriction';
+        });
+        const label = String(
+            (restriction && (restriction.label || restriction.restriction_kind || restriction.restrictionKind))
+            || graphNodeDisplayLabel(nodeData)
+            || ''
+        ).toLowerCase();
+        if (label.includes('universal')) return 'Universal restriction';
+        if (label.includes('existential')) return 'Existential restriction';
+        if (label.includes('min')) return 'Min cardinality';
+        if (label.includes('max')) return 'Max cardinality';
+        if (label.includes('cardinality')) return 'Cardinality restriction';
+        return 'Restriction';
+    }
+
+    function setOperatorSymbol(edgeData) {
+        const label = String(
+            edgeDisplayLabel(edgeData)
+            || edgeData.class_expression_kind
+            || edgeData.classExpressionKind
+            || ''
+        ).toLowerCase();
+        if (label.includes('intersection')) return '∩';
+        if (label.includes('complement')) return '¬';
+        if (label.includes('union')) return '∪';
+        return 'U';
+    }
+
+    function ontologyEdgeLabelText(edgeData) {
+        const raw = edgeDisplayLabel(edgeData);
+        if (isSetOperatorEdge(edgeData)) return '';
+        if (edgeHasConstruct(edgeData, 'shape-overlay') && isGenericShapeOverlayLabel(raw)) return '';
+        if (edgeHasConstruct(edgeData, 'subclass')) return 'Subclass of';
+        if (edgeHasConstruct(edgeData, 'membership')) return 'member';
+        return raw;
+    }
+
+    function isGenericShapeOverlayLabel(value) {
+        return String(value || '').toLowerCase().includes('shape overlay');
+    }
+
+    function edgeLabelPalette(edgeData) {
+        if (edgeData.property_kind === 'datatype-property') {
+            return { fill: '#48692d', stroke: '#315120', text: '#ffffff' };
+        }
+        if (edgeData.property_kind === 'object-property') {
+            return { fill: '#3f5f83', stroke: '#233f5c', text: '#ffffff' };
+        }
+        return { fill: '#3f6231', stroke: '#28451e', text: '#ffffff' };
+    }
+
+    function curvedEdgeLabelPoint(edgeData, source, target) {
+        const geometry = curvedEdgeGeometry(edgeData, source, target);
+        const visible = visibleEdgeCurveParameters(source, target);
+        return quadraticPoint(source, geometry.control, target, (visible.startT + visible.endT) / 2);
+    }
+
+    function visibleEdgeCurveParameters(source, target) {
+        const length = Math.max(1, Math.hypot(target.x - source.x, target.y - source.y));
+        return {
+            startT: Math.max(0.03, Math.min(0.18, ((source.size || 0) + 4) / length)),
+            endT: 1 - Math.max(0.06, Math.min(0.24, ((target.size || 0) + 12) / length))
+        };
+    }
+
+    function curvedEdgeGeometry(edgeData, source, target) {
+        const curvature = Number(edgeData.curvature || 0.08);
+        const dx = target.x - source.x;
+        const dy = target.y - source.y;
+        const length = Math.max(1, Math.hypot(dx, dy));
+        const normalX = -dy / length;
+        const normalY = dx / length;
+        const offset = length * curvature;
+        const control = {
+            x: (source.x + target.x) / 2 + normalX * offset,
+            y: (source.y + target.y) / 2 + normalY * offset
+        };
+        return { control };
+    }
+
+    function quadraticPoint(source, control, target, t) {
+        const oneMinusT = 1 - t;
+        return {
+            x: oneMinusT * oneMinusT * source.x + 2 * oneMinusT * t * control.x + t * t * target.x,
+            y: oneMinusT * oneMinusT * source.y + 2 * oneMinusT * t * control.y + t * t * target.y
+        };
+    }
+
+    function sigmaNodeLabel(nodeData) {
+        if (isConstructGlyphNode(nodeData)) {
+            return truncateLabel(constructNodeDisplayLabel(nodeData), 96);
+        }
+        const text = truncateLabel(nodeData.display_label || graphNodeDisplayLabel(nodeData), sigmaLabelWidth(nodeData));
+        const badges = visibleBadgeSymbols(nodeData);
+        return badges ? `${text} ${badges}` : text;
+    }
+
+    function fullSigmaNodeLabel(nodeData) {
+        if (isConstructGlyphNode(nodeData)) {
+            return constructNodeDisplayLabel(nodeData);
+        }
+        const text = nodeData.display_label || graphNodeDisplayLabel(nodeData);
+        const badges = visibleBadgeSymbols(nodeData);
+        return badges ? `${text} ${badges}` : text;
+    }
+
+    function roundedRect(context, x, y, width, height, radius) {
+        context.beginPath();
+        context.moveTo(x + radius, y);
+        context.lineTo(x + width - radius, y);
+        context.quadraticCurveTo(x + width, y, x + width, y + radius);
+        context.lineTo(x + width, y + height - radius);
+        context.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+        context.lineTo(x + radius, y + height);
+        context.quadraticCurveTo(x, y + height, x, y + height - radius);
+        context.lineTo(x, y + radius);
+        context.quadraticCurveTo(x, y, x + radius, y);
+        context.closePath();
+    }
+
+    function dimColor(color, alpha) {
+        if (!color || !color.startsWith('#')) return color;
+        const foreground = parseHexColor(color);
+        const background = parseHexColor(reqvireSurfaceBase);
+        if (!foreground || !background) return color;
+        const r = Math.round(foreground.r * alpha + background.r * (1 - alpha));
+        const g = Math.round(foreground.g * alpha + background.g * (1 - alpha));
+        const b = Math.round(foreground.b * alpha + background.b * (1 - alpha));
+        return rgbToHex(r, g, b);
+    }
+
+    function parseHexColor(color) {
+        const hex = color.slice(1);
+        const value = hex.length === 3
+            ? hex.split('').map(part => part + part).join('')
+            : hex.padEnd(6, '0').slice(0, 6);
+        const r = parseInt(value.slice(0, 2), 16);
+        const g = parseInt(value.slice(2, 4), 16);
+        const b = parseInt(value.slice(4, 6), 16);
+        if ([r, g, b].some(component => Number.isNaN(component))) return null;
+        return { r, g, b };
+    }
+
+    function rgbToHex(r, g, b) {
+        return `#${[r, g, b].map(component => component.toString(16).padStart(2, '0')).join('')}`;
+    }
+
+    function buildRenderedOntologyLinks(rawEdges, allNodesById, properties) {
+        const rendered = [];
+        const seen = new Set();
+        rawEdges.forEach(edgeData => {
+            const source = endpointId(edgeData.source);
+            const target = endpointId(edgeData.target);
+            if (!source || !target) {
+                return;
+            }
+            if (isOntologyPropertyNode(allNodesById.get(source)) || isOntologyPropertyNode(allNodesById.get(target))) {
+                return;
+            }
+            pushRenderedLink(rendered, seen, {
+                ...edgeData,
+                source,
+                target,
+                rendered_kind: 'construct'
+            });
+        });
+
+        properties.forEach(propertyNode => {
+            const domains = propertyEndpointTerms(propertyNode.domain);
+            const ranges = propertyEndpointTerms(propertyNode.range);
+            domains.forEach(domain => {
+                ranges.forEach(range => {
+                    if (domain.iri === range.iri) {
+                        return;
+                    }
+                    pushRenderedLink(rendered, seen, {
+                        source: domain.iri,
+                        target: range.iri,
+                        label: graphNodeDisplayLabel(propertyNode),
+                        rendered_kind: 'property',
+                        property_node_id: propertyNode.id,
+                        property_kind: propertyNode.semantic_type || 'rdf-property'
+                    });
+                });
+            });
+        });
+        return rendered;
+    }
+
+    function pushRenderedLink(rendered, seen, linkData) {
+        const source = endpointId(linkData.source);
+        const target = endpointId(linkData.target);
+        if (!source || !target || !nodeExistsForRenderedGraph(source) || !nodeExistsForRenderedGraph(target)) {
+            return;
+        }
+        const key = [
+            source,
+            target,
+            linkData.label || '',
+            linkData.rendered_kind || '',
+            linkData.property_node_id || ''
+        ].join('|');
+        if (seen.has(key)) {
+            return;
+        }
+        seen.add(key);
+        rendered.push(linkData);
+    }
+
+    function nodeExistsForRenderedGraph(nodeId) {
+        const nodeData = rawNodeById.get(nodeId);
+        return Boolean(nodeData && !isOntologyPropertyNode(nodeData));
+    }
+
+    function propertyEndpointTerms(terms) {
+        return (terms || [])
+            .filter(term => term && term.iri && nodeExistsForRenderedGraph(term.iri));
+    }
+
+    function isOntologyPropertyNode(nodeData) {
+        const type = String((nodeData && nodeData.semantic_type) || '');
+        return type === 'object-property' || type === 'datatype-property' || type === 'rdf-property';
+    }
+
+    function computeRenderedNodeConnections(renderedNodes, renderedLinks) {
+        const counts = new Map(renderedNodes.map(nodeData => [nodeData.id, 0]));
+        renderedLinks.forEach(linkData => {
+            if (!isMeaningfulConnectionLink(linkData)) {
+                return;
+            }
+            const source = endpointId(linkData.source);
+            const target = endpointId(linkData.target);
+            if (counts.has(source)) {
+                counts.set(source, counts.get(source) + 1);
+            }
+            if (counts.has(target) && target !== source) {
+                counts.set(target, counts.get(target) + 1);
+            }
+        });
+        return counts;
+    }
+
+    function isMeaningfulConnectionLink(linkData) {
+        return linkData.property_kind !== 'datatype-property';
+    }
+
+    function edgeDisplayLabel(edgeData) {
+        return edgeData.display_label || edgeData.label || '';
+    }
+
+    function nodeLayoutBand(nodeData) {
+        const type = String(nodeData.semantic_type || '');
+        if (type === 'node-shape' || type === 'property-shape') return 'shacl';
+        if (type.endsWith('property')) return 'property';
+        if (type === 'named-individual' || type === 'datatype' || type === 'resource') return 'value';
+        if (nodeHasConstructClass(nodeData, 'restriction') || nodeHasConstructClass(nodeData, 'class-expression')) return 'construct';
+        return 'concept';
+    }
+
+    function nodeShapeType(nodeData) {
+        const type = String(nodeData.semantic_type || '');
+        if (type === 'class' || nodeHasConstructClass(nodeData, 'restriction') || nodeHasConstructClass(nodeData, 'class-expression')) {
+            return 'class-anchor';
+        }
+        return 'box';
     }
 
     function truncateLabel(value, width) {
@@ -2840,6 +3981,10 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
             .replaceAll('>', '&gt;')
             .replaceAll('"', '&quot;')
             .replaceAll("'", '&#39;');
+    }
+
+    function escapeXml(value) {
+        return escapeHtml(value);
     }
 
     function escapeJsString(value) {
@@ -2929,7 +4074,7 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
     function visibleBadges(nodeData) {
         return (nodeData.badges || []).filter(badge => {
             const value = badgeFilterValue(badge);
-            return value ? filterState.construct.has(value) : true;
+            return value ? filterState.construct.has(value) && constructPassesRelationFilters(value) : true;
         });
     }
 
@@ -2937,15 +4082,12 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
         return visibleBadges(nodeData).map(badge => badge.symbol).join(' ');
     }
 
-    function visibleConstructDetails(nodeData) {
-        return (nodeData.constructs || []).filter(item => {
-            const values = constructFilterValues(item);
-            return values.size ? hasAny(values, filterState.construct) : true;
-        });
+    function inspectorConstructDetails(nodeData) {
+        return nodeData.constructs || [];
     }
 
-    function visibleSlotFacets(nodeData) {
-        return filterState.construct.has('shape-overlay') ? (nodeData.slot_facets || []) : [];
+    function inspectorSlotFacets(nodeData) {
+        return nodeData.slot_facets || [];
     }
 
     function equivalenceMembers(group) {
@@ -3037,6 +4179,86 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
         return `<div class="ontology-chain"><div>${body}</div>${source}</div>`;
     }
 
+    function propertyUsagesForNode(nodeData) {
+        const id = nodeData.id;
+        const usages = [];
+        propertyNodes.forEach(propertyNode => {
+            const domains = propertyEndpointTerms(propertyNode.domain);
+            const ranges = propertyEndpointTerms(propertyNode.range);
+            const domainMatch = domains.some(term => term.iri === id);
+            const rangeMatch = ranges.some(term => term.iri === id);
+            if (!domainMatch && !rangeMatch) {
+                return;
+            }
+            usages.push({
+                isDomain: domainMatch,
+                isRange: rangeMatch,
+                property: propertyNode,
+                domains,
+                ranges,
+                facets: domainMatch ? slotFacetsForPropertyOnNode(propertyNode, nodeData) : []
+            });
+        });
+        usages.sort((a, b) => {
+            const propertyCompare = graphNodeDisplayLabel(a.property).localeCompare(graphNodeDisplayLabel(b.property));
+            if (propertyCompare) {
+                return propertyCompare;
+            }
+            const aRole = propertyUsageRoleLabel(a);
+            const bRole = propertyUsageRoleLabel(b);
+            return aRole.localeCompare(bRole);
+        });
+        return usages;
+    }
+
+    function slotFacetsForPropertyOnNode(propertyNode, nodeData) {
+        return (nodeData.slot_facets || []).filter(facet => facet.slot_iri === propertyNode.id);
+    }
+
+    function renderPropertyUsages(nodeData) {
+        const usages = propertyUsagesForNode(nodeData);
+        if (!usages.length) {
+            return '';
+        }
+        return `<div class="ontology-meta-section">
+            <div class="ontology-meta-title">Properties</div>
+            ${usages.map(renderPropertyUsage).join('')}
+        </div>`;
+    }
+
+    function renderPropertyUsage(usage) {
+        const propertyNode = usage.property;
+        const propertyLabel = graphNodeDisplayLabel(propertyNode) || propertyNode.id;
+        const propertyKind = humanizeSemanticType(propertyNode.semantic_type);
+        const facets = usage.facets && usage.facets.length
+            ? `<div class="ontology-slot-facet-values">${usage.facets.flatMap(facet => facet.facets || []).map(item => (
+                `<span class="ontology-slot-facet-pill"><span>${escapeHtml(item.name)}</span>${escapeHtml(item.value)}</span>`
+            )).join('')}</div>`
+            : '';
+        return `<div class="ontology-property-usage">`
+            + `<div class="ontology-property-usage-title"><strong title="${escapeHtml(propertyNode.full_uri || propertyNode.id)}">${escapeHtml(propertyLabel)}</strong><span class="ontology-property-kind">${escapeHtml(propertyKind)}</span></div>`
+            + `<div class="ontology-property-usage-body">${renderPropertyUsageBody(usage)}</div>`
+            + facets
+            + `</div>`;
+    }
+
+    function propertyUsageRoleLabel(usage) {
+        if (usage.isDomain && usage.isRange) {
+            return 'domain and range';
+        }
+        return usage.isDomain ? 'domain' : 'range';
+    }
+
+    function renderPropertyUsageBody(usage) {
+        if (usage.isDomain && usage.isRange) {
+            return `<span>domain/range</span> property; Domain ${renderTermRefs(usage.domains, 'Any')}; Range ${renderTermRefs(usage.ranges, 'Any')}`;
+        }
+        if (usage.isDomain) {
+            return `<span>domain</span> property; Range ${renderTermRefs(usage.ranges, 'Any')}`;
+        }
+        return `<span>range</span> property; Domain ${renderTermRefs(usage.domains, 'Any')}`;
+    }
+
     function renderConstructDetail(item) {
         if (item.kind === 'class-expression') {
             return renderClassExpressionConstructDetail(item);
@@ -3087,7 +4309,7 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
     }
 
     function classExpressionConstructs(nodeData) {
-        return visibleConstructDetails(nodeData).filter(item => item.kind === 'class-expression');
+        return inspectorConstructDetails(nodeData).filter(item => item.kind === 'class-expression');
     }
 
     function graphUsagesForNode(nodeData) {
@@ -3259,7 +4481,7 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
             </div>`
             : '';
 
-        const badges = renderBadges(visibleBadges(nodeData));
+        const badges = renderBadges(nodeData.badges || []);
 
         const equivalence = nodeData.equivalence_group
             ? `<div class="ontology-meta-section">
@@ -3282,7 +4504,7 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
             </div>`
             : '';
 
-        const visibleConstructs = visibleConstructDetails(nodeData).filter(item => {
+        const visibleConstructs = inspectorConstructDetails(nodeData).filter(item => {
             if (nodeData.semantic_type !== 'class-expression') {
                 return true;
             }
@@ -3297,12 +4519,13 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
         const classExpressionSummary = renderClassExpressionSummary(nodeData);
         const literalValues = renderLiteralValues(nodeData.literal_values);
         const identifier = renderIdentifierSection(nodeData, identifierTitle);
+        const properties = renderPropertyUsages(nodeData);
 
         const isProperty = String(nodeData.semantic_type || '').endsWith('property')
             || (nodeData.domain && nodeData.domain.length)
             || (nodeData.range && nodeData.range.length);
 
-        const visibleSlots = visibleSlotFacets(nodeData);
+        const visibleSlots = inspectorSlotFacets(nodeData);
         const slots = visibleSlots.length
             ? `<div class="ontology-meta-section">
                 <div class="ontology-meta-title">${isProperty ? 'Used As Slot / Facets' : 'Slots / Facets'}</div>
@@ -3341,6 +4564,7 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
             </div>
             ${literalValues}
             ${classExpressionSummary}
+            ${properties}
             ${domain}
             ${range}
             ${slots}
@@ -3356,23 +4580,12 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
         `;
     }
 
-    function highlightNeighborhood(nodeId) {
-        const related = adjacency.get(nodeId) || new Set([nodeId]);
-        node.style('opacity', d => related.has(d.id) ? 1 : 0.18);
-        edge.style('opacity', d => related.has(d.source.id) && related.has(d.target.id) ? 1 : 0.12)
-            .style('stroke', d => d.source.id === nodeId || d.target.id === nodeId ? '#2563eb' : '#cbd5e1')
-            .style('stroke-width', d => d.source.id === nodeId || d.target.id === nodeId ? 2.4 : 1.4);
-        edgeLabel.style('opacity', d => d.source.id === nodeId || d.target.id === nodeId ? 1 : 0.08);
-    }
-
-    function clearHighlight() {
-        node.style('opacity', 1);
-        edge.style('opacity', 1).style('stroke', '#cbd5e1').style('stroke-width', 1.4);
-        edgeLabel.style('opacity', 1);
-    }
-
     function endpointId(value) {
         return typeof value === 'string' ? value : (value && value.id ? value.id : '');
+    }
+
+    function endpointNode(value) {
+        return typeof value === 'string' ? nodeById.get(value) : value;
     }
 
     function hasAny(values, activeValues) {
@@ -3416,6 +4629,13 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
 
     function nodeConstructValues(nodeData) {
         const constructs = new Set();
+        const semanticType = String(nodeData.semantic_type || '');
+        if (semanticType === 'restriction') {
+            constructs.add('restriction');
+        }
+        if (semanticType === 'class-expression') {
+            constructs.add('class-expression');
+        }
         (nodeData.constructs || []).forEach(item => {
             constructFilterValues(item).forEach(value => constructs.add(value));
         });
@@ -3434,18 +4654,20 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
         return constructs;
     }
 
-    function edgeRoleValues(edgeData) {
-        return new Set(['relation']);
-    }
-
     function edgeConstructValues(edgeData) {
         const constructs = new Set();
         const label = String(edgeData.label || '');
+        if (edgeData.rendered_kind === 'property') constructs.add('domain-range');
         if (label === 'domain' || label === 'range') constructs.add('domain-range');
         if (label === 'subclass') constructs.add('subclass');
         if (label === 'member') constructs.add('membership');
         if (label === 'disjoint') constructs.add('disjoint');
         if (label === 'inverse') constructs.add('inverse');
+        if (label === 'on property' || label.endsWith('restriction')) constructs.add('restriction');
+        if (['intersection', 'union', 'complement', 'class-expression'].includes(label)) {
+            constructs.add('class-expression');
+        }
+        if (label.includes('shape overlay')) constructs.add('shape-overlay');
         return constructs;
     }
 
@@ -3467,52 +4689,115 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
         return values;
     }
 
-    function nodeOriginValues(nodeData) {
-        const origins = new Set();
-        const sources = nodeData.sources || [];
-        if (sources.some(source => source.kind === 'ontology' || source.kind === 'shapes')) {
-            origins.add('authored');
+    function isConstructOnlyNode(nodeData) {
+        const semanticType = String(nodeData.semantic_type || '');
+        const id = String(nodeData.id || nodeData.full_uri || '');
+        if (nodeHasConstructClass(nodeData, 'restriction') || nodeHasConstructClass(nodeData, 'class-expression')) {
+            return true;
         }
-        if (sources.length || (nodeData.rdf_types || []).length || (nodeData.type_evidence || []).length) {
-            origins.add('registry');
-        }
-        if ((nodeData.constructs || []).length
-            || (nodeData.badges || []).length
-            || (nodeData.inverse_properties || []).length
-            || (nodeData.property_chains || []).length
-            || (nodeData.domain || []).length
-            || (nodeData.range || []).length
-            || (nodeData.slot_facets || []).length) {
-            origins.add('construct');
-        }
-        if (!origins.size) {
-            origins.add('registry');
-        }
-        return origins;
+        return id.startsWith('urn:reqvire:ontology-construct')
+            || id.startsWith('urn:reqvire:ontology-member')
+            || id.startsWith('urn:reqvire:ontology-symbol');
     }
 
-    function edgeOriginValues(edgeData) {
-        const origins = new Set();
-        const label = String(edgeData.label || '');
-        if (['domain', 'range', 'subclass', 'member', 'disjoint', 'inverse', 'restriction', 'class expression'].includes(label)) {
-            origins.add('construct');
-        } else {
-            origins.add('registry');
-        }
-        return origins;
+    function hasAuthoredSource(nodeData) {
+        return (nodeData.sources || []).some(source => source.kind === 'ontology' || source.kind === 'shapes');
     }
 
     function nodePassesOwnFilters(nodeData) {
-        return hasAny(nodeData._ontologyRoles, filterState.role)
-            && hasAny(nodeData._ontologyOrigins, filterState.origin);
+        if (!hasAny(nodeData._ontologyRoles, filterState.role)) {
+            return false;
+        }
+        if (!nodePassesRelationFilters(nodeData)) {
+            return false;
+        }
+        if (isConstructOnlyNode(nodeData)) {
+            return hasAny(nodeData._ontologyConstructs, filterState.construct);
+        }
+        return hasAuthoredSource(nodeData);
     }
 
     function edgePassesFilters(edgeData) {
         const hasConstructRole = edgeData._ontologyConstructs && edgeData._ontologyConstructs.size > 0;
-        const roleVisible = hasConstructRole
-            ? hasAny(edgeData._ontologyConstructs, filterState.construct)
-            : hasAny(edgeData._ontologyRoles, filterState.role);
-        return roleVisible && hasAny(edgeData._ontologyOrigins, filterState.origin);
+        if (edgeData.rendered_kind === 'property' && !filterState.role.has('property')) {
+            return false;
+        }
+        if (!edgePassesRelationFilters(edgeData)) {
+            return false;
+        }
+        return hasConstructRole
+            && hasAny(edgeData._ontologyConstructs, filterState.construct);
+    }
+
+    function nodePassesRelationFilters(nodeData) {
+        if (!relationFilterState.has('class-expressions') && nodeHasConstructClass(nodeData, 'class-expression')) {
+            return false;
+        }
+        if (!relationFilterState.has('restrictions') && nodeHasConstructClass(nodeData, 'restriction')) {
+            return false;
+        }
+        return true;
+    }
+
+    function edgePassesRelationFilters(edgeData) {
+        if (!relationFilterState.has('datatype-properties') && edgeData.property_kind === 'datatype-property') {
+            return false;
+        }
+        if (!relationFilterState.has('object-properties') && edgeData.rendered_kind === 'property' && edgeData.property_kind !== 'datatype-property') {
+            return false;
+        }
+        if (!relationFilterState.has('class-disjointness') && edgeHasConstruct(edgeData, 'disjoint')) {
+            return false;
+        }
+        if (!relationFilterState.has('class-membership') && edgeHasConstruct(edgeData, 'membership')) {
+            return false;
+        }
+        if (!relationFilterState.has('restrictions') && edgeHasConstruct(edgeData, 'restriction')) {
+            return false;
+        }
+        if (!relationFilterState.has('class-expressions') && edgeHasConstruct(edgeData, 'class-expression')) {
+            return false;
+        }
+        if (!filterState.role.has('shacl-shape') && edgeHasConstruct(edgeData, 'shape-overlay')) {
+            return false;
+        }
+        return true;
+    }
+
+    function edgeHasConstruct(edgeData, construct) {
+        return Boolean(edgeData._ontologyConstructs && edgeData._ontologyConstructs.has(construct));
+    }
+
+    function constructPassesRelationFilters(construct) {
+        if (construct === 'membership' && !relationFilterState.has('class-membership')) {
+            return false;
+        }
+        if (construct === 'disjoint' && !relationFilterState.has('class-disjointness')) {
+            return false;
+        }
+        if (construct === 'restriction' && !relationFilterState.has('restrictions')) {
+            return false;
+        }
+        if (construct === 'class-expression' && !relationFilterState.has('class-expressions')) {
+            return false;
+        }
+        if (construct === 'shape-overlay' && !filterState.role.has('shacl-shape')) {
+            return false;
+        }
+        return true;
+    }
+
+    function setPassesRelationConstructFilters(values) {
+        for (const value of values || []) {
+            if (!constructPassesRelationFilters(value)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    function isSetOperatorNode(nodeData) {
+        return nodeHasConstructClass(nodeData, 'class-expression');
     }
 
     function computeVisibleNodeIds() {
@@ -3535,17 +4820,30 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
 
     function applyGraphFilters() {
         visibleNodeIds = computeVisibleNodeIds();
-        node.classed('ontology-filtered-out', d => !visibleNodeIds.has(d.id));
-        edge.classed('ontology-filtered-out', d => !isEdgeVisible(d));
-        edgeLabel.classed('ontology-filtered-out', d => !isEdgeVisible(d));
-        node.select('.ontology-node-badges')
-            .text(d => visibleBadgeSymbols(d))
-            .classed('ontology-filtered-out', d => !visibleBadgeSymbols(d));
+        graphFilterRevision += 1;
+        focusNeighborhoodCacheKey = '';
+        if (graph) {
+            nodes.forEach(nodeData => {
+                if (graph.hasNode(nodeData.id)) {
+                    graph.setNodeAttribute(nodeData.id, 'hidden', !visibleNodeIds.has(nodeData.id));
+                    graph.setNodeAttribute(nodeData.id, 'label', sigmaNodeLabel(nodeData));
+                    graph.setNodeAttribute(nodeData.id, 'fullLabel', fullSigmaNodeLabel(nodeData));
+                }
+            });
+            links.forEach((_linkData, index) => {
+                const key = `o${index}`;
+                if (graph.hasEdge(key)) {
+                    graph.setEdgeAttribute(key, 'hidden', !isEdgeVisible(_linkData));
+                }
+            });
+        }
 
         document.querySelectorAll('.ontology-filter-toggle').forEach(button => {
             const category = button.dataset.filterCategory;
             const value = button.dataset.filterValue;
-            const active = Boolean(filterState[category] && filterState[category].has(value));
+            const active = category === 'relation'
+                ? relationFilterState.has(value)
+                : Boolean(filterState[category] && filterState[category].has(value));
             button.classList.toggle('is-active', active);
             button.setAttribute('aria-pressed', active ? 'true' : 'false');
         });
@@ -3554,11 +4852,10 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
         if (search && search.value.trim()) {
             window.filterOntologyGraph(search.value);
         }
-        if (selectedNodeId && !visibleNodeIds.has(selectedNodeId)) {
-            window.clearOntologySelection();
-        } else if (selectedNodeId && nodeById.has(selectedNodeId)) {
+        if (selectedNodeId && nodeById.has(selectedNodeId)) {
             renderInspector(nodeById.get(selectedNodeId));
         }
+        refreshOntologyRenderer();
     }
 
     function initializeOntologyFilters() {
@@ -3568,13 +4865,23 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
                 event.stopPropagation();
                 const category = button.dataset.filterCategory;
                 const value = button.dataset.filterValue;
-                if (!filterState[category] || !value) {
+                if (!value) {
                     return;
                 }
-                if (filterState[category].has(value)) {
-                    filterState[category].delete(value);
+                if (category === 'relation') {
+                    if (relationFilterState.has(value)) {
+                        relationFilterState.delete(value);
+                    } else {
+                        relationFilterState.add(value);
+                    }
+                } else if (filterState[category]) {
+                    if (filterState[category].has(value)) {
+                        filterState[category].delete(value);
+                    } else {
+                        filterState[category].add(value);
+                    }
                 } else {
-                    filterState[category].add(value);
+                    return;
                 }
                 applyGraphFilters();
             });
@@ -3611,21 +4918,13 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
     window.focusOntologyNode = function (nodeId) {
         const selected = nodeById.get(nodeId);
         if (!selected) return;
-        if (!visibleNodeIds.has(nodeId)) return;
+        if (!visibleNodeIds.has(nodeId) || !graph || !graph.hasNode(nodeId)) return;
         selectedNodeId = nodeId;
         document.getElementById('ontology-graph-results').style.display = 'none';
         document.getElementById('ontology-graph-search').value = '';
         renderInspector(selected);
-        highlightNeighborhood(nodeId);
-
-        node.selectAll('rect, ellipse')
-            .attr('stroke-width', d => d.id === nodeId ? 4 : 1.5)
-            .attr('stroke', d => d.id === nodeId ? '#0f172a' : nodePalette(d).stroke);
-
-        const transform = d3.zoomIdentity
-            .translate(width / 2 - selected.x * 1.35, height / 2 - selected.y * 1.35)
-            .scale(1.35);
-        svg.transition().duration(400).call(zoomBehavior.transform, transform);
+        centerOnOntologyNode(nodeId);
+        refreshOntologyRenderer();
     };
 
     window.clearOntologySelection = function () {
@@ -3633,14 +4932,132 @@ const ONTOLOGY_GRAPH_JS: &str = r#"
         document.getElementById('ontology-inspector-clear').style.display = 'none';
         document.getElementById('ontology-inspector-title').textContent = 'Node Inspector';
         document.getElementById('ontology-inspector-body').innerHTML = '<p class="text-gray-500 italic m-0">Search or select a graph node to inspect URI, RDF type, comments, and SHACL constraints.</p>';
-        clearHighlight();
-        node.selectAll('rect, ellipse')
-            .attr('stroke-width', 1.5)
-            .attr('stroke', d => nodePalette(d).stroke);
+        refreshOntologyRenderer();
     };
+
+    window.fitOntologyGraph = function () {
+        if (!renderer || !graph) return;
+        renderer.getCamera().animatedReset({ duration: 250 });
+    };
+
+    window.resetOntologyGraphLayout = function () {
+        if (!graph) return;
+        assignInitialSigmaPositions(nodes);
+        nodes.forEach(nodeData => {
+            if (graph.hasNode(nodeData.id)) {
+                graph.mergeNodeAttributes(nodeData.id, { x: nodeData.x, y: nodeData.y });
+            }
+        });
+        applyOntologyLayout();
+        refreshOntologyRenderer();
+        window.fitOntologyGraph();
+    };
+
+    function refreshOntologyRenderer() {
+        if (renderer) {
+            renderer.refresh();
+        }
+    }
+
+    function activeOntologyFocusIds() {
+        const ids = [];
+        if (selectedNodeId) ids.push(selectedNodeId);
+        if (hoveredNodeId && hoveredNodeId !== selectedNodeId) ids.push(hoveredNodeId);
+        return ids;
+    }
+
+    function activeOntologyFocusNeighborhoodIds() {
+        const focusIds = activeOntologyFocusIds().filter(nodeId => visibleNodeIds.has(nodeId));
+        if (!focusIds.length) {
+            return new Set();
+        }
+        const cacheKey = `${graphFilterRevision}|${focusIds.join('\u001f')}`;
+        if (focusNeighborhoodCacheKey === cacheKey) {
+            return focusNeighborhoodCache;
+        }
+        focusNeighborhoodCacheKey = cacheKey;
+        focusNeighborhoodCache = computeFocusNeighborhoodIds(focusIds);
+        return focusNeighborhoodCache;
+    }
+
+    function computeFocusNeighborhoodIds(focusIds) {
+        const focusSet = new Set(focusIds);
+        const neighborhood = new Set();
+        const expansionQueue = [];
+        const expandedFrom = new Set();
+
+        focusIds.forEach(nodeId => {
+            if (visibleNodeIds.has(nodeId)) {
+                neighborhood.add(nodeId);
+                expansionQueue.push(nodeId);
+            }
+        });
+
+        while (expansionQueue.length) {
+            const currentId = expansionQueue.shift();
+            if (expandedFrom.has(currentId)) {
+                continue;
+            }
+            const currentNode = nodeById.get(currentId);
+            const canExpand = focusSet.has(currentId) || (currentNode && isConstructOnlyNode(currentNode));
+            if (!canExpand) {
+                continue;
+            }
+            expandedFrom.add(currentId);
+
+            links.forEach(linkData => {
+                if (!isEdgeVisible(linkData)) {
+                    return;
+                }
+                const sourceId = endpointId(linkData.source);
+                const targetId = endpointId(linkData.target);
+                if (sourceId !== currentId && targetId !== currentId) {
+                    return;
+                }
+                const otherId = sourceId === currentId ? targetId : sourceId;
+                if (!visibleNodeIds.has(otherId)) {
+                    return;
+                }
+                neighborhood.add(otherId);
+                const otherNode = nodeById.get(otherId);
+                if (otherNode && isConstructOnlyNode(otherNode) && !expandedFrom.has(otherId)) {
+                    expansionQueue.push(otherId);
+                }
+            });
+        }
+
+        return neighborhood;
+    }
+
+    function isEdgeInFocusNeighborhood(edgeData, focusIds, focusNeighborhoodIds) {
+        const sourceId = endpointId(edgeData.source);
+        const targetId = endpointId(edgeData.target);
+        if (!focusNeighborhoodIds.has(sourceId) || !focusNeighborhoodIds.has(targetId)) {
+            return false;
+        }
+        if (focusIds.some(focusId => sourceId === focusId || targetId === focusId)) {
+            return true;
+        }
+        const sourceNode = nodeById.get(sourceId);
+        const targetNode = nodeById.get(targetId);
+        return Boolean((sourceNode && isConstructOnlyNode(sourceNode)) || (targetNode && isConstructOnlyNode(targetNode)));
+    }
+
+    function centerOnOntologyNode(nodeId) {
+        if (!renderer || !graph || !graph.hasNode(nodeId)) return;
+        const display = renderer.getNodeDisplayData(nodeId);
+        if (!display) return;
+        const camera = renderer.getCamera();
+        const state = camera.getState();
+        camera.animate(
+            { x: display.x, y: display.y, ratio: Math.min(state.ratio, 0.9) },
+            { duration: 280 }
+        );
+    }
 
     initializeOntologyFilters();
     applyGraphFilters();
-    window.addEventListener('resize', () => resizeGraph(false));
+    window.setTimeout(window.fitOntologyGraph, 550);
+    window.addEventListener('resize', () => refreshOntologyRenderer());
 })();
-"#;
+"##;

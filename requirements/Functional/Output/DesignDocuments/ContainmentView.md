@@ -8,17 +8,17 @@
 
 ## ContainmentView
 
-# Containment View Specification
+# Model Containment Modes Specification
 
 ## Overview
 
-The containment view displays the physical organization of the model using interactive D3.js visualizations. This serves as the main entry point (index.html) for HTML documentation, providing a complete navigable view of the model structure including elements and their attachments.
+Model containment modes display the physical organization of the model using interactive D3.js visualizations inside the canonical `index.html#/model` Explorer route. Sunburst and Icicle are Model modes over the Project Store hierarchy, providing navigable structure including folders, files, modeled elements, and their attachments. There is no separate primary Containment Explorer route.
 
 Two visualization types are available:
 - **Sunburst**: Circular nested hierarchy with zoom-in/zoom-out navigation
 - **Icicle**: Horizontal rectangular bars with breadcrumb navigation
 
-Users can switch between views using toggle buttons at the top of the page.
+Users switch between Model modes using compact controls in the left Explorer pane.
 
 ## Hierarchy Extraction
 
@@ -121,24 +121,25 @@ Both visualizations use consistent colors matching Mermaid diagrams:
 
 ---
 
-## View Toggle
+## Model Mode Controls
 
-The page includes a toggle mechanism:
+The Model route includes compact mode controls in the shared left Explorer pane:
 
 **Toggle Buttons:**
-- Two buttons: "Sunburst" and "Icicle"
-- Active button highlighted with primary color
+- Four compact icon buttons: "List", "Grid", "Sunburst", and "Icicle"
+- Active button uses the shared black/near-white selected-control treatment
 - Clicking switches the visible view
 
 **View Instructions:**
-- Each view has context-specific instructions shown below the toggle
+- View instructions belong in the shared Explorer help/inspector surfaces rather than in a page header or content preamble
 - Sunburst: "Click on segments to zoom in. Click center circle to zoom out. Click the center name link to navigate to the element."
 - Icicle: "Click on bars to zoom in. Click breadcrumb path to navigate back. Click the element link to open it."
 
 **Technical Implementation:**
-- Both views render on page load (required for D3 dimension calculations)
-- Icicle view hidden after DOMContentLoaded
-- Switching views toggles CSS display property
+- Model List, Grid, Sunburst, and Icicle render as native Explorer mode states over the same Project Store filesystem/containment hierarchy.
+- Sunburst and Icicle use D3 partition renderers with click-to-drill/zoom.
+- Model mode changes are handled by React Explorer UI state inside the canonical `index.html#/model` route, with no static page sections or separate containment route.
+- The route uses the shared headerless Explorer shell with vertical `Explorer` edge strip, expanded left-pane Model mode controls, central workspace, shared collapsible right `Inspector` lane, and right tool rail.
 
 ---
 
@@ -219,7 +220,7 @@ The D3.js visualizations are embedded in markdown using code blocks:
 1. Code blocks are extracted before markdown link conversion
 2. JSON data is preserved with .md extensions in names
 3. During HTML conversion, blocks are replaced with D3.js visualizations
-4. D3.js library loaded from CDN (d3js.org)
+4. D3 runtime support is provided by the compiled Explorer bundle; the exported Explorer shall not depend on a CDN-loaded D3 script for native Model modes
 
 ---
 
@@ -228,18 +229,18 @@ The D3.js visualizations are embedded in markdown using code blocks:
 HTML export integration must:
 
 **Index Page:**
-- Generate as `containment.md` containing both D3.js visualizations
-- Rename to `index.html` during export
-- Serve as primary entry point for documentation
+- Expose containment visualization as Sunburst and Icicle modes inside the canonical `index.html#/model` Explorer route
+- Seed from the central Project Store containment/file sections rather than a page-local data island
+- Keep `index.html` as the primary Explorer shell and entry point for documentation
 
 **Integration with Existing Export:**
-- Follow existing HTML export styling and structure
+- Follow the shared Explorer shell styling and structure
 - Use Reqvire color scheme for consistency
-- Maintain consistent navigation patterns
-- Include in navigation bar as "Index" (first link)
+- Maintain the shared headerless Explorer shell navigation pattern
+- Include as Model mode controls, not as a separate left Explorer primary view
 
 **Requirements:**
 - Generated during `reqvire export` command
 - Updates automatically when model changes
 - Deterministic output for version control
-- Both views render correctly with proper dimensions
+- List, Grid, Sunburst, and Icicle modes render correctly with proper dimensions

@@ -49,13 +49,12 @@ if echo "$OUTPUT" | grep -q "Circular dependency"; then
   exit 1
 fi
 
-# Verify expected number of requirements were processed using jq
-# We expect 8 requirements total (all user requirements due to test location)
-TOTAL_USER_REQS=$(echo "$OUTPUT" | jq '.global_counters.total_requirements_user')
+# Verify expected number of elements were processed using jq.
+# The migrated fixture has 8 requirements plus 1 capability root.
 TOTAL_ELEMENTS=$(echo "$OUTPUT" | jq '.global_counters.total_elements')
 
-if [ "$TOTAL_ELEMENTS" != "8" ]; then
-  echo "FAILED: Expected 8 total elements, found $TOTAL_ELEMENTS"
+if [ "$TOTAL_ELEMENTS" != "9" ]; then
+  echo "FAILED: Expected 9 total elements, found $TOTAL_ELEMENTS"
   echo "Output: $OUTPUT"
   exit 1
 fi

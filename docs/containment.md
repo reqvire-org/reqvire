@@ -1,7 +1,3 @@
-# Containment
-
-The containment view shows the physical organization of the model—how requirements, verifications, and other elements are structured within folders and files. This hierarchical view helps you understand the model's file structure and navigate to specific elements.
-
 <div class="view-toggle">
     <button id="btn-sunburst" class="view-btn active" onclick="showView('sunburst')">Sunburst</button>
     <button id="btn-icicle" class="view-btn" onclick="showView('icicle')">Icicle</button>
@@ -20,6 +16,477 @@ The containment view shows the physical organization of the model—how requirem
       "name": "requirements",
       "type": "folder",
       "children": [
+        {
+          "name": "Capabilities",
+          "type": "folder",
+          "children": [
+            {
+              "name": "BehaviorValidationOperations.md",
+              "type": "file",
+              "link": "requirements/Capabilities/BehaviorValidationOperations.html",
+              "children": [
+                {
+                  "name": "Formatting Model Documents",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#formatting-model-documents",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Formatting Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-formatting-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Linting Model Quality",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#linting-model-quality",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Validation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-validation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Linting Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-linting-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Operating on Model Elements",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#operating-on-model-elements",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Validation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-validation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Operation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-operation-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Reqvire Behavior Rule Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#reqvire-behavior-rule-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Linting Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#reqvire-linting-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Validation Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#reqvire-validation-ontology-shape-profile"
+                },
+                {
+                  "name": "Validating Structures",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#validating-structures",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Requirement Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-requirement-ontology"
+                    },
+                    {
+                      "name": "Reqvire Semantic Contract Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                    },
+                    {
+                      "name": "Reqvire Validation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-validation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Behavior Rule Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-behavior-rule-ontology"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "CapabilityRequirementModel.md",
+              "type": "file",
+              "link": "requirements/Capabilities/CapabilityRequirementModel.html",
+              "children": [
+                {
+                  "name": "Reqvire Capability Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-capability-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Custom Element Trace Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-custom-element-trace-shape-profile"
+                },
+                {
+                  "name": "Reqvire Ontology Element Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-ontology-element-shape-profile"
+                },
+                {
+                  "name": "Reqvire Refinement Subtype Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-refinement-subtype-shape-profile"
+                },
+                {
+                  "name": "Reqvire Requirement Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-requirement-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Semantic Contract Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Semantic Query Contract Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-semantic-query-contract-shape-profile"
+                }
+              ]
+            },
+            {
+              "name": "Governance.md",
+              "type": "file",
+              "link": "requirements/Capabilities/Governance.html",
+              "children": [
+                {
+                  "name": "Reqvire Governance Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Governance.html#reqvire-governance-ontology-shape-profile"
+                }
+              ]
+            },
+            {
+              "name": "Integration.md",
+              "type": "file",
+              "link": "requirements/Capabilities/Integration.html",
+              "children": [
+                {
+                  "name": "AI-Assisted System Model Management",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Integration.html#ai-assisted-system-model-management",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire AI Assistance Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Integration.html#reqvire-ai-assistance-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Aligning Design with Code",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Integration.html#aligning-design-with-code",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Code Traceability Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Integration.html#reqvire-code-traceability-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "GitHub Workflow Automation",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Integration.html#github-workflow-automation",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire GitHub Workflow Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Integration.html#reqvire-github-workflow-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Reqvire Code Traceability Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Integration.html#reqvire-code-traceability-ontology-shape-profile"
+                }
+              ]
+            },
+            {
+              "name": "Interfaces.md",
+              "type": "file",
+              "link": "requirements/Capabilities/Interfaces.html",
+              "children": [
+                {
+                  "name": "Command-Line Interface",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Interfaces.html#command-line-interface"
+                },
+                {
+                  "name": "MCP Tool Interface",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Interfaces.html#mcp-tool-interface"
+                },
+                {
+                  "name": "Reqvire MCP Side-Effect Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Interfaces.html#reqvire-mcp-side-effect-ontology-shape-profile"
+                },
+                {
+                  "name": "System Model Interfaces",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Interfaces.html#system-model-interfaces",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Operation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-operation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Report Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-report-ontology"
+                    },
+                    {
+                      "name": "Reqvire Interface Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Interfaces.html#reqvire-interface-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Web Documentation Interface",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Interfaces.html#web-documentation-interface"
+                }
+              ]
+            },
+            {
+              "name": "RelationsAndImpact.md",
+              "type": "file",
+              "link": "requirements/Capabilities/RelationsAndImpact.html",
+              "children": [
+                {
+                  "name": "Reqvire Change Impact Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/RelationsAndImpact.html#reqvire-change-impact-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Relation Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/RelationsAndImpact.html#reqvire-relation-ontology-shape-profile"
+                },
+                {
+                  "name": "Trace Changes in System Model",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/RelationsAndImpact.html#trace-changes-in-system-model",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Requirement Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-requirement-ontology"
+                    },
+                    {
+                      "name": "Reqvire Semantic Contract Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                    },
+                    {
+                      "name": "Reqvire Change Impact Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-change-impact-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "ReportsAndQuery.md",
+              "type": "file",
+              "link": "requirements/Capabilities/ReportsAndQuery.html",
+              "children": [
+                {
+                  "name": "Provide Reports",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/ReportsAndQuery.html#provide-reports",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Rollup Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-rollup-ontology"
+                    },
+                    {
+                      "name": "Reqvire Report Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-report-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Reqvire Report Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/ReportsAndQuery.html#reqvire-report-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Semantic Export Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/ReportsAndQuery.html#reqvire-semantic-export-ontology-shape-profile"
+                },
+                {
+                  "name": "Semantic Model Export",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/ReportsAndQuery.html#semantic-model-export",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Semantic Contract Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                    },
+                    {
+                      "name": "Reqvire Semantic Export Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-semantic-export-ontology"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Verification.md",
+              "type": "file",
+              "link": "requirements/Capabilities/Verification.html",
+              "children": [
+                {
+                  "name": "Reqvire Verification Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Verification.html#reqvire-verification-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Verification Rollup Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Verification.html#reqvire-verification-rollup-ontology-shape-profile"
+                },
+                {
+                  "name": "Verification Traceability",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Verification.html#verification-traceability",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Rollup Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-rollup-ontology"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
         {
           "name": "Functional",
           "type": "folder",
@@ -56,6 +523,66 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "ReservedSubsections.md",
                       "type": "design-document",
                       "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.html"
+                    },
+                    {
+                      "name": "ElementIdentity.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/ElementIdentity.html",
+                      "children": [
+                        {
+                          "name": "ElementIdentity",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/ElementIdentity.html#elementidentity"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "IdentifiersAndRelations.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/IdentifiersAndRelations.html",
+                      "children": [
+                        {
+                          "name": "IdentifiersAndRelations",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/IdentifiersAndRelations.html#identifiersandrelations"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MarkdownStructure.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/MarkdownStructure.html",
+                      "children": [
+                        {
+                          "name": "MarkdownStructure",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/MarkdownStructure.html#markdownstructure"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "RelationTypes.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html",
+                      "children": [
+                        {
+                          "name": "RelationTypes",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html#relationtypes"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "ReservedSubsections.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.html",
+                      "children": [
+                        {
+                          "name": "ReservedSubsections",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.html#reservedsubsections"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -119,6 +646,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.html#move-asset-command-verification"
                         },
                         {
+                          "name": "Ontology and Contract Attachment Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.html#ontology-and-contract-attachment-verification"
+                        },
+                        {
                           "name": "Remove Asset Command Verification",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.html#remove-asset-command-verification"
@@ -130,6 +662,11 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "file",
                       "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html",
                       "children": [
+                        {
+                          "name": "Element Size Estimate Model Build Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html#element-size-estimate-model-build-verification"
+                        },
                         {
                           "name": "Element Subsection Parsing Test",
                           "type": "verification",
@@ -156,6 +693,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html#refinement-relations-rejection-test"
                         },
                         {
+                          "name": "Requirement Governance Metadata Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html#requirement-governance-metadata-verification"
+                        },
+                        {
                           "name": "Specification File Identification Test",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html#specification-file-identification-test"
@@ -168,6 +710,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html",
                       "children": [
                         {
+                          "name": "Capability Element Relation Compatibility Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#capability-element-relation-compatibility-test"
+                        },
+                        {
                           "name": "Cross-Section Duplicate Validation Test",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#cross-section-duplicate-validation-test"
@@ -176,6 +723,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Default Element Type Assignment Test",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test"
+                        },
+                        {
+                          "name": "Document Refinement Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#document-refinement-validation-test"
                         },
                         {
                           "name": "Element Type Relation Compatibility Test",
@@ -206,6 +758,36 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Same-File Fragment Relations Test",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#same-file-fragment-relations-test"
+                        },
+                        {
+                          "name": "Semantic Contract Ontology Declaration Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-ontology-declaration-validation-test"
+                        },
+                        {
+                          "name": "Semantic Contract Ownership Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-ownership-validation-test"
+                        },
+                        {
+                          "name": "Semantic Contract Section Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-section-validation-test"
+                        },
+                        {
+                          "name": "Semantic Contract SHACL Sanity Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-shacl-sanity-validation-test"
+                        },
+                        {
+                          "name": "Semantic Query Contract Section Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-query-contract-section-validation-test"
+                        },
+                        {
+                          "name": "Single Root Hierarchy Ownership Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#single-root-hierarchy-ownership-validation-test"
                         },
                         {
                           "name": "Subdirectory Processing Verification",
@@ -249,6 +831,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Behaviors.html#attachment-input-auto-detection-behavior"
                     },
                     {
+                      "name": "Requirement Governance Metadata Inheritance Behavior",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Behaviors.html#requirement-governance-metadata-inheritance-behavior"
+                    },
+                    {
                       "name": "Subdirectory Auto-Detection Behavior",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Behaviors.html#subdirectory-auto-detection-behavior"
@@ -277,7 +864,7 @@ The containment view shows the physical organization of the model—how requirem
                   "children": [
                     {
                       "name": "Coexistence of Structured and Unstructured Documents",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Configuration.html#coexistence-of-structured-and-unstructured-documents",
                       "children": [
                         {
@@ -303,11 +890,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Configuration.html#requirements-processing"
                     },
                     {
-                      "name": "Reserved Repository Files Exclusion",
-                      "type": "system-requirement",
-                      "link": "requirements/Functional/Core/Configuration.html#reserved-repository-files-exclusion"
-                    },
-                    {
                       "name": "Structured Markdown Files Search and Detection",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Configuration.html#structured-markdown-files-search-and-detection"
@@ -330,6 +912,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Constraints.html#attachment-satisfied-refinement-constraint"
                     },
                     {
+                      "name": "Attachment Subgraph Direction Constraint",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Constraints.html#attachment-subgraph-direction-constraint"
+                    },
+                    {
                       "name": "Cross-Section Duplicate Constraint",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Constraints.html#cross-section-duplicate-constraint"
@@ -338,6 +925,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Element Type Relation Compatibility Constraint",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Constraints.html#element-type-relation-compatibility-constraint"
+                    },
+                    {
+                      "name": "Single Root Hierarchy Ownership Constraint",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Constraints.html#single-root-hierarchy-ownership-constraint"
                     }
                   ]
                 },
@@ -357,8 +949,38 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/ModelManagement.html#attachment-scope-constraints"
                     },
                     {
+                      "name": "Capability Collect Traversal",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#capability-collect-traversal"
+                    },
+                    {
+                      "name": "Capability Coverage Rollup",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#capability-coverage-rollup"
+                    },
+                    {
+                      "name": "Capability Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#capability-element-semantic-contract"
+                    },
+                    {
+                      "name": "Capability Model Structure",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#capability-model-structure"
+                    },
+                    {
+                      "name": "Core Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#core-element-semantic-contract"
+                    },
+                    {
+                      "name": "Custom Element Trace Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#custom-element-trace-semantic-contract"
+                    },
+                    {
                       "name": "Default Requirement Type Assignment",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#default-requirement-type-assignment",
                       "children": [
                         {
@@ -370,44 +992,43 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Efficient Processing",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#efficient-processing"
                     },
                     {
                       "name": "Element Manipulation Operations",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#element-manipulation-operations",
-                      "children": [
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#element-manipulation-operations"
                     },
                     {
                       "name": "Element Type Relation Compatibility",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#element-type-relation-compatibility",
-                      "children": [
-                        {
-                          "name": "Supported Element Types Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#supported-element-types-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/ModelManagement.html#element-type-relation-compatibility"
                     },
                     {
                       "name": "Git Repository as Project Root",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#git-repository-as-project-root",
-                      "children": [
-                        {
-                          "name": "Containment Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#containment-specification"
-                        }
-                      ]
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#git-repository-as-project-root"
+                    },
+                    {
+                      "name": "Governance Metadata Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#governance-metadata-semantic-contract"
+                    },
+                    {
+                      "name": "Ontology and Semantic Contract Model",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#ontology-and-semantic-contract-model"
+                    },
+                    {
+                      "name": "Ontology Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#ontology-element-semantic-contract"
+                    },
+                    {
+                      "name": "Opt-In Element Size Estimate Model Build",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#opt-in-element-size-estimate-model-build"
                     },
                     {
                       "name": "Refinement Element Structure Constraints",
@@ -420,6 +1041,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Refinements.html#supported-element-types-specification"
                         }
                       ]
+                    },
+                    {
+                      "name": "Refinement Subtype Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#refinement-subtype-semantic-contract"
                     },
                     {
                       "name": "Relation Management Operations",
@@ -439,25 +1065,45 @@ The containment view shows the physical organization of the model—how requirem
                       ]
                     },
                     {
+                      "name": "Relation Model Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#relation-model-semantic-contract"
+                    },
+                    {
                       "name": "Relation Types and behaviors",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#relation-types-and-behaviors",
+                      "link": "requirements/Functional/Core/ModelManagement.html#relation-types-and-behaviors"
+                    },
+                    {
+                      "name": "Requirement Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#requirement-element-semantic-contract"
+                    },
+                    {
+                      "name": "Requirement Governance Metadata",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#requirement-governance-metadata",
                       "children": [
                         {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.md"
-                        },
-                        {
-                          "name": "Relation Semantics Specification",
+                          "name": "Requirement Governance Metadata Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Refinements.html#relation-semantics-specification"
+                          "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
                         }
                       ]
                     },
                     {
+                      "name": "Semantic Contract Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#semantic-contract-element-semantic-contract"
+                    },
+                    {
+                      "name": "Semantic Query Contract Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#semantic-query-contract-element-semantic-contract"
+                    },
+                    {
                       "name": "Template-Based Model Bootstrapping",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#template-based-model-bootstrapping"
                     },
                     {
@@ -480,9 +1126,39 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Core/Specifications.html",
                   "children": [
                     {
+                      "name": "Attachment Scope Validation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#attachment-scope-validation-refinement-specification"
+                    },
+                    {
+                      "name": "Attachment Target Validation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#attachment-target-validation-refinement-specification"
+                    },
+                    {
+                      "name": "Capability Model Structure Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#capability-model-structure-specification"
+                    },
+                    {
+                      "name": "Default Requirement Type Assignment Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#default-requirement-type-assignment-refinement-specification"
+                    },
+                    {
+                      "name": "Element Size Estimate Model Build Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#element-size-estimate-model-build-specification"
+                    },
+                    {
                       "name": "Element Type Metadata Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Specifications.html#element-type-metadata-specification"
+                    },
+                    {
+                      "name": "Excluded File Relation Validation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#excluded-file-relation-validation-refinement-specification"
                     },
                     {
                       "name": "Git Repository Scope Specification",
@@ -490,9 +1166,59 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Specifications.html#git-repository-scope-specification"
                     },
                     {
+                      "name": "Identifiers and Relations Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#identifiers-and-relations-refinement-specification"
+                    },
+                    {
                       "name": "Ignore Files Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Specifications.html#ignore-files-specification"
+                    },
+                    {
+                      "name": "Ignoring Unstructured Documents Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#ignoring-unstructured-documents-refinement-specification"
+                    },
+                    {
+                      "name": "Integrated Validation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#integrated-validation-refinement-specification"
+                    },
+                    {
+                      "name": "Internal Consistency Validator Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#internal-consistency-validator-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Annotation Convention Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#ontology-annotation-convention-specification"
+                    },
+                    {
+                      "name": "Refinement Element Structure Constraints Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#refinement-element-structure-constraints-refinement-specification"
+                    },
+                    {
+                      "name": "Relation Element Type Validator Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#relation-element-type-validator-refinement-specification"
+                    },
+                    {
+                      "name": "Relation Types and behaviors Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#relation-types-and-behaviors-refinement-specification"
+                    },
+                    {
+                      "name": "Requirement Governance Metadata Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
+                    },
+                    {
+                      "name": "Requirements Processing Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#requirements-processing-refinement-specification"
                     },
                     {
                       "name": "Requirements Processing Specification",
@@ -500,9 +1226,34 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Specifications.html#requirements-processing-specification"
                     },
                     {
-                      "name": "Reserved Files Specification",
+                      "name": "Semantic Contract Reference Context Validation Specification",
                       "type": "refinement",
-                      "link": "requirements/Functional/Core/Specifications.html#reserved-files-specification"
+                      "link": "requirements/Functional/Core/Specifications.html#semantic-contract-reference-context-validation-specification"
+                    },
+                    {
+                      "name": "Semantic Contract Structure Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#semantic-contract-structure-specification"
+                    },
+                    {
+                      "name": "Semantic Query Contract Structure Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#semantic-query-contract-structure-specification"
+                    },
+                    {
+                      "name": "Specification File Identification Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#specification-file-identification-refinement-specification"
+                    },
+                    {
+                      "name": "Structure and Addressing in Markdown Documents Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#structure-and-addressing-in-markdown-documents-refinement-specification"
+                    },
+                    {
+                      "name": "Structured Markdown Files Search and Detection Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#structured-markdown-files-search-and-detection-refinement-specification"
                     },
                     {
                       "name": "Verification Type Selection Guidelines",
@@ -519,38 +1270,17 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Element Identity Model",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/StructureAndParsing.html#element-identity-model",
-                      "children": [
-                        {
-                          "name": "ElementIdentity.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/ElementIdentity.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/StructureAndParsing.html#element-identity-model"
                     },
                     {
                       "name": "Identifiers and Relations",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/StructureAndParsing.html#identifiers-and-relations",
-                      "children": [
-                        {
-                          "name": "IdentifiersAndRelations.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/IdentifiersAndRelations.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/StructureAndParsing.html#identifiers-and-relations"
                     },
                     {
                       "name": "Reserved Subsections Support",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/StructureAndParsing.html#reserved-subsections-support",
-                      "children": [
-                        {
-                          "name": "ReservedSubsections.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/StructureAndParsing.html#reserved-subsections-support"
                     },
                     {
                       "name": "Specification File Identification",
@@ -560,14 +1290,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Structure and Addressing in Markdown Documents",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents",
-                      "children": [
-                        {
-                          "name": "MarkdownStructure.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/MarkdownStructure.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents"
                     }
                   ]
                 },
@@ -587,6 +1310,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Core/Constraints.html#attachment-hierarchical-independence-constraint"
                         },
                         {
+                          "name": "Attachment Subgraph Direction Constraint",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Constraints.html#attachment-subgraph-direction-constraint"
+                        },
+                        {
                           "name": "Attachment Satisfied Refinement Constraint",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Core/Constraints.html#attachment-satisfied-refinement-constraint"
@@ -599,6 +1327,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Validation.html#attachment-target-validation"
                     },
                     {
+                      "name": "Behavior Rule Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/Validation.html#behavior-rule-semantic-contract"
+                    },
+                    {
                       "name": "Cross-Component Dependency Validator",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#cross-component-dependency-validator"
@@ -607,11 +1340,6 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Cross-Section Duplicate Validation",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#cross-section-duplicate-validation"
-                    },
-                    {
-                      "name": "Enhanced Validation Error Reporting",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Core/Validation.html#enhanced-validation-error-reporting"
                     },
                     {
                       "name": "Excluded File Relation Validation",
@@ -656,6 +1384,16 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Validation.html#relation-type-validation"
                     },
                     {
+                      "name": "Semantic Contract Reference Context Validation",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/Validation.html#semantic-contract-reference-context-validation"
+                    },
+                    {
+                      "name": "Single Root Hierarchy Ownership",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/Validation.html#single-root-hierarchy-ownership"
+                    },
+                    {
                       "name": "Two-Pass Validation Strategy",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#two-pass-validation-strategy"
@@ -667,40 +1405,38 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Validate Cross-Component Dependencies",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-cross-component-dependencies"
                     },
                     {
                       "name": "Validate Filesystem Structure",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-filesystem-structure"
                     },
                     {
                       "name": "Validate Internal Consistency",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-internal-consistency"
                     },
                     {
                       "name": "Validate Markdown Structure",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-markdown-structure"
                     },
                     {
                       "name": "Validate Relation Types",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-relation-types"
                     },
                     {
                       "name": "Validation Error Handling",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/Validation.html#validation-error-handling",
-                      "children": [
-                        {
-                          "name": "Error Message Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#error-message-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/Validation.html#validation-error-handling"
+                    },
+                    {
+                      "name": "Validation Rule Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/Validation.html#validation-rule-semantic-contract"
                     }
                   ]
                 }
@@ -710,6 +1446,60 @@ The containment view shows the physical organization of the model—how requirem
               "name": "Integration",
               "type": "folder",
               "children": [
+                {
+                  "name": "AISkills.md",
+                  "type": "file",
+                  "link": "requirements/Functional/Integration/AISkills.html",
+                  "children": [
+                    {
+                      "name": "AI Assistant Skill-Guided Reqvire Modeling",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-assistant-skill-guided-reqvire-modeling",
+                      "children": [
+                        {
+                          "name": "Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#refinement-specification"
+                        },
+                        {
+                          "name": "Relation Semantics Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#relation-semantics-specification"
+                        },
+                        {
+                          "name": "Supported Element Types Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#supported-element-types-specification"
+                        },
+                        {
+                          "name": "Traceability Reporting Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#traceability-reporting-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "AI Skills Instruction Contract Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-skills-instruction-contract-specification"
+                    },
+                    {
+                      "name": "AI Skills Instruction Contracts",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-skills-instruction-contracts"
+                    },
+                    {
+                      "name": "AI Skills Markdown Artifact Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-skills-markdown-artifact-specification"
+                    },
+                    {
+                      "name": "AI Skills Markdown Implementation Artifacts",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-skills-markdown-implementation-artifacts"
+                    }
+                  ]
+                },
                 {
                   "name": "CodeAlignment.md",
                   "type": "file",
@@ -722,7 +1512,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Code Traceability",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/CodeAlignment.html#code-traceability"
                     },
                     {
@@ -737,7 +1527,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Dash style comment",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/CodeAlignment.html#dash-style-comment"
                     },
                     {
@@ -774,12 +1564,12 @@ The containment view shows the physical organization of the model—how requirem
                   "children": [
                     {
                       "name": "Automate Documentation Export",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/GitHubIntegration.html#automate-documentation-export"
                     },
                     {
                       "name": "Automate Pull Request Validations",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/GitHubIntegration.html#automate-pull-request-validations"
                     },
                     {
@@ -789,7 +1579,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Generate Change Logs for Pull Requests",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/GitHubIntegration.html#generate-change-logs-for-pull-requests"
                     }
                   ]
@@ -800,9 +1590,44 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Integration/Specifications.html",
                   "children": [
                     {
+                      "name": "Automated Documentation Export on PR Merge Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#automated-documentation-export-on-pr-merge-refinement-specification"
+                    },
+                    {
                       "name": "Comment Style Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Integration/Specifications.html#comment-style-specification"
+                    },
+                    {
+                      "name": "CSS Style Comment Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#css-style-comment-refinement-specification"
+                    },
+                    {
+                      "name": "Pull Request Change Log Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#pull-request-change-log-workflow-specification"
+                    },
+                    {
+                      "name": "Pull Request Validation Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#pull-request-validation-workflow-specification"
+                    },
+                    {
+                      "name": "Slash Style Comment Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#slash-style-comment-refinement-specification"
+                    },
+                    {
+                      "name": "Traceability Format Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#traceability-format-refinement-specification"
+                    },
+                    {
+                      "name": "XML Style Comment Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#xml-style-comment-refinement-specification"
                     }
                   ]
                 }
@@ -830,6 +1655,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Add Command Error Messages Test",
                           "type": "verification",
                           "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test"
+                        },
+                        {
+                          "name": "Atomic Relation Relink Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#atomic-relation-relink-test"
                         },
                         {
                           "name": "CLI Add Element Test",
@@ -982,6 +1812,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Relation Ordering Verification",
                           "type": "verification",
                           "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.html#relation-ordering-verification"
+                        },
+                        {
+                          "name": "Requirement Governance Metadata Formatting Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.html#requirement-governance-metadata-formatting-verification"
                         }
                       ]
                     },
@@ -1042,6 +1877,11 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Operations/Constraints.html",
                   "children": [
                     {
+                      "name": "Atomic Relink Validity Constraint",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Constraints.html#atomic-relink-validity-constraint"
+                    },
+                    {
                       "name": "Merge Type Compatibility Constraint",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Constraints.html#merge-type-compatibility-constraint"
@@ -1058,6 +1898,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Functional/Operations/ElementManipulation.html",
                   "children": [
+                    {
+                      "name": "Atomic Relation Relink Operation",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#atomic-relation-relink-operation"
+                    },
                     {
                       "name": "Create Element Operation",
                       "type": "system-requirement",
@@ -1082,8 +1927,18 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Attachment Satisfied Refinement Constraint",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Core/Constraints.html#attachment-satisfied-refinement-constraint"
+                        },
+                        {
+                          "name": "Element Type Metadata Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#element-type-metadata-specification"
                         }
                       ]
+                    },
+                    {
+                      "name": "CRUD Semantic Contract Mutation Validation",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#crud-semantic-contract-mutation-validation"
                     },
                     {
                       "name": "Delete Element Operation",
@@ -1161,7 +2016,19 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Target Location Validation and Auto-Creation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/ElementManipulation.html#target-location-validation-and-auto-creation"
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#target-location-validation-and-auto-creation",
+                      "children": [
+                        {
+                          "name": "Ignore Files Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#ignore-files-specification"
+                        },
+                        {
+                          "name": "Git Repository Scope Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#git-repository-scope-specification"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -1206,21 +2073,16 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Formatting.html#full-relations-insertion",
                       "children": [
                         {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.md"
+                          "name": "RelationTypes",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html#relationtypes"
                         }
                       ]
                     },
                     {
                       "name": "Git-Style Diff Output for Format",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Operations/Formatting.html#git-style-diff-output-for-format"
-                    },
-                    {
-                      "name": "Model Formatting",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Operations/Formatting.html#model-formatting"
                     },
                     {
                       "name": "Relation Ordering Normalization",
@@ -1240,20 +2102,23 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Operations/Linting.html",
                   "children": [
                     {
+                      "name": "Cross-Submodel Hierarchical Relation Detection",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Operations/Linting.html#cross-submodel-hierarchical-relation-detection"
+                    },
+                    {
                       "name": "Lint Auto-fix Capability",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/Linting.html#lint-auto-fix-capability",
-                      "children": [
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Operations/Linting.html#lint-auto-fix-capability"
+                    },
+                    {
+                      "name": "Lint Rule Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Operations/Linting.html#lint-rule-semantic-contract"
                     },
                     {
                       "name": "Model Linting",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Operations/Linting.html#model-linting"
                     },
                     {
@@ -1300,9 +2165,24 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Operations/Specifications.html",
                   "children": [
                     {
+                      "name": "Atomic Relation Relink Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#atomic-relation-relink-workflow-specification"
+                    },
+                    {
                       "name": "Create Element Workflow Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification"
+                    },
+                    {
+                      "name": "Cross-Submodel Hierarchical Relation Detection Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#cross-submodel-hierarchical-relation-detection-specification"
+                    },
+                    {
+                      "name": "CRUD Semantic Contract Validation Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#crud-semantic-contract-validation-specification"
                     },
                     {
                       "name": "Delete Element Workflow Specification",
@@ -1315,9 +2195,24 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Specifications.html#document-structure-specification"
                     },
                     {
+                      "name": "Element Manipulation File Persistence Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#element-manipulation-file-persistence-refinement-specification"
+                    },
+                    {
                       "name": "Format Consistency Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#format-consistency-specification"
+                    },
+                    {
+                      "name": "Full Relations Insertion Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#full-relations-insertion-refinement-specification"
+                    },
+                    {
+                      "name": "Lint Auto-fix Capability Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#lint-auto-fix-capability-refinement-specification"
                     },
                     {
                       "name": "Lint Output Specification",
@@ -1335,9 +2230,19 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Specifications.html#move-element-workflow-specification"
                     },
                     {
+                      "name": "Move File Operation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#move-file-operation-refinement-specification"
+                    },
+                    {
                       "name": "Multi-Branch Convergence Detection Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#multi-branch-convergence-detection-specification"
+                    },
+                    {
+                      "name": "Operation Command Contract Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#operation-command-contract-specification"
                     },
                     {
                       "name": "Orphaned Children Error Message Specification",
@@ -1348,6 +2253,16 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Redundant Hierarchical Relations Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#redundant-hierarchical-relations-specification"
+                    },
+                    {
+                      "name": "Redundant Verify Relations Detection Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#redundant-verify-relations-detection-refinement-specification"
+                    },
+                    {
+                      "name": "Relation Consistency Maintenance Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#relation-consistency-maintenance-refinement-specification"
                     },
                     {
                       "name": "Relation Operations Specification",
@@ -1363,6 +2278,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Relation Validation Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#relation-validation-specification"
+                    },
+                    {
+                      "name": "Rename Element Operation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#rename-element-operation-refinement-specification"
                     }
                   ]
                 }
@@ -1390,6 +2310,42 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "TraceFlowView.md",
                       "type": "design-document",
                       "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.html"
+                    },
+                    {
+                      "name": "ContainmentView.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.html",
+                      "children": [
+                        {
+                          "name": "ContainmentView",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.html#containmentview"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "SearchFiltering.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Output/DesignDocuments/SearchFiltering.html",
+                      "children": [
+                        {
+                          "name": "SearchFiltering",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Output/DesignDocuments/SearchFiltering.html#searchfiltering"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "TraceFlowView.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.html",
+                      "children": [
+                        {
+                          "name": "TraceFlowView",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.html#traceflowview"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -1435,9 +2391,24 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html",
                       "children": [
                         {
+                          "name": "Capability Collect Traversal Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#capability-collect-traversal-test"
+                        },
+                        {
+                          "name": "Capability Coverage Rollup Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#capability-coverage-rollup-test"
+                        },
+                        {
                           "name": "CLI Collect Command Test",
                           "type": "verification",
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#cli-collect-command-test"
+                        },
+                        {
+                          "name": "CLI JSON File Output Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#cli-json-file-output-test"
                         },
                         {
                           "name": "Containment Hierarchy Extraction Test",
@@ -1475,6 +2446,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#html-export-containment-view-integration-test"
                         },
                         {
+                          "name": "JSON Element Size Estimate Output Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#json-element-size-estimate-output-verification"
+                        },
+                        {
                           "name": "Model Command Verification",
                           "type": "verification",
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#model-command-verification"
@@ -1507,6 +2483,16 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#search-command-tests"
                         },
                         {
+                          "name": "Semantic Contract Search JSON Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#semantic-contract-search-json-test"
+                        },
+                        {
+                          "name": "Semantic Query Contract Search JSON Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#semantic-query-contract-search-json-test"
+                        },
+                        {
                           "name": "Start Type Filter Test",
                           "type": "verification",
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#start-type-filter-test",
@@ -1517,6 +2503,11 @@ The containment view shows the physical organization of the model—how requirem
                               "link": "requirements/Functional/Output/Behaviors.html#start-element-type-filter-behavior"
                             }
                           ]
+                        },
+                        {
+                          "name": "Submodels Report Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#submodels-report-verification"
                         },
                         {
                           "name": "TraceFlow View Test",
@@ -1547,6 +2538,16 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Functional/Output/Behaviors.html",
                   "children": [
+                    {
+                      "name": "Forward-Only Relation Traversal Behavior",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Behaviors.html#forward-only-relation-traversal-behavior"
+                    },
+                    {
+                      "name": "Implementation Coverage Behavior",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Behaviors.html#implementation-coverage-behavior"
+                    },
                     {
                       "name": "Mermaid Diagram Interaction Behavior",
                       "type": "refinement",
@@ -1596,7 +2597,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Interactive Mermaid Diagrams",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
                     },
                     {
@@ -1617,9 +2618,14 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Output/Reporting.html",
                   "children": [
                     {
-                      "name": "Collect Content from Requirement Chain",
+                      "name": "Change Impact Semantic Contract",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#collect-content-from-requirement-chain"
+                      "link": "requirements/Functional/Output/Reporting.html#change-impact-semantic-contract"
+                    },
+                    {
+                      "name": "Collect Capability and Requirement Context",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#collect-capability-and-requirement-context"
                     },
                     {
                       "name": "Comma-Separated Type Filter Parsing",
@@ -1628,14 +2634,9 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Containment View Report",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#containment-view-report",
                       "children": [
-                        {
-                          "name": "ContainmentView.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.md"
-                        },
                         {
                           "name": "Containment Specification",
                           "type": "attachment-element",
@@ -1655,13 +2656,18 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Flexible Search Type Filtering",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#flexible-search-type-filtering"
                     },
                     {
                       "name": "Forward-Only Relation Traversal",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal"
+                    },
+                    {
+                      "name": "JSON Element Size Estimate Exposure",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#json-element-size-estimate-exposure"
                     },
                     {
                       "name": "Model Diagram Output Formats",
@@ -1682,29 +2688,68 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Model Reports",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#model-reports",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#model-reports"
+                    },
+                    {
+                      "name": "Model Structure and Summaries",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#model-structure-and-summaries"
+                    },
+                    {
+                      "name": "Ontology and Shapes Collection",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#ontology-and-shapes-collection",
                       "children": [
                         {
-                          "name": "Traceability Reporting Specification",
+                          "name": "Semantic Contract Structure Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Refinements.html#traceability-reporting-specification"
+                          "link": "requirements/Functional/Core/Specifications.html#semantic-contract-structure-specification"
                         }
                       ]
                     },
                     {
-                      "name": "Model Structure and Summaries",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#model-structure-and-summaries"
+                      "name": "Ontology Projection Subgraph Materialization",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#ontology-projection-subgraph-materialization",
+                      "children": [
+                        {
+                          "name": "Ontology Collection Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                        },
+                        {
+                          "name": "Semantic Query Contract Structure Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#semantic-query-contract-structure-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Provide Validation Reports",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#provide-validation-reports"
                     },
                     {
+                      "name": "Requirement Implementation Coverage Report",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#requirement-implementation-coverage-report"
+                    },
+                    {
+                      "name": "Requirement Submodels Report",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#requirement-submodels-report",
+                      "children": [
+                        {
+                          "name": "RelationTypes",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html#relationtypes"
+                        }
+                      ]
+                    },
+                    {
                       "name": "Resources Report",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#resources-report"
                     },
                     {
@@ -1718,9 +2763,9 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Reporting.html#search-report-generator",
                       "children": [
                         {
-                          "name": "SearchFiltering.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Output/DesignDocuments/SearchFiltering.md"
+                          "name": "Requirement Governance Metadata Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
                         },
                         {
                           "name": "Supported Element Types Specification",
@@ -1745,11 +2790,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Reporting.html#traceflow-view-report-generation",
                       "children": [
                         {
-                          "name": "TraceFlowView.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.md"
-                        },
-                        {
                           "name": "Verification Trace Tree Construction",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
@@ -1758,7 +2798,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Tracing Structural Changes",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#tracing-structural-changes",
                       "children": [
                         {
@@ -1775,14 +2815,9 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Verification Coverage Report",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#verification-coverage-report",
                       "children": [
-                        {
-                          "name": "Verification Coverage Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#verification-coverage-specification"
-                        },
                         {
                           "name": "Verification Roll-up Specification",
                           "type": "attachment-element",
@@ -1803,6 +2838,11 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Output/Specifications.html",
                   "children": [
                     {
+                      "name": "Capability Collect Traversal Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#capability-collect-traversal-specification"
+                    },
+                    {
                       "name": "Collect Content Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#collect-content-specification"
@@ -1818,6 +2858,16 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#color-scheme-specification"
                     },
                     {
+                      "name": "Comma-Separated Type Filter Parsing Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#comma-separated-type-filter-parsing-refinement-specification"
+                    },
+                    {
+                      "name": "Containment View Report Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#containment-view-report-refinement-specification"
+                    },
+                    {
                       "name": "Deterministic Output Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
@@ -1828,14 +2878,29 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
                     },
                     {
-                      "name": "Diff Output Format Specification",
+                      "name": "File Diagram Attachment Display Refinement Specification",
                       "type": "refinement",
-                      "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                      "link": "requirements/Functional/Output/Specifications.html#file-diagram-attachment-display-refinement-specification"
                     },
                     {
-                      "name": "Error Message Format Specification",
+                      "name": "Flexible Search Type Filtering Refinement Specification",
                       "type": "refinement",
-                      "link": "requirements/Functional/Output/Specifications.html#error-message-format-specification"
+                      "link": "requirements/Functional/Output/Specifications.html#flexible-search-type-filtering-refinement-specification"
+                    },
+                    {
+                      "name": "Implementation Coverage Output Structure Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#implementation-coverage-output-structure-specification"
+                    },
+                    {
+                      "name": "Interactive Mermaid Diagram Node Behavior Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#interactive-mermaid-diagram-node-behavior-refinement-specification"
+                    },
+                    {
+                      "name": "JSON Element Size Estimate Output Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#json-element-size-estimate-output-specification"
                     },
                     {
                       "name": "JSON Output Structure",
@@ -1863,6 +2928,41 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-capabilities-specification"
                     },
                     {
+                      "name": "Model Diagram Output Formats Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#model-diagram-output-formats-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Collection Output Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                    },
+                    {
+                      "name": "Ontology Projection Subgraph Materialization Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#ontology-projection-subgraph-materialization-specification"
+                    },
+                    {
+                      "name": "Report Command Catalog Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#report-command-catalog-specification"
+                    },
+                    {
+                      "name": "Requirement Governance Metadata JSON Output Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#requirement-governance-metadata-json-output-specification"
+                    },
+                    {
+                      "name": "Requirement Implementation Coverage Logic Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#requirement-implementation-coverage-logic-specification"
+                    },
+                    {
+                      "name": "Requirement Submodels Report Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#requirement-submodels-report-specification"
+                    },
+                    {
                       "name": "Resources Report Format Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
@@ -1876,6 +2976,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Text Output Formatting",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#text-output-formatting"
+                    },
+                    {
+                      "name": "Trace Relation Non-Directional Behavior Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#trace-relation-non-directional-behavior-refinement-specification"
                     },
                     {
                       "name": "Verification Trace Diagram Specification",
@@ -1898,6 +3003,18 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "ChangePropagation.md",
                       "type": "design-document",
                       "link": "requirements/Functional/Processing/DesignDocuments/ChangePropagation.html"
+                    },
+                    {
+                      "name": "ChangePropagation.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Processing/DesignDocuments/ChangePropagation.html",
+                      "children": [
+                        {
+                          "name": "ChangePropagation",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Processing/DesignDocuments/ChangePropagation.html#changepropagation"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -1910,6 +3027,11 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "file",
                       "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html",
                       "children": [
+                        {
+                          "name": "Capability Ontology and Semantic Contract Change Impact Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#capability-ontology-and-semantic-contract-change-impact-test"
+                        },
                         {
                           "name": "Change Impact Analysis Verification",
                           "type": "verification",
@@ -1934,6 +3056,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Element Content Extraction Test",
                           "type": "verification",
                           "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test"
+                        },
+                        {
+                          "name": "Impact Scope Summary Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#impact-scope-summary-test"
                         },
                         {
                           "name": "Structural Change Reports Verification",
@@ -1981,14 +3108,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Requirements Change Propagation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Processing/ChangeImpact.html#requirements-change-propagation",
-                      "children": [
-                        {
-                          "name": "ChangePropagation.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Processing/DesignDocuments/ChangePropagation.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Processing/ChangeImpact.html#requirements-change-propagation"
                     },
                     {
                       "name": "Structural Change Analyzer",
@@ -2002,6 +3122,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Functional/Processing/Specifications.html",
                   "children": [
+                    {
+                      "name": "Impact Scope Computation Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Processing/Specifications.html#impact-scope-computation-specification"
+                    },
                     {
                       "name": "Verification Roll-up Specification",
                       "type": "refinement",
@@ -2020,9 +3145,19 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Processing/VerificationTraces.html",
                   "children": [
                     {
+                      "name": "Verification Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Processing/VerificationTraces.html#verification-element-semantic-contract"
+                    },
+                    {
                       "name": "Verification Roll-up Strategy",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Processing/VerificationTraces.html#verification-roll-up-strategy"
+                    },
+                    {
+                      "name": "Verification Rollup Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Processing/VerificationTraces.html#verification-rollup-semantic-contract"
                     },
                     {
                       "name": "Verification Trace Builder",
@@ -2031,15 +3166,8 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Verification Upward Traceability",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Processing/VerificationTraces.html#verification-upward-traceability",
-                      "children": [
-                        {
-                          "name": "Traceability Reporting Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#traceability-reporting-specification"
-                        }
-                      ]
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Processing/VerificationTraces.html#verification-upward-traceability"
                     }
                   ]
                 }
@@ -2075,6 +3203,21 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#cli-help-structure-verification"
                         },
                         {
+                          "name": "CLI Ontologies Command Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#cli-ontologies-command-verification"
+                        },
+                        {
+                          "name": "CLI Size Estimate JSON Option Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#cli-size-estimate-json-option-verification"
+                        },
+                        {
+                          "name": "Explicit Workspace Selection Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#explicit-workspace-selection-verification"
+                        },
+                        {
                           "name": "Verification Traces Element Navigation Test",
                           "type": "verification",
                           "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#verification-traces-element-navigation-test"
@@ -2106,7 +3249,12 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         },
                         {
                           "name": "Attachment Hierarchical Independence Constraint",
@@ -2153,7 +3301,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -2232,9 +3380,9 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
                         },
                         {
-                          "name": "ContainmentView.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.md"
+                          "name": "ContainmentView",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.html#containmentview"
                         },
                         {
                           "name": "D3.js Containment Tree Specification",
@@ -2259,6 +3407,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         },
                         {
+                          "name": "Implementation Coverage Output Structure Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#implementation-coverage-output-structure-specification"
+                        },
+                        {
                           "name": "Text Output Formatting",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#text-output-formatting"
@@ -2266,9 +3419,19 @@ The containment view shows the physical organization of the model—how requirem
                       ]
                     },
                     {
+                      "name": "CLI Diff Output",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-diff-output"
+                    },
+                    {
                       "name": "CLI Interface Structure",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/CLI/Commands.html#cli-interface-structure"
+                    },
+                    {
+                      "name": "CLI JSON File Output Option",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-json-file-output-option"
                     },
                     {
                       "name": "CLI Lint Command",
@@ -2289,6 +3452,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Lint Output Specification",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Specifications.html#lint-output-specification"
+                        },
+                        {
+                          "name": "Cross-Submodel Hierarchical Relation Detection Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#cross-submodel-hierarchical-relation-detection-specification"
                         },
                         {
                           "name": "Text Output Formatting",
@@ -2355,6 +3523,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
                         },
                         {
+                          "name": "Model Diagram Output Formats Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#model-diagram-output-formats-refinement-specification"
+                        },
+                        {
                           "name": "Reverse Relation Traversal Behavior",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Behaviors.html#reverse-relation-traversal-behavior"
@@ -2389,7 +3562,12 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         }
                       ]
                     },
@@ -2421,7 +3599,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -2458,7 +3636,51 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "CLI Ontologies Command",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-ontologies-command",
+                      "children": [
+                        {
+                          "name": "Semantic Contract Structure Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#semantic-contract-structure-specification"
+                        },
+                        {
+                          "name": "Ontology Collection Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "CLI Relink Command",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-relink-command",
+                      "children": [
+                        {
+                          "name": "Atomic Relation Relink Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#atomic-relation-relink-workflow-specification"
+                        },
+                        {
+                          "name": "Atomic Relink Validity Constraint",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Constraints.html#atomic-relink-validity-constraint"
+                        },
+                        {
+                          "name": "Diff Output Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -2485,7 +3707,12 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         }
                       ]
                     },
@@ -2507,7 +3734,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -2539,7 +3766,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -2558,6 +3785,11 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/CLI/Commands.html#cli-search-command",
                       "children": [
+                        {
+                          "name": "Requirement Governance Metadata Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
+                        },
                         {
                           "name": "Supported Element Types Specification",
                           "type": "attachment-element",
@@ -2582,6 +3814,28 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Type Validation Error Behavior",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Core/Behaviors.html#type-validation-error-behavior"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "CLI Size Estimate JSON Option",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-size-estimate-json-option"
+                    },
+                    {
+                      "name": "CLI Submodels Command",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-submodels-command",
+                      "children": [
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Requirement Submodels Report Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#requirement-submodels-report-specification"
                         }
                       ]
                     },
@@ -2625,6 +3879,18 @@ The containment view shows the physical organization of the model—how requirem
                       ]
                     },
                     {
+                      "name": "Explicit Workspace Selection",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#explicit-workspace-selection",
+                      "children": [
+                        {
+                          "name": "Git Repository Scope Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#git-repository-scope-specification"
+                        }
+                      ]
+                    },
+                    {
                       "name": "Format Command",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/CLI/Commands.html#format-command",
@@ -2637,7 +3903,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -2657,9 +3923,9 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Operations/Specifications.html#relation-operations-specification"
                         },
                         {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.md"
+                          "name": "RelationTypes",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html#relationtypes"
                         },
                         {
                           "name": "Dry-Run Mode Behavior",
@@ -2669,7 +3935,12 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         }
                       ]
                     },
@@ -2696,7 +3967,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Error Message Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#error-message-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#error-message-format-specification"
                         },
                         {
                           "name": "Attachment Hierarchical Independence Constraint",
@@ -2714,6 +3985,641 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Verification Traces Element Navigation",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/CLI/Commands.html#verification-traces-element-navigation"
+                    }
+                  ]
+                },
+                {
+                  "name": "Specifications.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/CLI/Specifications.html",
+                  "children": [
+                    {
+                      "name": "CLI Add Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-add-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Collect Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-collect-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Coverage Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-coverage-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Interface Structure Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-interface-structure-refinement-specification"
+                    },
+                    {
+                      "name": "CLI JSON File Output Option Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-json-file-output-option-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Lint Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-lint-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Merge Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-merge-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Model Diagram Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-model-diagram-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Move Asset Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-move-asset-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Move Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-move-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Move File Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-move-file-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Ontologies Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-ontologies-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Relink Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-relink-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Remove Asset Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-remove-asset-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Remove Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-remove-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Rename Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-rename-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Resources Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-resources-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Search Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-search-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Size Estimate JSON Option Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-size-estimate-json-option-specification"
+                    },
+                    {
+                      "name": "CLI Submodels Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-submodels-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Traces Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-traces-command-refinement-specification"
+                    },
+                    {
+                      "name": "Detailed Error Handling and Logging Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#detailed-error-handling-and-logging-refinement-specification"
+                    },
+                    {
+                      "name": "Diff Output Format Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                    },
+                    {
+                      "name": "Error Message Format Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#error-message-format-specification"
+                    },
+                    {
+                      "name": "Explicit Workspace Selection Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#explicit-workspace-selection-specification"
+                    },
+                    {
+                      "name": "Format Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#format-command-refinement-specification"
+                    },
+                    {
+                      "name": "Mutating Command Hierarchy Safety Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#mutating-command-hierarchy-safety-refinement-specification"
+                    },
+                    {
+                      "name": "Relation Commands Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#relation-commands-refinement-specification"
+                    },
+                    {
+                      "name": "Validate Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#validate-command-refinement-specification"
+                    },
+                    {
+                      "name": "Verification Traces Element Navigation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#verification-traces-element-navigation-refinement-specification"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "MCP",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Verifications",
+                  "type": "folder",
+                  "children": [
+                    {
+                      "name": "MCPVerifications.md",
+                      "type": "file",
+                      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html",
+                      "children": [
+                        {
+                          "name": "MCP Access Control Baseline Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-access-control-baseline-verification"
+                        },
+                        {
+                          "name": "MCP Contract Layer Boundary Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-contract-layer-boundary-verification"
+                        },
+                        {
+                          "name": "MCP Contract Versioning Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-contract-versioning-verification"
+                        },
+                        {
+                          "name": "MCP HTTP Transport End-to-End Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-http-transport-end-to-end-verification"
+                        },
+                        {
+                          "name": "MCP Model Evidence Tools Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-model-evidence-tools-verification"
+                        },
+                        {
+                          "name": "MCP Mutation Execution Flow Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-mutation-execution-flow-verification"
+                        },
+                        {
+                          "name": "MCP Mutation Tool Safety Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-mutation-tool-safety-verification"
+                        },
+                        {
+                          "name": "MCP Protocol Standard Conformance Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-protocol-standard-conformance-verification"
+                        },
+                        {
+                          "name": "MCP Quality Traceability Tools Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-quality-traceability-tools-verification"
+                        },
+                        {
+                          "name": "MCP Resource Interface Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-resource-interface-verification"
+                        },
+                        {
+                          "name": "MCP Server Command Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-server-command-verification"
+                        },
+                        {
+                          "name": "MCP Server End-to-End Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-server-end-to-end-verification"
+                        },
+                        {
+                          "name": "MCP Server State and Cache Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-server-state-and-cache-verification"
+                        },
+                        {
+                          "name": "MCP Shared Operation Contracts Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-shared-operation-contracts-verification"
+                        },
+                        {
+                          "name": "MCP Size Estimate Startup Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-size-estimate-startup-verification"
+                        },
+                        {
+                          "name": "MCP Structured Payload Contracts Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-structured-payload-contracts-verification"
+                        },
+                        {
+                          "name": "MCP Tool Call Contracts Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-tool-call-contracts-verification"
+                        },
+                        {
+                          "name": "MCP Tool Exposure Scope Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-tool-exposure-scope-verification"
+                        },
+                        {
+                          "name": "MCP Tool Side Effect Classification Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-tool-side-effect-classification-verification"
+                        },
+                        {
+                          "name": "MCP Workspace Session Tools Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-workspace-session-tools-verification"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Specifications.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/MCP/Specifications.html",
+                  "children": [
+                    {
+                      "name": "MCP Access Control Baseline Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-access-control-baseline-specification"
+                    },
+                    {
+                      "name": "MCP Contract Layer Boundary Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-contract-layer-boundary-specification"
+                    },
+                    {
+                      "name": "MCP Contract Versioning Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-contract-versioning-specification"
+                    },
+                    {
+                      "name": "MCP Interface Boundary Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-interface-boundary-specification"
+                    },
+                    {
+                      "name": "MCP Model Evidence Tools Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-model-evidence-tools-specification"
+                    },
+                    {
+                      "name": "MCP Mutation Concurrency Control Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-mutation-concurrency-control-specification"
+                    },
+                    {
+                      "name": "MCP Mutation Execution Flow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-mutation-execution-flow-specification"
+                    },
+                    {
+                      "name": "MCP Mutation Tool Safety Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-mutation-tool-safety-specification"
+                    },
+                    {
+                      "name": "MCP Protocol Standard Conformance Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-protocol-standard-conformance-specification"
+                    },
+                    {
+                      "name": "MCP Quality Traceability Tools Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-quality-traceability-tools-specification"
+                    },
+                    {
+                      "name": "MCP Resource Interface Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-resource-interface-specification"
+                    },
+                    {
+                      "name": "MCP Server Command Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-server-command-specification"
+                    },
+                    {
+                      "name": "MCP Server State and Cache Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-server-state-and-cache-specification"
+                    },
+                    {
+                      "name": "MCP Shared Operation Contracts Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-shared-operation-contracts-specification"
+                    },
+                    {
+                      "name": "MCP Size Estimate Startup Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-size-estimate-startup-specification"
+                    },
+                    {
+                      "name": "MCP Streamable HTTP Transport Safety Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-streamable-http-transport-safety-specification"
+                    },
+                    {
+                      "name": "MCP Streamable HTTP Transport Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-streamable-http-transport-specification"
+                    },
+                    {
+                      "name": "MCP Structured Payload Contracts Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-structured-payload-contracts-specification"
+                    },
+                    {
+                      "name": "MCP Tool Call Contracts Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-tool-call-contracts-specification"
+                    },
+                    {
+                      "name": "MCP Tool Exposure Scope Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-tool-exposure-scope-specification"
+                    },
+                    {
+                      "name": "MCP Tool Side Effect Classification Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-tool-side-effect-classification-specification"
+                    },
+                    {
+                      "name": "MCP Workspace Session Tools Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-workspace-session-tools-specification"
+                    }
+                  ]
+                },
+                {
+                  "name": "Tools.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/MCP/Tools.html",
+                  "children": [
+                    {
+                      "name": "MCP Access Control Baseline",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-access-control-baseline"
+                    },
+                    {
+                      "name": "MCP Adapter Boundary",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-adapter-boundary"
+                    },
+                    {
+                      "name": "MCP Compatibility Versioning",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-compatibility-versioning"
+                    },
+                    {
+                      "name": "MCP Model Evidence Tools",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-model-evidence-tools",
+                      "children": [
+                        {
+                          "name": "Requirement Governance Metadata Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
+                        },
+                        {
+                          "name": "Flexible Search Type Filtering Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#flexible-search-type-filtering-refinement-specification"
+                        },
+                        {
+                          "name": "Containment View Report Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#containment-view-report-refinement-specification"
+                        },
+                        {
+                          "name": "Collect Content Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#collect-content-specification"
+                        },
+                        {
+                          "name": "Requirement Submodels Report Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#requirement-submodels-report-specification"
+                        },
+                        {
+                          "name": "Ontology Collection Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Mutation Concurrency Control",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-mutation-concurrency-control"
+                    },
+                    {
+                      "name": "MCP Mutation Execution Flow",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-mutation-execution-flow"
+                    },
+                    {
+                      "name": "MCP Mutation Tool Safety",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-mutation-tool-safety",
+                      "children": [
+                        {
+                          "name": "Dry-Run Mode Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
+                        },
+                        {
+                          "name": "File Persistence Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
+                        },
+                        {
+                          "name": "Create Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification"
+                        },
+                        {
+                          "name": "Delete Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#delete-element-workflow-specification"
+                        },
+                        {
+                          "name": "Move Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#move-element-workflow-specification"
+                        },
+                        {
+                          "name": "Rename Element Operation Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#rename-element-operation-refinement-specification"
+                        },
+                        {
+                          "name": "Merge Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#merge-element-workflow-specification"
+                        },
+                        {
+                          "name": "Move File Operation Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#move-file-operation-refinement-specification"
+                        },
+                        {
+                          "name": "Relation Operations Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#relation-operations-specification"
+                        },
+                        {
+                          "name": "Atomic Relation Relink Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#atomic-relation-relink-workflow-specification"
+                        },
+                        {
+                          "name": "Relation Consistency Maintenance Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#relation-consistency-maintenance-refinement-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Protocol Standard Conformance",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-protocol-standard-conformance"
+                    },
+                    {
+                      "name": "MCP Quality Traceability Tools",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-quality-traceability-tools",
+                      "children": [
+                        {
+                          "name": "Lint Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#lint-output-specification"
+                        },
+                        {
+                          "name": "Requirement Implementation Coverage Logic Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#requirement-implementation-coverage-logic-specification"
+                        },
+                        {
+                          "name": "Verification Trace Tree Construction",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
+                        },
+                        {
+                          "name": "Resources Report Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
+                        },
+                        {
+                          "name": "Impact Scope Computation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Processing/Specifications.html#impact-scope-computation-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Resource Interface",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-resource-interface",
+                      "children": [
+                        {
+                          "name": "Resources Report Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
+                        },
+                        {
+                          "name": "Containment View Report Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#containment-view-report-refinement-specification"
+                        },
+                        {
+                          "name": "Requirement Submodels Report Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#requirement-submodels-report-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Server Command",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-server-command"
+                    },
+                    {
+                      "name": "MCP Server State and Cache",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-server-state-and-cache"
+                    },
+                    {
+                      "name": "MCP Shared Operation Interfaces",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-shared-operation-interfaces",
+                      "children": [
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Streamable HTTP Transport",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-streamable-http-transport"
+                    },
+                    {
+                      "name": "MCP Streamable HTTP Transport Safety",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-streamable-http-transport-safety"
+                    },
+                    {
+                      "name": "MCP Structured Payload Interfaces",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-structured-payload-interfaces"
+                    },
+                    {
+                      "name": "MCP Tool Exposure Scope",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-tool-exposure-scope"
+                    },
+                    {
+                      "name": "MCP Tool Side Effect Classification",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-tool-side-effect-classification"
+                    },
+                    {
+                      "name": "MCP Workspace Session Tools",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-workspace-session-tools"
                     }
                   ]
                 }
@@ -2780,6 +4686,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#diagram-attachment-display-verification"
                         },
                         {
+                          "name": "HTML Export Local Linked Files Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#html-export-local-linked-files-verification"
+                        },
+                        {
                           "name": "HTML Export Verification",
                           "type": "verification",
                           "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#html-export-verification"
@@ -2788,6 +4699,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Model View Element Navigation Test",
                           "type": "verification",
                           "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#model-view-element-navigation-test"
+                        },
+                        {
+                          "name": "Ontology Model Viewer Analysis Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#ontology-model-viewer-analysis-verification"
                         },
                         {
                           "name": "Serve Command Verification",
@@ -2843,6 +4759,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Interfaces/WebInterface/Capabilities.html#html-export"
                     },
                     {
+                      "name": "Local Linked File Export",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#local-linked-file-export"
+                    },
+                    {
                       "name": "Model-Centric View Generation",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/WebInterface/Capabilities.html#model-centric-view-generation",
@@ -2860,10 +4781,57 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Interfaces/WebInterface/Capabilities.html#model-view-element-navigation"
                     },
                     {
+                      "name": "Ontologies View Generation",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#ontologies-view-generation",
+                      "children": [
+                        {
+                          "name": "Ontology Collection Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ontology Construct Grouping",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#ontology-construct-grouping"
+                    },
+                    {
+                      "name": "Ontology Property-Centric Visualization",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#ontology-property-centric-visualization"
+                    },
+                    {
+                      "name": "Ontology Symbol and Badge Vocabulary",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#ontology-symbol-and-badge-vocabulary"
+                    },
+                    {
+                      "name": "OWL Semantic Ontology Projection",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#owl-semantic-ontology-projection"
+                    },
+                    {
+                      "name": "Project Knowledge Graph View",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#project-knowledge-graph-view"
+                    },
+                    {
                       "name": "Serve Command",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/WebInterface/Capabilities.html#serve-command",
                       "children": [
+                        {
+                          "name": "Two-Pass Validation Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Behaviors.html#two-pass-validation-behavior"
+                        },
+                        {
+                          "name": "Validation Error Reporting Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Behaviors.html#validation-error-reporting-behavior"
+                        },
                         {
                           "name": "HTML Export Pipeline Specification",
                           "type": "attachment-element",
@@ -2895,7 +4863,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Mobile-Friendly Documentation",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#mobile-friendly-documentation"
                     },
                     {
@@ -2911,14 +4879,56 @@ The containment view shows the physical organization of the model—how requirem
                   ]
                 },
                 {
+                  "name": "OntologyRenderingDetails.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/WebInterface/OntologyRenderingDetails.html",
+                  "children": [
+                    {
+                      "name": "Ontology Rendering Details",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/OntologyRenderingDetails.html#ontology-rendering-details"
+                    }
+                  ]
+                },
+                {
                   "name": "Specifications.md",
                   "type": "file",
                   "link": "requirements/Interfaces/WebInterface/Specifications.html",
                   "children": [
                     {
+                      "name": "Attachment Export Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#attachment-export-refinement-specification"
+                    },
+                    {
+                      "name": "Component-Based HTML Architecture Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#component-based-html-architecture-refinement-specification"
+                    },
+                    {
+                      "name": "Containment View Attachment Links Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#containment-view-attachment-links-refinement-specification"
+                    },
+                    {
+                      "name": "CSS Framework Integration Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#css-framework-integration-refinement-specification"
+                    },
+                    {
                       "name": "D3.js Containment Tree Specification",
                       "type": "refinement",
                       "link": "requirements/Interfaces/WebInterface/Specifications.html#d3js-containment-tree-specification"
+                    },
+                    {
+                      "name": "Diagram Attachment Display Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#diagram-attachment-display-refinement-specification"
+                    },
+                    {
+                      "name": "Direct OWL Construct Projection Query Contract",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#direct-owl-construct-projection-query-contract"
                     },
                     {
                       "name": "HTML Branding Specification",
@@ -2936,6 +4946,81 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Interfaces/WebInterface/Specifications.html#html-navigation-bar-specification"
                     },
                     {
+                      "name": "Local Linked File Export Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#local-linked-file-export-refinement-specification"
+                    },
+                    {
+                      "name": "Model-Centric View Generation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#model-centric-view-generation-refinement-specification"
+                    },
+                    {
+                      "name": "Model View Element Navigation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#model-view-element-navigation-refinement-specification"
+                    },
+                    {
+                      "name": "Ontologies View Generation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#ontologies-view-generation-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Construct Grouping Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#ontology-construct-grouping-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Property-Centric Visualization Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#ontology-property-centric-visualization-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Symbol and Badge Vocabulary Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#ontology-symbol-and-badge-vocabulary-refinement-specification"
+                    },
+                    {
+                      "name": "OWL Property Metadata Projection Query Contract",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#owl-property-metadata-projection-query-contract"
+                    },
+                    {
+                      "name": "OWL Semantic Ontology Projection Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#owl-semantic-ontology-projection-refinement-specification"
+                    },
+                    {
+                      "name": "Project Knowledge Graph View Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#project-knowledge-graph-view-refinement-specification"
+                    },
+                    {
+                      "name": "RDF List OWL Construct Projection Query Contract",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#rdf-list-owl-construct-projection-query-contract"
+                    },
+                    {
+                      "name": "Responsive HTML Generation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#responsive-html-generation-refinement-specification"
+                    },
+                    {
+                      "name": "Serve Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#serve-command-refinement-specification"
+                    },
+                    {
+                      "name": "Type-Safe HTML Generation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#type-safe-html-generation-refinement-specification"
+                    },
+                    {
+                      "name": "Web Interface Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#web-interface-refinement-specification"
+                    },
+                    {
                       "name": "Web Interface Style Specification",
                       "type": "refinement",
                       "link": "requirements/Interfaces/WebInterface/Specifications.html#web-interface-style-specification"
@@ -2951,15 +5036,248 @@ The containment view shows the physical organization of the model—how requirem
               "children": [
                 {
                   "name": "CLI interface",
-                  "type": "user-requirement",
+                  "type": "system-requirement",
                   "link": "requirements/Interfaces/Interfaces.html#cli-interface"
                 },
                 {
+                  "name": "MCP Interface",
+                  "type": "system-requirement",
+                  "link": "requirements/Interfaces/Interfaces.html#mcp-interface"
+                },
+                {
                   "name": "Web Interface",
-                  "type": "user-requirement",
+                  "type": "system-requirement",
                   "link": "requirements/Interfaces/Interfaces.html#web-interface"
                 }
               ]
+            }
+          ]
+        },
+        {
+          "name": "Ontologies",
+          "type": "folder",
+          "children": [
+            {
+              "name": "BehaviorValidationOperations.md",
+              "type": "file",
+              "link": "requirements/Ontologies/BehaviorValidationOperations.html",
+              "children": [
+                {
+                  "name": "Reqvire Behavior Rule Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-behavior-rule-ontology"
+                },
+                {
+                  "name": "Reqvire Formatting Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-formatting-ontology"
+                },
+                {
+                  "name": "Reqvire Linting Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-linting-ontology"
+                },
+                {
+                  "name": "Reqvire Operation Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-operation-ontology"
+                },
+                {
+                  "name": "Reqvire Validation Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-validation-ontology"
+                }
+              ]
+            },
+            {
+              "name": "CapabilityRequirementModel.md",
+              "type": "file",
+              "link": "requirements/Ontologies/CapabilityRequirementModel.html",
+              "children": [
+                {
+                  "name": "Reqvire Capability Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-capability-ontology"
+                },
+                {
+                  "name": "Reqvire Requirement Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-requirement-ontology"
+                },
+                {
+                  "name": "Reqvire Semantic Contract Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Core.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Core.html",
+              "children": [
+                {
+                  "name": "Reqvire Core Element Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Governance.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Governance.html",
+              "children": [
+                {
+                  "name": "Reqvire Governance Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Governance.html#reqvire-governance-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Integration.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Integration.html",
+              "children": [
+                {
+                  "name": "Reqvire AI Assistance Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Integration.html#reqvire-ai-assistance-ontology"
+                },
+                {
+                  "name": "Reqvire Code Traceability Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Integration.html#reqvire-code-traceability-ontology"
+                },
+                {
+                  "name": "Reqvire GitHub Workflow Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Integration.html#reqvire-github-workflow-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Interfaces.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Interfaces.html",
+              "children": [
+                {
+                  "name": "Reqvire Interface Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Interfaces.html#reqvire-interface-ontology"
+                }
+              ]
+            },
+            {
+              "name": "RelationsAndImpact.md",
+              "type": "file",
+              "link": "requirements/Ontologies/RelationsAndImpact.html",
+              "children": [
+                {
+                  "name": "Reqvire Change Impact Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-change-impact-ontology"
+                },
+                {
+                  "name": "Reqvire Relation Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                }
+              ]
+            },
+            {
+              "name": "ReportsAndQuery.md",
+              "type": "file",
+              "link": "requirements/Ontologies/ReportsAndQuery.html",
+              "children": [
+                {
+                  "name": "Reqvire Report Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-report-ontology"
+                },
+                {
+                  "name": "Reqvire Semantic Export Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-semantic-export-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Verification.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Verification.html",
+              "children": [
+                {
+                  "name": "Reqvire Verification Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                },
+                {
+                  "name": "Reqvire Verification Rollup Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Verification.html#reqvire-verification-rollup-ontology"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Capabilities.md",
+          "type": "file",
+          "link": "requirements/Capabilities.html",
+          "children": [
+            {
+              "name": "Defining Model Structure",
+              "type": "capability",
+              "link": "requirements/Capabilities.html#defining-model-structure",
+              "children": [
+                {
+                  "name": "Reqvire Core Element Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                },
+                {
+                  "name": "Reqvire Capability Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-capability-ontology"
+                },
+                {
+                  "name": "Reqvire Requirement Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-requirement-ontology"
+                },
+                {
+                  "name": "Reqvire Semantic Contract Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                },
+                {
+                  "name": "Reqvire Relation Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                },
+                {
+                  "name": "Reqvire Verification Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                },
+                {
+                  "name": "Reqvire Governance Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/Governance.html#reqvire-governance-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Defining Model Structure Source",
+              "type": "refinement",
+              "link": "requirements/Capabilities.html#defining-model-structure-source"
+            },
+            {
+              "name": "Reqvire Core Element Ontology Shape Profile",
+              "type": "refinement",
+              "link": "requirements/Capabilities.html#reqvire-core-element-ontology-shape-profile"
             }
           ]
         },
@@ -2997,93 +5315,6 @@ The containment view shows the physical organization of the model—how requirem
               "name": "Verification Coverage Specification",
               "type": "refinement",
               "link": "requirements/Refinements.html#verification-coverage-specification"
-            }
-          ]
-        },
-        {
-          "name": "UserStories.md",
-          "type": "file",
-          "link": "requirements/UserStories.html",
-          "children": [
-            {
-              "name": "AI-Assisted System Model Management",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#ai-assisted-system-model-management"
-            },
-            {
-              "name": "Align with Industry Standards",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#align-with-industry-standards"
-            },
-            {
-              "name": "Aligning Design with Code",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#aligning-design-with-code"
-            },
-            {
-              "name": "Defining Model Structure",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#defining-model-structure"
-            },
-            {
-              "name": "Formatting Model Documents",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#formatting-model-documents"
-            },
-            {
-              "name": "Fostering Community Contributions",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#fostering-community-contributions"
-            },
-            {
-              "name": "Generate Diagrams",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#generate-diagrams"
-            },
-            {
-              "name": "Integrate with GitHub Workflows",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#integrate-with-github-workflows"
-            },
-            {
-              "name": "Linting Model Quality",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#linting-model-quality"
-            },
-            {
-              "name": "Operating on Model Elements",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#operating-on-model-elements"
-            },
-            {
-              "name": "Promote Automation and Efficiency",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#promote-automation-and-efficiency"
-            },
-            {
-              "name": "Provide Reports",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#provide-reports"
-            },
-            {
-              "name": "System Model Interfaces",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#system-model-interfaces"
-            },
-            {
-              "name": "Trace Changes in System Model",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#trace-changes-in-system-model"
-            },
-            {
-              "name": "Validating Structures",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#validating-structures"
-            },
-            {
-              "name": "Verification Traceability",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#verification-traceability"
             }
           ]
         }
@@ -3110,6 +5341,477 @@ The containment view shows the physical organization of the model—how requirem
       "type": "folder",
       "children": [
         {
+          "name": "Capabilities",
+          "type": "folder",
+          "children": [
+            {
+              "name": "BehaviorValidationOperations.md",
+              "type": "file",
+              "link": "requirements/Capabilities/BehaviorValidationOperations.html",
+              "children": [
+                {
+                  "name": "Formatting Model Documents",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#formatting-model-documents",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Formatting Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-formatting-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Linting Model Quality",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#linting-model-quality",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Validation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-validation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Linting Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-linting-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Operating on Model Elements",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#operating-on-model-elements",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Validation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-validation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Operation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-operation-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Reqvire Behavior Rule Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#reqvire-behavior-rule-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Linting Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#reqvire-linting-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Validation Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#reqvire-validation-ontology-shape-profile"
+                },
+                {
+                  "name": "Validating Structures",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/BehaviorValidationOperations.html#validating-structures",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Requirement Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-requirement-ontology"
+                    },
+                    {
+                      "name": "Reqvire Semantic Contract Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                    },
+                    {
+                      "name": "Reqvire Validation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-validation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Behavior Rule Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-behavior-rule-ontology"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "CapabilityRequirementModel.md",
+              "type": "file",
+              "link": "requirements/Capabilities/CapabilityRequirementModel.html",
+              "children": [
+                {
+                  "name": "Reqvire Capability Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-capability-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Custom Element Trace Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-custom-element-trace-shape-profile"
+                },
+                {
+                  "name": "Reqvire Ontology Element Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-ontology-element-shape-profile"
+                },
+                {
+                  "name": "Reqvire Refinement Subtype Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-refinement-subtype-shape-profile"
+                },
+                {
+                  "name": "Reqvire Requirement Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-requirement-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Semantic Contract Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Semantic Query Contract Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/CapabilityRequirementModel.html#reqvire-semantic-query-contract-shape-profile"
+                }
+              ]
+            },
+            {
+              "name": "Governance.md",
+              "type": "file",
+              "link": "requirements/Capabilities/Governance.html",
+              "children": [
+                {
+                  "name": "Reqvire Governance Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Governance.html#reqvire-governance-ontology-shape-profile"
+                }
+              ]
+            },
+            {
+              "name": "Integration.md",
+              "type": "file",
+              "link": "requirements/Capabilities/Integration.html",
+              "children": [
+                {
+                  "name": "AI-Assisted System Model Management",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Integration.html#ai-assisted-system-model-management",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire AI Assistance Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Integration.html#reqvire-ai-assistance-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Aligning Design with Code",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Integration.html#aligning-design-with-code",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Code Traceability Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Integration.html#reqvire-code-traceability-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "GitHub Workflow Automation",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Integration.html#github-workflow-automation",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire GitHub Workflow Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Integration.html#reqvire-github-workflow-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Reqvire Code Traceability Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Integration.html#reqvire-code-traceability-ontology-shape-profile"
+                }
+              ]
+            },
+            {
+              "name": "Interfaces.md",
+              "type": "file",
+              "link": "requirements/Capabilities/Interfaces.html",
+              "children": [
+                {
+                  "name": "Command-Line Interface",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Interfaces.html#command-line-interface"
+                },
+                {
+                  "name": "MCP Tool Interface",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Interfaces.html#mcp-tool-interface"
+                },
+                {
+                  "name": "Reqvire MCP Side-Effect Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Interfaces.html#reqvire-mcp-side-effect-ontology-shape-profile"
+                },
+                {
+                  "name": "System Model Interfaces",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Interfaces.html#system-model-interfaces",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Operation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-operation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Report Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-report-ontology"
+                    },
+                    {
+                      "name": "Reqvire Interface Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Interfaces.html#reqvire-interface-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Web Documentation Interface",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Interfaces.html#web-documentation-interface"
+                }
+              ]
+            },
+            {
+              "name": "RelationsAndImpact.md",
+              "type": "file",
+              "link": "requirements/Capabilities/RelationsAndImpact.html",
+              "children": [
+                {
+                  "name": "Reqvire Change Impact Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/RelationsAndImpact.html#reqvire-change-impact-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Relation Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/RelationsAndImpact.html#reqvire-relation-ontology-shape-profile"
+                },
+                {
+                  "name": "Trace Changes in System Model",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/RelationsAndImpact.html#trace-changes-in-system-model",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Requirement Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-requirement-ontology"
+                    },
+                    {
+                      "name": "Reqvire Semantic Contract Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                    },
+                    {
+                      "name": "Reqvire Change Impact Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-change-impact-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "ReportsAndQuery.md",
+              "type": "file",
+              "link": "requirements/Capabilities/ReportsAndQuery.html",
+              "children": [
+                {
+                  "name": "Provide Reports",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/ReportsAndQuery.html#provide-reports",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Rollup Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-rollup-ontology"
+                    },
+                    {
+                      "name": "Reqvire Report Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-report-ontology"
+                    }
+                  ]
+                },
+                {
+                  "name": "Reqvire Report Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/ReportsAndQuery.html#reqvire-report-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Semantic Export Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/ReportsAndQuery.html#reqvire-semantic-export-ontology-shape-profile"
+                },
+                {
+                  "name": "Semantic Model Export",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/ReportsAndQuery.html#semantic-model-export",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Semantic Contract Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                    },
+                    {
+                      "name": "Reqvire Semantic Export Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-semantic-export-ontology"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Verification.md",
+              "type": "file",
+              "link": "requirements/Capabilities/Verification.html",
+              "children": [
+                {
+                  "name": "Reqvire Verification Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Verification.html#reqvire-verification-ontology-shape-profile"
+                },
+                {
+                  "name": "Reqvire Verification Rollup Ontology Shape Profile",
+                  "type": "refinement",
+                  "link": "requirements/Capabilities/Verification.html#reqvire-verification-rollup-ontology-shape-profile"
+                },
+                {
+                  "name": "Verification Traceability",
+                  "type": "capability",
+                  "link": "requirements/Capabilities/Verification.html#verification-traceability",
+                  "children": [
+                    {
+                      "name": "Reqvire Core Element Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                    },
+                    {
+                      "name": "Reqvire Relation Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                    },
+                    {
+                      "name": "Reqvire Verification Rollup Ontology",
+                      "type": "attachment-element",
+                      "link": "requirements/Ontologies/Verification.html#reqvire-verification-rollup-ontology"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "Functional",
           "type": "folder",
           "children": [
@@ -3145,6 +5847,66 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "ReservedSubsections.md",
                       "type": "design-document",
                       "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.html"
+                    },
+                    {
+                      "name": "ElementIdentity.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/ElementIdentity.html",
+                      "children": [
+                        {
+                          "name": "ElementIdentity",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/ElementIdentity.html#elementidentity"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "IdentifiersAndRelations.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/IdentifiersAndRelations.html",
+                      "children": [
+                        {
+                          "name": "IdentifiersAndRelations",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/IdentifiersAndRelations.html#identifiersandrelations"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MarkdownStructure.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/MarkdownStructure.html",
+                      "children": [
+                        {
+                          "name": "MarkdownStructure",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/MarkdownStructure.html#markdownstructure"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "RelationTypes.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html",
+                      "children": [
+                        {
+                          "name": "RelationTypes",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html#relationtypes"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "ReservedSubsections.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.html",
+                      "children": [
+                        {
+                          "name": "ReservedSubsections",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.html#reservedsubsections"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -3208,6 +5970,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.html#move-asset-command-verification"
                         },
                         {
+                          "name": "Ontology and Contract Attachment Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.html#ontology-and-contract-attachment-verification"
+                        },
+                        {
                           "name": "Remove Asset Command Verification",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/AttachmentsVerifications.html#remove-asset-command-verification"
@@ -3219,6 +5986,11 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "file",
                       "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html",
                       "children": [
+                        {
+                          "name": "Element Size Estimate Model Build Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html#element-size-estimate-model-build-verification"
+                        },
                         {
                           "name": "Element Subsection Parsing Test",
                           "type": "verification",
@@ -3245,6 +6017,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html#refinement-relations-rejection-test"
                         },
                         {
+                          "name": "Requirement Governance Metadata Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html#requirement-governance-metadata-verification"
+                        },
+                        {
                           "name": "Specification File Identification Test",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/ParsingVerifications.html#specification-file-identification-test"
@@ -3257,6 +6034,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html",
                       "children": [
                         {
+                          "name": "Capability Element Relation Compatibility Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#capability-element-relation-compatibility-test"
+                        },
+                        {
                           "name": "Cross-Section Duplicate Validation Test",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#cross-section-duplicate-validation-test"
@@ -3265,6 +6047,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Default Element Type Assignment Test",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#default-element-type-assignment-test"
+                        },
+                        {
+                          "name": "Document Refinement Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#document-refinement-validation-test"
                         },
                         {
                           "name": "Element Type Relation Compatibility Test",
@@ -3295,6 +6082,36 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Same-File Fragment Relations Test",
                           "type": "verification",
                           "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#same-file-fragment-relations-test"
+                        },
+                        {
+                          "name": "Semantic Contract Ontology Declaration Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-ontology-declaration-validation-test"
+                        },
+                        {
+                          "name": "Semantic Contract Ownership Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-ownership-validation-test"
+                        },
+                        {
+                          "name": "Semantic Contract Section Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-section-validation-test"
+                        },
+                        {
+                          "name": "Semantic Contract SHACL Sanity Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-contract-shacl-sanity-validation-test"
+                        },
+                        {
+                          "name": "Semantic Query Contract Section Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#semantic-query-contract-section-validation-test"
+                        },
+                        {
+                          "name": "Single Root Hierarchy Ownership Validation Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Core/Verifications/ValidationVerifications.html#single-root-hierarchy-ownership-validation-test"
                         },
                         {
                           "name": "Subdirectory Processing Verification",
@@ -3338,6 +6155,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Behaviors.html#attachment-input-auto-detection-behavior"
                     },
                     {
+                      "name": "Requirement Governance Metadata Inheritance Behavior",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Behaviors.html#requirement-governance-metadata-inheritance-behavior"
+                    },
+                    {
                       "name": "Subdirectory Auto-Detection Behavior",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Behaviors.html#subdirectory-auto-detection-behavior"
@@ -3366,7 +6188,7 @@ The containment view shows the physical organization of the model—how requirem
                   "children": [
                     {
                       "name": "Coexistence of Structured and Unstructured Documents",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Configuration.html#coexistence-of-structured-and-unstructured-documents",
                       "children": [
                         {
@@ -3392,11 +6214,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Configuration.html#requirements-processing"
                     },
                     {
-                      "name": "Reserved Repository Files Exclusion",
-                      "type": "system-requirement",
-                      "link": "requirements/Functional/Core/Configuration.html#reserved-repository-files-exclusion"
-                    },
-                    {
                       "name": "Structured Markdown Files Search and Detection",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Configuration.html#structured-markdown-files-search-and-detection"
@@ -3419,6 +6236,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Constraints.html#attachment-satisfied-refinement-constraint"
                     },
                     {
+                      "name": "Attachment Subgraph Direction Constraint",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Constraints.html#attachment-subgraph-direction-constraint"
+                    },
+                    {
                       "name": "Cross-Section Duplicate Constraint",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Constraints.html#cross-section-duplicate-constraint"
@@ -3427,6 +6249,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Element Type Relation Compatibility Constraint",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Constraints.html#element-type-relation-compatibility-constraint"
+                    },
+                    {
+                      "name": "Single Root Hierarchy Ownership Constraint",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Constraints.html#single-root-hierarchy-ownership-constraint"
                     }
                   ]
                 },
@@ -3446,8 +6273,38 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/ModelManagement.html#attachment-scope-constraints"
                     },
                     {
+                      "name": "Capability Collect Traversal",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#capability-collect-traversal"
+                    },
+                    {
+                      "name": "Capability Coverage Rollup",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#capability-coverage-rollup"
+                    },
+                    {
+                      "name": "Capability Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#capability-element-semantic-contract"
+                    },
+                    {
+                      "name": "Capability Model Structure",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#capability-model-structure"
+                    },
+                    {
+                      "name": "Core Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#core-element-semantic-contract"
+                    },
+                    {
+                      "name": "Custom Element Trace Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#custom-element-trace-semantic-contract"
+                    },
+                    {
                       "name": "Default Requirement Type Assignment",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#default-requirement-type-assignment",
                       "children": [
                         {
@@ -3459,44 +6316,43 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Efficient Processing",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#efficient-processing"
                     },
                     {
                       "name": "Element Manipulation Operations",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#element-manipulation-operations",
-                      "children": [
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#element-manipulation-operations"
                     },
                     {
                       "name": "Element Type Relation Compatibility",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#element-type-relation-compatibility",
-                      "children": [
-                        {
-                          "name": "Supported Element Types Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#supported-element-types-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/ModelManagement.html#element-type-relation-compatibility"
                     },
                     {
                       "name": "Git Repository as Project Root",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#git-repository-as-project-root",
-                      "children": [
-                        {
-                          "name": "Containment Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#containment-specification"
-                        }
-                      ]
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#git-repository-as-project-root"
+                    },
+                    {
+                      "name": "Governance Metadata Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#governance-metadata-semantic-contract"
+                    },
+                    {
+                      "name": "Ontology and Semantic Contract Model",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#ontology-and-semantic-contract-model"
+                    },
+                    {
+                      "name": "Ontology Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#ontology-element-semantic-contract"
+                    },
+                    {
+                      "name": "Opt-In Element Size Estimate Model Build",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#opt-in-element-size-estimate-model-build"
                     },
                     {
                       "name": "Refinement Element Structure Constraints",
@@ -3509,6 +6365,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Refinements.html#supported-element-types-specification"
                         }
                       ]
+                    },
+                    {
+                      "name": "Refinement Subtype Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#refinement-subtype-semantic-contract"
                     },
                     {
                       "name": "Relation Management Operations",
@@ -3528,25 +6389,45 @@ The containment view shows the physical organization of the model—how requirem
                       ]
                     },
                     {
+                      "name": "Relation Model Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#relation-model-semantic-contract"
+                    },
+                    {
                       "name": "Relation Types and behaviors",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/ModelManagement.html#relation-types-and-behaviors",
+                      "link": "requirements/Functional/Core/ModelManagement.html#relation-types-and-behaviors"
+                    },
+                    {
+                      "name": "Requirement Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#requirement-element-semantic-contract"
+                    },
+                    {
+                      "name": "Requirement Governance Metadata",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#requirement-governance-metadata",
                       "children": [
                         {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.md"
-                        },
-                        {
-                          "name": "Relation Semantics Specification",
+                          "name": "Requirement Governance Metadata Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Refinements.html#relation-semantics-specification"
+                          "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
                         }
                       ]
                     },
                     {
+                      "name": "Semantic Contract Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#semantic-contract-element-semantic-contract"
+                    },
+                    {
+                      "name": "Semantic Query Contract Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/ModelManagement.html#semantic-query-contract-element-semantic-contract"
+                    },
+                    {
                       "name": "Template-Based Model Bootstrapping",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/ModelManagement.html#template-based-model-bootstrapping"
                     },
                     {
@@ -3569,9 +6450,39 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Core/Specifications.html",
                   "children": [
                     {
+                      "name": "Attachment Scope Validation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#attachment-scope-validation-refinement-specification"
+                    },
+                    {
+                      "name": "Attachment Target Validation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#attachment-target-validation-refinement-specification"
+                    },
+                    {
+                      "name": "Capability Model Structure Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#capability-model-structure-specification"
+                    },
+                    {
+                      "name": "Default Requirement Type Assignment Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#default-requirement-type-assignment-refinement-specification"
+                    },
+                    {
+                      "name": "Element Size Estimate Model Build Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#element-size-estimate-model-build-specification"
+                    },
+                    {
                       "name": "Element Type Metadata Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Specifications.html#element-type-metadata-specification"
+                    },
+                    {
+                      "name": "Excluded File Relation Validation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#excluded-file-relation-validation-refinement-specification"
                     },
                     {
                       "name": "Git Repository Scope Specification",
@@ -3579,9 +6490,59 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Specifications.html#git-repository-scope-specification"
                     },
                     {
+                      "name": "Identifiers and Relations Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#identifiers-and-relations-refinement-specification"
+                    },
+                    {
                       "name": "Ignore Files Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Core/Specifications.html#ignore-files-specification"
+                    },
+                    {
+                      "name": "Ignoring Unstructured Documents Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#ignoring-unstructured-documents-refinement-specification"
+                    },
+                    {
+                      "name": "Integrated Validation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#integrated-validation-refinement-specification"
+                    },
+                    {
+                      "name": "Internal Consistency Validator Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#internal-consistency-validator-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Annotation Convention Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#ontology-annotation-convention-specification"
+                    },
+                    {
+                      "name": "Refinement Element Structure Constraints Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#refinement-element-structure-constraints-refinement-specification"
+                    },
+                    {
+                      "name": "Relation Element Type Validator Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#relation-element-type-validator-refinement-specification"
+                    },
+                    {
+                      "name": "Relation Types and behaviors Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#relation-types-and-behaviors-refinement-specification"
+                    },
+                    {
+                      "name": "Requirement Governance Metadata Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
+                    },
+                    {
+                      "name": "Requirements Processing Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#requirements-processing-refinement-specification"
                     },
                     {
                       "name": "Requirements Processing Specification",
@@ -3589,9 +6550,34 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Specifications.html#requirements-processing-specification"
                     },
                     {
-                      "name": "Reserved Files Specification",
+                      "name": "Semantic Contract Reference Context Validation Specification",
                       "type": "refinement",
-                      "link": "requirements/Functional/Core/Specifications.html#reserved-files-specification"
+                      "link": "requirements/Functional/Core/Specifications.html#semantic-contract-reference-context-validation-specification"
+                    },
+                    {
+                      "name": "Semantic Contract Structure Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#semantic-contract-structure-specification"
+                    },
+                    {
+                      "name": "Semantic Query Contract Structure Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#semantic-query-contract-structure-specification"
+                    },
+                    {
+                      "name": "Specification File Identification Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#specification-file-identification-refinement-specification"
+                    },
+                    {
+                      "name": "Structure and Addressing in Markdown Documents Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#structure-and-addressing-in-markdown-documents-refinement-specification"
+                    },
+                    {
+                      "name": "Structured Markdown Files Search and Detection Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Core/Specifications.html#structured-markdown-files-search-and-detection-refinement-specification"
                     },
                     {
                       "name": "Verification Type Selection Guidelines",
@@ -3608,38 +6594,17 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Element Identity Model",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/StructureAndParsing.html#element-identity-model",
-                      "children": [
-                        {
-                          "name": "ElementIdentity.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/ElementIdentity.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/StructureAndParsing.html#element-identity-model"
                     },
                     {
                       "name": "Identifiers and Relations",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/StructureAndParsing.html#identifiers-and-relations",
-                      "children": [
-                        {
-                          "name": "IdentifiersAndRelations.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/IdentifiersAndRelations.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/StructureAndParsing.html#identifiers-and-relations"
                     },
                     {
                       "name": "Reserved Subsections Support",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/StructureAndParsing.html#reserved-subsections-support",
-                      "children": [
-                        {
-                          "name": "ReservedSubsections.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/ReservedSubsections.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/StructureAndParsing.html#reserved-subsections-support"
                     },
                     {
                       "name": "Specification File Identification",
@@ -3649,14 +6614,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Structure and Addressing in Markdown Documents",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents",
-                      "children": [
-                        {
-                          "name": "MarkdownStructure.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/MarkdownStructure.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/StructureAndParsing.html#structure-and-addressing-in-markdown-documents"
                     }
                   ]
                 },
@@ -3676,6 +6634,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Core/Constraints.html#attachment-hierarchical-independence-constraint"
                         },
                         {
+                          "name": "Attachment Subgraph Direction Constraint",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Constraints.html#attachment-subgraph-direction-constraint"
+                        },
+                        {
                           "name": "Attachment Satisfied Refinement Constraint",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Core/Constraints.html#attachment-satisfied-refinement-constraint"
@@ -3688,6 +6651,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Validation.html#attachment-target-validation"
                     },
                     {
+                      "name": "Behavior Rule Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/Validation.html#behavior-rule-semantic-contract"
+                    },
+                    {
                       "name": "Cross-Component Dependency Validator",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#cross-component-dependency-validator"
@@ -3696,11 +6664,6 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Cross-Section Duplicate Validation",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#cross-section-duplicate-validation"
-                    },
-                    {
-                      "name": "Enhanced Validation Error Reporting",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Core/Validation.html#enhanced-validation-error-reporting"
                     },
                     {
                       "name": "Excluded File Relation Validation",
@@ -3745,6 +6708,16 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Core/Validation.html#relation-type-validation"
                     },
                     {
+                      "name": "Semantic Contract Reference Context Validation",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/Validation.html#semantic-contract-reference-context-validation"
+                    },
+                    {
+                      "name": "Single Root Hierarchy Ownership",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/Validation.html#single-root-hierarchy-ownership"
+                    },
+                    {
                       "name": "Two-Pass Validation Strategy",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#two-pass-validation-strategy"
@@ -3756,40 +6729,38 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Validate Cross-Component Dependencies",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-cross-component-dependencies"
                     },
                     {
                       "name": "Validate Filesystem Structure",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-filesystem-structure"
                     },
                     {
                       "name": "Validate Internal Consistency",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-internal-consistency"
                     },
                     {
                       "name": "Validate Markdown Structure",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-markdown-structure"
                     },
                     {
                       "name": "Validate Relation Types",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Core/Validation.html#validate-relation-types"
                     },
                     {
                       "name": "Validation Error Handling",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Core/Validation.html#validation-error-handling",
-                      "children": [
-                        {
-                          "name": "Error Message Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#error-message-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Core/Validation.html#validation-error-handling"
+                    },
+                    {
+                      "name": "Validation Rule Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Core/Validation.html#validation-rule-semantic-contract"
                     }
                   ]
                 }
@@ -3799,6 +6770,60 @@ The containment view shows the physical organization of the model—how requirem
               "name": "Integration",
               "type": "folder",
               "children": [
+                {
+                  "name": "AISkills.md",
+                  "type": "file",
+                  "link": "requirements/Functional/Integration/AISkills.html",
+                  "children": [
+                    {
+                      "name": "AI Assistant Skill-Guided Reqvire Modeling",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-assistant-skill-guided-reqvire-modeling",
+                      "children": [
+                        {
+                          "name": "Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#refinement-specification"
+                        },
+                        {
+                          "name": "Relation Semantics Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#relation-semantics-specification"
+                        },
+                        {
+                          "name": "Supported Element Types Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#supported-element-types-specification"
+                        },
+                        {
+                          "name": "Traceability Reporting Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Refinements.html#traceability-reporting-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "AI Skills Instruction Contract Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-skills-instruction-contract-specification"
+                    },
+                    {
+                      "name": "AI Skills Instruction Contracts",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-skills-instruction-contracts"
+                    },
+                    {
+                      "name": "AI Skills Markdown Artifact Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-skills-markdown-artifact-specification"
+                    },
+                    {
+                      "name": "AI Skills Markdown Implementation Artifacts",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Integration/AISkills.html#ai-skills-markdown-implementation-artifacts"
+                    }
+                  ]
+                },
                 {
                   "name": "CodeAlignment.md",
                   "type": "file",
@@ -3811,7 +6836,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Code Traceability",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/CodeAlignment.html#code-traceability"
                     },
                     {
@@ -3826,7 +6851,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Dash style comment",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/CodeAlignment.html#dash-style-comment"
                     },
                     {
@@ -3863,12 +6888,12 @@ The containment view shows the physical organization of the model—how requirem
                   "children": [
                     {
                       "name": "Automate Documentation Export",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/GitHubIntegration.html#automate-documentation-export"
                     },
                     {
                       "name": "Automate Pull Request Validations",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/GitHubIntegration.html#automate-pull-request-validations"
                     },
                     {
@@ -3878,7 +6903,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Generate Change Logs for Pull Requests",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Integration/GitHubIntegration.html#generate-change-logs-for-pull-requests"
                     }
                   ]
@@ -3889,9 +6914,44 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Integration/Specifications.html",
                   "children": [
                     {
+                      "name": "Automated Documentation Export on PR Merge Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#automated-documentation-export-on-pr-merge-refinement-specification"
+                    },
+                    {
                       "name": "Comment Style Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Integration/Specifications.html#comment-style-specification"
+                    },
+                    {
+                      "name": "CSS Style Comment Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#css-style-comment-refinement-specification"
+                    },
+                    {
+                      "name": "Pull Request Change Log Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#pull-request-change-log-workflow-specification"
+                    },
+                    {
+                      "name": "Pull Request Validation Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#pull-request-validation-workflow-specification"
+                    },
+                    {
+                      "name": "Slash Style Comment Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#slash-style-comment-refinement-specification"
+                    },
+                    {
+                      "name": "Traceability Format Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#traceability-format-refinement-specification"
+                    },
+                    {
+                      "name": "XML Style Comment Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Integration/Specifications.html#xml-style-comment-refinement-specification"
                     }
                   ]
                 }
@@ -3919,6 +6979,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Add Command Error Messages Test",
                           "type": "verification",
                           "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#add-command-error-messages-test"
+                        },
+                        {
+                          "name": "Atomic Relation Relink Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Operations/Verifications/ElementManipulationVerifications.html#atomic-relation-relink-test"
                         },
                         {
                           "name": "CLI Add Element Test",
@@ -4071,6 +7136,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Relation Ordering Verification",
                           "type": "verification",
                           "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.html#relation-ordering-verification"
+                        },
+                        {
+                          "name": "Requirement Governance Metadata Formatting Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Operations/Verifications/FormattingVerifications.html#requirement-governance-metadata-formatting-verification"
                         }
                       ]
                     },
@@ -4131,6 +7201,11 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Operations/Constraints.html",
                   "children": [
                     {
+                      "name": "Atomic Relink Validity Constraint",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Constraints.html#atomic-relink-validity-constraint"
+                    },
+                    {
                       "name": "Merge Type Compatibility Constraint",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Constraints.html#merge-type-compatibility-constraint"
@@ -4147,6 +7222,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Functional/Operations/ElementManipulation.html",
                   "children": [
+                    {
+                      "name": "Atomic Relation Relink Operation",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#atomic-relation-relink-operation"
+                    },
                     {
                       "name": "Create Element Operation",
                       "type": "system-requirement",
@@ -4171,8 +7251,18 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Attachment Satisfied Refinement Constraint",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Core/Constraints.html#attachment-satisfied-refinement-constraint"
+                        },
+                        {
+                          "name": "Element Type Metadata Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#element-type-metadata-specification"
                         }
                       ]
+                    },
+                    {
+                      "name": "CRUD Semantic Contract Mutation Validation",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#crud-semantic-contract-mutation-validation"
                     },
                     {
                       "name": "Delete Element Operation",
@@ -4250,7 +7340,19 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Target Location Validation and Auto-Creation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/ElementManipulation.html#target-location-validation-and-auto-creation"
+                      "link": "requirements/Functional/Operations/ElementManipulation.html#target-location-validation-and-auto-creation",
+                      "children": [
+                        {
+                          "name": "Ignore Files Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#ignore-files-specification"
+                        },
+                        {
+                          "name": "Git Repository Scope Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#git-repository-scope-specification"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -4295,21 +7397,16 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Formatting.html#full-relations-insertion",
                       "children": [
                         {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.md"
+                          "name": "RelationTypes",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html#relationtypes"
                         }
                       ]
                     },
                     {
                       "name": "Git-Style Diff Output for Format",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Operations/Formatting.html#git-style-diff-output-for-format"
-                    },
-                    {
-                      "name": "Model Formatting",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Operations/Formatting.html#model-formatting"
                     },
                     {
                       "name": "Relation Ordering Normalization",
@@ -4329,20 +7426,23 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Operations/Linting.html",
                   "children": [
                     {
+                      "name": "Cross-Submodel Hierarchical Relation Detection",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Operations/Linting.html#cross-submodel-hierarchical-relation-detection"
+                    },
+                    {
                       "name": "Lint Auto-fix Capability",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Operations/Linting.html#lint-auto-fix-capability",
-                      "children": [
-                        {
-                          "name": "Diff Output Format Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
-                        }
-                      ]
+                      "link": "requirements/Functional/Operations/Linting.html#lint-auto-fix-capability"
+                    },
+                    {
+                      "name": "Lint Rule Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Operations/Linting.html#lint-rule-semantic-contract"
                     },
                     {
                       "name": "Model Linting",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Operations/Linting.html#model-linting"
                     },
                     {
@@ -4389,9 +7489,24 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Operations/Specifications.html",
                   "children": [
                     {
+                      "name": "Atomic Relation Relink Workflow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#atomic-relation-relink-workflow-specification"
+                    },
+                    {
                       "name": "Create Element Workflow Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification"
+                    },
+                    {
+                      "name": "Cross-Submodel Hierarchical Relation Detection Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#cross-submodel-hierarchical-relation-detection-specification"
+                    },
+                    {
+                      "name": "CRUD Semantic Contract Validation Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#crud-semantic-contract-validation-specification"
                     },
                     {
                       "name": "Delete Element Workflow Specification",
@@ -4404,9 +7519,24 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Specifications.html#document-structure-specification"
                     },
                     {
+                      "name": "Element Manipulation File Persistence Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#element-manipulation-file-persistence-refinement-specification"
+                    },
+                    {
                       "name": "Format Consistency Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#format-consistency-specification"
+                    },
+                    {
+                      "name": "Full Relations Insertion Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#full-relations-insertion-refinement-specification"
+                    },
+                    {
+                      "name": "Lint Auto-fix Capability Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#lint-auto-fix-capability-refinement-specification"
                     },
                     {
                       "name": "Lint Output Specification",
@@ -4424,9 +7554,19 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Operations/Specifications.html#move-element-workflow-specification"
                     },
                     {
+                      "name": "Move File Operation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#move-file-operation-refinement-specification"
+                    },
+                    {
                       "name": "Multi-Branch Convergence Detection Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#multi-branch-convergence-detection-specification"
+                    },
+                    {
+                      "name": "Operation Command Contract Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#operation-command-contract-specification"
                     },
                     {
                       "name": "Orphaned Children Error Message Specification",
@@ -4437,6 +7577,16 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Redundant Hierarchical Relations Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#redundant-hierarchical-relations-specification"
+                    },
+                    {
+                      "name": "Redundant Verify Relations Detection Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#redundant-verify-relations-detection-refinement-specification"
+                    },
+                    {
+                      "name": "Relation Consistency Maintenance Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#relation-consistency-maintenance-refinement-specification"
                     },
                     {
                       "name": "Relation Operations Specification",
@@ -4452,6 +7602,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Relation Validation Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Operations/Specifications.html#relation-validation-specification"
+                    },
+                    {
+                      "name": "Rename Element Operation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Operations/Specifications.html#rename-element-operation-refinement-specification"
                     }
                   ]
                 }
@@ -4479,6 +7634,42 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "TraceFlowView.md",
                       "type": "design-document",
                       "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.html"
+                    },
+                    {
+                      "name": "ContainmentView.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.html",
+                      "children": [
+                        {
+                          "name": "ContainmentView",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.html#containmentview"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "SearchFiltering.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Output/DesignDocuments/SearchFiltering.html",
+                      "children": [
+                        {
+                          "name": "SearchFiltering",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Output/DesignDocuments/SearchFiltering.html#searchfiltering"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "TraceFlowView.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.html",
+                      "children": [
+                        {
+                          "name": "TraceFlowView",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.html#traceflowview"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -4524,9 +7715,24 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html",
                       "children": [
                         {
+                          "name": "Capability Collect Traversal Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#capability-collect-traversal-test"
+                        },
+                        {
+                          "name": "Capability Coverage Rollup Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#capability-coverage-rollup-test"
+                        },
+                        {
                           "name": "CLI Collect Command Test",
                           "type": "verification",
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#cli-collect-command-test"
+                        },
+                        {
+                          "name": "CLI JSON File Output Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#cli-json-file-output-test"
                         },
                         {
                           "name": "Containment Hierarchy Extraction Test",
@@ -4564,6 +7770,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#html-export-containment-view-integration-test"
                         },
                         {
+                          "name": "JSON Element Size Estimate Output Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#json-element-size-estimate-output-verification"
+                        },
+                        {
                           "name": "Model Command Verification",
                           "type": "verification",
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#model-command-verification"
@@ -4596,6 +7807,16 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#search-command-tests"
                         },
                         {
+                          "name": "Semantic Contract Search JSON Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#semantic-contract-search-json-test"
+                        },
+                        {
+                          "name": "Semantic Query Contract Search JSON Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#semantic-query-contract-search-json-test"
+                        },
+                        {
                           "name": "Start Type Filter Test",
                           "type": "verification",
                           "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#start-type-filter-test",
@@ -4606,6 +7827,11 @@ The containment view shows the physical organization of the model—how requirem
                               "link": "requirements/Functional/Output/Behaviors.html#start-element-type-filter-behavior"
                             }
                           ]
+                        },
+                        {
+                          "name": "Submodels Report Verification",
+                          "type": "verification",
+                          "link": "requirements/Functional/Output/Verifications/ReportingVerifications.html#submodels-report-verification"
                         },
                         {
                           "name": "TraceFlow View Test",
@@ -4636,6 +7862,16 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Functional/Output/Behaviors.html",
                   "children": [
+                    {
+                      "name": "Forward-Only Relation Traversal Behavior",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Behaviors.html#forward-only-relation-traversal-behavior"
+                    },
+                    {
+                      "name": "Implementation Coverage Behavior",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Behaviors.html#implementation-coverage-behavior"
+                    },
                     {
                       "name": "Mermaid Diagram Interaction Behavior",
                       "type": "refinement",
@@ -4685,7 +7921,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Interactive Mermaid Diagrams",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/DiagramGeneration.html#interactive-mermaid-diagrams"
                     },
                     {
@@ -4706,9 +7942,14 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Output/Reporting.html",
                   "children": [
                     {
-                      "name": "Collect Content from Requirement Chain",
+                      "name": "Change Impact Semantic Contract",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#collect-content-from-requirement-chain"
+                      "link": "requirements/Functional/Output/Reporting.html#change-impact-semantic-contract"
+                    },
+                    {
+                      "name": "Collect Capability and Requirement Context",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#collect-capability-and-requirement-context"
                     },
                     {
                       "name": "Comma-Separated Type Filter Parsing",
@@ -4717,14 +7958,9 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Containment View Report",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#containment-view-report",
                       "children": [
-                        {
-                          "name": "ContainmentView.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.md"
-                        },
                         {
                           "name": "Containment Specification",
                           "type": "attachment-element",
@@ -4744,13 +7980,18 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Flexible Search Type Filtering",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#flexible-search-type-filtering"
                     },
                     {
                       "name": "Forward-Only Relation Traversal",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#forward-only-relation-traversal"
+                    },
+                    {
+                      "name": "JSON Element Size Estimate Exposure",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#json-element-size-estimate-exposure"
                     },
                     {
                       "name": "Model Diagram Output Formats",
@@ -4771,29 +8012,68 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Model Reports",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#model-reports",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#model-reports"
+                    },
+                    {
+                      "name": "Model Structure and Summaries",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#model-structure-and-summaries"
+                    },
+                    {
+                      "name": "Ontology and Shapes Collection",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#ontology-and-shapes-collection",
                       "children": [
                         {
-                          "name": "Traceability Reporting Specification",
+                          "name": "Semantic Contract Structure Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Refinements.html#traceability-reporting-specification"
+                          "link": "requirements/Functional/Core/Specifications.html#semantic-contract-structure-specification"
                         }
                       ]
                     },
                     {
-                      "name": "Model Structure and Summaries",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Output/Reporting.html#model-structure-and-summaries"
+                      "name": "Ontology Projection Subgraph Materialization",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#ontology-projection-subgraph-materialization",
+                      "children": [
+                        {
+                          "name": "Ontology Collection Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                        },
+                        {
+                          "name": "Semantic Query Contract Structure Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#semantic-query-contract-structure-specification"
+                        }
+                      ]
                     },
                     {
                       "name": "Provide Validation Reports",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#provide-validation-reports"
                     },
                     {
+                      "name": "Requirement Implementation Coverage Report",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#requirement-implementation-coverage-report"
+                    },
+                    {
+                      "name": "Requirement Submodels Report",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Output/Reporting.html#requirement-submodels-report",
+                      "children": [
+                        {
+                          "name": "RelationTypes",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html#relationtypes"
+                        }
+                      ]
+                    },
+                    {
                       "name": "Resources Report",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#resources-report"
                     },
                     {
@@ -4807,9 +8087,9 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Reporting.html#search-report-generator",
                       "children": [
                         {
-                          "name": "SearchFiltering.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Output/DesignDocuments/SearchFiltering.md"
+                          "name": "Requirement Governance Metadata Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
                         },
                         {
                           "name": "Supported Element Types Specification",
@@ -4834,11 +8114,6 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Reporting.html#traceflow-view-report-generation",
                       "children": [
                         {
-                          "name": "TraceFlowView.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Output/DesignDocuments/TraceFlowView.md"
-                        },
-                        {
                           "name": "Verification Trace Tree Construction",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
@@ -4847,7 +8122,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Tracing Structural Changes",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#tracing-structural-changes",
                       "children": [
                         {
@@ -4864,14 +8139,9 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Verification Coverage Report",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Functional/Output/Reporting.html#verification-coverage-report",
                       "children": [
-                        {
-                          "name": "Verification Coverage Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#verification-coverage-specification"
-                        },
                         {
                           "name": "Verification Roll-up Specification",
                           "type": "attachment-element",
@@ -4892,6 +8162,11 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Output/Specifications.html",
                   "children": [
                     {
+                      "name": "Capability Collect Traversal Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#capability-collect-traversal-specification"
+                    },
+                    {
                       "name": "Collect Content Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#collect-content-specification"
@@ -4907,6 +8182,16 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#color-scheme-specification"
                     },
                     {
+                      "name": "Comma-Separated Type Filter Parsing Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#comma-separated-type-filter-parsing-refinement-specification"
+                    },
+                    {
+                      "name": "Containment View Report Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#containment-view-report-refinement-specification"
+                    },
+                    {
                       "name": "Deterministic Output Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#deterministic-output-specification"
@@ -4917,14 +8202,29 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#diagram-relation-filtering-specification"
                     },
                     {
-                      "name": "Diff Output Format Specification",
+                      "name": "File Diagram Attachment Display Refinement Specification",
                       "type": "refinement",
-                      "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                      "link": "requirements/Functional/Output/Specifications.html#file-diagram-attachment-display-refinement-specification"
                     },
                     {
-                      "name": "Error Message Format Specification",
+                      "name": "Flexible Search Type Filtering Refinement Specification",
                       "type": "refinement",
-                      "link": "requirements/Functional/Output/Specifications.html#error-message-format-specification"
+                      "link": "requirements/Functional/Output/Specifications.html#flexible-search-type-filtering-refinement-specification"
+                    },
+                    {
+                      "name": "Implementation Coverage Output Structure Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#implementation-coverage-output-structure-specification"
+                    },
+                    {
+                      "name": "Interactive Mermaid Diagram Node Behavior Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#interactive-mermaid-diagram-node-behavior-refinement-specification"
+                    },
+                    {
+                      "name": "JSON Element Size Estimate Output Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#json-element-size-estimate-output-specification"
                     },
                     {
                       "name": "JSON Output Structure",
@@ -4952,6 +8252,41 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Functional/Output/Specifications.html#mermaid-interactive-capabilities-specification"
                     },
                     {
+                      "name": "Model Diagram Output Formats Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#model-diagram-output-formats-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Collection Output Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                    },
+                    {
+                      "name": "Ontology Projection Subgraph Materialization Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#ontology-projection-subgraph-materialization-specification"
+                    },
+                    {
+                      "name": "Report Command Catalog Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#report-command-catalog-specification"
+                    },
+                    {
+                      "name": "Requirement Governance Metadata JSON Output Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#requirement-governance-metadata-json-output-specification"
+                    },
+                    {
+                      "name": "Requirement Implementation Coverage Logic Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#requirement-implementation-coverage-logic-specification"
+                    },
+                    {
+                      "name": "Requirement Submodels Report Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#requirement-submodels-report-specification"
+                    },
+                    {
                       "name": "Resources Report Format Specification",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
@@ -4965,6 +8300,11 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Text Output Formatting",
                       "type": "refinement",
                       "link": "requirements/Functional/Output/Specifications.html#text-output-formatting"
+                    },
+                    {
+                      "name": "Trace Relation Non-Directional Behavior Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Output/Specifications.html#trace-relation-non-directional-behavior-refinement-specification"
                     },
                     {
                       "name": "Verification Trace Diagram Specification",
@@ -4987,6 +8327,18 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "ChangePropagation.md",
                       "type": "design-document",
                       "link": "requirements/Functional/Processing/DesignDocuments/ChangePropagation.html"
+                    },
+                    {
+                      "name": "ChangePropagation.md",
+                      "type": "file",
+                      "link": "requirements/Functional/Processing/DesignDocuments/ChangePropagation.html",
+                      "children": [
+                        {
+                          "name": "ChangePropagation",
+                          "type": "refinement",
+                          "link": "requirements/Functional/Processing/DesignDocuments/ChangePropagation.html#changepropagation"
+                        }
+                      ]
                     }
                   ]
                 },
@@ -4999,6 +8351,11 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "file",
                       "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html",
                       "children": [
+                        {
+                          "name": "Capability Ontology and Semantic Contract Change Impact Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#capability-ontology-and-semantic-contract-change-impact-test"
+                        },
                         {
                           "name": "Change Impact Analysis Verification",
                           "type": "verification",
@@ -5023,6 +8380,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Element Content Extraction Test",
                           "type": "verification",
                           "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#element-content-extraction-test"
+                        },
+                        {
+                          "name": "Impact Scope Summary Test",
+                          "type": "verification",
+                          "link": "requirements/Functional/Processing/Verifications/ChangeImpactVerifications.html#impact-scope-summary-test"
                         },
                         {
                           "name": "Structural Change Reports Verification",
@@ -5070,14 +8432,7 @@ The containment view shows the physical organization of the model—how requirem
                     {
                       "name": "Requirements Change Propagation",
                       "type": "system-requirement",
-                      "link": "requirements/Functional/Processing/ChangeImpact.html#requirements-change-propagation",
-                      "children": [
-                        {
-                          "name": "ChangePropagation.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Processing/DesignDocuments/ChangePropagation.md"
-                        }
-                      ]
+                      "link": "requirements/Functional/Processing/ChangeImpact.html#requirements-change-propagation"
                     },
                     {
                       "name": "Structural Change Analyzer",
@@ -5091,6 +8446,11 @@ The containment view shows the physical organization of the model—how requirem
                   "type": "file",
                   "link": "requirements/Functional/Processing/Specifications.html",
                   "children": [
+                    {
+                      "name": "Impact Scope Computation Specification",
+                      "type": "refinement",
+                      "link": "requirements/Functional/Processing/Specifications.html#impact-scope-computation-specification"
+                    },
                     {
                       "name": "Verification Roll-up Specification",
                       "type": "refinement",
@@ -5109,9 +8469,19 @@ The containment view shows the physical organization of the model—how requirem
                   "link": "requirements/Functional/Processing/VerificationTraces.html",
                   "children": [
                     {
+                      "name": "Verification Element Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Processing/VerificationTraces.html#verification-element-semantic-contract"
+                    },
+                    {
                       "name": "Verification Roll-up Strategy",
                       "type": "system-requirement",
                       "link": "requirements/Functional/Processing/VerificationTraces.html#verification-roll-up-strategy"
+                    },
+                    {
+                      "name": "Verification Rollup Semantic Contract",
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Processing/VerificationTraces.html#verification-rollup-semantic-contract"
                     },
                     {
                       "name": "Verification Trace Builder",
@@ -5120,15 +8490,8 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Verification Upward Traceability",
-                      "type": "user-requirement",
-                      "link": "requirements/Functional/Processing/VerificationTraces.html#verification-upward-traceability",
-                      "children": [
-                        {
-                          "name": "Traceability Reporting Specification",
-                          "type": "attachment-element",
-                          "link": "requirements/Refinements.html#traceability-reporting-specification"
-                        }
-                      ]
+                      "type": "system-requirement",
+                      "link": "requirements/Functional/Processing/VerificationTraces.html#verification-upward-traceability"
                     }
                   ]
                 }
@@ -5164,6 +8527,21 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#cli-help-structure-verification"
                         },
                         {
+                          "name": "CLI Ontologies Command Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#cli-ontologies-command-verification"
+                        },
+                        {
+                          "name": "CLI Size Estimate JSON Option Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#cli-size-estimate-json-option-verification"
+                        },
+                        {
+                          "name": "Explicit Workspace Selection Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#explicit-workspace-selection-verification"
+                        },
+                        {
                           "name": "Verification Traces Element Navigation Test",
                           "type": "verification",
                           "link": "requirements/Interfaces/CLI/Verifications/CLIVerifications.html#verification-traces-element-navigation-test"
@@ -5195,7 +8573,12 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         },
                         {
                           "name": "Attachment Hierarchical Independence Constraint",
@@ -5242,7 +8625,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -5321,9 +8704,9 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
                         },
                         {
-                          "name": "ContainmentView.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.md"
+                          "name": "ContainmentView",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/DesignDocuments/ContainmentView.html#containmentview"
                         },
                         {
                           "name": "D3.js Containment Tree Specification",
@@ -5348,6 +8731,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         },
                         {
+                          "name": "Implementation Coverage Output Structure Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#implementation-coverage-output-structure-specification"
+                        },
+                        {
                           "name": "Text Output Formatting",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Specifications.html#text-output-formatting"
@@ -5355,9 +8743,19 @@ The containment view shows the physical organization of the model—how requirem
                       ]
                     },
                     {
+                      "name": "CLI Diff Output",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-diff-output"
+                    },
+                    {
                       "name": "CLI Interface Structure",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/CLI/Commands.html#cli-interface-structure"
+                    },
+                    {
+                      "name": "CLI JSON File Output Option",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-json-file-output-option"
                     },
                     {
                       "name": "CLI Lint Command",
@@ -5378,6 +8776,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Lint Output Specification",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Operations/Specifications.html#lint-output-specification"
+                        },
+                        {
+                          "name": "Cross-Submodel Hierarchical Relation Detection Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#cross-submodel-hierarchical-relation-detection-specification"
                         },
                         {
                           "name": "Text Output Formatting",
@@ -5444,6 +8847,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Output/Specifications.html#mermaid-diagram-style-specification"
                         },
                         {
+                          "name": "Model Diagram Output Formats Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#model-diagram-output-formats-refinement-specification"
+                        },
+                        {
                           "name": "Reverse Relation Traversal Behavior",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Output/Behaviors.html#reverse-relation-traversal-behavior"
@@ -5478,7 +8886,12 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         }
                       ]
                     },
@@ -5510,7 +8923,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -5547,7 +8960,51 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "CLI Ontologies Command",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-ontologies-command",
+                      "children": [
+                        {
+                          "name": "Semantic Contract Structure Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#semantic-contract-structure-specification"
+                        },
+                        {
+                          "name": "Ontology Collection Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "CLI Relink Command",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-relink-command",
+                      "children": [
+                        {
+                          "name": "Atomic Relation Relink Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#atomic-relation-relink-workflow-specification"
+                        },
+                        {
+                          "name": "Atomic Relink Validity Constraint",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Constraints.html#atomic-relink-validity-constraint"
+                        },
+                        {
+                          "name": "Diff Output Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -5574,7 +9031,12 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         }
                       ]
                     },
@@ -5596,7 +9058,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -5628,7 +9090,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -5647,6 +9109,11 @@ The containment view shows the physical organization of the model—how requirem
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/CLI/Commands.html#cli-search-command",
                       "children": [
+                        {
+                          "name": "Requirement Governance Metadata Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
+                        },
                         {
                           "name": "Supported Element Types Specification",
                           "type": "attachment-element",
@@ -5671,6 +9138,28 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Type Validation Error Behavior",
                           "type": "attachment-element",
                           "link": "requirements/Functional/Core/Behaviors.html#type-validation-error-behavior"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "CLI Size Estimate JSON Option",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-size-estimate-json-option"
+                    },
+                    {
+                      "name": "CLI Submodels Command",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#cli-submodels-command",
+                      "children": [
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        },
+                        {
+                          "name": "Requirement Submodels Report Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#requirement-submodels-report-specification"
                         }
                       ]
                     },
@@ -5714,6 +9203,18 @@ The containment view shows the physical organization of the model—how requirem
                       ]
                     },
                     {
+                      "name": "Explicit Workspace Selection",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/CLI/Commands.html#explicit-workspace-selection",
+                      "children": [
+                        {
+                          "name": "Git Repository Scope Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#git-repository-scope-specification"
+                        }
+                      ]
+                    },
+                    {
                       "name": "Format Command",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/CLI/Commands.html#format-command",
@@ -5726,7 +9227,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
                         },
                         {
                           "name": "JSON Output Structure",
@@ -5746,9 +9247,9 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Functional/Operations/Specifications.html#relation-operations-specification"
                         },
                         {
-                          "name": "RelationTypes.md",
-                          "type": "attachment-file",
-                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.md"
+                          "name": "RelationTypes",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/DesignDocuments/RelationTypes.html#relationtypes"
                         },
                         {
                           "name": "Dry-Run Mode Behavior",
@@ -5758,7 +9259,12 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Diff Output Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#diff-output-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                        },
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
                         }
                       ]
                     },
@@ -5785,7 +9291,7 @@ The containment view shows the physical organization of the model—how requirem
                         {
                           "name": "Error Message Format Specification",
                           "type": "attachment-element",
-                          "link": "requirements/Functional/Output/Specifications.html#error-message-format-specification"
+                          "link": "requirements/Interfaces/CLI/Specifications.html#error-message-format-specification"
                         },
                         {
                           "name": "Attachment Hierarchical Independence Constraint",
@@ -5803,6 +9309,641 @@ The containment view shows the physical organization of the model—how requirem
                       "name": "Verification Traces Element Navigation",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/CLI/Commands.html#verification-traces-element-navigation"
+                    }
+                  ]
+                },
+                {
+                  "name": "Specifications.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/CLI/Specifications.html",
+                  "children": [
+                    {
+                      "name": "CLI Add Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-add-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Collect Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-collect-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Coverage Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-coverage-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Interface Structure Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-interface-structure-refinement-specification"
+                    },
+                    {
+                      "name": "CLI JSON File Output Option Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-json-file-output-option-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Lint Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-lint-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Merge Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-merge-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Model Diagram Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-model-diagram-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Move Asset Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-move-asset-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Move Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-move-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Move File Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-move-file-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Ontologies Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-ontologies-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Relink Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-relink-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Remove Asset Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-remove-asset-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Remove Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-remove-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Rename Element Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-rename-element-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Resources Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-resources-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Search Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-search-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Size Estimate JSON Option Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-size-estimate-json-option-specification"
+                    },
+                    {
+                      "name": "CLI Submodels Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-submodels-command-refinement-specification"
+                    },
+                    {
+                      "name": "CLI Traces Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#cli-traces-command-refinement-specification"
+                    },
+                    {
+                      "name": "Detailed Error Handling and Logging Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#detailed-error-handling-and-logging-refinement-specification"
+                    },
+                    {
+                      "name": "Diff Output Format Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#diff-output-format-specification"
+                    },
+                    {
+                      "name": "Error Message Format Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#error-message-format-specification"
+                    },
+                    {
+                      "name": "Explicit Workspace Selection Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#explicit-workspace-selection-specification"
+                    },
+                    {
+                      "name": "Format Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#format-command-refinement-specification"
+                    },
+                    {
+                      "name": "Mutating Command Hierarchy Safety Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#mutating-command-hierarchy-safety-refinement-specification"
+                    },
+                    {
+                      "name": "Relation Commands Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#relation-commands-refinement-specification"
+                    },
+                    {
+                      "name": "Validate Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#validate-command-refinement-specification"
+                    },
+                    {
+                      "name": "Verification Traces Element Navigation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/CLI/Specifications.html#verification-traces-element-navigation-refinement-specification"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "MCP",
+              "type": "folder",
+              "children": [
+                {
+                  "name": "Verifications",
+                  "type": "folder",
+                  "children": [
+                    {
+                      "name": "MCPVerifications.md",
+                      "type": "file",
+                      "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html",
+                      "children": [
+                        {
+                          "name": "MCP Access Control Baseline Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-access-control-baseline-verification"
+                        },
+                        {
+                          "name": "MCP Contract Layer Boundary Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-contract-layer-boundary-verification"
+                        },
+                        {
+                          "name": "MCP Contract Versioning Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-contract-versioning-verification"
+                        },
+                        {
+                          "name": "MCP HTTP Transport End-to-End Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-http-transport-end-to-end-verification"
+                        },
+                        {
+                          "name": "MCP Model Evidence Tools Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-model-evidence-tools-verification"
+                        },
+                        {
+                          "name": "MCP Mutation Execution Flow Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-mutation-execution-flow-verification"
+                        },
+                        {
+                          "name": "MCP Mutation Tool Safety Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-mutation-tool-safety-verification"
+                        },
+                        {
+                          "name": "MCP Protocol Standard Conformance Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-protocol-standard-conformance-verification"
+                        },
+                        {
+                          "name": "MCP Quality Traceability Tools Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-quality-traceability-tools-verification"
+                        },
+                        {
+                          "name": "MCP Resource Interface Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-resource-interface-verification"
+                        },
+                        {
+                          "name": "MCP Server Command Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-server-command-verification"
+                        },
+                        {
+                          "name": "MCP Server End-to-End Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-server-end-to-end-verification"
+                        },
+                        {
+                          "name": "MCP Server State and Cache Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-server-state-and-cache-verification"
+                        },
+                        {
+                          "name": "MCP Shared Operation Contracts Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-shared-operation-contracts-verification"
+                        },
+                        {
+                          "name": "MCP Size Estimate Startup Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-size-estimate-startup-verification"
+                        },
+                        {
+                          "name": "MCP Structured Payload Contracts Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-structured-payload-contracts-verification"
+                        },
+                        {
+                          "name": "MCP Tool Call Contracts Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-tool-call-contracts-verification"
+                        },
+                        {
+                          "name": "MCP Tool Exposure Scope Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-tool-exposure-scope-verification"
+                        },
+                        {
+                          "name": "MCP Tool Side Effect Classification Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-tool-side-effect-classification-verification"
+                        },
+                        {
+                          "name": "MCP Workspace Session Tools Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/MCP/Verifications/MCPVerifications.html#mcp-workspace-session-tools-verification"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "name": "Specifications.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/MCP/Specifications.html",
+                  "children": [
+                    {
+                      "name": "MCP Access Control Baseline Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-access-control-baseline-specification"
+                    },
+                    {
+                      "name": "MCP Contract Layer Boundary Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-contract-layer-boundary-specification"
+                    },
+                    {
+                      "name": "MCP Contract Versioning Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-contract-versioning-specification"
+                    },
+                    {
+                      "name": "MCP Interface Boundary Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-interface-boundary-specification"
+                    },
+                    {
+                      "name": "MCP Model Evidence Tools Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-model-evidence-tools-specification"
+                    },
+                    {
+                      "name": "MCP Mutation Concurrency Control Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-mutation-concurrency-control-specification"
+                    },
+                    {
+                      "name": "MCP Mutation Execution Flow Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-mutation-execution-flow-specification"
+                    },
+                    {
+                      "name": "MCP Mutation Tool Safety Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-mutation-tool-safety-specification"
+                    },
+                    {
+                      "name": "MCP Protocol Standard Conformance Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-protocol-standard-conformance-specification"
+                    },
+                    {
+                      "name": "MCP Quality Traceability Tools Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-quality-traceability-tools-specification"
+                    },
+                    {
+                      "name": "MCP Resource Interface Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-resource-interface-specification"
+                    },
+                    {
+                      "name": "MCP Server Command Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-server-command-specification"
+                    },
+                    {
+                      "name": "MCP Server State and Cache Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-server-state-and-cache-specification"
+                    },
+                    {
+                      "name": "MCP Shared Operation Contracts Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-shared-operation-contracts-specification"
+                    },
+                    {
+                      "name": "MCP Size Estimate Startup Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-size-estimate-startup-specification"
+                    },
+                    {
+                      "name": "MCP Streamable HTTP Transport Safety Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-streamable-http-transport-safety-specification"
+                    },
+                    {
+                      "name": "MCP Streamable HTTP Transport Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-streamable-http-transport-specification"
+                    },
+                    {
+                      "name": "MCP Structured Payload Contracts Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-structured-payload-contracts-specification"
+                    },
+                    {
+                      "name": "MCP Tool Call Contracts Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-tool-call-contracts-specification"
+                    },
+                    {
+                      "name": "MCP Tool Exposure Scope Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-tool-exposure-scope-specification"
+                    },
+                    {
+                      "name": "MCP Tool Side Effect Classification Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-tool-side-effect-classification-specification"
+                    },
+                    {
+                      "name": "MCP Workspace Session Tools Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/MCP/Specifications.html#mcp-workspace-session-tools-specification"
+                    }
+                  ]
+                },
+                {
+                  "name": "Tools.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/MCP/Tools.html",
+                  "children": [
+                    {
+                      "name": "MCP Access Control Baseline",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-access-control-baseline"
+                    },
+                    {
+                      "name": "MCP Adapter Boundary",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-adapter-boundary"
+                    },
+                    {
+                      "name": "MCP Compatibility Versioning",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-compatibility-versioning"
+                    },
+                    {
+                      "name": "MCP Model Evidence Tools",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-model-evidence-tools",
+                      "children": [
+                        {
+                          "name": "Requirement Governance Metadata Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Specifications.html#requirement-governance-metadata-specification"
+                        },
+                        {
+                          "name": "Flexible Search Type Filtering Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#flexible-search-type-filtering-refinement-specification"
+                        },
+                        {
+                          "name": "Containment View Report Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#containment-view-report-refinement-specification"
+                        },
+                        {
+                          "name": "Collect Content Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#collect-content-specification"
+                        },
+                        {
+                          "name": "Requirement Submodels Report Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#requirement-submodels-report-specification"
+                        },
+                        {
+                          "name": "Ontology Collection Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Mutation Concurrency Control",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-mutation-concurrency-control"
+                    },
+                    {
+                      "name": "MCP Mutation Execution Flow",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-mutation-execution-flow"
+                    },
+                    {
+                      "name": "MCP Mutation Tool Safety",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-mutation-tool-safety",
+                      "children": [
+                        {
+                          "name": "Dry-Run Mode Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Behaviors.html#dry-run-mode-behavior"
+                        },
+                        {
+                          "name": "File Persistence Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Behaviors.html#file-persistence-behavior"
+                        },
+                        {
+                          "name": "Create Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#create-element-workflow-specification"
+                        },
+                        {
+                          "name": "Delete Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#delete-element-workflow-specification"
+                        },
+                        {
+                          "name": "Move Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#move-element-workflow-specification"
+                        },
+                        {
+                          "name": "Rename Element Operation Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#rename-element-operation-refinement-specification"
+                        },
+                        {
+                          "name": "Merge Element Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#merge-element-workflow-specification"
+                        },
+                        {
+                          "name": "Move File Operation Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#move-file-operation-refinement-specification"
+                        },
+                        {
+                          "name": "Relation Operations Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#relation-operations-specification"
+                        },
+                        {
+                          "name": "Atomic Relation Relink Workflow Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#atomic-relation-relink-workflow-specification"
+                        },
+                        {
+                          "name": "Relation Consistency Maintenance Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#relation-consistency-maintenance-refinement-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Protocol Standard Conformance",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-protocol-standard-conformance"
+                    },
+                    {
+                      "name": "MCP Quality Traceability Tools",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-quality-traceability-tools",
+                      "children": [
+                        {
+                          "name": "Lint Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Operations/Specifications.html#lint-output-specification"
+                        },
+                        {
+                          "name": "Requirement Implementation Coverage Logic Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#requirement-implementation-coverage-logic-specification"
+                        },
+                        {
+                          "name": "Verification Trace Tree Construction",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Processing/Specifications.html#verification-trace-tree-construction"
+                        },
+                        {
+                          "name": "Resources Report Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
+                        },
+                        {
+                          "name": "Impact Scope Computation Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Processing/Specifications.html#impact-scope-computation-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Resource Interface",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-resource-interface",
+                      "children": [
+                        {
+                          "name": "Resources Report Format Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#resources-report-format-specification"
+                        },
+                        {
+                          "name": "Containment View Report Refinement Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#containment-view-report-refinement-specification"
+                        },
+                        {
+                          "name": "Requirement Submodels Report Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#requirement-submodels-report-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Server Command",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-server-command"
+                    },
+                    {
+                      "name": "MCP Server State and Cache",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-server-state-and-cache"
+                    },
+                    {
+                      "name": "MCP Shared Operation Interfaces",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-shared-operation-interfaces",
+                      "children": [
+                        {
+                          "name": "JSON Output Structure",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#json-output-structure"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "MCP Streamable HTTP Transport",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-streamable-http-transport"
+                    },
+                    {
+                      "name": "MCP Streamable HTTP Transport Safety",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-streamable-http-transport-safety"
+                    },
+                    {
+                      "name": "MCP Structured Payload Interfaces",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-structured-payload-interfaces"
+                    },
+                    {
+                      "name": "MCP Tool Exposure Scope",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-tool-exposure-scope"
+                    },
+                    {
+                      "name": "MCP Tool Side Effect Classification",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-tool-side-effect-classification"
+                    },
+                    {
+                      "name": "MCP Workspace Session Tools",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/MCP/Tools.html#mcp-workspace-session-tools"
                     }
                   ]
                 }
@@ -5869,6 +10010,11 @@ The containment view shows the physical organization of the model—how requirem
                           "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#diagram-attachment-display-verification"
                         },
                         {
+                          "name": "HTML Export Local Linked Files Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#html-export-local-linked-files-verification"
+                        },
+                        {
                           "name": "HTML Export Verification",
                           "type": "verification",
                           "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#html-export-verification"
@@ -5877,6 +10023,11 @@ The containment view shows the physical organization of the model—how requirem
                           "name": "Model View Element Navigation Test",
                           "type": "verification",
                           "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#model-view-element-navigation-test"
+                        },
+                        {
+                          "name": "Ontology Model Viewer Analysis Verification",
+                          "type": "verification",
+                          "link": "requirements/Interfaces/WebInterface/Verifications/WebInterfaceVerifications.html#ontology-model-viewer-analysis-verification"
                         },
                         {
                           "name": "Serve Command Verification",
@@ -5932,6 +10083,11 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Interfaces/WebInterface/Capabilities.html#html-export"
                     },
                     {
+                      "name": "Local Linked File Export",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#local-linked-file-export"
+                    },
+                    {
                       "name": "Model-Centric View Generation",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/WebInterface/Capabilities.html#model-centric-view-generation",
@@ -5949,10 +10105,57 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Interfaces/WebInterface/Capabilities.html#model-view-element-navigation"
                     },
                     {
+                      "name": "Ontologies View Generation",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#ontologies-view-generation",
+                      "children": [
+                        {
+                          "name": "Ontology Collection Output Specification",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Output/Specifications.html#ontology-collection-output-specification"
+                        }
+                      ]
+                    },
+                    {
+                      "name": "Ontology Construct Grouping",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#ontology-construct-grouping"
+                    },
+                    {
+                      "name": "Ontology Property-Centric Visualization",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#ontology-property-centric-visualization"
+                    },
+                    {
+                      "name": "Ontology Symbol and Badge Vocabulary",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#ontology-symbol-and-badge-vocabulary"
+                    },
+                    {
+                      "name": "OWL Semantic Ontology Projection",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#owl-semantic-ontology-projection"
+                    },
+                    {
+                      "name": "Project Knowledge Graph View",
+                      "type": "system-requirement",
+                      "link": "requirements/Interfaces/WebInterface/Capabilities.html#project-knowledge-graph-view"
+                    },
+                    {
                       "name": "Serve Command",
                       "type": "system-requirement",
                       "link": "requirements/Interfaces/WebInterface/Capabilities.html#serve-command",
                       "children": [
+                        {
+                          "name": "Two-Pass Validation Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Behaviors.html#two-pass-validation-behavior"
+                        },
+                        {
+                          "name": "Validation Error Reporting Behavior",
+                          "type": "attachment-element",
+                          "link": "requirements/Functional/Core/Behaviors.html#validation-error-reporting-behavior"
+                        },
                         {
                           "name": "HTML Export Pipeline Specification",
                           "type": "attachment-element",
@@ -5984,7 +10187,7 @@ The containment view shows the physical organization of the model—how requirem
                     },
                     {
                       "name": "Mobile-Friendly Documentation",
-                      "type": "user-requirement",
+                      "type": "system-requirement",
                       "link": "requirements/Interfaces/WebInterface/HTMLGeneration.html#mobile-friendly-documentation"
                     },
                     {
@@ -6000,14 +10203,56 @@ The containment view shows the physical organization of the model—how requirem
                   ]
                 },
                 {
+                  "name": "OntologyRenderingDetails.md",
+                  "type": "file",
+                  "link": "requirements/Interfaces/WebInterface/OntologyRenderingDetails.html",
+                  "children": [
+                    {
+                      "name": "Ontology Rendering Details",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/OntologyRenderingDetails.html#ontology-rendering-details"
+                    }
+                  ]
+                },
+                {
                   "name": "Specifications.md",
                   "type": "file",
                   "link": "requirements/Interfaces/WebInterface/Specifications.html",
                   "children": [
                     {
+                      "name": "Attachment Export Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#attachment-export-refinement-specification"
+                    },
+                    {
+                      "name": "Component-Based HTML Architecture Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#component-based-html-architecture-refinement-specification"
+                    },
+                    {
+                      "name": "Containment View Attachment Links Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#containment-view-attachment-links-refinement-specification"
+                    },
+                    {
+                      "name": "CSS Framework Integration Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#css-framework-integration-refinement-specification"
+                    },
+                    {
                       "name": "D3.js Containment Tree Specification",
                       "type": "refinement",
                       "link": "requirements/Interfaces/WebInterface/Specifications.html#d3js-containment-tree-specification"
+                    },
+                    {
+                      "name": "Diagram Attachment Display Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#diagram-attachment-display-refinement-specification"
+                    },
+                    {
+                      "name": "Direct OWL Construct Projection Query Contract",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#direct-owl-construct-projection-query-contract"
                     },
                     {
                       "name": "HTML Branding Specification",
@@ -6025,6 +10270,81 @@ The containment view shows the physical organization of the model—how requirem
                       "link": "requirements/Interfaces/WebInterface/Specifications.html#html-navigation-bar-specification"
                     },
                     {
+                      "name": "Local Linked File Export Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#local-linked-file-export-refinement-specification"
+                    },
+                    {
+                      "name": "Model-Centric View Generation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#model-centric-view-generation-refinement-specification"
+                    },
+                    {
+                      "name": "Model View Element Navigation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#model-view-element-navigation-refinement-specification"
+                    },
+                    {
+                      "name": "Ontologies View Generation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#ontologies-view-generation-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Construct Grouping Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#ontology-construct-grouping-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Property-Centric Visualization Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#ontology-property-centric-visualization-refinement-specification"
+                    },
+                    {
+                      "name": "Ontology Symbol and Badge Vocabulary Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#ontology-symbol-and-badge-vocabulary-refinement-specification"
+                    },
+                    {
+                      "name": "OWL Property Metadata Projection Query Contract",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#owl-property-metadata-projection-query-contract"
+                    },
+                    {
+                      "name": "OWL Semantic Ontology Projection Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#owl-semantic-ontology-projection-refinement-specification"
+                    },
+                    {
+                      "name": "Project Knowledge Graph View Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#project-knowledge-graph-view-refinement-specification"
+                    },
+                    {
+                      "name": "RDF List OWL Construct Projection Query Contract",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#rdf-list-owl-construct-projection-query-contract"
+                    },
+                    {
+                      "name": "Responsive HTML Generation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#responsive-html-generation-refinement-specification"
+                    },
+                    {
+                      "name": "Serve Command Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#serve-command-refinement-specification"
+                    },
+                    {
+                      "name": "Type-Safe HTML Generation Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#type-safe-html-generation-refinement-specification"
+                    },
+                    {
+                      "name": "Web Interface Refinement Specification",
+                      "type": "refinement",
+                      "link": "requirements/Interfaces/WebInterface/Specifications.html#web-interface-refinement-specification"
+                    },
+                    {
                       "name": "Web Interface Style Specification",
                       "type": "refinement",
                       "link": "requirements/Interfaces/WebInterface/Specifications.html#web-interface-style-specification"
@@ -6040,15 +10360,248 @@ The containment view shows the physical organization of the model—how requirem
               "children": [
                 {
                   "name": "CLI interface",
-                  "type": "user-requirement",
+                  "type": "system-requirement",
                   "link": "requirements/Interfaces/Interfaces.html#cli-interface"
                 },
                 {
+                  "name": "MCP Interface",
+                  "type": "system-requirement",
+                  "link": "requirements/Interfaces/Interfaces.html#mcp-interface"
+                },
+                {
                   "name": "Web Interface",
-                  "type": "user-requirement",
+                  "type": "system-requirement",
                   "link": "requirements/Interfaces/Interfaces.html#web-interface"
                 }
               ]
+            }
+          ]
+        },
+        {
+          "name": "Ontologies",
+          "type": "folder",
+          "children": [
+            {
+              "name": "BehaviorValidationOperations.md",
+              "type": "file",
+              "link": "requirements/Ontologies/BehaviorValidationOperations.html",
+              "children": [
+                {
+                  "name": "Reqvire Behavior Rule Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-behavior-rule-ontology"
+                },
+                {
+                  "name": "Reqvire Formatting Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-formatting-ontology"
+                },
+                {
+                  "name": "Reqvire Linting Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-linting-ontology"
+                },
+                {
+                  "name": "Reqvire Operation Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-operation-ontology"
+                },
+                {
+                  "name": "Reqvire Validation Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/BehaviorValidationOperations.html#reqvire-validation-ontology"
+                }
+              ]
+            },
+            {
+              "name": "CapabilityRequirementModel.md",
+              "type": "file",
+              "link": "requirements/Ontologies/CapabilityRequirementModel.html",
+              "children": [
+                {
+                  "name": "Reqvire Capability Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-capability-ontology"
+                },
+                {
+                  "name": "Reqvire Requirement Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-requirement-ontology"
+                },
+                {
+                  "name": "Reqvire Semantic Contract Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Core.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Core.html",
+              "children": [
+                {
+                  "name": "Reqvire Core Element Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Governance.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Governance.html",
+              "children": [
+                {
+                  "name": "Reqvire Governance Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Governance.html#reqvire-governance-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Integration.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Integration.html",
+              "children": [
+                {
+                  "name": "Reqvire AI Assistance Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Integration.html#reqvire-ai-assistance-ontology"
+                },
+                {
+                  "name": "Reqvire Code Traceability Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Integration.html#reqvire-code-traceability-ontology"
+                },
+                {
+                  "name": "Reqvire GitHub Workflow Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Integration.html#reqvire-github-workflow-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Interfaces.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Interfaces.html",
+              "children": [
+                {
+                  "name": "Reqvire Interface Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Interfaces.html#reqvire-interface-ontology"
+                }
+              ]
+            },
+            {
+              "name": "RelationsAndImpact.md",
+              "type": "file",
+              "link": "requirements/Ontologies/RelationsAndImpact.html",
+              "children": [
+                {
+                  "name": "Reqvire Change Impact Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-change-impact-ontology"
+                },
+                {
+                  "name": "Reqvire Relation Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                }
+              ]
+            },
+            {
+              "name": "ReportsAndQuery.md",
+              "type": "file",
+              "link": "requirements/Ontologies/ReportsAndQuery.html",
+              "children": [
+                {
+                  "name": "Reqvire Report Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-report-ontology"
+                },
+                {
+                  "name": "Reqvire Semantic Export Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/ReportsAndQuery.html#reqvire-semantic-export-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Verification.md",
+              "type": "file",
+              "link": "requirements/Ontologies/Verification.html",
+              "children": [
+                {
+                  "name": "Reqvire Verification Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                },
+                {
+                  "name": "Reqvire Verification Rollup Ontology",
+                  "type": "element",
+                  "link": "requirements/Ontologies/Verification.html#reqvire-verification-rollup-ontology"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Capabilities.md",
+          "type": "file",
+          "link": "requirements/Capabilities.html",
+          "children": [
+            {
+              "name": "Defining Model Structure",
+              "type": "capability",
+              "link": "requirements/Capabilities.html#defining-model-structure",
+              "children": [
+                {
+                  "name": "Reqvire Core Element Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/Core.html#reqvire-core-element-ontology"
+                },
+                {
+                  "name": "Reqvire Capability Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-capability-ontology"
+                },
+                {
+                  "name": "Reqvire Requirement Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-requirement-ontology"
+                },
+                {
+                  "name": "Reqvire Semantic Contract Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/CapabilityRequirementModel.html#reqvire-semantic-contract-ontology"
+                },
+                {
+                  "name": "Reqvire Relation Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/RelationsAndImpact.html#reqvire-relation-ontology"
+                },
+                {
+                  "name": "Reqvire Verification Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/Verification.html#reqvire-verification-ontology"
+                },
+                {
+                  "name": "Reqvire Governance Ontology",
+                  "type": "attachment-element",
+                  "link": "requirements/Ontologies/Governance.html#reqvire-governance-ontology"
+                }
+              ]
+            },
+            {
+              "name": "Defining Model Structure Source",
+              "type": "refinement",
+              "link": "requirements/Capabilities.html#defining-model-structure-source"
+            },
+            {
+              "name": "Reqvire Core Element Ontology Shape Profile",
+              "type": "refinement",
+              "link": "requirements/Capabilities.html#reqvire-core-element-ontology-shape-profile"
             }
           ]
         },
@@ -6086,93 +10639,6 @@ The containment view shows the physical organization of the model—how requirem
               "name": "Verification Coverage Specification",
               "type": "refinement",
               "link": "requirements/Refinements.html#verification-coverage-specification"
-            }
-          ]
-        },
-        {
-          "name": "UserStories.md",
-          "type": "file",
-          "link": "requirements/UserStories.html",
-          "children": [
-            {
-              "name": "AI-Assisted System Model Management",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#ai-assisted-system-model-management"
-            },
-            {
-              "name": "Align with Industry Standards",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#align-with-industry-standards"
-            },
-            {
-              "name": "Aligning Design with Code",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#aligning-design-with-code"
-            },
-            {
-              "name": "Defining Model Structure",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#defining-model-structure"
-            },
-            {
-              "name": "Formatting Model Documents",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#formatting-model-documents"
-            },
-            {
-              "name": "Fostering Community Contributions",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#fostering-community-contributions"
-            },
-            {
-              "name": "Generate Diagrams",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#generate-diagrams"
-            },
-            {
-              "name": "Integrate with GitHub Workflows",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#integrate-with-github-workflows"
-            },
-            {
-              "name": "Linting Model Quality",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#linting-model-quality"
-            },
-            {
-              "name": "Operating on Model Elements",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#operating-on-model-elements"
-            },
-            {
-              "name": "Promote Automation and Efficiency",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#promote-automation-and-efficiency"
-            },
-            {
-              "name": "Provide Reports",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#provide-reports"
-            },
-            {
-              "name": "System Model Interfaces",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#system-model-interfaces"
-            },
-            {
-              "name": "Trace Changes in System Model",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#trace-changes-in-system-model"
-            },
-            {
-              "name": "Validating Structures",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#validating-structures"
-            },
-            {
-              "name": "Verification Traceability",
-              "type": "user-requirement",
-              "link": "requirements/UserStories.html#verification-traceability"
             }
           ]
         }

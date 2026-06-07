@@ -20,6 +20,16 @@ jobs:
       - name: Cache Cargo dependencies
         uses: Swatinem/rust-cache@v2
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: "24"
+
+      - name: Build Explorer SPA bundle
+        # core/build.rs embeds explorer/dist into the binary at compile time,
+        # so the bundle must be built before cargo build/test.
+        run: cd explorer && npm ci && npm run build
+
       - name: Run Tests
         run: cargo test --verbose
 

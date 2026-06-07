@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -368,71 +467,94 @@
       2013d4b62a0c841["Attachment Satisfied Refinement Constraint"];
       class 2013d4b62a0c841 default;
       click 2013d4b62a0c841 "Constraints.html#attachment-satisfied-refinement-constraint";
+      104588d95ae3b87b["Attachment Subgraph Direction Constraint"];
+      class 104588d95ae3b87b default;
+      click 104588d95ae3b87b "Constraints.html#attachment-subgraph-direction-constraint";
       c2c71cb34cb7b7c9["Cross-Section Duplicate Constraint"];
       class c2c71cb34cb7b7c9 default;
       click c2c71cb34cb7b7c9 "Constraints.html#cross-section-duplicate-constraint";
       c1660a11594249ca["Element Type Relation Compatibility Constraint"];
       class c1660a11594249ca default;
       click c1660a11594249ca "Constraints.html#element-type-relation-compatibility-constraint";
+      1d75992c57f0ac29["Single Root Hierarchy Ownership Constraint"];
+      class 1d75992c57f0ac29 default;
+      click 1d75992c57f0ac29 "Constraints.html#single-root-hierarchy-ownership-constraint";
     end
   end
 </div>
 <h3 id="attachment-hierarchical-independence-constraint">Attachment Hierarchical Independence Constraint</h3>
 <p>Rules for preventing attachments within the same requirement hierarchy.</p>
 <p><strong>For refinement elements:</strong>
-A refinement element can only be attached to a requirement if that requirement has NO hierarchical relationship with the requirement that defines the refinement via <code>satisfiedBy</code>:</p>
+A refinement element can only be attached to a requirement if that requirement has NO hierarchical relationship with the requirement that owns the refinement via <code>refinedBy</code>:</p>
 <ul>
-<li>Cannot attach to the requirement that has <code>satisfiedBy</code> to this refinement</li>
+<li>Cannot attach to the requirement that has <code>refinedBy</code> to this refinement</li>
 <li>Cannot attach to any parent (ancestor) of that requirement via derivedFrom chain</li>
 <li>Cannot attach to any child (descendant) of that requirement via derive chain</li>
 </ul>
-<p><strong>For file attachments (assets):</strong>
-When a file is referenced via <code>satisfiedBy</code> from a requirement (establishing ownership), the same hierarchical independence rules apply:</p>
-<ul>
-<li>Cannot attach to the requirement that owns the file via <code>satisfiedBy</code></li>
-<li>Cannot attach to any parent (ancestor) of the owner via derivedFrom chain</li>
-<li>Cannot attach to any child (descendant) of the owner via derive chain</li>
-</ul>
 <p><strong>Upstream attachment propagation:</strong>
-If an attachment (refinement or file) is already attached to an ancestor requirement in the derivation hierarchy, descendants cannot attach the same target:</p>
+If an attachment (refinement identifier) is already attached to an ancestor requirement in the derivation hierarchy, descendants cannot attach the same target:</p>
 <ul>
 <li>Attachments propagate downstream through the derivedFrom chain</li>
 <li>Re-attaching at a descendant level is redundant</li>
 <li>Only the highest-level requirement in a hierarchy branch should attach</li>
 </ul>
-<p>Only requirements in a separate branch of the hierarchy (no derivedFrom chain connecting them to the owner or existing attacher) may attach the refinement or file.</p>
-<p><strong>Rationale</strong>: Attachments enable cross-submodel traceability while maintaining stakeholder separation. Attachments within the same hierarchy are redundant since traceability already flows through the satisfiedBy relationship and propagates to derived requirements.</p>
+<p>Only requirements in a separate branch of the hierarchy (no derivedFrom chain connecting them to the owner or existing attacher) may attach the refinement.</p>
+<p><strong>Rationale</strong>: Attachments enable cross-submodel traceability while maintaining stakeholder separation. Attachments within the same hierarchy are redundant since traceability already flows through the refinedBy relationship and propagates to derived requirements.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: constraint</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ModelManagement.html#attachment-scope-constraints">Attachment Scope Constraints</a></li>
+<li>refine: <a href="ModelManagement.html#attachment-scope-constraints">Attachment Scope Constraints</a></li>
 </ul>
 <hr />
 <h3 id="attachment-satisfied-refinement-constraint">Attachment Satisfied Refinement Constraint</h3>
-<p>Rules requiring refinements to have satisfy relations before being attachable.</p>
-<p>A refinement element can only be attached to requirements if:</p>
+<p>Rules requiring attachment targets to have compatible ownership before being attachable.</p>
+<p>An attachment target is valid only when it matches the attaching element family:</p>
 <ul>
-<li>The refinement has at least one <code>satisfy</code> relation to a requirement</li>
-<li>Refinements without satisfy relations cannot be attached anywhere</li>
+<li>Capability attachments target ontology elements only.</li>
+<li>Requirements must not attach ontology directly.</li>
+<li>Requirement attachments target requirement-owned refinements only: <code>semantic-contract</code>, <code>semantic-query-contract</code>, <code>constraint</code>, <code>behavior</code>, <code>specification</code>, <code>state</code>, or <code>input-output</code>.</li>
+<li>Requirement-owned refinements must have a <code>refine</code> relation to exactly one compatible requirement owner before they can be attached.</li>
+<li>Capabilities must not own refinements; invalid capability refinement ownership edges are not cross-subgraph attachment contracts.</li>
+<li>Refinements without a valid <code>refine</code> relation cannot be attached anywhere.</li>
 </ul>
-<p><strong>Rationale</strong>: Enforces model hygiene by ensuring refinements are properly integrated into the model through explicit satisfaction relationships before being referenced elsewhere.</p>
+<p>Attachment compatibility is defined by the Reqvire relation, capability, requirement, ontology, semantic-contract, and semantic-query-contract model contracts.</p>
+<p><strong>Rationale</strong>: Enforces model hygiene by making capability-level ontology context the single vocabulary inheritance path, while ensuring reusable requirement contracts are owned by exactly one requirement before being referenced elsewhere.</p>
 <h4>Metadata</h4>
 <ul>
 <li>type: constraint</li>
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ModelManagement.html#attachment-scope-constraints">Attachment Scope Constraints</a></li>
+<li>refine: <a href="ModelManagement.html#attachment-scope-constraints">Attachment Scope Constraints</a></li>
+</ul>
+<hr />
+<h3 id="attachment-subgraph-direction-constraint">Attachment Subgraph Direction Constraint</h3>
+<p>Rules for keeping cross-subgraph attachment contracts one-directional.</p>
+<h4>Details</h4>
+<p>For cross-subgraph refinement attachments, flow is defined from the attaching element’s capability-root hierarchy to the defining owner’s capability-root hierarchy.</p>
+<p><strong>One-direction invariant:</strong></p>
+<ul>
+<li>If subgraph <code>A</code> attaches a refinement owned by subgraph <code>B</code>, then subgraph <code>B</code> must not attach refinements owned by subgraph <code>A</code></li>
+<li>This rule applies at the capability-root hierarchy level, not only to directly involved requirements or capabilities</li>
+</ul>
+<p><strong>Rationale</strong>: Attachment contracts are used to model waterfall-style dependency flow between subgraphs. Allowing reverse attachment flow between the same two subgraphs breaks boundary directionality and undermines attachment contracts as one-way dependency edges.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: constraint</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="ModelManagement.html#attachment-scope-constraints">Attachment Scope Constraints</a></li>
 </ul>
 <hr />
 <h3 id="cross-section-duplicate-constraint">Cross-Section Duplicate Constraint</h3>
 <p>Rules for detecting duplicate link targets across subsections.</p>
 <p><strong>Cross-section duplicates</strong> (same target in BOTH Relations AND Attachments):</p>
 <ul>
-<li>Applies to all target types: element identifiers AND file paths</li>
+<li>Applies to identifier targets</li>
 <li>Treated as semantic errors requiring user resolution</li>
 <li>The validate command fails with error</li>
 <li>The format command does not auto-fix (user must decide which section to keep)</li>
@@ -449,25 +571,20 @@ If an attachment (refinement or file) is already attached to an ancestor require
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="Validation.html#cross-section-duplicate-validation">Cross-Section Duplicate Validation</a></li>
+<li>refine: <a href="Validation.html#cross-section-duplicate-validation">Cross-Section Duplicate Validation</a></li>
 </ul>
 <hr />
 <h3 id="element-type-relation-compatibility-constraint">Element Type Relation Compatibility Constraint</h3>
 <p>Validation rules for element type and relation type combinations.</p>
 <h4>Details</h4>
-<p><strong>Relation Type Restrictions:</strong></p>
-<table><thead><tr><th>Relation Type</th><th>Allowed Source Types</th><th>Allowed Target Types</th></tr></thead><tbody>
-<tr><td>derivedFrom/derive</td><td>requirement, user-requirement</td><td>requirement, user-requirement</td></tr>
-<tr><td>satisfiedBy/satisfy</td><td>requirement, user-requirement, test-verification, refinement types</td><td>InternalPath, refinement types</td></tr>
-<tr><td>verifiedBy/verify</td><td>requirement, user-requirement</td><td>All verification types</td></tr>
-<tr><td>trace</td><td>Any (except refinement types)</td><td>Any</td></tr>
-</tbody></table>
-<p><strong>Key Constraints:</strong></p>
+<p>Canonical relation compatibility is defined by the Reqvire relation ontology, core element type vocabulary, capability/requirement refinement vocabulary, and verification type vocabulary.</p>
+<p>Validation shall enforce those model contracts so that:</p>
 <ul>
-<li>derivedFrom/derive restricted to requirement types only</li>
-<li>Refinement types (constraint, behavior, specification) can only have <code>satisfy</code> relations</li>
-<li>Only test-verification can use satisfiedBy among verification types</li>
-<li>Elements with type “other” can only use trace relations</li>
+<li>hierarchy relations stay within capability, requirement, or ontology hierarchy families</li>
+<li><code>specify</code>/<code>specifiedBy</code> is the requirement-to-capability bridge</li>
+<li><code>refine</code>/<code>refinedBy</code> is limited to requirement-owned subordinate refinement details and contracts</li>
+<li><code>satisfiedBy</code>/<code>satisfy</code> is limited to requirement and evidence-backed verification satisfaction</li>
+<li><code>trace</code> remains trace-only for custom element types</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -475,7 +592,28 @@ If an attachment (refinement or file) is already attached to an ancestor require
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
+<li>refine: <a href="ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
+</ul>
+<hr />
+<h3 id="single-root-hierarchy-ownership-constraint">Single Root Hierarchy Ownership Constraint</h3>
+<p>Rules for ensuring each requirement hierarchy belongs to exactly one capability root.</p>
+<h4>Details</h4>
+<ul>
+<li>Capability hierarchy is defined by <code>derivedFrom</code>/<code>derive</code> between capability elements.</li>
+<li>Requirement hierarchy is defined by <code>derivedFrom</code>/<code>derive</code> between requirement elements.</li>
+<li>A top-level requirement must connect to its owning capability through <code>specify</code>/<code>specifiedBy</code>.</li>
+<li>Every requirement hierarchy element shall resolve to exactly one capability root by traversing requirement parents and then the owning capability hierarchy.</li>
+<li>Resolution count <code>0</code> is invalid (orphaned hierarchy from capability-root ownership perspective).</li>
+<li>Resolution count <code>&gt;1</code> is invalid (ambiguous multi-root ownership).</li>
+</ul>
+<p>This rule is a structural model invariant and shall be enforced as validation, not lint.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: constraint</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Validation.html#single-root-hierarchy-ownership">Single Root Hierarchy Ownership</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -524,7 +662,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -533,10 +672,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -549,7 +691,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -567,6 +709,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -959,9 +1106,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

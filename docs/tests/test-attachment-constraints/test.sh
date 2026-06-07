@@ -7,17 +7,18 @@ set -uo pipefail
 #   - requirements/Functional/Core/Verifications/AttachmentsVerifications.md#attachment-scope-constraints-test
 #
 # Acceptance Criteria:
-# - Orphan refinement (no satisfy relations) attachment causes validation to fail
-# - Defining requirement (has satisfiedBy) cannot also attach the refinement
+# - Orphan refinement (no refine relations) attachment causes validation to fail
+# - Defining requirement (has refinedBy) cannot also attach the refinement
 # - Descendant of defining requirement cannot attach the refinement
 # - Ancestor of defining requirement cannot attach the refinement
+# - Cross-subgraph attachment flow is one-directional at capability-root hierarchy level
 # - Requirements in separate hierarchies can attach the refinement
 # - Link command enforces same constraints
 #
 # Test Model Structure:
 #
-# Spec-1 satisfies User Req A:
-#   User Req A (defining requirement - has satisfiedBy: Spec-1)
+# Spec-1 refines User Req A:
+#   User Req A (defining requirement - has refinedBy: Spec-1)
 #   ├── Req B (child - cannot attach Spec-1)
 #   │   └── Req C (grandchild - cannot attach Spec-1)
 #   │       └── Req C1 (great-grandchild - cannot attach Spec-1)
@@ -26,10 +27,14 @@ set -uo pipefail
 #   User Req X (separate branch - CAN attach Spec-1) ✓
 #   User Req Y → Req Y1 (separate branch - CAN attach Spec-1) ✓
 #
-# Spec-2 satisfies Child With Refinement:
+# Spec-2 refines Child With Refinement:
 #   Ancestor Req (ANCESTOR - cannot attach Spec-2)
-#   └── Child With Refinement (defining - has satisfiedBy: Spec-2)
+#   └── Child With Refinement (defining - has refinedBy: Spec-2)
 #       └── Grandchild Req (descendant - cannot attach Spec-2)
+#
+# Directionality case:
+#   User Req X attaches Spec-1 owned by User Req A hierarchy
+#   => User Req X hierarchy must not receive attachments to refinements it defines from User Req A hierarchy
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -66,7 +71,7 @@ fi
 # ==================================
 # Test 2: Orphan Refinement Attachment Fails
 # ==================================
-# Add attachment to orphan refinement (no satisfy relations)
+# Add attachment to orphan refinement (no refine relations)
 
 cat > "$TEST_DIR/specifications/TestOrphanAttachment.md" <<'EOF'
 # Elements
@@ -76,10 +81,13 @@ cat > "$TEST_DIR/specifications/TestOrphanAttachment.md" <<'EOF'
 A requirement that tries to attach an orphan refinement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Attachments
   * [Orphan-Spec](Refinements.md#orphan-spec)
+
+#### Relations
+  * specify: [User Req X Capability](Requirements.md#user-req-x-capability)
 ---
 
 EOF
@@ -104,25 +112,26 @@ assert_output_matches "${TEST_SCRIPT_DIR}/expected/orphan-attachment-error.txt" 
 rm -f "$TEST_DIR/specifications/TestOrphanAttachment.md"
 
 # ==================================
-# Test 3: Defining Requirement Attachment Fails (same as satisfiedBy)
+# Test 3: Defining Requirement Attachment Fails (same as refinedBy)
 # ==================================
-# User Req A has satisfiedBy: Spec-1, so it cannot ALSO attach Spec-1
+# User Req A has refinedBy: Spec-1, so it cannot ALSO attach Spec-1
 
 cat > "$TEST_DIR/specifications/TestDefiningAttachment.md" <<'EOF'
 # Elements
 
 ### User Req A With Attachment
 
-User requirement that has satisfiedBy AND attachment to same refinement.
+User requirement that has refinedBy AND attachment to same refinement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Attachments
   * [Spec-1](Refinements.md#spec-1)
 
 #### Relations
-  * satisfiedBy: [Spec-1](Refinements.md#spec-1)
+  * specify: [User Req A Capability](Requirements.md#user-req-a-capability)
+  * refinedBy: [Spec-1](Refinements.md#spec-1)
 ---
 
 EOF
@@ -242,12 +251,13 @@ cat > "$TEST_DIR/specifications/TestAncestorAttachment.md" <<'EOF'
 Ancestor of defining requirement tries to attach the refinement.
 
 #### Metadata
-  * type: user-requirement
+  * type: requirement
 
 #### Attachments
   * [Spec-2](Refinements.md#spec-2)
 
 #### Relations
+  * specify: [Ancestor Req Capability](Requirements.md#ancestor-req-capability)
   * derive: [Ancestor Req](Requirements.md#ancestor-req)
 ---
 
@@ -272,11 +282,113 @@ assert_output_matches "${TEST_SCRIPT_DIR}/expected/ancestor-attachment-error.txt
 rm -f "$TEST_DIR/specifications/TestAncestorAttachment.md"
 
 # ==================================
-# Test 7: Link Command Enforces Orphan Constraint
+# Test 7: Reverse Direction Attachment Fails
+# ==================================
+
+cat > "$TEST_DIR/specifications/TestReverseDirectionAttachment.md" <<'EOF'
+# Elements
+
+### Req D Reverse Flow Attachment
+
+Requirement in User Req A hierarchy tries to attach a refinement owned by User Req X.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Spec-X](Refinements.md#spec-x)
+
+#### Relations
+  * derivedFrom: [Req D](Requirements.md#req-d)
+---
+
+EOF
+
+set +e
+REVERSE_DIRECTION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" validate 2>&1)
+REVERSE_DIRECTION_EXIT=$?
+set -e
+
+if [ $REVERSE_DIRECTION_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Validation should fail for reverse-direction subgraph attachment flow"
+  exit 1
+fi
+
+SANITIZED_REVERSE_DIRECTION=$(echo "$REVERSE_DIRECTION_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g')
+
+assert_output_matches "${TEST_SCRIPT_DIR}/expected/reverse-direction-attachment-error.txt" \
+  "$SANITIZED_REVERSE_DIRECTION" \
+  "Reverse-direction attachment error message does not match expected"
+
+rm -f "$TEST_DIR/specifications/TestReverseDirectionAttachment.md"
+
+# ==================================
+# Test 8: Link Command Enforces Direction Constraint
 # ==================================
 
 set +e
-LINK_ORPHAN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "User Req X" attaching "Orphan-Spec" 2>&1)
+LINK_DIRECTION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Req D" attaching "Refinements.md#spec-x" 2>&1)
+LINK_DIRECTION_EXIT=$?
+set -e
+
+if [ $LINK_DIRECTION_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Link command should fail for reverse-direction subgraph attachment"
+  exit 1
+fi
+
+SANITIZED_LINK_DIRECTION=$(echo "$LINK_DIRECTION_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g' | sed 's|\[.*ERROR reqvire\] |error: |g')
+
+assert_output_matches "${TEST_SCRIPT_DIR}/expected/link-direction-error.txt" \
+  "$SANITIZED_LINK_DIRECTION" \
+  "Link direction constraint error message does not match expected"
+
+# ==================================
+# Test 9: Merge Command Enforces Direction Constraint
+# ==================================
+
+cat > "$TEST_DIR/specifications/TestMergeDirection.md" <<'EOF'
+# Elements
+
+### Merge Direction Source
+
+Source element with attachment to Spec-X.
+
+#### Metadata
+  * type: requirement
+
+#### Attachments
+  * [Spec-X](Refinements.md#spec-x)
+
+#### Relations
+  * derivedFrom: [User Req Y](Requirements.md#user-req-y)
+---
+
+EOF
+
+set +e
+MERGE_DIRECTION_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" merge "Req D" "Merge Direction Source" 2>&1)
+MERGE_DIRECTION_EXIT=$?
+set -e
+
+if [ $MERGE_DIRECTION_EXIT -eq 0 ]; then
+  echo "❌ FAILED: Merge command should fail when merged attachment would reverse subgraph flow"
+  exit 1
+fi
+
+SANITIZED_MERGE_DIRECTION=$(echo "$MERGE_DIRECTION_OUTPUT" | sed "s|${TEST_DIR}/||g" | sed 's|/tmp/reqvire-test-[^/]*/||g' | sed 's|\[.*ERROR reqvire\] |error: |g')
+
+assert_output_matches "${TEST_SCRIPT_DIR}/expected/merge-direction-error.txt" \
+  "$SANITIZED_MERGE_DIRECTION" \
+  "Merge direction constraint error message does not match expected"
+
+rm -f "$TEST_DIR/specifications/TestMergeDirection.md"
+
+# ==================================
+# Test 10: Link Command Enforces Orphan Constraint
+# ==================================
+
+set +e
+LINK_ORPHAN_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "User Req X" attaching "Refinements.md#orphan-spec" 2>&1)
 LINK_ORPHAN_EXIT=$?
 set -e
 
@@ -292,11 +404,11 @@ assert_output_matches "${TEST_SCRIPT_DIR}/expected/link-orphan-error.txt" \
   "Link orphan refinement error message does not match expected"
 
 # ==================================
-# Test 8: Link Command Enforces Hierarchy Constraint
+# Test 11: Link Command Enforces Hierarchy Constraint
 # ==================================
 
 set +e
-LINK_HIERARCHY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Req B" attaching "Spec-1" 2>&1)
+LINK_HIERARCHY_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" link "Req B" attaching "Refinements.md#spec-1" 2>&1)
 LINK_HIERARCHY_EXIT=$?
 set -e
 
@@ -312,7 +424,7 @@ assert_output_matches "${TEST_SCRIPT_DIR}/expected/link-hierarchy-error.txt" \
   "Link same hierarchy error message does not match expected"
 
 # ==================================
-# Test 9: Merge Command Enforces Hierarchy Constraint
+# Test 12: Merge Command Enforces Hierarchy Constraint
 # ==================================
 # Create a source element with attachment that would violate hierarchy for target
 
@@ -354,7 +466,7 @@ assert_output_matches "${TEST_SCRIPT_DIR}/expected/merge-hierarchy-error.txt" \
 rm -f "$TEST_DIR/specifications/TestMergeSource.md"
 
 # ==================================
-# Test 10: Merge Command Enforces Orphan Constraint
+# Test 13: Merge Command Enforces Orphan Constraint
 # ==================================
 # Create a source element with attachment to orphan refinement
 

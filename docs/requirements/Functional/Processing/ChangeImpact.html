@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../traceflow.html" class="nav-link">TraceFlow</a><a href="../../../coverage.html" class="nav-link">Coverage</a><a href="../../../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../../../index.html" class="mobile-nav-link">Containment</a><a href="../../../model.html" class="mobile-nav-link">Model</a><a href="../../../traces.html" class="mobile-nav-link">Traces</a><a href="../../../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../../../coverage.html" class="mobile-nav-link">Coverage</a><a href="../../../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -372,16 +471,31 @@
       a27cb4ff2637ed4a["Change Impact Detection"];
       class a27cb4ff2637ed4a systemRequirement;
       click a27cb4ff2637ed4a "ChangeImpact.html#change-impact-detection";
-      1868da177a2e8ffd["Requirements Change Propagation<br/>📎 ChangePropagation.md"];
+      1868da177a2e8ffd["Requirements Change Propagation"];
       class 1868da177a2e8ffd systemRequirement;
       click 1868da177a2e8ffd "ChangeImpact.html#requirements-change-propagation";
       27ee21b54c142739["Structural Change Analyzer"];
       class 27ee21b54c142739 systemRequirement;
       click 27ee21b54c142739 "ChangeImpact.html#structural-change-analyzer";
     end
+    subgraph 1fca82108d7bd4a6["📄 Specifications.md"]
+      36a78e8abf126164["Impact Scope Computation Specification"];
+      class 36a78e8abf126164 default;
+      click 36a78e8abf126164 "Specifications.html#impact-scope-computation-specification";
+    end
+  end
+  subgraph b9d5b6213cd54cdf["📁 requirements/Functional/Processing/DesignDocuments"]
+    subgraph 31a1ae4987582495["📄 ChangePropagation.md"]
+      c9e468a3ca948863["ChangePropagation"];
+      class c9e468a3ca948863 default;
+      click c9e468a3ca948863 "DesignDocuments/ChangePropagation.html#changepropagation";
+    end
   end
   subgraph 11bcfbac66c238f6["📁 requirements/Functional/Processing/Verifications"]
     subgraph de803263fbe70715["📄 ChangeImpactVerifications.md"]
+      1671dffae8c8b861["Capability Ontology and Semantic Contract Change Impact Test"];
+      class 1671dffae8c8b861 verification;
+      click 1671dffae8c8b861 "Verifications/ChangeImpactVerifications.html#capability-ontology-and-semantic-contract-change-impact-test";
       dc9eb3da0c5e0ed0["Change Impact Detection Test"];
       class dc9eb3da0c5e0ed0 verification;
       click dc9eb3da0c5e0ed0 "Verifications/ChangeImpactVerifications.html#change-impact-detection-test";
@@ -394,16 +508,24 @@
       d7a45cebd272c16["Element Content Extraction Test"];
       class d7a45cebd272c16 verification;
       click d7a45cebd272c16 "Verifications/ChangeImpactVerifications.html#element-content-extraction-test";
+      5cb5ec4aa9b53fba["Impact Scope Summary Test"];
+      class 5cb5ec4aa9b53fba verification;
+      click 5cb5ec4aa9b53fba "Verifications/ChangeImpactVerifications.html#impact-scope-summary-test";
     end
   end
   a27cb4ff2637ed4a -.->|deriveReqT| 1868da177a2e8ffd;
   a27cb4ff2637ed4a -.->|deriveReqT| 27ee21b54c142739;
+  a27cb4ff2637ed4a -->|refinedBy| 36a78e8abf126164;
   4391424e97bc407a["change_impact.rs"];
   class 4391424e97bc407a default;
   click 4391424e97bc407a "../../../core/src/change_impact.rs";
   a27cb4ff2637ed4a -->|satisfiedBy| 4391424e97bc407a;
   a27cb4ff2637ed4a -.->|verifiedBy| 3758f5f1c504cd42;
+  a27cb4ff2637ed4a -.->|verifiedBy| 1671dffae8c8b861;
+  a27cb4ff2637ed4a -.->|verifiedBy| 5cb5ec4aa9b53fba;
+  1868da177a2e8ffd -->|refinedBy| c9e468a3ca948863;
   1868da177a2e8ffd -->|satisfiedBy| 4391424e97bc407a;
+  1868da177a2e8ffd -.->|verifiedBy| 1671dffae8c8b861;
   1868da177a2e8ffd -.->|verifiedBy| dc9eb3da0c5e0ed0;
   1868da177a2e8ffd -.->|verifiedBy| b5f861c2be8eddab;
   1868da177a2e8ffd -.->|verifiedBy| 1b778e17c237657e;
@@ -413,6 +535,14 @@
   class 4225cde0908b7474 default;
   click 4225cde0908b7474 "../../../tests/test-change-impact-attachments/test.sh";
   3758f5f1c504cd42 -->|satisfiedBy| 4225cde0908b7474;
+  77217e653434e208["test.sh"];
+  class 77217e653434e208 default;
+  click 77217e653434e208 "../../../tests/test-capability-change-impact/test.sh";
+  1671dffae8c8b861 -->|satisfiedBy| 77217e653434e208;
+  75112a0d3a13caae["test.sh"];
+  class 75112a0d3a13caae default;
+  click 75112a0d3a13caae "../../../tests/test-change-impact-scope/test.sh";
+  5cb5ec4aa9b53fba -->|satisfiedBy| 75112a0d3a13caae;
   c2377a15dab54ba5["test.sh"];
   class c2377a15dab54ba5 default;
   click c2377a15dab54ba5 "../../../tests/test-change-impact-detection/test.sh";
@@ -439,7 +569,9 @@
 <li><strong>Detection</strong>: Identify what changed (content, additions, removals, relocations)</li>
 <li><strong>Propagation</strong>: Determine how changes flow through model relationships</li>
 <li><strong>Reporting</strong>: Present change analysis results to users</li>
+<li><strong>Impact Scope</strong>: Compute the minimal set of common parent requirements covering all impacted elements</li>
 </ol>
+<p>When generating a change impact report, the system shall compute and display the per-branch lowest common ancestors of all impacted, added, and deleted requirements through the derivedFrom hierarchy, providing reviewers with a summary of affected model areas.</p>
 <p><strong>Refinement Element Changes:</strong></p>
 <ul>
 <li>Refinement element content changes (hash changes) shall propagate change impact through the model via their attachment relationships</li>
@@ -453,10 +585,12 @@
 <ul>
 <li>derive: <a href="#requirements-change-propagation">Requirements Change Propagation</a></li>
 <li>derive: <a href="#structural-change-analyzer">Structural Change Analyzer</a></li>
-<li>derivedFrom: <a href="../Core/StructureAndParsing.html#element-identity-model">Element Identity Model</a></li>
 <li>derivedFrom: <a href="../Output/Reporting.html#tracing-structural-changes">Tracing Structural Changes</a></li>
+<li>refinedBy: <a href="Specifications.html#impact-scope-computation-specification">Impact Scope Computation Specification</a></li>
 <li>satisfiedBy: <a href="../../../core/src/change_impact.rs">change_impact.rs</a></li>
 <li>verifiedBy: <a href="../Core/Verifications/AttachmentsVerifications.html#attachments-change-impact-verification">Attachments Change Impact Verification</a></li>
+<li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#capability-ontology-and-semantic-contract-change-impact-test">Capability Ontology and Semantic Contract Change Impact Test</a></li>
+<li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#impact-scope-summary-test">Impact Scope Summary Test</a></li>
 </ul>
 <hr />
 <h3 id="requirements-change-propagation">Requirements Change Propagation</h3>
@@ -465,14 +599,12 @@
 <ul>
 <li>type: requirement</li>
 </ul>
-<h4>Attachments</h4>
-<ul>
-<li><a href="DesignDocuments/ChangePropagation.html">ChangePropagation.html</a></li>
-</ul>
 <h4>Relations</h4>
 <ul>
 <li>derivedFrom: <a href="#change-impact-detection">Change Impact Detection</a></li>
+<li>refinedBy: <a href="DesignDocuments/ChangePropagation.html#changepropagation">ChangePropagation</a></li>
 <li>satisfiedBy: <a href="../../../core/src/change_impact.rs">change_impact.rs</a></li>
+<li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#capability-ontology-and-semantic-contract-change-impact-test">Capability Ontology and Semantic Contract Change Impact Test</a></li>
 <li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#change-impact-detection-test">Change Impact Detection Test</a></li>
 <li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#change-impact-relations-test">Change Impact Relations Test</a></li>
 <li>verifiedBy: <a href="Verifications/ChangeImpactVerifications.html#change-impact-smart-filtering-test">Change Impact Smart Filtering Test</a></li>
@@ -537,7 +669,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -546,10 +679,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -562,7 +698,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -580,6 +716,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -972,9 +1113,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

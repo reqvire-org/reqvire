@@ -1,0 +1,1907 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Specifications</title><link rel="icon" type="image/x-icon" href="../../../assets/favicon.ico"><link rel="apple-touch-icon" href="../../../assets/apple-touch-icon.png"><script src="https://cdn.tailwindcss.com"></script><style>
+                :root {
+                    /* Primary Colors - MONO theme */
+                    --color-nav: #1c1c1c;
+                    --color-nav-hover: #2a2a2a;
+                    --color-primary: #333333;
+                    --color-primary-hover: #4a4a4a;
+                    --color-primary-active: #2a2a2a;
+
+                    /* Element Type Colors */
+                    --color-requirement: #4a4a4a;
+                    --color-verification: #5a5a5a;
+                    --color-other: #8a8a8a;
+
+                    /* Status Colors - grayscale with subtle distinction */
+                    --color-verified: #6a6a6a;
+                    --color-pending: #9a9a9a;
+                    --color-error: #4a4a4a;
+
+                    /* Interactive Colors */
+                    --color-highlight: #d0d0d0;
+                    --color-link: #4a4a4a;
+                    --color-link-hover: #2a2a2a;
+
+                    /* Text Colors */
+                    --color-text-primary: #212121;
+                    --color-text-secondary: #424242;
+                    --color-text-muted: #757575;
+                    --color-background: #ececea;
+                    --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
+                }
+
+                /* Ensure body takes full height */
+                body {
+                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+                    line-height: 1.6;
+                    margin: 0;
+                    padding: 0;
+                    background-color: var(--color-background);
+                    color: var(--color-text-secondary);
+                }
+
+                /* Navigation bar */
+                .reqvire-nav {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 50px;
+                    background-color: var(--color-nav);
+                    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                    z-index: 1000;
+                    display: flex;
+                    align-items: center;
+                    padding: 0 20px;
+                }
+
+                .reqvire-nav a {
+                    color: white;
+                    text-decoration: none;
+                    padding: 0 15px;
+                    font-weight: 500;
+                    transition: background-color 0.2s;
+                }
+
+                .reqvire-nav a:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: none;
+                }
+
+                .nav-logo {
+                    margin-right: 16px;
+                }
+
+                .nav-logo:hover {
+                    background-color: transparent !important;
+                    text-decoration: none !important;
+                }
+
+                .nav-logo img {
+                    height: 24px;
+                    width: auto;
+                    vertical-align: middle;
+                }
+
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
+                .nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 7px 10px;
+                    margin-right: 0;
+                    border-radius: 3px;
+                    font-size: 14px;
+                    transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
+                }
+
+                .nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .nav-link:active {
+                    background-color: var(--color-nav-hover);
+                    text-decoration: underline;
+                    color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
+                }
+
+                .mobile-nav-link {
+                    color: white;
+                    text-decoration: none;
+                    padding: 12px 20px;
+                    display: block;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: background-color 0.2s;
+                }
+
+                .mobile-nav-link:hover {
+                    background-color: var(--color-nav-hover);
+                    color: white;
+                }
+
+                .reqvire-nav-spacer {
+                    height: 50px;
+                }
+
+                /* Content container */
+                .container {
+                    max-width: 1200px;
+                    margin: 0 auto;
+                    padding: 20px;
+                }
+
+                .content {
+                    background-color: white;
+                    padding: 30px;
+                    border-radius: 4px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
+                }
+
+                /* Content area typography and styling - matches old template exactly */
+                /* Use higher specificity to override Tailwind reset */
+                .bg-white h1, .content h1, h1 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 2px solid #EEEEEE !important;
+                    padding-bottom: 10px !important;
+                    margin-top: 0 !important;
+                    font-size: 2em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h2, .content h2, h2 {
+                    color: var(--color-text-primary) !important;
+                    border-bottom: 1px solid #EEEEEE !important;
+                    padding-bottom: 5px !important;
+                    font-size: 1.5em !important;
+                    font-weight: bold !important;
+                    margin-top: 20px !important;
+                }
+
+                .bg-white h3, .content h3, h3 {
+                    color: var(--color-text-primary) !important;
+                    margin-top: 25px !important;
+                    font-size: 1.17em !important;
+                    font-weight: bold !important;
+                }
+
+                .bg-white h4, .content h4, h4 {
+                    color: var(--color-text-secondary) !important;
+                    font-weight: 600 !important;
+                    font-size: 1em !important;
+                    margin-top: 15px !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                .content a:not(.nav-link):not(.mobile-nav-link):not(.text-indigo-700),
+                div.bg-white > a {
+                    color: var(--color-primary) !important;
+                    text-decoration: none !important;
+                    font-weight: 500 !important;
+                    transition: text-decoration 0.15s ease !important;
+                }
+
+                .bg-white a:not(.nav-link):not(.mobile-nav-link):hover,
+                .content a:not(.nav-link):not(.mobile-nav-link):hover {
+                    text-decoration: underline !important;
+                }
+
+                .bg-white a:focus, .content a:focus {
+                    outline: 2px solid var(--color-primary);
+                    outline-offset: 2px;
+                }
+
+                .bg-white table, .content table, table {
+                    border-collapse: collapse !important;
+                    width: 100% !important;
+                    margin: 20px 0 !important;
+                }
+
+                .bg-white table, .bg-white th, .bg-white td,
+                .content table, .content th, .content td {
+                    border: 1px solid #EEEEEE !important;
+                }
+
+                .bg-white th, .bg-white td,
+                .content th, .content td {
+                    padding: 8px 12px !important;
+                    text-align: left !important;
+                }
+
+                .bg-white th, .content th {
+                    background-color: #F5F5F5 !important;
+                    color: #212121 !important;
+                    font-weight: 600 !important;
+                }
+
+                .bg-white tr:hover td, .content tr:hover td {
+                    background-color: #FFF8E1 !important;
+                }
+
+                .bg-white code, .content code, code {
+                    background: #f6f8fa !important;
+                    padding: 2px 4px !important;
+                    border-radius: 3px !important;
+                    font-family: SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace !important;
+                    font-size: 90% !important;
+                }
+
+                .bg-white pre, .content pre, pre {
+                    background: #f6f8fa !important;
+                    border-radius: 3px !important;
+                    padding: 16px !important;
+                    overflow: auto !important;
+                }
+
+                .bg-white pre code, .content pre code {
+                    background: transparent !important;
+                    padding: 0 !important;
+                }
+
+                .bg-white blockquote, .content blockquote, blockquote {
+                    margin: 0 !important;
+                    padding: 0 15px !important;
+                    color: var(--color-text-muted) !important;
+                    border-left: 4px solid var(--color-primary) !important;
+                }
+
+                .bg-white p, .content p {
+                    margin: 10px 0 !important;
+                    line-height: 1.6 !important;
+                }
+
+                .bg-white ul, .content ul,
+                .bg-white ol, .content ol {
+                    margin: 10px 0 !important;
+                    padding-left: 30px !important;
+                }
+
+                .bg-white li, .content li {
+                    margin: 5px 0 !important;
+                }
+
+                /* Custom Mermaid diagram styles - matches old template */
+                .mermaid {
+                    margin: 20px 0;
+                    text-align: center;
+                    height: auto;
+                    min-height: 280px;
+                    width: 100%;
+                    overflow: hidden;
+                    position: relative;
+                    border: 1px solid #EEEEEE;
+                    border-radius: 3px;
+                    background-color: #FAFAFA;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: center;
+                    /* Hide raw markdown text until rendered */
+                    color: transparent;
+                }
+
+                .mermaid svg {
+                    /* Show rendered diagram */
+                    color: initial;
+                }
+
+                .mermaid svg {
+                    width: 100%;
+                    height: 100%;
+                    max-width: 100%;
+                    max-height: 100%;
+                    position: relative;
+                    z-index: 1;
+                }
+
+                /* Diagram navigation buttons */
+                .diagram-nav-buttons {
+                    position: absolute;
+                    top: 5px;
+                    left: 5px;
+                    z-index: 999;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2px;
+                    background-color: rgba(255, 255, 255, 0.85);
+                    padding: 3px;
+                    border-radius: 3px;
+                    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+                }
+
+                .diagram-nav-row {
+                    display: flex;
+                    gap: 2px;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn {
+                    width: 22px;
+                    height: 22px;
+                    background-color: var(--color-primary);
+                    color: white;
+                    border: none;
+                    border-radius: 2px;
+                    cursor: pointer;
+                    font-size: 11px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                .diagram-nav-btn:hover {
+                    background-color: var(--color-primary-hover);
+                }
+
+                .diagram-nav-btn:active {
+                    background-color: var(--color-primary-active);
+                }
+
+                /* Smooth transitions for interactive elements */
+                a, button {
+                    transition: all 0.2s ease-in-out;
+                }
+
+                /* Responsive typography */
+                @media (max-width: 640px) {
+                    h1 { font-size: 1.5rem; }
+                    h2 { font-size: 1.25rem; }
+                    h3 { font-size: 1.125rem; }
+                }
+
+                /* Print styles */
+                @media print {
+                    nav, .no-print { display: none; }
+                }
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../../../index.html" class="nav-logo flex items-center pr-4"><img src="../../../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../../../index.html" class="nav-link">Containment</a><a href="../../../model.html" class="nav-link">Model</a><a href="../../../traces.html" class="nav-link">Traces</a><a href="../../../ontologies.html" class="nav-link">Ontologies</a><a href="../../../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../../../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+<div class="mermaid">graph TD;
+  %% REQVIRE-AUTOGENERATED-DIAGRAM
+  %% Graph styling
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
+  classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
+  classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
+  classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
+  classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
+  classDef default fill:#F5F5F5,stroke:#424242,stroke-width:1.5px;
+
+  subgraph cfe1eea0278796bc["📁 requirements/Interfaces/CLI"]
+    subgraph 48eada14a147409e["📄 Specifications.md"]
+      7d39cbeb78007adf["CLI Add Element Command Refinement Specification"];
+      class 7d39cbeb78007adf default;
+      click 7d39cbeb78007adf "Specifications.html#cli-add-element-command-refinement-specification";
+      563b689d0d348544["CLI Collect Command Refinement Specification"];
+      class 563b689d0d348544 default;
+      click 563b689d0d348544 "Specifications.html#cli-collect-command-refinement-specification";
+      5f1d7777a2e84761["CLI Coverage Command Refinement Specification"];
+      class 5f1d7777a2e84761 default;
+      click 5f1d7777a2e84761 "Specifications.html#cli-coverage-command-refinement-specification";
+      2189ddc3b8d04a16["CLI Interface Structure Refinement Specification"];
+      class 2189ddc3b8d04a16 default;
+      click 2189ddc3b8d04a16 "Specifications.html#cli-interface-structure-refinement-specification";
+      360c2818a449d8e["CLI JSON File Output Option Refinement Specification"];
+      class 360c2818a449d8e default;
+      click 360c2818a449d8e "Specifications.html#cli-json-file-output-option-refinement-specification";
+      52547c1c57f39f0e["CLI Lint Command Refinement Specification"];
+      class 52547c1c57f39f0e default;
+      click 52547c1c57f39f0e "Specifications.html#cli-lint-command-refinement-specification";
+      853d6a8c46fcbdd5["CLI Merge Element Command Refinement Specification"];
+      class 853d6a8c46fcbdd5 default;
+      click 853d6a8c46fcbdd5 "Specifications.html#cli-merge-element-command-refinement-specification";
+      7db2eb21d9bdb600["CLI Model Diagram Command Refinement Specification"];
+      class 7db2eb21d9bdb600 default;
+      click 7db2eb21d9bdb600 "Specifications.html#cli-model-diagram-command-refinement-specification";
+      c1ea7da85046420d["CLI Move Asset Command Refinement Specification"];
+      class c1ea7da85046420d default;
+      click c1ea7da85046420d "Specifications.html#cli-move-asset-command-refinement-specification";
+      9d09b899d0a1b39a["CLI Move Element Command Refinement Specification"];
+      class 9d09b899d0a1b39a default;
+      click 9d09b899d0a1b39a "Specifications.html#cli-move-element-command-refinement-specification";
+      a6dcf99643828dc2["CLI Move File Command Refinement Specification"];
+      class a6dcf99643828dc2 default;
+      click a6dcf99643828dc2 "Specifications.html#cli-move-file-command-refinement-specification";
+      1f105b0dfc004220["CLI Ontologies Command Refinement Specification"];
+      class 1f105b0dfc004220 default;
+      click 1f105b0dfc004220 "Specifications.html#cli-ontologies-command-refinement-specification";
+      aee053039551b55a["CLI Relink Command Refinement Specification"];
+      class aee053039551b55a default;
+      click aee053039551b55a "Specifications.html#cli-relink-command-refinement-specification";
+      7185b03dc19996e0["CLI Remove Asset Command Refinement Specification"];
+      class 7185b03dc19996e0 default;
+      click 7185b03dc19996e0 "Specifications.html#cli-remove-asset-command-refinement-specification";
+      5e7e5c38a6ca8d1["CLI Remove Element Command Refinement Specification"];
+      class 5e7e5c38a6ca8d1 default;
+      click 5e7e5c38a6ca8d1 "Specifications.html#cli-remove-element-command-refinement-specification";
+      ceb5cdf983046189["CLI Rename Element Command Refinement Specification"];
+      class ceb5cdf983046189 default;
+      click ceb5cdf983046189 "Specifications.html#cli-rename-element-command-refinement-specification";
+      1ce37be3b261bf11["CLI Resources Command Refinement Specification"];
+      class 1ce37be3b261bf11 default;
+      click 1ce37be3b261bf11 "Specifications.html#cli-resources-command-refinement-specification";
+      2b2a121f3fe44a94["CLI Search Command Refinement Specification"];
+      class 2b2a121f3fe44a94 default;
+      click 2b2a121f3fe44a94 "Specifications.html#cli-search-command-refinement-specification";
+      d519de7f0729c2eb["CLI Size Estimate JSON Option Specification"];
+      class d519de7f0729c2eb default;
+      click d519de7f0729c2eb "Specifications.html#cli-size-estimate-json-option-specification";
+      a27e2d678cf0d6a2["CLI Submodels Command Refinement Specification"];
+      class a27e2d678cf0d6a2 default;
+      click a27e2d678cf0d6a2 "Specifications.html#cli-submodels-command-refinement-specification";
+      3139be6773fdd42a["CLI Traces Command Refinement Specification"];
+      class 3139be6773fdd42a default;
+      click 3139be6773fdd42a "Specifications.html#cli-traces-command-refinement-specification";
+      1d21a62c9647e320["Detailed Error Handling and Logging Refinement Specification"];
+      class 1d21a62c9647e320 default;
+      click 1d21a62c9647e320 "Specifications.html#detailed-error-handling-and-logging-refinement-specification";
+      c074fc10f83523a["Diff Output Format Specification"];
+      class c074fc10f83523a default;
+      click c074fc10f83523a "Specifications.html#diff-output-format-specification";
+      2ef5fb673837eda6["Error Message Format Specification"];
+      class 2ef5fb673837eda6 default;
+      click 2ef5fb673837eda6 "Specifications.html#error-message-format-specification";
+      e88b683427bde936["Explicit Workspace Selection Specification"];
+      class e88b683427bde936 default;
+      click e88b683427bde936 "Specifications.html#explicit-workspace-selection-specification";
+      ae6b4f74282d8b68["Format Command Refinement Specification"];
+      class ae6b4f74282d8b68 default;
+      click ae6b4f74282d8b68 "Specifications.html#format-command-refinement-specification";
+      91d2577e91c2e917["Mutating Command Hierarchy Safety Refinement Specification"];
+      class 91d2577e91c2e917 default;
+      click 91d2577e91c2e917 "Specifications.html#mutating-command-hierarchy-safety-refinement-specification";
+      29b533e39150f497["Relation Commands Refinement Specification"];
+      class 29b533e39150f497 default;
+      click 29b533e39150f497 "Specifications.html#relation-commands-refinement-specification";
+      a977253b3256c7a7["Validate Command Refinement Specification"];
+      class a977253b3256c7a7 default;
+      click a977253b3256c7a7 "Specifications.html#validate-command-refinement-specification";
+      617c21f9d62d0e83["Verification Traces Element Navigation Refinement Specification"];
+      class 617c21f9d62d0e83 default;
+      click 617c21f9d62d0e83 "Specifications.html#verification-traces-element-navigation-refinement-specification";
+    end
+  end
+</div>
+<h3 id="cli-add-element-command-refinement-specification">CLI Add Element Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>The <code>add</code> command is expected to:</p>
+<ul>
+<li>Accept element definition input from standard input (stdin) by default</li>
+<li>Support <code>--content &lt;string&gt;</code> option as alternative to stdin input</li>
+<li>When <code>--content</code> is provided, use its value instead of reading stdin</li>
+<li>Accept target file path as required positional argument (resolved relative to Git repository root)</li>
+<li>Support command syntax: <code>reqvire add &lt;file&gt;</code> (stdin) or <code>reqvire add &lt;file&gt; --content "..."</code></li>
+<li>Validate element structure before insertion</li>
+<li>Insert element into file following Element Ordering Behavior</li>
+<li>Apply changes immediately by default</li>
+<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
+<li>Support <code>--override</code> flag to replace existing element with same name</li>
+<li>Output git-style diff showing file changes by default</li>
+<li>Support <code>--json</code> flag for structured output format</li>
+<li>Report validation errors if element structure is invalid</li>
+<li>Exit with code 0 on success, non-zero on error</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-add-element-command">CLI Add Element Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-collect-command-refinement-specification">CLI Collect Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Command syntax: <code>reqvire collect &lt;element-name&gt; [--direction UPSTREAM|DOWNSTREAM] [--json]</code></p>
+<p><strong>Arguments:</strong></p>
+<ul>
+<li><code>&lt;element-name&gt;</code> - Required. Name of the capability or requirement element to collect from.</li>
+</ul>
+<p><strong>Options:</strong></p>
+<ul>
+<li><code>--direction &lt;DIRECTION&gt;</code> - Traversal direction. Values: <code>UPSTREAM</code> (default) or <code>DOWNSTREAM</code>. Requirement UPSTREAM traverses requirement parents and crosses to the owning capability through <code>specify</code>; requirement DOWNSTREAM follows child requirements. Capability UPSTREAM follows capability parents only; capability DOWNSTREAM follows child capabilities and requirements through <code>specifiedBy</code>.</li>
+<li><code>--json</code> - Output in JSON format instead of text</li>
+</ul>
+<p><strong>Exit codes:</strong></p>
+<ul>
+<li>0 on success</li>
+<li>Non-zero on error (element not found, invalid type, invalid direction, etc.)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-collect-command">CLI Collect Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-coverage-command-refinement-specification">CLI Coverage Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Coverage command behavior:</p>
+<ul>
+<li>Be invoked as <code>reqvire coverage</code></li>
+<li>Support <code>--json</code> flag for JSON output format</li>
+<li>Default to human-readable text output when JSON flag is not present</li>
+<li>Generate reports focusing on leaf requirements (requirements without forward relations to other requirements)</li>
+<li>Show the percentage and details of verified and unverified leaf requirements</li>
+<li>Include breakdowns by file, section, and verification type</li>
+<li>Show satisfaction status of test-verification elements (those with <code>satisfiedBy</code> relations)</li>
+<li>Show orphaned verifications (verification elements without any <code>verify</code> relations to capabilities or requirements)</li>
+<li>Include requirement implementation coverage summary for <code>requirement</code> elements only</li>
+<li>Include capability coverage roll-up from requirements connected through <code>specifiedBy</code> / <code>specify</code></li>
+<li>Classify covered requirements using the implementation coverage source vocabulary defined by the Reqvire report ontology</li>
+<li>Show implementation-uncovered requirements with identifiers and names</li>
+<li>Emit all coverage percentages with at most 2 decimal places in text and JSON output</li>
+<li>Uses <a href="../../Functional/Processing/VerificationTraces.html#verification-roll-up-strategy">Verification Roll-up Strategy</a></li>
+<li>Treat test-verification elements as satisfied only when they have <code>satisfiedBy</code> relations</li>
+<li>Treat analysis, inspection, and demonstration verification elements as satisfied by default</li>
+<li>Exit with status code 0 on success</li>
+<li>Exit with non-zero status code on errors</li>
+</ul>
+<p>Command output is written to stdout for easy redirection to files.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-coverage-command">CLI Coverage Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-interface-structure-refinement-specification">CLI Interface Structure Refinement Specification</h3>
+<h4>Details</h4>
+<p>The CLI must display all commands and options and command’s options flattened in the main help output which must also be a default command:
+Reqvire requirements &amp; traceability management tool</p>
+<p>Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]</p>
+<p>Commands:
+export Export model to browsable HTML documentation
+serve Serve model as browsable HTML documentation via HTTP server
+format Format and normalize requirements files
+validate Validate model
+search Search and filter model elements
+change-impact Analyze change impact and provide report
+traces Generate verification traces
+coverage Generate verification and implementation coverage report
+model Generate model-centric structure diagram
+lint Analyze model quality and detect issues
+add Add new element to model
+rm Remove element from model
+mv Move element to different location
+rename Rename element
+merge Merge multiple elements into target element
+mv-file Move entire specification file
+link Add relation or attachment between elements
+unlink Remove relation or attachment (auto-detects)
+mv-asset Move/rename asset file and update references
+rm-asset Remove asset file and remove references
+containment Generate containment view
+resources Generate resources report
+ontologies Collect ontology elements and semantic-contract SHACL shapes
+help Print help for commands</p>
+<p>Ontologies options:
+–jsonld Output JSON-LD format instead of RDF/Turtle (.ttl)
+–full Include Reqvire model context triples in the semantic export
+–output <FILE> Save output to file</p>
+<p>Options:
+-h, –help Print help
+-V, –version Print version</p>
+<p><COMMAND OPTIONS>:
+Each command has its own options displayed in a flattened section
+(e.g., FORMAT OPTIONS, VALIDATE OPTIONS, etc.)</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-interface-structure">CLI Interface Structure</a></li>
+</ul>
+<hr />
+<h3 id="cli-json-file-output-option-refinement-specification">CLI JSON File Output Option Refinement Specification</h3>
+<h4>Details</h4>
+<p><code>--output</code> option behavior:</p>
+<ul>
+<li>Be available on every command that has a <code>--json</code> flag.</li>
+<li>Require <code>--json</code> to also be set; report an error when <code>--output</code> is used without <code>--json</code>.</li>
+<li>Write JSON content to the specified file path.</li>
+<li>Create the file if it does not exist, and overwrite it if it does.</li>
+<li>Print a confirmation message to stdout: <code>✅ Output saved to &lt;filepath&gt;</code>.</li>
+<li>Exit with code 0 on success and non-zero on file write error.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-json-file-output-option">CLI JSON File Output Option</a></li>
+</ul>
+<hr />
+<h3 id="cli-lint-command-refinement-specification">CLI Lint Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Lint command behavior:</p>
+<ul>
+<li>Be invoked as <code>reqvire lint</code>.</li>
+<li>Default to dry-run mode (report issues without applying fixes).</li>
+<li>Support <code>--fixable</code> to show only auto-fixable issues.</li>
+<li>Support <code>--auditable</code> to show only issues requiring manual review.</li>
+<li>Support <code>--fix</code> to apply auto-fixable changes.</li>
+<li>Support <code>--json</code> for structured output.</li>
+<li>Default to showing all issues when no filter flags are provided.</li>
+<li>Categorize output into:</li>
+<li>Auto-fixable issues.</li>
+<li>Needs manual review issues.</li>
+<li>Exit with code 0 when no issues are found or when fixes are successfully applied.</li>
+<li>Exit with non-zero status code on errors.</li>
+</ul>
+<p>Command output is written to stdout for easy redirection to files.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-lint-command">CLI Lint Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-merge-element-command-refinement-specification">CLI Merge Element Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Merge command behavior:</p>
+<ul>
+<li>Accept target element name as the first required positional argument.</li>
+<li>Accept one or more source element names as subsequent required arguments.</li>
+<li>Support command syntax: <code>reqvire merge &lt;target&gt; &lt;source1&gt; [source2...]</code>.</li>
+<li>Reject merge when a source is in <code># Documents</code> format and target is in <code># Elements</code> format; report that manual migration is required.</li>
+<li>Apply changes immediately by default.</li>
+<li>Support <code>--dry-run</code> to preview changes without applying.</li>
+<li>Output git-style diff showing all affected files by default.</li>
+<li>Support <code>--json</code> for structured output.</li>
+<li>Exit with code 0 on success and non-zero on error.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-merge-element-command">CLI Merge Element Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-model-diagram-command-refinement-specification">CLI Model Diagram Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Model command behavior:</p>
+<ul>
+<li>Be named <code>model</code>.</li>
+<li>Support <code>--from=&lt;name&gt;</code> for filtering from a specific element by name.</li>
+<li>Use globally unique element names for name-based lookup.</li>
+<li>Support <code>--json</code> for JSON output format.</li>
+<li>Support <code>--mmd</code> for pure Mermaid flowchart output without Markdown wrapper text or fenced code blocks.</li>
+<li>Support <code>--reverse</code> for leaf-to-root traversal.</li>
+<li>Support <code>--filter-type=&lt;types&gt;</code> with comma-separated element types to filter starting points.</li>
+<li>Default to Markdown output with embedded Mermaid diagram.</li>
+<li>When neither <code>--from</code> nor <code>--filter-type</code> is provided in forward mode, use ontology roots and capability roots as default starting elements.</li>
+<li>Integrate with existing model diagram generation functionality.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-model-diagram-command">CLI Model Diagram Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-move-asset-command-refinement-specification">CLI Move Asset Command Refinement Specification</h3>
+<h4>Details</h4>
+<p><code>mv-asset</code> command behavior:</p>
+<ul>
+<li>Accept old file path as required positional argument.</li>
+<li>Accept new file path as required positional argument.</li>
+<li>Find all elements referencing the file as InternalPath.</li>
+<li>Update all InternalPath references:</li>
+<li>In <code>Attachments</code> subsection (update both display text and href).</li>
+<li>In relations (<code>satisfiedBy</code>, <code>satisfy</code>, <code>trace</code> targets).</li>
+<li>Physically move/rename the file on the filesystem.</li>
+<li>Apply changes immediately by default.</li>
+<li>Support <code>--dry-run</code> to preview changes without applying.</li>
+<li>Output git-style diff showing all affected files.</li>
+<li>Support <code>--json</code> for structured output.</li>
+<li>Support <code>--output &lt;FILE&gt;</code> when <code>--json</code> is present.</li>
+<li>Report all affected elements and relation updates.</li>
+<li>Exit with code 0 on success and non-zero on error.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-move-asset-command">CLI Move Asset Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-move-element-command-refinement-specification">CLI Move Element Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>The <code>mv</code> command is expected to:</p>
+<ul>
+<li>Accept element name as required positional argument</li>
+<li>Accept target file path as required positional argument (resolved relative to Git repository root)</li>
+<li>Support command syntax: <code>reqvire mv &lt;element-name&gt; &lt;file&gt;</code></li>
+<li>Move element to target file following Element Ordering Behavior</li>
+<li>Update all incoming relations system-wide with new identifier</li>
+<li>Preserve element content, metadata, and outgoing relations</li>
+<li>Apply changes immediately by default</li>
+<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
+<li>Output git-style diff showing all affected files by default</li>
+<li>Support <code>--json</code> flag for structured output with relation updates and identifier change</li>
+<li>Report identifier change (old → new)</li>
+<li>Report error if element does not exist or target location is invalid</li>
+<li>Reject moves into existing <code># Documents</code> files when the move would create multiple elements in that file</li>
+<li>Exit with code 0 on success, non-zero on error</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-move-element-command">CLI Move Element Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-move-file-command-refinement-specification">CLI Move File Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>The <code>mv-file</code> command is expected to:</p>
+<ul>
+<li>Accept source file path (required, relative to current working directory)</li>
+<li>Accept target file path (required, relative to current working directory)</li>
+<li>Support <code>--dry-run</code> flag to preview changes without applying</li>
+<li>Support <code>--json</code> flag for structured output</li>
+<li>Exit with code 0 on success, non-zero on error</li>
+<li>Command syntax: <code>reqvire mv-file &lt;source-file&gt; &lt;target-file&gt;</code></li>
+<li>When <code>--squash</code> is used, reject if target is an existing <code># Documents</code> file</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-move-file-command">CLI Move File Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-ontologies-command-refinement-specification">CLI Ontologies Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>The <code>ontologies</code> command shall collect ontology <code>#### Ontology</code> content and semantic-contract <code>#### Shapes</code> content for downstream tooling:</p>
+<ul>
+<li>Command syntax: <code>reqvire ontologies [--jsonld] [--full] [--output &lt;FILE&gt;]</code></li>
+<li>Default output format: RDF/Turtle (<code>.ttl</code>)</li>
+<li><code>--jsonld</code>: emit JSON-LD instead of Turtle</li>
+<li><code>--full</code>: include generated RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, semantic-contract shape references, and generated ontology projection facts</li>
+<li>Full generated ontology projection facts shall serialize <code>reqvire:OntologyProjectionGraph</code>, <code>reqvire:OntologyConstructProjection</code>, <code>reqvire:OntologyConstruct</code>, and <code>reqvire:OntologySymbol</code> resources, including source/provenance, construct subject/object/predicate/property facts where present, ordered member sequence facts where present, and direct-authored derivation mode.</li>
+<li>Semantic-query-contract <code>#### Query</code> content and query metadata are excluded from default and <code>--full</code> output until a dedicated query-export command exists; generated ontology projection facts may cite semantic-query-contract IRIs as provenance without embedding raw query text</li>
+<li><code>--output &lt;FILE&gt;</code>: write the selected format to the requested file instead of stdout</li>
+<li>The command shall use the graph-registry semantic index used by validation.</li>
+<li>The default mode and exported <code>ontologies.ttl</code> artifact shall preserve the current artifact-only export of authored ontology and SHACL blocks without generated ontology projection facts.</li>
+<li>The full mode shall append an in-memory RDF projection of the Reqvire graph registry context and generated direct-authored ontology construct subprojection without requiring a persistent RDF store.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-ontologies-command">CLI Ontologies Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-relink-command-refinement-specification">CLI Relink Command Refinement Specification</h3>
+<h4>Details</h4>
+<p><code>relink</code> command behavior:</p>
+<ul>
+<li>Accept source element name as required positional argument.</li>
+<li>Accept relation type as required positional argument.</li>
+<li>Accept old target and new target as required positional arguments.</li>
+<li>Support command syntax: <code>reqvire relink &lt;source&gt; &lt;relation-type&gt; &lt;old-target&gt; &lt;new-target&gt;</code>.</li>
+<li>Invoke the functional atomic relation relink operation.</li>
+<li>Validate candidate model state before persistence.</li>
+<li>Support <code>--dry-run</code> preview and <code>--json</code> output.</li>
+<li>Support <code>--output &lt;FILE&gt;</code> when <code>--json</code> is present.</li>
+<li>Reject unresolved source/target references, missing source relation, and post-relink validation failures with non-zero exit status.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-relink-command">CLI Relink Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-remove-asset-command-refinement-specification">CLI Remove Asset Command Refinement Specification</h3>
+<h4>Details</h4>
+<p><code>rm-asset</code> command behavior:</p>
+<ul>
+<li>Accept file path as required positional argument.</li>
+<li>Find all elements referencing the file as InternalPath.</li>
+<li>Remove all InternalPath references:</li>
+<li>From <code>Attachments</code> subsection (remove link entry and remove subsection if empty).</li>
+<li>From relations (remove entire relation line for <code>satisfiedBy</code>, <code>satisfy</code>, <code>trace</code>).</li>
+<li>Delete the physical file from the filesystem.</li>
+<li>Apply changes immediately by default.</li>
+<li>Support <code>--dry-run</code> to preview changes without applying.</li>
+<li>Output git-style diff showing all affected files.</li>
+<li>Support <code>--json</code> for structured output.</li>
+<li>Support <code>--output &lt;FILE&gt;</code> when <code>--json</code> is present.</li>
+<li>Report all affected elements and removed relations.</li>
+<li>Exit with code 0 on success and non-zero on error.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-remove-asset-command">CLI Remove Asset Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-remove-element-command-refinement-specification">CLI Remove Element Command Refinement Specification</h3>
+<h4>Details</h4>
+<p><code>rm</code> command behavior:</p>
+<ul>
+<li>Accept element name as required positional argument.</li>
+<li>Support command syntax: <code>reqvire rm &lt;element-name&gt;</code>.</li>
+<li>Delete the specified element from its file.</li>
+<li>Remove all incoming relations from other elements.</li>
+<li>Apply changes immediately by default.</li>
+<li>Support <code>--dry-run</code> to preview changes without applying.</li>
+<li>Output git-style diff showing file changes by default.</li>
+<li>Support <code>--json</code> for structured output with affected relations.</li>
+<li>Report error when the element does not exist.</li>
+<li>Exit with code 0 on success and non-zero on error.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-remove-element-command">CLI Remove Element Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-rename-element-command-refinement-specification">CLI Rename Element Command Refinement Specification</h3>
+<h4>Details</h4>
+<p><code>rename</code> command behavior:</p>
+<ul>
+<li>Accept current element name (required).</li>
+<li>Accept new element name (required).</li>
+<li>Update all incoming relations system-wide with the new identifier.</li>
+<li>Apply changes immediately by default.</li>
+<li>Support <code>--dry-run</code> to preview changes without applying.</li>
+<li>Output git-style diff showing all affected files by default.</li>
+<li>Support <code>--json</code> for structured output with relation updates and identifier change.</li>
+<li>Report identifier change (<code>old -&gt; new</code>).</li>
+<li>Report error if the element does not exist or the new name conflicts with an existing element.</li>
+<li>Exit with code 0 on success and non-zero on error.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-rename-element-command">CLI Rename Element Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-resources-command-refinement-specification">CLI Resources Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Resources command behavior:</p>
+<ul>
+<li>Be invoked as <code>reqvire resources</code>.</li>
+<li>Support <code>--json</code> for JSON output format.</li>
+<li>Default to human-readable text output when <code>--json</code> is not present.</li>
+<li>Generate two sections: Relations and Attachments.</li>
+<li>Show files from InternalPath relation targets (<code>satisfiedBy</code>, <code>trace</code>, and related path-based targets).</li>
+<li>Show referenced refinement identifiers from attachment targets.</li>
+<li>List relation file entries and attachment identifier entries alphabetically.</li>
+<li>For each entry, show referencing elements with links.</li>
+<li>Sort references by relation type (for relations section), then by element identifier.</li>
+<li>Exit with status code 0 on success and non-zero on errors.</li>
+</ul>
+<p>Command output is written to stdout for easy redirection to files.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-resources-command">CLI Resources Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-search-command-refinement-specification">CLI Search Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Search command capabilities:</p>
+<ul>
+<li><code>search</code>: Search model elements and output results to stdout</li>
+<li>Support <code>--json</code> flag for structured JSON output</li>
+<li>Support <code>--short</code> flag for abbreviated output (both text and JSON)</li>
+<li>Support comprehensive filter options (all combinable):</li>
+<li>By file path glob: <code>--filter-file="src/**/*Reqs.md"</code></li>
+<li>By element name regex: <code>--filter-name=".*safety.*"</code></li>
+<li>By element type: <code>--filter-type="requirement"</code> or <code>--filter-type="semantic-query-contract"</code> (exact match)</li>
+<li>By effective governance status: <code>--filter-status=approved</code></li>
+<li>By effective governance priority: <code>--filter-priority=high,critical</code></li>
+<li>By effective governance risk: <code>--filter-risk=high,critical</code></li>
+<li>By effective governance owner regex: <code>--filter-owner="Platform.*"</code></li>
+<li>By element content regex: <code>--filter-content="MUST"</code></li>
+<li>By page content regex: <code>--filter-page-content="architecture"</code></li>
+<li>By having relations: <code>--have-relations=verifiedBy,satisfiedBy</code> (comma-separated, must have ALL)</li>
+<li>By not having relations: <code>--not-have-relations=verifiedBy</code> (comma-separated, must NOT have ALL)</li>
+<li>By having attachments: <code>--has-attachments</code> (filter elements with Attachments subsection)</li>
+<li>By attachment identifier pattern: <code>--filter-attachment &lt;glob&gt;</code> (supports glob patterns over identifier strings)</li>
+</ul>
+<p>Short mode behavior:</p>
+<ul>
+<li>Text output: Display abbreviated one-line format per element</li>
+<li>JSON output: Omit fields: <code>content</code>, <code>page_content</code>, <code>verified_relations_count</code>, <code>satisfied_relations_count</code>, <code>element_count</code>, <code>total_elements</code>, <code>global_counters</code></li>
+</ul>
+<p>Error handling:</p>
+<ul>
+<li>Invalid regex patterns is expected to return clear error message showing the faulty pattern and exit</li>
+<li>Invalid relation type names is expected to return error with list of valid relation types</li>
+<li>Invalid governance metadata filter values are expected to return clear error messages with the accepted values</li>
+</ul>
+<p>Default output:</p>
+<ul>
+<li>Human-readable text format when neither <code>--json</code> nor <code>--short</code> is specified</li>
+<li>Full detail mode showing all element metadata and relations</li>
+<li>Full JSON output includes effective governance metadata for governance-bearing elements (<code>capability</code> and <code>requirement</code>)</li>
+<li>Full JSON output includes parsed semantic ADT fields when present:
+<ul>
+<li><code>ontology</code> for ontology elements</li>
+<li><code>semantic_contract</code> for semantic-contract elements</li>
+<li><code>semantic_query_contract</code> for semantic-query-contract elements, including derived IRI and Query fenced block language, content, and line number</li>
+</ul>
+</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-search-command">CLI Search Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-size-estimate-json-option-specification">CLI Size Estimate JSON Option Specification</h3>
+<p>The CLI <code>--with-size-estimates</code> option is expected to be an opt-in JSON evidence option.</p>
+<h4>Details</h4>
+<ul>
+<li>Supported report commands may expose <code>--with-size-estimates</code>.</li>
+<li>The option passes <code>with_size_estimates = true</code> into model loading for that command invocation.</li>
+<li>The option is accepted only when <code>--json</code> is also present.</li>
+<li>Using <code>--with-size-estimates</code> without <code>--json</code> fails before report execution with an actionable diagnostic.</li>
+<li>The initial supported command is <code>model --json --with-size-estimates</code>.</li>
+<li>Additional JSON evidence commands may opt in later after their output contracts are specified.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-size-estimate-json-option">CLI Size Estimate JSON Option</a></li>
+</ul>
+<hr />
+<h3 id="cli-submodels-command-refinement-specification">CLI Submodels Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Submodels command behavior:</p>
+<ul>
+<li>Be invoked as <code>reqvire submodels</code>.</li>
+<li>Support <code>--from &lt;NAME&gt;</code> to scope report to one capability or requirement subtree by name.</li>
+<li>Support <code>--json</code> for JSON output format.</li>
+<li>Default to human-readable text output when <code>--json</code> is not present.</li>
+<li>Report independent capability-rooted submodels using capability hierarchy, <code>specifiedBy</code>, and requirement hierarchy.</li>
+<li>Report cross-submodel requirement couplings using explicit requirement-to-requirement relations.</li>
+<li>In <code>--from</code> mode for a capability, report the selected capability as the scoped capability submodel and count requirements in the selected capability subtree.</li>
+<li>In <code>--from</code> mode for a requirement, treat the selected requirement as a scope boundary and exclude it from reported <code>submodels</code> entries.</li>
+<li>Provide deterministic ordering for submodels and couplings.</li>
+<li>Include summary totals for submodels, requirements, and cross-submodel couplings.</li>
+<li>Return a clear error when <code>--from &lt;NAME&gt;</code> does not match any capability or requirement scope source.</li>
+<li>Exit with status code 0 on success and non-zero on errors.</li>
+</ul>
+<p>Command output is written to stdout for easy redirection to files.</p>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-submodels-command">CLI Submodels Command</a></li>
+</ul>
+<hr />
+<h3 id="cli-traces-command-refinement-specification">CLI Traces Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>The command is expected to:</p>
+<ul>
+<li>Be invoked as <code>reqvire traces</code></li>
+<li>Generate output in Markdown format with embedded Mermaid diagrams by default</li>
+<li>Support <code>--json</code> flag for structured JSON output without diagrams</li>
+<li>Show verification elements as roots with arrows following relation semantics</li>
+<li>Include clickable links on all nodes (verifications and requirements) in Mermaid diagrams</li>
+<li>Highlight directly verified capabilities or requirements using CSS classes in diagrams</li>
+<li>Traverse all upward parent relations to reach capability-rooted requirements</li>
+<li>Merge multiple verification paths into a single tree per verification</li>
+<li>Exit with status code 0 on success</li>
+<li>Exit with non-zero status code on errors</li>
+</ul>
+<p>The Mermaid diagrams generated for verification traces is expected to include clickable links on diagram nodes that navigate to the referenced element using relative paths (the <code>traces</code> command always uses relative paths and does not support the <code>--links-with-blobs</code> flag).</p>
+<p>Command output is expected to be written to stdout for easy redirection to files.</p>
+<p><strong>Filter Options:</strong>
+The system is expected to support filtering verification traces by verification ID, name pattern, and verification type to allow users to generate traces for specific subsets of verifications.</p>
+<p>The following filter options is expected to be supported:</p>
+<ul>
+<li><code>--filter-id=&lt;id&gt;</code>: Generate trace for a specific verification element by its full identifier</li>
+<li><code>--filter-name=&lt;regex&gt;</code>: Filter verifications by name using regular expression matching</li>
+<li><code>--filter-type=&lt;type&gt;</code>: Filter by verification type (test-verification, analysis-verification, inspection-verification, demonstration-verification, formal-proof-verification)</li>
+</ul>
+<p>Filters is expected to be combinable, and when multiple filters are specified, only verifications matching ALL filter criteria is expected to be included in the output.</p>
+<p><strong>From-Folder Option:</strong>
+The system is expected to support a <code>--from-folder</code> option for the <code>traces</code> command that specifies the relative path from where Reqvire runs to the folder where generated output files will be saved, enabling generation of relative links in Mermaid diagrams and other outputs that are portable when the output is saved in different locations.</p>
+<p>The <code>--from-folder</code> option is expected to:</p>
+<ul>
+<li>Accept a relative path string as parameter (e.g., <code>--from-folder=docs/verification-reports</code>)</li>
+<li>Default to empty/current directory when not specified (maintaining existing behavior)</li>
+<li>Support special case <code>/</code> to indicate the reqvire root (git root), keeping identifiers as git-root-relative paths</li>
+<li>Adjust all clickable links in Mermaid diagrams to be relative to the specified folder path</li>
+<li>Adjust all file path references in output to be relative to the specified folder path</li>
+<li>Work with both Markdown output (with Mermaid diagrams) and JSON output</li>
+<li>Ensure generated links work correctly when the output file is saved in the specified folder</li>
+<li>Use the standard path resolution logic to calculate relative paths from the from-folder to git root</li>
+</ul>
+<p><strong>Example usage:</strong></p>
+<h1 id="generate-traces-with-links-relative-to-docs/reports/-folder">Generate traces with links relative to docs/reports/ folder</h1>
+<p>reqvire traces –from-folder=docs/reports &gt; docs/reports/traces.md</p>
+<h1 id="links-in-the-output-will-be-relative-to-docs/reports/-(e.g.,-../../specifications/file.md)">Links in the output will be relative to docs/reports/ (e.g., ../../specifications/file.md)</h1>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-traces-command">CLI Traces Command</a></li>
+</ul>
+<hr />
+<h3 id="detailed-error-handling-and-logging-refinement-specification">Detailed Error Handling and Logging Refinement Specification</h3>
+<h4>Details</h4>
+<p>CLI error handling and logging behavior:</p>
+<ul>
+<li>Returns contextual error messages that help users identify command failure causes.</li>
+<li>Preserves actionable feedback format so remediation steps are visible near errors.</li>
+<li>Uses shared validation/error reporting behavior for consistent message quality across commands.</li>
+<li>Emits non-zero exit codes for command failures.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></li>
+</ul>
+<hr />
+<h3 id="diff-output-format-specification">Diff Output Format Specification</h3>
+<p>Git-style diff format for change previews.</p>
+<h4>Details</h4>
+<p><strong>Used by commands:</strong> format, lint, add, rm, mv, rename, mv-file, change-impact</p>
+<p><strong>Format:</strong></p>
+<pre><code class="language-diff">--- a/&lt;file_path&gt;
++++ b/&lt;file_path&gt;
+@@ -&lt;old_start&gt;,&lt;old_count&gt; +&lt;new_start&gt;,&lt;new_count&gt; @@
+-&lt;removed line&gt;
++&lt;added line&gt;
+ &lt;context line&gt;
+</code></pre>
+<p><strong>Colors:</strong></p>
+<ul>
+<li>Red: Removed lines (-)</li>
+<li>Green: Added lines (+)</li>
+<li>Cyan: Hunk headers (@@)</li>
+<li>White: Context lines</li>
+</ul>
+<p><strong>Context:</strong></p>
+<ul>
+<li>Show 3 lines before and after changes</li>
+<li>Collapse large unchanged sections</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-diff-output">CLI Diff Output</a></li>
+</ul>
+<hr />
+<h3 id="error-message-format-specification">Error Message Format Specification</h3>
+<p>Structure for error and warning messages.</p>
+<h4>Details</h4>
+<p><strong>Format:</strong></p>
+<pre><code>&lt;file_path&gt;:&lt;line_number&gt;: &lt;level&gt;: &lt;message&gt;
+ &lt;context_line&gt;
+ ^--- &lt;pointer to issue&gt;
+</code></pre>
+<p><strong>Fields:</strong></p>
+<ul>
+<li><code>file_path</code>: Git-root-relative path</li>
+<li><code>line_number</code>: 1-based line number</li>
+<li><code>level</code>: error | warning | info</li>
+<li><code>message</code>: Concise description</li>
+<li><code>context_line</code>: Source line (optional)</li>
+<li><code>suggestion</code>: How to fix (optional)</li>
+</ul>
+<p><strong>Grouping:</strong></p>
+<ul>
+<li>Group errors by file</li>
+<li>Sort by line number within file</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#detailed-error-handling-and-logging">Detailed Error Handling and Logging</a></li>
+</ul>
+<hr />
+<h3 id="explicit-workspace-selection-specification">Explicit Workspace Selection Specification</h3>
+<p>The CLI is expected to resolve and enter an explicitly selected workspace before executing Reqvire operations.</p>
+<h4>Details</h4>
+<p>Workspace selection rules:</p>
+<ul>
+<li>The global option is <code>--workspace &lt;DIR&gt;</code>.</li>
+<li>The selected workspace path is resolved and canonicalized before command execution.</li>
+<li>The selected workspace must exist and be a directory.</li>
+<li>The process current directory is changed to the selected workspace before loading <code>.gitignore</code>, <code>.reqvireignore</code>, scanning Markdown files, resolving git root, computing reports, or executing mutations.</li>
+<li>If the selected workspace is a git repository subdirectory, existing Reqvire subtree-scoped scanning behavior is preserved.</li>
+<li>If <code>--workspace</code> is not provided, existing current-working-directory behavior is preserved.</li>
+<li>Workspace selection is process startup configuration and is not exposed as an MCP tool argument.</li>
+<li>MCP workspace/session responses report the effective workspace after selection.</li>
+<li>Invalid workspace paths fail before command execution with a clear error.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#explicit-workspace-selection">Explicit Workspace Selection</a></li>
+</ul>
+<hr />
+<h3 id="format-command-refinement-specification">Format Command Refinement Specification</h3>
+<h4>Details</h4>
+<p><code>format</code> command is expected to:</p>
+<ul>
+<li>Default to dry-run mode (show suggested changes without applying them)</li>
+<li>Require –fix flag to actually apply formatting changes to files</li>
+<li>Display a diff-style summary of changes that would be or have been made</li>
+<li>Support –json flag for structured output of formatting results</li>
+<li>Show git diff style output with line numbers and colors for both preview and actual formatting</li>
+<li>Support –with-full-relations flag to include all registered relations (user-created and auto-generated)</li>
+</ul>
+<p>Additional behavior:</p>
+<ul>
+<li>By default (no –fix flag), preview changes without applying them</li>
+<li>–fix flag applies the formatting changes to files</li>
+<li>–json flag outputs formatting results in JSON format including file changes and diff information</li>
+<li>When formatting is applied, show a summary of changed files with diff details</li>
+<li>–with-full-relations flag inserts all relations from the model registry into elements, including auto-generated inverse relations (e.g., satisfiedBy from satisfy, derive from derivedFrom)</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#format-command">Format Command</a></li>
+</ul>
+<hr />
+<h3 id="mutating-command-hierarchy-safety-refinement-specification">Mutating Command Hierarchy Safety Refinement Specification</h3>
+<h4>Details</h4>
+<p>For mutating commands (<code>add</code>, <code>rm</code>, <code>mv</code>, <code>rename</code>, <code>merge</code>, <code>mv-file</code>, <code>link</code>, <code>unlink</code>, <code>relink</code>):</p>
+<ul>
+<li>Commands is expected to validate candidate state before persistence.</li>
+<li>Operations that would violate hierarchy invariants is expected to fail with non-zero status.</li>
+<li>Failed operations is expected to not partially persist model changes.</li>
+<li>Error output is expected to include clear hierarchy constraint context.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#cli-relink-command">CLI Relink Command</a></li>
+</ul>
+<hr />
+<h3 id="relation-commands-refinement-specification">Relation Commands Refinement Specification</h3>
+<h4>Details</h4>
+<p>Relation command behavior:</p>
+<p>The <code>link</code> command:</p>
+<ul>
+<li>Accepts syntax: <code>reqvire link &lt;source&gt; &lt;relation-type-or-attaching&gt; &lt;target&gt;</code>.</li>
+<li>Uses existing element name for source.</li>
+<li>Accepts relation type from <code>derivedFrom</code>, <code>derive</code>, <code>satisfiedBy</code>, <code>satisfy</code>, <code>verifiedBy</code>, <code>verify</code>, <code>trace</code>, or <code>attaching</code>.</li>
+<li>Supports relation targets as element name, internal file path, or external URL (<code>http</code>/<code>https</code>).</li>
+<li>Supports attachment targets as refinement element identifiers.</li>
+<li>Rejects <code>attaching</code> targets that are not refinement element identifiers.</li>
+<li>Rejects duplicate relation/attachment pairs with clear error.</li>
+<li>Supports <code>--dry-run</code> preview.</li>
+<li>Supports <code>--json</code> for structured output.</li>
+<li>Supports <code>--output &lt;FILE&gt;</code> when <code>--json</code> is present.</li>
+</ul>
+<p>The <code>unlink</code> command:</p>
+<ul>
+<li>Accepts syntax: <code>reqvire unlink &lt;source&gt; &lt;target&gt;</code>.</li>
+<li>Auto-detects target in relations first, then attachments.</li>
+<li>Enforces single relation per source-target pair.</li>
+<li>Uses existing element name for source.</li>
+<li>Accepts element name, element identifier, or file path as target.</li>
+<li>Supports <code>--dry-run</code> preview.</li>
+<li>Supports <code>--json</code> for structured output.</li>
+<li>Supports <code>--output &lt;FILE&gt;</code> when <code>--json</code> is present.</li>
+</ul>
+<p>Hierarchy ownership behavior:</p>
+<ul>
+<li>Hierarchical <code>link</code>/<code>unlink</code> edits that would produce invalid hierarchy state is expected to fail.</li>
+<li>Error messages is expected to guide users to atomic relink operation for hierarchy boundary rewiring.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#relation-commands">Relation Commands</a></li>
+</ul>
+<hr />
+<h3 id="validate-command-refinement-specification">Validate Command Refinement Specification</h3>
+<h4>Details</h4>
+<p>Validate command behavior:</p>
+<ul>
+<li>Executes the two-pass validation strategy.</li>
+<li>Pass 1 performs parsing, element collection, and local validation.</li>
+<li>Pass 2 builds graph state and validates relations and cross-component consistency.</li>
+<li>Prints all validation issues found in the model.</li>
+<li>Prints <code>No validation issues found</code> when model validation succeeds.</li>
+<li>Supports <code>--json</code> output for structured validation results.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#validate-command">Validate Command</a></li>
+</ul>
+<hr />
+<h3 id="verification-traces-element-navigation-refinement-specification">Verification Traces Element Navigation Refinement Specification</h3>
+<h4>Details</h4>
+<p>Verification traces element navigation behavior:</p>
+<ul>
+<li>Verification element names displayed as headers are rendered as hyperlinks.</li>
+<li>Hyperlinks point to the verification source file with fragment identifier.</li>
+<li>Link format is <code>[Verification Name](file_path#element-fragment)</code>.</li>
+<li>Navigation allows direct jump from traces report to verification definition.</li>
+</ul>
+<h4>Metadata</h4>
+<ul>
+<li>type: specification</li>
+</ul>
+<h4>Relations</h4>
+<ul>
+<li>refine: <a href="Commands.html#verification-traces-element-navigation">Verification Traces Element Navigation</a></li>
+</ul>
+<hr />
+</div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
+import elkLayouts from 'https://cdn.jsdelivr.net/npm/@mermaid-js/layout-elk/dist/mermaid-layout-elk.esm.min.mjs';
+
+// Register ELK layout for large diagrams
+mermaid.registerLayoutLoaders(elkLayouts);
+
+// Capture Mermaid errors
+mermaid.parseError = function(err, hash) {
+    console.error('Mermaid Parse Error:', err);
+    console.error('Error details:', {
+        str: err.str,
+        hash: err.hash,
+        message: err.message,
+        stack: err.stack
+    });
+};
+
+mermaid.initialize({
+    startOnLoad: false,
+    theme: 'neutral',
+    maxTextSize: 5000000,
+    maxEdges: 50000,
+    flowchart: {
+        useMaxWidth: true,
+        htmlLabels: true,
+        curve: 'basis',
+        defaultRenderer: 'elk'
+    },
+    layout: 'elk',
+    elk: {
+        mergeEdges: true,
+        nodePlacementStrategy: 'SIMPLE'
+    },
+    securityLevel: 'loose',
+    logLevel: 'error'
+});
+
+// Store original mermaid content before rendering (for resize refreshes)
+document.querySelectorAll('.mermaid').forEach(el => {
+    el.setAttribute('data-original-content', el.textContent);
+});
+
+await mermaid.run();
+window.mermaid = mermaid;
+
+// Wait for SVGs to be fully rendered, then initialize
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
+    var containers = document.querySelectorAll('.mermaid');
+    var allReady = true;
+    containers.forEach(function(c) {
+        var svg = c.querySelector('svg');
+        if (!svg || !svg.getBBox || svg.getBBox().width === 0) {
+            allReady = false;
+        }
+    });
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
+        callback();
+    } else {
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
+    }
+}
+
+// Function to initialize pan/zoom on all Mermaid diagrams
+function initializePanZoom() {
+    document.querySelectorAll('.mermaid').forEach(function(mermaidContainer) {
+            var svg = mermaidContainer.querySelector('svg');
+            if (!svg) return;
+
+            // Get the natural size of the diagram
+            var bbox = svg.getBBox();
+            var containerWidth = mermaidContainer.clientWidth;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
+
+            // Check if diagram fits within container (with some padding)
+            var padding = 40;
+            var fitsInContainer = (bbox.width <= containerWidth - padding) && (bbox.height <= containerHeight - padding);
+
+            if (fitsInContainer) {
+                // Diagram fits - use natural size, shrink container to fit content
+                svg.style.width = 'auto';
+                svg.style.height = 'auto';
+                mermaidContainer.style.height = 'auto';
+                mermaidContainer.style.minHeight = (bbox.height + padding) + 'px';
+                mermaidContainer.style.maxHeight = 'calc(100vh - 150px)';
+                // No pan/zoom needed for small diagrams
+                return;
+            }
+
+            // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
+            svg.style.maxWidth = 'none';
+            svg.style.maxHeight = 'none';
+
+            var eventsHandler = {
+                haltEventListeners: ['touchstart', 'touchend', 'touchmove', 'touchleave', 'touchcancel'],
+                init: function(options) {
+                    var instance = options.instance;
+                    var initialScale = 1;
+                    var pannedX = 0;
+                    var pannedY = 0;
+
+                    this.hammer = Hammer(options.svgElement, {
+                        inputClass: Hammer.SUPPORT_POINTER_EVENTS ? Hammer.PointerEventInput : Hammer.TouchInput
+                    });
+
+                    this.hammer.get('pinch').set({enable: true});
+
+                    this.hammer.on('doubletap', function(ev){
+                        instance.zoomIn();
+                    });
+
+                    this.hammer.on('panstart panmove', function(ev){
+                        if (ev.type === 'panstart') {
+                            pannedX = 0;
+                            pannedY = 0;
+                        }
+                        instance.panBy({x: ev.deltaX - pannedX, y: ev.deltaY - pannedY});
+                        pannedX = ev.deltaX;
+                        pannedY = ev.deltaY;
+                    });
+
+                    this.hammer.on('pinchstart pinchmove', function(ev){
+                        if (ev.type === 'pinchstart') {
+                            initialScale = instance.getZoom();
+                        }
+                        instance.zoomAtPoint(initialScale * ev.scale, {x: ev.center.x, y: ev.center.y});
+                    });
+
+                    options.svgElement.addEventListener('touchmove', function(e){ e.preventDefault(); });
+                },
+                destroy: function(){
+                    this.hammer.destroy();
+                }
+            };
+
+            // Diagrams with default zoom (no auto-fit)
+            var panZoomInstance = svgPanZoom(svg, {
+                zoomEnabled: true,
+                controlIconsEnabled: true,
+                fit: false,
+                center: false,
+                contain: false,
+                minZoom: 0.5,
+                maxZoom: 10,
+                zoomScaleSensitivity: 0.3,
+                customEventsHandler: eventsHandler
+            });
+
+            // Add navigation buttons
+            var navButtons = document.createElement('div');
+            navButtons.className = 'diagram-nav-buttons';
+            navButtons.innerHTML = `
+                <div class="diagram-nav-row">
+                    <button class="diagram-nav-btn" data-action="up">▲</button>
+                </div>
+                <div class="diagram-nav-row">
+                    <button class="diagram-nav-btn" data-action="left">◀</button>
+                    <button class="diagram-nav-btn" data-action="down">▼</button>
+                    <button class="diagram-nav-btn" data-action="right">▶</button>
+                </div>
+            `;
+            mermaidContainer.appendChild(navButtons);
+
+            // Wire up navigation buttons
+            var panStep = 100;
+            navButtons.querySelectorAll('.diagram-nav-btn').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    var action = this.getAttribute('data-action');
+                    switch(action) {
+                        case 'up':
+                            panZoomInstance.panBy({x: 0, y: panStep});
+                            break;
+                        case 'down':
+                            panZoomInstance.panBy({x: 0, y: -panStep});
+                            break;
+                        case 'left':
+                            panZoomInstance.panBy({x: panStep, y: 0});
+                            break;
+                        case 'right':
+                            panZoomInstance.panBy({x: -panStep, y: 0});
+                            break;
+                    }
+                });
+            });
+    });
+
+    // Add CSS for edge highlighting (high specificity for SVG)
+    var style = document.createElement('style');
+    style.textContent = `
+        path.edge-highlighted,
+        .edge-highlighted path,
+        svg path.edge-highlighted {
+            stroke: #FFAB91 !important;
+            stroke-width: 3px !important;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // Add edge highlighting on node hover
+    document.querySelectorAll('.mermaid svg').forEach(function(svg) {
+        var nodes = svg.querySelectorAll('.node');
+
+        // Find flowchart-link paths (actual edges)
+        var edgePaths = svg.querySelectorAll('path.flowchart-link');
+        // Fallback: find paths in .edges group
+        if (edgePaths.length === 0) {
+            var edgesGroup = svg.querySelector('.edges');
+            if (edgesGroup) {
+                edgePaths = edgesGroup.querySelectorAll('path');
+            }
+        }
+
+        // Get SVG point for coordinate transforms
+        var svgPoint = svg.createSVGPoint();
+
+        // Helper: transform point through element's CTM
+        function getTransformedBBox(element) {
+            var bbox = element.getBBox();
+            var ctm = element.getCTM();
+            if (!ctm) return bbox;
+
+            // Transform all four corners
+            var corners = [
+                {x: bbox.x, y: bbox.y},
+                {x: bbox.x + bbox.width, y: bbox.y},
+                {x: bbox.x, y: bbox.y + bbox.height},
+                {x: bbox.x + bbox.width, y: bbox.y + bbox.height}
+            ];
+
+            var transformed = corners.map(function(c) {
+                svgPoint.x = c.x;
+                svgPoint.y = c.y;
+                var tp = svgPoint.matrixTransform(ctm);
+                return {x: tp.x, y: tp.y};
+            });
+
+            var minX = Math.min.apply(null, transformed.map(function(p) { return p.x; }));
+            var maxX = Math.max.apply(null, transformed.map(function(p) { return p.x; }));
+            var minY = Math.min.apply(null, transformed.map(function(p) { return p.y; }));
+            var maxY = Math.max.apply(null, transformed.map(function(p) { return p.y; }));
+
+            return {x: minX, y: minY, width: maxX - minX, height: maxY - minY};
+        }
+
+        // Helper: get all points from path
+        function getPathPoints(path) {
+            var d = path.getAttribute('d') || '';
+            var points = [];
+            var ctm = path.getCTM();
+
+            // Match all coordinate pairs in the path
+            var regex = /([ML])\s*([\d.-]+)[,\s]+([\d.-]+)|([CQ])[^MLCQZ]*/gi;
+            var match;
+
+            // Get M (start) point
+            var startMatch = d.match(/M\s*([\d.-]+)[,\s]+([\d.-]+)/i);
+            if (startMatch) {
+                var sx = parseFloat(startMatch[1]);
+                var sy = parseFloat(startMatch[2]);
+                if (ctm) {
+                    svgPoint.x = sx; svgPoint.y = sy;
+                    var tp = svgPoint.matrixTransform(ctm);
+                    points.push({x: tp.x, y: tp.y});
+                } else {
+                    points.push({x: sx, y: sy});
+                }
+            }
+
+            // Get last point - find last number pair before Z or end
+            var allNums = d.match(/[\d.-]+/g);
+            if (allNums && allNums.length >= 2) {
+                var ex = parseFloat(allNums[allNums.length - 2]);
+                var ey = parseFloat(allNums[allNums.length - 1]);
+                if (ctm) {
+                    svgPoint.x = ex; svgPoint.y = ey;
+                    var tp = svgPoint.matrixTransform(ctm);
+                    points.push({x: tp.x, y: tp.y});
+                } else {
+                    points.push({x: ex, y: ey});
+                }
+            }
+
+            return points;
+        }
+
+        // Build node bounding boxes with transforms
+        var nodeData = {};
+        nodes.forEach(function(node) {
+            var nodeId = node.id || '';
+            var parts = nodeId.split('-');
+            var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+            nodeData[hashId] = {
+                node: node,
+                bbox: getTransformedBBox(node)
+            };
+        });
+
+        // Calculate distance from point to bbox center
+        function distToBboxCenter(pt, bbox) {
+            var centerX = bbox.x + bbox.width / 2;
+            var centerY = bbox.y + bbox.height / 2;
+            return Math.sqrt(Math.pow(pt.x - centerX, 2) + Math.pow(pt.y - centerY, 2));
+        }
+
+        // Check if point is near bbox
+        function isNearBbox(pt, bbox, margin) {
+            margin = margin || 10;
+            return pt.x >= bbox.x - margin && pt.x <= bbox.x + bbox.width + margin &&
+                   pt.y >= bbox.y - margin && pt.y <= bbox.y + bbox.height + margin;
+        }
+
+        // Build edge connections with direction tracking
+        var edgeConnections = []; // [{path, source, target}]
+        var upstreamOf = {}; // node -> [parent nodes that point TO this node]
+        var downstreamOf = {}; // node -> [child nodes this node points TO]
+
+        Object.keys(nodeData).forEach(function(hashId) {
+            upstreamOf[hashId] = [];
+            downstreamOf[hashId] = [];
+        });
+
+        edgePaths.forEach(function(path) {
+            var points = getPathPoints(path);
+            if (points.length < 2) return;
+
+            var startPt = points[0];
+            var endPt = points[points.length - 1];
+
+            var sourceNode = null;
+            var targetNode = null;
+            var sourceMinDist = Infinity;
+            var targetMinDist = Infinity;
+
+            // Find closest source and target nodes for this edge
+            Object.keys(nodeData).forEach(function(hashId) {
+                var bbox = nodeData[hashId].bbox;
+
+                // Find closest node to start point (source)
+                if (isNearBbox(startPt, bbox, 30)) {
+                    var dist = distToBboxCenter(startPt, bbox);
+                    if (dist < sourceMinDist) {
+                        sourceMinDist = dist;
+                        sourceNode = hashId;
+                    }
+                }
+
+                // Find closest node to end point (target)
+                if (isNearBbox(endPt, bbox, 30)) {
+                    var dist = distToBboxCenter(endPt, bbox);
+                    if (dist < targetMinDist) {
+                        targetMinDist = dist;
+                        targetNode = hashId;
+                    }
+                }
+            });
+
+            if (sourceNode && targetNode && sourceNode !== targetNode) {
+                edgeConnections.push({path: path, source: sourceNode, target: targetNode});
+                // source -> target means: target's upstream includes source
+                if (!upstreamOf[targetNode].includes(sourceNode)) {
+                    upstreamOf[targetNode].push(sourceNode);
+                }
+                // source -> target means: source's downstream includes target
+                if (!downstreamOf[sourceNode].includes(targetNode)) {
+                    downstreamOf[sourceNode].push(targetNode);
+                }
+            }
+        });
+
+        // Traverse only upstream (to parents/ancestors)
+        function findUpstream(startNodeId) {
+            var visited = {};
+            var queue = [startNodeId];
+            visited[startNodeId] = true;
+
+            while (queue.length > 0) {
+                var current = queue.shift();
+                var parents = upstreamOf[current] || [];
+                parents.forEach(function(parent) {
+                    if (!visited[parent]) {
+                        visited[parent] = true;
+                        queue.push(parent);
+                    }
+                });
+            }
+            return visited;
+        }
+
+        // Traverse only downstream (to children/descendants)
+        function findDownstream(startNodeId) {
+            var visited = {};
+            var queue = [startNodeId];
+            visited[startNodeId] = true;
+
+            while (queue.length > 0) {
+                var current = queue.shift();
+                var children = downstreamOf[current] || [];
+                children.forEach(function(child) {
+                    if (!visited[child]) {
+                        visited[child] = true;
+                        queue.push(child);
+                    }
+                });
+            }
+            return visited;
+        }
+
+        // Get edges for connected nodes
+        function getChainEdges(nodeSet) {
+            var edges = [];
+            edgeConnections.forEach(function(conn) {
+                if (nodeSet[conn.source] && nodeSet[conn.target]) {
+                    edges.push(conn.path);
+                }
+            });
+            return edges;
+        }
+
+        // Attach hover handlers
+        nodes.forEach(function(node) {
+            var nodeId = node.id || '';
+            var parts = nodeId.split('-');
+            var hashId = parts.length >= 2 ? parts[1] : nodeId;
+
+            node.style.cursor = 'pointer';
+
+            node.addEventListener('mouseenter', function(e) {
+                e.stopPropagation();
+                nodes.forEach(function(n) { n.style.filter = ''; });
+                node.style.filter = 'drop-shadow(0 0 8px rgba(255, 171, 145, 0.7))';
+
+                // Find upstream (ancestors) and downstream (descendants) separately
+                var upstream = findUpstream(hashId);
+                var downstream = findDownstream(hashId);
+                // Merge both sets
+                var allConnected = {};
+                Object.keys(upstream).forEach(function(k) { allConnected[k] = true; });
+                Object.keys(downstream).forEach(function(k) { allConnected[k] = true; });
+
+                var chainEdges = getChainEdges(allConnected);
+                chainEdges.forEach(function(path) {
+                    path.classList.add('edge-highlighted');
+                });
+            });
+
+            node.addEventListener('mouseleave', function() {
+                node.style.filter = '';
+                // Remove highlight from all edges
+                edgePaths.forEach(function(path) {
+                    path.classList.remove('edge-highlighted');
+                });
+            });
+        });
+    });
+}
+
+// Initialize pan/zoom after page load
+waitForSvgs(initializePanZoom);
+
+// Refresh diagrams on window resize (debounced to avoid performance issues)
+let resizeTimer;
+window.addEventListener('resize', function() {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(async function() {
+        // Re-run mermaid on all diagrams
+        const mermaidElements = document.querySelectorAll('.mermaid');
+        mermaidElements.forEach(el => {
+            // Restore original markdown content
+            const originalContent = el.getAttribute('data-original-content');
+            if (originalContent) {
+                el.innerHTML = originalContent;
+                el.removeAttribute('data-processed');
+            }
+        });
+        // Re-render diagrams
+        await mermaid.run();
+        // Re-initialize pan-zoom after re-render
+        waitForSvgs(initializePanZoom);
+    }, 250); // Wait 250ms after resize stops before re-rendering
+});
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>

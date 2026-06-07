@@ -26,8 +26,13 @@
                     --color-text-primary: #212121;
                     --color-text-secondary: #424242;
                     --color-text-muted: #757575;
-                    --color-background: #FAFAFA;
+                    --color-background: #ececea;
                     --color-border: #EEEEEE;
+                    --reqvire-surface-card: #f7f7f4;
+                    --reqvire-surface-muted: #f1efe9;
+                    --reqvire-surface-hover: #e8e4da;
+                    --reqvire-surface-active: #ddd6c7;
+                    --reqvire-surface-border: #c7c1b7;
                 }
 
                 /* Ensure body takes full height */
@@ -36,7 +41,7 @@
                     line-height: 1.6;
                     margin: 0;
                     padding: 0;
-                    background-color: #FAFAFA;
+                    background-color: var(--color-background);
                     color: var(--color-text-secondary);
                 }
 
@@ -69,7 +74,7 @@
                 }
 
                 .nav-logo {
-                    margin-right: 20px;
+                    margin-right: 16px;
                 }
 
                 .nav-logo:hover {
@@ -83,13 +88,28 @@
                     vertical-align: middle;
                 }
 
+                .reqvire-view-switcher {
+                    display: flex;
+                    align-items: center;
+                    gap: 2px;
+                    min-width: 0;
+                    overflow-x: auto;
+                    scrollbar-width: none;
+                }
+
+                .reqvire-view-switcher::-webkit-scrollbar {
+                    display: none;
+                }
+
                 .nav-link {
                     color: white;
                     text-decoration: none;
-                    padding: 10px 20px;
-                    margin-right: 5px;
+                    padding: 7px 10px;
+                    margin-right: 0;
                     border-radius: 3px;
+                    font-size: 14px;
                     transition: background-color 0.2s, text-decoration 0.2s;
+                    white-space: nowrap;
                 }
 
                 .nav-link:hover {
@@ -102,6 +122,79 @@
                     background-color: var(--color-nav-hover);
                     text-decoration: underline;
                     color: white;
+                }
+
+                .reqvire-help-button {
+                    margin-left: auto;
+                    width: 26px;
+                    height: 26px;
+                    border: 1px solid rgba(255, 255, 255, 0.25);
+                    border-radius: 50%;
+                    background: transparent;
+                    color: #f3f4f6;
+                    font-size: 14px;
+                    font-weight: 700;
+                    line-height: 1;
+                    cursor: pointer;
+                }
+
+                .reqvire-help-button:hover {
+                    background: var(--color-nav-hover);
+                }
+
+                .reqvire-help-modal {
+                    display: none;
+                    position: fixed;
+                    inset: 0;
+                    z-index: 1100;
+                    align-items: flex-start;
+                    justify-content: flex-end;
+                    padding: 62px 18px 18px;
+                    background: rgba(17, 24, 39, 0.35);
+                }
+
+                .reqvire-help-modal.is-open {
+                    display: flex;
+                }
+
+                .reqvire-help-dialog {
+                    width: min(420px, calc(100vw - 36px));
+                    border: 1px solid #d1d5db;
+                    border-radius: 6px;
+                    background: #f7f7f4;
+                    color: var(--color-text-secondary);
+                    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.25);
+                    padding: 14px;
+                }
+
+                .reqvire-help-header {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    gap: 12px;
+                    margin-bottom: 8px;
+                }
+
+                .reqvire-help-header h2 {
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    border: 0 !important;
+                    font-size: 18px !important;
+                    line-height: 1.25 !important;
+                }
+
+                .reqvire-help-header button {
+                    border: 0;
+                    background: transparent;
+                    color: #4b5563;
+                    cursor: pointer;
+                    font-size: 18px;
+                }
+
+                .reqvire-help-dialog p {
+                    margin: 0;
+                    font-size: 14px;
+                    line-height: 1.5;
                 }
 
                 .mobile-nav-link {
@@ -134,6 +227,10 @@
                     padding: 30px;
                     border-radius: 4px;
                     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+                }
+
+                .reqvire-html-body {
+                    background-color: var(--color-background) !important;
                 }
 
                 /* Content area typography and styling - matches old template exactly */
@@ -262,7 +359,8 @@
                 .mermaid {
                     margin: 20px 0;
                     text-align: center;
-                    height: calc(100vh - 150px);
+                    height: auto;
+                    min-height: 280px;
                     width: 100%;
                     overflow: hidden;
                     position: relative;
@@ -349,12 +447,13 @@
                 @media print {
                     nav, .no-print { display: none; }
                 }
-            </style></head><body class="bg-gray-50"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../index.html" class="nav-logo flex items-center pr-4"><img src="../assets/logo.png" alt="Reqvire" height="24"></a><div class="hidden md:flex md:items-center md:gap-1"><a href="../index.html" class="nav-link">Containment</a><a href="../model.html" class="nav-link">Model</a><a href="../traces.html" class="nav-link">Traces</a><a href="../traceflow.html" class="nav-link">TraceFlow</a><a href="../coverage.html" class="nav-link">Coverage</a><a href="../resources.html" class="nav-link">Resources</a></div><button id="mobile-menu-btn" class="md:hidden ml-auto text-white p-2 rounded" style="transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#2a2a2a'" onmouseout="this.style.backgroundColor='transparent'" aria-label="Toggle menu"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg></button></nav><div id="mobile-menu" class="hidden md:hidden fixed top-[50px] left-0 right-0 shadow-lg z-[999]" style="background-color: #1c1c1c;"><div class="flex flex-col"><a href="../index.html" class="mobile-nav-link">Containment</a><a href="../model.html" class="mobile-nav-link">Model</a><a href="../traces.html" class="mobile-nav-link">Traces</a><a href="../traceflow.html" class="mobile-nav-link">TraceFlow</a><a href="../coverage.html" class="mobile-nav-link">Coverage</a><a href="../resources.html" class="mobile-nav-link">Resources</a></div></div><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
+            </style></head><body class="reqvire-html-body"><nav class="reqvire-nav fixed top-0 left-0 right-0 h-[50px] shadow-md z-[1000] flex items-center px-5" style="background-color: #1c1c1c;"><a href="../index.html" class="nav-logo flex items-center pr-4"><img src="../assets/logo.png" alt="Reqvire" height="24"></a><div class="reqvire-view-switcher" aria-label="Explorer views"><a href="../index.html" class="nav-link">Containment</a><a href="../model.html" class="nav-link">Model</a><a href="../traces.html" class="nav-link">Traces</a><a href="../ontologies.html" class="nav-link">Ontologies</a><a href="../knowledgegraph.html" class="nav-link">Knowledge Graph</a><a href="../kn2.html" class="nav-link">KN2</a></div><button class="reqvire-help-button" type="button" aria-label="Open view help" onclick="openReqvireExplorerHelp()">?</button></nav><div class="h-[50px]"></div><div class="w-full max-w-[95%] mx-auto p-5"><div class="bg-white p-8 rounded shadow-sm border border-gray-200"><div class="prose max-w-none"><h1 id="elements">Elements</h1>
 <div class="mermaid">graph TD;
   %% REQVIRE-AUTOGENERATED-DIAGRAM
   %% Graph styling
-  classDef userRequirement fill:#D1C4E9,stroke:#7E57C2,stroke-width:2px;
+  classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px;
   classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px;
+  classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px;
   classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px;
   classDef folder fill:#FAFAFA,stroke:#9E9E9E,stroke-width:3px;
   classDef file fill:#FFF8E1,stroke:#FFCA28,stroke-width:2px;
@@ -410,24 +509,27 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>refine: <a href="Functional/Core/ModelManagement.html#git-repository-as-project-root">Git Repository as Project Root</a></li>
 </ul>
 <hr />
 <h3 id="refinement-specification">Refinement Specification</h3>
-<p>Reqvire implements requirement refinement through the Details subsection.</p>
+<p>Reqvire implements requirement refinement through explicit refinement elements linked to requirements.</p>
 <h4>Details</h4>
-<p><strong>SysML Refine Stereotype:</strong></p>
+<p><strong>Refinement Ownership:</strong></p>
 <ul>
-<li><code>#### Details</code> subsection provides textual refinement</li>
-<li>One level of refinement per element</li>
-<li>Elaborates requirement without creating separate child element</li>
+<li>Refinement content is captured in dedicated requirement-owned elements (<code>source</code>, <code>semantic-contract</code>, <code>semantic-query-contract</code>, <code>specification</code>, <code>constraint</code>, <code>behavior</code>, <code>state</code>, <code>input-output</code>)</li>
+<li>Requirement owns refinement via <code>refinedBy</code>; refinement points back via <code>refine</code></li>
+<li>Refinement elements can be attached by external requirements when ownership constraints allow</li>
 </ul>
 <p><strong>Usage:</strong></p>
 <ul>
-<li>Acceptance criteria</li>
-<li>Implementation notes</li>
-<li>Clarifying information</li>
-<li>Rationale and context</li>
+<li>Acceptance criteria and technical details reside in refinement elements</li>
+<li>Requirement text stays intent-focused (EARS-style), with concise detail pointers</li>
+<li>Clarifying information and rationale are captured in linked refinements</li>
+<li>Refinements provide attachment-ready specification contracts across submodels</li>
+<li><code>semantic-query-contract</code> refinements capture requirement-owned declarative semantic queries over reachable semantic model context without a query-kind classification.</li>
+<li><code>state</code> refinements capture lifecycle states, state machines, allowed transitions, terminal states, and state-dependent contract behavior.</li>
+<li><code>input-output</code> refinements capture payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -435,35 +537,17 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>refine: <a href="Functional/Core/ModelManagement.html#refinement-element-structure-constraints">Refinement Element Structure Constraints</a></li>
 </ul>
 <hr />
 <h3 id="relation-semantics-specification">Relation Semantics Specification</h3>
-<p>Reqvire implements SysML relation stereotypes for requirements management.</p>
+<p>Reqvire implements relation semantics for ownership, hierarchy, verification, implementation satisfaction, attachments, and traceability.</p>
 <h4>Details</h4>
-<p><strong>Requirement Decomposition:</strong></p>
 <ul>
-<li><code>derive</code>/<code>derivedFrom</code>: SysML DeriveReqt stereotype</li>
-<li>Parent requirements decompose into child requirements</li>
-<li>Maintains traceability from stakeholder needs to system requirements</li>
-</ul>
-<p><strong>Verification Linkage:</strong></p>
-<ul>
-<li><code>verify</code>/<code>verifiedBy</code>: SysML Verify stereotype</li>
-<li>Links test cases and verification methods to requirements</li>
-<li>Enables verification coverage analysis</li>
-</ul>
-<p><strong>Implementation Satisfaction:</strong></p>
-<ul>
-<li><code>satisfy</code>/<code>satisfiedBy</code>: SysML Satisfy stereotype</li>
-<li>Links implementation artifacts (code, designs) to requirements</li>
-<li>Demonstrates requirement fulfillment</li>
-</ul>
-<p><strong>General Traceability:</strong></p>
-<ul>
-<li><code>trace</code>: SysML Trace stereotype</li>
-<li>Loose coupling between related elements</li>
-<li>Cross-reference without hierarchical dependency</li>
+<li>Relation names, inverse names, allowed source/target families, ownership semantics, and change-impact propagation are defined by the Reqvire relation ontology.</li>
+<li>Implementation relation validators shall enforce the relation ontology together with element-type compatibility constraints.</li>
+<li>Report and mutation code shall use the same relation direction and propagation semantics so validation, collect, submodels, coverage, and change impact remain consistent.</li>
+<li><code>trace</code> remains non-owning documentation traceability and must not be used as a substitute for hierarchy, refinement ownership, verification, satisfaction, or attachment dependencies.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -471,41 +555,27 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>refine: <a href="Functional/Core/ModelManagement.html#relation-types-and-behaviors">Relation Types and behaviors</a></li>
 </ul>
 <hr />
 <h3 id="supported-element-types-specification">Supported Element Types Specification</h3>
-<p>Element types supported by the system for classification and behavior determination, aligned with SysML and systems engineering standards.</p>
+<p>Element types supported by the system for classification and behavior determination.</p>
 <h4>Details</h4>
-<p><strong>Requirement Types:</strong></p>
-<table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>requirement</code></td><td>System requirement (default type if not specified)</td></tr>
-<tr><td><code>user-requirement</code></td><td>User requirement representing stakeholder needs</td></tr>
-</tbody></table>
-<p><strong>Verification Types:</strong></p>
-<table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>verification</code></td><td>Verification through testing (equivalent to <code>test-verification</code>)</td></tr>
-<tr><td><code>test-verification</code></td><td>Explicit verification through testing with documented test procedures</td></tr>
-<tr><td><code>analysis-verification</code></td><td>Verification through formal analysis of documentation or code</td></tr>
-<tr><td><code>inspection-verification</code></td><td>Verification through formal inspection or review</td></tr>
-<tr><td><code>demonstration-verification</code></td><td>Verification through demonstration in a realistic environment</td></tr>
-</tbody></table>
-<p><strong>Refinement Types:</strong></p>
-<table><thead><tr><th>Type</th><th>Description</th><th>Constraints</th></tr></thead><tbody>
-<tr><td><code>constraint</code></td><td>Documents constraints that limit or bound the system</td><td>Only <code>satisfy</code> relations allowed</td></tr>
-<tr><td><code>behavior</code></td><td>Documents behavior details and operational specifications</td><td>Only <code>satisfy</code> relations allowed</td></tr>
-<tr><td><code>specification</code></td><td>Documents detailed specifications and technical descriptions</td><td>Only <code>satisfy</code> relations allowed</td></tr>
-</tbody></table>
-<p><strong>Other Types:</strong></p>
-<table><thead><tr><th>Type</th><th>Description</th></tr></thead><tbody>
-<tr><td><code>other</code></td><td>Generic custom element type</td></tr>
-<tr><td><code>other-TYPENAME</code></td><td>Named custom element type (e.g., <code>other-interface</code>, <code>other-actor</code>)</td></tr>
-</tbody></table>
-<p><strong>Custom Type Pattern:</strong></p>
+<p>The canonical type vocabulary is defined by the Reqvire core element, capability, requirement, ontology, semantic-contract, semantic-query-contract, and verification model contracts.</p>
+<p>The implementation shall use those contracts as the authoritative source for:</p>
 <ul>
-<li>Use <code>other-TYPENAME</code> where TYPENAME is the custom type name</li>
-<li>TYPENAME must be at least one character (e.g., <code>other-x</code> is valid, <code>other-</code> alone is not)</li>
-<li>Custom types can only use <code>trace</code> relations</li>
+<li>capability, requirement, refinement, verification, and custom type categories</li>
+<li>default element type semantics</li>
+<li>requirement-owned refinement type semantics</li>
+<li>evidence-backed verification type semantics</li>
+</ul>
+<p>Parser-facing behavior remains:</p>
+<ul>
+<li>When <code>type</code> metadata is omitted, the element type is <code>requirement</code>.</li>
+<li><code>type</code> metadata uses the exact element-type token declared in the semantic vocabulary.</li>
+<li><code>other</code> and <code>other-TYPENAME</code> are custom trace-only types.</li>
+<li><code>other-TYPENAME</code> requires at least one character after <code>other-</code>; <code>other-</code> alone is invalid.</li>
+<li>Custom types can only use <code>trace</code> relations.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -513,29 +583,17 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>refine: <a href="Functional/Core/ModelManagement.html#element-type-relation-compatibility">Element Type Relation Compatibility</a></li>
 </ul>
 <hr />
 <h3 id="traceability-reporting-specification">Traceability Reporting Specification</h3>
-<p>Reqvire provides traceability reports per ISO/IEC/IEEE 29148.</p>
+<p>Reqvire provides traceability reports over the Reqvire capability, requirement, verification, refinement, attachment, and implementation graph.</p>
 <h4>Details</h4>
-<p><strong>Upward Traceability:</strong></p>
 <ul>
-<li>Trace from implementation to requirements</li>
-<li>Trace from tests to requirements</li>
-<li>Verification coverage reports</li>
-</ul>
-<p><strong>Downward Traceability:</strong></p>
-<ul>
-<li>Trace from stakeholder needs to system requirements</li>
-<li>Derive chain visualization</li>
-<li>Model-centric hierarchical views</li>
-</ul>
-<p><strong>Bidirectional Traceability:</strong></p>
-<ul>
-<li>Impact analysis for requirement changes</li>
-<li>Affected elements identification</li>
-<li>Change propagation tracking</li>
+<li>Traceability reports shall use Reqvire relation semantics for traversal direction, ownership, and evidence links.</li>
+<li>Upward reports shall trace implementation and verification evidence to requirements and owning capability roots where applicable.</li>
+<li>Downstream reports shall trace capability roots to specified requirements and requirement descendants.</li>
+<li>Change-impact reports shall use propagation relations, attachments, semantic dependencies, and impact scope rules to identify affected elements.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -543,30 +601,17 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>refine: <a href="Functional/Output/Reporting.html#model-reports">Model Reports</a></li>
 </ul>
 <hr />
 <h3 id="verification-coverage-specification">Verification Coverage Specification</h3>
-<p>Reqvire supports verification coverage analysis per INCOSE best practices.</p>
+<p>Reqvire supports verification coverage analysis for requirement verification and capability roll-up.</p>
 <h4>Details</h4>
-<p><strong>Coverage Metrics:</strong></p>
 <ul>
-<li>Requirements with verification links (verifiedBy)</li>
-<li>Requirements without verification (coverage gaps)</li>
-<li>Verification completeness percentage</li>
-</ul>
-<p><strong>Coverage Reports:</strong></p>
-<ul>
-<li>List unverified requirements</li>
-<li>Group by element type</li>
-<li>Identify critical gaps</li>
-</ul>
-<p><strong>Verification Types:</strong></p>
-<ul>
-<li>test-verification: Automated or manual tests</li>
-<li>analysis-verification: Analysis and review</li>
-<li>inspection-verification: Physical inspection</li>
-<li>demonstration-verification: Demonstration of capability</li>
+<li>Verification type vocabulary, evidence-backed verification semantics, and capability coverage vocabulary are defined by the Reqvire verification and verification rollup ontologies.</li>
+<li>Coverage reports shall classify verified and unverified requirements from <code>verifiedBy</code>/<code>verify</code> relations.</li>
+<li>Coverage reports shall use the ontology-defined evidence-backed flag to decide whether a verification requires <code>satisfiedBy</code> evidence for coverage satisfaction.</li>
+<li>Capability coverage shall be reported by rolling up coverage from requirements that specify each capability and from descendant capability subgraphs.</li>
 </ul>
 <h4>Metadata</h4>
 <ul>
@@ -574,7 +619,7 @@
 </ul>
 <h4>Relations</h4>
 <ul>
-<li>satisfy: <a href="UserStories.html#align-with-industry-standards">Align with Industry Standards</a></li>
+<li>refine: <a href="Functional/Output/Reporting.html#verification-coverage-report">Verification Coverage Report</a></li>
 </ul>
 <hr />
 </div><script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script><script src="https://cdn.jsdelivr.net/npm/svg-pan-zoom@3.5.0/dist/svg-pan-zoom.min.js"></script><script type="module">import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs';
@@ -623,7 +668,8 @@ await mermaid.run();
 window.mermaid = mermaid;
 
 // Wait for SVGs to be fully rendered, then initialize
-function waitForSvgs(callback) {
+function waitForSvgs(callback, startedAt) {
+    startedAt = startedAt || performance.now();
     var containers = document.querySelectorAll('.mermaid');
     var allReady = true;
     containers.forEach(function(c) {
@@ -632,10 +678,13 @@ function waitForSvgs(callback) {
             allReady = false;
         }
     });
-    if (allReady && containers.length > 0) {
+    if ((allReady && containers.length > 0) || performance.now() - startedAt > 5000) {
+        if (!allReady) {
+            console.warn('Timed out waiting for one or more Mermaid diagrams; initializing rendered diagrams.');
+        }
         callback();
     } else {
-        requestAnimationFrame(function() { waitForSvgs(callback); });
+        requestAnimationFrame(function() { waitForSvgs(callback, startedAt); });
     }
 }
 
@@ -648,7 +697,7 @@ function initializePanZoom() {
             // Get the natural size of the diagram
             var bbox = svg.getBBox();
             var containerWidth = mermaidContainer.clientWidth;
-            var containerHeight = mermaidContainer.clientHeight;
+            var containerHeight = Math.max(mermaidContainer.clientHeight, 280);
 
             // Check if diagram fits within container (with some padding)
             var padding = 40;
@@ -666,6 +715,11 @@ function initializePanZoom() {
             }
 
             // Large diagram - enable pan/zoom
+            var viewportHeight = Math.max(360, window.innerHeight - 150);
+            var desiredHeight = Math.min(Math.max(420, bbox.height + padding), viewportHeight);
+            mermaidContainer.style.height = desiredHeight + 'px';
+            mermaidContainer.style.minHeight = '0';
+            mermaidContainer.style.maxHeight = 'none';
             svg.style.maxWidth = 'none';
             svg.style.maxHeight = 'none';
 
@@ -1058,9 +1112,25 @@ window.addEventListener('resize', function() {
         waitForSvgs(initializePanZoom);
     }, 250); // Wait 250ms after resize stops before re-rendering
 });
-</script><footer class="mt-8 pt-5 border-t border-gray-200 text-center text-gray-600 text-sm">Generated by <a href="https://reqvire.org" class="text-gray-700 no-underline hover:underline">Reqvire</a></footer></div></div><script>
-                        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
-                            var menu = document.getElementById('mobile-menu');
-                            menu.classList.toggle('hidden');
-                        });
-                    </script></body></html>
+</script></div></div><div id="reqvire-help-modal" class="reqvire-help-modal" aria-hidden="true"><div class="reqvire-help-dialog" role="dialog" aria-modal="true" aria-labelledby="reqvire-help-title"><div class="reqvire-help-header"><h2 id="reqvire-help-title">Reqvire Explorer</h2><button type="button" aria-label="Close view help" onclick="closeReqvireExplorerHelp()">x</button></div><p>Use the header switcher to move between Containment, Model, Traces, Ontologies, and Knowledge Graph. Supporting report artifact pages may still exist but are not primary Explorer destinations.</p></div></div><script>
+                function openReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.add('is-open');
+                    modal.setAttribute('aria-hidden', 'false');
+                }
+                function closeReqvireExplorerHelp() {
+                    var modal = document.getElementById('reqvire-help-modal');
+                    if (!modal) return;
+                    modal.classList.remove('is-open');
+                    modal.setAttribute('aria-hidden', 'true');
+                }
+                document.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') closeReqvireExplorerHelp();
+                });
+                document.addEventListener('click', function(event) {
+                    if (event.target && event.target.id === 'reqvire-help-modal') {
+                        closeReqvireExplorerHelp();
+                    }
+                });
+            </script></body></html>
