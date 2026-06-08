@@ -40,7 +40,7 @@ jobs:
           remote-repository-name: reqvire-cla
           #create-file-commit-message: 'For example: Creating file for storing CLA Signatures'
           signed-commit-message: '$contributorName signed the Reqvire CLA for $owner/$repo#$pullRequestNo'
-          custom-notsigned-prcomment: 'Thank you for contributing to Reqvire. Before this pull request can be merged, each contributor must read the Reqvire CLA: $pathToCLADocument. To sign, add this exact pull request comment: I have read the CLA Document and I hereby sign the CLA'
+          custom-notsigned-prcomment: 'Thank you for contributing to Reqvire. Before this pull request can be merged, each contributor must read the [Reqvire CLA](https://github.com/reqvire-org/reqvire/blob/main/doc/CLA.md). To sign, add this exact pull request comment: I have read the CLA Document and I hereby sign the CLA'
           custom-pr-sign-comment: 'I have read the CLA Document and I hereby sign the CLA'
           custom-allsigned-prcomment: 'All pull request contributors have signed the Reqvire CLA.'
           lock-pullrequest-aftermerge: true
