@@ -22,8 +22,6 @@ jobs:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
           script: |
-            const { getOctokit } = require('@actions/github');
-
             const SIGNATURE_TEXT = 'I have read the CLA Document and I hereby sign the CLA';
             const CLA_DOCUMENT_URL = 'https://github.com/reqvire-org/reqvire/blob/main/doc/CLA.md';
             const SIGNATURE_OWNER = 'reqvire-org';
@@ -62,7 +60,6 @@ jobs:
               return;
             }
 
-            const signatureGithub = getOctokit(pat);
             const pullRequest = await resolvePullRequest();
             if (!pullRequest) {
               core.info('No pull request found for this event.');
@@ -73,7 +70,7 @@ jobs:
             const headSha = pullRequest.head.sha;
             const contributors = await listPullRequestContributors(pullNumber);
             const contributorKeys = new Set(contributors.flatMap(contributorKeysFor));
-            const signatureFile = await readSignatureFile(signatureGithub);
+            const signatureFile = await readSignatureFile();
             const signedContributors = normalizeSignedContributors(signatureFile.content.signedContributors || []);
 
             if (eventName === 'issue_comment') {
@@ -93,7 +90,7 @@ jobs:
                 core.info(`@${commenter.login} already has a CLA signature; not writing a duplicate.`);
               } else {
                 signedContributors.push(commenterRecord);
-                await writeSignatureFile(signatureGithub, signatureFile.sha, {
+                await writeSignatureFile(signatureFile.sha, {
                   ...signatureFile.content,
                   signedContributors,
                 }, `@${commenter.login} signed the Reqvire CLA for ${owner}/${repo}#${pullNumber}`);
@@ -165,22 +162,20 @@ jobs:
               return Array.from(contributorsByKey.values()).sort((left, right) => left.name.localeCompare(right.name));
             }
 
-            async function readSignatureFile(signatureGithub) {
+            async function readSignatureFile() {
               try {
-                const response = await signatureGithub.rest.repos.getContent({
-                  owner: SIGNATURE_OWNER,
-                  repo: SIGNATURE_REPO,
-                  path: SIGNATURE_PATH,
-                  ref: SIGNATURE_BRANCH,
-                });
+                const response = await requestSignatureRepo(
+                  'GET',
+                  `/repos/${SIGNATURE_OWNER}/${SIGNATURE_REPO}/contents/${SIGNATURE_PATH}?ref=${encodeURIComponent(SIGNATURE_BRANCH)}`
+                );
 
-                if (Array.isArray(response.data)) {
+                if (Array.isArray(response)) {
                   throw new Error(`${SIGNATURE_PATH} resolves to a directory, expected JSON file.`);
                 }
 
-                const content = Buffer.from(response.data.content, response.data.encoding).toString('utf8');
+                const content = Buffer.from(response.content, response.encoding).toString('utf8');
                 return {
-                  sha: response.data.sha,
+                  sha: response.sha,
                   content: JSON.parse(content),
                 };
               } catch (error) {
@@ -194,11 +189,8 @@ jobs:
               }
             }
 
-            async function writeSignatureFile(signatureGithub, sha, content, message) {
+            async function writeSignatureFile(sha, content, message) {
               const payload = {
-                owner: SIGNATURE_OWNER,
-                repo: SIGNATURE_REPO,
-                path: SIGNATURE_PATH,
                 message,
                 content: Buffer.from(JSON.stringify(content, null, 2) + '\n').toString('base64'),
                 branch: SIGNATURE_BRANCH,
@@ -208,7 +200,39 @@ jobs:
                 payload.sha = sha;
               }
 
-              await signatureGithub.rest.repos.createOrUpdateFileContents(payload);
+              await requestSignatureRepo(
+                'PUT',
+                `/repos/${SIGNATURE_OWNER}/${SIGNATURE_REPO}/contents/${SIGNATURE_PATH}`,
+                payload
+              );
+            }
+
+            async function requestSignatureRepo(method, path, body) {
+              const response = await fetch(`https://api.github.com${path}`, {
+                method,
+                headers: {
+                  Accept: 'application/vnd.github+json',
+                  Authorization: `Bearer ${pat}`,
+                  'Content-Type': 'application/json',
+                  'X-GitHub-Api-Version': '2022-11-28',
+                },
+                body: body ? JSON.stringify(body) : undefined,
+              });
+
+              if (response.status === 204) {
+                return null;
+              }
+
+              const text = await response.text();
+              const data = text ? JSON.parse(text) : null;
+
+              if (!response.ok) {
+                const error = new Error(data?.message || `GitHub API request failed: ${method} ${path}`);
+                error.status = response.status;
+                throw error;
+              }
+
+              return data;
             }
 
             function normalizeSignedContributors(contributors) {
