@@ -9,7 +9,7 @@ on:
 permissions:
   contents: read
   issues: write
-  pull-requests: read
+  pull-requests: write
   statuses: write
 
 jobs:
@@ -21,6 +21,7 @@ jobs:
         env:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
             const SIGNATURE_TEXT = 'I have read the CLA Document and I hereby sign the CLA';
             const CLA_DOCUMENT_URL = 'https://github.com/reqvire-org/reqvire/blob/main/doc/CLA.md';
@@ -272,7 +273,9 @@ jobs:
                   content: '+1',
                 });
               } catch (error) {
-                if (error.status !== 422) {
+                if (error.status === 403) {
+                  core.warning(`Could not add acknowledgement reaction to signing comment: ${error.message}`);
+                } else if (error.status !== 422) {
                   throw error;
                 }
               }
