@@ -29,7 +29,6 @@ jobs:
             const SIGNATURE_REPO = 'reqvire-cla';
             const SIGNATURE_BRANCH = 'main';
             const SIGNATURE_PATH = 'signatures/version1/cla.json';
-            const REQUEST_MARKER_PREFIX = '<!-- reqvire-cla-request:';
 
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -276,24 +275,7 @@ jobs:
             }
 
             async function requestMissingSignatures(pullNumber, missing) {
-              const comments = await github.paginate(github.rest.issues.listComments, {
-                owner,
-                repo,
-                issue_number: pullNumber,
-                per_page: 100,
-              });
-              const existingMarkers = new Set(
-                comments
-                  .map((comment) => comment.body?.match(/<!-- reqvire-cla-request:([^>]+) -->/)?.[1])
-                  .filter(Boolean)
-              );
-
               for (const contributor of missing) {
-                const key = contributorKey(contributor);
-                if (existingMarkers.has(key)) {
-                  continue;
-                }
-
                 await github.rest.issues.createComment({
                   owner,
                   repo,
@@ -302,8 +284,6 @@ jobs:
                     `@${contributor.name}, please read the [Reqvire CLA](${CLA_DOCUMENT_URL}) and add this exact pull request comment to sign:`,
                     '',
                     '`' + SIGNATURE_TEXT + '`',
-                    '',
-                    `${REQUEST_MARKER_PREFIX}${key} -->`,
                   ].join('\n'),
                 });
               }
