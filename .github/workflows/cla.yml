@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "CLA Assistant"
+        id: cla
         if: github.event_name == 'pull_request_target' || github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA'
         uses: contributor-assistant/github-action@v2.6.1
         env:
@@ -46,3 +47,24 @@ jobs:
           lock-pullrequest-aftermerge: true
           use-dco-flag: false
           suggest-recheck: false
+      - name: "Acknowledge CLA signing comment"
+        if: github.event_name == 'issue_comment' && github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA' && steps.cla.outcome == 'success'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const signingCommentId = context.payload.comment.id;
+
+            try {
+              await github.rest.reactions.createForIssueComment({
+                owner,
+                repo,
+                comment_id: signingCommentId,
+                content: '+1',
+              });
+            } catch (error) {
+              if (error.status !== 422) {
+                throw error;
+              }
+            }
