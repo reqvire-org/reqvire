@@ -1,4 +1,4 @@
-name: "CLA Assistant"
+name: "Reqvire CLA"
 
 on:
   issue_comment:
@@ -10,10 +10,9 @@ permissions:
   contents: read
   issues: write
   pull-requests: write
-  statuses: write
 
 jobs:
-  CLAAssistant:
+  check:
     runs-on: ubuntu-latest
     steps:
       - name: "Reqvire CLA"
@@ -29,9 +28,7 @@ jobs:
             const SIGNATURE_REPO = 'reqvire-cla';
             const SIGNATURE_BRANCH = 'main';
             const SIGNATURE_PATH = 'signatures/version1/cla.json';
-            const STATUS_CONTEXT = 'Reqvire CLA';
-            const COMMENT_MARKER = '<!-- reqvire-cla-assistant -->';
-            const BOT_COMMENT_FOOTER = '\n\nPosted by the **Reqvire CLA bot**.\n' + COMMENT_MARKER;
+            const REQUEST_MARKER_PREFIX = '<!-- reqvire-cla-request:';
 
             const owner = context.repo.owner;
             const repo = context.repo.repo;
@@ -68,7 +65,6 @@ jobs:
             }
 
             const pullNumber = pullRequest.number;
-            const headSha = pullRequest.head.sha;
             const contributors = await listPullRequestContributors(pullNumber);
             const contributorKeys = new Set(contributors.flatMap(contributorKeysFor));
             const signatureFile = await readSignatureFile();
@@ -102,19 +98,9 @@ jobs:
             const missing = contributors.filter((contributor) => !contributorKeysFor(contributor).some((key) => signedKeys.has(key)));
             const allSigned = missing.length === 0;
 
-            await github.rest.repos.createCommitStatus({
-              owner,
-              repo,
-              sha: headSha,
-              state: allSigned ? 'success' : 'failure',
-              context: STATUS_CONTEXT,
-              description: allSigned
-                ? 'All pull request contributors have signed the Reqvire CLA.'
-                : `${missing.length} contributor(s) must sign the Reqvire CLA.`,
-              target_url: `${context.payload.repository.html_url}/pull/${pullNumber}`,
-            });
-
-            await upsertClaComment(pullNumber, allSigned, missing);
+            if (eventName === 'pull_request_target' && !allSigned) {
+              await requestMissingSignatures(pullNumber, missing);
+            }
 
             if (!allSigned) {
               core.setFailed(`Missing Reqvire CLA signatures: ${missing.map((contributor) => '@' + contributor.name).join(', ')}`);
@@ -281,48 +267,36 @@ jobs:
               }
             }
 
-            async function upsertClaComment(pullNumber, allSigned, missing) {
-              const body = allSigned
-                ? `All pull request contributors have signed the Reqvire CLA.${BOT_COMMENT_FOOTER}`
-                : [
-                    `Thank you for contributing to Reqvire. Before this pull request can be merged, each contributor must read the [Reqvire CLA](${CLA_DOCUMENT_URL}).`,
-                    '',
-                    'Missing signatures:',
-                    ...missing.map((contributor) => `- @${contributor.name}`),
-                    '',
-                    'To sign, each missing contributor must add this exact pull request comment:',
-                    '',
-                    '`' + SIGNATURE_TEXT + '`',
-                    BOT_COMMENT_FOOTER,
-                  ].join('\n');
-
+            async function requestMissingSignatures(pullNumber, missing) {
               const comments = await github.paginate(github.rest.issues.listComments, {
                 owner,
                 repo,
                 issue_number: pullNumber,
                 per_page: 100,
               });
-              const existing = comments
-                .filter((comment) =>
-                  comment.body?.includes(COMMENT_MARKER) ||
-                  comment.body?.includes('CLA Assistant Lite bot') ||
-                  comment.body?.includes('Before this pull request can be merged, each contributor must read the [Reqvire CLA]')
-                )
-                .sort((left, right) => new Date(right.updated_at) - new Date(left.updated_at))[0];
+              const existingMarkers = new Set(
+                comments
+                  .map((comment) => comment.body?.match(/<!-- reqvire-cla-request:([^>]+) -->/)?.[1])
+                  .filter(Boolean)
+              );
 
-              if (existing) {
-                await github.rest.issues.updateComment({
-                  owner,
-                  repo,
-                  comment_id: existing.id,
-                  body,
-                });
-              } else {
+              for (const contributor of missing) {
+                const key = contributorKey(contributor);
+                if (existingMarkers.has(key)) {
+                  continue;
+                }
+
                 await github.rest.issues.createComment({
                   owner,
                   repo,
                   issue_number: pullNumber,
-                  body,
+                  body: [
+                    `@${contributor.name}, please read the [Reqvire CLA](${CLA_DOCUMENT_URL}) and add this exact pull request comment to sign:`,
+                    '',
+                    '`' + SIGNATURE_TEXT + '`',
+                    '',
+                    `${REQUEST_MARKER_PREFIX}${key} -->`,
+                  ].join('\n'),
                 });
               }
             }
