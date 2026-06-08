@@ -7,6 +7,7 @@ on:
     types: [opened, closed, synchronize]
 
 permissions:
+  actions: write
   contents: read
   issues: write
   pull-requests: write
@@ -69,10 +70,9 @@ jobs:
             const contributorKeys = new Set(contributors.flatMap(contributorKeysFor));
             const signatureFile = await readSignatureFile();
             const signedContributors = normalizeSignedContributors(signatureFile.content.signedContributors || []);
+            let signatureAccepted = false;
 
             if (eventName === 'issue_comment') {
-              await acknowledgeSigningComment();
-
               const commenter = context.payload.comment.user;
               const commenterRecord = {
                 name: commenter.login,
@@ -85,12 +85,16 @@ jobs:
                 core.warning(`@${commenter.login} is not a current contributor on PR #${pullNumber}; not recording a CLA signature.`);
               } else if (isSigned(signedContributors, commenterRecord)) {
                 core.info(`@${commenter.login} already has a CLA signature; not writing a duplicate.`);
+                signatureAccepted = true;
+                await acknowledgeSigningComment();
               } else {
                 signedContributors.push(commenterRecord);
                 await writeSignatureFile(signatureFile.sha, {
                   ...signatureFile.content,
                   signedContributors,
                 }, `@${commenter.login} signed the Reqvire CLA for ${owner}/${repo}#${pullNumber}`);
+                signatureAccepted = true;
+                await acknowledgeSigningComment();
               }
             }
 
@@ -98,8 +102,12 @@ jobs:
             const missing = contributors.filter((contributor) => !contributorKeysFor(contributor).some((key) => signedKeys.has(key)));
             const allSigned = missing.length === 0;
 
-            if (eventName === 'pull_request_target' && !allSigned) {
+            if (!allSigned) {
               await requestMissingSignatures(pullNumber, missing);
+            }
+
+            if (eventName === 'issue_comment' && signatureAccepted && allSigned) {
+              await rerunPullRequestClaCheck(pullRequest);
             }
 
             if (!allSigned) {
@@ -299,4 +307,28 @@ jobs:
                   ].join('\n'),
                 });
               }
+            }
+
+            async function rerunPullRequestClaCheck(pullRequest) {
+              const runs = await github.paginate(github.rest.actions.listWorkflowRuns, {
+                owner,
+                repo,
+                workflow_id: 'cla.yml',
+                event: 'pull_request_target',
+                per_page: 100,
+              });
+              const run = runs
+                .filter((candidate) => candidate.head_sha === pullRequest.head.sha && candidate.status === 'completed')
+                .sort((left, right) => new Date(right.updated_at) - new Date(left.updated_at))[0];
+
+              if (!run) {
+                core.warning(`Could not find a completed pull_request_target CLA run for ${pullRequest.head.sha}; the PR check may need a manual rerun.`);
+                return;
+              }
+
+              await github.rest.actions.reRunWorkflow({
+                owner,
+                repo,
+                run_id: run.id,
+              });
             }
