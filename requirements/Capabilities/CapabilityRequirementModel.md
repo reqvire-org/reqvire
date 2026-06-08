@@ -8,6 +8,7 @@ Defines SHACL constraints for capability structure, ownership, refinement, verif
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:CapabilityShape
   a sh:NodeShape ;
@@ -71,6 +72,7 @@ Defines SHACL constraints for requirement ownership, hierarchy, refinements, ver
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:RequirementShape
   a sh:NodeShape ;
@@ -116,6 +118,10 @@ reqvire:RequirementShape
     sh:class reqvire:Artifact ;
   ] ;
   sh:property [
+    sh:path reqvire:requirementObligationText ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
     sh:path reqvire:satisfy ;
     sh:maxCount 0 ;
   ] ;
@@ -144,7 +150,7 @@ reqvire:RequirementOwnedRefinementShape
 
 ### Reqvire Semantic Contract Ontology Shape Profile
 
-Defines SHACL constraints for semantic-contract identity, profile kind, shape content, and owning capability or requirement.
+Defines SHACL constraints for semantic-contract identity, profile kind, shape content, and owning requirement.
 
 #### Shapes
 ```turtle
@@ -159,7 +165,7 @@ reqvire:SemanticContractShape
     sh:path reqvire:semanticContractIri ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:datatype xsd:string ;
+    sh:datatype xsd:anyURI ;
   ] ;
   sh:property [
     sh:path reqvire:semanticContractKind ;
@@ -182,10 +188,7 @@ reqvire:SemanticContractShape
     sh:path reqvire:refine ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:or (
-      [ sh:class reqvire:Capability ]
-      [ sh:class reqvire:Requirement ]
-    ) ;
+    sh:class reqvire:Requirement ;
   ] .
 ```
 
@@ -194,6 +197,61 @@ reqvire:SemanticContractShape
 
 #### Relations
   * refine: [Semantic Contract Element Semantic Contract](../Functional/Core/ModelManagement.md#semantic-contract-element-semantic-contract)
+---
+
+### Reqvire Semantic Query Contract Shape Profile
+
+Defines SHACL constraints for semantic-query-contract identity, query content, query language, and owning requirement.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:SemanticQueryContractShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:SemanticQueryContract ;
+  sh:property [
+    sh:path reqvire:queryContractIri ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:anyURI ;
+  ] ;
+  sh:property [
+    sh:path reqvire:queryLanguage ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("sparql") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:queryText ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:ontologyText ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:shapesText ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * refine: [Semantic Query Contract Element Semantic Contract](../Functional/Core/ModelManagement.md#semantic-query-contract-element-semantic-contract)
 ---
 
 ### Reqvire Ontology Element Shape Profile

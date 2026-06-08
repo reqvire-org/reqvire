@@ -118,7 +118,7 @@ This test verifies that capability, specified requirement, ontology, and semanti
 - Attached ontology content changes mark the attaching capability as changed and propagate through that capability context to descendant capabilities and specified requirements.
 
 ##### Test Criteria
-- Modify a capability, its specified requirement, its owned semantic contract, and an attached ontology.
+- Modify a capability, its specified requirement, the requirement-owned semantic contract, and an attached ontology.
 - Run `reqvire change-impact --json`; assert exit code 0 and valid JSON.
 - Assert the capability impact tree contains the specified requirement.
 - Assert the requirement impact tree contains the verification.

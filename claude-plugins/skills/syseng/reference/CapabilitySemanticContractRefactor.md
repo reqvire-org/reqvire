@@ -9,9 +9,9 @@ Separate three concerns without losing traceability:
 - Capabilities own coherent operational/system ability, source context, compatible refinements, and reusable ontology vocabulary.
 - `ontology` elements own stable model/domain meaning: `X is`, `X has`, `X relates to Y`, allowed semantic structure, and shared OWL/Turtle vocabulary.
 - Requirements own implementable obligations: what the system shall do, what can satisfy it, and what verification proves it.
-- Capability-owned or requirement-owned `semantic-contract` refinements own SHACL shape profiles over reachable ontology terms.
+- Requirement-owned `semantic-contract` refinements own SHACL shape profiles over reachable ontology terms.
 - Ontology attached by capabilities should define nouns, relationships, allowed semantic categories, and stable model rules.
-- Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in capability-owned or requirement-owned `specification`, `behavior`, `state`, `input-output`, or shape-only `semantic-contract` refinements.
+- Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible `specification`, `behavior`, `state`, and `input-output` refinements owned by the relevant capability or requirement. Requirement-owned shape-only `semantic-contract` refinements capture requirement-specific SHACL profiles.
 
 ## Capability Modeling Philosophy
 
@@ -50,7 +50,7 @@ Use this method when building or refactoring a system model, not only when clean
 4. **Keep obligations in requirements**
    - Requirements state what the system shall do.
    - Requirements may use `#### Concept References` to bind readable text to ontology terms.
-   - `semantic-contract` elements contain `#### Shapes` only and profile reachable ontology terms for one capability or obligation.
+   - `semantic-contract` elements contain `#### Shapes` only, never `#### Ontology`, and profile reachable ontology terms for exactly one compatible requirement owner.
 
 5. **Preserve boundaries through attachments**
    - Use hierarchy only inside a capability, requirement, or ontology family.
@@ -69,7 +69,7 @@ Use this workflow when:
 
 - A requirement reads like a vocabulary catalog, domain definition, type taxonomy, relation dictionary, or data-shape definition.
 - A capability contains implementable system obligations instead of capability scope.
-- A semantic contract is attached or referenced without a clear owning capability or requirement.
+- A semantic contract is attached or referenced without a clear owning requirement.
 - A capability-root subgraph has no concrete requirements.
 - A requirement duplicates ontology facts already present in an ontology element.
 - A semantic contract needs local `Ontology`; it should usually become ontology element plus shape-only `semantic-contract`.
@@ -105,8 +105,8 @@ Put content in a requirement when it says:
 
 Put content in a semantic contract when:
 
-- One capability or obligation needs a closed-world SHACL profile.
-- The profile only uses ontology terms reachable through the owning capability or requirement context.
+- One requirement obligation needs a closed-world SHACL profile.
+- The profile only uses ontology terms reachable through the owning requirement's capability context.
 - The contract contains `#### Shapes` and no `#### Ontology`.
 
 ## Audit Commands
@@ -192,7 +192,7 @@ The system shall reject API requests whose access token does not conform to the 
 
 When an obligation needs specific closed-world validation:
 
-- Create a `semantic-contract` refining the capability or requirement.
+- Create a `semantic-contract` refining the requirement.
 - Include `#### Shapes`.
 - Do not include `#### Ontology`.
 - Use only ontology terms declared by reachable ontology context.
@@ -203,9 +203,9 @@ Use:
 
 - `capability specifiedBy requirement` or `requirement specify capability` for ownership.
 - capability `Attachments` to ontology elements.
-- `capability refinedBy semantic-contract` or `requirement refinedBy semantic-contract` for capability-level or obligation-specific SHACL profiles.
+- `requirement refinedBy semantic-contract` for requirement-owned SHACL profiles; semantic contracts refine exactly one compatible requirement owner.
 - Capability attachments only for ontology elements from other capability roots.
-- Requirement attachments only for requirement-owned semantic contracts or requirement-detail refinements.
+- Requirement attachments only for compatible requirement-owned `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements.
 
 Do not use `trace` as a substitute for ownership or dependency.
 Do not remove a cross-root dependency unless the consumer now has an explicit attachment that gives `collect` and change impact the same dependency path.

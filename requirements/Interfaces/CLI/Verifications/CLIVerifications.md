@@ -116,12 +116,14 @@ This verification shall prove that the ontologies command and export workflow co
 
 #### Details
 Expected checks:
-- Run `reqvire ontologies` and verify Turtle output contains ontology declarations and SHACL shape references.
-- Run `reqvire ontologies --jsonld` and verify the output is valid JSON-LD.
-- Run `reqvire ontologies --full` and verify Turtle output contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements.
-- Run `reqvire ontologies --full --jsonld` and verify JSON-LD output contains Reqvire model context triples.
+- Run `reqvire ontologies` and verify Turtle output contains ontology declarations and SHACL shape references without generated ontology projection facts.
+- Run `reqvire ontologies --jsonld` and verify the output is valid JSON-LD without generated ontology projection facts.
+- Run `reqvire ontologies --full` and verify Turtle output contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
+- Run `reqvire ontologies --full --jsonld` and verify JSON-LD output contains Reqvire model context triples and generated ontology projection facts.
 - Run `reqvire export --output <DIR>` and verify `ontologies.ttl` and `ontologies.html` are generated.
-- Verify exported `ontologies.ttl` contains collected ontology content.
+- Verify exported `ontologies.ttl` contains collected ontology content without generated ontology projection facts.
+- Verify exported `ontologies.html` contains the ontology explorer, compact sidebar summary footer, `.ttl` download action, linked source citation evidence, generated semantic construct evidence from the ontology projection subgraph, dense viewport layout CSS, and no obsolete raw Turtle/source-block list or page-header preamble.
+- Verify the Reqvire authored ontology source tree does not contain stale `owl:deprecated true` presentation-only vocabulary declarations after ontology refactoring.
 
 #### Metadata
   * type: test-verification
@@ -130,7 +132,7 @@ Expected checks:
   * satisfiedBy: [test.sh](../../../../tests/test-ontologies-command/test.sh)
   * verify: [CLI Ontologies Command](../Commands.md#cli-ontologies-command)
   * verify: [Ontology and Shapes Collection](../../../Functional/Output/Reporting.md#ontology-and-shapes-collection)
-  * verify: [Ontologies View Generation](../../WebInterface/Capabilities.md#ontologies-view-generation)
+  * verify: [Ontology Projection Subgraph Materialization](../../../Functional/Output/Reporting.md#ontology-projection-subgraph-materialization)
 ---
 
 ### Explicit Workspace Selection Verification

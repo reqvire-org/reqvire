@@ -10,28 +10,80 @@ Behavior rules, state transitions, and input-output mappings are semantic model 
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:BehaviorRule a owl:Class .
-reqvire:StateTransition a owl:Class .
-reqvire:InputOutputMapping a owl:Class .
-reqvire:ContractRule a owl:Class .
+reqvire:BehaviorRule a owl:Class ;
+  rdfs:subClassOf reqvire:ContractRule ;
+  rdfs:comment "Contract rule that describes behavior-specific conditions and outcomes." .
+reqvire:StateTransition a owl:Class ;
+  rdfs:comment "Modeled transition between named states in a behavior refinement." .
+reqvire:InputOutputMapping a owl:Class ;
+  rdfs:comment "Mapping from modeled input elements to modeled output elements." .
+reqvire:ContractRule a owl:Class ;
+  rdfs:comment "Reusable rule concept carrying canonical rule tokens, conditions, and outcomes." .
 
-reqvire:hasRule a owl:ObjectProperty .
-reqvire:hasTransition a owl:ObjectProperty .
-reqvire:usesInput a owl:ObjectProperty .
-reqvire:producesOutput a owl:ObjectProperty .
+reqvire:hasRule a owl:ObjectProperty ;
+  rdfs:domain reqvire:Behavior ;
+  rdfs:range reqvire:BehaviorRule ;
+  rdfs:comment "Associates a behavior refinement with a behavior rule." .
+reqvire:hasTransition a owl:ObjectProperty ;
+  rdfs:domain reqvire:Behavior ;
+  rdfs:range reqvire:StateTransition ;
+  rdfs:comment "Associates a behavior refinement with a state transition." .
+reqvire:usesInput a owl:ObjectProperty ;
+  rdfs:domain reqvire:InputOutputMapping ;
+  rdfs:range reqvire:Element ;
+  rdfs:comment "Identifies a model element consumed as input by an input-output mapping." .
+reqvire:producesOutput a owl:ObjectProperty ;
+  rdfs:domain reqvire:InputOutputMapping ;
+  rdfs:range reqvire:Element ;
+  rdfs:comment "Identifies a model element produced as output by an input-output mapping." .
 
-reqvire:ruleName a owl:DatatypeProperty .
-reqvire:ruleCondition a owl:DatatypeProperty .
-reqvire:ruleOutcome a owl:DatatypeProperty .
-reqvire:sourceBehavior a owl:DatatypeProperty .
-reqvire:behaviorPhase a owl:DatatypeProperty .
-reqvire:rulePriority a owl:DatatypeProperty .
-reqvire:trigger a owl:DatatypeProperty .
-reqvire:precondition a owl:DatatypeProperty .
-reqvire:postcondition a owl:DatatypeProperty .
-reqvire:fromState a owl:DatatypeProperty .
-reqvire:toState a owl:DatatypeProperty .
+reqvire:ruleName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ContractRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical rule token used for lookup, reporting, validation, or query contracts." .
+reqvire:ruleCondition a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ContractRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Textual condition under which a contract rule applies." .
+reqvire:ruleOutcome a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ContractRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Textual outcome expected when a contract rule condition is met." .
+reqvire:sourceBehavior a owl:DatatypeProperty ;
+  rdfs:domain reqvire:BehaviorRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Identifier or label for the behavior source described by a behavior rule." .
+reqvire:behaviorPhase a owl:DatatypeProperty ;
+  rdfs:domain reqvire:BehaviorRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Named lifecycle or execution phase for a behavior rule." .
+reqvire:rulePriority a owl:DatatypeProperty ;
+  rdfs:domain reqvire:BehaviorRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Priority token used to order or classify behavior rules." .
+reqvire:trigger a owl:DatatypeProperty ;
+  rdfs:domain reqvire:StateTransition ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Trigger text or token that initiates a state transition." .
+reqvire:precondition a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ContractRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Condition that must hold before applying a contract rule." .
+reqvire:postcondition a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ContractRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Condition expected to hold after applying a contract rule." .
+reqvire:fromState a owl:DatatypeProperty ;
+  rdfs:domain reqvire:StateTransition ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Source state token for a state transition." .
+reqvire:toState a owl:DatatypeProperty ;
+  rdfs:domain reqvire:StateTransition ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Target state token for a state transition." .
 
 ```
 
@@ -39,7 +91,7 @@ reqvire:toState a owl:DatatypeProperty .
   * type: ontology
 
 #### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
+  * derivedFrom: [Reqvire Requirement Ontology](CapabilityRequirementModel.md#reqvire-requirement-ontology)
 ---
 
 ### Reqvire Formatting Ontology
@@ -52,9 +104,12 @@ Formatting is separate from general model-element operations because its primary
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-reqvire:FormattingRule a owl:Class .
-reqvire:FormattingInvariant a owl:Class .
+reqvire:FormattingRule a owl:Class ;
+  rdfs:comment "Rule category for deterministic Markdown normalization behavior." .
+reqvire:FormattingInvariant a owl:Class ;
+  rdfs:comment "Semantic preservation invariant that formatting must maintain." .
 
 ```
 
@@ -75,15 +130,35 @@ Linting is separate from validation because validation blocks invalid model stat
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:LintingRule a owl:Class .
-reqvire:LintFinding a owl:Class .
+reqvire:LintingRule a owl:Class ;
+  rdfs:subClassOf reqvire:ContractRule ;
+  rdfs:comment "Auditable model-quality rule that reports reviewable findings." .
+reqvire:LintFinding a owl:Class ;
+  rdfs:comment "Reported model-quality finding produced by a linting rule." .
 
-reqvire:lintRuleName a owl:DatatypeProperty .
-reqvire:lintScope a owl:DatatypeProperty .
-reqvire:lintCondition a owl:DatatypeProperty .
-reqvire:lintFindingKind a owl:DatatypeProperty .
-reqvire:lintRepairMode a owl:DatatypeProperty .
+reqvire:lintRuleName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:LintingRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical lint rule token used by lint output, validation profiles, and queries." .
+reqvire:lintScope a owl:DatatypeProperty ;
+  rdfs:domain reqvire:LintingRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Model scope over which a linting rule evaluates." .
+reqvire:lintCondition a owl:DatatypeProperty ;
+  rdfs:domain reqvire:LintingRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Condition that causes a linting rule to report a finding." .
+reqvire:lintFindingKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:LintingRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical finding-kind token emitted by a linting rule." .
+reqvire:lintRepairMode a owl:DatatypeProperty ;
+  rdfs:domain reqvire:LintingRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Repair-mode token describing whether and how a lint finding can be corrected." .
 
 reqvire:crossSubmodelHierarchyLintRule a reqvire:LintingRule ;
   reqvire:lintRuleName "cross-submodel-hierarchy" ;
@@ -105,7 +180,7 @@ reqvire:redundantRelationLintRule a reqvire:LintingRule ;
   * type: ontology
 
 #### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
+  * derivedFrom: [Reqvire Behavior Rule Ontology](#reqvire-behavior-rule-ontology)
 ---
 
 ### Reqvire Operation Ontology
@@ -118,66 +193,84 @@ This ontology defines reusable operation categories used by operation requiremen
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:CommandOperation a owl:Class .
-reqvire:MutationOperation a owl:Class .
-reqvire:ReportOperation a owl:Class .
-reqvire:FormatOperation a owl:Class .
-reqvire:MergeCompatibilityCategory a owl:Class .
-reqvire:OperationFamily a owl:Class .
+reqvire:CommandOperation a owl:Class ;
+  rdfs:comment "Operation exposed through a command or equivalent programmatic action." .
+reqvire:MutationOperation a owl:Class ;
+  rdfs:subClassOf reqvire:CommandOperation ;
+  rdfs:comment "Command operation that can persist model or asset changes." .
+reqvire:ReportOperation a owl:Class ;
+  rdfs:subClassOf reqvire:CommandOperation ;
+  rdfs:comment "Command operation that reads model state and emits output without mutating source files." .
+reqvire:FormatOperation a owl:Class ;
+  rdfs:subClassOf reqvire:CommandOperation ;
+  rdfs:comment "Command operation that normalizes Markdown while preserving semantic model meaning." .
+reqvire:MergeCompatibilityCategory a owl:Class ;
+  rdfs:comment "Controlled category describing which element types are merge-compatible." .
+reqvire:OperationFamily a owl:Class ;
+  rdfs:comment "Controlled operation-family value used to classify Reqvire operations." .
 
-reqvire:mergeCategoryName a owl:DatatypeProperty .
-reqvire:mergeCategoryElementType a owl:DatatypeProperty .
-reqvire:mergeCategoryMeaning a owl:DatatypeProperty .
-reqvire:mergeRequiresSameCategory a owl:DatatypeProperty .
-reqvire:operationFamilyName a owl:DatatypeProperty .
-reqvire:operationFamilyMeaning a owl:DatatypeProperty .
+reqvire:mergeCategoryElementType a owl:DatatypeProperty ;
+  rdfs:domain reqvire:MergeCompatibilityCategory ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Element type token included in a merge compatibility category." .
+reqvire:mergeRequiresSameCategory a owl:DatatypeProperty ;
+  rdfs:domain reqvire:MergeCompatibilityCategory ;
+  rdfs:range xsd:boolean ;
+  rdfs:comment "Indicates whether merge candidates must belong to the same compatibility category." .
 
 reqvire:mutationOperationFamily a reqvire:OperationFamily ;
-  reqvire:operationFamilyName "mutation" ;
-  reqvire:operationFamilyMeaning "Operation family that can persist model or asset changes after validation gates pass." .
+  rdfs:label "mutation" ;
+  rdfs:comment "Operation family that can persist model or asset changes after validation gates pass." .
 reqvire:reportOperationFamily a reqvire:OperationFamily ;
-  reqvire:operationFamilyName "report" ;
-  reqvire:operationFamilyMeaning "Operation family that reads model state and emits structured or human-readable reports without mutating source files." .
+  rdfs:label "report" ;
+  rdfs:comment "Operation family that reads model state and emits structured or human-readable reports without mutating source files." .
 reqvire:validationOperationFamily a reqvire:OperationFamily ;
-  reqvire:operationFamilyName "validation" ;
-  reqvire:operationFamilyMeaning "Operation family that checks whether model state satisfies structural and semantic guardrails." .
+  rdfs:label "validation" ;
+  rdfs:comment "Operation family that checks whether model state satisfies structural and semantic guardrails." .
 reqvire:formatOperationFamily a reqvire:OperationFamily ;
-  reqvire:operationFamilyName "formatting" ;
-  reqvire:operationFamilyMeaning "Operation family that normalizes Markdown representation while preserving semantic model meaning." .
+  rdfs:label "formatting" ;
+  rdfs:comment "Operation family that normalizes Markdown representation while preserving semantic model meaning." .
 reqvire:relationMaintenanceOperationFamily a reqvire:OperationFamily ;
-  reqvire:operationFamilyName "relation-maintenance" ;
-  reqvire:operationFamilyMeaning "Operation family that links, unlinks, relinks, or rewires relation and attachment edges while preserving graph validity." .
+  rdfs:label "relation-maintenance" ;
+  rdfs:comment "Operation family that links, unlinks, relinks, or rewires relation and attachment edges while preserving graph validity." .
 
 reqvire:capabilityMergeCategory a reqvire:MergeCompatibilityCategory ;
-  reqvire:mergeCategoryName "capability" ;
+  rdfs:label "capability" ;
   reqvire:mergeCategoryElementType "capability" ;
-  reqvire:mergeCategoryMeaning "Capability elements merge only with capability elements." ;
+  rdfs:comment "Capability elements merge only with capability elements." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:requirementMergeCategory a reqvire:MergeCompatibilityCategory ;
-  reqvire:mergeCategoryName "requirement" ;
+  rdfs:label "requirement" ;
   reqvire:mergeCategoryElementType "requirement" ;
-  reqvire:mergeCategoryMeaning "Requirement elements merge only with requirement elements." ;
+  rdfs:comment "Requirement elements merge only with requirement elements." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:verificationMergeCategory a reqvire:MergeCompatibilityCategory ;
-  reqvire:mergeCategoryName "verification" ;
+  rdfs:label "verification" ;
   reqvire:mergeCategoryElementType "verification", "test-verification", "analysis-verification", "inspection-verification", "demonstration-verification", "formal-proof-verification" ;
-  reqvire:mergeCategoryMeaning "Verification elements merge only within the verification element family." ;
+  rdfs:comment "Verification elements merge only within the verification element family." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:capabilityRefinementMergeCategory a reqvire:MergeCompatibilityCategory ;
-  reqvire:mergeCategoryName "capability-refinement" ;
-  reqvire:mergeCategoryElementType "source", "semantic-contract", "constraint", "behavior", "specification", "state", "input-output" ;
-  reqvire:mergeCategoryMeaning "Capability-owned refinements merge only with compatible capability-owned refinements." ;
+  rdfs:label "capability-refinement" ;
+  reqvire:mergeCategoryElementType "source", "constraint", "behavior", "specification", "state", "input-output" ;
+  rdfs:comment "Capability-owned refinements merge only with compatible capability-owned refinements." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:requirementRefinementMergeCategory a reqvire:MergeCompatibilityCategory ;
-  reqvire:mergeCategoryName "requirement-refinement" ;
+  rdfs:label "requirement-refinement" ;
   reqvire:mergeCategoryElementType "constraint", "behavior", "specification", "state", "input-output" ;
-  reqvire:mergeCategoryMeaning "Requirement-owned refinements merge only with requirement-owned refinements." ;
+  rdfs:comment "Requirement-owned refinements merge only with requirement-owned refinements." ;
   reqvire:mergeRequiresSameCategory true .
 reqvire:semanticContractMergeCategory a reqvire:MergeCompatibilityCategory ;
-  reqvire:mergeCategoryName "semantic-contract" ;
+  rdfs:label "semantic-contract" ;
   reqvire:mergeCategoryElementType "semantic-contract" ;
-  reqvire:mergeCategoryMeaning "Semantic-contract merge compatibility applies to capability-owned or requirement-owned SHACL profile refinements." ;
+  rdfs:comment "Semantic-contract merge compatibility applies to requirement-owned SHACL profile refinements." ;
+  reqvire:mergeRequiresSameCategory true .
+reqvire:semanticQueryContractMergeCategory a reqvire:MergeCompatibilityCategory ;
+  rdfs:label "semantic-query-contract" ;
+  reqvire:mergeCategoryElementType "semantic-query-contract" ;
+  rdfs:comment "Semantic-query-contract merge compatibility applies to requirement-owned query-backed semantic refinements." ;
   reqvire:mergeRequiresSameCategory true .
 
 ```
@@ -199,36 +292,71 @@ Validation is the canonical guardrail layer for the model. This ontology defines
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:ValidationRule a owl:Class .
-reqvire:ValidationIssue a owl:Class .
-reqvire:LintIssue a owl:Class .
-reqvire:MutationSafetyGate a owl:Class .
-reqvire:ValidationIssueKind a owl:Class .
+reqvire:ValidationRule a owl:Class ;
+  rdfs:subClassOf reqvire:ContractRule ;
+  rdfs:comment "Validation guardrail rule that can block invalid model states." .
+reqvire:ValidationIssue a owl:Class ;
+  rdfs:comment "Diagnostic issue reported by structural or semantic validation." .
+reqvire:LintIssue a owl:Class ;
+  rdfs:subClassOf reqvire:ValidationIssue ;
+  rdfs:comment "Validation issue that represents a lint finding rather than a hard invalid state." .
+reqvire:MutationSafetyGate a owl:Class ;
+  rdfs:comment "Validation gate that determines whether a mutation may persist changes." .
+reqvire:ValidationIssueKind a owl:Class ;
+  rdfs:comment "Controlled validation issue kind identified by a canonical diagnostic token." .
 
-reqvire:validationRuleName a owl:DatatypeProperty .
-reqvire:validationScope a owl:DatatypeProperty .
-reqvire:validationSeverity a owl:DatatypeProperty .
-reqvire:validationCondition a owl:DatatypeProperty .
-reqvire:validationOutcome a owl:DatatypeProperty .
-reqvire:validationRepair a owl:DatatypeProperty .
-reqvire:validationIssueKindName a owl:DatatypeProperty .
-reqvire:validationIssueKindMeaning a owl:DatatypeProperty .
-reqvire:lintIssueKind a owl:DatatypeProperty .
-reqvire:blocksPersistence a owl:DatatypeProperty .
+reqvire:validationRuleName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical validation rule token used by diagnostics, output, and queries." .
+reqvire:validationScope a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Model scope over which a validation rule applies." .
+reqvire:validationSeverity a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Severity token emitted for issues from a validation rule." .
+reqvire:validationCondition a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Condition that causes a validation rule to report an issue." .
+reqvire:validationOutcome a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Expected validation outcome when the rule condition is met." .
+reqvire:validationRepair a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Repair guidance associated with a validation rule." .
+reqvire:validationIssueKindName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationIssueKind ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical validation issue-kind token used by parser output, diagnostics, and queries." .
+reqvire:lintIssueKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:LintIssue ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical lint issue-kind token carried by a lint issue." .
+reqvire:blocksPersistence a owl:DatatypeProperty ;
+  rdfs:domain reqvire:MutationSafetyGate ;
+  rdfs:range xsd:boolean ;
+  rdfs:comment "Indicates whether the safety gate blocks persistence of a mutation." .
 
 reqvire:semanticReferenceNotFoundIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindName "semantic-reference-not-found" ;
-  reqvire:validationIssueKindMeaning "A semantic-contract SHACL reference points to an IRI that no Reqvire ontology element declares." .
+  rdfs:comment "A semantic-contract SHACL reference points to an IRI that no Reqvire ontology element declares." .
 reqvire:semanticReferenceOutsideContextIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindName "semantic-reference-found-outside-context" ;
-  reqvire:validationIssueKindMeaning "A semantic-contract SHACL reference points to an IRI declared by an ontology element that is outside the owning capability or requirement's reachable capability ontology context." .
+  rdfs:comment "A semantic-contract SHACL reference points to an IRI declared by an ontology element that is outside the owning requirement's reachable capability ontology context." .
 reqvire:semanticDuplicateDeclarationIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindName "semantic-duplicate-declaration" ;
-  reqvire:validationIssueKindMeaning "The same ontology term IRI is declared by multiple ontology elements." .
+  rdfs:comment "The same ontology term IRI is declared by multiple ontology elements." .
 reqvire:semanticConflictingDeclarationIssueKind a reqvire:ValidationIssueKind ;
   reqvire:validationIssueKindName "semantic-conflicting-declaration" ;
-  reqvire:validationIssueKindMeaning "The same ontology term IRI is declared with incompatible semantic roles across ontology elements." .
+  rdfs:comment "The same ontology term IRI is declared with incompatible semantic roles across ontology elements." .
 
 reqvire:globalElementNameUniquenessRule a reqvire:ValidationRule ;
   reqvire:validationRuleName "global-element-name-uniqueness" ;
@@ -331,5 +459,5 @@ reqvire:multiBranchConvergenceLintRule a reqvire:ValidationRule ;
   * type: ontology
 
 #### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
+  * derivedFrom: [Reqvire Behavior Rule Ontology](#reqvire-behavior-rule-ontology)
 ---

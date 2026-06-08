@@ -62,6 +62,36 @@ MCP requirements define concrete protocol behavior while reusing the same model 
   * specifiedBy: [MCP Interface](../Interfaces/Interfaces.md#mcp-interface)
 ---
 
+### Reqvire MCP Side-Effect Ontology Shape Profile
+
+Defines SHACL constraints for MCP tool side-effect class vocabulary tokens.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:McpToolSideEffectClassShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:McpReadOnlyToolClass, reqvire:McpConditionalMutationToolClass, reqvire:McpMutationToolClass ;
+  sh:property [
+    sh:path reqvire:mcpSideEffectClassName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("read_only" "conditional_mutation" "mutation") ;
+    sh:message "MCP side-effect classes must use a supported tool discovery side-effect token." ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * refine: [MCP Tool Side-Effect Classification](../Interfaces/MCP/Tools.md#mcp-tool-side-effect-classification)
+---
+
 ### Web Documentation Interface
 
 As a **System Engineer**, I want Reqvire to expose browsable generated documentation, so that model structure, reports, diagrams, traces, resources, and ontology exports can be inspected in a web interface.
@@ -78,4 +108,3 @@ Web requirements define concrete generated views, local server behavior, HTML as
   * derivedFrom: [System Model Interfaces](#system-model-interfaces)
   * specifiedBy: [Web Interface](../Interfaces/Interfaces.md#web-interface)
 ---
-

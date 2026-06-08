@@ -33,7 +33,7 @@ Reqvire implements requirement refinement through explicit refinement elements l
 
 #### Details
 **Refinement Ownership:**
-- Refinement content is captured in dedicated elements (`specification`, `constraint`, `behavior`, `state`, `input-output`)
+- Refinement content is captured in dedicated elements (`semantic-query-contract`, `specification`, `constraint`, `behavior`, `state`, `input-output`)
 - Requirement owns refinement via `refinedBy`; refinement points back via `refine`
 - Refinement elements can be attached by external requirements when ownership constraints allow
 
@@ -42,6 +42,7 @@ Reqvire implements requirement refinement through explicit refinement elements l
 - Requirement text stays intent-focused (EARS-style), with concise detail pointers
 - Clarifying information and rationale are captured in linked refinements
 - Refinements provide attachment-ready specification contracts across submodels
+- `semantic-query-contract` refinements capture requirement-owned declarative semantic queries over reachable semantic model context without a query-kind classification.
 - `state` refinements capture lifecycle states, state machines, allowed transitions, terminal states, and state-dependent contract behavior.
 - `input-output` refinements capture payloads, messages, documents, schemas, fixtures, and data contracts crossing system or component boundaries.
 
@@ -74,7 +75,7 @@ Reqvire implements relation semantics for ownership, hierarchy, verification, im
 Element types supported by the system for classification and behavior determination.
 
 #### Details
-The canonical type vocabulary is defined by the Reqvire core element, capability, requirement, ontology, semantic-contract, and verification model contracts.
+The canonical type vocabulary is defined by the Reqvire core element, capability, requirement, ontology, semantic-contract, semantic-query-contract, and verification model contracts.
 
 The implementation shall use those contracts as the authoritative source for:
 - capability, requirement, refinement, verification, and custom type categories

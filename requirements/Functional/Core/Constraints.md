@@ -48,12 +48,12 @@ Rules requiring attachment targets to have compatible ownership before being att
 An attachment target is valid only when it matches the attaching element family:
 - Capability attachments target ontology elements only.
 - Requirements must not attach ontology directly.
-- Requirement attachments target requirement-owned refinements only: `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output`.
+- Requirement attachments target requirement-owned refinements only: `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output`.
 - Requirement-owned refinements must have a `refine` relation to exactly one compatible requirement owner before they can be attached.
 - Capability-owned refinements are not cross-subgraph attachment contracts.
 - Refinements without a valid `refine` relation cannot be attached anywhere.
 
-Attachment compatibility is defined by the Reqvire relation, capability, requirement, ontology, and semantic-contract model contracts.
+Attachment compatibility is defined by the Reqvire relation, capability, requirement, ontology, semantic-contract, and semantic-query-contract model contracts.
 
 **Rationale**: Enforces model hygiene by making capability-level ontology context the single vocabulary inheritance path, while ensuring reusable requirement contracts are owned by exactly one requirement before being referenced elsewhere.
 

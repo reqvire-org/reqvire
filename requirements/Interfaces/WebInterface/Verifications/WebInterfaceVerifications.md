@@ -117,6 +117,54 @@ This test verifies that the system exports specifications into HTML format with 
   * verify: [HTML Export](../Capabilities.md#html-export)
 ---
 
+### Ontology Model Viewer Analysis Verification
+
+This analysis verifies that the Ontologies page behaves as an ontology model viewer rather than a raw RDF triple viewer.
+
+#### Details
+Expected analysis checks:
+- Confirm the primary Ontologies visualization, search data, and inspector construct metadata are built from `SemanticIndex.ontology_projection`, the same generated ontology construct projection used by full semantic export.
+- Confirm the primary viewer does not render `rdf:type` edges, OWL/RDFS metaclass nodes, RDF list plumbing, anonymous SHACL property-shape blank nodes, or generic literal plumbing as the main user-facing graph.
+- Confirm classes, object properties, datatype properties, RDF properties, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources are classified into distinct semantic node kinds when present.
+- Confirm datatype-property literal values are not graph nodes or visibility filter layers, but remain searchable and appear in the selected subject node inspector as predicate/value evidence.
+- Confirm a named IRI typed only by a declared ontology class, without explicit `owl:NamedIndividual`, is shown in graph data and the inspector as a named individual while retaining its `∈` membership construct evidence.
+- Confirm visual coloring is driven by semantic node kind, not by source provenance, so a class or property referenced by SHACL remains class/property-colored while actual SHACL node shapes and property shapes use SHACL-specific colors.
+- Confirm built-in XSD, RDF, RDFS, OWL, and SHACL namespace references are available as an external-reference layer that is hidden by default and can be enabled for datatype/range audit.
+- Confirm object and datatype properties are first-class visual entities with aggregated domain and range information.
+- Confirm SHACL node-shape target classes and named property nodes receive derived slot/facet inspector sections from property-shape paths, datatype/class range constraints, node kind, cardinality, pattern, allowed values, and source-shape evidence.
+- Confirm target-class slot/facet sections are labeled as class slots, named-property slot/facet sections are labeled as usages of the selected property by target classes, and repeated usages with different target classes or source shapes are not presented as duplicate property definitions.
+- Confirm raw SHACL evidence is shown only when direct raw constraints are attached to the inspected node and that class/property nodes with only normalized SHACL overlays do not show an empty raw-evidence section.
+- Confirm equivalence groups use stable deterministic identifiers derived from canonical member lists.
+- Confirm domain/range, subclass/member-of, disjointness, equivalence groups, inverse properties, property chains, property characteristics, class-expression/restriction constructs, SHACL overlays, provenance/source citations, and symbols are represented from generated semantic projection constructs when present in the ontology input.
+- Confirm class-expression nodes used as property domain/range expressions display contextual labels such as `refine range: Capability ∪ Requirement`, while preserving expression members and property usage evidence in the inspector.
+- Confirm semantic-query-contract refinements define the direct-authored construct extraction patterns while raw query text remains out of ontology collection and full semantic export.
+- Confirm ontology viewer symbols are defined with semantic meaning, raw Unicode code point, rendered Unicode character, allowed viewer usage, tooltip text, and accessible labels.
+- Confirm ontology inspector badges render the symbol and semantic label without rendering the raw Unicode code point as visible badge text, and that visible badge labels prefer domain wording such as `Subclass`.
+- Confirm subclass and membership badges are directional and are not mirrored onto superclass or class-object nodes solely because those nodes are construct targets.
+- Confirm source citations remain available as inspector/search evidence, link to the exported source HTML page fragments, and the exported `ontologies.ttl` artifact remains available for raw RDF/Turtle auditability and downstream tooling.
+- Confirm `ontologies.html` opens directly on the explorer, fills the available viewport below the fixed navigation bar, places the `.ttl` download action in the same compact single-line sidebar footer as the summary counts, and does not render the old top/sidebar action bar, raw Turtle/source-block list, page header preamble, or shared content-card footer.
+- Confirm search, focus, inspector, filters, and the compact legend operate over semantic ontology roles and OWL constructs rather than generic RDF predicate edges.
+- Confirm the detailed semantic type color key is passive, while visibility controls are separate multi-select filter-in toggles that are active by default for grouped semantic roles, relation edges, construct overlay kinds, and data origins.
+- Confirm the passive type legend exposes separate color swatches for classes, object properties, datatype properties, RDF properties, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources.
+- Confirm the grouped role filters expose ontology terms, properties, SHACL shapes, resources, relations, and external references instead of making every detailed type swatch clickable.
+- Confirm role and origin filters are hard gates for node visibility, so disabling SHACL shapes hides SHACL shape nodes even when SHACL-overlay construct filters remain enabled.
+- Confirm construct filters cover domain/range, subclass, membership, disjointness, equivalence, inverse, property chain, property characteristic, restriction, class-expression, and SHACL-overlay constructs.
+- Confirm construct filters affect construct-specific edges, node badges, derived slot/facet sections, and inspector projection-construct rows without making nodes visible when their role or origin filter is disabled.
+- Confirm ontology origin filters can distinguish authored Reqvire ontology/SHACL content, graph-registry extracted model facts, and generated ontology projection constructs, and that generated construct edges disappear when construct origin is disabled even if registry origin remains enabled.
+- Confirm active filters combine inclusively within one category and narrow together across different active categories.
+
+#### Metadata
+  * type: analysis-verification
+
+#### Relations
+  * verify: [Ontologies View Generation](../Capabilities.md#ontologies-view-generation)
+  * verify: [OWL Semantic Ontology Projection](../Capabilities.md#owl-semantic-ontology-projection)
+  * verify: [Ontology Property-Centric Visualization](../Capabilities.md#ontology-property-centric-visualization)
+  * verify: [Ontology Construct Grouping](../Capabilities.md#ontology-construct-grouping)
+  * verify: [Ontology Symbol and Badge Vocabulary](../Capabilities.md#ontology-symbol-and-badge-vocabulary)
+  * verify: [Ontology Projection Subgraph Materialization](../../../Functional/Output/Reporting.md#ontology-projection-subgraph-materialization)
+---
+
 ### HTML Export Local Linked Files Verification
 
 This test verifies that HTML export preserves local linked-file references used in exported markdown content.

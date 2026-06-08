@@ -1007,6 +1007,25 @@ Test cases:
   * verify: [CLI Search Command](../../../Interfaces/CLI/Commands.md#cli-search-command)
 ---
 
+### Semantic Query Contract Search JSON Test
+
+Test verifies that search JSON exposes semantic-query-contract ADT content and derived semantic-query-contract identity.
+
+#### Details
+Test cases:
+- `search --filter-type=semantic-query-contract --json` returns semantic-query-contract elements.
+- JSON includes `semantic_query_contract.iri`.
+- JSON includes `semantic_query_contract.query.language`, content, and fenced block line number.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-semantic-query-contracts/test.sh)
+  * verify: [Search Report Generator](../Reporting.md#search-report-generator)
+  * verify: [CLI Search Command](../../../Interfaces/CLI/Commands.md#cli-search-command)
+---
+
 ### Start Type Filter Test
 
 Test verifies model start-element type filtering using JSON/Markdown assertions and expected fixtures.

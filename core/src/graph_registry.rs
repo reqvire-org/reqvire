@@ -1919,28 +1919,44 @@ impl GraphRegistry {
 
         for node in self.nodes.values() {
             let element = &node.element;
-            if !element.element_type.is_semantic_contract() {
-                continue;
-            }
-            let owners = self.get_refinement_owners(&element.identifier);
-            if owners.len() != 1 {
-                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "Semantic contract '{}' must refine exactly one capability or requirement.",
-                    element.identifier
-                )));
-                continue;
-            }
-            let Some(owner) = self.nodes.get(&owners[0]) else {
-                continue;
-            };
-            if !owner.element.element_type.is_capability()
-                && !owner.element.element_type.is_requirement()
-            {
-                errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                    "Semantic contract '{}' must refine a capability or requirement, not '{}'.",
-                    element.identifier,
-                    owner.element.element_type.as_str()
-                )));
+            if element.element_type.is_semantic_contract() {
+                let owners = self.get_refinement_owners(&element.identifier);
+                if owners.len() != 1 {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Semantic contract '{}' must refine exactly one requirement.",
+                        element.identifier
+                    )));
+                    continue;
+                }
+                let Some(owner) = self.nodes.get(&owners[0]) else {
+                    continue;
+                };
+                if !owner.element.element_type.is_requirement() {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Semantic contract '{}' must refine a requirement, not '{}'.",
+                        element.identifier,
+                        owner.element.element_type.as_str()
+                    )));
+                }
+            } else if element.element_type.is_semantic_query_contract() {
+                let owners = self.get_refinement_owners(&element.identifier);
+                if owners.len() != 1 {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Semantic query contract '{}' must refine exactly one requirement.",
+                        element.identifier
+                    )));
+                    continue;
+                }
+                let Some(owner) = self.nodes.get(&owners[0]) else {
+                    continue;
+                };
+                if !owner.element.element_type.is_requirement() {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Semantic query contract '{}' must refine a requirement, not '{}'.",
+                        element.identifier,
+                        owner.element.element_type.as_str()
+                    )));
+                }
             }
         }
 
@@ -1978,7 +1994,7 @@ impl GraphRegistry {
                     .cloned()
                     .unwrap_or_else(|| "unknown semantic contract".to_string());
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable from owning capability or requirement '{}' through capability-attached ontology context. Attach the declaring ontology to the owning or consuming capability, or move the declaration into reachable capability ontology context.",
+                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable from owning requirement '{}' through capability-attached ontology context. Attach the declaring ontology to the owning or consuming capability, or move the declaration into reachable capability ontology context.",
                         reference.element_identifier,
                         reference.kind,
                         reference.iri,
@@ -2219,12 +2235,6 @@ impl GraphRegistry {
             return None;
         }
         let owner = self.nodes.get(&owners[0])?;
-        if owner.element.element_type.is_capability() {
-            return Some((
-                owners[0].clone(),
-                self.build_capability_ontology_context(&owners[0]),
-            ));
-        }
         if owner.element.element_type.is_requirement() {
             return Some((
                 owners[0].clone(),

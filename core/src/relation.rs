@@ -431,7 +431,7 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// - satisfiedBy: Source must be system requirement (requirement) or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
 /// - refinedBy: Source must be capability or requirement, target must be compatible refinement element
-/// - refine: Source must be refinement element, target must be compatible capability or requirement owner
+/// - refine: Source must be refinement element, target must be compatible owner
 /// - trace: Any non-refinement element type can use trace
 /// - Refinement types (constraint, behavior, specification): Can only have refine relations
 /// - Other type: Can only use trace relations
@@ -536,6 +536,7 @@ pub fn validate_relation_element_types(
                 ElementType::Requirement(_),
                 ElementType::Refinement(
                     RefinementType::SemanticContract
+                    | RefinementType::SemanticQueryContract
                     | RefinementType::Constraint
                     | RefinementType::Behavior
                     | RefinementType::Specification
@@ -550,6 +551,7 @@ pub fn validate_relation_element_types(
             (
                 ElementType::Refinement(
                     RefinementType::SemanticContract
+                    | RefinementType::SemanticQueryContract
                     | RefinementType::Constraint
                     | RefinementType::Behavior
                     | RefinementType::Specification
@@ -582,8 +584,8 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "verify" => Some("'verify' should connect a verification element to a capability or requirement".to_string()),
         "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; capability is not allowed".to_string()),
         "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; capability is not allowed".to_string()),
-        "refinedBy" => Some("'refinedBy' should connect a capability or requirement to a compatible refinement element".to_string()),
-        "refine" => Some("'refine' should connect a compatible refinement element to a capability or requirement owner".to_string()),
+        "refinedBy" => Some("'refinedBy' should connect a capability or requirement to a compatible refinement element; semantic-contract is requirement-owned only".to_string()),
+        "refine" => Some("'refine' should connect a compatible refinement element to its owner; semantic-contract must refine a requirement".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }

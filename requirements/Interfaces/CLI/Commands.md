@@ -588,7 +588,8 @@ The system shall provide an `ontologies` command that collects all ontology `###
 The command shall:
 - Emit RDF/Turtle by default.
 - Support `--jsonld` to emit JSON-LD instead of Turtle.
-- Support `--full` to include RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, and semantic-contract shape references.
+- Support `--full` to include RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, semantic-contract shape references, and generated ontology projection facts.
+- Exclude semantic-query-contract `#### Query` content and query metadata from default and `--full` output until a dedicated query-export command exists; generated ontology projection facts may cite semantic-query-contract IRIs without embedding raw query text.
 - Support `--output <FILE>` to write the selected format to a file.
 - Reuse the semantic index built from the graph registry instead of reparsing Turtle separately from validation.
 
@@ -613,7 +614,7 @@ The command shall:
 The system shall provide a unified search function, activated by the `search` root command, which shall search and report on model elements with comprehensive filtering capabilities.
 
 #### Details
-Implementation details shall follow the associated refinement specifications.
+Implementation details shall follow the associated refinement specifications. Search JSON shall expose parsed semantic ADT fields for ontology elements, semantic-contract elements, and semantic-query-contract elements when full results are requested.
 
 #### Metadata
   * type: requirement
@@ -632,6 +633,7 @@ Implementation details shall follow the associated refinement specifications.
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * verifiedBy: [Attachment Search Filters Verification](../../Functional/Core/Verifications/AttachmentsVerifications.md#attachment-search-filters-verification)
   * verifiedBy: [Search Command Tests](../../Functional/Output/Verifications/ReportingVerifications.md#search-command-tests)
+  * verifiedBy: [Semantic Query Contract Search JSON Test](../../Functional/Output/Verifications/ReportingVerifications.md#semantic-query-contract-search-json-test)
   * verifiedBy: [CLI Help Structure Verification](Verifications/CLIVerifications.md#cli-help-structure-verification)
 ---
 

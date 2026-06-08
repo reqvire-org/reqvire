@@ -426,7 +426,7 @@ Governance metadata filters apply to effective governance metadata values and ex
 Semantic model evidence rules:
 - `filter_type` accepts all canonical element type tokens supported by Reqvire core, including `capability`, `requirement`, `ontology`, `semantic-contract`, `source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, and verification types.
 - `reqvire.search --filter-type=ontology` through MCP returns ontology elements with parsed ontology ADT content when full results are requested.
-- `reqvire.search --filter-type=semantic-contract` through MCP returns capability-owned and requirement-owned shape contracts with parsed semantic-contract ADT content when full results are requested.
+- `reqvire.search --filter-type=semantic-contract` through MCP returns requirement-owned shape contracts with parsed semantic-contract ADT content when full results are requested.
 - `reqvire.read_element` returns `concept_references` for elements that author `#### Concept References`.
 - `reqvire.collect` includes reachable ontology context using the same capability-attached ontology inheritance traversal as Reqvire core.
 - `reqvire.model` and `reqvire.submodels` preserve capability roots, requirement ownership through `specify`/`specifiedBy`, ontology hierarchy through `derive`/`derivedFrom`, and attachment edges needed for semantic dependency traceability.

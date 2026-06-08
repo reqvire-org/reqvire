@@ -128,7 +128,7 @@ Element identifier attachments link to model elements that are attachable under 
 **Validation Rules:**
 - Target element must exist in the model
 - Capability attachment targets must be ontology elements.
-- Requirement attachment targets must be requirement-owned `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` elements.
+- Requirement attachment targets must be requirement-owned `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` elements.
 - Requirement-owned refinement targets must have exactly one compatible `refine` relation before they are attachable.
 - Non-attachable element identifiers are rejected with a validation error.
 - Redundant same-hierarchy attachments and invalid cross-subgraph attachment flow are rejected by attachment validation.

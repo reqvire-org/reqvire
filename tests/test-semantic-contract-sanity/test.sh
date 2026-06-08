@@ -75,6 +75,16 @@ do
 done
 
 assert_invalid_contains \
+  "capability-owned-shape-invalid.md.txt" \
+  "Capability-owned semantic contract is rejected" \
+  "semantic-contract must refine a requirement" \
+  /tmp/semantic-contract-sanity-capability-owned.out
+assert_diff \
+  "${TEST_SCRIPT_DIR}/expected/capability-owned-shape-invalid.txt" \
+  /tmp/semantic-contract-sanity-capability-owned.out \
+  "capability-owned semantic contract output mismatch"
+
+assert_invalid_contains \
   "unknown-target-class.md.txt" \
   "Unknown target class is rejected" \
   "Semantic reference not found" \

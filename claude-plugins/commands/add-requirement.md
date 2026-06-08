@@ -169,6 +169,6 @@ Reqvire uses **bottom roll-up verification coverage**:
 - Element names become URL fragments (spaces → hyphens, lowercase)
 - Use two-space indentation for Relations entries
 - Use `#### Details` for refinements that don't add capabilities
-- Use `ontology` for shared ontology meaning and capability-owned or requirement-owned `semantic-contract` for local SHACL shape profiles
-- Keep exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior in capability-owned or requirement-owned `specification`, `behavior`, `state`, `input-output`, or shape-only `semantic-contract` refinements, not in ontology
+- Use `ontology` for shared ontology meaning attached by capabilities and requirement-owned `semantic-contract` refinements for local SHACL shape profiles
+- Keep exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior in compatible `specification`, `behavior`, `state`, and `input-output` refinements owned by the relevant capability or requirement. Use shape-only `semantic-contract` refinements only for requirement-owned semantic checks.
 - For complete capability (requirement + verification + test), use `/reqvire:add-capability`

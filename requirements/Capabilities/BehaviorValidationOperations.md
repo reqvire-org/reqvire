@@ -105,6 +105,26 @@ reqvire:BehaviorRuleShape
     sh:path reqvire:ruleOutcome ;
     sh:minCount 1 ;
     sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:sourceBehavior ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:behaviorPhase ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:rulePriority ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:precondition ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:postcondition ;
+    sh:datatype xsd:string ;
   ] .
 
 reqvire:StateTransitionShape
@@ -138,6 +158,18 @@ reqvire:BehaviorShape
     sh:path reqvire:hasTransition ;
     sh:class reqvire:StateTransition ;
   ] .
+
+reqvire:InputOutputMappingShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:InputOutputMapping ;
+  sh:property [
+    sh:path reqvire:usesInput ;
+    sh:class reqvire:Element ;
+  ] ;
+  sh:property [
+    sh:path reqvire:producesOutput ;
+    sh:class reqvire:Element ;
+  ] .
 ```
 
 #### Metadata
@@ -164,6 +196,14 @@ reqvire:LintingRuleShape
     sh:path reqvire:lintRuleName ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:lintScope ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:lintCondition ;
     sh:datatype xsd:string ;
   ] ;
   sh:property [
@@ -225,6 +265,39 @@ reqvire:ValidationRuleShape
     sh:path reqvire:validationOutcome ;
     sh:minCount 1 ;
     sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:validationRepair ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ValidationIssueKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ValidationIssueKind ;
+  sh:property [
+    sh:path reqvire:validationIssueKindName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:LintIssueShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:LintIssue ;
+  sh:property [
+    sh:path reqvire:lintIssueKind ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:MutationSafetyGateShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:MutationSafetyGate ;
+  sh:property [
+    sh:path reqvire:blocksPersistence ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
   ] .
 
 ```

@@ -15,22 +15,30 @@ reqvire:CapabilityGovernanceShape
   sh:targetClass reqvire:Capability ;
   sh:property [
     sh:path reqvire:status ;
+    sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:in ("draft" "review" "approved") ;
+    sh:message "Capability status metadata must be one of draft, review, or approved." ;
   ] ;
   sh:property [
     sh:path reqvire:priority ;
+    sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:in ("low" "medium" "high" "critical") ;
+    sh:message "Capability priority metadata must be one of low, medium, high, or critical." ;
   ] ;
   sh:property [
     sh:path reqvire:risk ;
+    sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:in ("low" "medium" "high" "critical") ;
+    sh:message "Capability risk metadata must be one of low, medium, high, or critical." ;
   ] ;
   sh:property [
     sh:path reqvire:owner ;
     sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:message "Capability owner metadata must be a single string routing label." ;
   ] .
 
 reqvire:RequirementGovernanceShape
@@ -38,22 +46,30 @@ reqvire:RequirementGovernanceShape
   sh:targetClass reqvire:Requirement ;
   sh:property [
     sh:path reqvire:status ;
+    sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:in ("draft" "review" "approved") ;
+    sh:message "Requirement status metadata must be one of draft, review, or approved." ;
   ] ;
   sh:property [
     sh:path reqvire:priority ;
+    sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:in ("low" "medium" "high" "critical") ;
+    sh:message "Requirement priority metadata must be one of low, medium, high, or critical." ;
   ] ;
   sh:property [
     sh:path reqvire:risk ;
+    sh:maxCount 1 ;
     sh:datatype xsd:string ;
     sh:in ("low" "medium" "high" "critical") ;
+    sh:message "Requirement risk metadata must be one of low, medium, high, or critical." ;
   ] ;
   sh:property [
     sh:path reqvire:owner ;
     sh:datatype xsd:string ;
+    sh:maxCount 1 ;
+    sh:message "Requirement owner metadata must be a single string routing label." ;
   ] .
 
 reqvire:NonGovernanceElementShape
@@ -62,18 +78,22 @@ reqvire:NonGovernanceElementShape
   sh:property [
     sh:path reqvire:status ;
     sh:maxCount 0 ;
+    sh:message "Governance status metadata may be authored only by capability or requirement elements." ;
   ] ;
   sh:property [
     sh:path reqvire:priority ;
     sh:maxCount 0 ;
+    sh:message "Governance priority metadata may be authored only by capability or requirement elements." ;
   ] ;
   sh:property [
     sh:path reqvire:risk ;
     sh:maxCount 0 ;
+    sh:message "Governance risk metadata may be authored only by capability or requirement elements." ;
   ] ;
   sh:property [
     sh:path reqvire:owner ;
     sh:maxCount 0 ;
+    sh:message "Governance owner metadata may be authored only by capability or requirement elements." ;
   ] .
 ```
 

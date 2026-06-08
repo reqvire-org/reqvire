@@ -2,16 +2,16 @@
     "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
     "name": "reqvire-org-marketplace",
     "description": "Official marketplace for reqvire-org plugins.",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "owner": {
         "name": "Ilija Ljubicic",
         "email": "ilijaljubicic@users.noreply.github.com"
     },
     "plugins": [
         {
-            "version": "1.9.0",
+            "version": "1.10.0",
             "name": "reqvire",
-            "description": "Expert MBSE engineer for system models, specifications and architectures. Use when exploring, updating and refactoring requirements, specifications and system model, adding features, managing verifications and creating tasks from introduced changes in requirements and system model.",
+            "description": "Expert MBSE engineer for system models, specifications, architectures, ontology authoring, semantic contracts and semantic query contracts. Use when exploring, updating and refactoring requirements, specifications and system model, adding features, managing verifications and creating tasks from introduced changes in requirements and system model.",
             "author": {
                 "name": "Ilija Ljubicic",
                 "email": "ilijaljubicic@users.noreply.github.com"
@@ -27,6 +27,8 @@
                 "systems-engineering",
                 "verification",
                 "traceability",
+                "ontology",
+                "semantic-web",
                 "rust"
             ],
             "commands": [
@@ -52,7 +54,8 @@
                 "./commands/unlink.md"
             ],
             "skills": [
-                "./skills/syseng/"
+                "./skills/syseng/",
+                "./skills/ontology-authoring/"
             ],
             "source": "./claude-plugins",
             "strict": false

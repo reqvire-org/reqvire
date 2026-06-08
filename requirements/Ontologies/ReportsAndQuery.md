@@ -11,89 +11,119 @@ Reports expose model structure without changing the source model. This ontology 
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:ReportContract a owl:Class .
-reqvire:TraversalContract a owl:Class .
-reqvire:FilterContract a owl:Class .
-reqvire:OutputContract a owl:Class .
-reqvire:ReportKind a owl:Class .
-reqvire:SearchFilterKind a owl:Class .
+reqvire:TraversalContract a owl:Class ;
+  rdfs:subClassOf reqvire:ReportContract .
+reqvire:FilterContract a owl:Class ;
+  rdfs:subClassOf reqvire:ReportContract .
+reqvire:OutputContract a owl:Class ;
+  rdfs:subClassOf reqvire:ReportContract .
+reqvire:ReportKind a owl:Class ;
+  rdfs:subClassOf reqvire:ReportContract .
+reqvire:SearchFilterKind a owl:Class ;
+  rdfs:subClassOf reqvire:FilterContract .
 reqvire:JsonOutputContract a owl:Class ;
   rdfs:subClassOf reqvire:OutputContract .
-reqvire:CollectSourceType a owl:Class .
-reqvire:ImplementationCoverageSource a owl:Class .
-reqvire:Submodel a owl:Class .
+reqvire:CollectSourceType a owl:Class ;
+  rdfs:subClassOf reqvire:ReportContract .
+reqvire:ImplementationCoverageSource a owl:Class ;
+  rdfs:subClassOf reqvire:ReportContract .
+reqvire:Submodel a owl:Class ;
+  rdfs:subClassOf reqvire:TraversalContract .
 reqvire:CapabilityRootSubmodel a owl:Class ;
   rdfs:subClassOf reqvire:Submodel .
 reqvire:ScopedSubmodel a owl:Class ;
   rdfs:subClassOf reqvire:Submodel .
-reqvire:CrossSubmodelCoupling a owl:Class .
-reqvire:ResourceReference a owl:Class .
+reqvire:CrossSubmodelCoupling a owl:Class ;
+  rdfs:subClassOf reqvire:TraversalContract .
+reqvire:ResourceReference a owl:Class ;
+  rdfs:subClassOf reqvire:ReportContract .
 
-reqvire:reportKindName a owl:DatatypeProperty .
-reqvire:reportKindMeaning a owl:DatatypeProperty .
-reqvire:searchFilterName a owl:DatatypeProperty .
-reqvire:searchFilterMeaning a owl:DatatypeProperty .
-reqvire:sourceTypeName a owl:DatatypeProperty .
-reqvire:coverageSourceName a owl:DatatypeProperty .
-reqvire:coverageSourceMeaning a owl:DatatypeProperty .
-reqvire:submodelBoundaryRule a owl:DatatypeProperty .
-reqvire:couplingSource a owl:ObjectProperty .
-reqvire:couplingTarget a owl:ObjectProperty .
-reqvire:couplingRelation a owl:ObjectProperty .
+reqvire:submodelBoundaryRule a owl:DatatypeProperty ;
+  rdfs:domain reqvire:TraversalContract ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Traversal rule text that defines a report submodel boundary or coupling interpretation." .
+reqvire:couplingSource a owl:ObjectProperty ;
+  rdfs:domain reqvire:CrossSubmodelCoupling ;
+  rdfs:range reqvire:Submodel .
+reqvire:couplingTarget a owl:ObjectProperty ;
+  rdfs:domain reqvire:CrossSubmodelCoupling ;
+  rdfs:range reqvire:Submodel .
+reqvire:couplingRelation a owl:ObjectProperty ;
+  rdfs:domain reqvire:CrossSubmodelCoupling ;
+  rdfs:range reqvire:RelationRule .
+
+reqvire:reportKindName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ReportKind ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical report command or report-output kind token." .
+reqvire:searchFilterName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:SearchFilterKind ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical search filter token used by search contracts and output." .
+reqvire:sourceTypeName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:CollectSourceType ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical collect report source type token." .
+reqvire:coverageSourceName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ImplementationCoverageSource ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical implementation coverage source token used in coverage records." .
 
 reqvire:searchReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "search" ;
-  reqvire:reportKindMeaning "Report kind that filters and lists model elements with evidence and summary counters." .
+  rdfs:comment "Report kind that filters and lists model elements with evidence and summary counters." .
 reqvire:collectReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "collect" ;
-  reqvire:reportKindMeaning "Report kind that gathers element context, refinements, attachments, and reachable semantic context." .
+  rdfs:comment "Report kind that gathers element context, refinements, attachments, and reachable semantic context." .
 reqvire:coverageReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "coverage" ;
-  reqvire:reportKindMeaning "Report kind that classifies implementation or verification coverage for requirements and capability roll-up." .
+  rdfs:comment "Report kind that classifies implementation or verification coverage for requirements and capability roll-up." .
 reqvire:submodelsReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "submodels" ;
-  reqvire:reportKindMeaning "Report kind that exposes independent capability-rooted subgraphs and cross-submodel couplings." .
+  rdfs:comment "Report kind that exposes independent capability-rooted subgraphs and cross-submodel couplings." .
 reqvire:resourcesReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "resources" ;
-  reqvire:reportKindMeaning "Report kind that lists files and external resources referenced by model relations and attachments." .
+  rdfs:comment "Report kind that lists files and external resources referenced by model relations and attachments." .
 reqvire:ontologiesReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "ontologies" ;
-  reqvire:reportKindMeaning "Report kind that exports ontology and SHACL content with source citations." .
+  rdfs:comment "Report kind that exports ontology and SHACL content with source citations." .
 reqvire:tracesReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "traces" ;
-  reqvire:reportKindMeaning "Report kind that projects relation paths for traceability review." .
+  rdfs:comment "Report kind that projects relation paths for traceability review." .
 reqvire:modelReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "model" ;
-  reqvire:reportKindMeaning "Report kind that exposes parsed model structure and relation evidence." .
+  rdfs:comment "Report kind that exposes parsed model structure and relation evidence." .
 reqvire:containmentReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "containment" ;
-  reqvire:reportKindMeaning "Report kind that exposes filesystem and element containment structure." .
+  rdfs:comment "Report kind that exposes filesystem and element containment structure." .
 reqvire:lintReportKind a reqvire:ReportKind ;
   reqvire:reportKindName "lint" ;
-  reqvire:reportKindMeaning "Report kind that exposes model quality findings that are not validation errors." .
+  rdfs:comment "Report kind that exposes model quality findings that are not validation errors." .
 
 reqvire:filePathSearchFilterKind a reqvire:SearchFilterKind ;
   reqvire:searchFilterName "file-path" ;
-  reqvire:searchFilterMeaning "Search filter over repository-relative file path patterns." .
+  rdfs:comment "Search filter over repository-relative file path patterns." .
 reqvire:elementNameSearchFilterKind a reqvire:SearchFilterKind ;
   reqvire:searchFilterName "element-name" ;
-  reqvire:searchFilterMeaning "Search filter over element display names." .
+  rdfs:comment "Search filter over element display names." .
 reqvire:elementTypeSearchFilterKind a reqvire:SearchFilterKind ;
   reqvire:searchFilterName "element-type" ;
-  reqvire:searchFilterMeaning "Search filter over canonical element type tokens and type categories." .
+  rdfs:comment "Search filter over canonical element type tokens and type categories." .
 reqvire:governanceMetadataSearchFilterKind a reqvire:SearchFilterKind ;
   reqvire:searchFilterName "governance-metadata" ;
-  reqvire:searchFilterMeaning "Search filter over effective status, priority, risk, and owner metadata." .
+  rdfs:comment "Search filter over effective status, priority, risk, and owner metadata." .
 reqvire:contentSearchFilterKind a reqvire:SearchFilterKind ;
   reqvire:searchFilterName "content" ;
-  reqvire:searchFilterMeaning "Search filter over element or page textual content." .
+  rdfs:comment "Search filter over element or page textual content." .
 reqvire:relationPresenceSearchFilterKind a reqvire:SearchFilterKind ;
   reqvire:searchFilterName "relation-presence" ;
-  reqvire:searchFilterMeaning "Search filter based on required or excluded authored relation types." .
+  rdfs:comment "Search filter based on required or excluded authored relation types." .
 reqvire:attachmentPresenceSearchFilterKind a reqvire:SearchFilterKind ;
   reqvire:searchFilterName "attachment-presence" ;
-  reqvire:searchFilterMeaning "Search filter based on required or excluded attachments." .
+  rdfs:comment "Search filter based on required or excluded attachments." .
 
 reqvire:elementCollectSource a reqvire:CollectSourceType ;
   reqvire:sourceTypeName "element" .
@@ -104,16 +134,16 @@ reqvire:attachmentCollectSource a reqvire:CollectSourceType ;
 
 reqvire:directSatisfiedCoverageSource a reqvire:ImplementationCoverageSource ;
   reqvire:coverageSourceName "direct_satisfied" ;
-  reqvire:coverageSourceMeaning "A requirement has direct satisfiedBy implementation or evidence." .
+  rdfs:comment "A requirement has direct satisfiedBy implementation or evidence." .
 reqvire:refinementContractSatisfiedViaAttachmentCoverageSource a reqvire:ImplementationCoverageSource ;
   reqvire:coverageSourceName "refinement_contract_satisfied_via_attachment" ;
-  reqvire:coverageSourceMeaning "A requirement is covered because a directly satisfied requirement attaches a refinement contract owned by it." .
+  rdfs:comment "A requirement is covered because a directly satisfied requirement attaches a refinement contract owned by it." .
 reqvire:refinementContractSatisfiedViaChildCoverageSource a reqvire:ImplementationCoverageSource ;
   reqvire:coverageSourceName "refinement_contract_satisfied_via_child" ;
-  reqvire:coverageSourceMeaning "A requirement is covered because a directly satisfied child requirement implements an owned refinement contract." .
+  rdfs:comment "A requirement is covered because a directly satisfied child requirement implements an owned refinement contract." .
 reqvire:uncoveredCoverageSource a reqvire:ImplementationCoverageSource ;
   reqvire:coverageSourceName "uncovered" ;
-  reqvire:coverageSourceMeaning "A requirement has no implementation coverage evidence through direct satisfaction, attachment coverage, or child coverage." .
+  rdfs:comment "A requirement has no implementation coverage evidence through direct satisfaction, attachment coverage, or child coverage." .
 
 reqvire:capabilityRootSubmodelRule a reqvire:CapabilityRootSubmodel ;
   reqvire:submodelBoundaryRule "A capability with no capability parent relation is a capability-root submodel boundary." .
@@ -126,7 +156,7 @@ reqvire:crossSubmodelAttachmentDependencyRule a reqvire:CrossSubmodelCoupling ;
   * type: ontology
 
 #### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
+  * derivedFrom: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
 
 ### Reqvire Semantic Export Ontology
@@ -140,49 +170,242 @@ Semantic exports preserve Markdown as the source of truth while exposing parsed 
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:GraphRegistry a owl:Class .
 reqvire:RdfProjection a owl:Class .
 reqvire:RdfTriple a owl:Class .
 reqvire:SemanticExport a owl:Class .
+reqvire:OntologyTerm a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection .
 reqvire:SemanticArtifactExport a owl:Class ;
   rdfs:subClassOf reqvire:SemanticExport .
 reqvire:FullSemanticModelExport a owl:Class ;
   rdfs:subClassOf reqvire:SemanticExport .
 reqvire:SemanticBlock a owl:Class .
 reqvire:OntologyBlock a owl:Class ;
-  rdfs:subClassOf reqvire:SemanticBlock .
+  rdfs:subClassOf reqvire:SemanticBlock ;
+  owl:disjointWith reqvire:ShapeBlock .
 reqvire:ShapeBlock a owl:Class ;
   rdfs:subClassOf reqvire:SemanticBlock .
 reqvire:ModelContextProjection a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection .
+reqvire:OntologyProjectionGraph a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Generated subprojection within the existing in-memory RDF projection containing normalized ontology-view constructs derived from authored ontology and SHACL quads." .
+reqvire:OntologyConstructProjection a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Projection record produced by the ontology construct projector for direct-authored OWL/RDFS/SHACL patterns." .
+reqvire:OntologyConstruct a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Generated semantic construct used by ontology export and HTML exploration, such as a restriction, class expression, equivalence group, property chain, or property characteristic." .
+reqvire:OntologyConstructMember a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Ordered member record for property chains and class-expression lists in generated ontology projection facts." .
+reqvire:OntologyProjectionProvenance a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Generated provenance record describing how an ontology construct projection fact was derived." .
+reqvire:OntologyProjectionEvidence a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Source quad evidence record supporting an ontology construct projection fact." .
+reqvire:OntologyProjectionSource a owl:Class ;
+  rdfs:subClassOf reqvire:SemanticBlock ;
+  rdfs:comment "Source block record used by generated ontology projection facts." .
+reqvire:OntologySymbol a owl:Class ;
+  rdfs:subClassOf reqvire:RdfProjection ;
+  rdfs:comment "Canonical symbol vocabulary entry used by ontology projection facts and ontology viewer badges." .
 
-reqvire:registryElement a owl:ObjectProperty .
-reqvire:projectionTriple a owl:ObjectProperty .
-reqvire:exportSourceElement a owl:ObjectProperty .
-reqvire:declaresTerm a owl:ObjectProperty .
-reqvire:referencesTerm a owl:ObjectProperty .
-reqvire:relationTarget a owl:ObjectProperty .
-reqvire:conceptReference a owl:ObjectProperty .
-reqvire:elementName a owl:DatatypeProperty .
-reqvire:elementIdentifier a owl:DatatypeProperty .
-reqvire:elementId a owl:DatatypeProperty .
-reqvire:lineNumber a owl:DatatypeProperty .
-reqvire:relationType a owl:DatatypeProperty .
-reqvire:relationTargetIdentifier a owl:DatatypeProperty .
-reqvire:attachmentTargetIdentifier a owl:DatatypeProperty .
-reqvire:conceptLabel a owl:DatatypeProperty .
-reqvire:referenceKind a owl:DatatypeProperty .
+reqvire:registryElement a owl:ObjectProperty ;
+  rdfs:domain reqvire:GraphRegistry ;
+  rdfs:range reqvire:Element .
+reqvire:projectionTriple a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:RdfTriple .
+reqvire:exportSourceElement a owl:ObjectProperty ;
+  rdfs:domain reqvire:SemanticExport ;
+  rdfs:range reqvire:Element .
+reqvire:declaresTerm a owl:ObjectProperty ;
+  rdfs:domain reqvire:SemanticBlock ;
+  rdfs:range reqvire:OntologyTerm .
+reqvire:referencesTerm a owl:ObjectProperty ;
+  rdfs:domain reqvire:SemanticBlock ;
+  rdfs:range reqvire:OntologyTerm .
+reqvire:relationTarget a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:Element .
+reqvire:conceptReference a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:Element .
+reqvire:projectedConstruct a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:OntologyConstruct .
+reqvire:ontologyConstructProjection a owl:ObjectProperty ;
+  rdfs:domain reqvire:OntologyProjectionGraph ;
+  rdfs:range reqvire:OntologyConstructProjection .
+reqvire:ontologySymbol a owl:ObjectProperty ;
+  rdfs:domain reqvire:OntologyProjectionGraph ;
+  rdfs:range reqvire:OntologySymbol .
+reqvire:constructSourceBlock a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:SemanticBlock .
+reqvire:constructQueryContract a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:SemanticQueryContract .
+reqvire:constructSubject a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:OntologyTerm .
+reqvire:constructPredicate a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:OntologyTerm .
+reqvire:constructObject a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:OntologyTerm .
+reqvire:constructProperty a owl:ObjectProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range reqvire:OntologyTerm .
+reqvire:constructMember a owl:ObjectProperty ;
+  rdfs:domain reqvire:OntologyConstruct ;
+  rdfs:range reqvire:OntologyConstructMember .
+reqvire:memberTerm a owl:ObjectProperty ;
+  rdfs:domain reqvire:OntologyConstructMember ;
+  rdfs:range reqvire:OntologyTerm .
+reqvire:constructProvenance a owl:ObjectProperty ;
+  rdfs:domain reqvire:OntologyConstruct ;
+  rdfs:range reqvire:OntologyProjectionProvenance .
+reqvire:provenanceSource a owl:ObjectProperty ;
+  rdfs:domain reqvire:OntologyProjectionProvenance ;
+  rdfs:range reqvire:OntologyProjectionSource .
+reqvire:provenanceEvidence a owl:ObjectProperty ;
+  rdfs:domain reqvire:OntologyProjectionProvenance ;
+  rdfs:range reqvire:OntologyProjectionEvidence .
+reqvire:constructSymbol a owl:ObjectProperty ;
+  rdfs:domain reqvire:OntologyConstruct ;
+  rdfs:range reqvire:OntologySymbol .
+reqvire:elementName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical model element display name emitted in full semantic export context." .
+reqvire:elementIdentifier a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Stable model element identifier emitted in semantic export records." .
+reqvire:elementId a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Stable model element id emitted in semantic export records." .
+reqvire:lineNumber a owl:DatatypeProperty ;
+  rdfs:domain reqvire:SemanticBlock ;
+  rdfs:range xsd:integer ;
+  rdfs:comment "Source line number for a semantic block or generated source projection record." .
+reqvire:relationType a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical relation type token emitted by model-context RDF projection facts." .
+reqvire:relationTargetIdentifier a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Stable identifier of a relation target emitted by model-context RDF projection facts." .
+reqvire:attachmentTargetIdentifier a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Stable identifier of an attachment target emitted by model-context RDF projection facts." .
+reqvire:conceptLabel a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Human-readable concept reference or ontology term label emitted by RDF projection facts." .
+reqvire:termKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyTerm ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical kind token for an ontology projection term, such as iri, blank-node, or literal." .
+reqvire:termValue a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyTerm ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Raw RDF term value emitted in ontology projection facts." .
+reqvire:sourceBlockId a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyProjectionSource ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Stable generated identifier for an authored ontology or SHACL source block." .
+reqvire:sourceElementIdentifier a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyProjectionSource ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Stable Reqvire element identifier for the source element that owns a semantic block." .
+reqvire:sourceName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyProjectionSource ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Source element display name emitted by generated ontology projection source records." .
+reqvire:blockKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyProjectionSource ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical semantic block kind token emitted by ontology projection source records." .
+reqvire:referenceKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical concept-reference kind token emitted by model-context RDF projection facts." .
+reqvire:constructFamily a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical ontology construct family token used for filtering generated projection facts." .
+reqvire:constructKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyConstruct ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical ontology construct kind token used for filtering generated projection facts." .
+reqvire:propertyCharacteristic a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyConstruct ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical property-characteristic token for generated ontology construct facts." .
+reqvire:restrictionKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyConstruct ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical OWL restriction kind token for generated ontology construct facts." .
+reqvire:classExpressionKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyConstruct ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical class-expression kind token for generated ontology construct facts." .
+reqvire:shapeOverlayKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologyConstruct ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical SHACL overlay kind token for generated ontology construct facts." .
+reqvire:constructSequenceIndex a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range xsd:integer ;
+  rdfs:comment "Ordered sequence index for generated ontology construct member facts." .
+reqvire:projectionDerivationMode a owl:DatatypeProperty ;
+  rdfs:domain reqvire:RdfProjection ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical derivation-mode token for generated projection facts." .
+reqvire:symbolConceptName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologySymbol ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical ontology viewer symbol concept token used for projection badges and filtering." .
+reqvire:rawUnicodeCodePoint a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologySymbol ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Unicode code point token for an ontology viewer symbol." .
+reqvire:renderedUnicodeCharacter a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologySymbol ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Rendered Unicode character for an ontology viewer symbol." .
+reqvire:symbolTooltip a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologySymbol ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Tooltip text for an ontology viewer symbol." .
+reqvire:accessibleLabel a owl:DatatypeProperty ;
+  rdfs:domain reqvire:OntologySymbol ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Accessible label for an ontology viewer symbol." .
 
 reqvire:semanticArtifactExportMode a reqvire:SemanticArtifactExport ;
   rdfs:comment "Default semantic export mode that emits authored ontology and SHACL blocks with source comments." .
 reqvire:fullSemanticModelExportMode a reqvire:FullSemanticModelExport ;
-  rdfs:comment "Semantic export mode that emits authored ontology and SHACL blocks plus RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, and shape references." .
+  rdfs:comment "Semantic export mode that emits authored ontology and SHACL blocks plus RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, shape references, and generated ontology projection facts." .
+reqvire:directAuthoredProjectionMode a reqvire:OntologyConstructProjection ;
+  reqvire:projectionDerivationMode "direct-authored" ;
+  rdfs:comment "Projection mode for constructs materialized from authored triples without OWL reasoning." .
 ```
 
 #### Metadata
   * type: ontology
 
 #### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
+  * derivedFrom: [Reqvire Semantic Contract Ontology](CapabilityRequirementModel.md#reqvire-semantic-contract-ontology)
 ---

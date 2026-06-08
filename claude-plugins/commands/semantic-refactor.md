@@ -35,9 +35,9 @@ Apply these boundaries:
 - Capability: coherent operational/system ability, stakeholder/regulatory/source scope, ownership, ontology context, optional semantic-enrichment context, and direct verification context.
 - `ontology`: reusable ontology/domain meaning and shared semantic structures.
 - Requirement: implementable, testable system obligation.
-- `semantic-contract`: capability-level or obligation-specific SHACL `Shapes` profile over reachable ontology context.
+- `semantic-contract`: requirement-owned SHACL `Shapes` profile over reachable ontology context.
 
-Ontology attached by capabilities should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in capability-owned or requirement-owned `specification`, `behavior`, `state`, `input-output`, or shape-only `semantic-contract` refinements.
+Ontology attached by capabilities should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible `specification`, `behavior`, `state`, and `input-output` refinements owned by the relevant capability or requirement. Shape-only `semantic-contract` refinements are requirement-owned checks.
 
 ## Procedure
 
@@ -79,9 +79,9 @@ For each candidate, classify each sentence:
 - Capability/source context goes to capability or capability-owned refinements.
 - Stable semantic meaning goes to `ontology`.
 - System obligation stays in requirement.
-- Local SHACL profile goes to capability-owned or requirement-owned `semantic-contract`.
+- Local SHACL profile goes to a requirement-owned `semantic-contract`.
 - Verification criteria stays in verification elements.
-- Exact commands, fields, URI patterns, workflow steps, output formats, file paths, persistence behavior, and reject/write/emit behavior stay in capability-owned or requirement-owned refinements, not ontology.
+- Exact commands, fields, URI patterns, workflow steps, output formats, file paths, persistence behavior, and reject/write/emit behavior stay in compatible refinements owned by the relevant capability or requirement, not ontology.
 
 Do not delete content until it has a new owner.
 
@@ -92,7 +92,7 @@ Use:
 - `requirement specify capability`
 - `capability specifiedBy requirement`
 - capability `Attachments` to ontology elements
-- `capability refinedBy semantic-contract` or `requirement refinedBy semantic-contract` for shape profiles
+- `requirement refinedBy semantic-contract` for shape profiles
 - Attachments for intentional cross-capability ontology dependencies and reusable requirement-owned contracts
 
 Do not use `trace` to replace ownership or dependency.

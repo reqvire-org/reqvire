@@ -11,6 +11,7 @@ This is the foundation ontology used by the rest of the Reqvire ontology set. Ot
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:Element a owl:Class ;
   rdfs:comment "Base class for addressable Reqvire model elements and related model artifacts." .
@@ -76,61 +77,90 @@ reqvire:ReservedSubsection a owl:Class ;
   rdfs:comment "Reserved level-four subsection name with parser-recognized model meaning." .
 
 reqvire:id a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
   rdfs:comment "Stable local element identifier." .
 reqvire:identifier a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
   rdfs:comment "Fully qualified Reqvire element identifier including file path and fragment." .
 reqvire:name a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
   rdfs:comment "Human-readable element name." .
 reqvire:elementType a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
   rdfs:comment "Reqvire element type value declared in element metadata." .
 reqvire:filePath a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
   rdfs:comment "Repository-relative file path containing the element." .
 reqvire:externalUrl a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Artifact ;
+  rdfs:range xsd:anyURI ;
   rdfs:comment "External URL referenced by a Reqvire artifact relation target." .
 reqvire:fragment a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
   rdfs:comment "Markdown fragment used to address the element within its file." .
 reqvire:content a owl:DatatypeProperty ;
+  rdfs:domain reqvire:Element ;
+  rdfs:range xsd:string ;
   rdfs:comment "Collected textual content for the element." .
 reqvire:elementTypeName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ElementType ;
+  rdfs:range xsd:string ;
   rdfs:comment "Metadata type token used in Markdown, such as capability, requirement, or semantic-contract." .
 reqvire:elementTypeCategory a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ElementType ;
+  rdfs:range xsd:string ;
   rdfs:comment "Broad family for a Reqvire element type." .
 reqvire:elementTypeDescription a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ElementType ;
+  rdfs:range xsd:string ;
   rdfs:comment "Stable semantic meaning of an element type." .
 reqvire:defaultElementType a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ElementType ;
+  rdfs:range xsd:boolean ;
   rdfs:comment "Marks the element type assigned when metadata omits type." .
 reqvire:customElementTypePattern a owl:DatatypeProperty ;
+  rdfs:domain reqvire:CustomElementType ;
+  rdfs:range xsd:string ;
   rdfs:comment "Pattern used to identify named custom element types." .
 reqvire:subsectionName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ReservedSubsection ;
+  rdfs:range xsd:string ;
   rdfs:comment "Reserved subsection heading token used in Reqvire Markdown." .
-reqvire:subsectionPurpose a owl:DatatypeProperty ;
-  rdfs:comment "Stable model purpose of a reserved subsection." .
 reqvire:identitySource a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ElementIdentity ;
+  rdfs:range xsd:string ;
   rdfs:comment "Source from which an identity or address concept is derived." .
 reqvire:identityStability a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ElementIdentity ;
+  rdfs:range xsd:string ;
   rdfs:comment "Stability behavior of an identity or address concept under relocation." .
 reqvire:referenceTargetKindName a owl:DatatypeProperty ;
-  rdfs:comment "Stable reference target category token used by parsers and reports." .
-reqvire:referenceTargetKindMeaning a owl:DatatypeProperty ;
-  rdfs:comment "Stable meaning of a reference target category." .
-
+  rdfs:domain reqvire:ReferenceTargetKind ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Stable reference target category token used by parsers, reports, and queries." .
 reqvire:capabilityType a reqvire:CapabilityElementType ;
   reqvire:elementTypeName "capability" ;
   reqvire:elementTypeCategory "capability" ;
-  reqvire:elementTypeDescription "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, refined by contracts, and verified by evidence." ;
+  rdfs:comment "Implementation-independent operational, product, business, regulatory, or system ability specified by requirements, refined by contracts, and verified by evidence." ;
   reqvire:defaultElementType false .
 
 reqvire:requirementType a reqvire:RequirementElementType ;
   reqvire:elementTypeName "requirement" ;
   reqvire:elementTypeCategory "requirement" ;
-  reqvire:elementTypeDescription "Implementation-facing system obligation verified by verification elements and satisfied by implementation or evidence." ;
+  rdfs:comment "Implementation-facing system obligation verified by verification elements and satisfied by implementation or evidence." ;
   reqvire:defaultElementType true .
 
 reqvire:otherType a reqvire:CustomElementType ;
   reqvire:elementTypeName "other" ;
   reqvire:elementTypeCategory "custom" ;
   reqvire:customElementTypePattern "other-TYPENAME" ;
-  reqvire:elementTypeDescription "Trace-only custom element type family for model extensions outside the canonical Reqvire type set." ;
+  rdfs:comment "Trace-only custom element type family for model extensions outside the canonical Reqvire type set." ;
   reqvire:defaultElementType false .
 
 reqvire:elementIdConcept a reqvire:ElementId ;
@@ -142,35 +172,38 @@ reqvire:elementIdentifierConcept a reqvire:ElementIdentifier ;
 
 reqvire:elementIdentifierReferenceTargetKind a reqvire:ElementIdentifierTarget ;
   reqvire:referenceTargetKindName "element-identifier" ;
-  reqvire:referenceTargetKindMeaning "Target resolves to a specific Reqvire model element by location-based identifier." .
+  rdfs:comment "Target resolves to a specific Reqvire model element by location-based identifier." .
 reqvire:internalPathReferenceTargetKind a reqvire:InternalPathTarget ;
   reqvire:referenceTargetKindName "internal-path" ;
-  reqvire:referenceTargetKindMeaning "Target resolves to a repository-internal path without an element fragment." .
+  rdfs:comment "Target resolves to a repository-internal path without an element fragment." .
 reqvire:externalUrlReferenceTargetKind a reqvire:ExternalUrlTarget ;
   reqvire:referenceTargetKindName "external-url" ;
-  reqvire:referenceTargetKindMeaning "Target resolves to an external URL resource." .
+  rdfs:comment "Target resolves to an external URL resource." .
 
 reqvire:metadataSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Metadata" ;
-  reqvire:subsectionPurpose "Element metadata, element type, governance metadata where valid, and custom metadata." .
+  rdfs:comment "Element metadata, element type, governance metadata where valid, and custom metadata." .
 reqvire:relationsSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Relations" ;
-  reqvire:subsectionPurpose "Authored relation edges from one model element to another model element or artifact." .
+  rdfs:comment "Authored relation edges from one model element to another model element or artifact." .
 reqvire:detailsSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Details" ;
-  reqvire:subsectionPurpose "Narrative requirement context and clarification that remains part of the owning element." .
+  rdfs:comment "Narrative requirement context and clarification that remains part of the owning element." .
 reqvire:attachmentsSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Attachments" ;
-  reqvire:subsectionPurpose "Explicit attached ontology or reusable refinement contract dependencies." .
+  rdfs:comment "Explicit attached ontology or reusable refinement contract dependencies." .
 reqvire:conceptReferencesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Concept References" ;
-  reqvire:subsectionPurpose "Human-readable bindings from element prose to reachable ontology terms." .
+  rdfs:comment "Human-readable bindings from element prose to reachable ontology terms." .
 reqvire:ontologySubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Ontology" ;
-  reqvire:subsectionPurpose "Inline Turtle ontology content for ontology elements." .
+  rdfs:comment "Inline Turtle ontology content for ontology elements." .
 reqvire:shapesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Shapes" ;
-  reqvire:subsectionPurpose "Inline SHACL shape content for capability-owned or requirement-owned semantic contracts." .
+  rdfs:comment "Inline SHACL shape content for requirement-owned semantic contracts." .
+reqvire:querySubsection a reqvire:ReservedSubsection ;
+  reqvire:subsectionName "Query" ;
+  rdfs:comment "Inline semantic query content for requirement-owned semantic query contracts; the fenced code info string declares the query language." .
 ```
 
 #### Metadata

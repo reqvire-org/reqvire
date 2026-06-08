@@ -2,10 +2,10 @@
 
 ### Defining Model Structure
 
-As a **System Engineer**, I want a well-defined Reqvire model structure and addressing language, so that I can organize capabilities, requirements, refinements, semantic contracts, verifications, and traceability links consistently across a repository.
+As a **System Engineer**, I want a well-defined Reqvire model structure and addressing language, so that I can organize capabilities, requirements, refinements, semantic contracts, semantic query contracts, verifications, and traceability links consistently across a repository.
 
 #### Details
-Defining model structure is the capability root for the Reqvire model vocabulary. It attaches the authoritative ontology set for elements, capability abilities, requirement obligations, capability-owned and requirement-owned semantic contracts, refinements, governance metadata, and traceability relations.
+Defining model structure is the capability root for the Reqvire model vocabulary. It attaches the authoritative ontology set for elements, capability abilities, requirement obligations, requirement-owned semantic contracts, requirement-owned semantic query contracts, refinements, governance metadata, and traceability relations.
 
 This capability answers how Reqvire structures system models in Markdown, which concepts are part of the modeling language, and which ontology elements define the language before implementation-facing requirements are written.
 
@@ -50,7 +50,7 @@ Requirement elements answer:
 - What implementation or evidence can satisfy it?
 - What verification proves it?
 
-Ontology elements hold stable domain and model-language meaning. They live in the dedicated `requirements/Ontologies` folder so the ontology plane stays orthogonal to capability-root subgraphs. Capability elements attach ontology to define the semantic context for the capability and for requirements that specify the capability. Requirement-owned semantic contracts define SHACL shape profiles that apply already reachable capability ontology to one obligation.
+Ontology elements hold stable domain and model-language meaning. They live in the dedicated `requirements/Ontologies` folder so the ontology plane stays orthogonal to capability-root subgraphs. Capability elements attach ontology to define the semantic context for the capability and for requirements that specify the capability. Requirement-owned semantic contracts define SHACL shape profiles that apply already reachable capability ontology to one obligation. Requirement-owned semantic query contracts define declarative semantic queries over the same reachable context without a query-kind classification.
 
 Requirements should not duplicate ontology content and should not attach ontology directly. A requirement that needs shared meaning should specify the capability that attaches the relevant ontology; child requirements inherit that ontology context through the owning requirement and capability hierarchy. If the requirement needs closed-world constraints for its own obligation, it may own a shapes-only semantic contract.
 
@@ -92,6 +92,99 @@ reqvire:ElementShape
   ] ;
   sh:property [
     sh:path reqvire:elementType ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:id ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:filePath ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:fragment ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:content ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ArtifactShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Artifact ;
+  sh:property [
+    sh:path reqvire:externalUrl ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:anyURI ;
+  ] .
+
+reqvire:ElementTypeShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ElementType ;
+  sh:property [
+    sh:path reqvire:elementTypeName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:elementTypeCategory ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:defaultElementType ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] .
+
+reqvire:CustomElementTypeShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:CustomElementType ;
+  sh:property [
+    sh:path reqvire:customElementTypePattern ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ReservedSubsectionShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ReservedSubsection ;
+  sh:property [
+    sh:path reqvire:subsectionName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ElementIdentityShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ElementIdentity ;
+  sh:property [
+    sh:path reqvire:identitySource ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:identityStability ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ReferenceTargetKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ReferenceTargetKind ;
+  sh:property [
+    sh:path reqvire:referenceTargetKindName ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
     sh:datatype xsd:string ;

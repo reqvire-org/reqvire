@@ -88,7 +88,8 @@ Reserved subsection vocabulary is defined by the Reqvire core element ontology. 
  * **Attachments**: explicit attached ontology or requirement-owned contract dependencies
  * **Concept References**: readable bindings to reachable ontology terms
  * **Ontology**: ontology-element Turtle content
- * **Shapes**: semantic-contract SHACL content
+ * **Shapes**: requirement-owned semantic-contract SHACL content
+ * **Query**: generic semantic-query-contract content with exactly one fenced `sparql` code block
 
 Each reserved subsection has specific parsing rules, validation requirements, and behaviors.
 

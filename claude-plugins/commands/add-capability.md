@@ -59,7 +59,7 @@ This command orchestrates the complete workflow:
 3. **Add ontology context when needed:**
 
    Use source, compatible refinements, or `ontology` elements when the capability needs reusable vocabulary, ontology terms, source authority, or shared SHACL/OWL contract language. Add ontology elements under `requirements/Ontologies`, then attach them from the consuming capability.
-   Ontology attached by capabilities should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in capability-owned or requirement-owned refinements.
+   Ontology attached by capabilities should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible refinements owned by the relevant capability or requirement; semantic contracts are requirement-owned only.
 
    For broader semantic contract refactoring, use:
    ```bash
@@ -118,7 +118,7 @@ This command orchestrates the complete workflow:
 - **Capability vs obligation**: Capability answers what the system can accomplish; requirement answers what the system shall do
 - **Capability boundaries**: Do not model UI screens, deployment artifacts, code modules, tickets, or low-level implementation details as capabilities
 - **Decompose intentionally**: Use child capabilities when verification, ownership, lifecycle, architecture impact, operational semantics, or requirement clusters differ
-- **Semantic contracts when useful**: Put reusable meaning in ontology elements; put local SHACL profiles in capability-owned or requirement-owned semantic contracts
+- **Semantic contracts when useful**: Put reusable meaning in ontology elements attached by capabilities; put local SHACL profiles in requirement-owned semantic contracts
 - **Requirements first**: Create all requirements before verifications
 - **Hierarchical**: Capability hierarchy uses capability `derivedFrom`; requirement hierarchy uses requirement `derivedFrom`
 - **Traceable**: Requirements point to their capability with `specify`

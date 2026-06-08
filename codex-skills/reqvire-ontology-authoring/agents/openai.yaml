@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reqvire Ontology Authoring"
+  short_description: "Create Reqvire OWL/Turtle ontologies"
+  default_prompt: "Use $reqvire-ontology-authoring to create or extend a Reqvire ontology with traceable OWL/Turtle terms."

@@ -21,7 +21,7 @@ Attachment targets support model element identifier references with family-speci
 
 **Identifier Targets:**
 - Capability attachments must point to `ontology` elements only
-- Requirement attachments must point to requirement-owned refinement element types only (`semantic-contract`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
+- Requirement attachments must point to requirement-owned refinement element types only (`semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, `input-output`)
 - Requirement attachment to `ontology` is invalid; requirements inherit ontology context from their owning capability path
 - Normalized like relation targets (resolved to full identifier path)
 - Validation is expected to reject identifiers pointing to non-attachable element types
@@ -307,7 +307,7 @@ Requirement governance metadata is declared in the `#### Metadata` subsection of
 
 Requirement governance metadata covers requirement management accountability and decision context: `status` represents the requirement lifecycle state, `priority` represents planning importance, `risk` represents realization risk, and `owner` represents maintenance accountability.
 
-Elements outside the governance-bearing family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Refinement elements (`source`, `semantic-contract`, `constraint`, `behavior`, `specification`, `state`, and `input-output`) obtain governance context from their owning capability or requirement instead of authored metadata.
+Elements outside the governance-bearing family are not requirement governance metadata authors and must not declare `status`, `priority`, `risk`, or `owner` metadata. Refinement elements (`source`, `constraint`, `behavior`, `specification`, `state`, and `input-output`) obtain governance context from their compatible owning capability or requirement instead of authored metadata. Requirement-owned `semantic-contract` and `semantic-query-contract` refinements obtain governance context from their owning requirement.
 
 When any non-governance-bearing element declares requirement governance metadata keys, the validator is expected to report an error indicating that governance metadata is only valid on capability and requirement elements.
 
@@ -397,6 +397,25 @@ The rule is intentionally strict:
   * refine: [Semantic Contract Reference Context Validation](Validation.md#semantic-contract-reference-context-validation)
 ---
 
+### Ontology Annotation Convention Specification
+
+#### Details
+Authored ontology vocabulary shall use standard RDF/RDFS annotation properties for generic presentation metadata:
+- Use `rdfs:label` for optional human-readable presentation labels when no more specific domain slot is needed.
+- Use `rdfs:comment` for optional explanatory annotations on classes, properties, individuals, and axioms.
+- Do not replace domain slots with annotations. A value that is a canonical authored token, parser field, export field, interface enum value, report kind, rule condition, queryable attribute, or controlled-vocabulary payload remains a declared ontology property even if its local name ends with `Name` or `Meaning`.
+- Controlled-vocabulary individuals shall carry their formal semantics through IRI identity, typed class membership, hierarchy, and axioms. Their literal tokens or definitions shall be modeled with domain properties when those literals are part of the system contract.
+- Do not introduce custom `*Name` or `*Meaning` datatype properties for purely generic labels or descriptions that have no separate domain semantics. If SHACL currently validates such a presentation-only field, refactor the SHACL path to `rdfs:label` or `rdfs:comment`; keep a custom token property only when the literal is consumed by parser, CLI/API, report, query, validation, or payload contracts.
+- Do not keep deprecated presentation-only ontology properties in authored Reqvire ontology source. Refactoring history belongs in version control; the active ontology vocabulary should expose only current semantic terms and current contract tokens.
+- SHACL shapes may require `rdfs:label` and `rdfs:comment` when the annotation itself is the intended contract. Those built-in RDFS annotation paths are treated as external vocabulary and do not require declaration by a Reqvire ontology element.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
+---
+
 ### Semantic Contract Structure Specification
 
 #### Details
@@ -430,6 +449,7 @@ The implementation shall enforce the ontology and semantic-contract structure:
   - `sh:path` values are declared by at least one ontology element in the Reqvire model.
   - `sh:class` values are declared by at least one ontology element in the Reqvire model.
   - Missing declarations are validation errors because they create dangling semantic references.
+  - Built-in RDFS annotation paths `rdfs:label` and `rdfs:comment` are allowed as external annotation properties in `sh:path` and do not require local ontology declarations.
   - Validation errors for missing semantic declarations must include the referencing semantic-contract identifier, reference kind, referenced IRI, and guidance to define the term or update/remove the SHACL reference before deleting or editing the declaring contract.
   - Declared references must also be reachable from the referencing semantic contract's owner context.
   - A capability context contains ontology elements attached by the capability and inherited through valid capability hierarchy traversal, plus ontology hierarchy reachable from those ontology elements.
@@ -440,6 +460,31 @@ The implementation shall enforce the ontology and semantic-contract structure:
   - `sh:maxCount` must be greater than or equal to `sh:minCount` when both are present.
   - `sh:in` must point to a valid RDF list.
 - OWL reasoning and full SHACL conformance execution are not required for the initial semantic contract validator; they may be added later through optional adapters once the dependency footprint is acceptable.
+
+#### Metadata
+  * type: specification
+
+#### Relations
+  * refine: [Ontology and Semantic Contract Model](ModelManagement.md#ontology-and-semantic-contract-model)
+---
+
+### Semantic Query Contract Structure Specification
+
+#### Details
+Semantic query contracts define declarative semantic questions over the graph-shaped model without baking the query technology into the element type name.
+
+The implementation shall enforce the semantic-query-contract structure:
+- `semantic-query-contract` must refine exactly one requirement.
+- `semantic-query-contract` is requirement-owned and may be attached by other requirements only when attachment ownership rules are satisfied.
+- `semantic-query-contract` must use a `#### Query` reserved subsection with exactly one fenced code block.
+- The subsection heading remains generic: use `#### Query`, not `#### SPARQL Query`.
+- The fenced code block must use info string `sparql`; this is the only initial supported query language.
+- `#### Ontology` and `#### Shapes` are forbidden on `semantic-query-contract` elements.
+- Query contracts must not define ontology vocabulary or SHACL shape profiles; they consume reachable semantic model context.
+- Reqvire derives the semantic query contract IRI as `urn:reqvire:semantic-query-contract:<element.id>`.
+- The graph registry indexes semantic query contracts by `element.id`, `element.identifier`, derived IRI, owning requirement, reachable ontology context, query language, and raw query text.
+- Search JSON shall expose semantic query contract identity and Query fenced block details; ontology collection and semantic export shall not emit query contract text or query metadata until a dedicated query-export command is specified. Generated ontology projection facts may cite semantic-query-contract IRIs as provenance without embedding raw query text.
+- Query kind, diagnostics, execution results, inference strategy, and persistent RDF store integration are not part of the initial semantic-query-contract model; they may be added later only through dedicated query-export or query-execution contracts.
 
 #### Metadata
   * type: specification

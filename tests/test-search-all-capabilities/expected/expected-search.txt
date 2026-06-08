@@ -131,6 +131,7 @@ Total elements: 9
   constraint: 0
   input-output: 0
   semantic-contract: 0
+  semantic-query-contract: 0
   source: 0
   specification: 0
   state: 0
