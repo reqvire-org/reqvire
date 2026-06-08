@@ -7,7 +7,7 @@ The system shall identify supported markdown model document types by the first l
 #### Details
 Supported model document types:
 - `# Elements`: parsed as element collections.
-- `# Documents`: parsed as a single-element document format with `## Metadata`, optional `## Relations`, and a dynamic `## <Actual Element Name>` section (the section heading itself is the element name) whose body may contain any markdown headers.
+- `# Element`: parsed as a single-element file with `## Metadata`, optional `## Relations`, and a dynamic `## <Actual Element Name>` section (the section heading itself is the element name) whose body may contain any markdown headers.
 
 Unsupported first H1 headings shall be ignored by element parsing.
 
@@ -20,7 +20,7 @@ Unsupported first H1 headings shall be ignored by element parsing.
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
   * verifiedBy: [Specification File Identification Test](Verifications/ParsingVerifications.md#specification-file-identification-test)
-  * verifiedBy: [Document Refinement Validation Test](Verifications/ValidationVerifications.md#document-refinement-validation-test)
+  * verifiedBy: [Single Element Refinement Validation Test](Verifications/ValidationVerifications.md#single-element-refinement-validation-test)
 ---
 
 ### Structure and Addressing in Markdown Documents

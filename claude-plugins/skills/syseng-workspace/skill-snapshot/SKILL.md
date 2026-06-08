@@ -181,7 +181,7 @@ Requirement
 
 ## Document Structure
 
-- Files begin with `# Elements` (multi-element) or `# Documents` (single-element)
+- Files begin with `# Elements` (multi-element) or `# Element` (single-element)
 - Elements are `###` headers with unique names per file
 - Reserved `####` subsections: **Metadata**, **Relations**, **Details**, **Attachments**, **Concept References**
 - Ontology elements require exactly one `#### Ontology` fenced Turtle block; semantic contracts require exactly one `#### Shapes` fenced Turtle block
@@ -337,8 +337,6 @@ containment [--short] [--json]
 mv-asset "old-path" "new-path"
 rm-asset "path"
 
-# Export
-export [--output <dir>]
 serve [--port 8080]
 ```
 

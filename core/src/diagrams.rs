@@ -1329,7 +1329,7 @@ fn get_element_class_from_type(element_type: &ElementType) -> &'static str {
 /// Generate containment view as D3.js collapsible tree
 ///
 /// Generates a markdown code block with `d3-tree` language containing JSON data
-/// that can be rendered as an interactive collapsible tree in HTML export.
+/// that can be rendered as an interactive collapsible tree in the Explorer.
 ///
 /// When `short` is true, shows only root elements (those without hierarchical parents).
 /// When `short` is false (default), shows all elements.
@@ -1366,7 +1366,7 @@ pub fn generate_containment_d3_tree(
 /// Generate containment view as D3.js sunburst diagram
 ///
 /// Generates a markdown code block with `d3-sunburst` language containing JSON data
-/// that can be rendered as an interactive sunburst diagram in HTML export.
+/// that can be rendered as an interactive sunburst diagram in the Explorer.
 ///
 /// Uses the same hierarchical JSON format as the D3 tree.
 pub fn generate_containment_d3_sunburst(

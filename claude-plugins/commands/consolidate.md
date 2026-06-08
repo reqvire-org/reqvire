@@ -32,7 +32,7 @@ Use `/reqvire:semantic-refactor` instead when the model needs to split capabilit
 
 A child requirement is a candidate for consolidation if it meets **multiple** of these criteria:
 
-1. **Very similar names to parent** - e.g., parent: "HTML Export", child: "HTML Export Verification" or "Export Related System Elements"
+1. **Very similar names to parent** - e.g., parent: "Explorer Serve", child: "Explorer Serve Verification" or "Related System Elements"
 2. **Short content** - Less than 200 words of requirement text (excluding relations)
 3. **No verifications** - Has no verifiedBy relations of its own
 4. **Implementation-level details** - Mentions specific technical details, file formats, parameters, or procedural steps
@@ -317,4 +317,4 @@ After consolidation is complete, verify:
 - All relations are preserved (no missing targets)
 - Verification coverage percentage unchanged or improved
 - Test verifications still link correctly to requirements
-- Documentation exports correctly: `reqvire export`
+- Explorer serves correctly: `reqvire serve`

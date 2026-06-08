@@ -1,32 +1,12 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { useStore } from "../store/StoreContext";
 
-export type ContainmentMode = "list" | "sunburst" | "icicle";
-export type ModelMode = "list" | "grid" | "sunburst" | "icicle";
-export type TraceMode = "flow" | "rows";
+export type ModelMode = "list" | "grid" | "graph";
+export type ModelSelectionId = "__root__" | `folder:${string}` | `file:${string}` | string;
 export type GraphOverlayKey = "cross" | "verification" | "trace";
-export type SearchKind = "file" | "element" | "resource" | "ontology" | "trace" | "coverage";
-export type Kn2LayoutMode = "structural" | "concentric" | "breadthfirst" | "circle" | "grid";
-export type Kn2ClusterMode = "structural" | "modularity";
-export type Kn2RelationCategory = "derive" | "specify" | "refine";
+export type SearchKind = "file" | "element" | "resource" | "ontology";
 
-export const MODEL_ROLE_TYPES = [
-  "capability",
-  "requirement",
-  "refinement",
-  "verification",
-  "ontology",
-  "resource",
-  "other",
-] as const;
-
-export const MODEL_DEFAULT_TYPES = [
-  "capability",
-  "requirement",
-  "refinement",
-  "verification",
-  "ontology",
-  "other",
-] as const;
+export const MODEL_DEFAULT_OVERLAYS = ["cross", "verification", "trace"] as const;
 
 export const ONTOLOGY_NODE_ROLES = [
   "class",
@@ -42,44 +22,58 @@ export const ONTOLOGY_NODE_ROLES = [
   "resource",
 ] as const;
 
-export const ONTOLOGY_SHOW_FILTERS = [
-  ["role", "ontology-term", "Terms", "class"],
-  ["relation", "datatype-properties", "Datatype property links", "datatype-property"],
-  ["relation", "object-properties", "Object property links", "object-property"],
-  ["relation", "class-membership", "Class membership", "class"],
-  ["relation", "class-disjointness", "Class disjointness", "disjoint"],
-  ["relation", "restrictions", "Restrictions", "forall"],
-  ["relation", "class-expressions", "Class expressions", "and"],
-  ["role", "shacl-shape", "SHACL shapes", "node-shape"],
-  ["role", "resource", "Resources", "resource"],
-  ["role", "external-reference", "External refs", "resource"],
+export const ONTOLOGY_SHOW_FILTERS = [] as const;
+
+export const ONTOLOGY_CONSTRUCT_FILTERS = [
+  ["domain-range", "Domain/range", "D/R"],
+  ["subclass", "Subclass", "⊆"],
+  ["membership", "Membership", "∈"],
+  ["disjoint", "Disjoint", "⟂"],
+  ["equivalence", "Equivalence", "⇔"],
+  ["inverse", "Inverse", "⟲"],
+  ["property-chain", "Property chain", "∘"],
+  ["property-characteristic", "Property char.", "→"],
+  ["restriction", "Restriction", "∀"],
+  ["class-expression", "Class expr.", "∩"],
+  ["shape-overlay", "SHACL overlay", "SH"],
+] as const;
+
+export const ONTOLOGY_ORIGIN_FILTERS = [
+  ["authored", "Defined", "authored"],
+  ["registry", "Registry", "registry"],
+  ["construct", "Constructs", "construct"],
 ] as const;
 
 export const ONTOLOGY_DEFAULT_FILTERS = [
   "ontology-term",
-  "datatype-properties",
-  "object-properties",
+  "shacl-shape",
+  "resource",
+  "external-reference",
   "class-membership",
+  "class-disjointness",
+  "class-expressions",
+  "domain-range",
+  "subclass",
+  "membership",
+  "disjoint",
+  "equivalence",
+  "inverse",
+  "property-chain",
+  "property-characteristic",
+  "class-expression",
+  "shape-overlay",
+  "authored",
+  "registry",
+  "construct",
 ] as const;
 
-export const SEARCH_KINDS = [
-  "file",
-  "element",
-  "resource",
-  "ontology",
-  "trace",
-  "coverage",
-] as const satisfies readonly SearchKind[];
-
-export const KN2_RELATIONS = ["derive", "specify", "refine"] as const satisfies readonly Kn2RelationCategory[];
+export const SEARCH_KINDS = ["file", "element", "resource", "ontology"] as const satisfies readonly SearchKind[];
 
 interface ExplorerUiState {
-  containmentMode: ContainmentMode;
-  setContainmentMode: (mode: ContainmentMode) => void;
   modelMode: ModelMode;
   setModelMode: (mode: ModelMode) => void;
-  traceMode: TraceMode;
-  setTraceMode: (mode: TraceMode) => void;
+  modelSelectionId: ModelSelectionId;
+  setModelSelectionId: (id: ModelSelectionId) => void;
   modelTypes: Set<string>;
   toggleModelType: (type: string) => void;
   resetModelTypes: () => void;
@@ -91,58 +85,70 @@ interface ExplorerUiState {
   ontologyFilters: Set<string>;
   toggleOntologyFilter: (filter: string) => void;
   resetOntologyFilters: () => void;
+  ontologyLayoutNonce: number;
+  resetOntologyLayout: () => void;
   searchKinds: Set<SearchKind>;
   toggleSearchKind: (kind: SearchKind) => void;
+  searchElementTypes: Set<string>;
+  toggleSearchElementType: (type: string) => void;
   resetSearchKinds: () => void;
-  kn2LayoutMode: Kn2LayoutMode;
-  setKn2LayoutMode: (mode: Kn2LayoutMode) => void;
-  kn2ClusterMode: Kn2ClusterMode;
-  setKn2ClusterMode: (mode: Kn2ClusterMode) => void;
-  kn2FocusRadius: number;
-  setKn2FocusRadius: (radius: number) => void;
-  kn2FocusOnly: boolean;
-  setKn2FocusOnly: (enabled: boolean) => void;
-  kn2LabelsEnabled: boolean;
-  setKn2LabelsEnabled: (enabled: boolean) => void;
-  kn2Relations: Set<Kn2RelationCategory>;
-  toggleKn2Relation: (relation: Kn2RelationCategory) => void;
-  kn2Overlays: Set<GraphOverlayKey>;
-  toggleKn2Overlay: (overlay: GraphOverlayKey) => void;
+  knowledgeGraphSelectionId: string | null;
+  setKnowledgeGraphSelectionId: (id: string | null) => void;
+  ontologySelectionId: string | null;
+  setOntologySelectionId: (id: string | null) => void;
+  traceFilePath: string | null;
+  setTraceFilePath: (path: string | null) => void;
+  traceSelectionId: string | null;
+  setTraceSelectionId: (id: string | null) => void;
 }
 
 const ExplorerUiStateContext = createContext<ExplorerUiState | null>(null);
 
 export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
-  const [containmentMode, setContainmentMode] = useState<ContainmentMode>("sunburst");
+  const { store } = useStore();
+  const searchElementTypeKeys = useMemo(
+    () => Array.from(new Set(store.elements.map((element) => element.element_type).filter(Boolean))).sort(),
+    [store.elements],
+  );
+  const modelTypeKeys = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          (store.knowledge_graph.nodes ?? [])
+            .map((node) => node.element_type || node.node_type || node.type || "other")
+            .filter(Boolean),
+        ),
+      ).sort(),
+    [store.knowledge_graph.nodes],
+  );
   const [modelMode, setModelMode] = useState<ModelMode>("grid");
-  const [traceMode, setTraceMode] = useState<TraceMode>("flow");
-  const [modelTypes, setModelTypes] = useState(() => new Set<string>(MODEL_DEFAULT_TYPES));
-  const [modelOverlays, setModelOverlays] = useState<Set<GraphOverlayKey>>(() => new Set());
+  const [modelSelectionId, setModelSelectionId] = useState<ModelSelectionId>("__root__");
+  const [modelTypes, setModelTypes] = useState(() => new Set<string>(modelTypeKeys));
+  const [modelOverlays, setModelOverlays] = useState<Set<GraphOverlayKey>>(
+    () => new Set(MODEL_DEFAULT_OVERLAYS),
+  );
   const [ontologyRoles, setOntologyRoles] = useState(() => new Set<string>(ONTOLOGY_NODE_ROLES));
   const [ontologyFilters, setOntologyFilters] = useState(
     () => new Set<string>(ONTOLOGY_DEFAULT_FILTERS),
   );
+  const [ontologyLayoutNonce, setOntologyLayoutNonce] = useState(0);
   const [searchKinds, setSearchKinds] = useState(() => new Set<SearchKind>(SEARCH_KINDS));
-  const [kn2LayoutMode, setKn2LayoutMode] = useState<Kn2LayoutMode>("structural");
-  const [kn2ClusterMode, setKn2ClusterMode] = useState<Kn2ClusterMode>("structural");
-  const [kn2FocusRadius, setKn2FocusRadius] = useState(1);
-  const [kn2FocusOnly, setKn2FocusOnly] = useState(false);
-  const [kn2LabelsEnabled, setKn2LabelsEnabled] = useState(true);
-  const [kn2Relations, setKn2Relations] = useState(() => new Set<Kn2RelationCategory>(KN2_RELATIONS));
-  const [kn2Overlays, setKn2Overlays] = useState<Set<GraphOverlayKey>>(() => new Set());
+  const [searchElementTypes, setSearchElementTypes] = useState(() => new Set<string>(searchElementTypeKeys));
+  const [knowledgeGraphSelectionId, setKnowledgeGraphSelectionId] = useState<string | null>(null);
+  const [ontologySelectionId, setOntologySelectionId] = useState<string | null>(null);
+  const [traceFilePath, setTraceFilePath] = useState<string | null>(null);
+  const [traceSelectionId, setTraceSelectionId] = useState<string | null>(null);
 
   const value = useMemo<ExplorerUiState>(
     () => ({
-      containmentMode,
-      setContainmentMode,
       modelMode,
       setModelMode,
-      traceMode,
-      setTraceMode,
+      modelSelectionId,
+      setModelSelectionId,
       modelTypes,
       toggleModelType: (type) =>
         setModelTypes((current) => toggleSetValue(current, type)),
-      resetModelTypes: () => setModelTypes(new Set(MODEL_DEFAULT_TYPES)),
+      resetModelTypes: () => setModelTypes(new Set(modelTypeKeys)),
       modelOverlays,
       toggleModelOverlay: (overlay) =>
         setModelOverlays((current) => toggleSetValue(current, overlay)),
@@ -154,44 +160,43 @@ export function ExplorerUiStateProvider({ children }: { children: ReactNode }) {
       toggleOntologyFilter: (filter) =>
         setOntologyFilters((current) => toggleSetValue(current, filter)),
       resetOntologyFilters: () => setOntologyFilters(new Set(ONTOLOGY_DEFAULT_FILTERS)),
+      ontologyLayoutNonce,
+      resetOntologyLayout: () => setOntologyLayoutNonce((value) => value + 1),
       searchKinds,
       toggleSearchKind: (kind) =>
         setSearchKinds((current) => toggleSetValue(current, kind)),
-      resetSearchKinds: () => setSearchKinds(new Set(SEARCH_KINDS)),
-      kn2LayoutMode,
-      setKn2LayoutMode,
-      kn2ClusterMode,
-      setKn2ClusterMode,
-      kn2FocusRadius,
-      setKn2FocusRadius: (radius) =>
-        setKn2FocusRadius(Number.isFinite(radius) ? Math.max(1, Math.min(4, radius)) : 1),
-      kn2FocusOnly,
-      setKn2FocusOnly,
-      kn2LabelsEnabled,
-      setKn2LabelsEnabled,
-      kn2Relations,
-      toggleKn2Relation: (relation) =>
-        setKn2Relations((current) => toggleSetValue(current, relation)),
-      kn2Overlays,
-      toggleKn2Overlay: (overlay) =>
-        setKn2Overlays((current) => toggleSetValue(current, overlay)),
+      searchElementTypes,
+      toggleSearchElementType: (type) =>
+        setSearchElementTypes((current) => toggleSetValue(current, type)),
+      resetSearchKinds: () => {
+        setSearchKinds(new Set(SEARCH_KINDS));
+        setSearchElementTypes(new Set(searchElementTypeKeys));
+      },
+      knowledgeGraphSelectionId,
+      setKnowledgeGraphSelectionId,
+      ontologySelectionId,
+      setOntologySelectionId,
+      traceFilePath,
+      setTraceFilePath,
+      traceSelectionId,
+      setTraceSelectionId,
     }),
     [
-      containmentMode,
-      kn2ClusterMode,
-      kn2FocusOnly,
-      kn2FocusRadius,
-      kn2LabelsEnabled,
-      kn2LayoutMode,
-      kn2Overlays,
-      kn2Relations,
+      knowledgeGraphSelectionId,
+      ontologySelectionId,
+      traceFilePath,
+      traceSelectionId,
       modelMode,
+      modelSelectionId,
       modelOverlays,
+      modelTypeKeys,
       modelTypes,
       ontologyFilters,
+      ontologyLayoutNonce,
       ontologyRoles,
       searchKinds,
-      traceMode,
+      searchElementTypes,
+      searchElementTypeKeys,
     ],
   );
 
@@ -206,6 +211,10 @@ export function useExplorerUiState() {
   const state = useContext(ExplorerUiStateContext);
   if (!state) throw new Error("Explorer UI state is missing");
   return state;
+}
+
+export function useOptionalExplorerUiState() {
+  return useContext(ExplorerUiStateContext);
 }
 
 function toggleSetValue<T>(set: Set<T>, value: T) {

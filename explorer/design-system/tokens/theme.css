@@ -1,0 +1,146 @@
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
+
+@theme {
+  /* Slate ramp */
+  --color-slate-0: oklch(100% 0 0);
+  --color-slate-25: oklch(99.09% 0.0029 264.54);
+  --color-slate-50: oklch(97.85% 0.0045 258.32);
+  --color-slate-100: oklch(95.73% 0.0074 260.73);
+  --color-slate-150: oklch(93.22% 0.0109 256.70);
+  --color-slate-200: oklch(89.59% 0.0151 260.73);
+  --color-slate-300: oklch(82.04% 0.0208 257.48);
+  --color-slate-400: oklch(70.94% 0.0291 260.30);
+  --color-slate-500: oklch(56.31% 0.0309 260.27);
+  --color-slate-600: oklch(45.78% 0.0291 259.78);
+  --color-slate-700: oklch(37.28% 0.0269 259.15);
+  --color-slate-800: oklch(28.68% 0.0248 258.35);
+  --color-slate-900: oklch(22.86% 0.0221 257.28);
+  --color-slate-950: oklch(17.74% 0.0178 263.96);
+
+  /* Warm surfaces */
+  --color-warm-0: oklch(100% 0 0);
+  --color-warm-25: oklch(98.50% 0.0041 91.45);
+  --color-warm-50: oklch(97.33% 0.0070 88.64);
+  --color-warm-100: oklch(95.80% 0.0083 91.48);
+  --color-warm-150: oklch(92.86% 0.0128 86.83);
+  --color-warm-200: oklch(89.87% 0.0145 84.59);
+  --color-warm-300: oklch(86.52% 0.0176 84.59);
+
+  /* Brand accent */
+  --color-rose-50: oklch(96.97% 0.0153 7.48);
+  --color-rose-100: oklch(94.19% 0.0301 7.52);
+  --color-rose-200: oklch(89.33% 0.0565 5.93);
+  --color-rose-400: oklch(71.73% 0.1718 11.46);
+  --color-rose-500: oklch(64.50% 0.2154 16.44);
+  --color-rose-600: oklch(58.58% 0.2220 17.58);
+  --color-rose-700: oklch(51.43% 0.1978 16.93);
+  --color-rose-800: oklch(45.46% 0.1713 13.70);
+
+  /* Element types */
+  --color-capability: oklch(88.48% 0.0546 243.39);
+  --color-requirement: oklch(47.42% 0.1862 294.78);
+  --color-verification: oklch(67.31% 0.1624 144.21);
+  --color-refinement: oklch(77.03% 0.1741 64.05);
+  --color-ontology: oklch(65.10% 0.1330 89.06);
+  --color-resource: oklch(86.22% 0.1681 88.31);
+  --color-other: oklch(69.93% 0 0);
+  --color-capability-tint-light: oklch(95.32% 0.0218 239.43);
+  --color-requirement-tint-light: oklch(93.70% 0.0210 304.02);
+  --color-refinement-tint-light: oklch(96.85% 0.0282 79.48);
+  --color-verification-tint-light: oklch(95.71% 0.0210 147.64);
+  --color-ontology-tint-light: oklch(91.43% 0.0859 95.41);
+  --color-resource-tint-light: oklch(96.45% 0.0485 91.75);
+  --color-other-tint-light: oklch(94.31% 0 0);
+  --color-node-generic-fill: oklch(95.04% 0.0042 236.50);
+
+  /* RDF / ontology graph */
+  --color-rdf-class: oklch(71.07% 0.0351 256.79);
+  --color-rdf-objprop: oklch(55.44% 0.0407 257.42);
+  --color-rdf-dtprop: oklch(51.09% 0.0861 186.39);
+  --color-rdf-rdfprop: oklch(43.70% 0.0705 188.22);
+  --color-rdf-individual: oklch(54.13% 0.2466 293.01);
+  --color-rdf-datatype: oklch(74.73% 0.1295 81.69);
+  --color-rdf-restriction: oklch(86.90% 0.0198 252.89);
+  --color-rdf-classexpr: oklch(92.88% 0.0126 255.51);
+  --color-rdf-nodeshape: oklch(57.71% 0.2152 27.33);
+  --color-rdf-propshape: oklch(51.43% 0.1978 16.93);
+  --color-rdf-resource: oklch(70.38% 0.1230 182.50);
+  --color-rdf-shacl: oklch(63.68% 0.2078 25.33);
+
+  /* Status and edge primitives */
+  --color-success: oklch(61.41% 0.1485 152.91);
+  --color-warning: oklch(76.52% 0.1552 84.70);
+  --color-danger: oklch(57.71% 0.2152 27.33);
+  --color-info: oklch(65.18% 0.1809 253.92);
+  --color-success-tint-light: oklch(93.22% 0.0388 158.33);
+  --color-warning-tint-light: oklch(94.85% 0.0586 93.52);
+  --color-danger-tint-light: oklch(92.87% 0.0298 17.70);
+  --color-info-tint-light: oklch(93.26% 0.0311 257.23);
+  --color-edge-default: oklch(83.02% 0.0189 258.36);
+  --color-edge-attach: oklch(65.82% 0.1690 248.81);
+
+  /* Dark semantic primitives */
+  --color-dark-canvas: oklch(18.97% 0.0206 258.33);
+  --color-dark-surface: oklch(21.97% 0.0247 256.46);
+  --color-dark-raised: oklch(24.54% 0.0282 257.53);
+  --color-dark-overlay: oklch(27.40% 0.0297 256.85);
+  --color-dark-sunken: oklch(17.56% 0.0192 255.78);
+  --color-dark-hover: oklch(26.99% 0.0298 256.85);
+  --color-dark-active: oklch(30.56% 0.0334 255.78);
+  --color-dark-rail: oklch(20.15% 0.0193 252.12);
+  --color-dark-edge-default: oklch(38.72% 0.0309 257.68);
+  --color-dark-edge-trace: oklch(56.31% 0.0309 260.27);
+  --color-dark-text-strong: oklch(96.85% 0.0079 253.85);
+  --color-dark-text-body: oklch(91.31% 0.0144 254.61);
+  --color-dark-text-secondary: oklch(77.20% 0.0265 255.59);
+  --color-dark-text-muted: oklch(63.28% 0.0324 257.78);
+  --color-dark-text-faint: oklch(51.38% 0.0288 257.68);
+  --color-dark-text-code: oklch(84.46% 0.0212 254.93);
+  --color-dark-border-subtle: oklch(29.34% 0.0299 254.70);
+  --color-dark-border-default: oklch(32.81% 0.0297 252.59);
+  --color-dark-border-strong: oklch(39.04% 0.0387 257.29);
+  --color-dark-scroll-thumb: oklch(34.89% 0.0339 257.10);
+
+  /* Typography primitives */
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas, monospace;
+  --text-micro: 11px;
+  --text-caption: 12px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 17px;
+  --text-xl: 21px;
+  --text-2xl: 26px;
+  --text-3xl: 33px;
+
+  /* Spacing primitives */
+  --spacing-0: 0;
+  --spacing-1: 2px;
+  --spacing-2: 4px;
+  --spacing-3: 6px;
+  --spacing-4: 8px;
+  --spacing-5: 10px;
+  --spacing-6: 12px;
+  --spacing-7: 14px;
+  --spacing-8: 16px;
+  --spacing-10: 20px;
+  --spacing-12: 24px;
+  --spacing-14: 28px;
+  --spacing-16: 32px;
+  --spacing-20: 40px;
+  --spacing-24: 48px;
+  --spacing-32: 64px;
+
+  /* Shadow primitives */
+  --shadow-xs: 0 1px 1px color-mix(in oklch, var(--color-slate-950) 4%, transparent);
+  --shadow-sm: 0 1px 2px color-mix(in oklch, var(--color-slate-950) 6%, transparent),
+    0 1px 3px color-mix(in oklch, var(--color-slate-950) 5%, transparent);
+  --shadow-md: 0 2px 4px color-mix(in oklch, var(--color-slate-950) 6%, transparent),
+    0 4px 12px color-mix(in oklch, var(--color-slate-950) 7%, transparent);
+  --shadow-lg: 0 8px 20px color-mix(in oklch, var(--color-slate-950) 10%, transparent),
+    0 2px 6px color-mix(in oklch, var(--color-slate-950) 6%, transparent);
+  --shadow-xl: 0 18px 48px color-mix(in oklch, var(--color-slate-950) 18%, transparent),
+    0 6px 16px color-mix(in oklch, var(--color-slate-950) 10%, transparent);
+}

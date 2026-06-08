@@ -2,7 +2,7 @@
 set -euo pipefail
 
 echo "===================================="
-echo "Document Refinement Format Tests"
+echo "Single Element Refinement Format Tests"
 echo "===================================="
 
 auto_fail() {
@@ -55,20 +55,20 @@ assert_validate_failure_matches() {
 REQ_FILE="$TEST_DIR/specifications/Requirements.md"
 DOC_FILE="$TEST_DIR/specifications/DesignDocuments/ChangePropagation.md"
 
-# 1) Valid refinedBy identifier target into #Documents element passes
+# 1) Valid refinedBy identifier target into # Element element passes
 OUT=$(run_validate) || {
   echo "$OUT"
-  auto_fail "Valid refinedBy element target in #Documents should pass validation"
+  auto_fail "Valid refinedBy element target in # Element should pass validation"
 }
 
-# 2) Document parsed as one element
+# 2) # Element file parsed as one element
 SEARCH_JSON=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --json)
 DOC_COUNT=$(echo "$SEARCH_JSON" | jq '[.files["specifications/DesignDocuments/ChangePropagation.md"].elements[]] | length')
-[ "$DOC_COUNT" -eq 1 ] || auto_fail "#Documents file must produce exactly one parsed element"
+[ "$DOC_COUNT" -eq 1 ] || auto_fail "# Element file must produce exactly one parsed element"
 DOC_TYPE=$(echo "$SEARCH_JSON" | jq -r '.files["specifications/DesignDocuments/ChangePropagation.md"].elements[0].type')
-[ "$DOC_TYPE" = "specification" ] || auto_fail "Document element type must come from metadata"
+[ "$DOC_TYPE" = "specification" ] || auto_fail "Single element type must come from metadata"
 
-# 3) refinedBy fails when targeted document element type is non-refinement
+# 3) refinedBy fails when targeted # Element file element type is non-refinement
 sed -i "s@  \\* type: specification@  * type: requirement@" "$DOC_FILE"
 set +e
 OUT=$(run_validate)
@@ -82,7 +82,7 @@ assert_validate_failure_matches \
 # restore valid doc type
 sed -i "s@  \\* type: requirement@  * type: specification@" "$DOC_FILE"
 
-# 4) refinedBy file target fails (must point to element identifier, not plain document path)
+# 4) refinedBy file target fails (must point to element identifier, not plain file path)
 sed -i "s@  \\* refinedBy: \\[ChangePropagation\\](DesignDocuments/ChangePropagation.md#changepropagation)@  * refinedBy: [ChangePropagation.md](DesignDocuments/ChangePropagation.md)@" "$REQ_FILE"
 set +e
 OUT=$(run_validate)
@@ -97,15 +97,15 @@ assert_validate_failure_matches \
 # restore refinedBy identifier target
 sed -i "s@  \\* refinedBy: \\[ChangePropagation.md\\](DesignDocuments/ChangePropagation.md)@  * refinedBy: [ChangePropagation](DesignDocuments/ChangePropagation.md#changepropagation)@" "$REQ_FILE"
 
-# 5) #Documents body may contain nested markdown headings after element name
+# 5) # Element body may contain nested markdown headings after element name
 cat > "$DOC_FILE" <<'DOC'
-# Documents
+# Element
 
 ## Metadata
   * type: specification
 
 ## Relations
-  * refine: [Requirement Using Document Refinement](../Requirements.md#requirement-using-document-refinement)
+  * refine: [Requirement Using Single Element Refinement](../Requirements.md#requirement-using-single-element-refinement)
 
 ## ChangePropagation
 
@@ -116,10 +116,10 @@ Body
 Body
 DOC
 
-# This is still one document element because headers are part of the body; validation should pass.
+# This is still one element because headers are part of the body; validation should pass.
 OUT=$(run_validate) || {
   echo "$OUT"
-  auto_fail "Document body headers should be allowed in #Documents format"
+  auto_fail "Body headers should be allowed in # Element format"
 }
 
-echo "All document refinement format tests passed"
+echo "All single element refinement format tests passed"

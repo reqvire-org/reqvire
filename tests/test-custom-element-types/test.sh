@@ -3,7 +3,9 @@ set -euo pipefail
 
 # Test: Custom Element Type Tracking in Model Summary
 # --------------------------------------
-# Satisfies: TBD - specifications/Verifications/<file>.md#<verification-element>
+# Satisfies:
+# - requirements/Functional/Output/Verifications/ReportingVerifications.md#custom-element-type-tracking-test
+# - requirements/Functional/Operations/Verifications/ElementManipulationVerifications.md#cli-move-element-test
 #
 # Acceptance Criteria:
 # - Custom element types (non-standard types) are tracked and counted in search report
@@ -292,6 +294,43 @@ fi
 FILTERED_USE_CASE=$(echo "$OUTPUT_FILTERED_JSON" | jq '.global_counters.total_other_types["use-case"]')
 if [ "$FILTERED_USE_CASE" -ne 3 ]; then
     echo "FAILED: Expected 3 use-case elements with filter, got: $FILTERED_USE_CASE"
+    exit 1
+fi
+
+# Test 7: Markdown write-back preserves custom type metadata
+# The internal representation stores other-use-case as Other("use-case").
+# Any persistence path must serialize it back to the source metadata token.
+echo "Test 7: Verifying custom type metadata survives mv write-back" >> "${TEST_DIR}/test_results.log"
+
+set +e
+MV_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" mv "Use Case Element 1" specifications/MovedCustomTypes.md 2>&1)
+EXIT_CODE=$?
+set -e
+
+echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
+printf "%s\n" "$MV_OUTPUT" >> "${TEST_DIR}/test_results.log"
+
+if [ $EXIT_CODE -ne 0 ]; then
+    echo "FAILED: mv command for custom type element exited with code $EXIT_CODE"
+    echo "$MV_OUTPUT"
+    exit 1
+fi
+
+MOVED_FILE="${TEST_DIR}/specifications/MovedCustomTypes.md"
+if [ ! -f "$MOVED_FILE" ]; then
+    echo "FAILED: mv command did not create MovedCustomTypes.md"
+    exit 1
+fi
+
+if ! grep -qE '^[[:space:]]*\*[[:space:]]+type:[[:space:]]+other-use-case[[:space:]]*$' "$MOVED_FILE"; then
+    echo "FAILED: moved custom element did not preserve type: other-use-case"
+    sed -n '1,120p' "$MOVED_FILE"
+    exit 1
+fi
+
+if grep -qE '^[[:space:]]*\*[[:space:]]+type:[[:space:]]+use-case[[:space:]]*$' "$MOVED_FILE"; then
+    echo "FAILED: moved custom element dropped other- prefix in type metadata"
+    sed -n '1,120p' "$MOVED_FILE"
     exit 1
 fi
 

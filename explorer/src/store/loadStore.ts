@@ -2,10 +2,9 @@
  * Project Store loader.
  *
  * Resolution order:
- *   1. `window.reqvireProjectStore` (global set by the export script tag).
- *   2. JSON text content of `<script id="reqvire-project-store">`.
- *   3. Dev fixture (only in `import.meta.env.DEV`) so `npm run dev` works
- *      without a Rust export.
+ *   1. `window.reqvireProjectStore` (global set by assets/project-store.js).
+ *   2. Dev fixture (only in `import.meta.env.DEV`) so `npm run dev` works
+ *      without `reqvire serve`.
  *
  * The loader FAILS CLOSED: a missing/malformed/incompatible seed yields a
  * diagnostic `LoadFailure` rather than a partially-rendered Explorer, per the
@@ -55,23 +54,6 @@ function readInjectedSeed(): unknown {
   if (typeof window !== "undefined" && window.reqvireProjectStore !== undefined) {
     return window.reqvireProjectStore;
   }
-  if (typeof document !== "undefined") {
-    const tag = document.getElementById("reqvire-project-store");
-    const raw = tag?.textContent?.trim();
-    if (raw) {
-      // The export embeds `const reqvireProjectStore = {...};`. If the global
-      // was not picked up, fall back to parsing the JSON object literal.
-      const start = raw.indexOf("{");
-      const end = raw.lastIndexOf("}");
-      if (start !== -1 && end !== -1 && end > start) {
-        try {
-          return JSON.parse(raw.slice(start, end + 1));
-        } catch {
-          return undefined;
-        }
-      }
-    }
-  }
   return undefined;
 }
 
@@ -116,8 +98,8 @@ export function loadStore(devFixture?: ExplorerProjectStore): StoreLoadResult {
         ok: false,
         reason: "No Reqvire Project Store seed found.",
         detail:
-          'Expected window.reqvireProjectStore or <script id="reqvire-project-store">. ' +
-          "This Explorer must be opened from a Reqvire HTML export.",
+          "Expected window.reqvireProjectStore from assets/project-store.js. " +
+          "This Explorer must be opened from reqvire serve or npm run dev.",
       };
     }
   }

@@ -1,0 +1,77 @@
+import type { SVGProps } from "react";
+
+function ReqvireMark() {
+  return (
+    <>
+      <g transform="rotate(0)">
+        <circle cx="0" cy="-9.5" r="3.3" fill="#2e90fa" />
+        <path d="M-0.9 -7L0.9 -7L0 -0.9Z" fill="#2e90fa" />
+      </g>
+      <g transform="rotate(60)">
+        <circle cx="0" cy="-9.5" r="3.3" fill="#8b5cf6" />
+        <path d="M-0.9 -7L0.9 -7L0 -0.9Z" fill="#8b5cf6" />
+      </g>
+      <g transform="rotate(120)">
+        <circle cx="0" cy="-9.5" r="3.3" fill="#1f9d57" />
+        <path d="M-0.9 -7L0.9 -7L0 -0.9Z" fill="#1f9d57" />
+      </g>
+      <g transform="rotate(180)">
+        <circle cx="0" cy="-9.5" r="3.3" fill="#e07b14" />
+        <path d="M-0.9 -7L0.9 -7L0 -0.9Z" fill="#e07b14" />
+      </g>
+      <g transform="rotate(240)">
+        <circle cx="0" cy="-9.5" r="3.3" fill="#e0a90b" />
+        <path d="M-0.9 -7L0.9 -7L0 -0.9Z" fill="#e0a90b" />
+      </g>
+      <g transform="rotate(300)">
+        <circle cx="0" cy="-9.5" r="3.3" fill="#8a7d1f" />
+        <path d="M-0.9 -7L0.9 -7L0 -0.9Z" fill="#8a7d1f" />
+      </g>
+    </>
+  );
+}
+
+export function ReqvireIconLogo(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="32"
+      height="32"
+      viewBox="0 0 32 32"
+      fill="none"
+      {...props}
+    >
+      <g transform="translate(16 16)">
+        <ReqvireMark />
+      </g>
+    </svg>
+  );
+}
+
+export function ReqvireLogo(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="122"
+      height="40"
+      viewBox="6 0 122 40"
+      fill="none"
+      {...props}
+    >
+      <g transform="translate(20 20)">
+        <ReqvireMark />
+      </g>
+      <text
+        x="43"
+        y="26"
+        fontFamily="Geist Mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"
+        fontSize="20"
+        fontWeight="700"
+        letterSpacing="-0.01em"
+        fill="currentColor"
+      >
+        Reqvire
+      </text>
+    </svg>
+  );
+}

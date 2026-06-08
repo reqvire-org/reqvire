@@ -84,10 +84,10 @@ The `ontologies` command shall collect ontology `#### Ontology` content and sema
 - `--jsonld`: emit JSON-LD instead of Turtle
 - `--full`: include generated RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, semantic-contract shape references, and generated ontology projection facts
 - Full generated ontology projection facts shall serialize `reqvire:OntologyProjectionGraph`, `reqvire:OntologyConstructProjection`, `reqvire:OntologyConstruct`, and `reqvire:OntologySymbol` resources, including source/provenance, construct subject/object/predicate/property facts where present, ordered member sequence facts where present, and direct-authored derivation mode.
-- Semantic-query-contract `#### Query` content and query metadata are excluded from default and `--full` output until a dedicated query-export command exists; generated ontology projection facts may cite semantic-query-contract IRIs as provenance without embedding raw query text
+- Semantic-query-contract `#### Query` content and query metadata are excluded from default and `--full` output until dedicated query output support exists; generated ontology projection facts may cite semantic-query-contract IRIs as provenance without embedding raw query text
 - `--output <FILE>`: write the selected format to the requested file instead of stdout
 - The command shall use the graph-registry semantic index used by validation.
-- The default mode and exported `ontologies.ttl` artifact shall preserve the current artifact-only export of authored ontology and SHACL blocks without generated ontology projection facts.
+- The default mode and served `ontologies.ttl` artifact shall preserve the current artifact-only output of authored ontology and SHACL blocks without generated ontology projection facts.
 - The full mode shall append an in-memory RDF projection of the Reqvire graph registry context and generated direct-authored ontology construct subprojection without requiring a persistent RDF store.
 
 #### Metadata
@@ -106,8 +106,7 @@ Reqvire requirements & traceability management tool
 Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
 
 Commands:
-export Export model to browsable HTML documentation
-serve Serve model as browsable HTML documentation via HTTP server
+serve Serve the embedded Explorer UI via HTTP server
 format Format and normalize requirements files
 validate Validate model
 search Search and filter model elements
@@ -309,7 +308,7 @@ Merge command behavior:
 - Accept target element name as the first required positional argument.
 - Accept one or more source element names as subsequent required arguments.
 - Support command syntax: `reqvire merge <target> <source1> [source2...]`.
-- Reject merge when a source is in `# Documents` format and target is in `# Elements` format; report that manual migration is required.
+- Reject merge when a source is in `# Element` format and target is in `# Elements` format; report that manual migration is required.
 - Apply changes immediately by default.
 - Support `--dry-run` to preview changes without applying.
 - Output git-style diff showing all affected files by default.
@@ -387,7 +386,7 @@ The `mv` command is expected to:
 - Support `--json` flag for structured output with relation updates and identifier change
 - Report identifier change (old → new)
 - Report error if element does not exist or target location is invalid
-- Reject moves into existing `# Documents` files when the move would create multiple elements in that file
+- Reject moves into existing `# Element` files when the move would create multiple elements in that file
 - Exit with code 0 on success, non-zero on error
 
 #### Metadata
@@ -404,7 +403,7 @@ The `mv-file` command is expected to:
 - Support `--json` flag for structured output
 - Exit with code 0 on success, non-zero on error
 - Command syntax: `reqvire mv-file <source-file> <target-file>`
-- When `--squash` is used, reject if target is an existing `# Documents` file
+- When `--squash` is used, reject if target is an existing `# Element` file
 
 #### Metadata
  * type: specification

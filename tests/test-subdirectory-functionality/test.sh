@@ -10,7 +10,7 @@ echo "Starting test..." > "${TEST_DIR}/test_results.log"
 # - System should process only files within current directory when run from a subfolder
 # - System should handle identifier normalization correctly within subdirectory context
 # - System should generate validation errors for references to parent directories
-# - System should work with validate, search, html, and other commands
+# - System should work with validate, search, format, traces, and other commands
 #
 # Test Criteria:
 # - Validation should fail when parent directory references are detected
@@ -61,67 +61,7 @@ fi
 # Replace the parent directory reference with a local reference for remaining tests
 sed -i 's|derivedFrom: \[.*specifications/MainRequirements.md.*\].*|derivedFrom: [Submodule System](#submodule-system)|' "${TMP_DIR}/project-root/submodule/specifications/SubmoduleRequirements.md"
 
-# Test 2: HTML export from submodule directory
-echo "Running: reqvire export --output subdirectory-html" >> "${TEST_DIR}/test_results.log"
-set +e
-OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" export --output subdirectory-html 2>&1)
-EXIT_CODE=$?
-set -e
-
-echo "Exit code: $EXIT_CODE" >> "${TEST_DIR}/test_results.log"
-printf "%s\n" "$OUTPUT" >> "${TEST_DIR}/test_results.log"
-
-if [ $EXIT_CODE -ne 0 ]; then
-  echo "❌ FAILED: HTML export from submodule directory failed with exit code $EXIT_CODE"
-  echo "$OUTPUT"
-  exit 1
-fi
-
-# Check that HTML was generated only for submodule
-if [ -f "${TMP_DIR}/project-root/submodule/subdirectory-html/specifications/MainRequirements.html" ]; then
-  echo "❌ FAILED: HTML export included main requirements when it should only process submodule"
-  exit 1
-fi
-
-if [ ! -f "${TMP_DIR}/project-root/submodule/subdirectory-html/specifications/SubmoduleRequirements.html" ]; then
-  echo "❌ FAILED: HTML export did not create submodule requirements file"
-  exit 1
-fi
-
-# Check that HTML content has correct paths (without submodule/ prefix)
-SUBMODULE_HTML="${TMP_DIR}/project-root/submodule/subdirectory-html/specifications/SubmoduleRequirements.html"
-
-# Verify paths don't have "submodule/" prefix in links
-if grep -q "submodule/specifications" "$SUBMODULE_HTML"; then
-  echo "❌ FAILED: HTML contains incorrect paths with 'submodule/' prefix"
-  grep "submodule/specifications" "$SUBMODULE_HTML"
-  exit 1
-fi
-
-# Check that mermaid diagrams use correct paths (if any exist)
-if grep -q "click.*specifications/" "$SUBMODULE_HTML"; then
-  # Mermaid click links should use specifications/, not submodule/specifications/
-  if grep -q "click.*submodule/specifications" "$SUBMODULE_HTML"; then
-    echo "❌ FAILED: Mermaid diagrams contain incorrect paths with 'submodule/' prefix"
-    grep "click.*submodule/specifications" "$SUBMODULE_HTML"
-    exit 1
-  fi
-fi
-
-# Check index.html for correct file paths
-for artifact in "index.html"; do
-  ARTIFACT_PATH="${TMP_DIR}/project-root/submodule/subdirectory-html/$artifact"
-  if [ -f "$ARTIFACT_PATH" ]; then
-    # File paths in artifacts should be specifications/, not submodule/specifications/
-    if grep -q "submodule/specifications" "$ARTIFACT_PATH"; then
-      echo "❌ FAILED: $artifact contains incorrect paths with 'submodule/' prefix"
-      grep "submodule/specifications" "$ARTIFACT_PATH" | head -5
-      exit 1
-    fi
-  fi
-done
-
-# Test 3: Format from submodule directory (preview mode - default)
+# Test 2: Format from submodule directory (preview mode - default)
 echo "Running: reqvire format" >> "${TEST_DIR}/test_results.log"
 set +e
 OUTPUT=$(cd "${TMP_DIR}/project-root/submodule" && "$REQVIRE_BIN" format 2>&1)

@@ -205,4 +205,24 @@ if ! echo "$OUTPUT_REFINEMENT_ATTACH" | grep -qi "refinement.*cannot have attach
   exit 1
 fi
 
+# Test 10: Verification types with attachments should fail
+echo "Test 10: Verification types with attachments"
+
+set +e
+OUTPUT_VERIFICATION_ATTACH=$(cd "${TEST_DIR}/invalid-verification-attachment" && "$REQVIRE_BIN" validate 2>&1)
+EXIT_CODE_VERIFICATION_ATTACH=$?
+set -e
+
+if [ $EXIT_CODE_VERIFICATION_ATTACH -eq 0 ]; then
+  echo "FAILED: Verification types with attachments should fail validation but returned success"
+  echo "Output: $OUTPUT_VERIFICATION_ATTACH"
+  exit 1
+fi
+
+if ! echo "$OUTPUT_VERIFICATION_ATTACH" | grep -qi "cannot author attachments\|verification evidence.*satisfiedBy\|verified targets.*verify"; then
+  echo "FAILED: Expected error message about verification elements not authoring attachments"
+  echo "Output: $OUTPUT_VERIFICATION_ATTACH"
+  exit 1
+fi
+
 exit 0

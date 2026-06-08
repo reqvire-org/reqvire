@@ -26,7 +26,6 @@ This guide is split into domain-specific guides for better organization:
 
 ### Basic cargo Commands
 - Build: `cargo build`
-- Run with HTML output: `cargo run -- specifications output --html`
 - Run specific commands: `cargo run -- format` or `./target/debug/reqvire format`
 - Test: `cargo test`
 - Test specific: `cargo test <test_name>`
@@ -43,7 +42,6 @@ This guide is split into domain-specific guides for better organization:
 - **Validate**: `./target/debug/reqvire validate [--json]`
 - **Format**: `./target/debug/reqvire format [--fix]`
 - **Search**: `./target/debug/reqvire search [--json] [--short] [--filter-*]`
-- **Export**: `./target/debug/reqvire export --output <DIR>`
 - **Serve**: `./target/debug/reqvire serve --port 8080`
 
 For comprehensive command reference, see the Reqvire skills.
@@ -133,4 +131,4 @@ Requirement-owned refinement types are `source`, `constraint`, `behavior`, `spec
 - ALWAYS prefer editing existing files in the codebase over creating new ones
 - NEVER proactively create documentation files (*.md) or README files unless explicitly requested
 - Only use emojis if the user explicitly requests it
-- Update generated docs/www only when the task explicitly asks for generated documentation updates.
+- Update generated website artifacts only when the task explicitly asks for website output changes.

@@ -1,0 +1,71 @@
+/* ============================================================
+   Reqvire Explorer - Elevation (shadows) & motion tokens
+   Restrained, technical. Shadows are soft and low; dark mode
+   leans on borders + deeper ambient shadow.
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* Shadows - light */
+    --shadow-xs: 0 1px 1px color-mix(in oklch, var(--slate-950) 4%, transparent);
+    --shadow-sm: 0 1px 2px color-mix(in oklch, var(--slate-950) 6%, transparent),
+      0 1px 3px color-mix(in oklch, var(--slate-950) 5%, transparent);
+    --shadow-md: 0 2px 4px color-mix(in oklch, var(--slate-950) 6%, transparent),
+      0 4px 12px color-mix(in oklch, var(--slate-950) 7%, transparent);
+    --shadow-lg: 0 8px 20px color-mix(in oklch, var(--slate-950) 10%, transparent),
+      0 2px 6px color-mix(in oklch, var(--slate-950) 6%, transparent);
+    --shadow-xl: 0 18px 48px color-mix(in oklch, var(--slate-950) 18%, transparent),
+      0 6px 16px color-mix(in oklch, var(--slate-950) 10%, transparent);
+
+    /* Focus & selection rings (use as box-shadow) */
+    --ring-focus: 0 0 0 3px var(--focus-ring);
+    --ring-selected: 0 0 0 1px var(--border-selected),
+      0 0 0 4px var(--ring-selected);
+    --inset-hairline: inset 0 0 0 1px var(--border-subtle);
+
+    /* Motion - quick, mechanical, no bounce */
+    --ease-standard: cubic-bezier(0.2, 0, 0, 1);   /* @kind other */
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);     /* @kind other */
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1); /* @kind other */
+
+    --dur-instant: 80ms; /* @kind other */
+    --dur-fast: 130ms;   /* @kind other */
+    --dur-base: 200ms;   /* @kind other */
+    --dur-slow: 320ms;   /* @kind other */
+
+    /* Layering */
+    --z-rail: 20;    /* @kind other */
+    --z-sticky: 40;  /* @kind other */
+    --z-popover: 60; /* @kind other */
+    --z-overlay: 80; /* @kind other */
+    --z-modal: 90;   /* @kind other */
+    --z-toast: 100;  /* @kind other */
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --shadow-xs: 0 1px 1px color-mix(in oklch, var(--slate-950) 30%, transparent);
+      --shadow-sm: 0 1px 2px color-mix(in oklch, var(--slate-950) 40%, transparent),
+        0 1px 3px color-mix(in oklch, var(--slate-950) 30%, transparent);
+      --shadow-md: 0 2px 6px color-mix(in oklch, var(--slate-950) 45%, transparent),
+        0 6px 16px color-mix(in oklch, var(--slate-950) 40%, transparent);
+      --shadow-lg: 0 10px 24px color-mix(in oklch, var(--slate-950) 55%, transparent),
+        0 2px 8px color-mix(in oklch, var(--slate-950) 45%, transparent);
+      --shadow-xl: 0 24px 60px color-mix(in oklch, var(--slate-950) 65%, transparent),
+        0 8px 20px color-mix(in oklch, var(--slate-950) 50%, transparent);
+    }
+  }
+
+  [data-theme="dark"],
+  .dark {
+    --shadow-xs: 0 1px 1px color-mix(in oklch, var(--slate-950) 30%, transparent);
+    --shadow-sm: 0 1px 2px color-mix(in oklch, var(--slate-950) 40%, transparent),
+      0 1px 3px color-mix(in oklch, var(--slate-950) 30%, transparent);
+    --shadow-md: 0 2px 6px color-mix(in oklch, var(--slate-950) 45%, transparent),
+      0 6px 16px color-mix(in oklch, var(--slate-950) 40%, transparent);
+    --shadow-lg: 0 10px 24px color-mix(in oklch, var(--slate-950) 55%, transparent),
+      0 2px 8px color-mix(in oklch, var(--slate-950) 45%, transparent);
+    --shadow-xl: 0 24px 60px color-mix(in oklch, var(--slate-950) 65%, transparent),
+      0 8px 20px color-mix(in oklch, var(--slate-950) 50%, transparent);
+  }
+}

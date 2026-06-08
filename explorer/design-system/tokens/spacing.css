@@ -1,0 +1,67 @@
+/* ============================================================
+   Reqvire Explorer — Spacing, radii, sizing, layout tokens
+   4px base grid.
+   ============================================================ */
+
+@layer base {
+  :root {
+  /* Spacing scale */
+  --space-0:  0;
+  --space-1:  2px;
+  --space-2:  4px;
+  --space-3:  6px;
+  --space-4:  8px;
+  --space-5:  10px;
+  --space-6:  12px;
+  --space-7:  14px;
+  --space-8:  16px;
+  --space-10: 20px;
+  --space-12: 24px;
+  --space-14: 28px;
+  --space-16: 32px;
+  --space-20: 40px;
+  --space-24: 48px;
+  --space-32: 64px;
+
+  /* Radii */
+  --radius-xs:   4px;   /* type-icon chips */
+  --radius-sm:   6px;   /* tags, small chips, inputs */
+  --radius-md:   8px;   /* buttons, toggles */
+  --radius-lg:   10px;  /* cards */
+  --radius-xl:   14px;  /* dialogs, large panels */
+  --radius-2xl:  20px;
+  --radius-pill: 999px;
+
+  /* Control heights (dense product) */
+  --control-xs: 22px;   /* count pills */
+  --control-sm: 28px;   /* compact buttons, chips */
+  --control-md: 34px;   /* default buttons, inputs, toggles */
+  --control-lg: 40px;
+
+  /* Icon sizes */
+  --icon-xs: 13px;
+  --icon-sm: 15px;
+  --icon-md: 17px;
+  --icon-lg: 20px;
+
+  /* Type-icon (colored rounded-square element glyph) */
+  --type-icon-sm: 16px;
+  --type-icon-md: 20px;
+  --type-icon-lg: 26px;
+
+  /* Layout */
+  --sidebar-w:      300px;  /* left model / control sidebar */
+  --sidebar-w-wide: 340px;
+  --rail-w:         52px;   /* right icon rail */
+  --header-h:       52px;   /* explorer top header */
+  --content-max:    1180px; /* main column max readable width */
+  --row-h:          30px;   /* tree row / list row height */
+
+  /* Borders */
+  --border-w:       1px;
+  --border-w-2:     1.5px;
+  --border-w-thick: 2px;   /* selection rails, swatch outlines */
+  --border-w-heavy: 3px;   /* blockquote bars, emphasized strokes */
+  --focus-w:        2px;
+  }
+}

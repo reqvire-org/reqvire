@@ -2,7 +2,7 @@
 set -euo pipefail
 
 echo "===================================="
-echo "Document Operation Constraint Tests"
+echo "Single Element Operation Constraint Tests"
 echo "===================================="
 
 auto_fail() {
@@ -58,19 +58,19 @@ if [ $INIT_VALIDATE_CODE -ne 0 ]; then
   auto_fail "Initial model should validate"
 fi
 
-# 1) merge from #Documents source into #Elements target must fail
+# 1) merge from # Element source into # Elements target must fail
 run_cmd_expect_fail_with_expected \
   "$TEST_SCRIPT_DIR/expected/merge-documents-to-elements-error.txt" \
   "$TEST_DIR/output/merge-documents-to-elements-error.actual.txt" \
-  merge "Target Requirement" "Document Source Requirement"
+  merge "Target Requirement" "Single Element Source Requirement"
 
-# 2) mv into existing #Documents file (single-element) must fail
+# 2) mv into existing # Element file (single-element) must fail
 run_cmd_expect_fail_with_expected \
   "$TEST_SCRIPT_DIR/expected/mv-into-documents-error.txt" \
   "$TEST_DIR/output/mv-into-documents-error.actual.txt" \
   mv "Move Source Requirement" "specifications/DesignDocuments/DocSource.md"
 
-# 3) mv-file --squash into existing #Documents file must fail
+# 3) mv-file --squash into existing # Element file must fail
 run_cmd_expect_fail_with_expected \
   "$TEST_SCRIPT_DIR/expected/mv-file-squash-into-documents-error.txt" \
   "$TEST_DIR/output/mv-file-squash-into-documents-error.actual.txt" \
@@ -86,4 +86,4 @@ if [ $FINAL_VALIDATE_CODE -ne 0 ]; then
   auto_fail "Model should remain valid after rejected operations"
 fi
 
-echo "All document operation constraint tests passed"
+echo "All single element operation constraint tests passed"

@@ -1,10 +1,10 @@
-# Documents
+# Element
 
 ## Metadata
   * type: specification
 
 ## Relations
-  * refine: [Requirement Using Document Refinement](../Requirements.md#requirement-using-document-refinement)
+  * refine: [Requirement Using Single Element Refinement](../Requirements.md#requirement-using-single-element-refinement)
 
 ## ChangePropagation
 
@@ -14,4 +14,4 @@
 
 ### Propagation Scope
 
-Document bodies may contain arbitrary markdown headings.
+Single-element bodies may contain arbitrary markdown headings.

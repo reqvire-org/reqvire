@@ -16,7 +16,7 @@ export function ViewFrame({
   return (
     <main
       data-view={testId}
-      className="absolute inset-0 overflow-auto bg-reqvire-background"
+      className="ex-view-frame"
     >
       {children}
     </main>

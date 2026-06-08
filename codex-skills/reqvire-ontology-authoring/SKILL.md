@@ -54,7 +54,7 @@ Use `specification`, `behavior`, `constraint`, `state`, or `input-output` for ex
 
 Use `semantic-contract` for requirement-owned SHACL `sh:NodeShape` profiles. A semantic contract must have `#### Shapes`, use `sh:targetClass` and `sh:path` over reachable ontology terms, refine exactly one requirement owner, and must not contain `#### Ontology`.
 
-Use `semantic-query-contract` for requirement-owned declarative graph queries. A semantic query contract must refine exactly one requirement, use the generic `#### Query` heading, contain exactly one fenced code block with info string `sparql`, and must not declare a query kind. It must not contain `#### Ontology` or `#### Shapes`. Search JSON exposes parsed query-contract fields; ontology collection and full semantic export do not emit query contracts until a dedicated query-export command exists. The initial feature does not define execution, inference strategy, or persistent RDF store behavior.
+Use `semantic-query-contract` for requirement-owned declarative graph queries. A semantic query contract must refine exactly one requirement, use the generic `#### Query` heading, contain exactly one fenced code block with info string `sparql`, and must not declare a query kind. It must not contain `#### Ontology` or `#### Shapes`. Search JSON exposes parsed query-contract fields; ontology collection and full semantic export do not emit query contracts until dedicated query output support is specified. The initial feature does not define execution, inference strategy, or persistent RDF store behavior.
 
 For greenfield ontology creation templates and examples, read `references/OntologyAuthoring.md`.
 

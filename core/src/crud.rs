@@ -722,10 +722,17 @@ pub fn attach_element_identifier(
     }
 
     let target_is_ontology = attachment_element.element_type.is_ontology();
+    if !target_element.element_type.is_capability() && !target_element.element_type.is_requirement()
+    {
+        return Err(ReqvireError::InvalidAttachmentTarget(format!(
+            "Element '{}' (type: {}) cannot author attachments. Only capability and requirement elements may author attachments; verification evidence must use satisfiedBy and verified targets must use verify.",
+            element_name,
+            target_element.element_type.as_str(),
+        )));
+    }
+
     let attachment_type_valid = if target_element.element_type.is_capability() {
         target_is_ontology
-    } else if target_element.element_type.is_requirement() {
-        attachment_element.element_type.is_requirement_refinement()
     } else {
         attachment_element.element_type.is_requirement_refinement()
     };

@@ -3,8 +3,7 @@ Reqvire requirements & traceability management tool
 Usage: reqvire [OPTIONS] <COMMAND> [COMMAND OPTIONS]
 
 Commands:
-  export            Export model to browsable HTML documentation with complete traceability
-  serve             Serve model as browsable HTML documentation via HTTP server
+  serve             Serve the embedded Explorer UI via HTTP server
   mcp               Start Reqvire MCP server
   format            Format and normalize requirements files. By default, shows preview without applying changes
   validate          Validate model
@@ -36,9 +35,6 @@ Options:
   --workspace <DIR>         Workspace directory to operate on
   -h, --help               Print help
   -V, --version            Print version
-
-EXPORT OPTIONS:
-      --output <OUTPUT>         Output directory for HTML files (defaults to temporary directory if not specified)
 
 SERVE OPTIONS:
       --host <HOST>             Bind address

@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -32,12 +34,17 @@ jobs:
         with:
           node-version: "24"
 
-      - name: Build Explorer SPA bundle
-        # The exported/served index.html is this bundle; core/build.rs embeds
-        # explorer/dist at compile time, so it must be built before cargo build.
-        run: cd explorer && npm ci && npm run build
+      - name: Install Explorer dependencies
+        # core/build.rs embeds explorer/dist and only builds it when
+        # REQVIRE_BUILD_EXPLORER=1 is set for the cargo invocation.
+        run: cd explorer && npm ci
+
+      - name: Lint Explorer SPA
+        run: cd explorer && npm run lint
 
       - name: Test
+        env:
+          REQVIRE_BUILD_EXPLORER: "1"
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             # on macOS skip our two tmpdir‐symlink tests
@@ -50,6 +57,8 @@ jobs:
           fi
         
       - name: Build Binary
+        env:
+          REQVIRE_BUILD_EXPLORER: "1"
         run: |
           if [[ "$RUNNER_OS" == "macOS" ]]; then
             if [[ "$(uname -m)" == "arm64" ]]; then
@@ -117,6 +126,12 @@ jobs:
           node-version: "24"
           registry-url: "https://registry.npmjs.org"
 
+      - name: Build Explorer SPA bundle for npm package
+        # The Rust binaries already embed this bundle. The npm package also
+        # ships the built dist so package contents make the Explorer payload
+        # explicit and npm publish fails if the bundle is missing.
+        run: cd explorer && npm ci && npm run lint && npm run build
+
       - name: Download All Archives
         uses: actions/download-artifact@v6
         with:
@@ -127,12 +142,85 @@ jobs:
       - name: Debug List Downloaded Archives
         run: ls -R artifacts
 
+      - name: Build release notes from commit changelog lines
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          CURRENT_TAG="${GITHUB_REF_NAME}"
+          PREVIOUS_TAG="$(git tag --sort=-v:refname | grep -v "^${CURRENT_TAG}$" | head -n 1 || true)"
+
+          if [[ -n "${PREVIOUS_TAG}" ]]; then
+            RANGE="${PREVIOUS_TAG}..${CURRENT_TAG}"
+          else
+            RANGE="${CURRENT_TAG}"
+          fi
+
+          git log --reverse --format="%B%n---END-COMMIT---" "${RANGE}" \
+            | awk '
+              function flush() {
+                if (entry != "") {
+                  print "- " entry
+                  entry = ""
+                }
+              }
+
+              /^[[:space:]]*Changelog:[[:space:]]*/ {
+                flush()
+                line = $0
+                sub(/^[[:space:]]*Changelog:[[:space:]]*/, "", line)
+                if (line == "" || line == "|" || line == ">") {
+                  in_changelog = 1
+                } else {
+                  print "- " line
+                  in_changelog = 0
+                }
+                next
+              }
+
+              in_changelog && /^[[:space:]]+/ {
+                line = $0
+                sub(/^[[:space:]]+/, "", line)
+                if (entry == "") {
+                  entry = line
+                } else {
+                  entry = entry "\n  " line
+                }
+                next
+              }
+
+              in_changelog && ($0 == "" || $0 == "---END-COMMIT---") {
+                flush()
+                in_changelog = 0
+                next
+              }
+
+              in_changelog {
+                flush()
+                in_changelog = 0
+                next
+              }
+
+              END {
+                flush()
+              }
+            ' > release-notes.md
+
+          if [[ ! -s release-notes.md ]]; then
+            {
+              echo "## Changes"
+              git log --format="- %s" "${RANGE}"
+            } > release-notes.md
+          fi
+
+          cat release-notes.md
+
       - name: Create GitHub Release and Upload Archives
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ github.ref_name }}
           name: "Release ${{ github.ref_name }}"
-          body: "Automated release of ${{ github.ref_name }}"
+          body_path: release-notes.md
           draft: false
           prerelease: false
           files: |
@@ -152,5 +240,8 @@ jobs:
           npm version "$VERSION" --no-git-tag-version --allow-same-version
           mkdir -p artifacts
           cp ../../artifacts/*.tar.gz artifacts/
+          rm -rf explorer-dist
+          cp -R ../../explorer/dist explorer-dist
+          npm run build
 
           npm publish --access public

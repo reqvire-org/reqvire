@@ -1,5 +1,4 @@
-import { Callout, Container, Flex, Heading, Text, Code } from "@radix-ui/themes";
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { Card, Icon } from "@ds";
 
 /*
  * Visible fail-closed diagnostic shown when the Project Store seed is missing,
@@ -14,27 +13,27 @@ export function MissingStoreNotice({
   detail?: string;
 }) {
   return (
-    <Container size="2" px="4" py="8">
-      <Flex direction="column" gap="4">
-        <Heading size="6">Reqvire Explorer</Heading>
-        <Callout.Root color="red" role="alert">
-          <Callout.Icon>
-            <ExclamationTriangleIcon />
-          </Callout.Icon>
-          <Callout.Text>{reason}</Callout.Text>
-        </Callout.Root>
+    <div className="missing-store-notice">
+      <Card className="missing-store-card">
+        <h1>Reqvire Explorer</h1>
+        <div className="missing-store-alert" role="alert">
+          <Icon name="alert-triangle" aria-hidden="true" />
+          <span>{reason}</span>
+        </div>
         {detail && (
-          <Text size="2" color="gray">
-            <Code>{detail}</Code>
-          </Text>
+          <p>
+            <code className="rq-coderef">{detail}</code>
+          </p>
         )}
-        <Text size="2" color="gray">
+        <p>
           The Explorer shell loads a browser-local Project Store seed produced by
-          a Reqvire HTML export. Open this page from an export, or run{" "}
-          <Code>npm run dev</Code> in <Code>explorer/</Code> to browse the shell
+          <code className="rq-coderef">reqvire serve</code>. Open this page from
+          the served Explorer, or run{" "}
+          <code className="rq-coderef">npm run dev</code> in{" "}
+          <code className="rq-coderef">explorer/</code> to browse the shell
           with fixture data.
-        </Text>
-      </Flex>
-    </Container>
+        </p>
+      </Card>
+    </div>
   );
 }

@@ -5,8 +5,6 @@ import { devFixture } from "./devFixture";
 
 afterEach(() => {
   delete window.reqvireProjectStore;
-  const tag = document.getElementById("reqvire-project-store");
-  if (tag) tag.remove();
 });
 
 describe("validateStore", () => {
@@ -48,15 +46,6 @@ describe("loadStore", () => {
       expect(result.schemaMismatch).toBeNull();
       expect(result.store.summaries.elements).toBe(devFixture.summaries.elements);
     }
-  });
-
-  it("loads a seed from the script tag JSON when no global is set", () => {
-    const tag = document.createElement("script");
-    tag.id = "reqvire-project-store";
-    tag.textContent = `const reqvireProjectStore = ${JSON.stringify(devFixture)};`;
-    document.body.appendChild(tag);
-    const result = loadStore();
-    expect(result.ok).toBe(true);
   });
 
   it("flags a schema version mismatch but still loads", () => {

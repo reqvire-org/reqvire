@@ -206,33 +206,6 @@ if grep -qF "$RAW_QUERY_SENTINEL" <<< "$FULL_JSONLD_OUTPUT"; then
   exit 1
 fi
 
-set +e
-EXPORT_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" export --output out 2>&1)
-EXPORT_EXIT=$?
-set -e
-
-if [ $EXPORT_EXIT -ne 0 ]; then
-  echo "FAILED: export command failed"
-  echo "$EXPORT_OUTPUT"
-  exit 1
-fi
-
-if [ ! -f "$TEST_DIR/out/ontologies.ttl" ]; then
-  echo "FAILED: export did not generate ontologies.ttl"
-  exit 1
-fi
-
-ONTOLOGIES_ENTRY="$TEST_DIR/out/ontologies"'.html'
-if [ -f "$ONTOLOGIES_ENTRY" ]; then
-  echo "FAILED: export must not generate standalone Ontologies page"
-  exit 1
-fi
-
-if ! grep -q "api:ServiceEndpoint" "$TEST_DIR/out/ontologies.ttl"; then
-  echo "FAILED: exported ontologies.ttl missing ontology content"
-  exit 1
-fi
-
 for forbidden in \
   "OntologyProjectionGraph" \
   "OntologyConstruct" \
@@ -240,19 +213,18 @@ for forbidden in \
   "urn:reqvire:ontology-member" \
   "urn:reqvire:ontology-symbol" \
   "projectionDerivationMode"; do
-  if grep -qF "$forbidden" "$TEST_DIR/out/ontologies.ttl"; then
-    echo "FAILED: exported ontologies.ttl must remain authored ontology/SHACL only: $forbidden"
+  if grep -qF "$forbidden" <<< "$TTL_OUTPUT"; then
+    echo "FAILED: default Turtle output must remain authored ontology/SHACL only: $forbidden"
     exit 1
   fi
 done
 
-if grep -qF "$RAW_QUERY_SENTINEL" "$TEST_DIR/out/ontologies.ttl"; then
-  echo "FAILED: exported ontologies.ttl must not contain raw semantic-query-contract text"
+if grep -qF "$RAW_QUERY_SENTINEL" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: default Turtle output must not contain raw semantic-query-contract text"
   exit 1
 fi
 
-# Exported ontologies.ttl must carry the representative OWL/RDFS constructs.
-TTL_FILE="$TEST_DIR/out/ontologies.ttl"
+# Default Turtle output must carry the representative OWL/RDFS constructs.
 for construct in \
   "propertyChainAxiom" \
   "inverseOf" \
@@ -261,119 +233,16 @@ for construct in \
   "sameAs" \
   "domain" \
   "range"; do
-  if ! grep -q "$construct" "$TTL_FILE"; then
-    echo "FAILED: exported ontologies.ttl missing OWL/RDFS construct: $construct"
+  if ! grep -q "$construct" <<< "$TTL_OUTPUT"; then
+    echo "FAILED: default Turtle output missing OWL/RDFS construct: $construct"
     exit 1
   fi
 done
 
 # xsd:string range must survive serialization (prefixed or full IRI form).
-if ! grep -Eq "xsd:string|http://www\.w3\.org/2001/XMLSchema#string" "$TTL_FILE"; then
-  echo "FAILED: exported ontologies.ttl missing xsd:string range"
+if ! grep -Eq "xsd:string|http://www\.w3\.org/2001/XMLSchema#string" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: default Turtle output missing xsd:string range"
   exit 1
 fi
-
-# Exported index.html must expose the ontology semantic view-model through the
-# single SPA Project Store seed.
-INDEX_FILE="$TEST_DIR/out/index.html" node - <<'NODE'
-const fs = require("fs");
-const html = fs.readFileSync(process.env.INDEX_FILE, "utf8");
-const match = html.match(/(?:const|let|var)\s+reqvireProjectStore\s*=\s*(\{[\s\S]*?\});\s*<\/script>/);
-if (!match) {
-  console.error("FAILED: exported index.html missing Project Store seed");
-  process.exit(1);
-}
-const store = JSON.parse(match[1]);
-if (!store.ontology || store.ontology.ttl_href !== "ontologies.ttl") {
-  console.error("FAILED: Project Store ontology projection missing ontologies.ttl link");
-  process.exit(1);
-}
-if (!store.ontology.graph_renderer || !store.ontology.graph_data) {
-  console.error("FAILED: Project Store ontology projection missing graph renderer/data");
-  process.exit(1);
-}
-const graph = store.ontology.graph_data;
-if (graph.nodes.some((node) => node.semantic_type === "literal" || node.type === "literal")) {
-  console.error("FAILED: literal values should not render as primary ontology graph nodes");
-  process.exit(1);
-}
-if (graph.nodes.some((node) => node.id === "http://www.w3.org/2001/XMLSchema#string")) {
-  console.error("FAILED: xsd:string datatype constraints should remain evidence, not primary ontology graph nodes");
-  process.exit(1);
-}
-const service = graph.nodes.find((node) => node.id === "urn:reqvire:test:api:ServiceEndpoint");
-if (!service || service.type !== "owl" || service.semantic_type !== "class") {
-  console.error("FAILED: declared OWL class should be a class graph node");
-  process.exit(1);
-}
-const serviceSlot = (service.slot_facets || []).find((slot) =>
-  slot.slot_iri === "urn:reqvire:test:api:identifier"
-    && slot.source_shape_iri === "urn:reqvire:test:api:ServiceEndpointShape"
-);
-if (!serviceSlot) {
-  console.error("FAILED: target class should retain SHACL slot facet evidence");
-  process.exit(1);
-}
-const identifier = graph.nodes.find((node) => node.id === "urn:reqvire:test:api:identifier");
-if (!identifier || identifier.semantic_type !== "datatype-property") {
-  console.error("FAILED: named SHACL path property should remain available as datatype property node");
-  process.exit(1);
-}
-const shape = graph.nodes.find((node) => node.id === "urn:reqvire:test:api:ServiceEndpointShape");
-if (!shape || shape.type !== "shacl" || shape.semantic_type !== "node-shape") {
-  console.error("FAILED: SHACL node shape should retain SHACL visual type");
-  process.exit(1);
-}
-const secondary = graph.nodes.find((node) => node.id === "urn:reqvire:test:api:SecondaryEndpoint");
-if (!secondary || secondary.type !== "owl" || secondary.semantic_type !== "named-individual") {
-  console.error("FAILED: named IRI typed by a declared ontology class should render as a named individual");
-  process.exit(1);
-}
-const secondaryIdentifier = (secondary.literal_values || []).find((item) =>
-  String(item.predicate || "").endsWith("identifier") && item.value === "secondary"
-);
-if (!secondaryIdentifier) {
-  console.error("FAILED: datatype-property literal values should be owned inspector/search evidence on the subject node");
-  process.exit(1);
-}
-const secondaryMembership = (secondary.constructs || []).find((construct) =>
-  construct.kind === "membership"
-    && construct.subject === "urn:reqvire:test:api:SecondaryEndpoint"
-    && construct.object === "urn:reqvire:test:api:ServiceEndpoint"
-);
-if (!secondaryMembership) {
-  console.error("FAILED: typed named individual should retain membership construct evidence");
-  process.exit(1);
-}
-const endpointRangeExpression = graph.nodes.find((node) =>
-  node.semantic_type === "class-expression"
-    && (node.constructs || []).some((construct) =>
-      construct.kind === "property-range"
-        && construct.subject === "urn:reqvire:test:api:exposes"
-        && construct.object === node.id
-    )
-    && (node.constructs || []).some((construct) =>
-      construct.kind === "class-expression"
-        && (construct.members || []).some((member) => String(member).endsWith("ServiceEndpoint"))
-    )
-);
-if (!endpointRangeExpression) {
-  console.error("FAILED: class expression nodes should retain property domain/range usage evidence for display labels");
-  process.exit(1);
-}
-const existentialRestriction = graph.nodes.find((node) =>
-  node.semantic_type === "restriction"
-    && (node.constructs || []).some((construct) =>
-      construct.kind === "restriction"
-        && String(construct.label || "").toLowerCase().includes("existential")
-        && String(construct.property || "").endsWith("produces")
-        && String(construct.object || "").endsWith("Response")
-    )
-);
-if (!existentialRestriction) {
-  console.error("FAILED: restriction nodes should retain existential someValuesFrom construct evidence for glyph rendering");
-  process.exit(1);
-}
-NODE
 
 exit 0

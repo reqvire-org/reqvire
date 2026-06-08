@@ -65,29 +65,29 @@ This test verifies that the system assigns the default type 'requirement' to all
   * verify: [Default Requirement Type Assignment](../ModelManagement.md#default-requirement-type-assignment)
 ---
 
-### Document Refinement Validation Test
+### Single Element Refinement Validation Test
 
-This test verifies that `# Documents` files are parsed as single-element model documents and that `refinedBy` targets must resolve to refinement elements (including those defined in `# Documents` files).
+This test verifies that `# Element` files are parsed as single-element model files and that `refinedBy` targets must resolve to refinement elements (including those defined in `# Element` files).
 
 #### Details
 
 ##### Acceptance Criteria
-- System shall parse `# Documents` files as model files with one element.
-- The document element shall use metadata type from `## Metadata`.
+- System shall parse `# Element` files as model files with one element.
+- The single element shall use metadata type from `## Metadata`.
 - Content under `## <Actual Element Name>` shall allow arbitrary markdown headers, and the heading text shall define the element name.
 - `refinedBy` targets shall be identifier links that resolve to refinement elements.
 - `refinedBy` plain file-path targets shall be rejected.
-- `refinedBy` identifier targets into `# Documents` files shall satisfy existing relation type compatibility rules based on target element type.
+- `refinedBy` identifier targets into `# Element` files shall satisfy existing relation type compatibility rules based on target element type.
 
 ##### Test Criteria
-1. Create valid `# Documents` refinement file with:
+1. Create valid `# Element` refinement file with:
    - `## Metadata` type `specification`
    - `## Relations` containing `refine` relation
    - `## <Actual Element Name>` body containing nested markdown headers
-2. Create requirement with `refinedBy` pointing to the document element identifier (`file.md#fragment`); run `reqvire validate`; assert success.
-3. Change document metadata type to `requirement`; run `reqvire validate`; assert failure with incompatible type message.
-4. Point `refinedBy` to plain file path (no fragment), including a `# Documents` file path; run `reqvire validate`; assert failure.
-5. Create `# Documents` file where `## <Actual Element Name>` body contains multiple markdown headers (including `###`); run `reqvire validate`; assert success.
+2. Create requirement with `refinedBy` pointing to the single-element identifier (`file.md#fragment`); run `reqvire validate`; assert success.
+3. Change single-element metadata type to `requirement`; run `reqvire validate`; assert failure with incompatible type message.
+4. Point `refinedBy` to plain file path (no fragment), including a `# Element` file path; run `reqvire validate`; assert failure.
+5. Create `# Element` file where `## <Actual Element Name>` body contains multiple markdown headers (including `###`); run `reqvire validate`; assert success.
 
 #### Metadata
   * type: test-verification
@@ -592,7 +592,7 @@ This test verifies that the system correctly processes only files within the cur
 - System shall process only files within the current directory when run from a subfolder
 - System shall handle identifier normalization correctly within subdirectory context
 - System shall generate missing relation target errors for references to elements or files outside the current subdirectory scope
-- System shall work with model, export, format, traces, and CRUD commands (validation is automatic)
+- System shall work with model, serve, format, traces, and CRUD commands (validation is automatic)
 - System shall ignore files outside the current directory scope
 - System shall provide meaningful missing relation target error messages for parent directory references
 - CRUD commands (add, rm, mv, mv-file) shall resolve paths relative to current working directory
@@ -603,7 +603,7 @@ This test verifies that the system correctly processes only files within the cur
 - Identifier normalization works correctly for paths within subdirectory
 - References to parent directories generate missing relation target errors with clear error messages
 - Missing relation target errors specifically identify the unreachable parent directory reference
-- All major commands (model, export, format, traces) work from subdirectories with automatic validation
+- All major commands (model, serve, format, traces) work from subdirectories with automatic validation
 - CRUD commands (add, rm, mv, mv-file) resolve file paths relative to current working directory
 - CRUD mv command successfully moves elements within subdirectory scope
 - CRUD mv-file command successfully moves entire files within subdirectory scope
@@ -640,9 +640,6 @@ Test verifies that type validation errors include helpful type lists.
 
 #### Metadata
   * type: test-verification
-
-#### Attachments
-  * [Type Validation Error Behavior](../Behaviors.md#type-validation-error-behavior)
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-type-validation-errors/test.sh)

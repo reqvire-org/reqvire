@@ -1,0 +1,312 @@
+export type ElementIconShape = "square" | "diamond" | "hub";
+export type ElementRole =
+  | "capability"
+  | "requirement"
+  | "refinement"
+  | "source"
+  | "constraint"
+  | "behavior"
+  | "state"
+  | "input-output"
+  | "verification"
+  | "specification"
+  | "semantic-contract"
+  | "ontology"
+  | "resource"
+  | "other";
+export type ElementType = Exclude<ElementRole, "other">;
+export type PaletteChannel = "fill" | "ink" | "tint";
+type CssTokenName = `--${string}`;
+
+export const ELEMENT_ROLE_TOKENS = {
+  capability: { fill: "--capability", ink: "--capability-ink", tint: "--capability-tint" },
+  requirement: { fill: "--requirement", ink: "--requirement-ink", tint: "--requirement-tint" },
+  refinement: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  source: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  constraint: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  behavior: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  state: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  "input-output": { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  verification: { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
+  specification: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  "semantic-contract": { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  ontology: { fill: "--ontology", ink: "--ontology-ink", tint: "--ontology-tint" },
+  resource: { fill: "--resource", ink: "--resource-ink", tint: "--resource-tint" },
+  other: { fill: "--other", ink: "--other-ink", tint: "--other-tint" },
+} as const;
+
+export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementIconShape; role: ElementRole; glyph?: string }> = {
+  capability: { color: "var(--capability)", shape: "hub", role: "capability" },
+  requirement: { color: "var(--requirement)", shape: "square", role: "requirement" },
+  refinement: { color: "var(--refinement)", shape: "diamond", role: "refinement", glyph: "R" },
+  source: { color: "var(--refinement)", shape: "diamond", role: "source", glyph: "↗" },
+  constraint: { color: "var(--refinement)", shape: "diamond", role: "constraint", glyph: "!" },
+  behavior: { color: "var(--refinement)", shape: "diamond", role: "behavior", glyph: "→" },
+  state: { color: "var(--refinement)", shape: "diamond", role: "state", glyph: "●" },
+  "input-output": { color: "var(--refinement)", shape: "diamond", role: "input-output", glyph: "↔" },
+  verification: { color: "var(--verification)", shape: "square", role: "verification" },
+  specification: { color: "var(--refinement)", shape: "diamond", role: "specification", glyph: "≡" },
+  "semantic-contract": { color: "var(--refinement)", shape: "diamond", role: "semantic-contract", glyph: "SH" },
+  ontology: { color: "var(--ontology)", shape: "square", role: "ontology" },
+  resource: { color: "var(--resource)", shape: "square", role: "resource" },
+};
+
+export const DESIGN_SYSTEM_COLOR_TOKENS = [
+  "--accent",
+  "--accent-ring",
+  "--bg-canvas",
+  "--bg-sunken",
+  "--bg-surface",
+  "--border-default",
+  "--edge-attach",
+  "--edge-default",
+  "--edge-derive",
+  "--edge-satisfy",
+  "--edge-trace",
+  "--node-generic-fill",
+  "--ontology-ink",
+  "--rdf-class",
+  "--rdf-classexpr",
+  "--rdf-datatype",
+  "--rdf-dtprop",
+  "--rdf-individual",
+  "--rdf-nodeshape",
+  "--rdf-objprop",
+  "--rdf-propshape",
+  "--rdf-rdfprop",
+  "--rdf-resource",
+  "--rdf-restriction",
+  "--rdf-shacl",
+  "--requirement-ink",
+  "--slate-0",
+  "--slate-950",
+  "--success",
+  "--text-body",
+  "--text-faint",
+  "--text-muted",
+  "--text-strong",
+] as const satisfies readonly CssTokenName[];
+
+type ElementRoleToken = {
+  [Role in keyof typeof ELEMENT_ROLE_TOKENS]: (typeof ELEMENT_ROLE_TOKENS)[Role][keyof (typeof ELEMENT_ROLE_TOKENS)[Role]];
+}[keyof typeof ELEMENT_ROLE_TOKENS];
+
+export type DesignSystemColorToken = ElementRoleToken | (typeof DESIGN_SYSTEM_COLOR_TOKENS)[number];
+export type ExplorerColorToken = DesignSystemColorToken;
+
+const CSS_TOKEN_FALLBACKS: Partial<Record<DesignSystemColorToken, string>> = {
+  "--capability": "#bbdefb",
+  "--capability-ink": "#1565c0",
+  "--capability-tint": "#e3f2fd",
+  "--requirement": "#673ab7",
+  "--requirement-ink": "#512da8",
+  "--requirement-tint": "#ede7f6",
+  "--refinement": "#ff9800",
+  "--refinement-ink": "#e65100",
+  "--refinement-tint": "#fff3e0",
+  "--verification": "#4caf50",
+  "--verification-ink": "#2e7d32",
+  "--verification-tint": "#e8f5e9",
+  "--ontology": "#b08a00",
+  "--ontology-ink": "#6f5600",
+  "--ontology-tint": "#f4e3a1",
+  "--resource": "#ffca28",
+  "--resource-ink": "#8d6e00",
+  "--resource-tint": "#fff3cf",
+  "--other": "#9e9e9e",
+  "--other-ink": "#616161",
+  "--other-tint": "#ececec",
+  "--node-generic-fill": "#eceff1",
+  "--edge-default": "#c0c8d4",
+  "--edge-derive": "#673ab7",
+  "--edge-satisfy": "#4caf50",
+  "--edge-trace": "#97a2b4",
+  "--edge-attach": "#2196f3",
+  "--bg-canvas": "#fbfaf7",
+  "--bg-sunken": "#f3f1eb",
+  "--bg-surface": "#ffffff",
+  "--border-default": "#d8d2c6",
+  "--accent": "#e11d48",
+  "--accent-ring": "rgba(225,29,72,0.32)",
+  "--rdf-class": "#94a3b8",
+  "--rdf-objprop": "#64748b",
+  "--rdf-dtprop": "#0f766e",
+  "--rdf-rdfprop": "#115e59",
+  "--rdf-individual": "#7c3aed",
+  "--rdf-datatype": "#d6a43f",
+  "--rdf-restriction": "#cbd5e1",
+  "--rdf-classexpr": "#e2e8f0",
+  "--rdf-nodeshape": "#dc2626",
+  "--rdf-propshape": "#be123c",
+  "--rdf-resource": "#14b8a6",
+  "--rdf-shacl": "#ef4444",
+  "--success": "#1f9d57",
+  "--slate-0": "#ffffff",
+  "--slate-950": "#0d1119",
+  "--text-body": "#232b37",
+  "--text-faint": "#97a2b4",
+  "--text-muted": "#6b7688",
+  "--text-strong": "#161d27",
+};
+
+const REFINEMENT_TYPES = new Set([
+  "source",
+  "specification",
+  "constraint",
+  "behavior",
+  "state",
+  "input-output",
+  "semantic-contract",
+  "semantic-query-contract",
+]);
+
+export function elementRole(type?: string | null, family?: string | null): ElementRole {
+  const normalizedType = (type ?? "").toLowerCase();
+  const normalizedFamily = (family ?? "").toLowerCase();
+
+  if (normalizedType in ELEMENT_TYPES) {
+    return ELEMENT_TYPES[normalizedType as ElementType].role;
+  }
+  if (normalizedType.includes("capability") || normalizedFamily === "capability") return "capability";
+  if (normalizedType.includes("verification") || normalizedFamily === "verification") return "verification";
+  if (normalizedType.includes("ontology") || normalizedFamily === "ontology") return "ontology";
+  if (normalizedType.includes("resource") || normalizedType === "file" || normalizedFamily === "resource") {
+    return "resource";
+  }
+  if (REFINEMENT_TYPES.has(normalizedType) && normalizedType in ELEMENT_TYPES) {
+    return ELEMENT_TYPES[normalizedType as ElementType].role;
+  }
+  if (normalizedType.includes("refinement") || normalizedFamily === "refinement") return "refinement";
+  if (normalizedType.includes("requirement") || normalizedFamily === "requirement") return "requirement";
+  if (normalizedType.includes("contract")) return "semantic-contract";
+  if (normalizedType.includes("specification")) return "specification";
+  return "other";
+}
+
+export function roleColorToken(role: string | null | undefined, channel: PaletteChannel = "fill"): DesignSystemColorToken {
+  return ELEMENT_ROLE_TOKENS[elementRole(role)][channel];
+}
+
+export function roleColorValue(role: string, channel: PaletteChannel = "fill") {
+  return cssVar(roleColorToken(role, channel));
+}
+
+export function cssVar(token: DesignSystemColorToken): string {
+  if (typeof window === "undefined") return `var(${token})`;
+  const resolved = resolveCssToken(token);
+  return normalizeCssColor(resolved) ?? resolved;
+}
+
+function resolveCssToken(token: CssTokenName, seen = new Set<string>()): string {
+  if (seen.has(token)) return `var(${token})`;
+  seen.add(token);
+
+  const value = window.getComputedStyle(document.documentElement).getPropertyValue(token).trim();
+  if (!value) return CSS_TOKEN_FALLBACKS[token as DesignSystemColorToken] ?? `var(${token})`;
+
+  return resolveCssValue(value, seen);
+}
+
+function resolveCssValue(value: string, seen = new Set<string>()): string {
+  const normalized = value.trim();
+  const nested = normalized.match(/^var\((--[a-z0-9-]+)(?:,\s*([^)]+))?\)$/i);
+  if (!nested) return normalized;
+
+  return resolveCssToken(nested[1] as CssTokenName, seen);
+}
+
+export function replaceCssVarsForMermaid(source: string) {
+  return source.replace(/var\((--[a-z0-9-]+)\)/gi, (match, token: string) => {
+    const colorToken = token as DesignSystemColorToken;
+    const value = normalizeCssColor(resolveCssToken(token as CssTokenName)) ?? CSS_TOKEN_FALLBACKS[colorToken];
+    return value ?? match;
+  });
+}
+
+export function getMermaidClassDefs() {
+  const classDef = (className: string, role: ElementRole, strokeWidth = "2px") => {
+    const tokens = ELEMENT_ROLE_TOKENS[role];
+    return `  classDef ${className} fill:${mermaidTokenColor(tokens.tint)},stroke:${mermaidTokenColor(tokens.fill)},stroke-width:${strokeWidth},color:${mermaidTokenColor("--text-body")};`;
+  };
+
+  return [
+    classDef("capability", "capability", "2.5px"),
+    classDef("systemRequirement", "requirement", "2px"),
+    classDef("requirement", "requirement", "2px"),
+    classDef("refinement", "refinement", "2px"),
+    classDef("source", "source", "2px"),
+    classDef("constraint", "constraint", "2px"),
+    classDef("behavior", "behavior", "2px"),
+    classDef("state", "state", "2px"),
+    classDef("inputOutput", "input-output", "2px"),
+    classDef("specification", "specification", "2px"),
+    classDef("semanticContract", "semantic-contract", "2px"),
+    classDef("semanticQueryContract", "semantic-contract", "2px"),
+    classDef("verification", "verification", "2px"),
+    classDef("ontology", "ontology", "2px"),
+    classDef("resource", "resource", "2px"),
+    classDef("file", "resource", "2px"),
+    classDef("folder", "resource", "2px"),
+    classDef("default", "other", "1.5px"),
+  ] as const;
+}
+
+function mermaidTokenColor(token: DesignSystemColorToken): string {
+  const value = normalizeCssColor(cssVar(token));
+  if (value) return value;
+  const fallback = CSS_TOKEN_FALLBACKS[token];
+  if (fallback) return fallback;
+  throw new Error(`Missing Mermaid-safe CSS token value for ${token}`);
+}
+
+function normalizeCssColor(value: string | undefined): string | null {
+  if (!value || typeof document === "undefined") return null;
+  const probe = document.createElement("span");
+  probe.style.color = "";
+  probe.style.color = value.trim();
+  if (!probe.style.color) return null;
+
+  const parent = document.body ?? document.documentElement;
+  parent.appendChild(probe);
+  const computed = window.getComputedStyle(probe).color;
+  probe.remove();
+
+  const hex = colorToHex(computed);
+  if (hex) return hex;
+
+  if (/\bjsdom\b/i.test(window.navigator?.userAgent ?? "")) return null;
+
+  // Wide-gamut path: browser returned color(display-p3 …) or similar.
+  // Render one pixel through a canvas to clamp into sRGB hex.
+  try {
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 1;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return null;
+    ctx.fillStyle = computed;
+    ctx.fillRect(0, 0, 1, 1);
+    const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+    return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+  } catch {
+    return null;
+  }
+}
+
+function colorToHex(color: string): string | null {
+  const match = color.match(/^rgba?\(\s*([0-9.]+)\s*,\s*([0-9.]+)\s*,\s*([0-9.]+)(?:\s*,\s*([0-9.]+))?\s*\)$/i);
+  if (!match) return null;
+
+  const [r, g, b] = match.slice(1, 4).map((part) => {
+    const value = Number.parseFloat(part);
+    if (!Number.isFinite(value)) return null;
+    return Math.max(0, Math.min(255, Math.round(value)));
+  });
+  if (r === null || g === null || b === null) return null;
+
+  const alpha = match[4] === undefined ? 1 : Number.parseFloat(match[4]);
+  const hex = [r, g, b].map((component) => component.toString(16).padStart(2, "0")).join("");
+  if (!Number.isFinite(alpha) || alpha >= 1) return `#${hex}`;
+
+  const alphaHex = Math.max(0, Math.min(255, Math.round(alpha * 255))).toString(16).padStart(2, "0");
+  return `#${hex}${alphaHex}`;
+}

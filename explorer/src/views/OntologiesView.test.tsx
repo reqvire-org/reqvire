@@ -1,9 +1,14 @@
-import { Theme } from "@radix-ui/themes";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
+import { ExplorerUiStateProvider } from "../components/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
-import { buildOntologyExplorerModel, OntologiesView } from "./OntologiesView";
+import type { ExplorerProjectStore } from "../store/types";
+import { OntologiesView } from "./OntologiesView";
+
+const sigmaState = vi.hoisted(() => ({
+  graphs: [] as Array<{ forEachNode: (callback: (node: string, attributes: Record<string, unknown>) => void) => void }>,
+}));
 
 vi.mock("graphology-layout-forceatlas2", () => ({
   default: {
@@ -12,8 +17,29 @@ vi.mock("graphology-layout-forceatlas2", () => ({
   },
 }));
 
+vi.mock("@sigma/edge-curve", () => ({
+  createDrawCurvedEdgeLabel: () => vi.fn(),
+  createEdgeCurveProgram: () => class MockCurvedEdgeProgram {},
+  indexParallelEdgesIndex: vi.fn(),
+}));
+
+vi.mock("@sigma/node-image", () => ({
+  createNodeImageProgram: () => class MockNodeImageProgram {},
+}));
+
+vi.mock("sigma/rendering", () => ({
+  EdgeProgram: class MockEdgeProgram {},
+}));
+
+vi.mock("sigma/utils", () => ({
+  floatColor: () => 0,
+}));
+
 vi.mock("sigma", () => ({
   default: class MockSigma {
+    constructor(graph: { forEachNode: (callback: (node: string, attributes: Record<string, unknown>) => void) => void }) {
+      sigmaState.graphs.push(graph);
+    }
     refresh = vi.fn();
     kill = vi.fn();
     on = vi.fn();
@@ -25,45 +51,60 @@ vi.mock("sigma", () => ({
   },
 }));
 
-function renderWithStore() {
+function renderWithStore(store: ExplorerProjectStore = devFixture) {
+  Object.defineProperty(globalThis, "WebGLRenderingContext", {
+    configurable: true,
+    value: { FLOAT: 5126, TRIANGLES: 4, UNSIGNED_BYTE: 5121 },
+  });
+  sigmaState.graphs.length = 0;
   return render(
-    <Theme>
-      <StoreProvider store={devFixture} schemaMismatch={null}>
-        <OntologiesView />
+    <>
+      <StoreProvider store={store} schemaMismatch={null}>
+        <ExplorerUiStateProvider>
+          <OntologiesView />
+        </ExplorerUiStateProvider>
       </StoreProvider>
-    </Theme>,
+    </>,
   );
 }
 
 describe("OntologiesView", () => {
-  it("builds an OWL-aware term and construct model from the Project Store projection", () => {
-    const model = buildOntologyExplorerModel(
-      devFixture.ontology.declarations,
-      devFixture.ontology.projection?.constructs,
-    );
-
-    expect(model.terms.some((term) => term.role === "class")).toBe(true);
-    expect(model.terms.some((term) => term.role === "datatype-property")).toBe(true);
-    expect(model.terms.some((term) => term.role === "node-shape")).toBe(true);
-    expect(model.edges.some((edge) => edge.label === "domain")).toBe(true);
-    expect(model.edges.some((edge) => edge.label === "range")).toBe(true);
-  });
-
-  it("renders the canonical committed ontology renderer with inspector search and Turtle download", async () => {
+  it("renders the TypeScript ontology graph without injected renderer assets", () => {
     const { container } = renderWithStore();
 
     const graph = screen.getByRole("img", { name: "Ontology and SHACL relationship graph" });
     expect(graph).toBeTruthy();
     expect(container.querySelector('[data-view="ontologies"]')).toBeTruthy();
+    expect(container.querySelector("#ontology-graph-container")).toBeTruthy();
     expect(container.querySelector("iframe")).toBeNull();
-    expect(screen.getByRole("link", { name: /Download \.ttl/i }).getAttribute("href")).toBe(
-      "ontologies.ttl",
-    );
-
-    expect(container.querySelector('script[type="module"]')?.textContent).toContain(
-      "ontologyGraphData",
-    );
-    expect(screen.getByRole("searchbox")).toBeTruthy();
-    expect(screen.getByText("Node Inspector")).toBeTruthy();
+    expect(container.querySelector('script[type="module"]')).toBeNull();
+    expect(container.querySelector("#ontology-graph-search")).toBeNull();
   });
+
+  it("does not pass exported ontology node type values to Sigma renderer programs", () => {
+    const graphData = devFixture.ontology.graph_data;
+    expect(graphData).toBeTruthy();
+    const store: ExplorerProjectStore = {
+      ...devFixture,
+      ontology: {
+        ...devFixture.ontology,
+        graph_data: {
+          ...graphData,
+          nodes: (graphData?.nodes ?? []).map((node, index) =>
+            index === 0 ? { ...node, type: "owl" } : node,
+          ),
+        },
+      },
+    };
+
+    renderWithStore(store);
+
+    const rendererTypes: unknown[] = [];
+    sigmaState.graphs[0].forEachNode((_node, attributes) => {
+      rendererTypes.push(attributes.type);
+    });
+    expect(rendererTypes).not.toContain("owl");
+    expect(rendererTypes.every((type) => type === "circle" || type === "constructGlyph")).toBe(true);
+  });
+
 });

@@ -294,7 +294,7 @@ assert_jq_line "$DEFAULT_OUTPUT" 1 '.result.serverInfo.name == "reqvire"' "initi
 
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.search") != null' "tools/list includes read tools"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.add_element") == null and index("reqvire.link") == null' "default tools/list omits mutation tools"
-assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.mcp") == null and index("reqvire.serve") == null and index("reqvire.export") == null and index("reqvire.validate") == null' "tools/list omits server, export, and validate commands"
+assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.mcp") == null and index("reqvire.serve") == null and index("reqvire.validate") == null' "tools/list omits server and validate commands"
 assert_jq_line "$DEFAULT_OUTPUT" 2 '[.result.tools[].name] | index("reqvire.command") == null and index("reqvire.shell") == null and index("reqvire.sout") == null' "tools/list omits shell-style tools"
 assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; (.name|type=="string") and (.description|type=="string") and (.inputSchema.type=="object") and (.outputSchema|type=="object") and (.annotations|type=="object"))' "each tool has MCP tool contract fields"
 assert_jq_line "$DEFAULT_OUTPUT" 2 'all(.result.tools[]; ((.inputSchema.properties // {}) | has("json") | not) and ((.inputSchema.properties // {}) | has("output") | not))' "tool schemas omit CLI transport options"

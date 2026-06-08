@@ -22,7 +22,7 @@ The system shall define a root requirement for hierarchy validation.
 
 ### Parent Requirement
 
-The system shall provide a valid owner requirement for refinement documents.
+The system shall provide a valid owner requirement for single-element refinement files.
 
 #### Metadata
   * type: requirement
@@ -31,9 +31,9 @@ The system shall provide a valid owner requirement for refinement documents.
   * derivedFrom: [Root User Need](#root-user-need)
 ---
 
-### Requirement Using Document Refinement
+### Requirement Using Single Element Refinement
 
-The system shall allow refinedBy only to refinement element identifiers, including elements defined in #Documents files.
+The system shall allow refinedBy only to refinement element identifiers, including elements defined in `# Element` files.
 
 #### Metadata
   * type: requirement

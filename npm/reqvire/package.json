@@ -11,9 +11,14 @@
   "bin": {
     "reqvire": "bin/reqvire.js"
   },
+  "scripts": {
+    "build": "node scripts/verify-package-inputs.js",
+    "prepack": "npm run build"
+  },
   "files": [
     "bin/",
-    "artifacts/"
+    "artifacts/",
+    "explorer-dist/"
   ],
   "publishConfig": {
     "access": "public"

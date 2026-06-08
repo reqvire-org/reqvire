@@ -1,0 +1,6 @@
+/*
+ * Reqvire Explorer — design-system entry.
+ * The app consumes the design system's single CSS entry point unmodified;
+ * all tokens, fonts, and component styles come from design-system/.
+ */
+@import "../design-system/styles.css";

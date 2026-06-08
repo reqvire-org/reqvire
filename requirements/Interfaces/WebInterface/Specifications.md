@@ -1,51 +1,123 @@
 # Elements
 
-### Attachment Export Refinement Specification
+### Attachment Link Serving Refinement Specification
 
 #### Details
-Attachment export behavior during HTML export:
+Attachment link behavior in the served Explorer:
 - Collects attachment references from `element.attachments` across the model.
 - Resolves each attachment as a refinement element identifier target.
 - Skips duplicate identifier processing when the same refinement is referenced by multiple elements.
-- Emits progress information for attachment-link processing operations.
+- Keeps attachment-link evidence available in Project Store data for content routes, graph views, search results, and element modals.
 
-This keeps exported documentation complete with navigable refinement attachment links.
-
-#### Metadata
- * type: specification
-
-#### Relations
- * refine: [Attachment Export](Capabilities.md#attachment-export)
----
-
-### CSS Framework Integration Refinement Specification
-
-#### Details
-CSS framework integration behavior:
-- Uses Tailwind CSS compiled into the static SPA bundle by the Vite build, not loaded from a runtime CDN.
-- Ships the generated Tailwind stylesheet as deterministic `assets/explorer.css` referenced by `index.html`, so the exported Explorer renders with no remote stylesheet or runtime Tailwind compiler.
-- Applies mobile-first utility classes for responsive layout behavior.
-- Uses responsive modifiers (`sm`, `md`, `lg`, `xl`) for adaptation.
-- Defines Reqvire theme colors including primary, requirement, and verification tones through the Tailwind config consumed at build time.
-- Pairs compiled Tailwind utilities with Radix Themes 3 component primitives and `@radix-ui/react-icons` so layout utilities and accessible component chrome share one design system.
-
-Tailwind usage provides:
-- Utility-first styling for predictable page composition.
-- Built-in responsive modifiers (for example `md:hidden`, `lg:flex`).
-- Consistent spacing, color, and typography scales.
-- Deterministic, offline-capable styling because the stylesheet is generated during export rather than fetched at runtime.
+This keeps served Explorer content complete with navigable refinement attachment links.
 
 #### Metadata
  * type: specification
 
 #### Relations
- * refine: [CSS Framework Integration](HTMLGeneration.md#css-framework-integration)
+ * refine: [Attachment Link Serving](Capabilities.md#attachment-link-serving)
 ---
 
-### Component-Based HTML Architecture Refinement Specification
+### Explorer Design System Styling Refinement Specification
 
 #### Details
-The HTML generation system is expected to be organized into reusable components:
+Explorer design-system styling behavior:
+- Uses the local Reqvire Explorer design-system token set, component classes, and compiled application CSS as the only required browser styling contract.
+- Ships deterministic `assets/explorer.css` referenced by `index.html`, so the embedded Explorer renders with no remote stylesheet, framework CDN, or runtime CSS compiler.
+- Uses local Geist font assets and warm-neutral Reqvire theme tokens for typography, surfaces, borders, shadows, semantic element colors, and graph colors.
+- Keeps responsive layout behavior in the local Explorer stylesheet and design-system components rather than requiring route-local utility styling or third-party component themes.
+- Keeps iconography, buttons, modals, tree rows, toggles, tabs, breadcrumbs, badges, and graph legends aligned through the shared design-system component and token API.
+
+The design-system styling contract provides:
+- Deterministic, offline-capable styling because all CSS and font assets are generated at Explorer build time and served locally.
+- One product color and typography system shared by Model, Graph, Ontologies, Traces, Search, source content, resources, and element modals.
+- A stable token boundary for programmatic renderers such as Sigma, D3, and Mermaid without requiring duplicated route-local color tables.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Explorer Design System Styling](ExplorerRendering.md#explorer-design-system-styling)
+---
+
+### Explorer Color and Type Palette Specification
+
+The Explorer interface owns the visual color, glyph, and badge semantics used by browser-rendered model views.
+
+#### Details
+Explorer palette behavior:
+- Use semantic design-system tokens as the canonical source for interface surfaces, type colors, graph colors, Mermaid class definitions, D3 traces, badges, and type glyphs.
+- Treat primitive color values as token implementation details. Explorer code and specifications shall name colors by purpose, such as model canvas, selected row, capability node, requirement node, verification node, ontology node, resource node, and relation edge.
+- Use local Geist font assets and warm-neutral Reqvire surfaces for Explorer chrome, source pages, modals, graph canvases, and routed report views.
+- Use one role palette across the Model tree, List/Grid rows, Graph mode, Search results, Ontologies, Traces, source content, and element modals.
+- Render refinement-family subtypes with one shared refinement hue and distinct type glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, and `semantic-contract`.
+- Keep color as a secondary cue: every type color must be paired with text, glyph shape, or accessible label.
+
+The Explorer element color contract uses saturated role colors for graph nodes and muted tints for badges and cards:
+
+| Role | Purpose |
+|------|---------|
+| Capability | Capability roots and capability-owned context |
+| Requirement / refinement | Requirement obligations and requirement-owned refinement contracts |
+| Verification | Verification elements and evidence-backed tests |
+| Ontology | Authored ontology vocabulary and ontology-derived terms |
+| Resource | Local implementation, evidence, document, or resource targets referenced by the model |
+| Other/default | Folders, files, unresolved external targets, and generic model infrastructure |
+
+Raw hexadecimal values belong in design-system token files or generated assets, not in route-local renderer code. Programmatic renderers shall resolve semantic tokens at runtime or build time through the Explorer design-system palette API.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Web Interface Color Scheme](Capabilities.md#web-interface-color-scheme)
+---
+
+### Explorer Mermaid Diagram Style Specification
+
+Browser-rendered Mermaid diagrams shall follow the Explorer design-system visual contract while preserving deterministic generated Mermaid text.
+
+#### Details
+Explorer Mermaid rendering behavior:
+- Generated Mermaid source may use semantic class names for element roles and container roles. The Explorer renderer resolves those classes through design-system tokens before Mermaid rendering.
+- Class definitions shall use concrete Mermaid-safe colors only after resolving semantic tokens; renderer code shall not hardcode a duplicate color table.
+- Folder and file subgraphs show physical containment, while element nodes use role-specific classes and source links.
+- Mermaid diagrams embedded in source pages, model content, and trace roll-up views use the same typography, background, border, zoom/pan controls, and selected/hovered visual treatment as the rest of the Explorer.
+- Each Mermaid diagram initializes independently after its route content is visible. Rendering many diagrams must not block the initial Explorer shell or require all diagrams to finish before the page becomes usable.
+- Small diagrams shrink to natural height. Large diagrams receive their own pan/zoom viewport and shall not force unrelated page content or later diagrams into a fixed full-screen scroll region.
+- Attachment labels in Model and Traces diagrams use display names rather than full `file#fragment` identifiers, while the full identifier remains the link target and structured data value.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Diagram Attachment Display](Capabilities.md#diagram-attachment-display)
+---
+
+### Explorer Verification Trace Rendering Specification
+
+The Traces Explorer view shall render verification flow and roll-up diagrams through the shared Explorer visual system.
+
+#### Details
+Trace rendering behavior:
+- Use the Project Store `traces` projection as data input and keep trace tree construction in Functional Processing.
+- Render Trace flow and Rows modes as native Explorer route states, with controls in the left Explorer pane rather than floating page-local toolbars.
+- Use the shared Explorer role palette for files, capabilities, requirements, and verifications.
+- Show selected trace elements through the left-pane selected-item link and shared element-detail modal rather than route-local floating inspectors.
+- Render per-verification Mermaid roll-up diagrams progressively and independently, preserving pan/zoom interaction for large diagrams without introducing nested page scroll bugs.
+- Verification trace diagrams shall display directly verified requirements and requirement roll-up context with compact labels and source links.
+
+#### Metadata
+ * type: specification
+
+#### Relations
+ * refine: [Traces View Generation](Capabilities.md#traces-view-generation)
+---
+
+### Component-Based Explorer Architecture Refinement Specification
+
+#### Details
+The Explorer UI system is expected to be organized into reusable components:
 
 **Shared components:**
 - Headerless Explorer shell with persistent vertical `Explorer` edge strip and active-view controls at the top of the expanded left pane
@@ -61,10 +133,10 @@ The HTML generation system is expected to be organized into reusable components:
 - Model view module
 - Traces view module
 - Ontologies explorer view module
-- Supporting SPA routes such as Search, Files, Coverage, and Resources, plus source/specification artifact pages when generated by export
+- Supporting SPA routes such as Search, Files, Coverage, and Resources, plus source/specification content routes
 - Individual specification pages
 
-Each component is expected to be defined once and reused across all generated pages to eliminate code duplication.
+Each component is expected to be defined once and reused across SPA view modules to eliminate code duplication.
 
 #### Metadata
  * type: specification
@@ -74,9 +146,9 @@ Each component is expected to be defined once and reused across all generated pa
 
 #### Details
 Model containment-mode attachment rendering behavior:
-- For each element with attachments, renders attachments as child nodes in the D3 tree.
-- Uses wrench icon (`🔧`) and type `attachment-element` for element attachments.
-- Element-attachment nodes navigate to the referenced element.
+- For each element with attachments, preserves attachment records in the Project Store data consumed by Model List/Grid and element-detail workflows.
+- Uses the shared Explorer element-role and refinement-subtype glyph contract for attachment records that target refinement elements, with `attachment-element` retained as data classification only.
+- Element-attachment records navigate to the referenced element detail/source route from supported Explorer surfaces.
 
 #### Metadata
  * type: specification
@@ -85,27 +157,27 @@ Model containment-mode attachment rendering behavior:
  * refine: [Containment View Attachment Links](Capabilities.md#containment-view-attachment-links)
 ---
 
-### D3.js Containment Tree Specification
+### Model Browser and Graph Specification
 
-Specification for native Model containment visualizations.
+Specification for native Model browsing and graph visualizations.
 
 #### Details
-The Model route's Sunburst and Icicle modes are expected to display the physical project-store hierarchy as native Explorer visualizations:
+The Model route's List, Grid, and Graph modes are expected to display the physical and relational project-store structure as native Explorer visualizations:
 1. Root node representing the model root
 2. Folder nodes
 3. File nodes containing element children
 4. Element nodes with type-specific icons and colors
-5. Attachment nodes as children of elements (refinement element attachments)
-6. Clickable elements that open the shared in-shell element detail modal while preserving the current containment mode
+5. Resource/evidence targets when enabled by the graph controls
+6. Clickable elements that open the shared in-shell element detail modal while preserving the current Model mode
 
 The Model containment modes shall provide:
-- Containment visualization is rendered through Sunburst and Icicle partition modes. List-style discovery is provided by Search and Model List/Grid modes rather than by a separate Containment List mode.
-- D3 Sunburst and Icicle modes rendered with the same partition data, color mapping, and source links.
-- Click-to-drill/zoom behavior in both Sunburst and Icicle modes, with breadcrumb links that follow the same usable content lane as the diagram.
+- List and Grid browsing over the same Project Store folder/file/element hierarchy. List-style discovery is provided by Search and Model List/Grid modes rather than by a separate Containment List mode.
+- Graph mode rendered with the same knowledge-graph data, role colors, filters, overlays, and source links as the project graph renderer.
+- Folder/file drill-in behavior in List and Grid, plus graph pan/zoom/focus behavior in Graph mode.
+- When Graph is active inside the Model route, selecting a folder, file, or modeled element in the left project tree shall update the graph focus when a matching graph node exists. Element selections shall also expose a selected-element link and open the shared element-detail modal while preserving the Model mode.
 - A persistent full-height left Explorer pane with a vertical `Explorer` edge strip; the expanded pane starts with active-view controls, then renders a filesystem-equivalent project tree of folders, files, and modeled elements only for Model/file drill-in workflows.
-- A 390px shared right `Inspector` lane with neutral compact headings and compact summary footer.
-- A narrow right vertical tool rail for switching contextual tools such as Inspector, Search, graph/model navigation, source/document view, settings, and help.
-- A responsive canvas layout where Sunburst and Icicle grow to the available space between the left Explorer pane/strip and the right `Inspector` lane/tool rail.
+- A narrow right vertical tool rail for switching contextual tools such as Search, Ontologies, Traces, source/document view, settings, and help.
+- A responsive workspace layout where List, Grid, and Graph grow to the available space between the left Explorer pane/strip and the right tool rail.
 
 The Model view remains the default Explorer route and visual overview of the model structure, while `index.html` remains the primary SPA shell.
 
@@ -137,67 +209,55 @@ elementId["Element Name<br/>📎 Deterministic Output Specification"]
  * refine: [Diagram Attachment Display](Capabilities.md#diagram-attachment-display)
 ---
 
-### HTML Branding Specification
+### Explorer Branding Specification
 
-Specification for Reqvire branding elements in HTML export.
+Specification for Reqvire branding elements in the served Explorer.
 
 #### Details
 **Logo and Branding:**
-- The native Explorer shell is headerless; Reqvire branding is expected to appear in the left Explorer pane or exported document metadata rather than global top chrome.
+- The native Explorer shell is headerless; Reqvire branding is expected to appear in the left Explorer pane or browser document metadata rather than global top chrome.
 - A favicon is expected to be included for browser tab identification
 - Apple touch icons is expected to be included for mobile device support
-- All brand assets is expected to be exported to an assets folder during HTML export
+- All brand assets are expected to be bundled with the Explorer assets and served from the Explorer asset tree
 
-**HTML Design:**
-The system is expected to design and implement HTML pages with consistent layout, styling, and navigation for browsing the System model.
+**Explorer Design:**
+The system is expected to design and implement the static Explorer shell with consistent layout, styling, and navigation for browsing the System model.
 
 #### Metadata
  * type: specification
 ---
 
-### HTML Export Pipeline Specification
+### Explorer Serve Pipeline Specification
 
-Technical specification for HTML export generation pipeline.
+Technical specification for the Explorer serve runtime pipeline.
 
 #### Details
-**Working Directory Setup:**
-- Create temporary working directory (e.g., in /tmp)
-- Generate markdown files from registry with full relations (user-created and auto-generated inverse relations)
-- Copy all related system elements (following satisfiedBy and other relations)
-- Resolve and preserve attachment identifier links to refinement elements
+**Runtime Data Setup:**
+- Assemble Project Store data in memory from the validated registry, semantic index, report projections, modeled resources, and existing graph-referenced local resource/evidence files.
+- Resolve and preserve attachment identifier links to refinement elements.
 
-**Generation Pipeline (in temporary directory):**
-Execute all generation commands treating temporary directory as repository root:
-1. Generate all Mermaid diagrams in markdown files
-2. Emit the native static SPA Explorer shell: `index.html` plus deterministic compiled Vite/TypeScript/React and Tailwind assets (`assets/explorer.js` and `assets/explorer.css`), with no CDN-loaded framework or stylesheet
-3. Seed `index.html` with a normalized browser-local project snapshot containing the view-neutral store data contract consumed by the SPA view modules
-4. Generate exported source/specification document pages as secondary source-document destinations, but do not generate separate Explorer/report HTML entry points
-5. Generate Model, Knowledge Graph, Traces, Ontologies, and KN2 projections for native SPA routes, plus coverage, resources, file, search, element-detail, and Model containment-mode projections for supporting routed workflows
-6. Generate `ontologies.ttl` from the semantic index for raw ontology/SHACL audit and downstream tooling
+**Serve Pipeline:**
+1. Serve the embedded Explorer shell: `index.html` plus deterministic compiled Vite/TypeScript/React and Reqvire Explorer design-system assets, with no CDN-loaded framework or stylesheet.
+2. Serve `assets/project-store.js` containing the normalized browser-local project snapshot consumed by the SPA view modules.
+3. Generate Model Graph, Traces, and Ontologies projections for native SPA routes, plus coverage, resources, file, search, element-detail, raw Markdown content, and Model containment projections for supporting routed workflows.
+4. Serve `ontologies.ttl` from the semantic index for raw ontology/SHACL audit and downstream tooling.
+5. Return the embedded `index.html` shell for non-asset browser routes so SPA navigation remains stable.
 
-**HTML Conversion:**
-- Convert all markdown files to HTML with embedded styles
-- Process Mermaid diagrams for web rendering
-- Convert internal .md links to .html links
-- Preserve directory structure
+**Browser Rendering Contract:**
+- Rust serve runtime shall not render Markdown, Mermaid, D3, ontology, knowledge-graph, trace, or source-document HTML
+- The Explorer SPA shall render Markdown/source content, Mermaid diagrams, D3 fenced blocks, ontology views, knowledge graph views, traces, coverage, resources, search, and element details from Project Store data
+- Internal Markdown links shall resolve in the browser to canonical `index.html#/content/<path>` or `index.html#/elements/<identifier>` routes
 
 **Output:**
-- Accept optional `--output` option to specify output directory
-- When `--output` is not specified, export to a temporary directory and print the path
-- When `--output` is specified, create output folder if not existing
-- Copy generated HTML and all artifacts from temp directory to output directory
-- Clean up temporary working directory (except when output is temp directory)
+- Serve the Explorer shell, generated data assets, and ontology artifacts over HTTP.
+- Keep generated Explorer artifacts in memory for the HTTP runtime.
 
 **Source Protection:**
 - Never modify original repository files
-- All generation happens in isolated temporary directory
+- Browser runtime data generation happens in memory
 
-**Git Directory Exclusion:**
-- The .git directory is expected to never be exported to the output folder
-- This prevents internal git metadata from polluting the exported documentation
-
-**Export Related System Elements:**
-- Ensure that any related system elements are also copied into output folder to ensure consistency of exported model
+**Related System Elements:**
+- Ensure that related system elements are available in the Project Store so the served model remains consistent
 
 #### Metadata
  * type: specification
@@ -210,24 +270,24 @@ Execute all generation commands treating temporary directory as repository root:
 
 **SPA Build and Runtime Target**
 - The Explorer shell shall be a native static single-page application built with Vite, TypeScript, and React, emitting a static `index.html` plus deterministic `assets/explorer.js` and `assets/explorer.css` bundles.
-- The shell shall use Radix Themes 3 component primitives and `@radix-ui/react-icons` for accessible layout chrome, controls, dialogs, and iconography, composed with compiled Tailwind utilities for spacing, responsive layout, and Reqvire theme colors.
-- Styling shall come from a Tailwind stylesheet compiled at build time. The exported shell shall not load Tailwind, React, or any other framework runtime from a CDN, and shall not embed a runtime Tailwind compiler.
-- The primary Explorer view is Model. The Model route shall provide compact icon-selected List, Grid, Sunburst, and Icicle modes: List/Grid browse the Project Store filesystem/file-manager model, and Sunburst/Icicle render the Project Store containment partition diagrams. Knowledge Graph, Ontologies, Traces, and KN2 remain separate routed specialist views reached from the right vertical tool rail. Supporting workflows (Coverage, Resources, Search, Summary, File deep links, and Element Detail) shall be native SPA view modules that read from the browser-local Project Store.
+- The shell shall use the Reqvire Explorer design system for accessible layout chrome, controls, dialogs, iconography, typography, and semantic element colors, with local compiled CSS and local Geist font assets.
+- Styling shall come from compiled local Explorer CSS and design-system tokens. The embedded shell shall not load React, styling frameworks, fonts, or other runtime assets from a CDN, and shall not embed a runtime CSS compiler.
+- The primary Explorer view is Model. The Model route shall provide compact icon-selected List, Grid, and Graph modes: List/Grid browse the Project Store filesystem/model, and Graph renders the Project Store knowledge graph. Ontologies and Traces remain separate specialist views. Supporting workflows (Coverage, Resources, Search, Summary, File deep links, and Element Detail) shall be native SPA view modules that read from the browser-local Project Store.
 - The static bundle shall run from local files and simple static servers without a build step, remote service, or server-side rendering at view time.
 
 **Project Store Host**
-- The exported `index.html` shall contain or load the authoritative browser-local Project Store seed for the export.
-- The Project Store is an immutable generated snapshot for the exported project unless a future requirement explicitly adds browser mutation.
+- The served `index.html` shall contain or load the authoritative browser-local Project Store seed for the loaded project.
+- The Project Store is an immutable generated snapshot for the served project unless a future requirement explicitly adds browser mutation.
 - Browser interactions may keep ephemeral UI state, filters, focus, layout, and route parameters separately from the generated model snapshot.
-- The Project Store shall be view-neutral: the primary Model view, right-tool specialist Knowledge Graph, Ontologies, Traces, and KN2 views, plus supporting Coverage, Resources, Search, Summary, File deep-link, and Element Detail workflows read from the same normalized records instead of from page-local ad hoc JSON islands.
-- Store identifiers shall be stable within one export and deterministic across repeated exports for unchanged model content.
+- The Project Store shall be view-neutral: the primary Model view and its Graph mode, specialist Ontologies and Traces views, plus supporting Coverage, Resources, Search, Summary, File deep-link, and Element Detail workflows read from the same normalized records instead of from page-local ad hoc JSON islands.
+- Store identifiers shall be stable within one served project snapshot and deterministic across repeated serve runtime generations for unchanged model content.
 
 **Required Store Schema Sections**
-- `project`: export identity, Reqvire version when available, generation timestamp policy, workspace-relative root label, and aggregate counts.
-- `files`: exported source/document file containers keyed by repository-relative path, with display path, exported HTML path, parent folder, child element ids, local asset links, and containment metadata.
+- `project`: project identity, Reqvire version when available, generation timestamp policy, workspace-relative root label, and aggregate counts.
+- `files`: source/document file containers keyed by repository-relative path, with display path, source route path, parent folder, child element ids, local asset links, and containment metadata.
 - `folders`: virtual filesystem folder containers used by containment and file navigation.
 - `resources`: modeled resource and evidence-file targets referenced by relations or attachments, keyed separately from `files`.
-- `elements`: normalized Reqvire elements keyed by full identifier, including name, type, canonical type family, source file path, line number when available, content summary, governance metadata, authored metadata, and exported source anchor.
+- `elements`: normalized Reqvire elements keyed by full identifier, including name, type, canonical type family, source file path, line number when available, content summary, governance metadata, authored metadata, and source anchor.
 - `relations`: normalized relation facts with source id, target id or target resource id, canonical relation direction, authored relation token, generated/opposite provenance, source location evidence, and relation family.
 - `attachments`: attachment facts from capability or requirement elements, with target kind distinguishing ontology attachments, requirement-owned refinement attachments, local file resources, and external resources.
 - `concept_refs`: concept-reference facts with element id, label, IRI or CURIE, resolution status, source evidence, and ontology-term linkage when known.
@@ -237,13 +297,13 @@ Execute all generation commands treating temporary directory as repository root:
 - `ontology`: ontology terms, source blocks, projection constructs, SHACL-derived slots/facets, symbol metadata, and `ontologies.ttl` artifact link.
 - `knowledge_graph`: graph-ready node and edge ids derived from the normalized element, relation, attachment, concept-reference, submodel, and resource records.
 - `search`: search documents for elements, files, resources, ontology terms, relation facts, traces, coverage records, and summaries.
-- `summaries`: aggregate counts and status summaries needed by dashboards, document headers, Explorer panes, Inspector lanes, and empty states.
+- `summaries`: aggregate counts and status summaries needed by dashboards, document headers, Explorer panes, selected-detail modals, and empty states.
 - `routes`: canonical route definitions for the SPA Explorer and supporting source/report workflows.
 
 **Files Versus Resources**
-- `files` are exported filesystem/source containers. They represent Markdown/source documents that contain model elements or local exported artifacts and are used for containment, file navigation, source links, and breadcrumbs.
+- `files` are browser-local filesystem/source containers. They represent Markdown/source documents that contain model elements and are used for containment, file navigation, source links, and breadcrumbs.
 - `resources` are modeled or evidence targets referenced by the model, such as implementation files, proof artifacts, linked evidence documents, external URLs, or local non-Markdown files.
-- A path may appear as a `file` only when it is exported as a source/document container for browsing. A path appears as a `resource` when it is referenced as evidence or a modeled target by relation, attachment, or resource-report facts.
+- A path may appear as a `file` only when it is included as a Project Store source/document container for browsing. A path appears as a `resource` when it is referenced as evidence or a modeled target by relation, attachment, or resource-report facts.
 - When the same repository-relative path is both browsable and referenced as evidence, the store shall preserve both identities and link them through an explicit cross-reference instead of collapsing the resource into the file container.
 - Resources shall retain relation evidence, referring elements, relation types, external/local classification, and availability/copy status when known.
 
@@ -255,40 +315,43 @@ Execute all generation commands treating temporary directory as repository root:
 - Verification traces and coverage records shall be derivable from the same element and relation records used by the Model and Knowledge Graph views.
 
 **Route Contract**
-- Canonical SPA routes shall use `index.html#/<view>` hash routes so the exported Explorer works from local files and simple static servers.
+- Canonical SPA routes shall use `index.html#/<view>` hash routes so the served Explorer works from local files and simple static servers.
 - Required primary canonical route is `#/model`.
-- Required right-tool specialist routes are `#/knowledge-graph`, `#/ontologies`, `#/traces`, and `#/kn2`.
+- Required specialist routes are `#/ontologies` and `#/traces`; the project knowledge graph is the Graph mode of `#/model`.
 - Required supporting canonical routes are `#/files`, `#/files/<path>`, `#/coverage`, `#/resources`, `#/elements/<identifier>`, and `#/search`. File routes deep-link to the Model view's List/Grid filesystem browser behavior rather than creating a separate primary Filesystem mode.
 - Query-style route state may be represented after the hash, for example selected element id, search query, filters, and focused graph node.
 - The default empty hash route shall open the Model view unless a future requirement changes the default view.
-- Primary and specialist view routes shall render native SPA view modules inside the `index.html` Explorer shell from the browser-local Project Store. A route change shall swap the active view module and shall not leave stale containment content visible when the route id is `model`, `knowledge-graph`, `traces`, `ontologies`, or `kn2`.
-- Native view modules shall fill the full viewport behind the persistent left Explorer pane, shared right `Inspector` lane, and right tool rail while preserving the canonical `index.html#/<view>` browser URL.
+- Primary and specialist view routes shall render native SPA view modules inside the `index.html` Explorer shell from the browser-local Project Store. A route change shall swap the active view module and shall not leave stale containment content visible when the route id is `model`, `traces`, or `ontologies`.
+- Native view modules shall fill the full viewport between the persistent left Explorer pane and right tool rail while preserving the canonical `index.html#/<view>` browser URL.
 - Route changes shall update the document title and route metadata to match the active Explorer view.
 - Routes shall be deep-linkable: loading `index.html#/elements/<identifier>` shall open the selected element inside the Explorer shell without leaving the current view family.
 - Element-detail routes shall render as an in-shell, scrollable modal/dialog over the active Explorer view. The modal shall use Project Store element records as the primary data source and shall show at minimum element name, type, source file, source anchor, metadata, governance context, content, relations, attachments, concept references, and available verification/coverage/resource evidence.
-- Element-detail modals shall provide a secondary source action that opens the exported source page and fragment when exact source-page browsing is needed. The source action shall not be the primary navigation target for graph, search, containment, or list element clicks.
+- Element-detail modals shall provide a secondary source action that opens the served source route and fragment when exact source browsing is needed. The source action shall not be the primary navigation target for graph, search, containment, or list element clicks.
 - Closing the element-detail modal shall return to the underlying Explorer route and preserve view context such as graph focus, filters, and search state when feasible.
-- Exported source-document element links shall remain available as secondary source browsing destinations, but normal Explorer element navigation shall prefer `index.html#/elements/<identifier>`.
+- Source-document element links shall remain available as secondary source browsing destinations, but normal Explorer element navigation shall prefer `index.html#/elements/<identifier>`.
 
 **SPA View Compatibility Policy**
-- Explorer views are SPA routes under `index.html`; standalone Explorer/report HTML entry points shall not be generated.
-- Old Explorer page URLs shall not be emitted as generated HTML outputs. Compatibility, when explicitly required by deployment, shall be handled outside the generated Explorer bundle and must not introduce separate explorer UI implementations or data models.
-- Source/document HTML pages remain valid for source anchors and Markdown-derived content, but normal Explorer navigation shall target canonical hash routes.
+- Explorer views are SPA routes under `index.html`; separate Explorer/report document entry points shall not be generated.
+- Old Explorer page URLs shall not be emitted as separate route outputs. Compatibility, when explicitly required by deployment, shall be handled outside the served Explorer bundle and must not introduce separate Explorer UI implementations or data models.
+- Source/document content shall be rendered by the Explorer content route from Project Store Markdown records; normal Explorer navigation shall target canonical hash routes.
 
 **Browser-Local Virtual Filesystem Semantics**
 - The store shall expose a virtual filesystem tree built from `folders` and `files` records.
-- Folder/file containment is physical export organization only; it does not define logical capability, requirement, ontology, or verification ownership.
+- Folder/file containment is physical repository/source organization only; it does not define logical capability, requirement, ontology, or verification ownership.
 - Element detail views shall resolve source file containers through element source metadata, not by inferring model ownership from folders.
 - Resource navigation shall use `resources` records and referring facts; it shall not imply that evidence files contain model elements unless a corresponding `files` record exists.
 - The Model view's List and Grid modes shall render native read-only file-manager/model-browser views from the Project Store virtual filesystem, including breadcrumb navigation, sortable list columns, grid cards, search across folders/files/modeled elements, color/icon legends, file selection, source-page secondary actions, and modeled-element rows that open the shared Explorer element-detail modal.
+- Model tree rows, grid cards, modeled-element lists, and element legends shall use the shared Explorer `ElementIcon` type glyph system. Refinement-family elements shall retain the shared refinement hue while using distinct subtype glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, and `semantic-contract`, so users can distinguish refinement subtypes without relying on text labels alone.
+- The Model project tree shall share one Model selection state with the active Model workspace. Selecting a folder, file, or modeled element in the left tree shall drive the current List, Grid, or Graph workspace selection/focus rather than navigating to an unrelated middle-pane route.
 - The supporting `#/files/<path>` route shall deep-link into the same Model List/Grid filesystem browser behavior for a selected file or folder; it shall not introduce a separate primary Filesystem mode.
-- Model List/Grid shall use the Explorer design-system shell, Radix/Tailwind styling contract, and shared right search/inspector lane; it shall not import a third-party file-manager stylesheet or mount an external file-manager widget that visually diverges from the Explorer application.
+- Model List/Grid shall use the Explorer design-system shell and styling contract; it shall not import a third-party file-manager stylesheet or mount an external file-manager widget that visually diverges from the Explorer application.
 
 **Search and Detail Semantics**
 - Search documents shall include enough normalized ids to route to element detail, file detail, resource detail, ontology term detail, trace detail, or coverage detail without rebuilding view-local indexes from HTML text.
-- Search shall render as a full-width result-list workspace between the left Explorer pane and right tool rail. It shall not reserve or render a right inspector lane because search results themselves carry the canonical route/detail information.
+- Search shall render as a full-width result-list workspace between the left Explorer pane and right tool rail. Search results shall carry the canonical route/detail information directly without requiring a separate detail pane.
+- The Search left-pane controls shall expose reset and result-type filter controls directly. They shall not render a second passive legend for the same result-type swatches when the filter controls already carry the visible type colors and labels.
 - Element detail shall show source, content, governance, metadata, relations, attachments, concept references, verification traces, coverage status, ontology context, and resource evidence from the Project Store in a scrollable route-backed modal.
-- Element detail shall retain a direct source-page link using the element's exported source anchor so users can inspect the generated Markdown-derived page without making that page the primary Explorer destination.
+- Element detail shall retain a direct source route link using the element's served source route and anchor so users can inspect the source content without making that content route the primary Explorer destination.
 - Store consumers shall tolerate unknown future fields and shall reject or visibly diagnose a missing required store seed.
 
 #### Metadata
@@ -304,53 +367,39 @@ Execute all generation commands treating temporary directory as repository root:
  * refine: [SPA Explorer Shell and Project Store](Capabilities.md#spa-explorer-shell-and-project-store)
 ---
 
-### Local Linked File Export Refinement Specification
+### Explorer Navigation Chrome Specification
+
+Specification for the headerless Explorer shell, persistent left project tree, and active-view controls in the static SPA.
 
 #### Details
-Local linked-file export behavior during HTML export:
-- Detect local file references in exported markdown content, including standard markdown links and markdown images.
-- Preserve relative linked-file paths in the rendered HTML output.
-- Copy referenced local non-markdown files into the exported artifact tree so rendered `href` and `img src` targets exist.
-- Skip rewriting or copying external URLs, data URLs, anchor-only links, and markdown document links that are exported as HTML pages.
+The native Explorer application shall not render a top header. Application chrome is provided by a persistent full-height left Explorer pane, a central workspace, and a narrow right vertical tool rail.
 
-This keeps exported HTML self-contained enough for local linked assets without changing author-written relative paths.
+The left Explorer pane shall expose its `Explorer` title as a persistent vertical edge strip on the pane boundary, not as a horizontal header. Clicking the strip shall collapse or expand the pane, and the strip shall include a compact midline affordance indicating the collapse/expand action. The expanded pane shall be wide enough for per-view controls and tree rows, with a nominal desktop width of about 340px. When collapsed, the pane shall remain as the same narrow fixed vertical `Explorer` strip, and the central workspace shall resize to use the recovered width without covering the right tool rail.
 
-#### Metadata
- * type: specification
+Active-view controls shall start at the top of the expanded left pane content area, beside the persistent vertical `Explorer` strip. In the Model route those controls expose compact List, Grid, and Graph mode buttons. Specialist views render their own filters, reset actions, legends, or notation keys there instead of adding primary left-pane view links.
 
-#### Relations
- * refine: [Local Linked File Export](Capabilities.md#local-linked-file-export)
----
+For Model and file drill-in routes, below the Model controls, the left pane shall render a filesystem-equivalent navigation tree. The tree shall show folders and files for all document types. When a file contains multiple modeled elements, the file row shall expand to show those element rows. Non-element documents and single-element files may remain a single file row to avoid redundant tree depth. Specialist views shall not inherit this tree unless they explicitly define their own domain-specific navigator.
 
-### HTML Navigation Bar Specification
+The Coverage route shall define its own compact coverage explorer in the left pane rather than reusing the Model project tree or duplicating dashboard summaries and legends. The coverage explorer shall list Overview, Capability coverage, Unverified requirements, Unimplemented requirements, Unsatisfied verifications, and Orphaned verifications with counts derived from Project Store coverage data. Selecting a coverage explorer item shall scroll and mark the matching section in the central Coverage workspace, while coverage row/item clicks continue to open the shared element-detail modal when they target a modeled element.
 
-Specification for the headerless Explorer shell, persistent left project tree, and active-view controls in HTML pages.
+Selecting a folder, file, or modeled element in the Model project tree shall update the active Model workspace mode. List and Grid modes shall browse to the selected folder or file; Graph mode shall focus the matching graph node when one exists; modeled-element selection shall open the shared element-detail modal. The tree selection shall be visibly marked in the left pane and shall return file drill-in routes to the Model workspace instead of leaving the middle pane on a disconnected Files view.
 
-#### Details
-The native Explorer application shall not render a top header. Application chrome is provided by a persistent full-height left Explorer pane, a central workspace, a shared right `Inspector` lane, and a narrow right vertical tool rail.
+The right vertical tool rail shall expose icon actions for specialist views and tools, including Ontologies, Traces, Search, source/document views, settings, and help as applicable. Ontologies and Traces are separate routed views, but they must not appear as left-pane primary mode links.
 
-The left Explorer pane shall expose its `Explorer` title as a persistent vertical edge strip on the pane boundary, not as a horizontal header. Clicking the strip shall collapse or expand the pane, and the strip shall include a compact midline affordance indicating the collapse/expand action. The expanded pane shall be wide enough for per-view controls and tree rows, with a nominal desktop width of about 340px. When collapsed, the pane shall remain as the same narrow fixed vertical `Explorer` strip, and the central workspace shall resize to use the recovered width without covering the right `Inspector` lane or right tool rail.
+The left Explorer pane must not expose Ontologies, Traces, TraceFlow, Coverage, or Resources as primary Explorer links. Specialist views are reached through top navigation, tool actions, or supporting canonical routes, while source/specification artifact pages remain secondary document outputs.
 
-Active-view controls shall start at the top of the expanded left pane content area, beside the persistent vertical `Explorer` strip. In the Model route those controls expose compact List, Grid, Sunburst, and Icicle mode buttons. Specialist views render their own filters, reset actions, legends, or notation keys there instead of adding primary left-pane view links.
-
-For Model and file drill-in routes, below the Model controls, the left pane shall render a filesystem-equivalent navigation tree. The tree shall show folders and files for all document types. When a file contains multiple modeled elements, the file row shall expand to show those element rows. Non-element documents and single-element documents may remain a single file row to avoid redundant tree depth. Specialist views shall not inherit this tree unless they explicitly define their own domain-specific navigator.
-
-The right vertical tool rail shall expose icon actions for specialist views and tools, including Ontologies, Traces, KN2, Search, source/document views, settings, and help as applicable. Ontologies, Traces, and KN2 are separate routed views, but they must not appear as left-pane primary mode links.
-
-The left Explorer pane must not expose Ontologies, Traces, KN2, TraceFlow, Coverage, or Resources as primary Explorer links. Specialist views are reached through the right tool rail or supporting canonical routes, while source/specification artifact pages remain secondary document outputs.
-
-Explorer view links shall use canonical hash routes. Generated source/specification pages remain secondary destinations only when they are source-document outputs, not standalone Explorer view pages.
+Explorer view links shall use canonical hash routes. Source-document destinations shall resolve through the SPA content route backed by Project Store source-content records and metadata.
 
 The persistent left pane and right tool rail must be:
 - Always visible while the central workspace scrolls, pans, or zooms
 - Consistent across all primary and specialist Explorer views
 - Clearly visible and accessible
-- Compact enough that tree, tool, and inspector chrome do not waste graph or document reading space
-- Free of generated attribution footers in exported pages
+- Compact enough that tree, tool, and detail chrome do not waste graph or document reading space
+- Free of generated attribution footers in served pages
 
-Primary and supporting SPA view modules shall not render their own duplicate left navigation panels, hidden left-panel alternates, or top navigation headers. View-specific mode buttons, filters, search inputs, reset actions, and legends shall render at the top of the expanded left Explorer pane using the shared compact control design, unboxed, before any view-owned tree. The central workspace is reserved for canvas/list/grid content and the shared right `Inspector` lane.
+Primary and supporting SPA view modules shall not render their own duplicate left navigation panels, hidden left-panel alternates, or top navigation headers. View-specific mode buttons, filters, search inputs, reset actions, legends, and selected-node summary links shall render at the top of the expanded left Explorer pane using the shared compact control design, unboxed, before any view-owned tree. The central workspace is reserved for canvas/list/grid/content rendering.
 
-Primary Explorer routes must not spend first-viewport space on static view titles, top headers, or explanatory prose. Model List/Grid/Sunburst/Icicle, Knowledge Graph, Ontologies, Traces, and KN2 view explanations belong in an on-demand help modal opened from the right tool rail. Source/specification artifact pages may keep document-specific headings inside their own content.
+Primary Explorer routes must not spend first-viewport space on static view titles, top headers, or explanatory prose. Model List/Grid/Graph, Ontologies, and Traces view explanations belong in an on-demand help modal opened from the shared help action. Source/specification artifact pages may keep document-specific headings inside their own content.
 
 #### Metadata
  * type: specification
@@ -361,26 +410,25 @@ Primary Explorer routes must not spend first-viewport space on static view title
 #### Details
 Project knowledge graph view generation behavior:
 - Uses the parsed `GraphRegistry` after validation and opposite-relation propagation so the view reflects the actual current model state.
-- Exposes the project Knowledge Graph as an independent specialist Explorer route, `index.html#/knowledge-graph`, during export and serve workflows without generating a separate Knowledge Graph HTML entry point.
+- Exposes the project Knowledge Graph as the Model route's Graph mode during serve workflows without generating a separate Knowledge Graph document entry point.
 - Builds graph nodes from actual Reqvire elements and resource targets, not from raw RDF triples or ontology vocabulary definitions.
-- Builds graph edges from actual relation facts, attachment facts, and concept-reference facts. User-authored and generated opposite relation facts shall remain distinguishable as evidence in the graph data and inspector.
+- Builds graph edges from actual relation facts, attachment facts, and concept-reference facts. User-authored and generated opposite relation facts shall remain distinguishable as evidence in the graph data and detail modal.
 - Emits Reqvire root submodel metadata alongside graph nodes and edges so Knowledge Graph variants can align visual subgraphs with the same capability-rooted submodel boundaries reported by the `submodels` command.
 - Classifies element nodes into four primary system-model layers: ontology definitions, capabilities, requirements, and verifications. Requirement-owned refinements are subordinate requirement detail/contract nodes, not an additional system-model layer. Custom/other elements and resource targets are supporting project-fact nodes, not additional model layers.
 - Separates system-model layer membership from relation semantics. Layer membership controls node role color and filtering; relation semantics control whether an edge is structural (`derive`, `specify`, `refine`) or an overlay/evidence fact (`attach`, `satisfiedBy`, `verifiedBy`, `trace`, concept reference, file target, or external target).
 - Shows file-path and external URL targets as resource nodes only when actual project facts reference them.
 - Treats ontology IRI concept-reference targets like attachment/resource targets in the main Knowledge Graph instead of exposing a separate concept-reference node category; detailed OWL/RDFS/SHACL vocabulary exploration remains the responsibility of the Ontologies view.
 - Provides search over element names, identifiers, file paths, relation facts, attachment facts, governance, metadata, and concept references.
-- Is rendered as the canonical `Knowledge Graph` route inside `index.html#/knowledge-graph`; the Model route owns List, Grid, Sunburst, and Icicle modes only.
-- Receives role visibility filters and overlay toggles from its own left Explorer pane. The Knowledge Graph left pane is reserved for graph filters, overlays, legends, and reset/layout controls; it shall not inherit the Model project tree unless a future Knowledge Graph-specific navigator is explicitly specified. The graph canvas shall not render a page-local `Model Show` toolbar, top control band, or floating boxed filter surface.
-- Treats KN2/Cytoscape as an exploratory renderer over the same Knowledge Graph data. Its default structural layout and cluster coloring shall use Reqvire ownership hierarchy relations (`derive`, `specify`, and `refine`) seeded from exported root submodels. Attachments, concept references, verification/satisfaction, and trace facts shall be optional overlays and shall not participate in submodel layout or cluster detection.
+- Is rendered as the canonical `Graph` mode inside `index.html#/model`; the Model route owns List, Grid, and Graph modes.
+- Receives role visibility filters and overlay toggles from the Model left Explorer pane when Graph mode is active. The graph controls are reserved for filters, overlays, legends, and reset/layout controls. The graph canvas shall not render a page-local `Model Show` toolbar, top control band, or floating boxed filter surface.
 - Preserves the four-layer model when overlays are enabled: ontology attachments, requirement-owned refinement details/contracts, verification evidence, satisfaction evidence, and trace links may connect across layers or subordinate nodes, but they must not imply a new layer or a new capability-root submodel boundary.
 - Renders search results with the same role-color swatch used by the graph and legend, and omits redundant parenthesized type suffixes so result lists remain scan-friendly.
 - Centers the graph viewport on a node selected from search or direct graph click.
-- Provides inspector content inside the shared right `Inspector` lane, including element type, identifier, source file/line link, description, governance, metadata, incoming facts, outgoing facts, attachments, and concept references.
-- Renders long inspector fields such as element identifiers and source paths as stacked label/value field rows so labels do not consume horizontal space from long values.
-- Colors the inspector kind badge with the same role color used by the graph node and legend entry so node type recognition is consistent across graph and inspector.
-- Uses a dense full-height WebGL graph canvas, persistent left Explorer pane, and scroll-contained shared right `Inspector` lane so graph space is prioritized without a top header.
-- Uses the same explorer surface language as Model List/Grid/Sunburst/Icicle, Knowledge Graph, Traces, Ontologies, and KN2 views: one near-white base surface for route background, canvas, Explorer pane, inspector bodies, and control panels; a shared collapsible 390px right `Inspector` lane; a narrow right vertical tool rail; black/near-white active filter controls; neutral compact inspector headings; and matching muted hover/evidence surfaces. The left pane background, inactive controls, search-result hover rows, selected rows, file-manager selections, and generic evidence cards must use shared Reqvire surface tokens rather than page-local colors.
+- Exposes selected-node detail through the left Explorer pane: the selected node remains pinned in the graph, a compact selected-element link appears near the pane summary, and that link opens the shared element-detail modal with element type, identifier, source file/line link, description, governance, metadata, incoming facts, outgoing facts, attachments, and concept references.
+- Renders long modal fields such as element identifiers and source paths as stacked label/value field rows so labels do not consume horizontal space from long values.
+- Colors detail badges with the same role color used by the graph node and legend entry so node type recognition is consistent across graph, pane summary, and modal detail.
+- Uses a dense full-height WebGL graph canvas and persistent left Explorer pane so graph space is prioritized without a top header or always-open detail pane.
+- Uses the same explorer surface language as Model List/Grid/Graph, Traces, and Ontologies views: one shared base surface for route background, canvas, Explorer pane, detail modals, and control panels; a narrow right vertical tool rail; selected-control tokens for active filter controls; and matching muted hover/evidence surfaces. The left pane background, inactive controls, search-result hover rows, selected rows, file-manager selections, and generic evidence cards must use shared Reqvire surface tokens rather than page-local colors.
 - Opens in a readable project-element default state: core element roles are visible, while file-path and external-URL resource targets are opt-in through the left filter because resource leaves can dominate dense project graphs.
 - Renders with Sigma.js over a Graphology graph so the project fact graph uses WebGL rendering rather than SVG.
 - Uses Sigma 3 default node-label and hover rendering for project fact graph labels, without a custom node-label canvas renderer or disabled hover renderer. Normal graph labels may be density-truncated, but the selected or hovered node label shall switch to the full element label.
@@ -392,9 +440,9 @@ Project knowledge graph view generation behavior:
 - Does not use renderer glow/highlight effects for selection; selection is communicated through pinned focus, forced label visibility, direct incident edges, and alpha fading of unrelated nodes.
 - Draws relation facts in the same canonical directions used by Mermaid diagrams: `derive`, `specifiedBy`, `satisfiedBy`, `refinedBy`, `verifiedBy`, and `trace`. Opposite propagated facts such as `derivedFrom`, `specify`, `satisfy`, `refine`, and `verify` shall be reversed and deduplicated into the canonical visual edge rather than rendered as duplicate parallel relations.
 - Owns its viewport sizing directly and uses shell-provided minimum viewport dimensions so the WebGL graph remains visible.
-- Emits graph data with source and target identifiers that all resolve to exported graph nodes so Graphology edge insertion cannot fail before drawing.
-- Uses one saturated role color contract across the Knowledge Graph legend, graph nodes, search swatches, and inspector kind badges: capability `#1976D2`, requirement/refinement `#673AB7`, verification `#4CAF50`, ontology `#B08A00`, resource `#FFCA28`, and other/default `#424242`.
-- Uses darker role borders only as subtle accents so legend entries, graph nodes, search result swatches, and inspector badges read as one consistent visual system instead of mixing pastel controls with saturated graph nodes.
+- Emits graph data with source and target identifiers that all resolve to Project Store graph nodes so Graphology edge insertion cannot fail before drawing.
+- Uses one semantic role color contract across the Knowledge Graph legend, graph nodes, search swatches, and detail kind badges: capability, requirement/refinement, verification, ontology, resource, and other/default all resolve through the Explorer design-system palette API.
+- Uses darker role borders only as subtle accents so legend entries, graph nodes, search result swatches, and detail badges read as one consistent visual system instead of mixing pastel controls with saturated graph nodes.
 
 #### Metadata
  * type: specification
@@ -408,71 +456,71 @@ Project knowledge graph view generation behavior:
 #### Details
 Ontologies view generation behavior:
 - Uses the semantic index built from graph-registry ontology and semantic-contract elements.
-- Displays summary counts for ontology blocks, shape blocks, RDF quads, total blocks, and the `ontologies.ttl` download action as one compact footer row in the shared right `Inspector` lane.
-- Aligns the ontology footer with the shared Inspector-lane footer treatment: centered compact entries, shared muted footer surface, visible separators, wrapping when needed, and no clipped `Download .ttl` action inside the fixed 390px right Inspector lane.
-- Builds the browser visualization, search index, and inspector construct metadata from `SemanticIndex.ontology_projection` facts; raw quads may support labels, comments, RDF type evidence, SHACL constraint display, and generic low-level links, but shall not be a separate authoritative extraction path for OWL/RDFS construct metadata.
+- Displays summary counts for ontology blocks, shape blocks, RDF quads, total blocks, and the `ontologies.ttl` download action in the Ontologies left Explorer pane near the reset/search controls.
+- Aligns ontology summary and download controls with the shared left-pane summary treatment: compact entries, muted surface tokens, visible grouping, wrapping when needed, and no clipped `Download .ttl` action.
+- Builds the browser visualization, search index, and ontology node modal metadata from `SemanticIndex.ontology_projection` facts; raw quads may support labels, comments, RDF type evidence, SHACL constraint display, and generic low-level links, but shall not be a separate authoritative extraction path for OWL/RDFS construct metadata.
 - Does not expose the raw RDF triple graph as the primary user-facing ontology visualization.
-- Reuses the same generated ontology construct projection that full semantic export emits so the Ontologies SPA route is not maintained as a separate HTML-only semantic model.
-- Uses the committed exported ontology graph renderer assets (`ontology.graph_data` plus `ontology.graph_renderer`) as the only runtime Ontologies route renderer. Missing renderer assets or graph data shall surface a canonical-data diagnostic instead of falling back to a separate React/Sigma/model renderer.
+- Reuses the same generated ontology construct projection that full semantic export emits so the Ontologies SPA route uses the canonical semantic projection.
+- Uses the Explorer-bundled Ontologies route renderer over `ontology.projection`, declarations, shape references, diagnostics, and `ontologies.ttl` link data. Rust serve runtime generation shall not provide executable ontology renderer JavaScript or CSS through the Project Store.
 - Opens directly on the ontology explorer without a separate page header, descriptive preamble, top-level summary-card band, footer, or shared padded content card.
 - Uses a dense canvas layout that fills the available viewport inside the headerless Explorer shell so ontology graph space is prioritized.
 - Uses Sigma.js over a Graphology graph with ForceAtlas2 layout for the ontology visualization, matching the project knowledge graph rendering engine while preserving ontology-specific projection and filter semantics. Uses Sigma curved-arrow edge programs and the edge-curve parallel-edge indexer for ontology relationship edges so parallel edges between the same nodes bend apart instead of stacking labels on top of each other.
-- Uses an ontology-diagram visual language rather than a raw RDF graph: class-like terms, restrictions, and class expressions render as compact circular or elliptical anchors; object/datatype/RDF properties render as labeled relationship edges and inspector evidence rather than standalone graph nodes; datatype, named-individual, SHACL, and generic resource nodes remain visually distinct; relation edges render as directed ontology-diagram connectors with visible arrowheads. Layout should favor class-centered neighborhoods where property labels stay close to their domain/range class anchors, similar to established ontology diagram viewers.
+- Uses an ontology-diagram visual language rather than a raw RDF graph: class-like terms, restrictions, and class expressions render as compact circular or elliptical anchors; object/datatype/RDF properties render as labeled relationship edges and modal evidence rather than standalone graph nodes; datatype, named-individual, SHACL, and generic resource nodes remain visually distinct; relation edges render as directed ontology-diagram connectors with visible arrowheads. Layout should favor class-centered neighborhoods where property labels stay close to their domain/range class anchors, similar to established ontology diagram viewers.
 - Draws relation connectors with subtle arrowheads and muted strokes so direction remains visible without arrows visually overflowing or dominating node labels.
 - Styles ontology edges in a WebVOWL-aligned visual grammar while retaining Reqvire colors: normal ontology property relationships use solid labeled Sigma arrows with compact colored label badges on the edge; subclass relationships use the same dashed connector stroke style as class-expression construct links but with a hollow triangle marker at the superclass target side; edge labels are anchored on the same curved connector geometry as the rendered Sigma edge; and relation strokes remain dark enough to read against the ontology canvas.
-- Renders OWL set-operator/class-expression member links with a dedicated Sigma/WebGL edge program, matching WebVOWL's structural set-operator behavior while preserving the expression kind and members in node labels and inspector evidence. Class-expression member links shall render as dashed curved connectors with an open diamond marker at the anonymous construct/source side and an arrowhead at the member target side. Dotted, dashed, hollow-triangle, or diamond-marker styling must not be drawn from the edge-label canvas hook.
+- Renders OWL set-operator/class-expression member links with a dedicated Sigma/WebGL edge program, matching WebVOWL's structural set-operator behavior while preserving the expression kind and members in node labels and modal evidence. Class-expression member links shall render as dashed curved connectors with an open diamond marker at the anonymous construct/source side and an arrowhead at the member target side. Dotted, dashed, hollow-triangle, or diamond-marker styling must not be drawn from the edge-label canvas hook.
 - Classifies renderable ontology nodes through a single construct-class contract derived from semantic type and projection construct evidence. Restriction and class-expression classification drives glyph rendering, relation visibility controls, construct-only node gating, and focused-neighborhood behavior consistently.
 - Renders OWL set-operator/class-expression and restriction nodes as compact construct circles using Sigma `nodeProgramClasses` with `@sigma/node-image`, so union/intersection/complement and restriction expressions read like WebVOWL construct nodes instead of ordinary named ontology classes. Sigma shall own the circular node background from the node color, while an inline SVG pictogram supplies a bold semantic glyph inside the clipped image node, and the Sigma node label shall name the construct kind. Construct glyphs shall not use PNG/raster sprites, SVG border detail, transparent square image backgrounds, or custom construct-node hover overlays. Out-of-focus construct nodes shall dim through the same Sigma reducer path as ordinary nodes.
 - Shows glyph-only construct circles only for actual OWL anonymous construct nodes, such as `owl:unionOf`, `owl:intersectionOf`, `owl:complementOf`, and `owl:Restriction`, when the corresponding `Class expressions` or `Restrictions` visibility control allows them and the focused edge visibility rules make their neighborhood visible.
 - Uses `@sigma/edge-curve`'s curved-label renderer for non-property construct labels so labels follow the same curve geometry as the Sigma edge program.
 - Renders subclass connectors through a dedicated Sigma/WebGL notation edge program while keeping the readable `Subclass of` label anchored on the connector.
 - Renders restriction constructs as explicit restriction glyph nodes plus Sigma-native restriction connector arrows to their `on property` and filler/target evidence, rather than rendering restrictions as ordinary domain/range property edges.
-- Keeps generic SHACL overlay relationship labels off the graph canvas because the overlay line and inspector evidence are sufficient; only more specific ontology/SHACL relation labels should render as edge text.
+- Keeps generic SHACL overlay relationship labels off the graph canvas because the overlay line and modal evidence are sufficient; only more specific ontology/SHACL relation labels should render as edge text.
 - Uses Sigma's default node-label and hover rendering for ontology node labels. Normal graph labels may be density-truncated, but the selected or hovered ordinary ontology node label shall switch to the full term label; construct glyph nodes show their construct-kind label through Sigma labels and their semantic symbol through Sigma image-node rendering.
 - Hides ontology relationship edges in the default full-graph view to avoid a hairball, matching the Knowledge Graph behavior. On node hover or click selection, shows ontology edges directly incident to the focused node set through Sigma's native edge reducer and `@sigma/edge-curve` edge programs; active relation visibility controls determine which focused edges are eligible to appear. If the visible focused neighborhood reaches an enabled construct-only node, such as an OWL union, intersection, complement, or restriction, the focus expands through that construct node so its member/filler links are visible too.
 - Enables Sigma z-index and highlighted-node rendering so the hovered or selected ontology focus neighborhood is painted through Sigma's normal focus path. Focused nodes shall sort above focused-neighbor nodes, focused-neighbor nodes shall sort above focused edges, and focused edges shall sort above unrelated or muted graph items. Focused edges shall be native Sigma edge-program output rather than a separate focused-edge canvas overlay.
 - Sizes circular class anchors by graph connection degree within bounded minimum and maximum sizes so highly connected ontology concepts read as stronger anchors without making low-degree concepts unreadable or letting label length dominate circle size.
-- Uses a muted ontology-diagram palette: blue class anchors, muted property link labels and property inspector badges, yellow datatype leaves, purple named individuals, and red SHACL shapes, with the graph canvas using the shared Explorer base surface.
-- Allocates the shared 390px right `Inspector` lane wide enough for source links and long identifiers, and confines overflowing inspector content to an internal Inspector-lane scroll area rather than scrolling the whole page.
+- Uses the ontology semantic role palette: class anchors, property link labels, modal property badges, datatype leaves, named individuals, SHACL shapes, generic resources, restrictions, class expressions, and external references each resolve through ontology role tokens, with the graph canvas using the shared Explorer base surface.
+- Opens selected ontology node detail in an ontology element modal wide enough for source links, long identifiers, property cards, slots/facets, projection constructs, and source citations.
 - Does not render a raw Turtle/source-block list in the Ontologies route.
-- Preserves source element identifier, source name, file path, line number, and block kind as inspector/search evidence.
-- Renders source citations in the inspector as links to the exported source HTML page and element fragment.
-- Provides the exported `ontologies.ttl` download link only in the compact Inspector footer so the top of the Inspector lane remains available for search and inspection.
-- Colors rendered nodes by semantic role rather than by provenance. Classes, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic RDF resources each use distinct legend swatches and graph colors, while object/datatype/RDF property kinds remain visible through property link labels, inspector badges, and search metadata instead of graph-node fill colors.
-- Treats a named IRI with `rdf:type` pointing to a declared ontology class as a named individual for node color, search badge, and inspector kind when the node has no stronger semantic role such as class, property, shape, datatype, restriction, or class expression. The `rdf:type` statement remains represented as membership construct evidence rather than as a generic RDF edge.
+- Preserves source element identifier, source name, file path, line number, and block kind as modal/search evidence.
+- Renders source citations in the modal as links to the served source route and element fragment.
+- Provides the served `ontologies.ttl` download link in the Ontologies left Explorer pane alongside summary counts and reset controls.
+- Colors rendered nodes by semantic role rather than by provenance. Classes, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic RDF resources each use distinct legend swatches and graph colors, while object/datatype/RDF property kinds remain visible through property link labels, modal badges, and search metadata instead of graph-node fill colors.
+- Treats a named IRI with `rdf:type` pointing to a declared ontology class as a named individual for node color, search badge, and modal kind when the node has no stronger semantic role such as class, property, shape, datatype, restriction, or class expression. The `rdf:type` statement remains represented as membership construct evidence rather than as a generic RDF edge.
 - Reserves SHACL colors for actual SHACL node shapes and property shapes. SHACL references to ontology terms remain evidence on the referenced term and do not recolor classes, individuals, datatypes, restrictions, class expressions, or property metadata as SHACL shapes.
 - Keeps SHACL references to ontology terms as source/construct evidence without recoloring the referenced ontology class or property metadata as a SHACL shape.
 - Treats built-in vocabulary references from XSD, RDF, RDFS, OWL, and SHACL namespaces as external references. External references remain available for datatype/range audit, but they are hidden by default to prevent built-in terms such as `xsd:string` from cluttering the primary ontology map.
-- Does not render literal values as primary graph nodes or as a visibility filter layer. Literal object values from datatype properties remain searchable and are shown in the inspector as predicate/value evidence owned by the selected subject node.
+- Does not render literal values as primary graph nodes or as a visibility filter layer. Literal object values from datatype properties remain searchable and are shown in the modal as predicate/value evidence owned by the selected subject node.
 - Labels class-expression nodes with their property usage context when the expression is used as a property domain or range, for example a valid union-valued range from the ontology model, so OWL domain/range constraints do not look like authored Reqvire model relations. The `refine` relation specifically must not render as `Capability ∪ Requirement`; its range is `Requirement` only.
-- Derives class and property slot facets from SHACL node shapes by combining `sh:targetClass`, `sh:property`, `sh:path`, `sh:datatype`, `sh:class`, `sh:nodeKind`, `sh:minCount`, `sh:maxCount`, `sh:pattern`, and `sh:in`. The target class inspector shall show those slots and facets directly, with source-shape evidence, without requiring users to inspect the shape node first.
+- Derives class and property slot facets from SHACL node shapes by combining `sh:targetClass`, `sh:property`, `sh:path`, `sh:datatype`, `sh:class`, `sh:nodeKind`, `sh:minCount`, `sh:maxCount`, `sh:pattern`, and `sh:in`. The target class modal shall show those slots and facets directly, with source-shape evidence, without requiring users to inspect the shape node first.
 - Attaches SHACL-derived slot facets to the named property metadata as well when the `sh:path` value is a named property already present in the graph model. On a selected class or term, those records represent property usages as slots; they must be labeled as property usages rather than as duplicate property definitions.
 
 Interaction behavior:
 - Provides search over ontology labels, IRIs, semantic kinds, source elements, and SHACL constraint terms.
-- Provides node or construct focus, neighbor highlighting, and an inspector for full IRI, semantic kind, RDF type evidence, comments, datatype-property literal values, source citations, property usages, domain/range, property characteristics, equivalence membership, inverse relationships, property chains, normalized SHACL-derived slots/facets, and optional raw SHACL evidence.
-- Treats graph visibility controls as canvas-only controls. Role and relation visibility controls shall not remove facts, properties, badges, SHACL facets, constructs, or source evidence from the shared right `Inspector` lane for the selected node.
+- Provides node or construct focus, neighbor highlighting, and an ontology element modal for full IRI, semantic kind, RDF type evidence, comments, datatype-property literal values, source citations, property usages, domain/range, property characteristics, equivalence membership, inverse relationships, property chains, normalized SHACL-derived slots/facets, and optional raw SHACL evidence.
+- Treats graph visibility controls as canvas-only controls. Role and relation visibility controls shall not remove facts, properties, badges, SHACL facets, constructs, or source evidence from the ontology element modal for the selected node.
 - Shows raw SHACL evidence only when direct raw constraints are attached to the inspected node. Class and property nodes that only receive normalized SHACL overlays must not show an empty raw-evidence section, and normalized slots/facets remain the primary readable representation of those SHACL overlays.
-- Provides one `Show` visibility group using a shared button design for role and relation filters: terms, datatype property links, object property links, class membership, class disjointness, restrictions, class expressions, SHACL shapes, resources, and external references. For these visibility toggles, active means shown on the canvas. Equivalence, inverse properties, property chains, property characteristics, and SHACL overlay notation remain passive notation/inspector evidence until they have a direct canvas-visible control.
+- Provides one `Show` visibility group using a shared button design for canvas visibility filters: datatype property links, object property links, class disjointness, restrictions, class expressions, SHACL shapes, resources, and external references. Ontology terms and class-membership context are always available rather than exposed as toggles. For these visibility toggles, active means shown on the canvas. Equivalence, inverse properties, property chains, property characteristics, and SHACL overlay notation remain passive notation/modal evidence until they have a direct canvas-visible control.
 - Renders the Ontologies `Reset`, active `Show` visibility controls, passive `Types` color key, and passive `Notation` legend in the shared left Explorer pane; the Ontologies route shall not inherit the Model project tree, and the ontology canvas shall not render a duplicate in-canvas legend/filter box.
 - Preserves interactive graph manipulation while filtering, focusing, panning, zooming, dragging nodes, and resizing; filtering shall not reset the current camera, focusing shall center the selected node, and reset shall rerun the ForceAtlas2 layout and fit the graph without losing ontology-diagram visual conventions. The viewer exposes a single visible `Reset` view control rather than separate fit and reset buttons.
 - Provides a compact passive color key for detailed semantic node roles in the left Explorer pane, separate from the active visibility-layer filter controls.
 - Keeps Reqvire's richer passive type and construct legends available alongside the active `Show` controls, because Reqvire exposes additional semantic constructs beyond class disjointness and set operators.
-- Treats only filter-control entries as selectable filter-in controls in the interactive viewer. The default filter state shall open as a readable authored ontology map: ontology terms, datatype-property links, object-property links, and class-membership edges are checked; relationship edges remain hidden until hover or selection focus; SHACL shapes, generic resources/individuals, disjointness, restrictions, class expressions, and external references are opt-in.
-- Uses KN2-style black/white active filter controls, neutral Inspector headings inside the shared `Inspector` lane, shared warm-neutral search-result hover rows, and generic evidence cards so filter and selection state reads as part of the explorer theme rather than as unrelated gray-green or blue UI chrome. A persistent left project tree appears only in Model and file drill-in workflows, or in a specialist view that defines its own domain-specific navigator.
+- Treats only filter-control entries as selectable filter-in controls in the interactive viewer. The default filter state shall open as a complete authored ontology map: ontology terms and class-membership context are always present; datatype-property links, object-property links, disjointness, restrictions, class expressions, SHACL shapes, resources, and external references are shown by default. Relationship edges may still be visually emphasized only on hover or selection focus to avoid a hairball.
+- Uses shared selected-control tokens, warm-neutral search-result hover rows, and generic evidence cards so filter and selection state reads as part of the explorer theme rather than as unrelated route-local UI chrome. A persistent left project tree appears only in Model and file drill-in workflows, or in a specialist view that defines its own domain-specific navigator.
 - Keeps detailed type-color entries passive so users do not have to treat every color swatch as a visibility control.
-- Supports multi-select grouped role filters for ontology terms, SHACL shapes, generic RDF resources, and external vocabulary references. The single SHACL shapes role filter controls both SHACL shape nodes and their SHACL overlay relations. Property links are controlled by the datatype-property and object-property visibility filters. Detailed semantic types remain visible through color, inspector kind, and search badges.
-- Computes selected and hovered focus neighborhoods from currently visible relation filters. If a relation filter hides the edge category that connected a neighbor to the focus node, that neighbor must no longer be highlighted or force-labeled as part of the focused subgraph, while the shared right `Inspector` lane remains an unfiltered evidence view for the selected node. Construct-only nodes expand the focused neighborhood one semantic step further through their enabled construct links so users can reason about union/intersection/complement members and restriction fillers without selecting the anonymous construct first.
-- Keeps the external-reference role filter available but inactive by default; enabling it shows built-in vocabulary nodes used by datatype constraints, ranges, and other audit-oriented constructs.
+- Supports grouped visibility controls for SHACL shapes, generic RDF resources, and external vocabulary references. The single SHACL shapes role filter controls both SHACL shape nodes and their SHACL overlay relations. Property links are controlled by the datatype-property and object-property visibility filters. Detailed semantic types remain visible through color, modal kind, and search badges.
+- Computes selected and hovered focus neighborhoods from currently visible relation filters. If a relation filter hides the edge category that connected a neighbor to the focus node, that neighbor must no longer be highlighted or force-labeled as part of the focused subgraph, while ontology node modal data remains an unfiltered evidence view for the selected node. Construct-only nodes expand the focused neighborhood one semantic step further through their enabled construct links so users can reason about union/intersection/complement members and restriction fillers without selecting the anonymous construct first.
+- Keeps the external-reference role filter available; enabling or disabling it controls built-in vocabulary nodes used by datatype constraints, ranges, and other audit-oriented constructs.
 - Presents domain/range, subclass, membership, disjointness, equivalence, inverse, property chain, property characteristic, restriction, class-expression, and SHACL-overlay constructs in a passive left-pane `Notation` legend rather than as a second active construct-filter panel.
-- Treats relation styling as passive visual notation, not as an independent filter layer. The active `Show` relation controls determine which categories are shown, such as property links, class membership, disjointness, restrictions, and class expressions; SHACL overlay relations follow the single SHACL shapes role filter.
-- Applies relation visibility controls to construct-specific edges, construct-only nodes, and graph node badges without making nodes visible when their role filter is disabled. The shared right `Inspector` lane remains an unfiltered evidence view for the selected node.
-- Does not expose or render graph-registry provenance or generated-projection provenance as graph-wide visual layers. Registry/projection provenance remains inspector and export evidence, not a visual layer selector and not a reason to add otherwise non-semantic debug nodes to the primary graph.
+- Treats relation styling as passive visual notation, not as an independent filter layer. The active `Show` relation controls determine which categories are shown, such as property links, disjointness, restrictions, and class expressions; class membership remains available as backbone context, and SHACL overlay relations follow the single SHACL shapes role filter.
+- Applies relation visibility controls to construct-specific edges, construct-only nodes, and graph node badges without making nodes visible when their role filter is disabled. The ontology element modal remains an unfiltered evidence view for the selected node.
+- Does not expose or render graph-registry provenance or generated-projection provenance as graph-wide visual layers. Registry/projection provenance remains modal and Project Store evidence, not a visual layer selector and not a reason to add otherwise non-semantic debug nodes to the primary graph.
 - Treats construct-only visual nodes, including generated restriction and class-expression nodes, as semantic construct nodes controlled by their matching relation visibility control rather than by a separate provenance filter.
 - Combines active controls predictably on the canvas: role controls are hard gates for authored node/resource visibility, and unchecked relation controls remove their named categories from property links, edges, construct-only nodes, and graph badges.
-- Keeps filtered-out canvas nodes, edges, and graph badges visually suppressed or hidden without clearing or narrowing the current inspector selection.
+- Keeps filtered-out canvas nodes, edges, and graph badges visually suppressed or hidden without clearing or narrowing the current modal detail selection.
 - Applies directional subclass and membership badges only to the subject side of the construct; superclass and class-object nodes must not display `⊆` or `∈` merely because another node points to them.
-- Keeps raw Turtle content available through `ontologies.ttl` instead of duplicating the serialized text in the HTML viewer.
+- Keeps raw Turtle content available through `ontologies.ttl` instead of duplicating the serialized text in the Ontologies viewer.
 
 #### Metadata
  * type: specification
@@ -485,17 +533,17 @@ Interaction behavior:
 
 #### Details
 Semantic projection behavior:
-- Classifies resources into semantic node kinds, including OWL/RDFS class, object property, datatype property, RDF property, named individual, SHACL node shape, SHACL property shape, datatype, and generic RDF resource when no stronger kind is known. Literal values are not primary graph nodes; they are subject-owned inspector/search evidence.
+- Classifies resources into semantic node kinds, including OWL/RDFS class, object property, datatype property, RDF property, named individual, SHACL node shape, SHACL property shape, datatype, and generic RDF resource when no stronger kind is known. Literal values are not primary graph nodes; they are subject-owned modal/search evidence.
 - Promotes otherwise-generic named resources to named-individual view nodes when their RDF type evidence references a class declared in the same ontology graph, even when the authored RDF does not explicitly include `owl:NamedIndividual`.
-- Materializes direct-authored OWL/RDFS/SHACL constructs as generated ontology projection facts attached to `SemanticIndex` before full semantic export or HTML rendering.
-- Preserves full IRI, compact label, RDF types, source element identifiers, source file paths, source line numbers, comments, related SHACL constraints, normalized slot/facet evidence, optional raw SHACL evidence, and projection provenance in the HTML explorer model derived from `SemanticIndex.ontology_projection`.
+- Materializes direct-authored OWL/RDFS/SHACL constructs as generated ontology projection facts attached to `SemanticIndex` before full semantic export or Explorer rendering.
+- Preserves full IRI, compact label, RDF types, source element identifiers, source file paths, source line numbers, comments, related SHACL constraints, normalized slot/facet evidence, optional raw SHACL evidence, and projection provenance in the Explorer ontology model derived from `SemanticIndex.ontology_projection`.
 - Derives SHACL slot/facet records from property-shape blank nodes and attaches them to the target class plus named property metadata as viewer-facing construct evidence. Target class nodes present those records as slots of the class; property usage rows present those records as class-specific usages of the selected property.
 - Uses semantic-query-contract refinements as declarative SPARQL pattern contracts for direct-authored construct extraction; the implementation may execute equivalent native Rust projection over parsed quads until a general query execution layer exists.
 - Does not emit semantic-query-contract raw query text through ontology collection or `--full`; generated facts may cite semantic-query-contract IRIs as provenance.
-- Separates direct-authored generated facts from inferred facts. Direct-authored facts may drive HTML/export now; inferred facts require a later inference or materialization requirement.
+- Separates direct-authored generated facts from inferred facts. Direct-authored facts may drive semantic export and Explorer rendering now; inferred facts require a later inference or materialization requirement.
 - Suppresses `rdf:type` edges, OWL/RDFS metaclass nodes such as `owl:Class`, `owl:ObjectProperty`, `owl:DatatypeProperty`, and `rdfs:Class`, and RDF list plumbing from the primary graph.
 - Suppresses anonymous blank nodes from the primary graph unless the blank node represents a meaningful semantic construct such as a property chain, equivalence group, SHACL shape, or collection member.
-- Retains unmodeled RDF statements only as inspector/source evidence, not as graph nodes and edges.
+- Retains unmodeled RDF statements only as modal/source evidence, not as graph nodes and edges.
 
 #### Metadata
  * type: specification
@@ -664,12 +712,12 @@ SELECT ?constructKind ?subject ?predicate ?object ?symbol WHERE {
 
 #### Details
 Property-centric visualization behavior:
-- Renders object properties and datatype properties as first-class property semantics: labeled domain/range links in the graph plus property usage rows in the inspector, not standalone property nodes.
+- Renders object properties and datatype properties as first-class property semantics: labeled domain/range links in the graph plus property usage rows in the ontology node modal, not standalone property nodes.
 - Aggregates all `rdfs:domain` classes and all `rdfs:range` classes or datatypes for each property.
 - Renders one deduplicated labeled relationship for each meaningful domain/range pair so that one property with many domains or ranges does not become a cluttered duplicate subgraph.
-- Keeps property detail, including full URI, semantic kind, domain/range terms, inverse/equivalence/chain evidence, characteristics, source citations, and SHACL slot facets, in the inspector for selected classes, individuals, and terms.
+- Keeps property detail, including full URI, semantic kind, domain/range terms, inverse/equivalence/chain evidence, characteristics, source citations, and SHACL slot facets, in the ontology node modal for selected classes, individuals, and terms.
 - Distinguishes object-property ranges that point to classes from datatype-property ranges that point to datatypes or literal constraints.
-- Shows property characteristics as compact badges or inspector attributes instead of overloading the primary label by default.
+- Shows property characteristics as compact badges or modal attributes instead of overloading the primary label by default.
 - Shows SHACL-derived slot facets on target classes and property usage rows, including datatype/class range constraints, node kind, min/max cardinality, pattern constraints, allowed values, and source shape.
 - Recognizes OWL property characteristic types including functional, inverse functional, transitive, symmetric, asymmetric, reflexive, and irreflexive properties.
 
@@ -687,12 +735,12 @@ OWL construct grouping behavior:
 - Computes equivalence groups for `owl:equivalentClass`, `owl:equivalentProperty`, and `owl:sameAs` using deterministic connected components over the equivalent resources.
 - Assigns each equivalence group a stable identifier derived from a canonical sorted member list rather than a random UUID.
 - Renders equivalence groups as collapsible group nodes or grouped regions so users can inspect group membership without requiring pairwise equivalence edges to dominate the graph.
-- Represents `owl:inverseOf` as inverse property metadata with clear visual treatment where applicable and inspector evidence.
+- Represents `owl:inverseOf` as inverse property metadata with clear visual treatment where applicable and modal evidence.
 - Parses `owl:propertyChainAxiom` RDF lists into ordered chain members and attaches the ordered chain to the defining object property.
 - Renders property chains as collapsible ordered chain constructs, preserving the member order from the RDF list.
 - Allows an object property to participate in multiple property chains without duplicating graph nodes for the property.
-- Presents SHACL node shapes and property shapes as an overlay on referenced ontology terms and as inspector constraints, not as raw blank-node plumbing mixed with the ontology model.
-- Presents anonymous OWL class-expression blank nodes such as `owl:unionOf`, `owl:intersectionOf`, and `owl:complementOf` as structural inspector constructs with expression kind, ordered members, and usage context. Raw blank-node identifiers are available only in collapsible raw details.
+- Presents SHACL node shapes and property shapes as an overlay on referenced ontology terms and as modal constraints, not as raw blank-node plumbing mixed with the ontology model.
+- Presents anonymous OWL class-expression blank nodes such as `owl:unionOf`, `owl:intersectionOf`, and `owl:complementOf` as structural modal constructs with expression kind, ordered members, and usage context. Raw blank-node identifiers are available only in collapsible raw details.
 
 #### Metadata
  * type: specification
@@ -708,10 +756,10 @@ The ontology viewer symbol vocabulary defines canonical rendered symbols for OWL
 
 Symbols shall:
 - Appear only in approved viewer locations listed in the table.
-- Have tooltip text and inspector text that names the semantic concept.
+- Have tooltip text and modal text that names the semantic concept.
 - Have accessible labels when rendered in interactive controls, badges, edges, or group headers.
 - Supplement normal labels; labels such as property names and class names shall remain searchable without symbol prefixes.
-- Keep raw Unicode code points in source/specification evidence and semantic data; do not render raw code points as visible badge text in the ontology inspector.
+- Keep raw Unicode code points in source/specification evidence and semantic data; do not render raw code points as visible badge text in the ontology modal.
 - Prefer domain labels such as `Subclass` over low-level set-theory labels such as `Subset or equal` when rendering visible ontology badges.
 - Use a font stack that can render mathematical and arrow symbols consistently.
 
@@ -722,10 +770,10 @@ Symbols shall:
 | Logical OR / Set Union | U+222A | ∪ | Class expression badge, construct group | Union |
 | Logical Implication | U+21D2 | ⇒ | Rule or implication edge label | Implies |
 | Logical Equivalence | U+21D4 | ⇔ | Equivalence edge label, equivalence group header | Equivalent |
-| Universal Quantifier | U+2200 | ∀ | Restriction badge, inspector field | Universal restriction |
-| Existential Quantifier | U+2203 | ∃ | Restriction badge, inspector field | Existential restriction |
-| Set Membership | U+2208 | ∈ | Inspector field, class membership edge label | Member of |
-| Set Non-Membership | U+2209 | ∉ | Inspector field, class exclusion edge label | Not member of |
+| Universal Quantifier | U+2200 | ∀ | Restriction badge, modal field | Universal restriction |
+| Existential Quantifier | U+2203 | ∃ | Restriction badge, modal field | Existential restriction |
+| Set Membership | U+2208 | ∈ | Modal field, class membership edge label | Member of |
+| Set Non-Membership | U+2209 | ∉ | Modal field, class exclusion edge label | Not member of |
 | Set Inclusion | U+2286 | ⊆ | Subclass or inclusion badge | Subset or equal |
 | Proper Subset | U+2282 | ⊂ | Strict inclusion badge | Proper subset |
 | Set Difference | U+2216 | ∖ | Class expression badge | Set difference |
@@ -765,15 +813,16 @@ Model-view element navigation behavior:
 #### Details
 Model-centric view generation behavior:
 - Uses model roots selected by default traversal rules as top-level entries.
-- Presents the canonical Model route as four compact icon-selected modes in the shared left Explorer pane: List, Grid, Sunburst, and Icicle.
-- Uses List and Grid modes as Reqvire-native filesystem/model navigation over folders, files, and modeled elements. Uses Sunburst and Icicle modes as containment partition diagrams over the same Project Store hierarchy. Filesystem discovery and list-style discovery belong to Model List/Grid and Search, not to separate primary Explorer pages.
+- Presents the canonical Model route as three compact icon-selected modes in the shared left Explorer pane: List, Grid, and Graph.
+- Uses List and Grid modes as Reqvire-native filesystem/model navigation over folders, files, and modeled elements. Uses Graph mode as the Project Store knowledge-graph visualization. Filesystem discovery and list-style discovery belong to Model List/Grid and Search, not to separate primary Explorer pages.
 - Keeps Model mode controls in the left Explorer pane before the project tree. Model list/grid/containment views shall not render a local top toolbar for mode selection, role filters, or overlay toggles.
+- Drives the active Model workspace from the left project-tree selection across all three Model modes so List/Grid browse selected folders or files, Graph focuses matching graph nodes, and selected modeled elements open the shared Project Store-backed modal.
 - Expands relations recursively with full target element details.
 - Includes summary metadata for element and relation counts.
 - Generates Mermaid diagrams for nested relation structures.
 - Sizes each Mermaid diagram after rendering based on its own SVG bounds. Small diagrams shrink to their natural height, while large diagrams receive an independent pan/zoom viewport; pages with many diagrams must not force every diagram, including the last one, into a fixed full-viewport-height panel.
-- Loads the Mermaid initializer exactly once per generated page so diagrams are not parsed, mutated, or pan/zoom-initialized twice.
-- Produces model-view output consumed by `index.html#/model` without generating a separate Model HTML entry point.
+- Loads the Mermaid initializer exactly once per Explorer runtime so diagrams are not parsed, mutated, or pan/zoom-initialized twice.
+- Produces model-view output consumed by `index.html#/model` without generating a separate Model document entry point.
 
 #### Metadata
  * type: specification
@@ -782,10 +831,10 @@ Model-centric view generation behavior:
  * refine: [Model-Centric View Generation](Capabilities.md#model-centric-view-generation)
 ---
 
-### Responsive HTML Generation Refinement Specification
+### Responsive Explorer Rendering Refinement Specification
 
 #### Details
-Responsive HTML behavior:
+Responsive Explorer behavior:
 - Supports viewport widths from 320px (mobile) through 1920px+ (desktop).
 - Uses mobile-first CSS with progressive enhancement.
 - Keeps compact left Explorer view controls usable on narrow viewports without exposing report-only pages as primary navigation.
@@ -801,7 +850,7 @@ Breakpoints:
  * type: specification
 
 #### Relations
- * refine: [Responsive HTML Generation](HTMLGeneration.md#responsive-html-generation)
+ * refine: [Responsive Explorer Rendering](ExplorerRendering.md#responsive-explorer-rendering)
 ---
 
 ### Serve Command Refinement Specification
@@ -810,10 +859,12 @@ Breakpoints:
 Serve command behavior:
 - Accept `--host <HOST>` option to specify the bind address (default: localhost)
 - Accept `--port <PORT>` option to specify the server port (default: 8080)
-- Use a random temporary directory for HTML export
-- Run HTML Export to generate complete documentation in the temporary directory
-- Start an HTTP server serving static files from the temporary directory
+- Assemble the embedded Explorer shell, Project Store data, and ontology artifact in memory
+- Populate Project Store source-file records from modeled element source files and existing graph-referenced local implementation/evidence/resource files, without using generated Markdown files on disk as an intermediate runtime artifact
+- Keep relation-backed implementation/evidence/source targets as Project Store resources for relation semantics, and include only existing repository-relative local targets in the Model tree file hierarchy
+- Start an HTTP server serving embedded Explorer assets and generated runtime data
 - Serve `index.html` for the root URL so the SPA Explorer shell is the default entry point
+- Return `index.html` for non-asset browser routes so SPA navigation can handle deep links
 - Display clickable server URL for user to open in browser
 - Display instructions to press Ctrl-C to stop server
 - Continue serving until terminated by the user (Ctrl-C)
@@ -825,47 +876,29 @@ Serve command behavior:
  * refine: [Serve Command](Capabilities.md#serve-command)
 ---
 
-### Type-Safe HTML Generation Refinement Specification
-
-#### Details
-Type-safe HTML generation behavior:
-- Uses `maud` macros for compile-time HTML generation.
-- Relies on Rust type checks to validate structure during compilation.
-- Prevents malformed tags, unclosed nodes, and invalid nesting.
-- Produces well-formed HTML5 output for generated pages.
-
-This shifts most structural HTML errors to compile time instead of runtime.
-
-#### Metadata
- * type: specification
-
-#### Relations
- * refine: [Type-Safe HTML Generation](HTMLGeneration.md#type-safe-html-generation)
----
-
 ### Web Interface Refinement Specification
 
 #### Details
 The browse interface allows users to:
-- View HTML-rendered specifications and requirements
+- View rendered specifications and requirements
 - Navigate through diagrams and visualizations
 - Access verification traces and coverage reports
 - Explore the complete model structure through an integrated web interface
 
 This capability enables both human users (via browser) and AI agents (via MCP server) to efficiently explore and understand the System model without manually navigating file structures.
 
-All generated HTML content is expected to produce deterministic output with consistent ordering to enable reliable version control and reproducible builds.
+All Explorer runtime data is expected to use deterministic ordering to enable reliable troubleshooting and reproducible builds.
 
-The system is expected to ensure deterministic HTML output by:
+The system is expected to ensure deterministic Explorer runtime data by:
 - Sorting elements by identifier before rendering
 - Sorting relations by type and target identifier
 - Maintaining consistent navigation and page ordering
 - Generating stable diagram node and relation ordering
 
 This determinism ensures that:
-- Running HTML generation multiple times produces byte-identical output
-- Version control diffs reflect actual content changes
-- Continuous integration pipelines produce reproducible results
+- Running serve runtime generation multiple times produces stable Project Store data for unchanged inputs
+- Runtime differences reflect actual model content changes
+- Continuous integration pipelines can validate Explorer data reproducibly
 
 #### Metadata
  * type: specification
@@ -873,67 +906,46 @@ This determinism ensures that:
 
 ### Web Interface Style Specification
 
-Styling conventions for HTML export web interface.
+Styling conventions for the served Explorer web interface.
 
 #### Details
 **Page Layout:**
 - No top header in the native Explorer application
 - Optional on-demand help modal for the current view
-- Primary Explorer graph/report views use one shared application shell: collapsible persistent full-height left Explorer pane with a vertical `Explorer` edge strip, full-height near-white canvas/content workspace, a collapsible 390px right `Inspector` lane with a vertical `Inspector` edge strip and neutral compact inspector headings, compact bottom summary strip when needed, and a narrow right vertical tool rail.
-- The right vertical tool rail provides compact icon access to Search, Model, Knowledge Graph, Ontologies, Traces, KN2, Settings, and Help so specialist views can return to Model without requiring the left primary switcher.
-- The left Explorer pane does not render primary view links. Model and file drill-in routes show Model mode controls followed by the shared project tree. Specialist tool-rail views such as Knowledge Graph, Traces, Ontologies, and KN2 start with that specialist view's controls and shall not render the shared project file tree unless that specialist view explicitly defines its own hierarchical navigator.
+- Primary Explorer graph/report views use one shared application shell: collapsible persistent full-height left Explorer pane with a vertical `Explorer` edge strip, full-height shared canvas/content workspace, route/detail modals when inspection needs more than a compact pane summary, compact bottom summary strip when needed, and a narrow right vertical tool rail.
+- The right vertical tool rail provides compact icon access to Search, Model, Ontologies, Traces, Settings, and Help so specialist views can return to Model without requiring the left primary switcher.
+- The left Explorer pane does not render primary view links. Model and file drill-in routes show Model mode controls followed by the shared project tree. Specialist views such as Traces, Ontologies, and Coverage start with that specialist view's controls or domain navigator and shall not render the shared project file tree unless that specialist view explicitly defines its own hierarchical navigator.
+- Search left-pane controls use their result-type filter buttons as the visible type key and must not duplicate those same colors in a separate passive legend.
 - Ontologies shall not render the shared project file tree in the left Explorer pane; the Ontologies left pane is reserved for ontology reset, active visibility filters, passive type/color key, and passive notation legend.
-- View controls use compact black/near-white active buttons and shared muted hover surfaces; per-view controls belong at the top of the expanded left Explorer pane or in the shared right `Inspector` lane when they are Inspector-specific, not in a top header or floating boxed toolbar.
-- View modules shall not define page-local Explorer-pane or Inspector-lane layout variants or hidden navigation alternates; shell chrome, edge strips, collapse state, and fixed inspector width are owned by the shared Explorer shell components.
-- Any view with contextual search, evidence, properties, selection details, or inspector content shall render that content in the shared right `Inspector` lane. It shall not mount a separate route-local sidebar outside the `Inspector` strip, even when embedding a committed renderer such as the ontology Sigma renderer.
-- Graph/canvas/list/grid content should not be occluded by floating toolbars; controls that affect the current view should live in the left Explorer pane unless they are Inspector-specific controls in the shared right `Inspector` lane.
-- Content in containment D3 breadcrumb lanes starts after the persistent left pane plus a small gutter and ends before the right `Inspector` strip, right `Inspector` lane, and tool rail.
+- Coverage shall not render summary cards or legends in the left Explorer pane; the central Coverage workspace owns dashboard summaries and gap cards, while the help modal owns legend explanations.
+- View controls use compact selected-control tokens and shared muted hover surfaces; per-view controls belong at the top of the expanded left Explorer pane or in a detail modal when they are inspection-specific, not in a top header or floating boxed toolbar.
+- View modules shall not define page-local Explorer-pane variants, hidden navigation alternates, or route-local sidebars. Shell chrome, edge strips, and collapse state are owned by the shared Explorer shell components.
+- Views with contextual search, evidence, properties, or selection details shall use the left Explorer pane for compact selected-item links and shared modal components for full detail. They shall not mount a separate route-local sidebar, even when embedding a committed renderer such as the ontology Sigma renderer.
+- Graph/canvas/list/grid content should not be occluded by floating toolbars; controls that affect the current view should live in the left Explorer pane unless they belong inside a focused detail modal.
+- Model workspace breadcrumbs, list/grid content, and graph canvases start after the persistent left pane plus a small gutter and end before the right tool rail.
 
 **Typography:**
-- System font stack for readability
-- Monospace for code and identifiers
-- Heading hierarchy matches markdown levels
+- Use the local Geist text font and Geist Mono for code, identifiers, file paths, and RDF/Turtle fragments.
+- Heading hierarchy follows document structure while route chrome and compact panels use the Explorer design-system type scale.
+- Long identifiers use wrapping, truncation, or copy affordances rather than forcing modal or pane overflow.
 
-**Color Palette (MONO Theme):**
-The web interface uses a monochrome grayscale theme for consistent, professional appearance.
+**Theme and Color Tokens:**
+- Use semantic design-system tokens rather than primitive color names or route-local literal colors.
+- Warm-neutral surface tokens define the shared application background, left Explorer pane, right tool rail, modal body, source content, graph canvas, hover rows, and selected rows.
+- Text tokens define primary, secondary, muted, inverse, link, and code text. Static labels use muted text tokens; accent text is reserved for links, focus, active state, and deliberate product emphasis.
+- Border, shadow, radius, spacing, control-height, and transition tokens come from the Explorer design system and must not be redefined per route.
+- Programmatic renderers resolve graph, Mermaid, D3, and badge colors through the Explorer palette API.
 
-| Usage | Color | Notes |
-|-------|-------|-------|
-| Navigation background | #fbfbf8 | Headerless left Explorer pane and right rail base surface |
-| Navigation hover | #f0f0ec | Shared left-tree, file-row, search-result, and control hover state |
-| Primary/Buttons | #333333 | Lighter gray for interactive elements |
-| Primary hover | #4a4a4a | Button hover state |
-| Page background | #fbfbf8 | Near-white neutral application background |
-| Content background | #fbfbf8 | Same base surface for content, canvas, Explorer panes, and inspector bodies |
-| Canvas background | #fbfbf8 | Same base surface; graph and containment canvases must not introduce a separate background lane |
-| Text primary | #212121 | Dark gray for headings |
-| Text secondary | #424242 | Medium gray for body text |
-| Text muted | #757575 | Light gray for secondary info |
-| Links | #4a4a4a | Grayscale links |
-| Borders | #EEEEEE | Light borders |
-| Surface card | #fbfbf8 | Explorer pane/card/control surface |
-| Surface muted | #f6f6f3 | Generic inspector evidence field and footer background |
-| Surface hover | #f0f0ec | Search-result and control hover state |
-| Surface active | #172027 foreground #fbfbf8 | Active/selected control and selected file/list row state |
-| Surface border | #c7c7bf | Border for explorer surfaces |
-| Control selected | #172027 foreground #fbfbf8 | KN2-style active graph filter button |
-| Highlight | #172027 foreground #fbfbf8 | Selection/highlight color |
-
-**Element Cards:**
-| Element Type | Border Color | Background |
-|--------------|--------------|------------|
-| Requirement | #0066FF | #D0E0FF |
-| User-requirement | #0066FF | #D0E0FF |
-| Verification | #CC9900 | #FFF7B3 |
-| Behavior | #9900CC | #E0D0FF |
-| Specification | #009900 | #DFFFD0 |
-| Constraint | #CC0000 | #FFD0D0 |
+**Element Cards and Badges:**
+- Element cards, grid tiles, list rows, search results, graph nodes, relation pills, and modal badges use the same role tokens and glyph contract.
+- Capability, requirement, verification, ontology, resource, and refinement-family roles are encoded by role token, text label, and glyph. Color is never the only type cue.
+- Refinement-family subtypes use a shared refinement hue with distinct glyphs for source, specification, constraint, behavior, state, input-output, and semantic-contract elements.
 
 **Navigation:**
 - Breadcrumb trail for element hierarchy
 - Clickable relation links
 - Collapsible sections for long content
-- No generated footer attribution in exported Explorer pages
+- No generated footer attribution in served Explorer pages
 
 #### Metadata
  * type: specification

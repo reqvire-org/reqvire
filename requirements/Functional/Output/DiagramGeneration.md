@@ -12,7 +12,6 @@ The system shall produce interactive visual representations of relationships wit
   * derivedFrom: [Model Reports](Reporting.md#model-reports)
   * refinedBy: [Diagram Relation Filtering Specification](Specifications.md#diagram-relation-filtering-specification)
   * refinedBy: [Mermaid Diagram Generation Specification](Specifications.md#mermaid-diagram-generation-specification)
-  * refinedBy: [Mermaid Diagram Style Specification](Specifications.md#mermaid-diagram-style-specification)
   * refinedBy: [Mermaid Interactive Capabilities Specification](Specifications.md#mermaid-interactive-capabilities-specification)
 ---
 
@@ -30,9 +29,6 @@ When requested, the system shall automatically generate diagrams with relation f
   * derivedFrom: [Interactive Mermaid Diagrams](#interactive-mermaid-diagrams)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
   * satisfiedBy: [utils.rs](../../../core/src/utils.rs)
-  * verifiedBy: [Diagram Generation Test](Verifications/DiagramVerifications.md#diagram-generation-test)
-  * verifiedBy: [Diagram Relation Filtering Verification](Verifications/DiagramVerifications.md#diagram-relation-filtering-verification)
-  * verifiedBy: [Visualize Model Relationships Verification](Verifications/DiagramVerifications.md#visualize-model-relationships-verification)
 ---
 
 ### File Diagram Attachment Display
@@ -49,7 +45,6 @@ Implementation details shall follow the associated refinement specifications.
   * derivedFrom: [Diagram Generation](#diagram-generation)
   * refinedBy: [File Diagram Attachment Display Refinement Specification](Specifications.md#file-diagram-attachment-display-refinement-specification)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)
-  * verifiedBy: [File Diagram Attachment Test](Verifications/DiagramVerifications.md#file-diagram-attachment-test)
 ---
 
 ### Interactive Mermaid Diagram Node Behavior
@@ -64,7 +59,7 @@ Implementation details shall follow the associated refinement specifications.
 
 #### Relations
   * derivedFrom: [Diagram Generation](#diagram-generation)
-  * refinedBy: [Mermaid Diagram Interaction Behavior](Behaviors.md#mermaid-diagram-interaction-behavior)
+  * refinedBy: [Mermaid Diagram Link Behavior](Behaviors.md#mermaid-diagram-link-behavior)
   * refinedBy: [Interactive Mermaid Diagram Node Behavior Refinement Specification](Specifications.md#interactive-mermaid-diagram-node-behavior-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
   * satisfiedBy: [diagrams.rs](../../../core/src/diagrams.rs)

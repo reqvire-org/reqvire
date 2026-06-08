@@ -312,27 +312,28 @@ This test verifies that the system rejects Refinement elements that include a Re
 
 ### Specification File Identification Test
 
-This test verifies that the system only parses markdown files where the first H1 heading is exactly `# Elements`, and silently ignores all other markdown files.
+This test verifies that the system only parses markdown files where the first H1 heading is exactly `# Elements` or `# Element`, and silently ignores all other markdown files.
 
 #### Details
 
 ##### Acceptance Criteria
 **File Identification:**
 - System shall parse markdown files where first H1 heading is `# Elements`
-- System shall ignore markdown files where first H1 heading is not `# Elements`
+- System shall parse markdown files where first H1 heading is `# Element`
+- System shall ignore markdown files where first H1 heading is not `# Elements` or `# Element`
 - System shall ignore markdown files with no H1 heading
-- Files without `# Elements` heading shall be silently skipped (no error)
+- Files without a supported model heading shall be silently skipped (no error)
 
 **Leading Content Handling:**
-- System shall allow blank lines before `# Elements` heading
-- System shall allow frontmatter (YAML between `---` markers) before `# Elements` heading
-- System shall allow HTML comments before `# Elements` heading
+- System shall allow blank lines before supported model headings
+- System shall allow frontmatter (YAML between `---` markers) before supported model headings
+- System shall allow HTML comments before supported model headings
 - System shall check the first H1 heading encountered, ignoring non-heading content
 
 **Backward Compatibility:**
 - Files with different H1 headings (e.g., `# User Stories`, `# System Design`) shall be ignored
 - This behavior applies in addition to `.gitignore` and `.reqvireignore` exclusions
-- Page title/header is not stored in the model (always output as `# Elements`)
+- Page title/header is not stored in the model; multi-element files output as `# Elements`, and single-element files output as `# Element`
 
 ##### Test Criteria
 1. **Valid specification file parsing:**
@@ -340,23 +341,28 @@ This test verifies that the system only parses markdown files where the first H1
    - Run reqvire search
    - Verify elements from file are in model
 
-2. **Invalid specification file skipping:**
+2. **Valid single-element file parsing:**
+   - Create file with `# Element` as first H1
+   - Run reqvire search
+   - Verify the file contributes exactly one element to the model
+
+3. **Invalid specification file skipping:**
    - Create file with different H1 (e.g., `# Other Title`)
    - Run reqvire search
    - Verify elements from file are NOT in model
    - Verify no error is reported
 
-3. **No H1 heading:**
+4. **No H1 heading:**
    - Create markdown file starting with `## Section` (no H1)
    - Run reqvire search
    - Verify file is ignored
 
-4. **Leading blank lines:**
+5. **Leading blank lines:**
    - Create file with blank lines before `# Elements`
    - Run reqvire search
    - Verify file is parsed correctly
 
-5. **Combined with ignore patterns:**
+6. **Combined with ignore patterns:**
    - Create valid `# Elements` file matching .gitignore pattern
    - Verify file is still excluded by ignore pattern
    - Both checks must pass for file to be parsed

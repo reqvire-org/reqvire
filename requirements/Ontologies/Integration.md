@@ -112,7 +112,7 @@ The Reqvire GitHub workflow ontology defines the vocabulary for hosted repositor
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
 reqvire:RepositoryWorkflowContract a owl:Class .
-reqvire:DocumentationExportContract a owl:Class ;
+reqvire:ExplorerServeContract a owl:Class ;
   rdfs:subClassOf reqvire:RepositoryWorkflowContract .
 reqvire:PullRequestValidationContract a owl:Class ;
   rdfs:subClassOf reqvire:RepositoryWorkflowContract .

@@ -38,6 +38,7 @@ loop/
 yolo_claude_loop.sh
 
 # Generated HTML output
+/docs/
 cli/html/
 .reqvire-agent/
 
@@ -47,4 +48,3 @@ npm/reqvire/*.tgz
 .index
 .env
 .playwright-cli
-proc-www.reqvire.org

@@ -389,9 +389,15 @@ impl ContainmentHierarchy {
     }
 }
 
-/// Convert markdown links to HTML links for the D3 tree
+/// Convert markdown links to SPA routes for the D3 tree
 fn md_to_html_link(link: &str) -> String {
-    link.replace(".md", ".html")
+    if link.starts_with("http://") || link.starts_with("https://") {
+        link.to_string()
+    } else if link.ends_with(".md") {
+        format!("#/content/{}", link)
+    } else {
+        format!("#/elements/{}", link)
+    }
 }
 
 /// Convert a ContainmentFolder to D3TreeNode recursively

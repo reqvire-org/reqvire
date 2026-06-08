@@ -99,7 +99,6 @@ The system shall persist all element manipulation operations to the source files
   * satisfiedBy: [crud.rs](../../../core/src/crud.rs)
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * verifiedBy: [File Persistence Test](Verifications/ElementManipulationVerifications.md#file-persistence-test)
-  * verifiedBy: [Element Ordering Verification](Verifications/FormattingVerifications.md#element-ordering-verification)
 ---
 
 ### Merge Element Operation
@@ -107,8 +106,8 @@ The system shall persist all element manipulation operations to the source files
 The system shall provide the capability to merge multiple source elements into a target element, consolidating content, relations, and attachments while enforcing type compatibility and removing source elements after successful merge.
 
 #### Details
-When the merge target is a `# Documents` model file element, the operation shall preserve the `# Documents` file format and keep the result as a single-element document file.
-The operation shall reject merges where a source element is in a `# Documents` file and the target element is in a `# Elements` file. That conversion can violate `# Elements` parsing constraints and shall be performed manually.
+When the merge target is a `# Element` model file element, the operation shall preserve the `# Element` file format and keep the result as a single-element file.
+The operation shall reject merges where a source element is in a `# Element` file and the target element is in a `# Elements` file. That conversion can violate `# Elements` parsing constraints and shall be performed manually.
 
 #### Metadata
   * type: requirement
@@ -133,7 +132,7 @@ The operation shall reject merges where a source element is in a `# Documents` f
 The system shall provide the capability to move existing model elements to different file locations while automatically updating all relations that reference the moved element, creating target files if needed, and removing empty source files when no elements remain.
 
 #### Details
-The operation shall reject moves into an existing `# Documents` file when that move would introduce an additional element. `# Documents` files are single-element model files.
+The operation shall reject moves into an existing `# Element` file when that move would introduce an additional element. `# Element` files are single-element model files.
 
 #### Metadata
   * type: requirement
@@ -157,7 +156,7 @@ The operation shall reject moves into an existing `# Documents` file when that m
 The system shall provide the capability to move entire specification files with all their elements to a new location in the repository while updating all relation references throughout the model.
 
 #### Details
-When `--squash` is requested, the operation shall reject squashing into an existing `# Documents` target file. `# Documents` files are single-element model files and cannot accept squashed multi-element content.
+When `--squash` is requested, the operation shall reject squashing into an existing `# Element` target file. `# Element` files are single-element model files and cannot accept squashed multi-element content.
 
 #### Metadata
   * type: requirement

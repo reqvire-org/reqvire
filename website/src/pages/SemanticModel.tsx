@@ -1,0 +1,255 @@
+import { Link } from "react-router-dom";
+import { DetailGrid } from "@/components/Doc";
+import { Footer } from "@/components/Footer";
+
+export default function SemanticModel() {
+  return (
+    <div className="max-w-[768px]">
+      <h1 className="text-4xl font-bold text-zinc-900 mb-5">
+        Reqvire Semantic Model
+      </h1>
+      <p className="text-base text-zinc-600 leading-relaxed mb-10">
+        The semantic model is Reqvire's typed representation of
+        engineering knowledge. It defines the element types, relations, ownership
+        rules, ontology context, verification links, and implementation evidence
+        that make traceability queryable and validation possible.
+      </p>
+
+      <Section title="High-Level Structure">
+        <p className="text-zinc-600 mb-4">
+          Reqvire is not organized as one large parent-child tree. The model is
+          built from independent layers and subgraphs that are connected through
+          explicit relations where the modeling rules allow them.
+        </p>
+        <ul className="space-y-3">
+          {[
+            ["Ontology layer", "reusable semantic definitions, relations, rules, and model vocabulary"],
+            ["Capability and requirement subgraphs", "one or more independent product or system intent structures with requirements and refinements"],
+            ["Verification layer", "tests, proofs, analysis, inspection, and demonstration evidence linked to the capabilities or requirements they verify"],
+            ["Implementation evidence", "code, tests, reports, documents, and other artifacts that satisfy requirements or provide verification evidence"],
+          ].map(([term, desc]) => (
+            <li key={term} className="flex items-start gap-2.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-2 flex-shrink-0" />
+              <span className="text-zinc-700">
+                <strong className="text-zinc-900">{term}</strong> — {desc}.
+              </span>
+            </li>
+          ))}
+        </ul>
+        <p className="text-zinc-600 mt-4">
+          Attachments bring ontology context, reusable contracts, and compatible
+          model context into scope without forcing unrelated concerns into the
+          same hierarchy.
+        </p>
+      </Section>
+
+      <Section title="Ownership Rules">
+        <DetailGrid
+          items={[
+            {
+              name: "Capability roots",
+              desc: "A capability with no capability parent is a capability-rooted submodel boundary. Child capabilities use derive or derivedFrom within the capability family.",
+            },
+            {
+              name: "Requirement ownership",
+              desc: "A requirement resolves to exactly one owning capability. Top-level requirements use specify; child requirements inherit ownership through requirement hierarchy.",
+            },
+            {
+              name: "Refinement ownership",
+              desc: "A refinement is owned by exactly one compatible requirement through refine or refinedBy. Requirement-owned refinements carry detailed contracts, not governance metadata.",
+            },
+            {
+              name: "Cross-boundary reuse",
+              desc: "Cross-capability semantic dependencies stay explicit through attachments so context, review impact, and AI collection remain auditable.",
+            },
+          ]}
+        />
+      </Section>
+
+      <Section title="Submodels and Attachments">
+        <p className="text-zinc-600 mb-4">
+          Capability-rooted submodels are intentionally independent. A capability
+          can own its operational meaning, the requirements that specify it, and
+          the refinements and verifications that prove it without becoming part
+          of one universal hierarchy.
+        </p>
+        <div className="space-y-4">
+          <div className="border border-zinc-200 rounded-lg p-4">
+            <h4 className="font-semibold text-zinc-900 mb-1">
+              Capability attachments
+            </h4>
+            <p className="text-sm text-zinc-600">
+              Capabilities attach ontology elements to define reachable
+              semantic context for descendant capabilities and specifying
+              requirements.
+            </p>
+          </div>
+          <div className="border border-zinc-200 rounded-lg p-4">
+            <h4 className="font-semibold text-zinc-900 mb-1">
+              Requirement attachments
+            </h4>
+            <p className="text-sm text-zinc-600">
+              Requirements attach reusable requirement-owned contracts such as
+              semantic contracts, semantic query contracts, specifications,
+              constraints, behaviors, states, and input/output definitions. The
+              attaching requirement declares that its subgraph must fulfill the
+              attached contract across that requirement, its child requirements,
+              and the refinements that detail those obligations.
+            </p>
+          </div>
+          <div className="border border-zinc-200 rounded-lg p-4">
+            <h4 className="font-semibold text-zinc-900 mb-1">
+              Fulfillment evidence
+            </h4>
+            <p className="text-sm text-zinc-600">
+              The attachment creates the contract dependency; fulfillment is
+              shown by satisfied requirements, child requirement coverage, and
+              verifications linked to evidence. Trace and change-impact views
+              keep that dependency visible so affected contracts, requirements,
+              refinements, verifications, and implementation artifacts can be
+              reviewed and hardened after changes.
+            </p>
+          </div>
+          <div className="border border-zinc-200 rounded-lg p-4">
+            <h4 className="font-semibold text-zinc-900 mb-1">
+              One-way dependency flow
+            </h4>
+            <p className="text-sm text-zinc-600">
+              Attachment flow between capability-rooted subgraphs is
+              one-directional. If two submodels attach contracts to each other in
+              both directions, the boundary becomes ambiguous, so validation
+              rejects that pattern and forces the dependency direction to be
+              explicit.
+            </p>
+          </div>
+        </div>
+      </Section>
+
+      <Section title="Element Types">
+        <div className="space-y-4">
+          {[
+            {
+              name: "Ontology",
+              desc: "Defines domain semantics, relations, rules, reusable concepts, and ontology vocabulary as first-class OWL/Turtle content.",
+            },
+            {
+              name: "Capability",
+              desc: "Describes coherent operational, product, business, regulatory, or system abilities. Stable, decomposable, and verifiable.",
+            },
+            {
+              name: "Requirement",
+              desc: "Defines implementable obligations, constraints, guarantees, and behavioral expectations that specify capabilities.",
+            },
+            {
+              name: "Refinement",
+              desc: "Adds specification, constraint, behavior, state, input/output, and semantic-contract detail to obligations.",
+            },
+            {
+              name: "Verification",
+              desc: "Evidence that capabilities or requirements are verified by tests, proofs, analysis, inspection, or demonstration.",
+            },
+          ].map((el) => (
+            <div
+              key={el.name}
+              className="border border-zinc-200 rounded-lg p-4"
+            >
+              <h4 className="font-semibold text-zinc-900 mb-1">{el.name}</h4>
+              <p className="text-sm text-zinc-600">{el.desc}</p>
+            </div>
+          ))}
+        </div>
+      </Section>
+
+      <Section title="Ontology Contracts">
+        <p className="text-zinc-600 mb-4">
+          Ontology and semantic contracts are separate layers of meaning.
+          Ontology defines reusable vocabulary. Requirement-owned contracts use
+          reachable ontology context to make obligations precise and
+          machine-checkable.
+        </p>
+        <p className="text-zinc-600 mb-4">
+          For ontology authoring rules, examples, validation, and export
+          commands, see{" "}
+          <Link to="/ontologies" className="text-blue-600 hover:text-blue-700">
+            Ontologies
+          </Link>
+          .
+        </p>
+        <DetailGrid
+          items={[
+            {
+              name: "Ontology",
+              desc: "Use ontology elements for reusable meaning: classes, properties, ranges, restrictions, labels, comments, and stable domain vocabulary. Ontology elements require one Ontology Turtle block.",
+            },
+            {
+              name: "Concept References",
+              desc: "Use concept references when readable requirement prose should bind labels to reachable ontology CURIEs or IRIs without crowding the requirement text.",
+            },
+            {
+              name: "Semantic Contract",
+              desc: "Use semantic-contract for a requirement-owned SHACL profile over reachable ontology. It requires Shapes and must not contain Ontology.",
+            },
+            {
+              name: "Semantic Query Contract",
+              desc: "Use semantic-query-contract for a requirement-owned SPARQL query contract. It requires one Query section with one fenced sparql block.",
+            },
+          ]}
+        />
+      </Section>
+
+      <Section title="Relations">
+        <p className="text-zinc-600 mb-4">
+          Relations connect elements in the model, creating traceability chains
+          from domain meaning to obligations, verification, implementation, and evidence:
+        </p>
+        <div className="overflow-x-auto border border-zinc-200 rounded-lg">
+          <table className="w-full text-sm">
+            <thead className="bg-zinc-50 text-zinc-900">
+              <tr>
+                <th className="text-left p-3 font-semibold">Relation</th>
+                <th className="text-left p-3 font-semibold">Meaning</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-200">
+              {[
+                ["derivedFrom / derive", "Hierarchy inside the same family: capability, requirement, or ontology."],
+                ["specify / specifiedBy", "Requirement specifies a capability."],
+                ["refine / refinedBy", "Requirement owns a compatible refinement contract."],
+                ["verify / verifiedBy", "Verification records evidence scope for a capability or requirement."],
+                ["satisfiedBy / satisfy", "Requirement or evidence-backed verification links to implementation or proof/test evidence."],
+                ["attach", "Capability imports ontology context; requirement imports a one-way requirement-owned contract dependency."],
+                ["trace", "Soft traceability without ownership semantics."],
+              ].map(([relation, meaning]) => (
+                <tr key={relation}>
+                  <td className="p-3 align-top">
+                    <code className="text-blue-700 font-semibold">
+                      {relation}
+                    </code>
+                  </td>
+                  <td className="p-3 text-zinc-600">{meaning}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Footer />
+    </div>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section className="mb-12">
+      <h2 className="text-2xl font-semibold text-zinc-900 mb-4">{title}</h2>
+      {children}
+    </section>
+  );
+}

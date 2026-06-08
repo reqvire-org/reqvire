@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="160" height="90" viewBox="0 0 160 90" role="img" aria-labelledby="title desc">
-  <title id="title">Local diagram</title>
-  <desc id="desc">Simple local image fixture for HTML export tests.</desc>
-  <rect width="160" height="90" rx="10" fill="#f3efe4"/>
-  <rect x="12" y="12" width="136" height="66" rx="8" fill="#1f4b3b"/>
-  <circle cx="40" cy="45" r="12" fill="#f5c04a"/>
-  <path d="M64 45h52" stroke="#f3efe4" stroke-width="6" stroke-linecap="round"/>
-</svg>

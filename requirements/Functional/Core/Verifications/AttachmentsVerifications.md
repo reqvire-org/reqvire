@@ -59,7 +59,7 @@ Verify attachments render correctly in all output formats.
 #### Details
 Test cases for identifier attachments:
 - Markdown output preserves format
-- HTML export renders clickable links
+- Explorer content renders clickable links
 - JSON includes attachments array
 - JSON includes element identifiers in attachments array as strings
 - Element identifier format: `"file.md#element-name"`
@@ -70,7 +70,7 @@ Test cases for identifier attachments:
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
   * verify: [Reserved Subsections Support](../StructureAndParsing.md#reserved-subsections-support)
 ---
 
@@ -87,6 +87,7 @@ Test cases:
 - Requirement attachment to a requirement-owned `semantic-contract` validates.
 - Requirement attachment to ontology is forbidden because ontology context is inherited from the owning capability path.
 - Requirement attachment to semantic contracts is limited to requirement-owned semantic contracts.
+- Verification element attachment to any target fails; verification evidence must use `satisfiedBy`, and verified targets must use `verify`.
 
 #### Metadata
   * type: test-verification

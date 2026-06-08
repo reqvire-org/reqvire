@@ -56,12 +56,8 @@ This test verifies that the format command reorders elements following the Eleme
 #### Metadata
   * type: test-verification
 
-#### Attachments
-  * [Element Ordering Behavior](../Behaviors.md#element-ordering-behavior)
-
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-element-ordering/test.sh)
-  * verify: [Element Manipulation File Persistence](../ElementManipulation.md#element-manipulation-file-persistence)
   * verify: [Element Ordering Normalization](../Formatting.md#element-ordering-normalization)
   * verify: [Format Command](../../../Interfaces/CLI/Commands.md#format-command)
 ---

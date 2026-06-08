@@ -22,6 +22,7 @@ This is a test requirement for serve command verification.
 #### Relations
   * derivedFrom: [Parent Requirement](#parent-requirement)
   * verifiedBy: [Test Verification](Verifications/Tests.md#test-verification-one)
+  * satisfiedBy: [Serve Evidence Script](../scripts/evidence.sh)
 
 ---
 

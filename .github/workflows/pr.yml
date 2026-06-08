@@ -25,10 +25,16 @@ jobs:
         with:
           node-version: "24"
 
+      - name: Install Explorer dependencies
+        run: cd explorer && npm ci
+
+      - name: Lint Explorer SPA
+        run: cd explorer && npm run lint
+
       - name: Build Explorer SPA bundle
         # core/build.rs embeds explorer/dist into the binary at compile time,
         # so the bundle must be built before cargo build/test.
-        run: cd explorer && npm ci && npm run build
+        run: cd explorer && npm run build
 
       - name: Run Tests
         run: cargo test --verbose

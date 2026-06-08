@@ -27,6 +27,14 @@ export function useHashRoute() {
 
   const [route, setRoute] = useState<ParsedRoute>(read);
 
+  const applyHash = useCallback(
+    (hash: string) => {
+      window.location.hash = hash;
+      setRoute(read());
+    },
+    [read],
+  );
+
   useEffect(() => {
     const onHashChange = () => setRoute(read());
     window.addEventListener("hashchange", onHashChange);
@@ -37,17 +45,23 @@ export function useHashRoute() {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, [read]);
 
-  const navigateView = useCallback((view: ViewId) => {
-    window.location.hash = routeForView(view);
-  }, []);
+  const navigateView = useCallback(
+    (view: ViewId) => {
+      applyHash(routeForView(view));
+    },
+    [applyHash],
+  );
 
-  const openElement = useCallback((identifier: string) => {
-    window.location.hash = routeForElement(identifier);
-  }, []);
+  const openElement = useCallback(
+    (identifier: string) => {
+      applyHash(routeForElement(identifier));
+    },
+    [applyHash],
+  );
 
   const closeElement = useCallback(() => {
-    window.location.hash = routeForView(lastViewRef.current);
-  }, []);
+    applyHash(routeForView(lastViewRef.current));
+  }, [applyHash]);
 
   return { route, navigateView, openElement, closeElement };
 }

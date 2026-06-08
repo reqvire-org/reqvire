@@ -23,9 +23,6 @@ pathdiff = { workspace = true }
 walkdir = { workspace = true }
 globset = { workspace = true }
 
-# HTML generation
-maud = { workspace = true }
-
 # Error handling
 anyhow = { workspace = true }
 thiserror = { workspace = true }

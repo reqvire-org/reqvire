@@ -198,7 +198,7 @@ reqvire:OntologyConstructProjection a owl:Class ;
   rdfs:comment "Projection record produced by the ontology construct projector for direct-authored OWL/RDFS/SHACL patterns." .
 reqvire:OntologyConstruct a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection ;
-  rdfs:comment "Generated semantic construct used by ontology export and HTML exploration, such as a restriction, class expression, equivalence group, property chain, or property characteristic." .
+  rdfs:comment "Generated semantic construct used by ontology output and Explorer exploration, such as a restriction, class expression, equivalence group, property chain, or property characteristic." .
 reqvire:OntologyConstructMember a owl:Class ;
   rdfs:subClassOf reqvire:RdfProjection ;
   rdfs:comment "Ordered member record for property chains and class-expression lists in generated ontology projection facts." .
@@ -296,7 +296,7 @@ reqvire:elementId a owl:DatatypeProperty ;
 reqvire:lineNumber a owl:DatatypeProperty ;
   rdfs:domain reqvire:SemanticBlock ;
   rdfs:range xsd:integer ;
-  rdfs:comment "Source line number for a semantic block or generated source projection record." .
+  rdfs:comment "Source line number for a semantic block or semantic source projection record." .
 reqvire:relationType a owl:DatatypeProperty ;
   rdfs:domain reqvire:RdfProjection ;
   rdfs:range xsd:string ;

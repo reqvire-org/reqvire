@@ -1,0 +1,150 @@
+{
+  "$schema": "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "patterns": [
+          {
+            "group": [
+              "design-system/components/**",
+              "../design-system/components/**",
+              "../../design-system/components/**",
+              "components/controls/**",
+              "components/core/**",
+              "components/data/**",
+              "components/navigation/**",
+              "ui_kits/explorer/**"
+            ],
+            "message": "Import design-system components from design-system/index.ts or the @ds alias, not component internals."
+          }
+        ]
+      }
+    ]
+  },
+  "ignorePatterns": [
+    "design-system/_ds_bundle.js"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "design-system/index.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "settings": {
+    "reqvireDesignSystem": {
+      "generatedFrom": "design-system/index.ts",
+      "components": {
+        "Alert": {
+          "replaces": []
+        },
+        "Badge": {
+          "replaces": []
+        },
+        "Breadcrumb": {
+          "replaces": []
+        },
+        "Button": {
+          "replaces": []
+        },
+        "Card": {
+          "replaces": []
+        },
+        "Chip": {
+          "replaces": []
+        },
+        "ElementIcon": {
+          "replaces": []
+        },
+        "Icon": {
+          "replaces": []
+        },
+        "IconButton": {
+          "replaces": []
+        },
+        "Modal": {
+          "replaces": []
+        },
+        "ModalBody": {
+          "replaces": []
+        },
+        "ModalClose": {
+          "replaces": []
+        },
+        "ModalContent": {
+          "replaces": []
+        },
+        "ModalDescription": {
+          "replaces": []
+        },
+        "ModalFooter": {
+          "replaces": []
+        },
+        "ModalHeader": {
+          "replaces": []
+        },
+        "ModalTitle": {
+          "replaces": []
+        },
+        "RelationPill": {
+          "replaces": []
+        },
+        "SearchInput": {
+          "replaces": []
+        },
+        "SegmentedControl": {
+          "replaces": []
+        },
+        "SidebarSection": {
+          "replaces": []
+        },
+        "Stat": {
+          "replaces": []
+        },
+        "StatRow": {
+          "replaces": []
+        },
+        "Table": {
+          "replaces": []
+        },
+        "TableBody": {
+          "replaces": []
+        },
+        "TableCell": {
+          "replaces": []
+        },
+        "TableHead": {
+          "replaces": []
+        },
+        "TableHeader": {
+          "replaces": []
+        },
+        "TableRow": {
+          "replaces": []
+        },
+        "TableSortButton": {
+          "replaces": []
+        },
+        "TableViewport": {
+          "replaces": []
+        },
+        "Tabs": {
+          "replaces": []
+        },
+        "ToggleRow": {
+          "replaces": []
+        },
+        "TreeItem": {
+          "replaces": []
+        },
+        "TypeBadge": {
+          "replaces": []
+        }
+      }
+    }
+  }
+}

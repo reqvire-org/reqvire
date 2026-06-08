@@ -176,9 +176,6 @@ The test shall verify that the `add` command creates new elements from stdin or 
 #### Metadata
   * type: test-verification
 
-#### Attachments
-  * [Element Ordering Behavior](../Behaviors.md#element-ordering-behavior)
-
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
   * verify: [CLI Add Element Command](../../../Interfaces/CLI/Commands.md#cli-add-element-command)
@@ -221,6 +218,11 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 3. Verify old → new identifier mapping
 4. Verify changes are applied
 
+**Test Steps - Metadata Preservation:**
+1. Move an element whose metadata uses a custom `other-*` element type.
+2. Verify the moved Markdown preserves the exact `other-*` metadata token.
+3. Verify the moved Markdown does not serialize only the internal custom type suffix.
+
 **Test Steps - Error Cases:**
 1. Try to move non-existent element by name
 2. Try to move to invalid location
@@ -231,7 +233,8 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 **Success Criteria:**
 - Moves element to target location
 - Updates all incoming relations
-- Preserves element content and outgoing relations
+- Preserves element content, metadata, and outgoing relations
+- Preserves custom `other-*` metadata tokens when rewriting moved elements
 - Inserts following Element Ordering Behavior
 - Shows git-style diff for all affected files
 - Reports identifier change
@@ -243,11 +246,9 @@ The test shall verify that the `mv` command relocates elements, updates all rela
 #### Metadata
   * type: test-verification
 
-#### Attachments
-  * [Element Ordering Behavior](../Behaviors.md#element-ordering-behavior)
-
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-manipulation/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-custom-element-types/test.sh)
   * verify: [CLI Move Element Command](../../../Interfaces/CLI/Commands.md#cli-move-element-command)
 ---
 
@@ -462,9 +463,6 @@ Test cases:
 
 #### Metadata
   * type: test-verification
-
-#### Attachments
-  * [Create Element Override Behavior](../Behaviors.md#create-element-override-behavior)
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-override/test.sh)
@@ -700,9 +698,6 @@ The test shall verify that element manipulation operations are persisted to sour
 #### Metadata
   * type: test-verification
 
-#### Attachments
-  * [Element Ordering Behavior](../Behaviors.md#element-ordering-behavior)
-
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-crud-file-persistence/test.sh)
   * verify: [Element Manipulation File Persistence](../ElementManipulation.md#element-manipulation-file-persistence)
@@ -834,7 +829,7 @@ Test cases:
 8. **Dry-run mode**: `--dry-run` does not modify files.
 9. **Relation deduplication**: duplicate merged relation appears once.
 10. **Regression scenario**: multi-source merge keeps target element present and model validates.
-11. **Document-to-elements rejection**: merging a source from `# Documents` into a target in `# Elements` fails with explicit manual-migration guidance.
+11. **Document-to-elements rejection**: merging a source from `# Element` into a target in `# Elements` fails with explicit manual-migration guidance.
 12. **Single-root rejection**: merge that would create multi-root hierarchy ownership fails with deterministic single-root ownership error output and persists no changes.
 
 #### Metadata
@@ -905,7 +900,7 @@ The test shall verify that existing model elements can be moved to different loc
 - Move last element from file (triggers source file deletion)
 - Move element leaving other elements (source file preserved)
 - Verify element ordering after move (parent before children)
-- Reject move into existing `# Documents` target that would create multiple elements
+- Reject move into existing `# Element` target that would create multiple elements
 
 #### Metadata
   * type: test-verification
@@ -983,7 +978,7 @@ The test shall verify that the `mv-file --squash` command moves all elements fro
 - Dry run mode with --squash
 - JSON output mode with --squash
 - Error: target file exists without --squash flag
-- Error: `mv-file --squash` target is existing `# Documents` file
+- Error: `mv-file --squash` target is existing `# Element` file
 
 #### Metadata
   * type: test-verification

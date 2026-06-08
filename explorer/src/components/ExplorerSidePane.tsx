@@ -1,35 +1,32 @@
-import { useMemo, type ReactNode } from "react";
-import { Badge, Text, Tooltip } from "@radix-ui/themes";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
-  ActivityLogIcon,
-  ArchiveIcon,
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  CubeIcon,
-  FileIcon,
-  GridIcon,
-  ListBulletIcon,
-  PieChartIcon,
-  RowsIcon,
-  TableIcon,
-} from "@radix-ui/react-icons";
+  Button,
+  ElementIcon,
+  Icon,
+  IconButton,
+  SearchInput,
+  SidebarSection,
+  Stat,
+  StatRow,
+  ToggleRow,
+  TreeItem,
+} from "@ds";
 import { useStore } from "../store/StoreContext";
-import type { ViewId } from "../router/routes";
-import type { ProjectStoreElement, ProjectStoreFile } from "../store/types";
+import { VIEW_TITLES, type ViewId } from "../router/routes";
+import type {
+  ExplorerProjectStore,
+  KnowledgeGraphNode,
+  OntologyGraphNode,
+  ProjectStoreElement,
+  ProjectStoreFile,
+} from "../store/types";
 import {
-  MODEL_ROLE_TYPES,
-  KN2_RELATIONS,
-  ONTOLOGY_SHOW_FILTERS,
   SEARCH_KINDS,
   useExplorerUiState,
-  type GraphOverlayKey,
-  type Kn2ClusterMode,
-  type Kn2LayoutMode,
-  type Kn2RelationCategory,
-  type ModelMode,
   type SearchKind,
-  type TraceMode,
 } from "./ExplorerUiState";
+import { PaneChromeHeader, ReqvireRailMark } from "./PaneChrome";
+import { buildTraceFiles, type TraceFileNode } from "../lib/traces";
 
 interface ExplorerSidePaneProps {
   activeView: ViewId;
@@ -37,6 +34,7 @@ interface ExplorerSidePaneProps {
   onToggle: () => void;
   onNavigate: (view: ViewId) => void;
   onOpenElement: (id: string) => void;
+  onOpenOntologyNode: (id: string) => void;
 }
 
 interface TreeFolder {
@@ -48,29 +46,74 @@ interface TreeFolder {
 
 const ROOT_PATH = "__root__";
 
+interface TracePaneVerification {
+  id: string;
+  name: string;
+  type?: string;
+}
+
+interface TracePaneFile {
+  path: string;
+  name: string;
+  verifications: TracePaneVerification[];
+}
+
+interface TracePaneFolder {
+  path: string;
+  name: string;
+  folders: TracePaneFolder[];
+  files: TracePaneFile[];
+}
+
+type CoverageSectionId =
+  | "overview"
+  | "capability-coverage"
+  | "unverified-requirements"
+  | "unimplemented-requirements"
+  | "unsatisfied-verifications"
+  | "orphaned-verifications";
+
 export function ExplorerSidePane({
   activeView,
   open,
   onToggle,
   onNavigate,
   onOpenElement,
+  onOpenOntologyNode,
 }: ExplorerSidePaneProps) {
   const { store, elementById } = useStore();
+  const ui = useExplorerUiState();
   const tree = useMemo(() => buildFileTree(store.files), [store.files]);
-  const showProjectTree = activeView === "model" || activeView === "files";
+  const traceTree = useMemo(() => buildTraceFileTree(buildTraceFiles(store)), [store]);
+  const graphModelActive = activeView === "model" && ui.modelMode === "graph";
+  const showProjectTree = (activeView === "model" || activeView === "files") && !graphModelActive;
+  const title = graphModelActive ? "Graph Explorer" : `${VIEW_TITLES[activeView]} Explorer`;
 
   return (
     <aside
-      className={["explorer-side-pane", open ? "" : "is-collapsed"].join(" ")}
+      className={["ex-side-pane", open ? "" : "is-collapsed"].join(" ")}
       aria-label="Explorer navigation"
     >
-      <div className="explorer-side-content">
-        <ExplorerViewControls activeView={activeView} onNavigate={onNavigate} />
+      <div className="ex-side-content">
+        <PaneChromeHeader title={title} />
+        {activeView === "ontologies" && <OntologyGraphSearch />}
+        <ExplorerViewControls
+          activeView={activeView}
+          onOpenElement={onOpenElement}
+          onOpenOntologyNode={onOpenOntologyNode}
+        />
+        {activeView === "traces" && (
+          <div className="ex-tree rq-tree" aria-label="Verification trace tree">
+            <TraceTreeFolderNode folder={traceTree} depth={0} />
+          </div>
+        )}
         {showProjectTree && (
-          <div className="explorer-tree" aria-label="Project tree">
+          <div className="ex-tree rq-tree" aria-label="Project tree">
             <TreeFolderNode
               folder={tree}
+              activeView={activeView}
               elementById={elementById}
+              onNavigate={onNavigate}
               onOpenElement={onOpenElement}
               depth={0}
             />
@@ -79,181 +122,251 @@ export function ExplorerSidePane({
       </div>
       <button
         type="button"
-        className="explorer-tree-tab"
+        className="ex-tree-tab"
         aria-label={open ? "Collapse explorer pane" : "Expand explorer pane"}
         aria-expanded={open}
         onClick={onToggle}
       >
-        <span className="explorer-tree-tab-label">Explorer</span>
-        <span className="explorer-tree-tab-toggle" aria-hidden="true">
-          {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+        <ReqvireRailMark />
+        <span className="ex-tree-tab-label">Explorer</span>
+        <span className="ex-tree-tab-toggle" aria-hidden="true">
+          {open ? <Icon name="chevron-left" /> : <Icon name="chevron-right" />}
         </span>
       </button>
     </aside>
   );
 }
 
+function OntologyGraphSearch() {
+  const [query, setQuery] = useState("");
+
+  useEffect(() => {
+    window.filterOntologyGraph?.(query);
+  }, [query]);
+
+  function submitSearch(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    window.filterOntologyGraph?.(query);
+  }
+
+  return (
+    <form className="ex-global-search" role="search" onSubmit={submitSearch}>
+      <SearchInput
+        id="ontology-graph-search"
+        className="ex-global-search-control"
+        size="lg"
+        aria-label="Search Explorer"
+        type="search"
+        placeholder="Search ontology graph..."
+        value={query}
+        onChange={(event) => setQuery(event.target.value)}
+      />
+      <ul id="ontology-graph-results" className="ontology-graph-results ex-global-search-results" />
+    </form>
+  );
+}
+
 function ExplorerViewControls({
   activeView,
-  onNavigate,
+  onOpenElement,
+  onOpenOntologyNode,
 }: {
   activeView: ViewId;
-  onNavigate: (view: ViewId) => void;
+  onOpenElement: (id: string) => void;
+  onOpenOntologyNode: (id: string) => void;
 }) {
   const ui = useExplorerUiState();
+  const { store, elementById } = useStore();
 
-  if (activeView === "model" || activeView === "files") {
-    function selectModelMode(value: string) {
-      ui.setModelMode(value as ModelMode);
-      if (activeView === "files") {
-        onNavigate("model");
-      }
-    }
+  const graphControlsActive = (activeView === "model" && ui.modelMode === "graph");
+  const graphTypeOptions = useMemo(
+    () => buildKnowledgeGraphTypeOptions(store.knowledge_graph.nodes ?? [], elementById),
+    [elementById, store.knowledge_graph.nodes],
+  );
+  const searchElementTypeOptions = useMemo(
+    () => buildSearchElementTypeOptions(store.elements),
+    [store.elements],
+  );
+  const searchKindCounts = useMemo(
+    () => buildSearchKindCounts(store),
+    [store.elements.length, store.files.length, store.resources.length, store.ontology.graph_data?.nodes],
+  );
 
-    return (
-      <section className="explorer-pane-controls" aria-label="Model controls">
-        <PaneTitle title="Model" />
-        <ModeIconGroup
-          items={[
-            ["list", "List", <ListBulletIcon />],
-            ["grid", "Grid", <GridIcon />],
-            ["sunburst", "Sunburst", <PieChartIcon />],
-            ["icicle", "Icicle", <RowsIcon />],
-          ]}
-          active={ui.modelMode}
-          onSelect={selectModelMode}
-        />
-      </section>
-    );
+  if ((activeView === "model" || activeView === "files") && !graphControlsActive) {
+    return null;
   }
 
-  if (activeView === "knowledge-graph") {
+  if (graphControlsActive) {
     return (
-      <section className="explorer-pane-controls" aria-label="Knowledge Graph controls">
-        <PaneTitle title="Knowledge Graph" />
+      <section className="ex-pane-controls" aria-label="Graph controls">
+        <SidebarSection title="Summary" className="ex-pane-summary" aria-label="Summary">
+          <StatRow className="ex-summary">
+            <Stat label="Submodels" value={formatSummaryValue(store.knowledge_graph.summary?.submodels ?? store.knowledge_graph.submodels?.length ?? 0)} />
+            <Stat label="Elements" value={formatSummaryValue(store.knowledge_graph.summary?.elements ?? store.elements.length)} />
+            <Stat label="Relations" value={formatSummaryValue(store.knowledge_graph.summary?.relations ?? store.relations.length)} />
+            <Stat label="Attachments" value={formatSummaryValue(store.knowledge_graph.summary?.attachments ?? store.attachments.length)} />
+          </StatRow>
+        </SidebarSection>
+        <KnowledgeGraphSelectedElementLink
+          selectedNodeId={ui.knowledgeGraphSelectionId}
+          nodes={store.knowledge_graph.nodes ?? []}
+          elementById={elementById}
+          onOpenElement={onOpenElement}
+        />
         <PaneSectionLabel label="Show" />
-        {MODEL_ROLE_TYPES.map((type) => (
-          <PaneToggle
-            key={type}
-            label={roleLabel(type)}
-            active={ui.modelTypes.has(type)}
-            color={roleColor(type)}
-            onClick={() => ui.toggleModelType(type)}
-          />
-        ))}
-        <PaneSectionLabel label="Overlays" />
-        {[
-          ["cross", "Attachments / concepts"],
-          ["verification", "Verification / satisfy"],
-          ["trace", "Trace"],
-        ].map(([key, label]) => (
-          <PaneToggle
-            key={key}
-            label={label}
-            active={ui.modelOverlays.has(key as GraphOverlayKey)}
-            line
-            onClick={() => ui.toggleModelOverlay(key as GraphOverlayKey)}
+        <Button size="sm" onClick={ui.resetModelTypes}>
+          Reset filters
+        </Button>
+        {graphTypeOptions.map((option) => (
+          <ToggleRow
+            key={option.type}
+            label={humanize(option.type)}
+            on={ui.modelTypes.has(option.type)}
+            icon={<ElementIcon type={option.type} family={option.family} size="sm" />}
+            meta={formatCompactCount(option.count)}
+            onToggle={() => ui.toggleModelType(option.type)}
           />
         ))}
       </section>
     );
   }
 
-  if (activeView === "traces") {
+  if (activeView === "traces") return null;
+
+  if (activeView === "coverage") {
+    const coverageItems = buildCoveragePaneItems(store);
     return (
-      <section className="explorer-pane-controls" aria-label="Trace controls">
-        <PaneTitle title="Traces" />
-        <ModeIconGroup
-          items={[
-            ["flow", "Flow", <ActivityLogIcon />],
-            ["rows", "Rows", <TableIcon />],
-          ]}
-          active={ui.traceMode}
-          onSelect={(value) => ui.setTraceMode(value as TraceMode)}
-        />
-        <PaneLegend
-          title="Legend"
-          rows={[
-            ["files", "#00897b"],
-            ["verifications", "#4caf50"],
-            ["requirements", "#673ab7"],
-          ]}
-        />
+      <section className="ex-pane-controls" aria-label="Coverage explorer">
+        <PaneSectionLabel label="Coverage" />
+        <div className="ex-pane-nav-list">
+          {coverageItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className="ex-pane-nav-row"
+              onClick={() => navigateCoverageSection(item.id)}
+            >
+              <span className="ex-pane-nav-row__icon" aria-hidden="true">
+                <Icon name={item.icon} />
+              </span>
+              <span className="ex-pane-nav-row__label">{item.label}</span>
+              <span className="ex-pane-nav-row__count">{formatCompactCount(item.count)}</span>
+            </button>
+          ))}
+        </div>
       </section>
     );
   }
 
   if (activeView === "search") {
     return (
-      <section className="explorer-pane-controls" aria-label="Search controls">
-        <PaneTitle title="Search" />
-        <button
-          type="button"
-          className="explorer-mode-link"
-          onClick={ui.resetSearchKinds}
-        >
+      <section className="ex-pane-controls" aria-label="Search controls">
+        <h2 className="ex-pane-controls-title">Filter by</h2>
+        <Button size="sm" onClick={ui.resetSearchKinds}>
           Reset filters
-        </button>
+        </Button>
         <PaneSectionLabel label="Result types" />
         {SEARCH_KINDS.map((kind) => (
-          <PaneToggle
+          <ToggleRow
             key={kind}
             label={searchKindLabel(kind)}
-            active={ui.searchKinds.has(kind)}
+            on={ui.searchKinds.has(kind)}
             color={searchKindColor(kind)}
-            onClick={() => ui.toggleSearchKind(kind)}
+            meta={formatCompactCount(searchKindCounts[kind] ?? 0)}
+            onToggle={() => ui.toggleSearchKind(kind)}
           />
         ))}
-        <PaneLegend
-          title="Legend"
-          rows={SEARCH_KINDS.map((kind) => [searchKindLabel(kind), searchKindColor(kind)])}
-        />
+        {searchElementTypeOptions.length > 0 ? (
+          <>
+            <PaneSectionLabel label="Element types" />
+            {searchElementTypeOptions.map((option) => (
+              <ToggleRow
+                key={option.type}
+                label={humanize(option.type)}
+                on={ui.searchElementTypes.has(option.type)}
+                icon={<ElementIcon type={option.type} family={option.family} size="sm" />}
+                meta={formatCompactCount(option.count)}
+                onToggle={() => ui.toggleSearchElementType(option.type)}
+              />
+            ))}
+          </>
+        ) : null}
       </section>
     );
   }
 
   if (activeView === "ontologies") {
+    const summary = store.ontology.summary ?? {};
     return (
-      <section className="explorer-pane-controls" aria-label="Ontology controls">
-        <PaneTitle title="Ontologies" />
-        <button
-          type="button"
-          className="explorer-mode-link"
-          onClick={() =>
-            (window as typeof window & { resetOntologyGraphLayout?: () => void })
-              .resetOntologyGraphLayout?.()
-          }
-        >
-          Reset layout
-        </button>
-        <PaneSectionLabel label="Show" />
-        {ONTOLOGY_SHOW_FILTERS.map(([category, value, label, swatch]) => (
-          <OntologyFilterToggle
-            key={value}
-            category={category}
-            value={value}
-            label={label}
-            active={ui.ontologyFilters.has(value)}
-            swatch={swatch}
-            onClick={() => ui.toggleOntologyFilter(value)}
-          />
-        ))}
+      <section className="ex-pane-controls" aria-label="Ontology controls">
+        <SidebarSection title="Summary" className="ex-pane-summary" aria-label="Summary">
+          <StatRow className="ex-summary">
+            <Stat label="Ontologies" value={formatSummaryValue(summary.ontology_blocks ?? 0)} />
+            <Stat label="Shapes" value={formatSummaryValue(summary.shape_blocks ?? 0)} />
+            <Stat
+              label="Quads"
+              value={formatSummaryValue(summary.total_quads ?? 0)}
+              title="RDF statements (subject-predicate-object, with graph context)"
+            />
+            <Stat
+              label="Blocks"
+              value={formatSummaryValue(summary.total_blocks ?? 0)}
+              title="Ontology and shape source blocks discovered in the model"
+            />
+          </StatRow>
+        </SidebarSection>
+        <OntologySelectedNodeLink
+          selectedNodeId={ui.ontologySelectionId}
+          nodes={store.ontology.graph_data?.nodes ?? []}
+          onOpenOntologyNode={onOpenOntologyNode}
+          onClear={() => {
+            ui.setOntologySelectionId(null);
+            window.clearOntologySelection?.();
+          }}
+        />
+        <PaneSectionLabel label="Graph" />
+        <div className="ex-pane-action-row">
+          {store.ontology.ttl_href && (
+            <a
+              href={store.ontology.ttl_href}
+              className="rq-btn rq-btn--ghost rq-btn--sm"
+              title="Download the exported ontology as Turtle (ontologies.ttl)"
+            >
+              <span className="rq-btn__icon" aria-hidden="true">
+                <Icon name="download" />
+              </span>
+              Download .ttl
+            </a>
+          )}
+          <button
+            type="button"
+            className="rq-btn rq-btn--ghost rq-btn--sm"
+            onClick={() =>
+              (window as typeof window & { resetOntologyGraphLayout?: () => void })
+                .resetOntologyGraphLayout?.()
+            }
+          >
+            <span className="rq-btn__icon" aria-hidden="true">
+              <Icon name="rotate-ccw" />
+            </span>
+            Reset layout
+          </button>
+        </div>
         <PaneSectionLabel label="Types" />
         <PaneVisualLegend
           rows={[
             ["class", "Class"],
             ["named-individual", "Individual"],
             ["datatype", "Datatype"],
-            ["restriction", "Restriction"],
             ["class-expression", "Class expr."],
             ["node-shape", "Node shape"],
             ["property-shape", "Property shape"],
             ["resource", "Resource"],
           ]}
         />
-        <div className="explorer-pane-legend-row">
+        <div className="ex-pane-legend-row">
           <span className="graph-line-swatch" />
-          <Text size="1">Relation</Text>
+          <span className="ex-pane-legend-text">Relation</span>
         </div>
         <PaneSectionLabel label="Notation" />
         <PaneNotationLegend
@@ -265,7 +378,6 @@ function ExplorerViewControls({
             ["⇔", "Equivalence"],
             ["⟲", "Inverse"],
             ["∘", "Property chain"],
-            ["∀", "Restriction"],
             ["∩", "Class expr."],
             ["SH", "SHACL overlay"],
           ]}
@@ -274,325 +386,350 @@ function ExplorerViewControls({
     );
   }
 
-  if (activeView === "kn2") {
-    return (
-      <section className="explorer-pane-controls" aria-label="KN2 controls">
-        <PaneTitle title="KN2" />
-        <PaneSectionLabel label="Layout" />
-        <ModeIconGroup
-          items={[
-            ["structural", "CoSE structural", <ActivityLogIcon />],
-            ["concentric", "Concentric", <PieChartIcon />],
-            ["breadthfirst", "Breadthfirst", <RowsIcon />],
-            ["circle", "Circle", <PieChartIcon />],
-            ["grid", "Grid", <GridIcon />],
-          ]}
-          active={ui.kn2LayoutMode}
-          onSelect={(value) => ui.setKn2LayoutMode(value as Kn2LayoutMode)}
-        />
-        <PaneSectionLabel label="Clusters" />
-        {[
-          ["structural", "Structural islands"],
-          ["modularity", "Modularity-style"],
-        ].map(([value, label]) => (
-          <PaneToggle
-            key={value}
-            label={label}
-            active={ui.kn2ClusterMode === value}
-            onClick={() => ui.setKn2ClusterMode(value as Kn2ClusterMode)}
-          />
-        ))}
-        <PaneSectionLabel label="Focus" />
-        <label className="graph-slider-control">
-          <span>
-            Selection radius <strong>{ui.kn2FocusRadius}</strong>
-          </span>
-          <input
-            type="range"
-            min="1"
-            max="4"
-            step="1"
-            value={ui.kn2FocusRadius}
-            onChange={(event) => ui.setKn2FocusRadius(Number(event.target.value))}
-          />
-        </label>
-        <label className="graph-check-control">
-          <input
-            type="checkbox"
-            checked={ui.kn2FocusOnly}
-            onChange={(event) => ui.setKn2FocusOnly(event.target.checked)}
-          />
-          Show focus only
-        </label>
-        <PaneSectionLabel label="Relations" />
-        {KN2_RELATIONS.map((relation) => (
-          <label key={relation} className="graph-check-control">
-            <input
-              type="checkbox"
-              checked={ui.kn2Relations.has(relation)}
-              onChange={() => ui.toggleKn2Relation(relation as Kn2RelationCategory)}
-            />
-            {relation}
-          </label>
-        ))}
-        <PaneSectionLabel label="Overlays" />
-        {[
-          ["cross", "Cross-subgraph overlays"],
-          ["verification", "Verification / satisfy"],
-          ["trace", "Trace"],
-        ].map(([overlay, label]) => (
-          <label key={overlay} className="graph-check-control">
-            <input
-              id={`kn2-${overlay === "cross" ? "cross-subgraph" : overlay}-overlay`}
-              type="checkbox"
-              checked={ui.kn2Overlays.has(overlay as GraphOverlayKey)}
-              onChange={() => ui.toggleKn2Overlay(overlay as GraphOverlayKey)}
-            />
-            {label}
-          </label>
-        ))}
-        <PaneSectionLabel label="Display" />
-        <label className="graph-check-control">
-          <input
-            type="checkbox"
-            checked={ui.kn2LabelsEnabled}
-            onChange={(event) => ui.setKn2LabelsEnabled(event.target.checked)}
-          />
-          Labels
-        </label>
-      </section>
-    );
-  }
-
   return null;
+}
+
+function KnowledgeGraphSelectedElementLink({
+  selectedNodeId,
+  nodes,
+  elementById,
+  onOpenElement,
+}: {
+  selectedNodeId: string | null;
+  nodes: KnowledgeGraphNode[];
+  elementById: (id: string) => ProjectStoreElement | undefined;
+  onOpenElement: (id: string) => void;
+}) {
+  if (!selectedNodeId) return null;
+  const node = nodes.find((candidate) => candidate.id === selectedNodeId);
+  if (!node?.identifier) return null;
+  const element = elementById(node.identifier);
+  if (!element) return null;
+
+  return (
+    <section className="ex-pane-selected-element" aria-label="Selected graph element">
+      <PaneSectionLabel label="Element" />
+      <button
+        type="button"
+        className="rq-relation__target ex-pane-selected-element-link"
+        onClick={() => onOpenElement(element.id)}
+      >
+        <ElementTypeGlyph element={element} />
+        <span>{element.name}</span>
+      </button>
+    </section>
+  );
+}
+
+function OntologySelectedNodeLink({
+  selectedNodeId,
+  nodes,
+  onOpenOntologyNode,
+  onClear,
+}: {
+  selectedNodeId: string | null;
+  nodes: OntologyGraphNode[];
+  onOpenOntologyNode: (id: string) => void;
+  onClear: () => void;
+}) {
+  const node = selectedNodeId
+    ? nodes.find((candidate) => candidate.id === selectedNodeId)
+    : undefined;
+  const kind = node ? node.semantic_type || node.node_type || node.type || "resource" : "";
+
+  return (
+    <section className="ex-pane-selected-element" aria-label="Selected ontology node">
+      <PaneSectionLabel label="Selection" />
+      {!node ? (
+        <p className="ex-empty ex-pane-selection-hint">
+          Select a graph node to inspect its details.
+        </p>
+      ) : (
+        <div className="ex-pane-selection-row">
+          <button
+            type="button"
+            className="rq-relation__target ex-pane-selected-element-link"
+            onClick={() => onOpenOntologyNode(node.id)}
+            title="Open node details"
+          >
+            <span
+              className="graph-control-swatch"
+              style={{ backgroundColor: ontologyColor(kind), borderColor: ontologyColor(kind) }}
+            />
+            <span className="ex-pane-selection-name">{node.label || node.id}</span>
+            <span className="ex-pane-selection-kind">{kind}</span>
+            <Icon name="arrow-up-right" size={13} className="ex-pane-selection-open" />
+          </button>
+          <IconButton size="sm" tone="ghost" aria-label="Clear selection" title="Clear selection" onClick={onClear}>
+            <Icon name="x" />
+          </IconButton>
+        </div>
+      )}
+    </section>
+  );
 }
 
 function TreeFolderNode({
   folder,
+  activeView,
   elementById,
+  onNavigate,
   onOpenElement,
   depth,
 }: {
   folder: TreeFolder;
+  activeView: ViewId;
   elementById: (id: string) => ProjectStoreElement | undefined;
+  onNavigate: (view: ViewId) => void;
   onOpenElement: (id: string) => void;
   depth: number;
 }) {
-  const open = depth < 2;
+  const [open, setOpen] = useState(depth < 2);
+  const ui = useExplorerUiState();
+  const selectionId = folder.path === ROOT_PATH ? "__root__" : `folder:${folder.path}`;
+
+  function selectFolder() {
+    ui.setModelSelectionId(selectionId);
+    if (activeView === "files") onNavigate("model");
+  }
+
   return (
-    <details className="explorer-tree-node" open={open}>
-      <summary className="explorer-tree-row" style={{ paddingLeft: 8 + depth * 14 }}>
-        <ArchiveIcon className="explorer-tree-icon file-kind-folder" />
-        <span className="explorer-tree-label">{folder.name}</span>
-        <Badge color="gray">{folder.files.length + folder.folders.length}</Badge>
-      </summary>
-      {folder.folders.map((child) => (
-        <TreeFolderNode
-          key={child.path}
-          folder={child}
-          elementById={elementById}
-          onOpenElement={onOpenElement}
+    <div className="ex-tree-node">
+      <TreeItem
+        kind="folder"
+        label={folder.name}
+        icon={open ? <Icon name="folder-open" className="file-kind-folder" /> : <Icon name="folder" className="file-kind-folder" />}
+        count={folder.files.length + folder.folders.length}
+        depth={depth}
+        open={open}
+        expandable={folder.files.length + folder.folders.length > 0}
+        selected={ui.modelSelectionId === selectionId}
+        onToggle={() => setOpen((value) => !value)}
+        onSelect={selectFolder}
+      />
+      {open && (
+        <>
+          {folder.folders.map((child) => (
+            <TreeFolderNode
+              key={child.path}
+              folder={child}
+              activeView={activeView}
+              elementById={elementById}
+              onNavigate={onNavigate}
+              onOpenElement={onOpenElement}
+              depth={depth + 1}
+            />
+          ))}
+          {folder.files.map((file) => (
+            <TreeFileNode
+              key={file.path}
+              file={file}
+              activeView={activeView}
+              elementById={elementById}
+              onNavigate={onNavigate}
+              onOpenElement={onOpenElement}
+              depth={depth + 1}
+            />
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+function TraceTreeFolderNode({
+  folder,
+  depth,
+}: {
+  folder: TracePaneFolder;
+  depth: number;
+}) {
+  const ui = useExplorerUiState();
+  const selectedPath = ui.traceFilePath;
+  const hasSelectedDescendant = selectedPath
+    ? traceFolderContainsPath(folder, selectedPath)
+    : false;
+  const [open, setOpen] = useState(depth < 2 || hasSelectedDescendant);
+
+  useEffect(() => {
+    if (hasSelectedDescendant) setOpen(true);
+  }, [hasSelectedDescendant]);
+
+  return (
+    <div className="ex-tree-node">
+      <TreeItem
+        kind="folder"
+        label={folder.name}
+        icon={open ? <Icon name="folder-open" className="file-kind-folder" /> : <Icon name="folder" className="file-kind-folder" />}
+        count={traceFolderVerificationCount(folder)}
+        depth={depth}
+        open={open}
+        expandable={folder.files.length + folder.folders.length > 0}
+        selected={folder.path === ROOT_PATH && !selectedPath}
+        onToggle={() => setOpen((value) => !value)}
+        onSelect={() => {
+          ui.setTraceFilePath(null);
+          ui.setTraceSelectionId(null);
+        }}
+      />
+      {open && (
+        <>
+          {folder.folders.map((child) => (
+            <TraceTreeFolderNode key={child.path} folder={child} depth={depth + 1} />
+          ))}
+          {folder.files.map((file) => (
+            <TraceTreeFileNode key={file.path} file={file} depth={depth + 1} />
+          ))}
+        </>
+      )}
+    </div>
+  );
+}
+
+function TraceTreeFileNode({
+  file,
+  depth,
+}: {
+  file: TracePaneFile;
+  depth: number;
+}) {
+  const ui = useExplorerUiState();
+  const selectedFile = ui.traceFilePath === file.path;
+  const selectedVerification = selectedFile ? ui.traceSelectionId : null;
+  const [open, setOpen] = useState(true);
+
+  function selectFile() {
+    ui.setTraceFilePath(file.path);
+    ui.setTraceSelectionId(null);
+  }
+
+  function selectVerification(id: string) {
+    ui.setTraceFilePath(file.path);
+    ui.setTraceSelectionId(id);
+  }
+
+  return (
+    <div className="ex-tree-node">
+      <TreeItem
+        kind="file"
+        label={file.name}
+        icon={<Icon name="file" className="file-kind-file" />}
+        count={file.verifications.length}
+        depth={depth}
+        open={open}
+        expandable={file.verifications.length > 0}
+        selected={selectedFile && !selectedVerification}
+        onToggle={() => setOpen((value) => !value)}
+        onSelect={selectFile}
+      />
+      {open && file.verifications.map((verification) => (
+        <TreeItem
+          key={verification.id}
+          kind="element"
+          label={verification.name}
+          icon={<ElementIcon type={verification.type ?? "verification"} family="verification" size="sm" />}
           depth={depth + 1}
+          selected={selectedVerification === verification.id}
+          onSelect={() => selectVerification(verification.id)}
         />
       ))}
-      {folder.files.map((file) => (
-        <TreeFileNode
-          key={file.path}
-          file={file}
-          elementById={elementById}
-          onOpenElement={onOpenElement}
-          depth={depth + 1}
-        />
-      ))}
-    </details>
+    </div>
   );
 }
 
 function TreeFileNode({
   file,
+  activeView,
   elementById,
+  onNavigate,
   onOpenElement,
   depth,
 }: {
   file: ProjectStoreFile;
+  activeView: ViewId;
   elementById: (id: string) => ProjectStoreElement | undefined;
+  onNavigate: (view: ViewId) => void;
   onOpenElement: (id: string) => void;
   depth: number;
 }) {
+  const ui = useExplorerUiState();
   const elements = file.element_ids.map(elementById).filter(Boolean) as ProjectStoreElement[];
-  const showElementChildren = elements.length > 1;
+  const showElementChildren = elements.length > 0;
+  const [open, setOpen] = useState(showElementChildren);
+  const selectionId = `file:${file.path}`;
+
+  function selectFile() {
+    ui.setModelSelectionId(selectionId);
+    if (activeView === "files") onNavigate("model");
+  }
+
+  function selectElement(elementId: string) {
+    ui.setModelSelectionId(elementId);
+    if (activeView === "files") onNavigate("model");
+    onOpenElement(elementId);
+  }
 
   return (
-    <details className="explorer-tree-node" open={showElementChildren}>
-      <summary className="explorer-tree-row" style={{ paddingLeft: 8 + depth * 14 }}>
-        <FileIcon className="explorer-tree-icon file-kind-file" />
-        <a className="explorer-tree-link" href={`#/files/${file.path}`}>
-          {displayName(file.display_path || file.path)}
-        </a>
-        {elements.length > 0 && <Badge color="gray">{elements.length}</Badge>}
-      </summary>
-      {showElementChildren &&
-        elements.map((element) => (
-          <button
-            key={element.id}
-            type="button"
-            className="explorer-tree-row explorer-tree-element-row"
-            style={{ paddingLeft: 8 + (depth + 1) * 14 }}
-            onClick={() => onOpenElement(element.id)}
-          >
-            <CubeIcon className="explorer-tree-icon file-kind-element" />
-            <span className="explorer-tree-label">{element.name}</span>
-          </button>
-        ))}
-    </details>
+    <div className="ex-tree-node">
+      <TreeItem
+        kind="file"
+        label={displayName(file.display_path || file.path)}
+        icon={<Icon name="file" className="file-kind-file" />}
+        count={elements.length > 0 ? elements.length : undefined}
+        depth={depth}
+        open={open}
+        expandable={showElementChildren}
+        selected={ui.modelSelectionId === selectionId}
+        onToggle={() => setOpen((value) => !value)}
+        onSelect={selectFile}
+      />
+      {open && showElementChildren && elements.map((element) => (
+        <TreeItem
+          key={element.id}
+          kind="element"
+          label={element.name}
+          icon={<ElementTypeGlyph element={element} />}
+          depth={depth + 1}
+          selected={ui.modelSelectionId === element.id}
+          onSelect={() => selectElement(element.id)}
+        />
+      ))}
+    </div>
   );
 }
 
-function PaneTitle({ title }: { title: string }) {
+export function ElementTypeGlyph({ element }: { element: ProjectStoreElement }) {
   return (
-    <Text size="2" weight="bold">
-      {title}
-    </Text>
+    <ElementIcon
+      type={element.element_type}
+      family={element.type_family}
+      title={element.element_type}
+      size="sm"
+    />
   );
 }
 
 function PaneSectionLabel({ label }: { label: string }) {
   return (
-    <Text size="1" color="gray" weight="bold" className="explorer-pane-section-label">
+    <span className="ex-pane-section-label">
       {label}
-    </Text>
-  );
-}
-
-function ModeIconGroup<T extends string>({
-  items,
-  active,
-  onSelect,
-}: {
-  items: [T, string, ReactNode][];
-  active: T;
-  onSelect: (value: T) => void;
-}) {
-  return (
-    <div className="explorer-mode-icon-strip" role="toolbar" aria-label="View mode">
-      {items.map(([value, label, icon]) => (
-        <Tooltip key={value} content={label} side="bottom">
-          <button
-            type="button"
-            className={["explorer-mode-icon-button", active === value ? "is-active" : ""].join(" ")}
-            aria-label={label}
-            aria-pressed={active === value}
-            onClick={() => onSelect(value)}
-          >
-            {icon}
-          </button>
-        </Tooltip>
-      ))}
-    </div>
-  );
-}
-
-function PaneToggle({
-  label,
-  active,
-  color,
-  line,
-  onClick,
-}: {
-  label: string;
-  active: boolean;
-  color?: string;
-  line?: boolean;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      className={["explorer-mode-link", active ? "is-active" : ""].join(" ")}
-      onClick={onClick}
-    >
-      <span
-        className={line ? "graph-line-swatch" : "graph-control-swatch"}
-        style={color ? { backgroundColor: color, borderColor: color } : undefined}
-      />
-      {label}
-    </button>
-  );
-}
-
-function OntologyFilterToggle({
-  category,
-  value,
-  label,
-  active,
-  swatch,
-  onClick,
-}: {
-  category: "role" | "relation";
-  value: string;
-  label: string;
-  active: boolean;
-  swatch: string;
-  onClick: () => void;
-}) {
-  const usesLine = category === "relation" && !swatch.includes("property");
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      data-filter-category={category}
-      data-filter-value={value}
-      className={[
-        "explorer-mode-link",
-        "ontology-filter-toggle",
-        active ? "is-active" : "",
-      ].join(" ")}
-      onClick={onClick}
-    >
-      {usesLine ? (
-        <span className="graph-line-swatch" />
-      ) : (
-        <span
-          className="graph-control-swatch"
-          style={{
-            backgroundColor: ontologyColor(swatch),
-            borderColor: ontologyColor(swatch),
-          }}
-        />
-      )}
-      {label}
-    </button>
-  );
-}
-
-function PaneLegend({ title, rows }: { title: string; rows: [string, string][] }) {
-  return (
-    <div className="explorer-pane-legend">
-      <PaneSectionLabel label={title} />
-      {rows.map(([label, color]) => (
-        <div key={label} className="explorer-pane-legend-row">
-          <span className="graph-control-swatch" style={{ backgroundColor: color, borderColor: color }} />
-          <Text size="1">{label}</Text>
-        </div>
-      ))}
-    </div>
+    </span>
   );
 }
 
 function PaneVisualLegend({ rows }: { rows: [string, string][] }) {
   return (
-    <div className="explorer-pane-legend">
+    <div className="ex-pane-legend">
       {rows.map(([kind, label]) => (
-        <div key={kind} className="explorer-pane-legend-row">
+        <div key={kind} className="rq-togglerow rq-togglerow--static ex-pane-legend-row">
           <span
-            className="graph-control-swatch"
+            className="rq-togglerow__swatch"
             style={{
               backgroundColor: ontologyColor(kind),
               borderColor: ontologyColor(kind),
             }}
           />
-          <Text size="1">{label}</Text>
+          <span className="rq-togglerow__label">{label}</span>
         </div>
       ))}
     </div>
@@ -601,15 +738,19 @@ function PaneVisualLegend({ rows }: { rows: [string, string][] }) {
 
 function PaneNotationLegend({ rows }: { rows: [string, string][] }) {
   return (
-    <div className="explorer-pane-legend">
+    <div className="ex-pane-legend">
       {rows.map(([symbol, label]) => (
-        <div key={symbol} className="explorer-pane-legend-row">
-          <span className="explorer-pane-symbol">{symbol}</span>
-          <Text size="1">{label}</Text>
+        <div key={symbol} className="ex-pane-legend-row">
+          <span className="ex-pane-symbol">{symbol}</span>
+          <span className="ex-pane-legend-text">{label}</span>
         </div>
       ))}
     </div>
   );
+}
+
+function formatSummaryValue(value: string | number) {
+  return typeof value === "number" ? value.toLocaleString() : value;
 }
 
 function buildFileTree(files: ProjectStoreFile[]): TreeFolder {
@@ -630,6 +771,66 @@ function buildFileTree(files: ProjectStoreFile[]): TreeFolder {
   }
 
   return root;
+}
+
+function buildTraceFileTree(files: TraceFileNode[]): TracePaneFolder {
+  const root: TracePaneFolder = { path: ROOT_PATH, name: "Project", folders: [], files: [] };
+  const byPath = new Map<string, TracePaneFolder>([[ROOT_PATH, root]]);
+
+  for (const entry of files) {
+    const path = entry.file;
+    const folderPath = dirname(path) || ROOT_PATH;
+    const folder = ensureTraceFolder(folderPath, byPath, root);
+    folder.files.push({
+      path,
+      name: displayName(path),
+      verifications: (entry.verifications ?? [])
+        .map((verification) => ({
+          id: verification.id,
+          name: verification.name,
+          type: verification.verificationType,
+        }))
+        .sort((a, b) => a.name.localeCompare(b.name)),
+    });
+  }
+
+  for (const folder of byPath.values()) {
+    folder.folders.sort((a, b) => a.name.localeCompare(b.name));
+    folder.files.sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  return root;
+}
+
+function ensureTraceFolder(
+  path: string,
+  byPath: Map<string, TracePaneFolder>,
+  root: TracePaneFolder,
+): TracePaneFolder {
+  if (path === ROOT_PATH || path === "") return root;
+  const existing = byPath.get(path);
+  if (existing) return existing;
+  const parentPath = dirname(path) || ROOT_PATH;
+  const parent = ensureTraceFolder(parentPath, byPath, root);
+  const folder: TracePaneFolder = {
+    path,
+    name: displayName(path),
+    folders: [],
+    files: [],
+  };
+  byPath.set(path, folder);
+  parent.folders.push(folder);
+  return folder;
+}
+
+function traceFolderVerificationCount(folder: TracePaneFolder): number {
+  return folder.files.reduce((sum, file) => sum + file.verifications.length, 0) +
+    folder.folders.reduce((sum, child) => sum + traceFolderVerificationCount(child), 0);
+}
+
+function traceFolderContainsPath(folder: TracePaneFolder, path: string): boolean {
+  return folder.files.some((file) => file.path === path) ||
+    folder.folders.some((child) => traceFolderContainsPath(child, path));
 }
 
 function ensureFolder(path: string, byPath: Map<string, TreeFolder>, root: TreeFolder): TreeFolder {
@@ -664,21 +865,170 @@ function humanize(value: string) {
   return value.replace(/-/g, " ").replace(/\b\w/g, (match) => match.toUpperCase());
 }
 
-function roleLabel(value: string) {
-  return humanize(value);
+const ELEMENT_TYPE_ORDER = [
+  "capability",
+  "requirement",
+  "refinement",
+  "verification",
+  "test-verification",
+  "analysis-verification",
+  "inspection-verification",
+  "demonstration-verification",
+  "specification",
+  "semantic-contract",
+  "semantic-query-contract",
+  "ontology",
+  "resource",
+  "other",
+];
+
+function buildKnowledgeGraphTypeOptions(
+  nodes: readonly KnowledgeGraphNode[],
+  elementById: (id: string) => ProjectStoreElement | undefined,
+) {
+  const byType = new Map<string, { type: string; family: string; count: number }>();
+  for (const node of nodes) {
+    const type = knowledgeGraphNodeKind(node);
+    const element = node.identifier ? elementById(node.identifier) : undefined;
+    const family = element?.type_family || node.node_type || node.type || type;
+    const existing = byType.get(type);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      byType.set(type, { type, family, count: 1 });
+    }
+  }
+
+  return Array.from(byType.values()).sort((left, right) => {
+    const leftRank = elementTypeRank(left.type, left.family);
+    const rightRank = elementTypeRank(right.type, right.family);
+    return leftRank - rightRank || left.type.localeCompare(right.type);
+  });
 }
 
-function roleColor(value: string) {
-  const colors: Record<string, string> = {
-    capability: "#1976D2",
-    requirement: "#673AB7",
-    refinement: "#673AB7",
-    verification: "#4CAF50",
-    ontology: "#B08A00",
-    resource: "#FFCA28",
-    other: "#424242",
+function knowledgeGraphNodeKind(node: KnowledgeGraphNode) {
+  return node.element_type || node.node_type || node.type || "other";
+}
+
+function buildSearchKindCounts(store: ExplorerProjectStore): Record<SearchKind, number> {
+  return {
+    file: store.files.length,
+    element: store.elements.length,
+    resource: store.resources.length,
+    ontology: store.ontology.graph_data?.nodes?.length ?? 0,
   };
-  return colors[value] ?? colors.other;
+}
+
+function buildCoveragePaneItems(store: ExplorerProjectStore): Array<{
+  id: CoverageSectionId;
+  label: string;
+  count: number;
+  icon: "pie-chart" | "box" | "file" | "activity" | "x" | "help-circle";
+}> {
+  const coverage = isPlainRecord(store.coverage) ? store.coverage : {};
+  const summary = isPlainRecord(coverage.summary) ? coverage.summary : {};
+  return [
+    {
+      id: "overview",
+      label: "Overview",
+      count: readNumber(summary.total_requirements_in_scope, store.elements.length),
+      icon: "pie-chart",
+    },
+    {
+      id: "capability-coverage",
+      label: "Capability coverage",
+      count: coverageCapabilityCount(coverage.capability_coverage),
+      icon: "box",
+    },
+    {
+      id: "unverified-requirements",
+      label: "Unverified requirements",
+      count: coverageSectionCount(coverage.unverified_leaf_requirements),
+      icon: "file",
+    },
+    {
+      id: "unimplemented-requirements",
+      label: "Unimplemented requirements",
+      count: coverageSectionCount(coverage.uncovered_requirements),
+      icon: "activity",
+    },
+    {
+      id: "unsatisfied-verifications",
+      label: "Unsatisfied verifications",
+      count: coverageSectionCount(coverage.unsatisfied_test_verifications),
+      icon: "x",
+    },
+    {
+      id: "orphaned-verifications",
+      label: "Orphaned verifications",
+      count: coverageSectionCount(coverage.orphaned_verifications),
+      icon: "help-circle",
+    },
+  ];
+}
+
+function navigateCoverageSection(section: CoverageSectionId) {
+  window.dispatchEvent(new CustomEvent("reqvire:coverage-navigate", { detail: { section } }));
+}
+
+function coverageSectionCount(section: unknown): number {
+  if (!isPlainRecord(section) || !isPlainRecord(section.files)) return 0;
+  return Object.values(section.files).reduce<number>((count, value) => {
+    return count + (Array.isArray(value) ? value.length : 0);
+  }, 0);
+}
+
+function coverageCapabilityCount(section: unknown): number {
+  if (!isPlainRecord(section) || !Array.isArray(section.capabilities)) return 0;
+  return section.capabilities.length;
+}
+
+function readNumber(value: unknown, fallback = 0): number {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function buildSearchElementTypeOptions(elements: readonly ProjectStoreElement[]) {
+  const byType = new Map<string, { type: string; family: string; count: number }>();
+  for (const element of elements) {
+    if (!element.element_type) continue;
+    const existing = byType.get(element.element_type);
+    if (existing) {
+      existing.count += 1;
+    } else {
+      byType.set(element.element_type, {
+        type: element.element_type,
+        family: element.type_family || element.element_type,
+        count: 1,
+      });
+    }
+  }
+
+  return Array.from(byType.values()).sort((left, right) => {
+    const leftRank = elementTypeRank(left.type, left.family);
+    const rightRank = elementTypeRank(right.type, right.family);
+    return leftRank - rightRank || left.type.localeCompare(right.type);
+  });
+}
+
+function elementTypeRank(type: string, family: string) {
+  const direct = ELEMENT_TYPE_ORDER.indexOf(type);
+  if (direct >= 0) return direct;
+  const familyRank = ELEMENT_TYPE_ORDER.indexOf(family);
+  return familyRank >= 0 ? familyRank + 0.5 : ELEMENT_TYPE_ORDER.length;
+}
+
+function formatCompactCount(value: number): string {
+  if (value >= 1_000_000) return `${trimCompactNumber(value / 1_000_000)}M`;
+  if (value >= 1_000) return `${trimCompactNumber(value / 1_000)}K`;
+  return value.toLocaleString();
+}
+
+function trimCompactNumber(value: number): string {
+  return value >= 10 ? Math.round(value).toString() : value.toFixed(1).replace(/\.0$/, "");
 }
 
 function searchKindLabel(kind: SearchKind) {
@@ -686,38 +1036,36 @@ function searchKindLabel(kind: SearchKind) {
     file: "Files",
     element: "Elements",
     resource: "Resources",
-    ontology: "Ontology",
-    trace: "Traces",
-    coverage: "Coverage",
+    ontology: "Ontology terms",
   };
   return labels[kind];
 }
 
 function searchKindColor(kind: SearchKind) {
   const colors: Record<SearchKind, string> = {
-    file: "#52605b",
-    element: "#673ab7",
-    resource: "#b08a00",
-    ontology: "#00897b",
-    trace: "#6d6258",
-    coverage: "#4caf50",
+    file: "var(--resource)",
+    element: "var(--requirement)",
+    resource: "var(--ontology)",
+    ontology: "var(--rdf-resource)",
   };
   return colors[kind];
 }
 
 function ontologyColor(value: string) {
   const colors: Record<string, string> = {
-    class: "#2f6fa7",
-    "object-property": "#65745f",
-    "datatype-property": "#8f7a22",
-    property: "#6f786a",
-    "named-individual": "#76579a",
-    datatype: "#b89422",
-    restriction: "#4d7f88",
-    "class-expression": "#5f6a9a",
-    "node-shape": "#a24b4b",
-    "property-shape": "#b25f54",
-    resource: "#8b8f84",
+    class: "var(--rdf-class)",
+    "object-property": "var(--rdf-objprop)",
+    "datatype-property": "var(--rdf-dtprop)",
+    "rdf-property": "var(--rdf-rdfprop)",
+    property: "var(--rdf-objprop)",
+    "named-individual": "var(--rdf-individual)",
+    datatype: "var(--rdf-datatype)",
+    restriction: "var(--rdf-restriction)",
+    "class-expression": "var(--rdf-classexpr)",
+    "node-shape": "var(--rdf-nodeshape)",
+    "property-shape": "var(--rdf-propshape)",
+    resource: "var(--rdf-resource)",
+    relation: "var(--edge-default)",
   };
   return colors[value] ?? colors.resource;
 }

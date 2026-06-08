@@ -79,16 +79,17 @@ This test verifies that the CLI help output displays all commands and their opti
    - output contains "Options:" section with `-h, --help`, `-V, --version`
 
 2. **Command listing completeness**
-   - All CLI commands are listed: html, format, validate, summary, section-summary, change-impact, verifications
-   - Nested commands are expanded: "traces", "coverage"
+   - All current CLI commands are listed: serve, mcp, format, validate, search, change-impact, traces, coverage, model, lint, add, rm, mv, rename, merge, mv-file, link, unlink, relink, mv-asset, rm-asset, containment, resources, ontologies, submodels, collect
 
 3. **Options flattening - all command-specific option sections present**
+   - SERVE OPTIONS section visible
+   - MCP OPTIONS section visible
    - FORMAT OPTIONS section visible
-   - SUMMARY OPTIONS section visible
-   - SECTION-SUMMARY OPTIONS section visible
    - CHANGE IMPACT OPTIONS section visible
-   - VERIFICATIONS TRACES OPTIONS section visible
-   - VERIFICATIONS COVERAGE OPTIONS section visible
+   - TRACES OPTIONS section visible
+   - COVERAGE OPTIONS section visible
+   - MODEL OPTIONS section visible
+   - ONTOLOGIES OPTIONS section visible
 
 4. **Help text quality**
    - Each command has descriptive help text
@@ -107,12 +108,12 @@ This test verifies that the CLI help output displays all commands and their opti
   * verify: [CLI Traces Command](../Commands.md#cli-traces-command)
   * verify: [Format Command](../Commands.md#format-command)
   * verify: [Validate Command](../Commands.md#validate-command)
-  * verify: [HTML Export](../../WebInterface/Capabilities.md#html-export)
+  * verify: [Served Explorer Browser Interface](../../WebInterface/Capabilities.md#served-explorer-browser-interface)
 ---
 
 ### CLI Ontologies Command Verification
 
-This verification shall prove that the ontologies command and export workflow collect ontology `Ontology` content and semantic-contract `Shapes` content.
+This verification shall prove that the ontologies command collects ontology `Ontology` content and semantic-contract `Shapes` content.
 
 #### Details
 Expected checks:
@@ -120,9 +121,8 @@ Expected checks:
 - Run `reqvire ontologies --jsonld` and verify the output is valid JSON-LD without generated ontology projection facts.
 - Run `reqvire ontologies --full` and verify Turtle output contains Reqvire model context triples linking the capability, ontology, requirement, and semantic-contract elements, plus generated ontology projection graph, projection, construct, symbol, source/provenance, member, and subject/object/predicate facts for direct-authored constructs.
 - Run `reqvire ontologies --full --jsonld` and verify JSON-LD output contains Reqvire model context triples and generated ontology projection facts.
-- Run `reqvire export --output <DIR>` and verify `ontologies.ttl` is generated and the Ontologies Explorer view is available from the canonical SPA route `index.html#/ontologies`.
-- Verify exported `ontologies.ttl` contains collected ontology content without generated ontology projection facts.
-- Verify the SPA Ontologies view contains the ontology explorer, compact shared Inspector-lane summary footer, `.ttl` download action, linked source citation evidence, generated semantic construct evidence from the ontology projection subgraph, dense viewport layout CSS, and no obsolete raw Turtle/source-block list or page-header preamble.
+- Verify default Turtle output contains collected ontology content without generated ontology projection facts.
+- Verify the Ontologies Explorer uses the same collected ontology content and semantic projection model when served.
 - Verify the Reqvire authored ontology source tree does not contain stale `owl:deprecated true` presentation-only vocabulary declarations after ontology refactoring.
 
 #### Metadata

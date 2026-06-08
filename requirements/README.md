@@ -10,7 +10,7 @@ flowchart LR
     subgraph "ReqvireTool"
         subgraph "Interfaces"
             cliInterface[CLI]
-            webInterface[Web/HTML Interface]
+            webInterface[Web Explorer Interface]
             mcpServer[MCP Server]
         end
 
@@ -156,9 +156,9 @@ The central component of the system, which facilitates various MBSE-related acti
 
 #### Tool Interfaces
 
-Tool interfaces are **CLI** (Command Line Interface), **Web/HTML Interface**, and **MCP** (Model Context Protocol) server:
+Tool interfaces are **CLI** (Command Line Interface), **Web Explorer Interface**, and **MCP** (Model Context Protocol) server:
 - CLI: Human and automation interface for direct command execution.
-- Web/HTML Interface: Human browsing and visualization interface for generated documentation, diagrams, reports, and traces.
+- Web Explorer Interface: Human browsing and visualization interface for served model content, diagrams, reports, and traces.
 - MCP Server: Typed external interface for AI agents, IDE integrations, CI adapters, and other tools.
 
 The MCP server exposes shared tool contracts, including semantic model evidence through `reqvire.ontologies`. It does not expose arbitrary shell execution, does not own model state, and does not bypass Reqvire core semantics.
@@ -214,7 +214,7 @@ These capabilities allow teams to seamlessly integrate System practices into the
 
 Humans interact with Reqvire tools to manage, refine, and validate System models, as well as to collaborate effectively within development workflows:
 - Via CLI: Users leverage Reqvire’s CLI to perform tasks such as managing models, generating diagrams, analyzing relationships, and validating structures.
-- Via Browser: Users browse generated HTML documentation, diagrams, reports, and traces.
+- Via Browser: Users browse the served Explorer UI for model content, diagrams, reports, and traces.
 - Via AI Agents: Users interact with AI agents to receive intelligent suggestions, review potential improvements, and approve changes, ensuring a human-in-the-loop approach.
   - AI agents use Reqvire’s MCP server for typed model evidence, reports, and approved mutation requests.
 - Collaboration: Users integrate Reqvire into agile workflows by collaborating through GitHub or similar platforms to manage repositories, track changes, and maintain traceability.

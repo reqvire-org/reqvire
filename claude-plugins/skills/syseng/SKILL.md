@@ -97,7 +97,7 @@ Use an `ontology` when content defines reusable domain or model meaning:
 
 Use a `semantic-contract` when one requirement obligation needs a closed-world SHACL profile over reachable ontology terms. Semantic contracts must have `#### Shapes`, must refine exactly one requirement owner, and must not contain `#### Ontology`.
 
-Use a `semantic-query-contract` when one requirement needs to record a declarative semantic query over reachable ontology context. Semantic query contracts must refine exactly one requirement, must have exactly one `#### Query` fenced `sparql` block, must not contain `#### Ontology` or `#### Shapes`, must not declare query kind/purpose, and are exposed through full search JSON. Ontology collection and full semantic export do not emit semantic-query-contract query content or metadata until a dedicated query-export command exists.
+Use a `semantic-query-contract` when one requirement needs to record a declarative semantic query over reachable ontology context. Semantic query contracts must refine exactly one requirement, must have exactly one `#### Query` fenced `sparql` block, must not contain `#### Ontology` or `#### Shapes`, must not declare query kind/purpose, and are exposed through full search JSON. Ontology collection and full semantic export do not emit semantic-query-contract query content or metadata until dedicated query output support is specified.
 
 Use `#### Concept References` when readable prose should bind human labels to ontology terms without filling the requirement text with CURIEs. The referenced IRI or CURIE must be declared by reachable ontology context.
 
@@ -184,7 +184,7 @@ Requirement
 
 ## Document Structure
 
-- Files begin with `# Elements` (multi-element) or `# Documents` (single-element)
+- Files begin with `# Elements` (multi-element) or `# Element` (single-element)
 - Elements are `###` headers with unique names per file
 - Reserved `####` subsections: **Metadata**, **Relations**, **Details**, **Attachments**, **Concept References**
 - Ontology elements require exactly one `#### Ontology` fenced Turtle block; semantic contracts require exactly one `#### Shapes` fenced Turtle block; semantic-query-contract elements require exactly one `#### Query` fenced `sparql` block
@@ -341,8 +341,6 @@ containment [--short] [--json]
 mv-asset "old-path" "new-path"
 rm-asset "path"
 
-# Export
-export [--output <dir>]
 serve [--port 8080]
 ```
 

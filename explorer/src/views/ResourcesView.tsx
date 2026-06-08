@@ -1,59 +1,101 @@
-import { Box, Card, Code, Flex, Grid, Heading, Link, Text, Badge } from "@radix-ui/themes";
 import { useStore } from "../store/StoreContext";
 import { ViewFrame } from "./ViewFrame";
 import type { ExplorerViewProps } from "../components/ExplorerViewProps";
+import { SourceCodePreview } from "../components/SourceCodePreview";
+import { Card } from "@ds";
 
 /*
  * Resources view (secondary / report artifact, not primary navigation).
  * Lists modeled resource and evidence-file targets from the Project Store,
  * kept distinct from browsable source `files`.
  */
-export function ResourcesView(_: Partial<ExplorerViewProps> = {}) {
+export function ResourcesView({
+  resourceId,
+}: Partial<ExplorerViewProps> & { resourceId?: string | null } = {}) {
   const { store } = useStore();
+  const resource = resourceId
+    ? store.resources.find((candidate) => candidate.id === resourceId)
+    : undefined;
+
+  if (resourceId) {
+    return (
+      <ViewFrame testId="resources">
+        <div className="ex-route ex-route-single">
+          <div className="ex-document-panel">
+            <div className="content-page-toolbar">
+              <div className="content-page-title">
+                <span>Resource</span>
+                <strong>{resource?.display ?? resourceId}</strong>
+              </div>
+              <a className="ex-command" href="#/model">
+                Back to model
+              </a>
+            </div>
+            {resource?.source_text ? (
+              <SourceCodePreview
+                path={resource.file_path ?? resource.target}
+                content={resource.source_text}
+                kind={resource.kind}
+                relationTypes={resource.relation_types}
+              />
+            ) : resource ? (
+              <Card className="resource-detail-card">
+                <span className="rq-typebadge">{resource.kind}</span>
+                {resource.external_url ? (
+                  <a href={resource.external_url} target="_blank" rel="noreferrer" className="rq-btn rq-btn--link">
+                    {resource.external_url}
+                  </a>
+                ) : (
+                  <code className="rq-coderef">{resource.target}</code>
+                )}
+              </Card>
+            ) : (
+              <div className="ex-empty">Resource not found: {resourceId}</div>
+            )}
+          </div>
+        </div>
+      </ViewFrame>
+    );
+  }
+
   return (
     <ViewFrame testId="resources">
-      <Grid columns={{ initial: "1fr", lg: "minmax(0, 1fr) 390px" }} className="explorer-route">
-        <Box className="explorer-document-panel">
-        <Flex align="center" gap="2" mb="3" wrap="wrap">
-          <Heading as="h1" size="4" className="explorer-panel-title">
+      <div className="ex-route ex-route-single">
+        <div className="ex-document-panel">
+        <div className="resources-header">
+          <h1 className="ex-panel-title">
             Resources
-          </Heading>
-          <Badge color="gray">{store.resources.length} resources</Badge>
-        </Flex>
-        <Flex direction="column" gap="2">
+          </h1>
+          <span className="rq-badge">{store.resources.length} resources</span>
+        </div>
+        <div className="resources-list">
           {store.resources.map((r) => (
-            <Card key={r.id} variant="surface" className="explorer-card">
-              <Flex align="center" gap="2" wrap="wrap">
-                <Badge color="gray">{r.kind}</Badge>
+            <Card key={r.id} className="resource-list-card">
+              <div className="resource-list-card-row">
+                <span className="rq-typebadge">{r.kind}</span>
                 {r.external_url ? (
-                  <Link href={r.external_url} target="_blank" rel="noreferrer" size="2">
+                  <a href={r.external_url} target="_blank" rel="noreferrer" className="rq-btn rq-btn--link">
                     {r.display}
-                  </Link>
+                  </a>
+                ) : r.file_path ? (
+                  <a href={`#/content/${r.file_path}`} className="rq-btn rq-btn--link">
+                    {r.display}
+                  </a>
                 ) : (
-                  <Code>{r.target}</Code>
+                  <code className="rq-coderef">{r.target}</code>
                 )}
                 {r.relation_types.length > 0 && (
-                  <Text size="1" color="gray">
+                  <span className="resource-list-card-meta">
                     via {r.relation_types.join(", ")}
-                  </Text>
+                  </span>
                 )}
-              </Flex>
+              </div>
             </Card>
           ))}
-          {store.resources.length === 0 && <Text color="gray">No resources in store.</Text>}
-        </Flex>
-        </Box>
-        <Box className="graph-sidebar">
-          <div className="graph-inspector-header">
-            <Heading as="h2" size="3">Resource Inspector</Heading>
-          </div>
-          <div className="graph-inspector-body">
-            <Text size="2" color="gray">
-              Resource rows keep file targets, external URLs, attachments, and satisfaction evidence separate from source-file navigation.
-            </Text>
-          </div>
-        </Box>
-      </Grid>
+          {store.resources.length === 0 && <span className="ex-empty">No resources in store.</span>}
+        </div>
+        </div>
+      </div>
     </ViewFrame>
   );
 }

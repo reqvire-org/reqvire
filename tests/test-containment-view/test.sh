@@ -8,7 +8,6 @@ set -uo pipefail
 #   - specifications/Verifications/ReportsTests.md#containment-view-text-output-test
 #   - specifications/Verifications/ReportsTests.md#containment-view-json-output-test
 #   - specifications/Verifications/ReportsTests.md#containment-view-mermaid-diagram-test
-#   - specifications/Verifications/ReportsTests.md#html-export-containment-view-integration-test
 #
 # Acceptance Criteria:
 # - Containment hierarchy extracts folders, files, and elements (skipping sections)
@@ -16,7 +15,6 @@ set -uo pipefail
 # - Element nodes with proper styling based on type
 # - Clickable links to element locations
 # - JSON output provides valid structured data with correct schema
-# - HTML export includes Model Sunburst/Icicle containment mode data with interactive capabilities
 
 TEST_SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
@@ -373,34 +371,6 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/expected-containment-diagram.mmd" "$TE
 fi
 
 echo "✓ Design documents are included in containment hierarchy"
-
-# ==================================
-# Test 9: HTML Export Integration (Optional)
-# ==================================
-echo ""
-echo "Test 9: HTML export integration..."
-
-set +e
-cd "$TEST_DIR" && "$REQVIRE_BIN" export --output output 2>&1
-EXPORT_EXIT=$?
-set -e
-
-if [ $EXPORT_EXIT -eq 0 ] && [ -f "$TEST_DIR/output/index.html" ]; then
-  CONTAINMENT_ENTRY="$TEST_DIR/output/containment"'.html'
-  if [ -f "$CONTAINMENT_ENTRY" ]; then
-    echo "❌ FAILED: standalone containment page must not be generated"
-    exit 1
-  fi
-
-  if ! grep -q "reqvireProjectStore" "$TEST_DIR/output/index.html"; then
-    echo "❌ FAILED: index.html doesn't include the SPA Project Store seed"
-    exit 1
-  fi
-
-  echo "✓ HTML export includes containment SPA data in index.html"
-else
-  echo "⏸  HTML export integration not yet implemented (optional)"
-fi
 
 # ==================================
 # Final Result

@@ -1,12 +1,15 @@
-import { Theme } from "@radix-ui/themes";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerSidePane } from "../components/ExplorerSidePane";
-import { ExplorerUiStateProvider } from "../components/ExplorerUiState";
+import { ExplorerUiStateProvider, useExplorerUiState } from "../components/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
-import { TracesView } from "./ReportViews";
-import { Kn2View, KnowledgeGraphView } from "./GraphLibraryViews";
+import {
+  __testBuildTraceRollupMermaid,
+  TracesView,
+} from "./ReportViews";
+import { KnowledgeGraphView } from "./GraphLibraryViews";
 
 vi.mock("graphology-layout-forceatlas2", () => ({
   default: {
@@ -39,200 +42,150 @@ vi.mock("sigma", () => ({
   },
 }));
 
-vi.mock("cytoscape", () => {
-  type MockElement = Record<string, any>;
-  type MockNode = MockElement;
-  type MockEdge = MockElement;
-
-  function makeCollection(items: MockElement[]) {
-    const collection = [...items] as MockElement[] & Record<string, any>;
-    collection.show = () => collection.forEach((item) => item.show());
-    collection.hide = () => collection.forEach((item) => item.hide());
-    collection.addClass = () => collection;
-    collection.removeClass = () => collection;
-    collection.removeData = () => collection;
-    collection.layout = () => ({ run: vi.fn() });
-    collection.union = (other: MockElement[] | MockElement) =>
-      makeCollection([
-        ...collection,
-        ...(Array.isArray(other) ? other : [other]),
-      ]);
-    collection.contains = (item: MockElement) => collection.includes(item);
-    collection.difference = (item: MockElement) =>
-      makeCollection(collection.filter((candidate) => candidate !== item));
-    const originalFilter = Array.prototype.filter.bind(collection);
-    (collection as any).filter = (predicate: (item: MockElement) => boolean) =>
-      makeCollection(originalFilter(predicate));
-    return collection;
-  }
-
-  function makeNode(data: Record<string, unknown>, getEdges: () => MockEdge[]): MockNode {
-    let hidden = false;
-    const node: MockNode = {
-      id: () => String(data.id),
-      data: (key?: string, value?: unknown) => {
-        if (key && value !== undefined) data[key] = value;
-        return key ? data[key] : data;
-      },
-      hide: () => {
-        hidden = true;
-      },
-      show: () => {
-        hidden = false;
-      },
-      hidden: () => hidden,
-      empty: () => false,
-      nonempty: () => true,
-      connectedEdges: () =>
-        makeCollection(
-          getEdges().filter(
-            (edge) => edge.source() === node || edge.target() === node,
-          ),
-        ),
-      cy: () => mockCore,
-      addClass: () => node,
-      removeClass: () => node,
-      removeData: () => node,
-      animate: () => node,
-      union: (other: MockElement[] | MockElement) =>
-        makeCollection([node, ...(Array.isArray(other) ? other : [other])]),
-    };
-    return node;
-  }
-
-  function makeEdge(
-    data: Record<string, unknown>,
-    source: MockNode,
-    target: MockNode,
-  ): MockEdge {
-    let hidden = false;
-    const edge: MockEdge = {
-      id: () => String(data.id),
-      data: (key?: string) => (key ? data[key] : data),
-      hide: () => {
-        hidden = true;
-      },
-      show: () => {
-        hidden = false;
-      },
-      hidden: () => hidden,
-      source: () => source,
-      target: () => target,
-      connectedNodes: () => makeCollection([source, target]),
-      addClass: () => edge,
-      removeClass: () => edge,
-    };
-    return edge;
-  }
-
-  let mockCore: Record<string, unknown>;
-
-  return {
-    default: vi.fn((options: { container: HTMLElement; elements: { group: string; data: Record<string, unknown> }[] }) => {
-      const canvas = document.createElement("canvas");
-      canvas.setAttribute("data-testid", "mock-cytoscape-renderer");
-      options.container.appendChild(canvas);
-      const edgeData = options.elements.filter((element) => element.group === "edges");
-      let edges: MockEdge[] = [];
-      const nodes = options.elements
-        .filter((element) => element.group === "nodes")
-        .map((element) => makeNode(element.data, () => edges));
-      const nodeById = new Map(nodes.map((node) => [node.id(), node]));
-      edges = edgeData.map((element) =>
-        makeEdge(
-          element.data,
-          nodeById.get(String(element.data.source)) ?? nodes[0],
-          nodeById.get(String(element.data.target)) ?? nodes[0],
-        ),
-      );
-      mockCore = {
-        on: vi.fn(),
-        destroy: vi.fn(),
-        style: vi.fn(),
-        resize: vi.fn(),
-        zoom: () => 1,
-        animate: vi.fn(),
-        collection: () => makeCollection([]),
-        elements: () => makeCollection([...nodes, ...edges]),
-        nodes: (selector?: string) => {
-          if (selector === ":visible") return makeCollection(nodes.filter((node) => !node.hidden()));
-          if (selector?.includes("concept")) {
-            return makeCollection(nodes.filter((node) => node.data("node_type") === "concept"));
-          }
-          return makeCollection(nodes);
-        },
-        edges: (selector?: string) =>
-          selector === ":visible"
-            ? makeCollection(edges.filter((edge) => !edge.hidden()))
-            : makeCollection(edges),
-        getElementById: (id: string) =>
-          nodes.find((node) => node.id() === id) ?? {
-            empty: () => true,
-            nonempty: () => false,
-          },
-      };
-      return mockCore;
-    }),
-  };
-});
-
 function renderWithStore(view: React.ReactElement) {
   return render(
-    <Theme>
-      <StoreProvider store={devFixture} schemaMismatch={null}>
-        <ExplorerUiStateProvider>{view}</ExplorerUiStateProvider>
-      </StoreProvider>
-    </Theme>,
+    <StoreProvider store={devFixture} schemaMismatch={null}>
+      <ExplorerUiStateProvider>{view}</ExplorerUiStateProvider>
+    </StoreProvider>,
   );
 }
 
 describe("native visualization parity views", () => {
-  it("renders Knowledge Graph as the native Sigma/Graphology project graph", () => {
+  it("renders Graph as the native Sigma/Graphology project graph", () => {
     const { container } = renderWithStore(
-      <KnowledgeGraphView frameTestId="knowledge-graph" onOpenElement={vi.fn()} />,
+      <KnowledgeGraphView frameTestId="model-graph" onOpenElement={vi.fn()} />,
     );
 
-    expect(container.querySelector('[data-view="knowledge-graph"]')).toBeTruthy();
+    expect(container.querySelector('[data-view="model-graph"]')).toBeTruthy();
     expect(screen.getByTestId("kg-sigma-canvas")).toBeTruthy();
     expect(screen.getByTestId("mock-sigma-renderer")).toBeTruthy();
     expect(screen.getByRole("img", { name: "Actual project elements and facts graph" })).toBeTruthy();
     expect(container.querySelector("iframe")).toBeNull();
   });
 
-  it("renders traces as a native verification flow", () => {
+  it("renders traces as native verification rows", () => {
     const { container } = renderWithStore(
       <TracesView onOpenElement={vi.fn()} />,
     );
 
-    expect(screen.getByTestId("trace-flow")).toBeTruthy();
-    expect(screen.getByRole("img", { name: "Verification trace flow" })).toBeTruthy();
+    expect(screen.getByTestId("trace-rows")).toBeTruthy();
     expect(screen.getAllByText("Example Verification").length).toBeGreaterThan(0);
     expect(container.querySelector("iframe")).toBeNull();
   });
 
-  it("renders KN2 with native Cytoscape controls, overlays, and canvas", () => {
+  it("uses the Explorer pane as a verification trace tree", () => {
+    renderWithStore(
+      <ExplorerSidePane
+        activeView="traces"
+        open
+        onToggle={vi.fn()}
+        onNavigate={vi.fn()}
+        onOpenElement={vi.fn()}
+        onOpenOntologyNode={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByLabelText("Verification trace tree")).toBeTruthy();
+    expect(screen.queryByText("Summary")).toBeNull();
+    expect(screen.queryByText("Legend")).toBeNull();
+    expect(screen.getByText("Specifications.md")).toBeTruthy();
+    expect(screen.getByText("Example Verification")).toBeTruthy();
+  });
+
+  it("builds per-verification roll-up Mermaid diagrams from trace trees", () => {
+    const mermaid = __testBuildTraceRollupMermaid(
+      {
+        id: "requirements/Traces.md#verify-api",
+        name: "Verify API",
+        file: "requirements/Traces.md",
+        directCount: 1,
+        totalCount: 2,
+        requirementIds: ["requirements/Traces.md#api-response"],
+        verificationType: "test-verification",
+        traceTree: {
+          requirements: [
+            {
+              id: "requirements/Traces.md#api-response",
+              name: "API Response",
+              type: "system-requirement",
+              is_directly_verified: true,
+              children: [
+                {
+                  id: "requirements/Traces.md#api-root",
+                  name: "API Root",
+                  type: "user-requirement",
+                  is_directly_verified: false,
+                  children: [],
+                },
+              ],
+            },
+          ],
+        },
+      },
+      new Map(),
+    );
+
+    expect(mermaid).toContain("graph TD");
+    expect(mermaid).toContain("classDef verification");
+    expect(mermaid).not.toContain("var(--");
+    expect(mermaid).toContain("subgraph");
+    expect(mermaid).toContain("|verifies|");
+    expect(mermaid).toContain("|derivedFrom|");
+    expect(mermaid).toContain("Verify API");
+    expect(mermaid).toContain("API Response");
+    expect(mermaid).toContain("API Root");
+  });
+
+  it("uses the Explorer pane search for ontology graph filtering", () => {
+    const filterOntologyGraph = vi.fn();
+    window.filterOntologyGraph = filterOntologyGraph;
+
     const { container } = renderWithStore(
-      <>
+      <ExplorerSidePane
+        activeView="ontologies"
+        open
+        onToggle={vi.fn()}
+        onNavigate={vi.fn()}
+        onOpenElement={vi.fn()}
+        onOpenOntologyNode={vi.fn()}
+      />,
+    );
+
+    const search = screen.getByRole("searchbox", { name: "Search Explorer" });
+    expect(search.getAttribute("id")).toBe("ontology-graph-search");
+    expect(container.querySelector("#ontology-graph-results")).toBeTruthy();
+
+    fireEvent.change(search, { target: { value: "shape" } });
+
+    expect(filterOntologyGraph).toHaveBeenCalledWith("shape");
+    delete window.filterOntologyGraph;
+  });
+
+  it("shows selected ontology node link in the Explorer pane", () => {
+    const openOntologyNode = vi.fn();
+    const node = devFixture.ontology.graph_data?.nodes?.[0];
+    expect(node).toBeTruthy();
+
+    function SelectedOntologyPane() {
+      const ui = useExplorerUiState();
+      useEffect(() => {
+        ui.setOntologySelectionId(node?.id ?? null);
+      }, [ui]);
+      return (
         <ExplorerSidePane
-          activeView="kn2"
+          activeView="ontologies"
           open
           onToggle={vi.fn()}
           onNavigate={vi.fn()}
           onOpenElement={vi.fn()}
+          onOpenOntologyNode={openOntologyNode}
         />
-        <Kn2View onOpenElement={vi.fn()} />
-      </>,
-    );
+      );
+    }
 
-    expect(screen.getByTestId("kn2-cytoscape-canvas")).toBeTruthy();
-    expect(screen.getByTestId("mock-cytoscape-renderer")).toBeTruthy();
-    expect(screen.getByRole("img", { name: "Cytoscape project graph POC" })).toBeTruthy();
-    expect(
-      screen.getByRole("button", { name: "CoSE structural" }).classList.contains("is-active"),
-    ).toBe(true);
-    expect(container.querySelector("#kn2-cross-subgraph-overlay")).toBeTruthy();
-    expect(container.querySelector("#kn2-verification-overlay")).toBeTruthy();
-    expect(container.querySelector("#kn2-trace-overlay")).toBeTruthy();
-    expect(container.querySelector("iframe")).toBeNull();
+    renderWithStore(<SelectedOntologyPane />);
+
+    fireEvent.click(screen.getByRole("button", { name: new RegExp(node?.label ?? "", "i") }));
+    expect(openOntologyNode).toHaveBeenCalledWith(node?.id);
   });
 });

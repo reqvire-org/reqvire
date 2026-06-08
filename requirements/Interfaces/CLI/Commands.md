@@ -175,7 +175,7 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 - `--json`: Output structured JSON impact data
 - Default to formatted text reports
 - Support Mermaid diagrams of impact trees
-- Integrate with HTML report generation
+- Integrate with text, JSON, Mermaid, and Explorer-supported reporting workflows
 
 **Integration Support**:
 - Support integration with CI/CD pipelines
@@ -189,7 +189,7 @@ Command invocation: `reqvire change-impact [OPTIONS]`
 #### Attachments
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Text Output Formatting](../../Functional/Output/Specifications.md#text-output-formatting)
-  * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
+  * [Explorer Mermaid Diagram Style Specification](../WebInterface/Specifications.md#explorer-mermaid-diagram-style-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -246,9 +246,9 @@ The markdown output shall include:
 
 #### Attachments
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
-  * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
-  * [ContainmentView.md](../../Functional/Output/DesignDocuments/ContainmentView.md#containmentview)
-  * [D3.js Containment Tree Specification](../WebInterface/Specifications.md#d3js-containment-tree-specification)
+  * [Explorer Mermaid Diagram Style Specification](../WebInterface/Specifications.md#explorer-mermaid-diagram-style-specification)
+  * [ContainmentView.md](../WebInterface/DesignDocuments/ContainmentView.md#containmentview)
+  * [Model Browser and Graph Specification](../WebInterface/Specifications.md#model-browser-and-graph-specification)
 
 #### Relations
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
@@ -380,7 +380,7 @@ Implementation details shall follow the associated refinement specifications. Th
 
 #### Attachments
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
-  * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
+  * [Explorer Mermaid Diagram Style Specification](../WebInterface/Specifications.md#explorer-mermaid-diagram-style-specification)
   * [Model Diagram Output Formats Refinement Specification](../../Functional/Output/Specifications.md#model-diagram-output-formats-refinement-specification)
   * [Reverse Relation Traversal Behavior](../../Functional/Output/Behaviors.md#reverse-relation-traversal-behavior)
   * [Start Element Type Filter Behavior](../../Functional/Output/Behaviors.md#start-element-type-filter-behavior)
@@ -423,7 +423,7 @@ Implementation details shall follow the associated refinement specifications.
 The system shall provide a `mv` command to move existing model elements to different file locations while automatically updating all relations that reference the moved element.
 
 #### Details
-The command shall reject moving an element into an existing `# Documents` file when that move would create more than one element in the target document file.
+The command shall reject moving an element into an existing `# Element` file when that move would create more than one element in the target document file.
 
 #### Metadata
   * type: requirement
@@ -450,7 +450,7 @@ The command shall reject moving an element into an existing `# Documents` file w
 The system shall provide a `mv-file` command to move entire specification files with all their elements to a new location.
 
 #### Details
-The command shall reject `mv-file --squash` when the target file is an existing `# Documents` file.
+The command shall reject `mv-file --squash` when the target file is an existing `# Element` file.
 
 #### Metadata
   * type: requirement
@@ -589,7 +589,7 @@ The command shall:
 - Emit RDF/Turtle by default.
 - Support `--jsonld` to emit JSON-LD instead of Turtle.
 - Support `--full` to include RDF triples for Reqvire model elements, relations, attachments, concept references, ontology declarations, semantic-contract shape references, and generated ontology projection facts.
-- Exclude semantic-query-contract `#### Query` content and query metadata from default and `--full` output until a dedicated query-export command exists; generated ontology projection facts may cite semantic-query-contract IRIs without embedding raw query text.
+- Exclude semantic-query-contract `#### Query` content and query metadata from default and `--full` output until dedicated query output support exists; generated ontology projection facts may cite semantic-query-contract IRIs without embedding raw query text.
 - Support `--output <FILE>` to write the selected format to a file.
 - Reuse the semantic index built from the graph registry instead of reparsing Turtle separately from validation.
 
@@ -677,7 +677,7 @@ Implementation details shall follow the associated refinement specifications.
 #### Attachments
   * [JSON Output Structure](../../Functional/Output/Specifications.md#json-output-structure)
   * [Verification Trace Tree Construction](../../Functional/Processing/Specifications.md#verification-trace-tree-construction)
-  * [Mermaid Diagram Style Specification](../../Functional/Output/Specifications.md#mermaid-diagram-style-specification)
+  * [Explorer Mermaid Diagram Style Specification](../WebInterface/Specifications.md#explorer-mermaid-diagram-style-specification)
   * [Type Validation Error Behavior](../../Functional/Core/Behaviors.md#type-validation-error-behavior)
 
 #### Relations

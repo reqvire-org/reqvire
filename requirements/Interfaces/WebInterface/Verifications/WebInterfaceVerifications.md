@@ -1,52 +1,50 @@
 # Elements
 
-### Attachment Export Verification
+### Attachment Link Serving Verification
 
-This test verifies that HTML export preserves attachment identifier links to referenced refinement elements.
+This test verifies that the served Explorer preserves attachment identifier links to referenced refinement elements.
 
 #### Details
 
 ##### Acceptance Criteria:
 - System shall preserve all refinement-identifier attachments referenced by elements
-- Attachment identifier links shall resolve to referenced refinement elements in exported HTML
+- Attachment identifier links shall resolve to referenced refinement elements in Explorer content and element detail workflows
 - Duplicate attachments (same refinement referenced multiple times) shall be processed consistently
 
 ##### Test Criteria:
 - Create model with elements having attachments
-- Run HTML export command
-- Verify attachment links in exported HTML resolve to refinement element anchors
-- Verify identifier targets are navigable from rendered pages
+- Run the Explorer through the serve workflow or a Project Store fixture
+- Verify attachment links resolve to refinement element records and source anchors
+- Verify identifier targets are navigable from rendered content routes and element modals
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
-  * verify: [Attachment Export](../Capabilities.md#attachment-export)
+  * verify: [Attachment Link Serving](../Capabilities.md#attachment-link-serving)
 ---
 
-### Containment Attachment Links Verification
+### Model Containment Attachment Links Verification
 
-This test verifies that the D3.js containment tree view displays attachments as children of elements.
+This test verifies that the served Explorer Model containment data preserves attachment links from modeled elements to referenced refinement elements.
 
 #### Details
 
 ##### Acceptance Criteria:
-- Elements with attachments shall show attachments as child nodes in D3.js tree
-- Element attachments (refinements) shall use wrench icon (🔧) with type `attachment-element`
-- Element attachments shall be clickable and navigate to the referenced element
+- Elements with attachments shall expose attachment records or equivalent Project Store containment attachment records
+- Element attachment records that target refinement elements shall use the shared Explorer element-role and subtype glyph contract rather than a report-specific symbol
+- Element attachments shall be clickable from supported Explorer surfaces and navigate to the referenced element detail/source route
 
 ##### Test Criteria:
 - Create model with element having attachments
-- Run HTML export command
-- Verify Model Sunburst/Icicle data contains D3 tree attachment nodes or equivalent Project Store containment attachment records
-- Verify attachment-element nodes have links to element definitions
+- Run the Explorer through the serve workflow or a Project Store fixture
+- Verify Model List/Grid data contains attachment records or equivalent Project Store containment attachment records
+- Verify attachment-element records have links to element definitions or element-detail routes
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
   * verify: [Containment View Attachment Links](../Capabilities.md#containment-view-attachment-links)
 ---
 
@@ -68,61 +66,59 @@ This test verifies that diagrams display attachment links within element boxes.
 - Generate diagram (format or model command)
 - Verify Mermaid output contains multiline labels with attachments
 - Verify attached refinement element names appear with 📎 prefix
-- Verify exported Model route/source pages and Traces route data use compact attachment labels and still render Mermaid containers for the final graph where Mermaid output is present
+- Verify Model route/source content and Traces route data use compact attachment labels and still render Mermaid containers for the final graph where Mermaid output is present
 - Verify diagram renders correctly with attachment labels
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-attachment-export/test.sh)
   * verify: [Diagram Attachment Display](../Capabilities.md#diagram-attachment-display)
 ---
 
-### HTML Export Verification
+### Explorer Serve Verification
 
-This test verifies that the system exports specifications into HTML format with the native SPA Explorer shell and Model route containment modes, then saves them in the designated output location.
+This test verifies that the system serves the native SPA Explorer shell with Model route containment modes and Project Store data.
 
 #### Details
 
 ##### Acceptance Criteria:
-- System should export specifications to HTML format
-- HTML files should be saved in the designated output location
-- HTML output should maintain the structure and content of the original specifications
-- System shall generate `index.html` as the primary SPA Explorer shell and browser-local Project Store host
+- System shall serve `index.html` as the primary SPA Explorer shell and browser-local Project Store host
 - `index.html` shall contain a Project Store seed before Explorer views render
-- The Model route shall display folders, files, and elements through native List, Grid, Sunburst, and Icicle modes.
-- Sunburst and Icicle Model modes shall render containment as D3 partition views with click-to-drill/zoom and breadcrumb navigation.
-- The native Explorer shell shall not render a top header or primary left-pane view links; Knowledge Graph, Ontologies, Traces, and KN2 are reached from right vertical tool-rail icons.
-- The native Explorer shell shall expose shared collapsible vertical `Explorer` and `Inspector` edge strips; views with contextual evidence use the shell-owned 390px right `Inspector` lane instead of defining route-local right-side geometry.
+- The Model route shall display folders, files, elements, and the project graph through native List, Grid, and Graph modes.
+- Graph mode shall render the project knowledge graph with pan/zoom, search/focus, selected-node state, and graph filters in the Model left pane.
+- The native Explorer shell shall not render primary left-pane view links; Ontologies and Traces are reached as specialist Explorer views, while the project Knowledge Graph is reached as Model Graph mode.
+- The native Explorer shell shall expose the shared collapsible vertical `Explorer` edge strip and a compact right tool rail; views with contextual evidence use left-pane selected-item links and shared detail modals instead of defining route-local right-side geometry.
 - Old Explorer page URLs shall not be generated; equivalent content shall be reachable through SPA routes and source-document links.
-- Links in diagrams and text must be converted to use .html instead of .md
-- Paths in HTML files should maintain the original relative structure
+- Links in diagrams and text shall resolve through Explorer content routes or Project Store source-content records
+- Paths in served content shall maintain the original relative structure
+- Project Store file records shall expose source content generated directly from modeled element source files and existing graph-referenced local implementation/evidence/resource files, without depending on generated Markdown files on disk.
+- Relation-backed implementation files, evidence files, scripts, images, and other local resource targets shall remain Project Store resources for relation semantics, and existing repository-relative local targets shall appear in the Model tree under their full path.
 - System should work in environments without Git repositories
 
 ##### Test Criteria:
 - Command exits with success (0) return code
-- HTML files are generated at the expected location with .html extension
-- Generated KN2 output exposes concept-reference facts as a relation toggle/filter, and disabling that relation can remove concept reference targets from the visible graph.
-- Output directory contains `index.html`
-- `index.html` contains an Explorer shell marker and Project Store seed
+- The served root URL returns `index.html`
+- `/assets/project-store.js` contains an Explorer Project Store seed
 - The Project Store seed includes required sections for files, resources, elements, relations, attachments, concept references, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes
-- The Project Store seed distinguishes file containers from modeled resources/evidence files
-- Hash routes for primary Model, file deep links, Knowledge Graph, Ontologies, Traces, and KN2 views plus supporting Coverage, Resources, Elements, and Search workflows are declared
+- The Project Store seed distinguishes modeled file containers from modeled resources/evidence files
+- Project Store file records include normalized source Markdown content derived from the registry for modeled files and raw source-preview content for existing registry-linked local resources
+- Relation-backed local resource targets are present as resources with source-preview content when the local file exists, and existing resource-only paths appear in the Project Store `files` and `folders` hierarchy under their full repository-relative path
+- Nonexistent local targets, unsupported parsed pages, unrelated repository files, and external URLs are absent from the Project Store file-tree hierarchy
+- Hash routes for primary Model, file deep links, Ontologies, and Traces views plus supporting Coverage, Resources, Elements, and Search workflows are declared; the project Knowledge Graph is not a separate hash route
 - Retired Explorer page URLs are absent from generated output and canonical route mappings
-- HTML content preserves the structure and information from the source files
-- Links in HTML files use .html extension instead of .md
-- Mermaid click links are properly converted from .md to .html
+- Explorer content preserves the structure and information from the source files
+- Mermaid click links resolve through canonical Explorer routes or source anchors
 - Both GitHub-style URLs and direct file paths in mermaid click links are handled correctly
 - Paths should not have duplicated folder names (e.g., specifications/specifications)
-- The .git directory is not present in export output
+- Missing embedded asset paths return 404 while non-asset browser routes return the SPA shell for client-side routing
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-html-export/test.sh)
-  * verify: [HTML Export](../Capabilities.md#html-export)
+  * satisfiedBy: [test.sh](../../../../tests/test-serve-command/test.sh)
+  * verify: [Served Explorer Browser Interface](../Capabilities.md#served-explorer-browser-interface)
 ---
 
 ### SPA Explorer Store Contract Verification
@@ -132,35 +128,41 @@ This test verifies that `index.html` is the central SPA Explorer shell and conta
 #### Details
 
 ##### Acceptance Criteria:
-- `index.html` shall be the primary Explorer shell and Project Store host, exported as a native static SPA built with Vite/TypeScript/React using Radix Themes 3, `@radix-ui/react-icons`, and compiled Tailwind.
-- The exported shell shall reference local compiled bundle and stylesheet assets with no CDN-loaded framework, no CDN-loaded Tailwind, and no runtime Tailwind compiler.
+- `index.html` shall be the primary Explorer shell and Project Store host, served as a native SPA built with Vite/TypeScript/React and the Reqvire Explorer design system.
+- The served shell shall reference local compiled bundle, stylesheet, design-system, and font assets with no CDN-loaded framework, no CDN-loaded styling runtime, and no runtime CSS compiler.
 - The Project Store seed shall be present before view rendering and shall include a schema/version marker.
 - The store shall expose normalized top-level sections for project, folders, files, resources, elements, relations, attachments, concept references, submodels, traces, coverage, ontology, knowledge graph, search, summaries, and routes.
 - File containers and modeled resources shall be represented as separate record families with explicit cross-references when the same path appears in both roles.
 - Route definitions shall include canonical hash routes for current views and element/file/search detail workflows.
-- Element-detail routes shall open a Project Store-backed scrollable modal/dialog in the Explorer shell instead of using the generated source page as the primary element navigation target.
-- Element-detail modals shall expose source-page navigation as a secondary action using the exported source anchor.
-- Standalone Explorer/report HTML entry points shall not be generated.
+- Element-detail routes shall open a Project Store-backed scrollable modal/dialog in the Explorer shell instead of using the source content route as the primary element navigation target.
+- Element-detail modals shall expose source navigation as a secondary action using the source anchor.
+- The Coverage route shall render a left-pane coverage explorer with section counts for Overview, Capability coverage, Unverified requirements, Unimplemented requirements, Unsatisfied verifications, and Orphaned verifications, while keeping summary cards, charts, and legends out of the left pane.
+- Separate Explorer/report document entry points shall not be generated.
 - Missing or malformed store seed data shall be detectable by automated checks and visible to users as an Explorer diagnostic.
 
 ##### Test Criteria:
-- Run HTML export on a minimal model with at least one capability, requirement, verification relation, satisfiedBy evidence file, attachment or concept-reference fact, and ontology term when available.
+- Run `reqvire serve` on a minimal model with at least one capability, requirement, verification relation, satisfiedBy evidence file, attachment or concept-reference fact, and ontology term when available.
 - Parse the generated store seed from `index.html` or its referenced static asset.
 - Assert all required top-level store sections exist.
-- Assert at least one exported Markdown source path appears in `files`.
+- Assert at least one Markdown source path appears in `files`.
 - Assert at least one implementation or evidence path referenced by `satisfiedBy`, `trace`, or an attachment appears in `resources`.
-- Assert `files` records carry exported HTML/source navigation metadata while `resources` records carry referring-fact evidence.
-- Assert canonical routes include primary `#/model`, right-tool specialist `#/knowledge-graph`, `#/ontologies`, `#/traces`, and `#/kn2`, and supporting `#/files`, `#/files/<path>`, `#/coverage`, `#/resources`, `#/elements/<identifier>`, and `#/search`; do not require a separate Containment route and do not generate a standalone Knowledge Graph page.
-- Assert at least one generated Explorer element link or search result targets `#/elements/<identifier>` and that the element-detail UI contains a modal/dialog marker plus a secondary source-page link.
-- Assert the Model view List/Grid modes render from Project Store `folders` and `files` without an iframe or third-party file-manager widget, expose breadcrumb navigation, sortable file rows, grid cards, shared Inspector-lane search, icon/color legends, source-page secondary actions, and modeled-element rows that open the shared element-detail modal. Assert `#/files` and `#/files/<path>` deep-link into that behavior without creating a separate primary Filesystem view.
-- Assert `index.html` loads local compiled SPA bundle/stylesheet assets and contains no Tailwind/framework CDN reference and no runtime Tailwind compiler.
+- Assert `files` records carry source navigation metadata while `resources` records carry referring-fact evidence.
+- Assert canonical routes include primary `#/model`, specialist `#/ontologies` and `#/traces`, and supporting `#/files`, `#/files/<path>`, `#/coverage`, `#/resources`, `#/elements/<identifier>`, and `#/search`; do not require a separate Containment route or a separate Knowledge Graph route/page file.
+- Assert at least one Explorer element link or search result targets `#/elements/<identifier>` and that the element-detail UI contains a modal/dialog marker plus a secondary source link.
+- Assert the Model view List/Grid modes render from Project Store `folders` and `files` without an iframe or third-party file-manager widget, expose breadcrumb navigation, sortable file rows, grid cards, central workspace search, icon/color legends, source-page secondary actions, and modeled-element rows that open the shared element-detail modal. Assert `#/files` and `#/files/<path>` deep-link into that behavior without creating a separate primary Filesystem view.
+- Assert the Model tree, grid cards, modeled-element lists, and element legends use the shared Explorer `ElementIcon` type glyphs, and that refinement-family subtypes keep the shared refinement color while rendering distinct glyph marks for `source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, and `semantic-contract`.
+- Assert selecting a folder, file, or modeled element in the left Model project tree updates the active Model workspace mode: List/Grid browse the selected folder or file, Graph focuses the matching graph node when one exists, and modeled-element rows open the shared element-detail modal without leaving the Model workspace.
+- Assert the Search route's left-pane result-type controls do not render a duplicate passive legend for the same result-type colors and labels.
+- Assert the Coverage route's left Explorer pane renders the coverage explorer section rows with counts, that selecting a row scrolls or selects the matching central Coverage section, and that the left pane does not duplicate the Coverage dashboard summaries or legend content.
+- Assert the Explorer builds its ranked search index in a browser worker after the initial shell render, keeps non-search Explorer views interactive during indexing, and returns BM25-style ranked results that prioritize title matches over path/result-kind matches and body/content matches.
+- Assert prefix and fuzzy search terms can find matching Project Store search documents, and result-kind controls filter ranked results without rebuilding the index.
+- Assert `index.html` loads local compiled SPA bundle/stylesheet assets and contains no framework/styling CDN reference and no runtime CSS compiler.
 - Assert canonical SPA routes are sufficient for Explorer navigation and that no retired Explorer page adapters or separate Explorer/report implementations are emitted.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-html-generation/test.sh)
   * verify: [SPA Explorer Shell and Project Store](../Capabilities.md#spa-explorer-shell-and-project-store)
 ---
 
@@ -170,29 +172,29 @@ This analysis verifies that the Ontologies page behaves as an ontology model vie
 
 #### Details
 Expected analysis checks:
-- Confirm the primary Ontologies visualization, search data, and inspector construct metadata are built from `SemanticIndex.ontology_projection`, the same generated ontology construct projection used by full semantic export.
+- Confirm the primary Ontologies visualization, search data, and ontology node modal construct metadata are built from `SemanticIndex.ontology_projection`, the same generated ontology construct projection used by full semantic export.
 - Confirm the primary viewer does not render `rdf:type` edges, OWL/RDFS metaclass nodes, RDF list plumbing, anonymous SHACL property-shape blank nodes, or generic literal plumbing as the main user-facing graph.
 - Confirm classes, object properties, datatype properties, RDF properties, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources are classified into distinct semantic kinds when present, while property terms are projected as graph relationship semantics rather than standalone graph nodes.
-- Confirm datatype-property literal values are not graph nodes or visibility filter layers, but remain searchable and appear in the selected subject node inspector as predicate/value evidence.
-- Confirm a named IRI typed only by a declared ontology class, without explicit `owl:NamedIndividual`, is shown in graph data and the inspector as a named individual while retaining its `∈` membership construct evidence.
-- Confirm visual coloring is driven by semantic kind, not by source provenance, so a class referenced by SHACL remains class-colored, property metadata remains property-typed in links/inspector/search, and actual SHACL node shapes and property shapes use SHACL-specific colors.
+- Confirm datatype-property literal values are not graph nodes or visibility filter layers, but remain searchable and appear in the selected subject node modal as predicate/value evidence.
+- Confirm a named IRI typed only by a declared ontology class, without explicit `owl:NamedIndividual`, is shown in graph data and the ontology node modal as a named individual while retaining its `∈` membership construct evidence.
+- Confirm visual coloring is driven by semantic kind, not by source provenance, so a class referenced by SHACL remains class-colored, property metadata remains property-typed in links/modal/search, and actual SHACL node shapes and property shapes use SHACL-specific colors.
 - Confirm built-in XSD, RDF, RDFS, OWL, and SHACL namespace references are available as an external-reference layer that is hidden by default and can be enabled for datatype/range audit.
-- Confirm object and datatype properties are first-class relationship semantics with aggregated domain and range information rendered as labeled links and inspector property usage evidence, not as standalone graph nodes.
-- Confirm SHACL node-shape target classes and property usage rows receive derived slot/facet inspector sections from property-shape paths, datatype/class range constraints, node kind, cardinality, pattern, allowed values, and source-shape evidence.
+- Confirm object and datatype properties are first-class relationship semantics with aggregated domain and range information rendered as labeled links and modal property usage evidence, not as standalone graph nodes.
+- Confirm SHACL node-shape target classes and property usage rows receive derived slot/facet modal sections from property-shape paths, datatype/class range constraints, node kind, cardinality, pattern, allowed values, and source-shape evidence.
 - Confirm target-class slot/facet sections are labeled as class slots, property usage sections are labeled as usages of the selected property by target classes, and repeated usages with different target classes or source shapes are not presented as duplicate property definitions.
 - Confirm raw SHACL evidence is shown only when direct raw constraints are attached to the inspected node and that classes or property metadata with only normalized SHACL overlays do not show an empty raw-evidence section.
 - Confirm equivalence groups use stable deterministic identifiers derived from canonical member lists.
 - Confirm domain/range, subclass/member-of, disjointness, equivalence groups, inverse properties, property chains, property characteristics, class-expression/restriction constructs, SHACL overlays, provenance/source citations, and symbols are represented from generated semantic projection constructs when present in the ontology input.
-- Confirm class-expression nodes used as property domain/range expressions display contextual labels for actual union-valued ontology constraints while preserving expression members and property usage evidence in the inspector, and confirm `refine` does not render as a `Capability ∪ Requirement` range expression because refinement ownership is requirement-only.
+- Confirm class-expression nodes used as property domain/range expressions display contextual labels for actual union-valued ontology constraints while preserving expression members and property usage evidence in the ontology node modal, and confirm `refine` does not render as a `Capability ∪ Requirement` range expression because refinement ownership is requirement-only.
 - Confirm semantic-query-contract refinements define the direct-authored construct extraction patterns while raw query text remains out of ontology collection and full semantic export.
 - Confirm ontology viewer symbols are defined with semantic meaning, raw Unicode code point, rendered Unicode character, allowed viewer usage, tooltip text, and accessible labels.
-- Confirm ontology inspector badges render the symbol and semantic label without rendering the raw Unicode code point as visible badge text, and that visible badge labels prefer domain wording such as `Subclass`.
+- Confirm ontology modal badges render the symbol and semantic label without rendering the raw Unicode code point as visible badge text, and that visible badge labels prefer domain wording such as `Subclass`.
 - Confirm subclass and membership badges are directional and are not mirrored onto superclass or class-object nodes solely because those nodes are construct targets.
-- Confirm source citations remain available as inspector/search evidence, link to the exported source HTML page fragments, and the exported `ontologies.ttl` artifact remains available for raw RDF/Turtle auditability and downstream tooling.
-- Confirm the Ontologies SPA route opens directly on the headerless Explorer shell, fills the available viewport between the persistent left Explorer pane/strip and the shared right `Inspector` lane/tool rail, places the `.ttl` download action in the canonical ontology control/footer location for the active renderer mode, and does not render a retired route-local action bar, raw Turtle/source-block list, page header preamble, or shared content-card footer.
+- Confirm source citations remain available as modal/search evidence, link to served source route fragments, and the served `ontologies.ttl` artifact remains available for raw RDF/Turtle auditability and downstream tooling.
+- Confirm the Ontologies SPA route opens directly on the headerless Explorer shell, fills the available viewport between the persistent left Explorer pane/strip and the right tool rail, places the `.ttl` download action in the Ontologies left pane with the summary controls, and does not render a retired route-local action bar, raw Turtle/source-block list, page header preamble, shared content-card footer, or route-local right sidebar.
 - Confirm the ontology graph uses the Sigma.js, Graphology, and ForceAtlas2 rendering engine already used by the project knowledge graph while preserving ontology-specific projection and filter semantics, and uses Sigma curved-arrow edge programs to separate parallel edges and labels between the same nodes.
 - Confirm ontology graph property and construct edge labels are anchored on the same curved connector geometry as the rendered Sigma edge rather than at unrelated straight-line chord positions.
-- Confirm normal ontology property relationships render as solid labeled Sigma arrows, while OWL set-operator/class-expression member links use a dedicated Sigma/WebGL edge program, render as unlabeled dashed structural connectors with an open diamond marker at the anonymous construct/source side and an arrowhead at the member target side, retain expression kind/member evidence in node labels and the inspector, and do not draw connector strokes or markers from the edge-label canvas hook.
+- Confirm normal ontology property relationships render as solid labeled Sigma arrows, while OWL set-operator/class-expression member links use a dedicated Sigma/WebGL edge program, render as unlabeled dashed structural connectors with an open diamond marker at the anonymous construct/source side and an arrowhead at the member target side, retain expression kind/member evidence in node labels and the ontology node modal, and do not draw connector strokes or markers from the edge-label canvas hook.
 - Confirm ontology render nodes use one construct-class contract derived from semantic type and projection construct evidence, and that restriction/class-expression classification drives glyph rendering, visibility filters, construct-only node gating, and focused-neighborhood behavior consistently.
 - Confirm OWL set-operator/class-expression and restriction nodes render as compact construct circles through Sigma `nodeProgramClasses` and `@sigma/node-image` rather than as ordinary named ontology classes, with Sigma providing the circular node-color background, a construct-kind node label, and an inline SVG pictogram providing a bold semantic glyph without PNG/raster sprites, SVG border detail, transparent square image backgrounds, or custom construct-node hover overlays; out-of-focus construct nodes must dim through the same Sigma reducer path as ordinary nodes.
 - Confirm glyph-only construct circles appear only for actual OWL anonymous construct nodes, such as `owl:unionOf`, `owl:intersectionOf`, `owl:complementOf`, and `owl:Restriction`, when their `Class expressions` or `Restrictions` visibility controls and focused edge visibility rules make the construct neighborhood visible.
@@ -203,27 +205,27 @@ Expected analysis checks:
 - Confirm the ontology graph uses ontology-diagram visual conventions: class-like concepts, restrictions, and class expressions render as compact circular or elliptical anchors; properties render as labeled domain/range relationship edges near their anchors rather than graph boxes; datatype/resource/SHACL nodes remain visually distinct; relation edges use directed ontology-diagram connector lines with visible direction arrowheads; and the graph supports Sigma pan/zoom, selected-node centering, and reset-driven layout.
 - Confirm ontology relationship edges are hidden in the default full-graph view and appear only for edges incident to the hovered or selected focus node set, plus enabled member/filler edges one semantic step beyond visible construct-only nodes, through Sigma's native edge reducer and `@sigma/edge-curve` edge programs, with relation visibility controls limiting which focused edges are eligible.
 - Confirm Sigma z-index and highlighted-node rendering are enabled so the hovered or selected ontology focus neighborhood is painted through Sigma's normal focus path, selected/focused nodes render above focused-neighbor nodes, focused-neighbor nodes render above focused edges, focused edges render above unrelated or muted graph items, and focused edges are not rendered through a separate focused-edge canvas overlay.
-- Confirm generic SHACL overlay edges render as unlabeled overlay lines while retaining inspector/projection evidence, unless an edge carries a more specific ontology/SHACL relation label.
+- Confirm generic SHACL overlay edges render as unlabeled overlay lines while retaining modal/projection evidence, unless an edge carries a more specific ontology/SHACL relation label.
 - Confirm relation connectors and arrowheads remain visible but subtle enough not to overflow or dominate labels.
 - Confirm circular class-anchor size is bounded and grows from graph connection degree rather than label length, so highly connected concepts are visually emphasized while low-degree concepts remain compact.
-- Confirm graph nodes, property link labels, inspector badges, and legend swatches use the muted ontology-diagram palette consistently, including blue class anchors, muted property semantics, yellow datatypes, purple named individuals, red SHACL shapes, and a low-contrast gray-green canvas.
-- Confirm search, focus, inspector, filters, and the compact legend operate over semantic ontology roles and OWL constructs rather than generic RDF predicate edges.
+- Confirm graph nodes, property link labels, modal badges, and legend swatches resolve through the ontology semantic role palette consistently, including separate role tokens for class anchors, property semantics, datatypes, named individuals, SHACL shapes, resources, restrictions, class expressions, external references, and the shared graph canvas surface.
+- Confirm search, focus, modal detail, filters, and the compact legend operate over semantic ontology roles and OWL constructs rather than generic RDF predicate edges.
 - Confirm ontology graph nodes can be dragged through Sigma pointer events, updating in-memory Graphology coordinates so users can uncover overlapped relation lines or labels, and confirm the visible view controls expose `Reset` without a separate `Fit` button.
-- Confirm the Ontologies and Model/project graph left legend/filter panels use the KN2 graph control width and selected-control treatment: 220px panels, black active buttons with white text/checkmarks, warm-neutral inactive/hover controls, and neutral compact right-inspector headings with no black title bar.
-- Confirm the right-inspector headings and content sit inside the shared collapsible `Inspector` lane and remain aligned with the shell-owned right edge strip and tool rail across Model, Knowledge Graph, Ontologies, Traces, KN2, Resources, and Files views.
+- Confirm the Ontologies and Model/project graph left legend/filter panels use the shared graph control width and selected-control treatment: active controls use selected-control background/foreground tokens and inactive/hover controls use shared warm-neutral surface tokens.
+- Confirm selected Model Graph nodes expose a selected-element link in the left Explorer pane that opens the shared element-detail modal, and selected Ontologies graph nodes expose a selected ontology-node link in the left Explorer pane that opens the ontology element modal.
 - Confirm the detailed semantic type color key and construct notation key are passive, while the `Show` group contains the active role and relation visibility controls.
-- Confirm the passive type legend exposes separate color swatches only for semantic kinds that can render as nodes, including classes, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources; property kinds remain visible through property links, inspector badges, search metadata, and relation visibility controls.
-- Confirm the `Show` visibility group exposes one shared button design for terms, datatype property links, object property links, class membership, class disjointness, restrictions, class expressions, SHACL shapes, resources, and external references without replacing Reqvire's richer passive type and notation legends, and that active means shown on the canvas.
-- Confirm the grouped role filters expose ontology terms, SHACL shapes, resources, and external references instead of making every detailed type swatch clickable; property links are controlled through datatype-property and object-property visibility controls, and the single SHACL shapes role filter controls both SHACL shape nodes and SHACL overlay relations.
-- Confirm selected and hovered focus neighborhoods are computed from currently visible relation filters, so disabling object-property, datatype-property, membership, restriction, class-expression, disjointness, or SHACL relation categories removes neighbors connected only by those hidden relations from the focused/highlighted subgraph without filtering evidence from the inspector; visible construct-only nodes expand the focus through their enabled construct links so union/intersection/complement members and restriction fillers are visible from the selected context.
-- Confirm the default filter state opens with datatype-property links, object-property links, and class-membership edges checked, while SHACL shapes, generic resources/individuals, disjointness, equivalence, inverse-property overlays, property chains, property characteristics, restrictions, class expressions, and external references are inactive until selected.
+- Confirm the passive type legend exposes separate color swatches only for semantic kinds that can render as nodes, including classes, named individuals, datatypes, restrictions, class expressions, SHACL node shapes, SHACL property shapes, and generic resources; property kinds remain visible through property links, modal badges, search metadata, and relation visibility controls.
+- Confirm the `Show` visibility group exposes one shared button design for datatype property links, object property links, class disjointness, restrictions, class expressions, SHACL shapes, resources, and external references without replacing Reqvire's richer passive type and notation legends, and that active means shown on the canvas.
+- Confirm ontology terms and class-membership context are not exposed as hideable toggles, property links are controlled through datatype-property and object-property visibility controls, and the single SHACL shapes role filter controls both SHACL shape nodes and SHACL overlay relations.
+- Confirm selected and hovered focus neighborhoods are computed from currently visible relation filters, so disabling object-property, datatype-property, restriction, class-expression, disjointness, or SHACL relation categories removes neighbors connected only by those hidden relations from the focused/highlighted subgraph without filtering evidence from the ontology element modal; visible construct-only nodes expand the focus through their enabled construct links so union/intersection/complement members and restriction fillers are visible from the selected context.
+- Confirm the default filter state opens with datatype-property links, object-property links, class disjointness, restrictions, class expressions, SHACL shapes, resources, and external references shown, while ontology terms and class-membership context remain always available.
 - Confirm role filters are hard gates for node visibility, so disabling SHACL shapes hides both SHACL shape nodes and SHACL overlay relations without requiring a second SHACL slot-overlay checkbox.
 - Confirm the passive `Notation` legend covers domain/range, subclass, membership, disjointness, equivalence, inverse, property chain, property characteristic, restriction, class-expression, and SHACL-overlay constructs without exposing those rows as a second construct-filter panel.
 - Confirm relation styling is passive visual notation rather than a selectable filter, and the active `Show` relation controls determine which clutter categories are shown.
-- Confirm equivalence, inverse-property, property-chain, and property-characteristic constructs remain visible as passive legend/inspector evidence rather than active filters while they have no direct canvas-visible toggle effect.
-- Confirm visibility controls affect construct-only canvas nodes, construct-specific canvas edges, and graph node badges without making nodes visible when their role filter is disabled, while the inspector continues to show the selected node's full evidence.
-- Confirm graph-registry provenance and generated-projection provenance are not exposed as graph-wide filter axes; source/provenance evidence remains available in the inspector and export data.
-- Confirm active filters combine inclusively within one category and narrow together across different active categories on the canvas without narrowing the shared right `Inspector` lane.
+- Confirm equivalence, inverse-property, property-chain, and property-characteristic constructs remain visible as passive legend/modal evidence rather than active filters while they have no direct canvas-visible toggle effect.
+- Confirm visibility controls affect construct-only canvas nodes, construct-specific canvas edges, and graph node badges without making nodes visible when their role filter is disabled, while the ontology node modal continues to show the selected node's full evidence.
+- Confirm graph-registry provenance and generated-projection provenance are not exposed as graph-wide filter axes; source/provenance evidence remains available in the ontology node modal and Project Store data.
+- Confirm active filters combine inclusively within one category and narrow together across different active categories on the canvas without narrowing the ontology element modal evidence.
 
 #### Metadata
   * type: analysis-verification
@@ -236,29 +238,58 @@ Expected analysis checks:
   * verify: [Ontology Projection Subgraph Materialization](../../../Functional/Output/Reporting.md#ontology-projection-subgraph-materialization)
 ---
 
-### HTML Export Local Linked Files Verification
+### Component Reuse Verification
 
-This test verifies that HTML export preserves local linked-file references used in exported markdown content.
+This analysis verifies Explorer components are reused across routes without duplicated route-local renderers.
 
 #### Details
+Expected checks:
+- `index.html` is the single Explorer SPA shell entry point.
+- Browser chrome is implemented by shared Explorer components.
+- Separate Explorer/report document entry points are not emitted.
+- Source code is organized in reusable route and shell modules.
 
-##### Acceptance Criteria:
-- Exported HTML pages shall preserve local file reference paths for markdown-rendered links and images
-- Local non-markdown files referenced by exported markdown content shall exist in the export output
-- Exported HTML pages shall render local file references without converting asset paths to HTML document paths
+#### Metadata
+  * type: analysis-verification
 
-##### Test Criteria:
-- Create model content with local file references
-- Run HTML export command
-- Verify exported HTML contains the expected local `href` and `<img src>` paths
-- Verify the referenced local files exist in the output tree
+#### Relations
+  * verify: [Component-Based Explorer Architecture](../ExplorerRendering.md#component-based-explorer-architecture)
+---
+
+### Mobile Responsiveness Verification
+
+This test verifies the Explorer is usable on mobile devices.
+
+#### Details
+Expected checks:
+- Desktop and mobile viewports can use the Explorer shell without horizontal page overflow.
+- Left Explorer pane and right tool rail remain compact and usable without a top header.
+- Touch targets remain usable on common mobile viewports.
 
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-html-export-local-images/test.sh)
-  * verify: [Local Linked File Export](../Capabilities.md#local-linked-file-export)
+  * verify: [Mobile-Friendly Explorer](../ExplorerRendering.md#mobile-friendly-explorer)
+  * verify: [Responsive Explorer Rendering](../ExplorerRendering.md#responsive-explorer-rendering)
+---
+
+### Responsive Design Verification
+
+This test verifies responsive breakpoints and compiled Explorer design-system CSS integration.
+
+#### Details
+Expected checks:
+- Explorer layout works at mobile, tablet, and desktop widths.
+- No layout breaks or overlapping controls are present.
+- Compiled CSS and font assets are local and no runtime CSS compiler or CDN framework is required.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Responsive Explorer Rendering](../ExplorerRendering.md#responsive-explorer-rendering)
+  * verify: [Explorer Design System Styling](../ExplorerRendering.md#explorer-design-system-styling)
 ---
 
 ### Model View Element Navigation Test
@@ -284,20 +315,20 @@ Test verifies that element names in the model-centric view are clickable links.
 
 ### Serve Command Verification
 
-This test verifies that the serve command exports HTML to a temporary directory and starts an HTTP server that serves the model documentation.
+This test verifies that the serve command starts an HTTP server for the embedded Explorer and generated model runtime data.
 
 #### Details
 
 ##### Acceptance Criteria:
-- System shall export HTML artifacts to a temporary directory
 - System shall start HTTP server on specified host and port
 - System shall display clickable terminal link to the server URL
 - System shall serve index.html when accessing root URL
-- System shall serve all exported HTML files with correct paths
-- System shall serve static assets (SVG diagrams, CSS, etc.)
-- System shall return 404 for non-existent files
+- System shall serve embedded Explorer assets and generated Project Store data with correct paths
+- System shall serve generated `ontologies.ttl`
+- System shall return index.html for non-asset browser routes
+- System shall return 404 for missing asset paths
 - System shall set correct Content-Type headers for different file types
-- System shall run in quiet mode (suppress verbose export output)
+- System shall run in quiet mode without verbose runtime-generation output
 - System shall not automatically open browser window
 - System shall display instructions for Ctrl-C stop
 
@@ -307,8 +338,9 @@ This test verifies that the serve command exports HTML to a temporary directory 
 - Root URL (/) serves index.html
 - HTML files are served with text/html content type
 - SVG files are served with image/svg+xml content type
-- Non-existent paths return 404 status
-- Export verbose output is suppressed (quiet mode active)
+- Missing embedded asset paths return 404 status
+- Non-asset browser routes return index.html for SPA fallback
+- Runtime-generation verbose output is suppressed (quiet mode active)
 
 #### Metadata
   * type: test-verification

@@ -1,0 +1,360 @@
+/* ============================================================
+   Reqvire Explorer — Color tokens
+   Warm neutrals · Rose brand accent · 6-color element semantics
+   Light is the default; dark overrides live at the bottom.
+
+   Structure:
+   - --color-* oklch primitives  (CSS-only consumers, perceptual ramps)
+   - --slate-*, --warm-*, --rose-* hex ramps  (resolved for JS compat)
+   - Element solid fills → var(--color-*) = oklch, normalized by cssVar()
+   - Element tints     → color-mix(), auto-adapts in dark mode
+   - Element inks      → design-specific hex values, dark mode overrides
+   ============================================================ */
+
+@layer base {
+  :root {
+    /* ── oklch runtime primitives ─────────────────────────────────
+       Mirrors @theme but as real CSS custom properties so
+       getPropertyValue() and color-mix() in CSS can read them.   */
+
+    /* Slate ramp */
+    --color-slate-0:   oklch(100% 0 0);
+    --color-slate-25:  oklch(99.09% 0.0029 264.54);
+    --color-slate-50:  oklch(97.85% 0.0045 258.32);
+    --color-slate-100: oklch(95.73% 0.0074 260.73);
+    --color-slate-150: oklch(93.22% 0.0109 256.7);
+    --color-slate-200: oklch(89.59% 0.0151 260.73);
+    --color-slate-300: oklch(82.04% 0.0208 257.48);
+    --color-slate-400: oklch(70.94% 0.0291 260.3);
+    --color-slate-500: oklch(56.31% 0.0309 260.27);
+    --color-slate-600: oklch(45.78% 0.0291 259.78);
+    --color-slate-700: oklch(37.28% 0.0269 259.15);
+    --color-slate-800: oklch(28.68% 0.0248 258.35);
+    --color-slate-900: oklch(22.86% 0.0221 257.28);
+    --color-slate-950: oklch(17.74% 0.0178 263.96);
+
+    /* Warm surfaces */
+    --color-warm-0:   oklch(100% 0 0);
+    --color-warm-25:  oklch(98.5% 0.0041 91.45);
+    --color-warm-50:  oklch(97.33% 0.007 88.64);
+    --color-warm-100: oklch(95.8% 0.0083 91.48);
+    --color-warm-150: oklch(92.86% 0.0128 86.83);
+    --color-warm-200: oklch(89.87% 0.0145 84.59);
+    --color-warm-300: oklch(86.52% 0.0176 84.59);
+
+    /* Brand accent */
+    --color-rose-50:  oklch(96.97% 0.0153 7.48);
+    --color-rose-100: oklch(94.19% 0.0301 7.52);
+    --color-rose-200: oklch(89.33% 0.0565 5.93);
+    --color-rose-400: oklch(71.73% 0.1718 11.46);
+    --color-rose-500: oklch(64.5% 0.2154 16.44);
+    --color-rose-600: oklch(58.58% 0.222 17.58);
+    --color-rose-700: oklch(51.43% 0.1978 16.93);
+    --color-rose-800: oklch(45.46% 0.1713 13.7);
+
+    /* Element type solid fills */
+    --color-capability:  oklch(88.48% 0.0546 243.39);
+    --color-requirement: oklch(47.42% 0.1862 294.78);
+    --color-verification:oklch(67.31% 0.1624 144.21);
+    --color-refinement:  oklch(77.03% 0.1741 64.05);
+    --color-ontology:    oklch(65.1%  0.133  89.06);
+    --color-resource:    oklch(86.22% 0.1681 88.31);
+    --color-other:       oklch(69.93% 0 0);
+    --color-node-generic-fill: oklch(95.04% 0.0042 236.5);
+
+    /* RDF / ontology graph */
+    --color-rdf-class:       oklch(71.07% 0.0351 256.79);
+    --color-rdf-objprop:     oklch(55.44% 0.0407 257.42);
+    --color-rdf-dtprop:      oklch(51.09% 0.0861 186.39);
+    --color-rdf-rdfprop:     oklch(43.7%  0.0705 188.22);
+    --color-rdf-individual:  oklch(54.13% 0.2466 293.01);
+    --color-rdf-datatype:    oklch(74.73% 0.1295 81.69);
+    --color-rdf-restriction: oklch(86.9%  0.0198 252.89);
+    --color-rdf-classexpr:   oklch(92.88% 0.0126 255.51);
+    --color-rdf-nodeshape:   oklch(57.71% 0.2152 27.33);
+    --color-rdf-propshape:   oklch(51.43% 0.1978 16.93);
+    --color-rdf-resource:    oklch(70.38% 0.123  182.5);
+    --color-rdf-shacl:       oklch(63.68% 0.2078 25.33);
+
+    /* Status */
+    --color-success: oklch(61.41% 0.1485 152.91);
+    --color-warning: oklch(76.52% 0.1552 84.7);
+    --color-danger:  oklch(57.71% 0.2152 27.33);
+    --color-info:    oklch(65.18% 0.1809 253.92);
+
+    /* Edge */
+    --color-edge-default: oklch(83.02% 0.0189 258.36);
+    --color-edge-attach:  oklch(65.82% 0.169  248.81);
+
+    /* Dark semantic primitives */
+    --color-dark-canvas:         oklch(18.97% 0.0206 258.33);
+    --color-dark-surface:        oklch(21.97% 0.0247 256.46);
+    --color-dark-raised:         oklch(24.54% 0.0282 257.53);
+    --color-dark-overlay:        oklch(27.4%  0.0297 256.85);
+    --color-dark-sunken:         oklch(17.56% 0.0192 255.78);
+    --color-dark-hover:          oklch(26.99% 0.0298 256.85);
+    --color-dark-active:         oklch(30.56% 0.0334 255.78);
+    --color-dark-rail:           oklch(20.15% 0.0193 252.12);
+    --color-dark-edge-default:   oklch(38.72% 0.0309 257.68);
+    --color-dark-text-strong:    oklch(96.85% 0.0079 253.85);
+    --color-dark-text-body:      oklch(91.31% 0.0144 254.61);
+    --color-dark-text-secondary: oklch(77.2%  0.0265 255.59);
+    --color-dark-text-muted:     oklch(63.28% 0.0324 257.78);
+    --color-dark-text-faint:     oklch(51.38% 0.0288 257.68);
+    --color-dark-border-subtle:  oklch(29.34% 0.0299 254.7);
+    --color-dark-border-default: oklch(32.81% 0.0297 252.59);
+    --color-dark-border-strong:  oklch(39.04% 0.0387 257.29);
+    --color-dark-scroll-thumb:   oklch(34.89% 0.0339 257.1);
+
+    /* ── Neutral ramp hex aliases — safe for JS / getPropertyValue ─ */
+    --slate-0:   #ffffff;
+    --slate-25:  #fbfcfe;
+    --slate-50:  #f6f8fb;
+    --slate-100: #eef1f6;
+    --slate-150: #e4e9f0;
+    --slate-200: #d7dde7;
+    --slate-300: #bcc5d2;
+    --slate-400: #97a2b4;
+    --slate-500: #6b7688;
+    --slate-600: #4e5868;
+    --slate-700: #38414f;
+    --slate-800: #232b37;
+    --slate-900: #161d27;
+    --slate-950: #0d1119;
+
+    --warm-0:   #ffffff;
+    --warm-25:  #fbfaf7;
+    --warm-50:  #f8f6f1;
+    --warm-100: #f3f1eb;
+    --warm-150: #ebe7de;
+    --warm-200: #e2ddd3;
+    --warm-300: #d8d2c6;
+
+    --rose-50:   #fff1f3;
+    --rose-100:  #ffe4e8;
+    --rose-200:  #fecdd6;
+    --rose-400:  #fb6f88;
+    --rose-500:  #f43f5e;
+    --rose-600:  #e11d48;
+    --rose-700:  #be123c;
+    --rose-800:  #9f1239;
+
+    /* ── Element-type semantic hues ────────────────────────────────
+       Solid fills:  oklch via primitive — normalizeCssColor() in
+                     palette.ts converts to hex for Sigma.js.
+       Ink colors:   design-specific, dark mode overrides below.
+       Tints:        auto-derived from solid + bg-surface;
+                     no -tint-d needed, dark mode adapts via bg-surface. */
+
+    --capability:     var(--color-capability);
+    --capability-ink: #1565c0;
+    --capability-tint: color-mix(in oklch, var(--capability) 15%, var(--bg-surface));
+
+    --requirement:     var(--color-requirement);
+    --requirement-ink: #512da8;
+    --requirement-tint: color-mix(in oklch, var(--requirement) 15%, var(--bg-surface));
+
+    --refinement:     var(--color-refinement);
+    --refinement-ink: #e65100;
+    --refinement-tint: color-mix(in oklch, var(--refinement) 15%, var(--bg-surface));
+
+    --verification:     var(--color-verification);
+    --verification-ink: #2e7d32;
+    --verification-tint: color-mix(in oklch, var(--verification) 15%, var(--bg-surface));
+
+    --ontology:     var(--color-ontology);
+    --ontology-ink: #6f5600;
+    --ontology-tint: color-mix(in oklch, var(--ontology) 15%, var(--bg-surface));
+
+    --resource:     var(--color-resource);
+    --resource-ink: #8d6e00;
+    --resource-tint: color-mix(in oklch, var(--resource) 15%, var(--bg-surface));
+
+    --other:     var(--color-other);
+    --other-ink: #616161;
+    --other-tint: color-mix(in oklch, var(--other) 15%, var(--bg-surface));
+
+    --node-generic-fill: var(--color-node-generic-fill);
+
+    /* ── RDF / ontology-graph palette ────────────────────────────── */
+    --rdf-class:       var(--color-rdf-class);
+    --rdf-objprop:     var(--color-rdf-objprop);
+    --rdf-dtprop:      var(--color-rdf-dtprop);
+    --rdf-rdfprop:     var(--color-rdf-rdfprop);
+    --rdf-individual:  var(--color-rdf-individual);
+    --rdf-datatype:    var(--color-rdf-datatype);
+    --rdf-restriction: var(--color-rdf-restriction);
+    --rdf-classexpr:   var(--color-rdf-classexpr);
+    --rdf-nodeshape:   var(--color-rdf-nodeshape);
+    --rdf-propshape:   var(--color-rdf-propshape);
+    --rdf-resource:    var(--color-rdf-resource);
+    --rdf-shacl:       var(--color-rdf-shacl);
+
+    /* ── Status ─────────────────────────────────────────────────── */
+    --success: var(--color-success);
+    --warning: var(--color-warning);
+    --danger:  var(--color-danger);
+    --info:    var(--color-info);
+    --success-tint: color-mix(in oklch, var(--success) 15%, var(--bg-surface));
+    --warning-tint: color-mix(in oklch, var(--warning) 15%, var(--bg-surface));
+    --danger-tint:  color-mix(in oklch, var(--danger)  15%, var(--bg-surface));
+    --info-tint:    color-mix(in oklch, var(--info)    15%, var(--bg-surface));
+
+    /* ── Graph edge colors ───────────────────────────────────────── */
+    --edge-default: var(--color-edge-default);
+    --edge-derive:  var(--color-requirement);
+    --edge-satisfy: var(--color-verification);
+    --edge-trace:   var(--color-slate-400);
+    --edge-attach:  var(--color-edge-attach);
+
+    /* ── Semantic surface / text / border aliases ────────────────── */
+    --bg-canvas:      var(--warm-25);
+    --bg-surface:     var(--warm-0);
+    --bg-raised:      var(--warm-0);
+    --bg-overlay:     var(--warm-0);
+    --bg-sunken:      var(--warm-100);
+    --bg-hover:       var(--warm-50);
+    --bg-active:      var(--warm-150);
+    --bg-rail:        var(--warm-25);
+
+    --bg-selected:      var(--rose-50);
+    --border-selected:  var(--rose-600);
+    --ring-selected:    rgba(225,29,72,0.28);
+
+    --text-strong:    var(--slate-900);
+    --text-body:      var(--slate-800);
+    --text-secondary: var(--slate-600);
+    --text-muted:     var(--slate-500);
+    --text-faint:     var(--slate-400);
+    --text-inverse:   var(--slate-0);
+    --text-link:      var(--rose-600);
+    --text-code:      var(--slate-700);
+
+    --border-subtle:  var(--warm-200);
+    --border-default: var(--warm-300);
+    --border-strong:  var(--slate-300);
+    --border-focus:   var(--rose-600);
+
+    --accent:         var(--rose-600);
+    --accent-hover:   var(--rose-700);
+    --accent-active:  var(--rose-800);
+    --accent-fg:      #ffffff;
+    --accent-subtle:  var(--rose-50);
+    --accent-ring:    rgba(225,29,72,0.32);
+
+    --focus-ring:     rgba(225,29,72,0.38);
+
+    --scroll-thumb:   var(--slate-300);
+    --scroll-track:   transparent;
+
+    color-scheme: light;
+  }
+
+  /* ── Dark theme — navy-slate ────────────────────────────────────
+     Tints auto-adapt via color-mix (--bg-surface flips).
+     Only inks and surface/text/border aliases need overrides.    */
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --capability-ink:    #90caf9;
+      --requirement-ink:   #b39ddb;
+      --refinement-ink:    #ffb74d;
+      --verification-ink:  #81c784;
+      --ontology-ink:      #e3cd7b;
+      --resource-ink:      #ffd95e;
+      --other-ink:         #bdbdbd;
+
+      --edge-default: #3a4555;
+
+      --bg-canvas:   #0e141d;
+      --bg-surface:  #131b26;
+      --bg-raised:   #18212e;
+      --bg-overlay:  #1e2836;
+      --bg-sunken:   #0b1119;
+      --bg-hover:    #1d2735;
+      --bg-active:   #243040;
+      --bg-rail:     #10171f;
+
+      --bg-selected:     rgba(251,113,133,0.18);
+      --border-selected: var(--rose-500);
+      --ring-selected:   rgba(251,113,133,0.45);
+
+      --text-strong:    #f1f5fa;
+      --text-body:      #dce3ec;
+      --text-secondary: #aab6c6;
+      --text-muted:     #7e8b9e;
+      --text-faint:     #5d6878;
+      --text-inverse:   #0e141d;
+      --text-link:      #fda4af;
+      --text-code:      #c3cdda;
+
+      --border-subtle:  #222d3b;
+      --border-default: #2a3644;
+      --border-strong:  #38465a;
+      --border-focus:   var(--rose-500);
+
+      --accent:        #fb7185;
+      --accent-hover:  #fda4af;
+      --accent-active: #ffccd4;
+      --accent-fg:     #ffffff;
+      --accent-subtle: rgba(251,113,133,0.20);
+      --accent-ring:   rgba(251,113,133,0.50);
+
+      --focus-ring:    rgba(251,113,133,0.55);
+      --scroll-thumb:  #2f3b4c;
+
+      color-scheme: dark;
+    }
+  }
+
+  [data-theme="dark"], .dark {
+    --capability-ink:    #90caf9;
+    --requirement-ink:   #b39ddb;
+    --refinement-ink:    #ffb74d;
+    --verification-ink:  #81c784;
+    --ontology-ink:      #e3cd7b;
+    --resource-ink:      #ffd95e;
+    --other-ink:         #bdbdbd;
+
+    --edge-default: #3a4555;
+
+    --bg-canvas:   #0e141d;
+    --bg-surface:  #131b26;
+    --bg-raised:   #18212e;
+    --bg-overlay:  #1e2836;
+    --bg-sunken:   #0b1119;
+    --bg-hover:    #1d2735;
+    --bg-active:   #243040;
+    --bg-rail:     #10171f;
+
+    --bg-selected:     rgba(251,113,133,0.18);
+    --border-selected: var(--rose-500);
+    --ring-selected:   rgba(251,113,133,0.45);
+
+    --text-strong:    #f1f5fa;
+    --text-body:      #dce3ec;
+    --text-secondary: #aab6c6;
+    --text-muted:     #7e8b9e;
+    --text-faint:     #5d6878;
+    --text-inverse:   #0e141d;
+    --text-link:      #fda4af;
+    --text-code:      #c3cdda;
+
+    --border-subtle:  #222d3b;
+    --border-default: #2a3644;
+    --border-strong:  #38465a;
+    --border-focus:   var(--rose-500);
+
+    --accent:        #fb7185;
+    --accent-hover:  #fda4af;
+    --accent-active: #ffccd4;
+    --accent-fg:     #ffffff;
+    --accent-subtle: rgba(251,113,133,0.20);
+    --accent-ring:   rgba(251,113,133,0.50);
+
+    --focus-ring:    rgba(251,113,133,0.55);
+    --scroll-thumb:  #2f3b4c;
+
+    color-scheme: dark;
+  }
+}

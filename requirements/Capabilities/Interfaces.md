@@ -25,7 +25,7 @@ Interface requirements define the concrete commands, generated views, transports
 #### Relations
   * derive: [Command-Line Interface](#command-line-interface)
   * derive: [MCP Tool Interface](#mcp-tool-interface)
-  * derive: [Web Documentation Interface](#web-documentation-interface)
+  * derive: [Web Explorer Interface](#web-explorer-interface)
 ---
 
 ### Command-Line Interface
@@ -92,14 +92,14 @@ reqvire:McpToolSideEffectClassShape
   * refine: [MCP Tool Side-Effect Classification](../Interfaces/MCP/Tools.md#mcp-tool-side-effect-classification)
 ---
 
-### Web Documentation Interface
+### Web Explorer Interface
 
-As a **System Engineer**, I want Reqvire to expose browsable generated documentation, so that model structure, reports, diagrams, traces, resources, and ontology exports can be inspected in a web interface.
+As a **System Engineer**, I want Reqvire to expose a browsable Explorer interface, so that model structure, reports, diagrams, traces, resources, and ontology artifacts can be inspected in a web interface.
 
 #### Details
-Web documentation interface is the capability for HTML export, local serving, navigation, visual styling, generated pages, and browser-oriented model exploration.
+Web Explorer interface is the capability for the local Explorer server, navigation, visual styling, embedded browser assets, and browser-oriented model exploration.
 
-Web requirements define concrete generated views, local server behavior, HTML assets, and visual rendering contracts.
+Web requirements define concrete Explorer views, local server behavior, browser assets, and visual rendering contracts.
 
 #### Metadata
   * type: capability

@@ -17,8 +17,7 @@ describe("parseHash", () => {
 
   it("parses primary view routes", () => {
     expect(parseHash("#/model", "model").view).toBe("model");
-    expect(parseHash("#/knowledge-graph", "model").view).toBe("knowledge-graph");
-    expect(parseHash("#/kn2", "model").view).toBe("kn2");
+    expect(parseHash("#/knowledge-graph", "model").view).toBe("model");
     expect(parseHash("#/ontologies", "model").view).toBe("ontologies");
   });
 
@@ -37,6 +36,12 @@ describe("parseHash", () => {
     expect(r.param).toBe("requirements/Specifications.md");
   });
 
+  it("parses resource routes with their id param", () => {
+    const r = parseHash("#/resources/resource:core/src/lib.rs", "model");
+    expect(r.view).toBe("resources");
+    expect(r.param).toBe("resource:core/src/lib.rs");
+  });
+
   it("parses search routes with query", () => {
     expect(parseHash("#/search", "model").view).toBe("search");
     expect(parseHash("#/search/requirement", "model").param).toBe("requirement");
@@ -48,8 +53,6 @@ describe("parseHash", () => {
 
   it("round-trips view and element route builders", () => {
     expect(routeForView("traces")).toBe("#/traces");
-    expect(routeForView("knowledge-graph")).toBe("#/knowledge-graph");
-    expect(routeForView("kn2")).toBe("#/kn2");
     expect(routeForElement("a/b.md#c")).toBe("#/elements/a/b.md#c");
     expect(parseHash(routeForElement("a/b.md#c"), "model").elementId).toBe("a/b.md#c");
   });

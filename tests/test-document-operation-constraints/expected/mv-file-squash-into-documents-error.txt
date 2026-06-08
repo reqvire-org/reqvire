@@ -1,1 +1,1 @@
-Invalid operation: Cannot use --squash into 'specifications/DesignDocuments/DocSource.md': target is a '# Documents' file and can contain only one element.
+Invalid operation: Cannot use --squash into 'specifications/DesignDocuments/DocSource.md': target is a '# Element' file and can contain only one element.

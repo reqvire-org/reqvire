@@ -1,30 +1,28 @@
 import { useEffect, useMemo, useState } from "react";
-import type { ReactNode } from "react";
-import {
-  Badge,
-  Box,
-  Code,
-  Flex,
-  Grid,
-  Heading,
-  Link,
-  SegmentedControl,
-  Text,
-  TextField,
-} from "@radix-ui/themes";
-import {
-  ArchiveIcon,
-  CubeIcon,
-  FileIcon,
-  MagnifyingGlassIcon,
-} from "@radix-ui/react-icons";
 import { useStore } from "../store/StoreContext";
 import type { ExplorerViewProps } from "../components/ExplorerViewProps";
 import type {
   ExplorerProjectStore,
+  ProjectStoreElement,
   ProjectStoreFile,
 } from "../store/types";
 import { ViewFrame } from "./ViewFrame";
+import { useOptionalExplorerUiState, type ModelMode } from "../components/ExplorerUiState";
+import { ElementTypeGlyph } from "../components/ExplorerSidePane";
+import { SourceCodePreview } from "../components/SourceCodePreview";
+import { routeForContent } from "../router/routes";
+import { Card, ElementIcon, Icon, SegmentedControl } from "@ds";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+  TableSortButton,
+  TableViewport,
+} from "@ds";
+import { TypeBadge } from "@ds";
 
 const ROOT_FOLDER = "__root__";
 
@@ -78,23 +76,33 @@ export function FilesView({
   onOpenElement: (id: string) => void;
 } & Partial<ExplorerViewProps>) {
   const { store, elementById } = useStore();
+  const ui = useOptionalExplorerUiState();
   const model = useMemo(() => buildFileManagerModel(store), [store]);
-  const selectedFile = path ? model.fileByPath.get(path) : undefined;
+  const stateDriven = Boolean(forcedLayout && ui);
+  const modelSelectionId = ui?.modelSelectionId ?? "__root__";
+  const selectedFile = stateDriven
+    ? selectedFileFromModelSelection(modelSelectionId, model, store)
+    : path
+      ? model.fileByPath.get(path)
+      : undefined;
   const [currentFolderPath, setCurrentFolderPath] = useState(ROOT_FOLDER);
   const [localLayout, setLocalLayout] = useState<FileLayout>("list");
   const [sortKey, setSortKey] = useState<SortKey>("name");
   const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-  const [query, setQuery] = useState("");
 
   useEffect(() => {
+    if (stateDriven) {
+      const folderPath = folderPathFromModelSelection(modelSelectionId, model, store);
+      setCurrentFolderPath(folderPath);
+      return;
+    }
     if (!selectedFile) return;
     const nextFolder = selectedFile.parent_folder || ROOT_FOLDER;
     setCurrentFolderPath(model.folderByPath.has(nextFolder) ? nextFolder : ROOT_FOLDER);
-  }, [model.folderByPath, selectedFile]);
+  }, [model, model.folderByPath, modelSelectionId, selectedFile, stateDriven, store]);
 
   const currentFolder = model.folderByPath.get(currentFolderPath) ?? model.root;
   const layout = forcedLayout ?? localLayout;
-  const normalizedQuery = query.trim().toLowerCase();
 
   const items = useMemo(() => {
     const folderToItem = (folder: FolderNode): FileManagerItem => ({
@@ -119,53 +127,17 @@ export function FilesView({
       file,
     });
 
-    const directItems = [
+    return [
       ...currentFolder.folders.map(folderToItem),
       ...currentFolder.files.map(fileToItem),
-    ];
-
-    const allItems = [
-      ...Array.from(model.folderByPath.values())
-        .filter((folder) => folder.path !== ROOT_FOLDER)
-        .map(folderToItem),
-      ...store.files.map(fileToItem),
-    ];
-
-    const source = normalizedQuery ? allItems : directItems;
-    return source
-      .filter((item) => {
-        if (!normalizedQuery) return true;
-        if (
-          item.name.toLowerCase().includes(normalizedQuery) ||
-          item.displayPath.toLowerCase().includes(normalizedQuery)
-        ) {
-          return true;
-        }
-        return item.file?.element_ids.some((id) => {
-          const element = elementById(id);
-          return (
-            element?.name.toLowerCase().includes(normalizedQuery) ||
-            id.toLowerCase().includes(normalizedQuery)
-          );
-        }) ?? false;
-      })
-      .sort((a, b) => compareItems(a, b, sortKey, sortDirection));
+    ].sort((a, b) => compareItems(a, b, sortKey, sortDirection));
   }, [
     currentFolder,
-    elementById,
-    model.folderByPath,
     model.folderElementCounts,
-    normalizedQuery,
     sortDirection,
     sortKey,
-    store.files,
     store.project.root_label,
   ]);
-
-  const searchResults = useMemo(
-    () => (normalizedQuery ? items.slice(0, 12) : []),
-    [items, normalizedQuery],
-  );
 
   function updateSort(nextKey: SortKey) {
     if (nextKey === sortKey) {
@@ -177,28 +149,46 @@ export function FilesView({
   }
 
   function openFolder(folderPath: string) {
+    if (stateDriven && ui) {
+      ui.setModelSelectionId(folderPath === ROOT_FOLDER ? "__root__" : `folder:${folderPath}`);
+    }
     setCurrentFolderPath(folderPath);
-    setQuery("");
+  }
+
+  function openFile(filePath: string) {
+    if (stateDriven && ui) {
+      ui.setModelSelectionId(`file:${filePath}`);
+    }
+  }
+
+  function changeLayout(nextLayout: ModelMode) {
+    if (stateDriven && ui) {
+      ui.setModelMode(nextLayout);
+      return;
+    }
+    if (nextLayout !== "graph") {
+      setLocalLayout(nextLayout);
+    }
   }
 
   return (
     <ViewFrame testId="files">
-      <Grid columns={{ initial: "1fr", lg: "minmax(0, 1fr) 390px" }} className="explorer-route">
-        <Box className="explorer-document-panel file-manager-shell">
+      <div className="ex-route ex-route-single">
+        <div className="ex-document-panel ex-browser ex-file-shell">
           <FileManagerToolbar
             currentFolder={currentFolder}
+            selectedFile={selectedFile}
             rootLabel={store.project.root_label || "Project root"}
-            query={query}
             layout={layout}
             resultCount={items.length}
             onOpenFolder={openFolder}
-            onLayoutChange={forcedLayout ? undefined : setLocalLayout}
+            onLayoutChange={changeLayout}
           />
 
           {path && !selectedFile ? (
-            <Text color="gray">
-              No file container for <Code>{path}</Code>.
-            </Text>
+            <span className="file-missing-message">
+              No file container for <code className="file-missing-path">{path}</code>.
+            </span>
           ) : (
             <>
               {layout === "list" ? (
@@ -209,34 +199,27 @@ export function FilesView({
                   sortDirection={sortDirection}
                   onSort={updateSort}
                   onOpenFolder={openFolder}
+                  onOpenFile={stateDriven ? openFile : undefined}
                 />
               ) : (
                 <FileManagerGrid
                   items={items}
                   selectedFile={selectedFile}
                   onOpenFolder={openFolder}
+                  onOpenFile={stateDriven ? openFile : undefined}
                 />
               )}
 
               <SelectedFileElements
                 file={selectedFile}
+                layout={layout}
                 onOpenElement={onOpenElement}
-                elementName={(id) => elementById(id)?.name ?? id}
+                elementById={elementById}
               />
             </>
           )}
-        </Box>
-
-        <FileInspector
-          file={selectedFile}
-          folder={currentFolder}
-          query={query}
-          searchResults={searchResults}
-          rootLabel={store.project.root_label || "Project root"}
-          onQueryChange={setQuery}
-          onOpenFolder={openFolder}
-        />
-      </Grid>
+        </div>
+      </div>
     </ViewFrame>
   );
 }
@@ -254,28 +237,33 @@ function buildFileManagerModel(store: ExplorerProjectStore): FileManagerModel {
   const folderByPath = new Map<string, FolderNode>([[ROOT_FOLDER, root]]);
 
   for (const folder of store.folders) {
-    folderByPath.set(folder.path, {
+    const folderPath = normalizeFolderPath(folder.path);
+    if (folderPath === ROOT_FOLDER) continue;
+    folderByPath.set(folderPath, {
       kind: "folder",
-      id: `folder:${folder.path}`,
-      path: folder.path,
-      name: displayName(folder.path),
-      parent: folder.parent,
+      id: `folder:${folderPath}`,
+      path: folderPath,
+      name: displayName(folderPath),
+      parent: normalizeFolderPath(folder.parent),
       folders: [],
       files: [],
     });
   }
 
   for (const folder of store.folders) {
-    const node = folderByPath.get(folder.path);
+    const folderPath = normalizeFolderPath(folder.path);
+    if (folderPath === ROOT_FOLDER) continue;
+    const node = folderByPath.get(folderPath);
     if (!node) continue;
-    const parent = folder.parent ? folderByPath.get(folder.parent) : root;
+    const parentPath = normalizeFolderPath(folder.parent);
+    const parent = parentPath === ROOT_FOLDER ? root : folderByPath.get(parentPath);
     (parent ?? root).folders.push(node);
   }
 
   const fileByPath = new Map<string, ProjectStoreFile>();
   for (const file of store.files) {
     fileByPath.set(file.path, file);
-    const parentPath = file.parent_folder || ROOT_FOLDER;
+    const parentPath = normalizeFolderPath(file.parent_folder);
     const parent = folderByPath.get(parentPath) ?? root;
     parent.files.push(file);
   }
@@ -298,50 +286,64 @@ function buildFileManagerModel(store: ExplorerProjectStore): FileManagerModel {
   return { root, folderByPath, fileByPath, folderElementCounts };
 }
 
+function normalizeFolderPath(path: string | null | undefined): string {
+  const normalized = (path ?? "").replace(/^\/+|\/+$/g, "");
+  return normalized || ROOT_FOLDER;
+}
+
 function FileManagerToolbar({
   currentFolder,
+  selectedFile,
   rootLabel,
-  query,
   layout,
   resultCount,
   onOpenFolder,
   onLayoutChange,
 }: {
   currentFolder: FolderNode;
+  selectedFile: ProjectStoreFile | undefined;
   rootLabel: string;
-  query: string;
   layout: FileLayout;
   resultCount: number;
   onOpenFolder: (path: string) => void;
-  onLayoutChange?: (layout: FileLayout) => void;
+  onLayoutChange: (layout: ModelMode) => void;
 }) {
   const crumbs = folderCrumbs(currentFolder, rootLabel);
   return (
-    <div className="file-manager-toolbar">
-      <div className="file-manager-breadcrumbs" aria-label="File breadcrumbs">
+    <div className="ex-browser__bar ex-file-toolbar">
+      <div className="rq-crumbs ex-file-breadcrumbs" aria-label="File breadcrumbs">
         {crumbs.map((crumb, index) => (
-          <span key={crumb.path} className="file-manager-crumb">
-            {index > 0 && <span className="file-manager-crumb-separator">/</span>}
+          <span key={crumb.path} className="rq-crumbs__item ex-file-crumb">
+            {index > 0 && <span className="rq-crumbs__sep ex-file-crumb-separator">/</span>}
             <button type="button" onClick={() => onOpenFolder(crumb.path)}>
               {crumb.label}
             </button>
           </span>
         ))}
-      </div>
-      <Flex align="center" gap="3" wrap="wrap">
-        <Text className="explorer-panel-muted">
-          {query ? `${resultCount} search results` : `${resultCount} items`}
-        </Text>
-        {onLayoutChange && (
-          <SegmentedControl.Root
-            value={layout}
-            onValueChange={(value) => onLayoutChange(value as FileLayout)}
-          >
-            <SegmentedControl.Item value="list">List</SegmentedControl.Item>
-            <SegmentedControl.Item value="grid">Grid</SegmentedControl.Item>
-          </SegmentedControl.Root>
+        {selectedFile && (
+          <span className="rq-crumbs__item ex-file-crumb ex-file-crumb-current">
+            <span className="rq-crumbs__sep ex-file-crumb-separator">/</span>
+            <span title={selectedFile.display_path || selectedFile.path}>
+              {displayName(selectedFile.display_path || selectedFile.path)}
+            </span>
+          </span>
         )}
-      </Flex>
+      </div>
+      <div className="ex-file-toolbar-actions">
+        <span className="ex-browser__count ex-panel-muted">
+          {resultCount} items
+        </span>
+        <SegmentedControl<ModelMode>
+          ariaLabel="Model layout"
+          value={layout}
+          onChange={onLayoutChange}
+          items={[
+            { value: "list", label: "List", icon: <Icon name="list" /> },
+            { value: "grid", label: "Grid", icon: <Icon name="layout-grid" /> },
+            { value: "graph", label: "Graph", icon: <Icon name="git-branch" /> },
+          ]}
+        />
+      </div>
     </div>
   );
 }
@@ -353,6 +355,7 @@ function FileManagerList({
   sortDirection,
   onSort,
   onOpenFolder,
+  onOpenFile,
 }: {
   items: FileManagerItem[];
   selectedFile: ProjectStoreFile | undefined;
@@ -360,35 +363,39 @@ function FileManagerList({
   sortDirection: SortDirection;
   onSort: (key: SortKey) => void;
   onOpenFolder: (path: string) => void;
+  onOpenFile?: (path: string) => void;
 }) {
   return (
-    <div className="file-manager-table-wrap">
-      <table className="file-manager-table">
-        <thead>
-          <tr>
+    <TableViewport className="ex-file-table-wrap">
+      <Table>
+        <TableHeader>
+          <TableRow>
             <SortableHeader label="Name" sortKey="name" activeKey={sortKey} direction={sortDirection} onSort={onSort} />
             <SortableHeader label="Type" sortKey="type" activeKey={sortKey} direction={sortDirection} onSort={onSort} />
             <SortableHeader label="Elements" sortKey="elements" activeKey={sortKey} direction={sortDirection} onSort={onSort} />
             <SortableHeader label="Path" sortKey="path" activeKey={sortKey} direction={sortDirection} onSort={onSort} />
-          </tr>
-        </thead>
-        <tbody>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {items.map((item) => (
-            <tr key={item.id} className={isSelectedFileItem(item, selectedFile) ? "is-selected" : ""}>
-              <td>
-                <ItemAction item={item} onOpenFolder={onOpenFolder} selectedFile={selectedFile} />
-              </td>
-              <td>
-                <Badge color="gray">{item.kind}</Badge>
-              </td>
-              <td>{item.elementCount}</td>
-              <td className="file-manager-path">{item.displayPath}</td>
-            </tr>
+            <TableRow key={item.id} selected={isSelectedFileItem(item, selectedFile)}>
+              <TableCell>
+                <div className="ex-file-name-cell">
+                  <ItemAction item={item} onOpenFolder={onOpenFolder} onOpenFile={onOpenFile} />
+                  <FileContentLink item={item} />
+                </div>
+              </TableCell>
+              <TableCell>
+                <span className="rq-typebadge">{item.kind}</span>
+              </TableCell>
+              <TableCell>{item.elementCount}</TableCell>
+              <TableCell className="ex-file-path">{item.displayPath}</TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
-      {items.length === 0 && <Text className="explorer-empty">No files or folders match the current filter.</Text>}
-    </div>
+        </TableBody>
+      </Table>
+      {items.length === 0 && <span className="ex-empty">No files or folders match the current filter.</span>}
+    </TableViewport>
   );
 }
 
@@ -407,12 +414,11 @@ function SortableHeader({
 }) {
   const active = sortKey === activeKey;
   return (
-    <th>
-      <button type="button" onClick={() => onSort(sortKey)}>
-        <span>{label}</span>
-        {active && <span className="file-manager-sort">{direction}</span>}
-      </button>
-    </th>
+    <TableHead>
+      <TableSortButton direction={active ? direction : undefined} onClick={() => onSort(sortKey)}>
+        {label}
+      </TableSortButton>
+    </TableHead>
   );
 }
 
@@ -420,59 +426,104 @@ function FileManagerGrid({
   items,
   selectedFile,
   onOpenFolder,
+  onOpenFile,
 }: {
   items: FileManagerItem[];
   selectedFile: ProjectStoreFile | undefined;
   onOpenFolder: (path: string) => void;
+  onOpenFile?: (path: string) => void;
 }) {
   return (
-    <div className="file-manager-grid">
+    <div className="ex-grid ex-file-grid">
       {items.map((item) => (
-        <div key={item.id} className={["file-manager-card", isSelectedFileItem(item, selectedFile) ? "is-selected" : ""].join(" ")}>
-          <ItemAction item={item} onOpenFolder={onOpenFolder} selectedFile={selectedFile} />
-          <Text className="explorer-panel-muted">
-            {item.kind === "folder" ? `${item.childCount} children` : `${item.elementCount} elements`}
-          </Text>
-          <Text className="file-manager-card-path">{item.displayPath}</Text>
-        </div>
+        <Card
+          key={item.id}
+          interactive
+          selected={isSelectedFileItem(item, selectedFile)}
+          className={[
+            "ex-tile",
+            "ex-file-card",
+            isSelectedFileItem(item, selectedFile) ? "is-selected" : "",
+            item.kind === "file" && item.elementCount === 0 ? "is-empty-file" : "",
+          ].join(" ")}
+        >
+          <ItemAction item={item} onOpenFolder={onOpenFolder} onOpenFile={onOpenFile} />
+          {(item.kind === "folder" || item.elementCount > 0) && (
+            <span className="ex-file-count-badge">
+              {item.kind === "folder" ? `${item.childCount} children` : `${item.elementCount} elements`}
+            </span>
+          )}
+          <span className="ex-file-card-path">{item.displayPath}</span>
+        </Card>
       ))}
-      {items.length === 0 && <Text className="explorer-empty">No files or folders match the current filter.</Text>}
+      {items.length === 0 && <span className="ex-empty">No files or folders match the current filter.</span>}
     </div>
+  );
+}
+
+function FileContentLink({
+  item,
+}: {
+  item: FileManagerItem;
+}) {
+  if (!item.file) return null;
+  return (
+    <a
+      href={routeForContent(item.path)}
+      className="ex-file-open-link"
+      aria-label={`Open content for ${item.name}`}
+      title="Open content"
+      onClick={(event) => event.stopPropagation()}
+    >
+      <Icon name="external-link" />
+    </a>
   );
 }
 
 function ItemAction({
   item,
-  selectedFile,
   onOpenFolder,
+  onOpenFile,
 }: {
   item: FileManagerItem;
-  selectedFile: ProjectStoreFile | undefined;
   onOpenFolder: (path: string) => void;
+  onOpenFile?: (path: string) => void;
 }) {
   const content = (
     <>
-      <span className={["explorer-icon-swatch", item.kind === "folder" ? "file-kind-folder" : "file-kind-file"].join(" ")}>
-        {item.kind === "folder" ? <ArchiveIcon /> : <FileIcon />}
-      </span>
-      <span className="min-w-0 flex-1 truncate">{item.name}</span>
-      {item.kind === "file" && <Code>{item.elementCount}</Code>}
+      {item.kind === "folder" ? (
+        <Icon name="folder" className="file-kind-folder ex-file-item-icon" />
+      ) : (
+        <Icon name="file" className="file-kind-file ex-file-item-icon" />
+      )}
+      <span className="ex-file-item-name">{item.name}</span>
     </>
   );
   if (item.folder) {
     return (
-      <button type="button" className="file-manager-item-action" onClick={() => onOpenFolder(item.folder?.path ?? ROOT_FOLDER)}>
+      <button type="button" className="ex-file-item-action" onClick={() => onOpenFolder(item.folder?.path ?? ROOT_FOLDER)}>
+        {content}
+      </button>
+    );
+  }
+  if (onOpenFile) {
+    return (
+      <button
+        type="button"
+        className="ex-file-item-action"
+        onClick={() => onOpenFile(item.path)}
+      >
         {content}
       </button>
     );
   }
   return (
-    <Link
+    <a
       href={`#/files/${item.path}`}
-      className={["file-manager-item-action", isSelectedFileItem(item, selectedFile) ? "is-selected" : ""].join(" ")}
+      className="ex-file-item-action"
     >
       {content}
-    </Link>
+    </a>
   );
 }
 
@@ -482,172 +533,82 @@ function isSelectedFileItem(item: FileManagerItem, selectedFile: ProjectStoreFil
 
 function SelectedFileElements({
   file,
+  layout,
   onOpenElement,
-  elementName,
+  elementById,
 }: {
   file: ProjectStoreFile | undefined;
+  layout: FileLayout;
   onOpenElement: (id: string) => void;
-  elementName: (id: string) => string;
+  elementById: (id: string) => ProjectStoreElement | undefined;
 }) {
   if (!file) {
     return (
-      <div className="file-manager-elements">
-        <Text className="explorer-empty">Select a file row to inspect its modeled elements.</Text>
+      <div className="ex-file-elements">
+        <span className="ex-empty">Select a file row to inspect its modeled elements.</span>
+      </div>
+    );
+  }
+  if (file.element_ids.length === 0) {
+    return (
+      <div className="ex-file-elements">
+        <SourceCodePreview
+          path={file.path}
+          content={file.markdown_content}
+          kind="source file"
+          defaultExpanded
+          showPath
+        />
       </div>
     );
   }
   return (
-    <div className="file-manager-elements">
-      <Flex align="center" justify="between" gap="3" wrap="wrap">
-        <Heading as="h2" size="3" className="explorer-panel-title">
-          Modeled elements
-        </Heading>
-        <Link href={file.html_path} target="_blank" rel="noreferrer">
-          Open exported source page
-        </Link>
-      </Flex>
-      <Flex direction="column" gap="1" mt="3">
-        {file.element_ids.map((id) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => onOpenElement(id)}
-            className="explorer-list-row"
-          >
-            <span className="explorer-icon-swatch file-kind-element">
-              <CubeIcon />
-            </span>
-            <Text size="2">{elementName(id)}</Text>
-          </button>
-        ))}
-      </Flex>
-      {file.element_ids.length === 0 && <Text className="explorer-empty">No modeled elements are attached to this file.</Text>}
-    </div>
-  );
-}
-
-function FileInspector({
-  file,
-  folder,
-  query,
-  searchResults,
-  rootLabel,
-  onQueryChange,
-  onOpenFolder,
-}: {
-  file: ProjectStoreFile | undefined;
-  folder: FolderNode;
-  query: string;
-  searchResults: FileManagerItem[];
-  rootLabel: string;
-  onQueryChange: (value: string) => void;
-  onOpenFolder: (path: string) => void;
-}) {
-  return (
-    <Box className="graph-sidebar">
-      <div className="graph-search-panel">
-        <TextField.Root
-          aria-label="Search files"
-          placeholder="Search files, folders, elements"
-          value={query}
-          onChange={(event) => onQueryChange(event.target.value)}
-        >
-          <TextField.Slot>
-            <MagnifyingGlassIcon />
-          </TextField.Slot>
-        </TextField.Root>
-        {searchResults.length > 0 && (
-          <ul className="graph-results">
-            {searchResults.map((item) => (
-              <li key={item.id}>
-                {item.folder ? (
-                  <button type="button" onClick={() => onOpenFolder(item.folder?.path ?? ROOT_FOLDER)}>
-                    <span className="graph-result-swatch file-result-folder" />
-                    <span>{item.displayPath}</span>
-                  </button>
+    <div className="ex-file-elements">
+      <div className={layout === "grid" ? "modeled-elements-grid" : "modeled-elements-list"}>
+        {file.element_ids.map((id) => {
+          const element = elementById(id);
+          if (layout === "grid") {
+            return (
+              <button
+                key={id}
+                type="button"
+                onClick={() => onOpenElement(id)}
+                className="modeled-element-card"
+              >
+                {element ? (
+                  <ElementTypeGlyph element={element} />
                 ) : (
-                  <a href={`#/files/${item.path}`}>
-                    <span className="graph-result-swatch file-result-file" />
-                    <span>{item.displayPath}</span>
-                  </a>
+                  <ElementIcon type="other" size="sm" />
                 )}
-              </li>
-            ))}
-          </ul>
-        )}
+                <span className="modeled-element-card-main">
+                  <span className="modeled-element-card-title">{element?.name ?? id}</span>
+                  {element?.element_type && (
+                    <TypeBadge type={element.element_type} family={element.type_family} tinted>
+                      {element.element_type}
+                    </TypeBadge>
+                  )}
+                </span>
+              </button>
+            );
+          }
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => onOpenElement(id)}
+              className="ex-list-row"
+            >
+              {element ? (
+                <ElementTypeGlyph element={element} />
+              ) : (
+                <ElementIcon type="other" size="sm" />
+              )}
+              <span className="modeled-element-list-title">{element?.name ?? id}</span>
+            </button>
+          );
+        })}
       </div>
-      <div className="graph-inspector-header">
-        <Heading as="h2" size="3">
-          File Inspector
-        </Heading>
-      </div>
-      <div className="graph-inspector-body">
-        {file ? (
-          <Flex direction="column" gap="3">
-            <Box>
-              <Heading as="h2" size="3" mb="2">
-                {displayName(file.display_path || file.path)}
-              </Heading>
-              <Flex gap="2" wrap="wrap">
-                <Badge color="gray">source file</Badge>
-                <Code>{file.element_ids.length} elements</Code>
-              </Flex>
-            </Box>
-            <Box>
-              <Text size="1" color="gray" weight="bold">
-                Path
-              </Text>
-              <Code className="block whitespace-normal break-words">{file.path}</Code>
-            </Box>
-            <Link href={file.html_path} target="_blank" rel="noreferrer">
-              Open exported source page
-            </Link>
-          </Flex>
-        ) : (
-          <Flex direction="column" gap="3">
-            <Box>
-              <Heading as="h2" size="3" mb="2">
-                {folder.path === ROOT_FOLDER ? rootLabel : folder.name}
-              </Heading>
-              <Flex gap="2" wrap="wrap">
-                <Badge color="gray">folder</Badge>
-                <Code>{folder.files.length} files</Code>
-                <Code>{folder.folders.length} folders</Code>
-              </Flex>
-            </Box>
-            <Text className="explorer-empty">Select a file to inspect its source path and modeled elements.</Text>
-          </Flex>
-        )}
-
-        <Box mt="4">
-          <Text size="1" color="gray" weight="bold">
-            Legend
-          </Text>
-          <Flex direction="column" gap="2" mt="2">
-            <LegendRow className="file-kind-folder" label="folder" icon={<ArchiveIcon />} />
-            <LegendRow className="file-kind-file" label="source file" icon={<FileIcon />} />
-            <LegendRow className="file-kind-element" label="modeled element" icon={<CubeIcon />} />
-          </Flex>
-        </Box>
-      </div>
-    </Box>
-  );
-}
-
-function LegendRow({
-  className,
-  label,
-  icon,
-}: {
-  className: string;
-  label: string;
-  icon: ReactNode;
-}) {
-  return (
-    <Flex align="center" gap="2">
-      <span className={["explorer-icon-swatch", className].join(" ")}>{icon}</span>
-      <Text size="1">{label}</Text>
-    </Flex>
+    </div>
   );
 }
 
@@ -688,4 +649,34 @@ function compareItems(
 
 function displayName(path: string): string {
   return path.split("/").filter(Boolean).at(-1) ?? path;
+}
+
+function selectedFileFromModelSelection(
+  selectionId: string,
+  model: FileManagerModel,
+  store: ExplorerProjectStore,
+): ProjectStoreFile | undefined {
+  if (selectionId.startsWith("file:")) {
+    return model.fileByPath.get(selectionId.slice("file:".length));
+  }
+  const element = store.elements.find((item) => item.id === selectionId);
+  return element ? model.fileByPath.get(element.file_path) : undefined;
+}
+
+function folderPathFromModelSelection(
+  selectionId: string,
+  model: FileManagerModel,
+  store: ExplorerProjectStore,
+): string {
+  if (selectionId === "__root__") return ROOT_FOLDER;
+  if (selectionId.startsWith("folder:")) {
+    const folderPath = selectionId.slice("folder:".length);
+    return model.folderByPath.has(folderPath) ? folderPath : ROOT_FOLDER;
+  }
+  const selectedFile = selectedFileFromModelSelection(selectionId, model, store);
+  if (selectedFile) {
+    const folderPath = selectedFile.parent_folder || ROOT_FOLDER;
+    return model.folderByPath.has(folderPath) ? folderPath : ROOT_FOLDER;
+  }
+  return ROOT_FOLDER;
 }

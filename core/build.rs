@@ -1,49 +1,125 @@
-//! Build script that stages the compiled Explorer SPA bundle for embedding.
+//! Build script: embeds the built Explorer SPA (Vite) `dist/`.
 //!
-//! The exported/served `index.html` is the Vite/React/Radix Explorer bundle
-//! (built from `explorer/`), not a runtime-assembled page. This script copies
-//! the built bundle (`explorer/dist/index.html` + `assets/explorer.{js,css}`)
-//! into `OUT_DIR` so `src/export.rs` can `include_bytes!`/`include_str!` it at
-//! compile time.
+//! By default, `cargo build` consumes an existing `explorer/dist`. Set
+//! `REQVIRE_BUILD_EXPLORER=1` to run `npm run build` in `../explorer` first.
+//! The script then recursively copies `explorer/dist` into
+//! `OUT_DIR/explorer_bundle` and generates a manifest of `(relative_path,
+//! bytes)` that `src/explorer_runtime.rs` consumes via `include!`.
 //!
-//! The bundle is a required build input. CI and `make` build the Explorer first
-//! (`cd explorer && npm ci && npm run build`) so release artifacts always embed
-//! the real bundle.
+//! Vite/Explorer is the single source of truth for ALL bundle assets
+//! (index.html, JS/CSS, favicons, logos, fonts). Rust embeds them verbatim and
+//! owns none of them.
 
 use std::env;
 use std::fs;
 use std::path::{Path, PathBuf};
+use std::process::Command;
 
 fn main() {
     let manifest_dir = PathBuf::from(env::var("CARGO_MANIFEST_DIR").unwrap());
     let out_dir = PathBuf::from(env::var("OUT_DIR").unwrap());
-    let bundle_out = out_dir.join("explorer_bundle");
-    fs::create_dir_all(&bundle_out).expect("create explorer_bundle out dir");
+    let explorer_dir = manifest_dir.join("../explorer");
+    let dist = explorer_dir.join("dist");
 
-    // explorer/dist relative to the workspace root (core/ is one level down).
-    let dist = manifest_dir.join("../explorer/dist");
-    let index = dist.join("index.html");
-    let js = dist.join("assets/explorer.js");
-    let css = dist.join("assets/explorer.css");
+    // Re-run whenever Explorer sources change so the embedded bundle stays fresh.
+    for p in [
+        "src",
+        "public",
+        "index.html",
+        "package.json",
+        "package-lock.json",
+        "vite.config.ts",
+        "vite.config.js",
+    ] {
+        println!("cargo:rerun-if-changed={}", explorer_dir.join(p).display());
+    }
+    println!("cargo:rerun-if-changed={}", dist.display());
+    println!("cargo:rerun-if-env-changed=REQVIRE_BUILD_EXPLORER");
 
-    // Rebuild embedding whenever the built bundle changes.
-    println!("cargo:rerun-if-changed={}", index.display());
-    println!("cargo:rerun-if-changed={}", js.display());
-    println!("cargo:rerun-if-changed={}", css.display());
+    // Build the Explorer SPA only when explicitly requested.
+    if env::var("REQVIRE_BUILD_EXPLORER").is_ok() {
+        match Command::new("npm")
+            .arg("run")
+            .arg("build")
+            .current_dir(&explorer_dir)
+            .status()
+        {
+            Ok(s) if s.success() => {}
+            Ok(s) => {
+                if !dist.is_dir() {
+                    panic!(
+                        "`npm run build` failed (status {s}) in {} and there is no existing dist/ to fall back to",
+                        explorer_dir.display()
+                    );
+                }
+                println!(
+                    "cargo:warning=`npm run build` failed (status {s}); embedding existing explorer/dist"
+                );
+            }
+            Err(e) => {
+                if !dist.is_dir() {
+                    panic!(
+                        "could not run `npm run build` in {} ({e}); install Node/npm and run `cd explorer && npm ci` first",
+                        explorer_dir.display()
+                    );
+                }
+                println!("cargo:warning=could not run npm ({e}); embedding existing explorer/dist");
+            }
+        }
+    }
 
-    if !(index.is_file() && js.is_file() && css.is_file()) {
+    if !dist.join("index.html").is_file() {
         panic!(
-            "explorer/dist bundle not found at {}. Run `cd explorer && npm run build` before `cargo build`.",
+            "explorer/dist bundle not found at {}. Run `cd explorer && npm ci && npm run build` first.",
             dist.display()
         );
     }
 
-    copy(&index, &bundle_out.join("index.html"));
-    copy(&js, &bundle_out.join("explorer.js"));
-    copy(&css, &bundle_out.join("explorer.css"));
+    // Stage: recursively copy the whole dist into OUT_DIR/explorer_bundle.
+    let bundle_out = out_dir.join("explorer_bundle");
+    if bundle_out.exists() {
+        fs::remove_dir_all(&bundle_out).expect("clear explorer_bundle out dir");
+    }
+    fs::create_dir_all(&bundle_out).expect("create explorer_bundle out dir");
+
+    let mut files: Vec<String> = Vec::new();
+    copy_tree(&dist, &dist, &bundle_out, &mut files);
+    files.sort();
+
+    // Generate the manifest consumed by src/explorer_runtime.rs via include!().
+    let mut manifest = String::from("// @generated by build.rs - embedded Explorer dist bundle\n");
+    manifest.push_str("pub static EMBEDDED_BUNDLE: &[(&str, &[u8])] = &[\n");
+    for rel in &files {
+        let abs = bundle_out.join(rel);
+        manifest.push_str(&format!(
+            "    ({:?}, include_bytes!({:?})),\n",
+            rel,
+            abs.display().to_string()
+        ));
+    }
+    manifest.push_str("];\n");
+    fs::write(out_dir.join("explorer_bundle_manifest.rs"), manifest)
+        .expect("write explorer_bundle_manifest.rs");
 }
 
-fn copy(src: &Path, dest: &Path) {
-    fs::copy(src, dest)
-        .unwrap_or_else(|e| panic!("copy {} -> {}: {e}", src.display(), dest.display()));
+/// Recursively copies files under `src` into `dst_root/<path relative to root>`,
+/// recording POSIX-style relative paths into `files`.
+fn copy_tree(root: &Path, src: &Path, dst_root: &Path, files: &mut Vec<String>) {
+    for entry in fs::read_dir(src).unwrap_or_else(|e| panic!("read dir {}: {e}", src.display())) {
+        let entry = entry.expect("dir entry");
+        let path = entry.path();
+        if path.is_dir() {
+            copy_tree(root, &path, dst_root, files);
+        } else if path.is_file() {
+            let rel = path.strip_prefix(root).unwrap();
+            let dest = dst_root.join(rel);
+            if let Some(parent) = dest.parent() {
+                fs::create_dir_all(parent).expect("create parent dir");
+            }
+            fs::copy(&path, &dest)
+                .unwrap_or_else(|e| panic!("copy {} -> {}: {e}", path.display(), dest.display()));
+            println!("cargo:rerun-if-changed={}", path.display());
+            files.push(rel.to_string_lossy().replace('\\', "/"));
+        }
+    }
 }

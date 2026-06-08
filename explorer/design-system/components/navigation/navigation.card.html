@@ -1,0 +1,59 @@
+<!-- @dsCard group="Components" viewport="700x360" name="Navigation — TreeItem, Breadcrumb, SidebarSection" subtitle="Model tree, path trail, sidebar groups" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<link rel="stylesheet" href="../../styles.css" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>
+  body { margin: 0; background: var(--bg-canvas); padding: 20px; }
+  .layout { display: flex; gap: 22px; }
+  .panel { background: var(--bg-surface); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 12px; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { TreeItem, Breadcrumb, SidebarSection, ElementIcon, Icon } = window.ReqvireExplorerDesignSystem_48409e;
+const { useState } = React;
+function Demo() {
+  const [open,setOpen] = useState({requirements:true,'Capabilities.md':true});
+  const [sel,setSel] = useState('Defining Model Structure');
+  const t = (k)=>setOpen(s=>({...s,[k]:!s[k]}));
+  return (
+    <div className="layout">
+      <div className="panel" style={{width:300}}>
+        <TreeItem label="requirements" icon={<Icon name={open.requirements?'folder-open':'folder'} size={15}/>} count={6} depth={0} expandable open={open.requirements} onToggle={()=>t('requirements')} />
+        {open.requirements && <>
+          <TreeItem label="Capabilities" icon={<Icon name="folder" size={15}/>} count={8} depth={1} expandable />
+          <TreeItem label="Ontologies" icon={<Icon name="folder" size={15}/>} count={9} depth={1} expandable />
+          <TreeItem label="Capabilities.md" icon={<Icon name="file-text" size={15}/>} count={3} depth={1} kind="file" expandable open={open['Capabilities.md']} onToggle={()=>t('Capabilities.md')} />
+          {open['Capabilities.md'] && <>
+            <TreeItem label="Defining Model Structure" icon={<ElementIcon type="capability" size="sm"/>} depth={2} kind="element" selected={sel==='Defining Model Structure'} onSelect={()=>setSel('Defining Model Structure')} />
+            <TreeItem label="Defining Model Structure Source" icon={<ElementIcon type="specification" size="sm"/>} depth={2} kind="element" selected={sel==='src'} onSelect={()=>setSel('src')} />
+            <TreeItem label="Reqvire Core Element Ontology Shape" icon={<ElementIcon type="semantic-contract" size="sm"/>} depth={2} kind="element" />
+          </>}
+        </>}
+      </div>
+      <div style={{flex:1, display:'flex', flexDirection:'column', gap:18}}>
+        <Breadcrumb items={[{label:'Reqvire root'},{label:'requirements'},{label:'Capabilities.md'}]} />
+        <div className="panel">
+          <SidebarSection title="Summary">
+            <div style={{fontSize:13, color:'var(--text-secondary)'}}>13 submodels · 640 elements · 1090 relations</div>
+          </SidebarSection>
+          <div style={{height:14}}></div>
+          <SidebarSection title="Overlays" action={<span style={{fontSize:12,color:'var(--text-link)',cursor:'pointer'}}>Reset</span>}>
+            <div style={{fontSize:13, color:'var(--text-secondary)'}}>Attachments · Verification · Trace</div>
+          </SidebarSection>
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo />);
+</script>
+</body>
+</html>

@@ -14,9 +14,9 @@
 
 # What is Reqvire?
 
-Semantic engineering framework for building verifiable and traceable systems.
+Build verifiable and traceable software.
 
-Model ontologies, capabilities, requirements, refinements, and verification directly inside Git — with AI-native traceability and engineering context built in.
+Model ontologies, capabilities, requirements, and verifications in Git, with traceability and engineering context built in for humans, AI agents, and modern engineering workflows.
 
 It unifies:
 - system modeling
@@ -28,7 +28,7 @@ It unifies:
 
 into a single workflow that stays aligned with your codebase.
 
-Unlike traditional requirements systems, Reqvire treats engineering knowledge as a living semantic graph rather than disconnected documents, tickets, or spreadsheets.
+Unlike traditional requirements systems, Reqvire treats engineering knowledge as a connected, versioned model rather than disconnected documents, tickets, or spreadsheets.
 
 ---
 
@@ -46,6 +46,27 @@ Validate a Reqvire workspace:
 reqvire validate
 ```
 
+Open the Explorer UI from an installed Reqvire binary:
+
+```bash
+reqvire serve
+```
+
+Then open the printed local URL, usually:
+
+```text
+http://localhost:8080/
+```
+
+No-install npm form:
+
+```bash
+npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace serve
+```
+
+The Explorer UI is embedded in release/npm binaries. Source builds are for
+development and must build the Explorer bundle before compiling Rust.
+
 ---
 
 ## Use with AI Coding Assistants
@@ -55,7 +76,13 @@ Reqvire ships with:
 - Codex skills
 - MCP server support
 
-Run the MCP server directly with `npx`:
+Start the MCP server with the Reqvire CLI:
+
+```bash
+reqvire --workspace /absolute/path/to/workspace mcp
+```
+
+Convenience no-install form using the npm package:
 
 ```bash
 npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace mcp
@@ -63,21 +90,20 @@ npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace mcp
 
 This exposes Reqvire engineering context to AI assistants through the Model Context Protocol (MCP).
 
+Reqvire MCP uses Streamable HTTP. Start the server with the command above, then point MCP clients at:
+
+```text
+http://127.0.0.1:8081/mcp
+```
+
 Example MCP client configuration:
 
 ```json
 {
   "mcpServers": {
     "reqvire-myrepository": {
-      "type": "stdio",
-      "command": "npx",
-      "args": [
-        "-y",
-        "@reqvire-org/reqvire@latest",
-        "--workspace",
-        "/absolute/path/to/my/repository",
-        "mcp"
-      ]
+      "type": "http",
+      "url": "http://127.0.0.1:8081/mcp"
     }
   }
 }
@@ -86,7 +112,7 @@ Example MCP client configuration:
 Enable mutation tools:
 
 ```bash
-npx -y @reqvire-org/reqvire@latest --workspace /absolute/path/to/workspace mcp --enable-mutations
+reqvire --workspace /absolute/path/to/workspace mcp --enable-mutations
 ```
 
 ---

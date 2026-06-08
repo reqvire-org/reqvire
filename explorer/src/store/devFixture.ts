@@ -1,9 +1,9 @@
 /*
  * Minimal dev fixture seed.
  *
- * Used ONLY in `npm run dev` (import.meta.env.DEV) when no Rust-exported seed
- * is injected, so the component shell is browsable during frontend work. It is
- * intentionally tiny and is never shipped into a real export.
+ * Used ONLY in `npm run dev` (import.meta.env.DEV) when no served Project Store
+ * seed is available, so the component shell is browsable during frontend work.
+ * It is intentionally tiny and is never shipped in release assets.
  */
 import type { ExplorerProjectStore } from "./types";
 import { EXPECTED_SCHEMA_VERSION } from "./types";
@@ -18,9 +18,24 @@ export const devFixture: ExplorerProjectStore = {
     {
       path: "requirements/Specifications.md",
       display_path: "requirements/Specifications.md",
-      html_path: "requirements/Specifications.html",
+      markdown_content: [
+        "# Elements",
+        "",
+        "### Example Requirement",
+        "",
+        "The dev fixture shall render Markdown inside the Explorer.",
+        "",
+        "#### Metadata",
+        "  * type: requirement",
+      ].join("\n"),
       parent_folder: "requirements",
-      element_ids: ["requirements/Specifications.md#example-requirement"],
+      element_ids: [
+        "requirements/Specifications.md#example-capability",
+        "requirements/Specifications.md#example-requirement",
+        "requirements/Specifications.md#example-unverified-requirement",
+        "requirements/Specifications.md#example-verification",
+        "requirements/Specifications.md#example-unsatisfied-verification",
+      ],
       resource_ids: [],
     },
   ],
@@ -31,6 +46,7 @@ export const devFixture: ExplorerProjectStore = {
       target: "core/src/lib.rs",
       display: "lib.rs",
       file_path: "core/src/lib.rs",
+      source_text: "pub fn fixture_source() -> &'static str {\n    \"ok\"\n}\n",
       external_url: null,
       referring_element_ids: ["requirements/Specifications.md#example-requirement"],
       relation_types: ["satisfiedBy"],
@@ -38,14 +54,38 @@ export const devFixture: ExplorerProjectStore = {
   ],
   elements: [
     {
+      id: "requirements/Specifications.md#example-capability",
+      name: "Example Capability",
+      element_type: "capability",
+      type_family: "capability",
+      file_path: "requirements/Specifications.md",
+      line_number: 1,
+      source_anchor: "#/content/requirements/Specifications.md#example-capability",
+      content: "The dev fixture shall expose a capability with mixed verification and implementation coverage.",
+      metadata: { type: "capability" },
+      governance: { status: "draft" },
+    },
+    {
       id: "requirements/Specifications.md#example-requirement",
       name: "Example Requirement",
       element_type: "requirement",
       type_family: "requirement",
       file_path: "requirements/Specifications.md",
       line_number: 3,
-      source_anchor: "requirements/Specifications.html#example-requirement",
+      source_anchor: "#/content/requirements/Specifications.md#example-requirement",
       content: "The system shall demonstrate the Explorer shell with fixture data.",
+      metadata: { type: "requirement" },
+      governance: { status: "draft" },
+    },
+    {
+      id: "requirements/Specifications.md#example-unverified-requirement",
+      name: "Unverified Fixture Requirement",
+      element_type: "requirement",
+      type_family: "requirement",
+      file_path: "requirements/Specifications.md",
+      line_number: 12,
+      source_anchor: "#/content/requirements/Specifications.md#example-unverified-requirement",
+      content: "The system shall demonstrate an uncovered requirement row in the Coverage view.",
       metadata: { type: "requirement" },
       governance: { status: "draft" },
     },
@@ -56,8 +96,20 @@ export const devFixture: ExplorerProjectStore = {
       type_family: "verification",
       file_path: "requirements/Specifications.md",
       line_number: 20,
-      source_anchor: "requirements/Specifications.html#example-verification",
+      source_anchor: "#/content/requirements/Specifications.md#example-verification",
       content: "Verifies the Example Requirement via a test.",
+      metadata: { type: "test-verification" },
+      governance: {},
+    },
+    {
+      id: "requirements/Specifications.md#example-unsatisfied-verification",
+      name: "Unsatisfied Fixture Verification",
+      element_type: "test-verification",
+      type_family: "verification",
+      file_path: "requirements/Specifications.md",
+      line_number: 28,
+      source_anchor: "#/content/requirements/Specifications.md#example-unsatisfied-verification",
+      content: "Demonstrates a verification with no satisfiedBy evidence and no verified target.",
       metadata: { type: "test-verification" },
       governance: {},
     },
@@ -80,7 +132,136 @@ export const devFixture: ExplorerProjectStore = {
   concept_refs: [],
   submodels: { submodels: [], cross_submodel_couplings: [], summary: {} },
   traces: { files: {} },
-  coverage: {},
+  coverage: {
+    summary: {
+      total_leaf_requirements: 2,
+      verified_leaf_requirements: 1,
+      unverified_leaf_requirements: 1,
+      leaf_requirements_coverage_percentage: 50,
+      total_test_verifications: 2,
+      satisfied_test_verifications: 1,
+      unsatisfied_test_verifications: 1,
+      test_verifications_satisfaction_percentage: 50,
+      total_verifications: 2,
+      orphaned_verifications: 1,
+      orphaned_verifications_percentage: 50,
+      verification_types: {
+        test: 2,
+        formal_proof: 0,
+        analysis: 0,
+        inspection: 0,
+        demonstration: 0,
+      },
+      total_requirements_in_scope: 2,
+      covered_requirements: 1,
+      uncovered_requirements: 1,
+      implementation_coverage_percentage: 50,
+      coverage_sources: {
+        direct_satisfied: 1,
+        refinement_contract_satisfied_via_attachment: 0,
+        refinement_contract_satisfied_via_child: 0,
+      },
+    },
+    verified_leaf_requirements: {
+      files: {
+        "requirements/Specifications.md": [
+          {
+            identifier: "requirements/Specifications.md#example-requirement",
+            name: "Example Requirement",
+            verified_by: ["requirements/Specifications.md#example-verification"],
+          },
+        ],
+      },
+    },
+    unverified_leaf_requirements: {
+      files: {
+        "requirements/Specifications.md": [
+          {
+            identifier: "requirements/Specifications.md#example-unverified-requirement",
+            name: "Unverified Fixture Requirement",
+            verified_by: [],
+          },
+        ],
+      },
+    },
+    satisfied_test_verifications: {
+      files: {
+        "requirements/Specifications.md": [
+          {
+            identifier: "requirements/Specifications.md#example-verification",
+            name: "Example Verification",
+            verification_type: "test-verification",
+            satisfied_by: ["resource:core/src/lib.rs"],
+          },
+        ],
+      },
+    },
+    unsatisfied_test_verifications: {
+      files: {
+        "requirements/Specifications.md": [
+          {
+            identifier: "requirements/Specifications.md#example-unsatisfied-verification",
+            name: "Unsatisfied Fixture Verification",
+            verification_type: "test-verification",
+            satisfied_by: [],
+          },
+        ],
+      },
+    },
+    orphaned_verifications: {
+      files: {
+        "requirements/Specifications.md": [
+          {
+            identifier: "requirements/Specifications.md#example-unsatisfied-verification",
+            name: "Unsatisfied Fixture Verification",
+            verification_type: "test-verification",
+            satisfied_by: [],
+          },
+        ],
+      },
+    },
+    covered_requirements: {
+      files: {
+        "requirements/Specifications.md": [
+          {
+            identifier: "requirements/Specifications.md#example-requirement",
+            name: "Example Requirement",
+            coverage_source: "direct_satisfied",
+            evidence: ["resource:core/src/lib.rs"],
+          },
+        ],
+      },
+    },
+    uncovered_requirements: {
+      files: {
+        "requirements/Specifications.md": [
+          {
+            identifier: "requirements/Specifications.md#example-unverified-requirement",
+            name: "Unverified Fixture Requirement",
+          },
+        ],
+      },
+    },
+    capability_coverage: {
+      capabilities: [
+        {
+          identifier: "requirements/Specifications.md#example-capability",
+          name: "Example Capability",
+          local_leaf_requirements: 2,
+          local_verified_leaf_requirements: 1,
+          aggregate_leaf_requirements: 2,
+          aggregate_verified_leaf_requirements: 1,
+          verification_coverage_percentage: 50,
+          local_requirements: 2,
+          local_covered_requirements: 1,
+          aggregate_requirements: 2,
+          aggregate_covered_requirements: 1,
+          implementation_coverage_percentage: 50,
+          mark: "partial",
+        },
+      ],
+    },
+  },
   ontology: {
     summary: {
       ontology_blocks: 1,
@@ -256,7 +437,7 @@ export const devFixture: ExplorerProjectStore = {
               file_path: "requirements/Specifications.md",
               line_number: 40,
               kind: "ontology",
-              link: "requirements/Specifications.html#example-requirement",
+              link: "#/content/requirements/Specifications.md#example-requirement",
             },
           ],
           constraints: [],
@@ -287,7 +468,7 @@ export const devFixture: ExplorerProjectStore = {
               file_path: "requirements/Specifications.md",
               line_number: 41,
               kind: "ontology",
-              link: "requirements/Specifications.html#example-requirement",
+              link: "#/content/requirements/Specifications.md#example-requirement",
             },
           ],
           constraints: [],
@@ -310,34 +491,6 @@ export const devFixture: ExplorerProjectStore = {
         },
       ],
     },
-    graph_renderer: {
-      css: "#ontology-graph-container{width:100%;height:100%;min-height:320px}",
-      js: `
-const container = document.getElementById("ontology-graph-container");
-if (container) {
-  container.dataset.renderer = "committed";
-  container.innerHTML = '<button type="button" data-node-id="urn:reqvire:test:api:identifier">identifier</button>';
-}
-window.filterOntologyGraph = function (query) {
-  const results = document.getElementById("ontology-graph-results");
-  if (!results) return;
-  results.innerHTML = query ? "<li>identifier</li>" : "";
-};
-window.focusOntologyNode = function () {};
-window.fitOntologyGraph = function () {};
-window.resetOntologyGraphLayout = function () {};
-window.clearOntologySelection = function () {
-  const title = document.getElementById("ontology-inspector-title");
-  if (title) title.textContent = "Node Inspector";
-};
-document.querySelectorAll(".ontology-filter-toggle").forEach((button) => {
-  button.addEventListener("click", () => {
-    button.classList.toggle("is-active");
-    button.setAttribute("aria-pressed", button.classList.contains("is-active") ? "true" : "false");
-  });
-});
-`,
-    },
     ttl_href: "ontologies.ttl",
   },
   knowledge_graph: {
@@ -351,7 +504,7 @@ document.querySelectorAll(".ontology-filter-toggle").forEach((button) => {
         element_type: "requirement",
         file_path: "requirements/Specifications.md",
         line_number: 3,
-        link: "requirements/Specifications.html#example-requirement",
+        link: "#/content/requirements/Specifications.md#example-requirement",
         description: "The system shall demonstrate the Explorer shell with fixture data.",
         metadata: [{ name: "type", value: "requirement", link: "", kind: "metadata" }],
         governance: [{ name: "status", value: "draft", link: "", kind: "governance" }],
@@ -369,7 +522,7 @@ document.querySelectorAll(".ontology-filter-toggle").forEach((button) => {
         element_type: "test-verification",
         file_path: "requirements/Specifications.md",
         line_number: 20,
-        link: "requirements/Specifications.html#example-verification",
+        link: "#/content/requirements/Specifications.md#example-verification",
         description: "Verifies the Example Requirement via a test.",
         metadata: [{ name: "type", value: "test-verification", link: "", kind: "metadata" }],
         governance: [],
@@ -428,10 +581,8 @@ document.querySelectorAll(".ontology-filter-toggle").forEach((button) => {
   routes: {
     canonical: [
       { id: "model", pattern: "#/model", title: "Model" },
-      { id: "knowledge-graph", pattern: "#/knowledge-graph", title: "Knowledge Graph" },
       { id: "traces", pattern: "#/traces", title: "Traces" },
       { id: "ontologies", pattern: "#/ontologies", title: "Ontologies" },
-      { id: "kn2", pattern: "#/kn2", title: "KN2" },
     ],
   },
 };

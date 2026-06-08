@@ -1,0 +1,7 @@
+{
+  "rules": {
+    "color-no-invalid-hex": true,
+    "font-family-no-duplicate-names": true,
+    "no-duplicate-selectors": true
+  }
+}

@@ -161,23 +161,27 @@ Example:
 
 ### Explorer Store Seed Data Output Specification
 
-HTML export shall emit a normalized browser-local Project Store seed that can initialize the native static `index.html` SPA Explorer shell (built with Vite/TypeScript/React, Radix Themes 3, `@radix-ui/react-icons`, and compiled Tailwind).
+Explorer serve runtime generation shall emit a normalized browser-local Project Store seed that can initialize the native `index.html` SPA Explorer shell.
 
 #### Details
 The seed output shall:
-- Be generated from the validated graph registry, semantic index, report projections, and exported file inventory during HTML export.
+- Be generated from the validated graph registry, semantic index, report projections, and graph-referenced local resources during Explorer runtime generation.
+- Seed source-file content directly from the in-memory graph registry and graph-referenced local resources: files with modeled elements use normalized registry-generated Markdown, while existing local implementation/evidence/resource files use captured raw source content when available.
+- Keep implementation files, evidence files, scripts, images, and other local relation targets as Project Store `resources` for relation semantics, and include them in Project Store `files`/`folders` only when they are existing repository-relative local files referenced by the graph registry.
+- Build the Project Store `files` and `folders` sections only from modeled element source files and existing graph-referenced local resource/evidence files. Unrelated git-tree files, unsupported parsed pages, nonexistent local targets, and external URLs shall not become Explorer file-tree or file-search records.
+- Preserve full repository-relative hierarchy for every Project Store file path so the Model tree renders folders, files, and file-owned elements without flattening single-element files or registry-linked resource files.
 - Be deterministic for unchanged model input, excluding explicitly documented volatile metadata.
 - Be available to the native SPA view modules in `index.html` before any Explorer view attempts to render, and be consumable from local static assets without a CDN-loaded framework or stylesheet.
 - Contain required top-level sections for `project`, `folders`, `files`, `resources`, `elements`, `relations`, `attachments`, `concept_refs`, `submodels`, `traces`, `coverage`, `ontology`, `knowledge_graph`, `search`, `summaries`, and `routes`.
 - Represent file containers and modeled resources as distinct record families.
-- Preserve source links from elements, ontology terms, traces, coverage records, search documents, and resource references back to exported file containers when a browsable source file exists.
-- Preserve element detail route data so Explorer links can open `index.html#/elements/<identifier>` as a Project Store-backed modal while retaining exported source-page anchors as secondary source actions.
+- Preserve source links from elements, ontology terms, traces, coverage records, search documents, and resource references back to served file containers when a browsable source file exists.
+- Preserve element detail route data so Explorer links can open `index.html#/elements/<identifier>` as a Project Store-backed modal while retaining source-page anchors as secondary source actions.
 - Preserve relation evidence, including authored versus generated/opposite provenance, without forcing every view to consume duplicate opposite relation edges.
 - Preserve canonical SPA route data and source/report links without emitting retired Explorer page route mappings.
 - Include a schema/version marker so future Project Store schema changes can be detected by the browser shell.
 - Fail closed or expose a visible diagnostic when required seed data is missing, malformed, or incompatible with the shell schema version.
 
-The seed may be embedded inline in `index.html` or loaded as a static asset, but it shall remain browser-local to the exported artifact and shall not require a remote service.
+The seed may be embedded inline in `index.html` or loaded as a static asset, but it shall remain browser-local to the served Explorer shell.
 
 #### Metadata
  * type: specification
@@ -252,10 +256,11 @@ Collect source type vocabulary is defined by the Reqvire report ontology.
 
 ### Color Scheme Specification
 
-Comprehensive color coding for terminal output, HTML export, and diagram generation.
+Color coding for terminal and CLI text output.
 
 #### Details
-**Terminal Colors (ANSI):**
+Terminal colors are optional presentation hints for human-readable CLI output:
+
 | Color | Meaning | Usage |
 |-------|---------|-------|
 | Red | Error | Validation errors, failed operations |
@@ -264,50 +269,7 @@ Comprehensive color coding for terminal output, HTML export, and diagram generat
 | Cyan | Info | Element names, identifiers |
 | White/Default | Normal | Regular content |
 
-**Primary Colors (HTML):**
-| Color Name | Hex Code | Usage |
-|------------|----------|-------|
-| Indigo | #3F51B5 | Navigation bar background, primary branding |
-| Indigo Hover | #7986CB | Navigation hover states |
-| Indigo Active | #303F9F | Navigation active/pressed states |
-| Off-White | #FAFAFA | Body background |
-| White | #FFFFFF | Content background, navigation text |
-
-**Element Type Colors:**
-| Element Type | Color Name | Hex Code | Usage |
-|--------------|------------|----------|-------|
-| Capability | Capability Blue | #BBDEFB | Capability roots |
-| Ontology | Muted Sunflower | #F4E3A1 | First-class ontology vocabulary/model terms |
-| Requirement | Deep Purple | #673AB7 | Core requirements, goals |
-| Verification | Emerald Green | #4CAF50 | Validation criteria, testing |
-| Refinement | Orange | #FF9800 | Behaviors, constraints, specifications |
-| Other | Cool Gray | #9E9E9E | Other element types |
-
-**Status Indicator Colors:**
-| Status | Color Name | Hex Code | Usage |
-|--------|------------|----------|-------|
-| Verified/Passing | Forest Green | #4CAF50 | Verified requirements, passing tests |
-| Pending/Warning | Amber | #FFB74D | Unverified items, warnings |
-| Failed/Error | Red | #F44336 | Error messages, validation errors |
-
-**Interactive State Colors:**
-| State | Hex Code | Usage |
-|-------|----------|-------|
-| Hover Highlight | #FFAB91 | Diagram node/edge hover effect |
-| Node Hover Shadow | rgba(255,171,145,0.7) | Drop-shadow on node hover |
-| Link Color | #3F51B5 | Hyperlinks |
-
-**D3.js Containment Tree Colors:**
-| Node Type | Hex Code | Icon |
-|-----------|----------|------|
-| folder | #9E9E9E | 📁 |
-| file | #FFCA28 | 📄 |
-| capability | #BBDEFB | ◆ |
-| requirement | #673AB7 | 📐 |
-| verification | #4CAF50 | ✅ |
-| refinement | #FF9800 | 🔧 |
-| design-document | #8D6E63 | 📝 |
-| attachment-element | #607D8B | 📎 |
+Explorer route colors, element glyphs, graph colors, Mermaid rendering colors, and browser interaction states are WebInterface presentation contracts and are specified by the Explorer design-system and WebInterface rendering specifications.
 
 #### Metadata
  * type: specification
@@ -345,18 +307,14 @@ The containment report and Model containment modes show the physical organizatio
 The system is expected to generate reports in multiple formats:
 - Mermaid diagrams for visualization
 - JSON for programmatic access
-- Native HTML Explorer integration through the Project Store-backed Model route
+- Project Store data for WebInterface Explorer integration
 
 The system is expected to include design documents:
 - Files in DesignDocuments folders displayed alongside specifications
 - Design documents visually distinguished from specification elements
 - Clickable navigation to document files
 
-The native Explorer Model route is expected to:
-- Provide List and Grid filesystem/model browsing modes plus Sunburst and Icicle containment partition modes over the same folder/file/element hierarchy.
-- Render Sunburst and Icicle as D3 partition views with click-to-drill/zoom and breadcrumb navigation.
-- Use the shared headerless Explorer shell: persistent collapsible left Explorer pane with vertical `Explorer` edge strip, expanded Model mode controls, project tree, near-white canvas/content lane, shared collapsible 390px right `Inspector` lane, right vertical tool rail for specialist views, and compact muted bottom summary strip.
-- Keep List content and D3 breadcrumb lanes aligned to the usable content area after the left Explorer pane/strip and before the shared right `Inspector` lane and tool rail.
+Explorer presentation, layout, mode controls, graph rendering, and shell integration are owned by the WebInterface specifications. Functional Output owns the deterministic report and Project Store data consumed by those views.
 
 #### Metadata
  * type: specification
@@ -367,7 +325,7 @@ The native Explorer Model route is expected to:
 Technical specification for ensuring deterministic, reproducible output across all report generation operations.
 
 #### Details
-All generated reports is expected to produce deterministic output with consistent ordering to enable reliable testing, version control, and reproducible builds.
+All report outputs are expected to use deterministic ordering to enable reliable testing, version control, and reproducible builds.
 
 **Ordering Rules:**
 
@@ -503,7 +461,7 @@ Clickable mermaid diagrams links by default must use relative links to the git r
 CLI flag options must be provided that can change default behavior to use stable github repository links:
 * diagrams click links are not working on Github if not using stable github repository links
 * from another side that pollutes PR diffs thus choice must be given to the user
-* Commands that generate diagrams (`generate-diagrams`, `export`, `serve`) must expose `--links-with-blobs` CLI flag for that purpose
+* Commands that generate diagrams (`generate-diagrams`, `serve`) must expose `--links-with-blobs` CLI flag for that purpose
 * The flag defaults to `false` (use relative paths)
 
 When generating diagram node links and when `--links-with-blobs` flag is set to `true`, the system is expected to:
@@ -576,8 +534,7 @@ Report commands:
 - `lint`: model quality findings grouped for auto-fix or manual review.
 - `change-impact`: changed, added, removed, relocated, and impacted model elements with propagation evidence.
 - `containment`: folder, file, and element containment.
-- `export`: static HTML documentation.
-- `serve`: local browsable documentation server.
+- `serve`: local Explorer server.
 
 #### Metadata
  * type: specification
@@ -649,72 +606,6 @@ The system is expected to provide visualization of the complete model structure 
 - Handle file path and external URL relations
 - Provide metadata about total elements and relations
 - Use consistent visual styling with mermaid diagrams showing hash-based node identifiers
-
-#### Metadata
- * type: specification
----
-
-### Mermaid Diagram Style Specification
-
-Styling conventions for Mermaid diagrams in CLI output and HTML export.
-
-#### Details
-**Containment Structure:**
-- Folder subgraphs: `subgraph hashId["folder-icon Folder Name"]`
-- File subgraphs: `subgraph hashId["file-icon File Name"]`
-- Elements rendered inside their containing file subgraph
-- Collapsible in interactive mode
-
-**Node Shapes:**
-| Element Type | Shape | Example |
-|--------------|-------|---------|
-| Requirement | Rectangle | `[Requirement Name]` |
-| Verification | Stadium | `([Verification Name])` |
-| File | Folder shape | `{{File.md}}` |
-| Folder | Hexagon | `{{folder/}}` |
-
-**Diagram Node Classes (CSS):**
-| Class Name | Fill Color | Stroke Color | Usage |
-|------------|------------|--------------|-------|
-| capability | #BBDEFB | #1976D2 | Product/stakeholder capability elements |
-| ontology | #F4E3A1 | #B08A00 | First-class ontology elements |
-| systemRequirement | #E1D8EE | #673AB7 | System-level requirements |
-| requirement | #ECEFF1 | #673AB7 | Generic requirements |
-| verified | #D1C4E9 | #7E57C2 | Directly verified requirements |
-| verification | #DCEDC8 | #4CAF50 | Verification elements |
-| folder | #FAFAFA | #9E9E9E | Folder containers |
-| file | #FFFFFF | #9E9E9E | File containers |
-| attachment | #EFEBE9 | #8D6E63 | Design documents |
-| impacted | #FFAAAA | - | Change impact nodes |
-| changed | #FFDD57 | - | Changed nodes |
-
-**Color Scheme Contract:**
-- Mermaid diagrams that render capability elements shall emit `classDef capability fill:#BBDEFB,stroke:#1976D2,stroke-width:2.5px`.
-- Mermaid diagrams that render ontology elements shall emit `classDef ontology fill:#F4E3A1,stroke:#B08A00,stroke-width:2px`.
-- Mermaid diagrams that render requirements shall emit `classDef systemRequirement fill:#E1D8EE,stroke:#673AB7,stroke-width:1.5px`.
-- Mermaid diagrams that render generic requirements shall emit `classDef requirement fill:#ECEFF1,stroke:#673AB7,stroke-width:1.5px` when the diagram format uses a generic requirement class.
-- Mermaid diagrams that render verification elements shall emit `classDef verification fill:#DCEDC8,stroke:#4CAF50,stroke-width:2px`.
-- Capability styling shall be visually distinct from requirement styling; capability elements shall not reuse the purple requirement color family.
-- Ontology styling shall be visually distinct from capability, requirement, verification, and subordinate refinement-detail styling; ontology elements use a muted sunflower color family.
-- The same capability and ontology color contracts apply to containment diagrams, model diagrams, verification trace diagrams, generated Markdown, and HTML export Mermaid blocks.
-
-**Relation Line Styles:**
-| Relation Type | Color | Line Style |
-|---------------|-------|------------|
-| Derive/DerivedFrom | #673AB7 | Dashed |
-| Verify/VerifiedBy | #4CAF50 | Dashed |
-| Satisfy/SatisfiedBy | #673AB7 | Solid |
-| Trace | #9E9E9E | Dashed |
-
-**Interactive Highlighting:**
-| Effect | Implementation |
-|--------|----------------|
-| Hovered node | drop-shadow(0 0 8px rgba(255,171,145,0.7)) |
-| Connected edges | stroke: #FFAB91, increased width |
-
-**Diagram Background:**
-- Canvas: #FAFAFA (off-white)
-- Border: 1px solid #EEEEEE
 
 #### Metadata
  * type: specification
@@ -912,8 +803,8 @@ The resources report is expected to consist of two sections:
 - Includes file paths, element identifiers, relation types
 - Suitable for automated processing and integration
 
-**HTML Export:**
-- Resources report data available in HTML export as a supporting route or report link, not as a primary left Explorer view link
+**Explorer Serve:**
+- Resources report data available in the Explorer as a supporting route or report link, not as a primary left Explorer view link
 - Shows complete list of referenced files with element traceability
 - Maintains same structure as text/JSON outputs
 - Provides clickable navigation between resources and elements
@@ -924,7 +815,7 @@ The resources report is expected to consist of two sections:
 
 ### Ontology Collection Output Specification
 
-The ontology collection output defines how Reqvire exposes ontology and SHACL content for export, serve, and downstream semantic tooling.
+The ontology collection output defines how Reqvire exposes ontology and SHACL content for serve-time Explorer rendering and downstream semantic tooling.
 
 #### Details
 The output shall:
@@ -942,19 +833,14 @@ The output shall:
   - ontology term declaration edges from ontology elements to declared terms
   - semantic-contract shape reference edges from semantic contracts to referenced ontology terms
   - generated ontology projection facts for direct-authored OWL/RDFS/SHACL constructs
-- Include source element identifier, source name, file path, section kind, and line number in the semantic index used by rendering/export.
-- Do not emit semantic-query-contract `#### Query` content or query metadata from ontology collection, including full semantic export. Generated ontology projection facts may cite semantic-query-contract IRIs as pattern-contract provenance, but raw query text remains searchable through search JSON; a dedicated query-export command may be specified later.
-- Avoid requiring a persistent RDF store for this collection path; full export uses the existing in-memory RDF projection over the graph registry and semantic index, extended with a generated ontology construct subprojection. Persistent RDF stores, SPARQL-backed search, general query execution, query export, and inferred reasoning are reserved for later query support.
+- Include source element identifier, source name, file path, section kind, and line number in the semantic index used by rendering and semantic output.
+- Do not emit semantic-query-contract `#### Query` content or query metadata from ontology collection, including full semantic export. Generated ontology projection facts may cite semantic-query-contract IRIs as pattern-contract provenance, but raw query text remains searchable through search JSON; dedicated query output support may be specified later.
+- Avoid requiring a persistent RDF store for this collection path; full semantic output uses the existing in-memory RDF projection over the graph registry and semantic index, extended with a generated ontology construct subprojection. Persistent RDF stores, SPARQL-backed search, general query execution, query output, and inferred reasoning are reserved for later query support.
 
-**HTML Export:**
-- HTML export shall include `ontologies.ttl`.
-- The Ontologies Explorer route shall open directly on an OWL-aware ontology model viewer derived from parsed semantic-index quads, use a dense full-width/full-height canvas inside the headerless Explorer shell, place the `ontologies.ttl` download link in the canonical ontology control/footer location for the active renderer mode, render collected ontology/shape/RDF summary counts as a compact muted single-line footer, suppress raw RDF serialization artifacts from the primary user-facing visualization, provide semantic search and inspection, preserve source citations as linked inspector/search evidence pointing to exported source HTML fragments, and not render a page header, shared content-card footer, or raw Turtle/source-block list in the view.
-- The Ontologies Explorer route shall separate passive type-color and construct-notation legend entries from active visibility controls. Detailed semantic kinds such as classes, properties, individuals, datatypes, restrictions, class expressions, SHACL shapes, and resources shall remain visible through color, property link labels, inspector kind, and search badges, while active controls shall use one `Show` group for ontology terms, datatype property links, object property links, class membership, class disjointness, restrictions, class expressions, SHACL shapes, resources, and external references. The SHACL shapes control shall govern both SHACL shape nodes and SHACL overlay relations. Equivalence, inverse properties, property chains, and property characteristics shall remain passive notation/inspector evidence until represented by direct canvas-visible elements. Datatype-property literal values shall remain searchable and visible as inspector predicate/value evidence on their subject nodes, not as graph nodes or filter layers.
-- The Ontologies Explorer route shall treat built-in XSD, RDF, RDFS, OWL, and SHACL namespace terms as external references that can be enabled for datatype/range audit but are hidden by default so built-in datatypes such as `xsd:string` do not dominate the primary ontology graph.
-- The Ontologies Explorer route shall render ontology properties as labeled domain/range links and inspector evidence rather than standalone graph nodes, and keep Reqvire's richer type and construct legends available.
-- The Ontologies Explorer route shall derive target-class and property-usage slot/facet inspector sections from SHACL node shapes and property shapes, including path, datatype/class range evidence, node kind, cardinality, pattern, allowed values, and source-shape evidence. Target-class sections shall describe slots of the selected class; property-usage sections shall describe each target-class usage of the selected property.
-- The Ontologies Explorer route shall render anonymous OWL class-expression blank nodes as structural constructs, not as primary domain concepts. The inspector shall show expression kind, ordered members, and usage context such as domain/range or subclass participation, while moving raw blank-node identifiers into collapsible raw details.
-- The Explorer tool rail shall include access to the Ontologies route, and source/specification pages may include secondary route links to that canonical route.
+**Explorer Serve:**
+- Explorer serve shall include `ontologies.ttl`.
+- Explorer serve shall include ontology collection and projection data in the Project Store so the WebInterface Ontologies route can render the ontology model viewer, source citations, search, modal evidence, and `ontologies.ttl` download action from one semantic projection.
+- Browser presentation details such as canvas layout, visibility controls, legends, graph colors, modal sections, and construct rendering are owned by the WebInterface Ontologies view specifications.
 
 #### Metadata
  * type: specification
@@ -968,9 +854,9 @@ The output shall:
 #### Details
 Projection subgraph generation behavior:
 - Extend the existing full semantic export in-memory RDF projection with a generated `reqvire:OntologyProjectionGraph` subprojection after RDF/Turtle and SHACL parsing has produced semantic-index quads.
-- Attach generated projection data to `SemanticIndex` as structured Rust data, not as a renderer-local object. The `SemanticIndex` projection data is the authoritative in-process source for full Turtle export, full JSON-LD export, and Ontologies HTML rendering.
+- Attach generated projection data to `SemanticIndex` as structured Rust data, not as a renderer-local object. The `SemanticIndex` projection data is the authoritative in-process source for full Turtle output, full JSON-LD output, and Ontologies Explorer rendering.
 - Store generated construct facts in the existing semantic export context as in-memory RDF statements derived from `SemanticIndex` projection data. Generated facts are not written back to authored Markdown ontology or semantic-contract blocks.
-- Keep projection data deterministic and serializable from `SemanticIndex` without reparsing raw Turtle in the HTML renderer.
+- Keep projection data deterministic and serializable from `SemanticIndex` without reparsing raw Turtle in the Ontologies renderer.
 - Use stable generated IRIs or blank-node identifiers derived from canonical source evidence and construct membership so repeated exports remain deterministic.
 - Materialize one `reqvire:OntologyConstructProjection` record per projection pass or construct family and one or more `reqvire:OntologyConstruct` records for extracted constructs.
 - Record `reqvire:projectionDerivationMode "direct-authored"` for facts derived only from authored quads without reasoning.
@@ -995,7 +881,7 @@ Direct-authored construct families:
 
 Consumer behavior:
 - `reqvire ontologies --full` and `reqvire ontologies --full --jsonld` include generated ontology projection subgraph facts.
-- Default `reqvire ontologies` and exported `ontologies.ttl` keep authored ontology and SHACL blocks only.
+- Default `reqvire ontologies` and served `ontologies.ttl` keep authored ontology and SHACL blocks only.
 - The Ontologies SPA route must build from the same generated projection facts used by full semantic export instead of maintaining a separate route-local construct model.
 - The projection subgraph is a reusable semantic data product for later SPARQL-backed search, semantic validation, or inferred-materialization work, but those later features require their own execution requirements.
 
@@ -1103,25 +989,6 @@ The implementation behavior is expected to include:
 - Trace relations can connect any element type to any other element type
 
 This ensures that trace relations serve their intended purpose of establishing lightweight traceability connections without creating artificial dependency constraints or participating in architectural validation logic.
-
-#### Metadata
- * type: specification
----
-
-### Verification Trace Diagram Specification
-
-Visual styling rules for verification trace diagrams.
-
-#### Details
-**Diagram Output:**
-Verification trace diagrams is expected to use the same visual styling as other mermaid diagrams:
-- Containment structure with folder and file subgraphs showing physical location of elements
-- Element type-based CSS classes (capability, ontology, systemRequirement, verification) for consistent coloring
-- Capability nodes use the canonical capability color contract from Mermaid Diagram Style Specification
-- Ontology nodes use the canonical muted sunflower ontology color contract from Mermaid Diagram Style Specification
-- Directly verified requirements highlighted with appropriate styling
-- Requirement attachments shown in verification trace diagrams use the referenced element display name, not the full attachment identifier path; full identifiers remain available as link targets or structured report data.
-- Verification trace pages may contain many Mermaid diagrams, so the HTML renderer sizes and initializes every diagram independently and must not leave the final diagram clipped, blank, or hidden behind a fixed-height viewport assumption.
 
 #### Metadata
  * type: specification

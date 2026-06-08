@@ -266,8 +266,7 @@ Exposure rules:
 - Do not expose a generic shell or `reqvire.command` tool.
 - Do not expose hidden/internal commands such as `shell` or `sout`.
 - Do not expose `reqvire mcp` as an MCP tool because it starts the server.
-- Do not expose `reqvire serve` as an MCP tool because it starts an HTTP documentation server.
-- Do not expose `reqvire export` in MVP because it produces standalone documentation artifacts rather than model evidence.
+- Do not expose `reqvire serve` as an MCP tool because it starts an HTTP Explorer server.
 - Do not expose `reqvire validate` as an MCP tool because successful validation is a server startup prerequisite.
 - Do not expose MCP prompts in MVP; future Reqvire prompts, if added, must be generic and grounded in Reqvire reports rather than client-specific behavior.
 - CLI flags, modes, and sub-options become typed request fields on one stable MCP operation instead of nested MCP tool names.

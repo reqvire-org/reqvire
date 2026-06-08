@@ -145,8 +145,8 @@ Git repository scope defines source-file discovery and path normalization. It do
 **Processing Scope:**
 - When run from git root: all files in the repository are processed
 - When run from a subdirectory: processing is limited to files within that subdirectory scope
-- Markdown files parsed as model documents become source file containers in browser exports when they are emitted for browsing
-- Relation and attachment targets outside parsed model documents remain modeled resources or evidence targets unless separately exported as source file containers
+- Markdown files parsed as model documents become source file containers in the Explorer Project Store when the served Explorer runtime data is generated
+- Relation and attachment targets outside parsed model documents remain modeled resources or evidence targets, not source file containers
 
 **Scope Boundary Validation:**
 - Relations referencing elements outside the subdirectory scope report missing relation target errors
@@ -283,7 +283,7 @@ Validation shall check:
 - evidence-backed verification compatibility from the verification contracts
 - trace-only behavior for custom `other` and `other-TYPENAME` element types
 - refinement restrictions: refinement elements use only `refine` relations and cannot have Attachments subsections
-- `refinedBy` targets resolve to element identifiers, not plain file paths or `# Documents` file links without element fragments
+- `refinedBy` targets resolve to element identifiers, not plain file paths or `# Element` file links without element fragments
 
 This validation occurs:
 - During model parsing and validation (model.rs, parser.rs)
@@ -488,8 +488,8 @@ The implementation shall enforce the semantic-query-contract structure:
 - Query contracts must not define ontology vocabulary or SHACL shape profiles; they consume reachable semantic model context.
 - Reqvire derives the semantic query contract IRI as `urn:reqvire:semantic-query-contract:<element.id>`.
 - The graph registry indexes semantic query contracts by `element.id`, `element.identifier`, derived IRI, owning requirement, reachable ontology context, query language, and raw query text.
-- Search JSON shall expose semantic query contract identity and Query fenced block details; ontology collection and semantic export shall not emit query contract text or query metadata until a dedicated query-export command is specified. Generated ontology projection facts may cite semantic-query-contract IRIs as provenance without embedding raw query text.
-- Query kind, diagnostics, execution results, inference strategy, and persistent RDF store integration are not part of the initial semantic-query-contract model; they may be added later only through dedicated query-export or query-execution contracts.
+- Search JSON shall expose semantic query contract identity and Query fenced block details; ontology collection and semantic export shall not emit query contract text or query metadata until dedicated query output support is specified. Generated ontology projection facts may cite semantic-query-contract IRIs as provenance without embedding raw query text.
+- Query kind, diagnostics, execution results, inference strategy, and persistent RDF store integration are not part of the initial semantic-query-contract model; they may be added later only through dedicated query-output or query-execution contracts.
 
 #### Metadata
   * type: specification
@@ -503,7 +503,7 @@ The implementation shall enforce the semantic-query-contract structure:
 #### Details
 - Supported first H1 headings:
  - `# Elements`: parse as multi-element model file
- - `# Documents`: parse as single-element model file with `## Metadata`, `## Relations` (optional), and `## <Actual Element Name>` body section where the section heading text defines the element name
+ - `# Element`: parse as single-element model file with `## Metadata`, `## Relations` (optional), and `## <Actual Element Name>` body section where the section heading text defines the element name
 - Leading whitespace, blank lines, or frontmatter before the heading are allowed
 - Files without a supported first H1 are silently skipped (no error)
 - This rule applies in addition to `.gitignore` and `.reqvireignore` exclusions

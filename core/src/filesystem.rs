@@ -81,7 +81,7 @@ pub fn create_dir_all<P: AsRef<Path>>(path: P) -> Result<(), ReqvireError> {
 /// Creates a temporary working directory with a unique name based on process ID
 pub fn create_temp_working_dir() -> Result<PathBuf, ReqvireError> {
     let temp_base = std::env::temp_dir();
-    let temp_dir = temp_base.join(format!("reqvire-export-{}", std::process::id()));
+    let temp_dir = temp_base.join(format!("reqvire-explorer-{}", std::process::id()));
 
     fs::create_dir_all(&temp_dir)
         .map_err(|e| ReqvireError::PathError(format!("Failed to create temp directory: {}", e)))?;

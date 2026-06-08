@@ -35,7 +35,7 @@ reqvire:ElementDetailModal a owl:Class ;
   rdfs:comment "Scrollable in-shell Explorer dialog for inspecting a Project Store element record without navigating away from the active view." .
 reqvire:FileContainer a owl:Class ;
   rdfs:subClassOf reqvire:WebInterfaceContract ;
-  rdfs:comment "Exported filesystem or source-document container used for containment, source links, file navigation, and breadcrumbs." .
+  rdfs:comment "Served filesystem or source-document container used for containment, source links, file navigation, and breadcrumbs." .
 reqvire:ModeledResource a owl:Class ;
   rdfs:subClassOf reqvire:WebInterfaceContract ;
   rdfs:comment "Modeled resource, implementation target, evidence file, local asset, or external URL referenced by Reqvire facts." .

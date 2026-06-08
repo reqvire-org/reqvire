@@ -343,7 +343,7 @@ This test verifies that the system generates valid, well-structured JSON output 
 
 ### Containment View Mermaid Diagram Test
 
-This test verifies that the system generates valid Mermaid flowchart diagrams with correct syntax, nested subgraphs, element styling, and clickable links.
+This test verifies that the system generates valid Mermaid flowchart diagrams with correct syntax, nested subgraphs, semantic element classes, and clickable links.
 
 #### Details
 
@@ -356,8 +356,8 @@ This test verifies that the system generates valid Mermaid flowchart diagrams wi
    - Validate with mermaid-cli or online editor
 
 2. **Subgraph structure:**
-   - Verify folders use subgraph with 📁 prefix
-   - Verify files use subgraph with 📄 prefix
+   - Verify folders use deterministic subgraph labels
+   - Verify files use deterministic subgraph labels
    - Verify subgraphs are properly nested
    - Test nested structure: folder → subfolder → file
    - Verify `direction TB` is set for nested subgraphs
@@ -369,14 +369,11 @@ This test verifies that the system generates valid Mermaid flowchart diagrams wi
    - Test hash ID generation is deterministic
    - Verify nodes are placed within file subgraphs
 
-4. **Styling:**
+4. **Semantic classes:**
    - Verify `class` directives for element types
-   - Test `capability` class emits `fill:#BBDEFB`, `stroke:#1976D2`, and `stroke-width:2.5px`
-   - Test `systemRequirement` class emits `fill:#E1D8EE`, `stroke:#673AB7`, and `stroke-width:1.5px`
-   - Test `verification` class emits `fill:#DCEDC8`, `stroke:#4CAF50`, and `stroke-width:2px`
-   - Test `default` class for other types
-   - Verify CSS class definitions are included
-   - Verify capability class styling is used consistently in containment, model, verification trace, Markdown, and HTML export diagrams
+   - Test capability, requirement, verification, and default node classes are emitted from element type semantics
+   - Verify class definitions or semantic class names are included for supported Mermaid consumers
+   - Verify generated class names are deterministic and usable by the Explorer Mermaid renderer
 
 5. **Clickable links:**
    - Verify `click` directives for all element nodes
@@ -427,9 +424,9 @@ This test verifies that the system generates correctly formatted human-readable 
    - Test nested structure: root (0), folder (2), subfolder (4), file (6), element (8)
    - Verify consistent indentation across all levels
 
-2. **Visual markers:**
-   - Verify folders display with `📁 Folder: <name>`
-   - Verify files display with `📄 File: <path>`
+2. **Container markers:**
+   - Verify folders display with a stable folder marker and name
+   - Verify files display with a stable file marker and path
    - Verify elements display with `[<type>] <name>`
    - Test all element types have correct bracket notation
 
@@ -453,7 +450,7 @@ This test verifies that the system generates correctly formatted human-readable 
 
 ##### Acceptance Criteria
 - Text output uses correct indentation (2 spaces per level)
-- Visual markers (📁, 📄) are displayed correctly
+- Container markers are displayed correctly
 - Element types are shown in brackets
 - All hierarchy levels are represented
 - Output is human-readable and well-formatted
@@ -541,70 +538,46 @@ This test verifies that the system correctly tracks and displays custom element 
    - Values are numbers (counts > 0)
    - No custom_element_types entry with zero count
 
+8. **Custom Type Metadata Write-back**
+   Command: `reqvire mv <custom-element-name> <target-file>`
+   - exits code **0**
+   - moved Markdown preserves the exact custom metadata token, such as `type: other-use-case`
+   - moved Markdown does not serialize the internal custom type name without the `other-` prefix
+
 #### Metadata
   * type: test-verification
 
 #### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-search-all-capabilities/test.sh)
+  * satisfiedBy: [test.sh](../../../../tests/test-custom-element-types/test.sh)
   * verify: [Search Report Generator](../Reporting.md#search-report-generator)
+  * verify: [CLI Move Element Command](../../../Interfaces/CLI/Commands.md#cli-move-element-command)
 ---
 
-### HTML Export Model Containment Modes Integration Test
+### Model Containment Report Integration Test
 
-This test verifies that Model Sunburst and Icicle containment modes are correctly integrated into HTML export with proper navigation, interactive capabilities, and styling.
+This test verifies that containment report generation exposes deterministic folder, file, and element hierarchy data for the Explorer model view.
 
 #### Details
 
 ##### Test Criteria
-1. **File generation:**
-   - Run `reqvire export` command
-   - Verify `index.html` is created in output directory as the Explorer shell
-   - Verify `index.html#/model` route contains the Model view with List, Grid, Sunburst, and Icicle modes
-   - Test file size is reasonable (< 1MB for typical models)
+1. **Report generation:**
+   - Run `reqvire containment` command.
+   - Verify containment output includes folders, files, elements, and design-document containers.
+   - Verify generated Mermaid containment output is deterministic.
 
 2. **Navigation integration:**
-   - Verify the left Explorer pane exposes compact Model mode controls without primary left-pane links for separate Containment or Filesystem routes
-   - Verify Sunburst and Icicle mode controls switch the Model view into containment partition renderers
-   - Test navigation persistence across page loads
+   - Verify containment paths are stable and scoped to the current workspace.
+   - Verify file and folder entries preserve their hierarchical parent/child relationships.
 
-3. **Native Model modes:**
-   - Verify the Model route renders native List, Grid, Sunburst, and Icicle modes from the Project Store
-   - Verify file deep links support file inspection without becoming separate primary Filesystem or Containment views
-   - Verify Sunburst and Icicle render without iframe-mounted static artifacts
-   - Verify Sunburst and Icicle support click-to-drill/zoom and breadcrumb navigation
-   - Verify clickable element rows or shapes open the shared in-shell element detail modal
-
-4. **Hierarchical list/filesystem navigation:**
-   - Verify the shared Explorer left project tree includes folder, file, and multi-element document navigation
-   - Verify list view groups elements by file
-   - Verify List content starts after the left Explorer pane/strip and preserves a right gutter before the inspector lane and tool rail
-   - Verify clicking elements preserves the current Model mode context
-
-5. **Styling consistency:**
-   - Verify page uses the shared Explorer shell and style contract
-   - Test element type colors match specification
-   - Verify layout matches Model, Traces, Ontologies, and KN2 inspector/control treatment
-   - Verify the left Explorer pane/strip remains visible while the page/canvas scrolls
-   - Test responsive design on different screen sizes
-
-6. **Interactive capabilities:**
-   - Test search/filter by folder or file name
-   - Verify search results can select folders, files, or elements
-
-7. **Integration with model:**
-   - Test Model containment modes update when the model changes
-   - Verify new elements appear after re-export
-   - Test moved elements show in correct location
-   - Verify deterministic output for version control
+3. **Integration with model:**
+   - Test containment output updates when the model changes.
+   - Verify new elements appear in the correct containing file.
+   - Verify deterministic output for version control.
 
 ##### Acceptance Criteria
-- `index.html` Explorer shell and Model route are generated correctly
-- Sunburst and Icicle appear as Model mode controls in the left Explorer pane
-- Model List, Grid, Sunburst, and Icicle modes render and are interactive
-- Model List/Grid modes provide filesystem/model browsing
-- Styling is consistent with the shared headerless Explorer shell
-- Interactive capabilities (search, selection, drill/zoom) function properly
-- Integration updates correctly when model changes
+- Containment output is generated correctly.
+- Folder, file, and element hierarchy is deterministic.
+- Integration updates correctly when model changes.
 
 #### Metadata
   * type: test-verification
@@ -612,7 +585,6 @@ This test verifies that Model Sunburst and Icicle containment modes are correctl
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-containment-view/test.sh)
   * verify: [Containment View Report](../Reporting.md#containment-view-report)
-  * verify: [HTML Export](../../../Interfaces/WebInterface/Capabilities.md#html-export)
 ---
 
 ### Model Command Verification
@@ -752,8 +724,8 @@ This test verifies that the resources command correctly generates reports showin
 - Text output uses markdown formatting with headers and bullet lists
 - JSON output provides structured data with relations, attachments, and summary
 
-**HTML Export Integration:**
-- Resources view is available as a supporting SPA route in HTML export
+**Explorer Integration:**
+- Resources view is available as a supporting SPA route in the served Explorer
 - Supporting report routes are reachable through canonical route links or source/report affordances, not a shared top header
 
 ##### Test Criteria
@@ -788,13 +760,7 @@ This test verifies that the resources command correctly generates reports showin
    - Within each entry, references sorted by relation_type then element_id
    - Consistent ordering across multiple runs
 
-6. **HTML export integration**
-   Command: `reqvire export --output=/tmp/test-export`
-   - Resources route data is seeded into the single `index.html` SPA Project Store
-   - No standalone Resources HTML entry point is generated
-   - Resources view reads equivalent resource/file evidence from the Project Store and contains the same content as CLI text output
-
-7. **Empty sections handling**
+6. **Empty sections handling**
    - If no InternalPath relations exist, Relations section shows appropriate message
    - If no attachment identifiers exist, Attachments section shows appropriate message
 
@@ -820,9 +786,6 @@ Test cases:
 
 #### Metadata
   * type: test-verification
-
-#### Attachments
-  * [Reverse Relation Traversal Behavior](../Behaviors.md#reverse-relation-traversal-behavior)
 
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
@@ -1040,9 +1003,6 @@ Test cases:
 #### Metadata
   * type: test-verification
 
-#### Attachments
-  * [Start Element Type Filter Behavior](../Behaviors.md#start-element-type-filter-behavior)
-
 #### Relations
   * satisfiedBy: [test.sh](../../../../tests/test-model-command/test.sh)
   * verify: [Start Element Type Filtering](../Reporting.md#start-element-type-filtering)
@@ -1139,59 +1099,6 @@ This test verifies that the `submodels` command reports independent capability-r
   * satisfiedBy: [test.sh](../../../../tests/test-submodels-command/test.sh)
   * verify: [Requirement Submodels Report](../Reporting.md#requirement-submodels-report)
   * verify: [CLI Submodels Command](../../../Interfaces/CLI/Commands.md#cli-submodels-command)
----
-
-### TraceFlow View Test
-
-This test verifies that TraceFlow/Traces data is correctly seeded into the SPA Explorer during HTML export and can render an interactive D3.js Sankey diagram showing verification traceability flow.
-
-#### Details
-
-##### Acceptance Criteria
-- System shall seed traceability flow data into the single `index.html` SPA Project Store during HTML export
-- TraceFlow/Traces SPA views shall contain D3.js Sankey diagram visualization behavior when that mode is exposed
-- Sankey diagram shall show flow from capabilities to requirements to verifications, including direct capability-to-verification links when present
-- TraceFlow/Traces shall be reachable through SPA routes or right-tool workflows without adding a primary left Explorer view link
-- Diagram shall support pan/zoom with mouse wheel and buttons
-- Diagram shall support touch pinch-zoom for mobile devices
-- Clicking nodes shall navigate to element definition pages
-- View guidance shall be available through the shared help/inspector surfaces rather than a static first-viewport page title, description, or instruction block
-
-##### Test Criteria
-1. **SPA Store Generation**
-   Command: `reqvire export --output <dir>`
-   - exits code **0**
-   - `index.html` file exists in output directory
-   - No standalone TraceFlow HTML file exists in output directory
-   - `index.html` contains valid HTML5 and Project Store trace data
-
-2. **Navigation Integration**
-   - SPA route data can reach Traces/TraceFlow behavior
-   - Primary left Explorer pane does not expose TraceFlow, Coverage, or Resources as top-level view links
-   - No link href targets a standalone TraceFlow HTML artifact
-
-3. **Sankey Diagram Content**
-   - Page contains D3.js Sankey diagram
-   - Diagram shows requirement flow (user-req → system-req → verification)
-   - Nodes are color-coded by type
-   - Links connect related elements
-
-4. **Interactive Capabilities**
-   - Pan/zoom buttons (+/-/reset) are present and functional
-   - Mouse wheel zoom works
-   - Touch pinch-zoom works on mobile
-   - Node click navigates to element page
-
-5. **View Guidance**
-   - No static first-viewport title/prose block is required in the routed Explorer workspace
-   - Help or inspector affordances describe the TraceFlow/Traces diagram when requested
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-traceflow-view/test.sh)
-  * verify: [TraceFlow View Report Generation](../Reporting.md#traceflow-view-report-generation)
 ---
 
 ### Verification Coverage Report Test

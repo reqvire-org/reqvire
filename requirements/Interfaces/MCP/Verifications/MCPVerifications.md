@@ -163,7 +163,7 @@ This verification shall prove that MCP exposes only supported Reqvire model oper
 Expected checks:
 - Verify `tools/list` does not include a generic shell or `reqvire.command` tool.
 - Verify `tools/list` does not include hidden/internal `shell` or `sout` commands.
-- Verify `tools/list` does not include `reqvire.mcp`, `reqvire.serve`, `reqvire.export`, or `reqvire.validate` in MVP.
+- Verify `tools/list` does not include `reqvire.mcp`, `reqvire.serve`, or `reqvire.validate` in MVP.
 - Verify no MCP prompts are advertised in MVP.
 - Verify CLI-only transport flags such as `--json` and `--output` are absent from MCP input schemas.
 - Verify CLI flags, modes, and sub-options are represented as typed request fields rather than nested tool names.

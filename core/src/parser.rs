@@ -9,12 +9,12 @@ use std::collections::HashSet;
 use std::path::Path;
 
 pub const ELEMENTS_HEADER: &str = "# Elements";
-pub const DOCUMENTS_HEADER: &str = "# Documents";
+pub const SINGLE_ELEMENT_HEADER: &str = "# Element";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModelFileType {
     Elements,
-    Documents,
+    SingleElement,
     Unsupported,
 }
 
@@ -364,7 +364,7 @@ pub fn detect_model_file_type(content: &str) -> ModelFileType {
         if trimmed.starts_with("# ") {
             return match trimmed {
                 ELEMENTS_HEADER => ModelFileType::Elements,
-                DOCUMENTS_HEADER => ModelFileType::Documents,
+                SINGLE_ELEMENT_HEADER => ModelFileType::SingleElement,
                 _ => ModelFileType::Unsupported,
             };
         }
@@ -380,21 +380,21 @@ pub fn detect_model_file_type(content: &str) -> ModelFileType {
 }
 
 #[derive(Debug, Clone)]
-pub struct ParsedDocumentRefinement {
+pub struct ParsedSingleElementRefinement {
     pub element_type: ElementType,
     pub refine_targets: Vec<String>,
 }
 
-/// Parses a `# Documents` refinement document and extracts metadata/refine relations.
-pub fn parse_document_refinement(
+/// Parses a `# Element` refinement document and extracts metadata/refine relations.
+pub fn parse_single_element_refinement(
     file: &str,
     content: &str,
     file_path: &Path,
-) -> Result<ParsedDocumentRefinement, ReqvireError> {
-    if detect_model_file_type(content) != ModelFileType::Documents {
+) -> Result<ParsedSingleElementRefinement, ReqvireError> {
+    if detect_model_file_type(content) != ModelFileType::SingleElement {
         return Err(ReqvireError::InvalidMarkdownStructure(format!(
-            "File '{}' is not a supported document refinement. First H1 must be '{}'.",
-            file, DOCUMENTS_HEADER
+            "File '{}' is not a supported single-element refinement. First H1 must be '{}'.",
+            file, SINGLE_ELEMENT_HEADER
         )));
     }
 
@@ -452,7 +452,7 @@ pub fn parse_document_refinement(
 
                     if relation_type != "refine" {
                         return Err(ReqvireError::InvalidRelationFormat(format!(
-                            "Document refinement '{}' can only contain 'refine' relations. Found '{}' at line {}.",
+                            "Single-element refinement '{}' can only contain 'refine' relations. Found '{}' at line {}.",
                             file, relation_type, line_num + 1
                         )));
                     }
@@ -485,39 +485,39 @@ pub fn parse_document_refinement(
 
     if !seen_metadata || !seen_relations || !seen_element_name {
         return Err(ReqvireError::InvalidMarkdownStructure(format!(
-            "Document refinement '{}' must include '## Metadata', '## Relations', and '## <Element Name>' sections.",
+            "Single-element refinement '{}' must include '## Metadata', '## Relations', and '## <Element Name>' sections.",
             file
         )));
     }
 
     let element_type = metadata_type.ok_or_else(|| {
         ReqvireError::InvalidMetadataFormat(format!(
-            "Document refinement '{}' must define metadata type.",
+            "Single-element refinement '{}' must define metadata type.",
             file
         ))
     })?;
 
     if !element_type.is_refinement() {
         return Err(ReqvireError::IncompatibleElementTypes(format!(
-            "Document refinement '{}' must use a refinement type (constraint, behavior, specification).",
+            "Single-element refinement '{}' must use a refinement type (constraint, behavior, specification).",
             file
         )));
     }
 
     if refine_targets.is_empty() {
         return Err(ReqvireError::InvalidRelationFormat(format!(
-            "Document refinement '{}' must define at least one 'refine' relation.",
+            "Single-element refinement '{}' must define at least one 'refine' relation.",
             file
         )));
     }
 
-    Ok(ParsedDocumentRefinement {
+    Ok(ParsedSingleElementRefinement {
         element_type,
         refine_targets,
     })
 }
 
-fn parse_documents_file(
+fn parse_single_element_file(
     file: &str,
     content: &str,
     file_path: &Path,
@@ -546,7 +546,7 @@ fn parse_documents_file(
         let trimmed = line.trim();
 
         // Skip header
-        if line_num == 0 && trimmed == DOCUMENTS_HEADER {
+        if line_num == 0 && trimmed == SINGLE_ELEMENT_HEADER {
             continue;
         }
 
@@ -586,7 +586,7 @@ fn parse_documents_file(
                     metadata.insert(key, value);
                 } else {
                     errors.push(ReqvireError::InvalidMetadataFormat(format!(
-                        "Invalid metadata format in document file '{}', line {}: '{}'",
+                        "Invalid metadata format in single-element file '{}', line {}: '{}'",
                         file,
                         line_num + 1,
                         trimmed
@@ -614,13 +614,13 @@ fn parse_documents_file(
                                                     element_relations.push(rel);
                                                 } else {
                                                     errors.push(ReqvireError::DuplicateRelation(format!(
-                                                        "Duplicate relation '{}' to '{}' in document file '{}' (line {})",
+                                                        "Duplicate relation '{}' to '{}' in single-element file '{}' (line {})",
                                                         relation_type, normalized_target, file, line_num + 1
                                                     )));
                                                 }
                                             }
                                             Err(_) => errors.push(ReqvireError::UnsupportedRelationType(format!(
-                                                "'{}' in document file '{}', line {}. Valid types: {}",
+                                                "'{}' in single-element file '{}', line {}. Valid types: {}",
                                                 relation_type,
                                                 file,
                                                 line_num + 1,
@@ -629,7 +629,7 @@ fn parse_documents_file(
                                         }
                                     }
                                     Err(e) => errors.push(ReqvireError::InvalidIdentifier(format!(
-                                        "Failed to normalize relation target in document file '{}', line {}: {}",
+                                        "Failed to normalize relation target in single-element file '{}', line {}: {}",
                                         file,
                                         line_num + 1,
                                         e
@@ -638,7 +638,7 @@ fn parse_documents_file(
                             }
                         }
                         Err(_) => errors.push(ReqvireError::InvalidRelationFormat(format!(
-                            "Invalid relation format in document file '{}', line {}: '{}'",
+                            "Invalid relation format in single-element file '{}', line {}: '{}'",
                             file,
                             line_num + 1,
                             trimmed
@@ -646,7 +646,7 @@ fn parse_documents_file(
                     }
                 } else {
                     errors.push(ReqvireError::InvalidRelationFormat(format!(
-                        "Invalid relations entry in document file '{}', line {}: '{}'",
+                        "Invalid relations entry in single-element file '{}', line {}: '{}'",
                         file,
                         line_num + 1,
                         trimmed
@@ -662,7 +662,7 @@ fn parse_documents_file(
                         Ok(href) => {
                             if !href.contains('#') {
                                 errors.push(ReqvireError::InvalidAttachmentFormat(format!(
-                                    "Invalid attachment identifier in document file '{}', line {}: '{}'. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
+                                    "Invalid attachment identifier in single-element file '{}', line {}: '{}'. Attachments must use attachable element identifiers in the form 'file.md#element-id' or '#element-id'.",
                                     file,
                                     line_num + 1,
                                     href
@@ -686,7 +686,7 @@ fn parse_documents_file(
                                 Ok(normalized) => AttachmentTarget::ElementIdentifier(normalized),
                                 Err(e) => {
                                     errors.push(ReqvireError::InvalidAttachmentFormat(format!(
-                                        "Invalid attachment identifier in document file '{}', line {}: {}",
+                                        "Invalid attachment identifier in single-element file '{}', line {}: {}",
                                         file,
                                         line_num + 1,
                                         e
@@ -703,7 +703,7 @@ fn parse_documents_file(
                                 });
                             } else {
                                 errors.push(ReqvireError::DuplicateAttachment(format!(
-                                    "Duplicate attachment '{}' in document file '{}' (line {})",
+                                    "Duplicate attachment '{}' in single-element file '{}' (line {})",
                                     href,
                                     file,
                                     line_num + 1
@@ -711,7 +711,7 @@ fn parse_documents_file(
                             }
                         }
                         Err(e) => errors.push(ReqvireError::InvalidAttachmentFormat(format!(
-                            "Invalid attachment in document file '{}', line {}: {}",
+                            "Invalid attachment in single-element file '{}', line {}: {}",
                             file,
                             line_num + 1,
                             e
@@ -719,7 +719,7 @@ fn parse_documents_file(
                     }
                 } else {
                     errors.push(ReqvireError::InvalidAttachmentFormat(format!(
-                        "Invalid attachments entry in document file '{}', line {}: '{}'",
+                        "Invalid attachments entry in single-element file '{}', line {}: '{}'",
                         file,
                         line_num + 1,
                         trimmed
@@ -732,7 +732,7 @@ fn parse_documents_file(
 
     if !seen_metadata || !seen_element_name {
         errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-            "Document file '{}' must include '## Metadata' and '## <Element Name>' sections.",
+            "Single-element file '{}' must include '## Metadata' and '## <Element Name>' sections.",
             file
         )));
     }
@@ -765,7 +765,7 @@ fn parse_documents_file(
         Some(ElementType::Requirement(RequirementType::System)),
     );
     element.content = element_content;
-    metadata.insert("_document_format".to_string(), "documents".to_string());
+    metadata.insert("_single_element_format".to_string(), "true".to_string());
     element.metadata = metadata;
     element.set_type_from_metadata();
     element.relations = element_relations;
@@ -778,7 +778,7 @@ fn parse_documents_file(
 
 /// Parses a markdown document and extracts elements with metadata and relations.
 /// Returns: (elements, errors, page_content)
-/// Only parses files where the first H1 heading is "# Elements".
+/// Only parses files where the first H1 heading is "# Elements" or "# Element".
 /// If git_commit is Some, file attachment hashes are computed from the git commit, not working directory.
 pub fn parse_elements(
     file: &str,
@@ -788,8 +788,8 @@ pub fn parse_elements(
 ) -> (Vec<Element>, Vec<ReqvireError>, String) {
     match detect_model_file_type(content) {
         ModelFileType::Elements => {}
-        ModelFileType::Documents => {
-            return parse_documents_file(file, content, file_path, git_commit);
+        ModelFileType::SingleElement => {
+            return parse_single_element_file(file, content, file_path, git_commit);
         }
         ModelFileType::Unsupported => {
             debug!("Skipping file {} - unsupported model file header", file);

@@ -62,14 +62,14 @@ impl Default for GraphRegistry {
 }
 
 impl GraphRegistry {
-    fn is_documents_format_file(&self, file_path: &str) -> bool {
+    fn is_single_element_format_file(&self, file_path: &str) -> bool {
         self.nodes.values().any(|node| {
             node.element.file_path == file_path
                 && node
                     .element
                     .metadata
-                    .get("_document_format")
-                    .map(|v| v == "documents")
+                    .get("_single_element_format")
+                    .map(|v| v == "true")
                     .unwrap_or(false)
         })
     }
@@ -1020,6 +1020,16 @@ impl GraphRegistry {
             let element = &element_node.element;
 
             for attachment in &element.attachments {
+                if !element.element_type.is_capability() && !element.element_type.is_requirement() {
+                    errors.push(ReqvireError::InvalidAttachmentTarget(format!(
+                        "File {}: Element '{}' (type: {}) cannot author attachments. Only capability and requirement elements may author attachments; verification evidence must use satisfiedBy and verified targets must use verify.",
+                        element.file_path,
+                        element.name,
+                        element.element_type.as_str(),
+                    )));
+                    continue;
+                }
+
                 match &attachment.target {
                     crate::element::AttachmentTarget::FilePath(file_path) => {
                         errors.push(ReqvireError::InvalidAttachmentTarget(format!(
@@ -1050,8 +1060,6 @@ impl GraphRegistry {
                             let target_is_ontology = target_node.element.element_type.is_ontology();
                             let attachment_type_valid = if element.element_type.is_capability() {
                                 target_is_ontology
-                            } else if element.element_type.is_requirement() {
-                                target_node.element.element_type.is_requirement_refinement()
                             } else {
                                 target_node.element.element_type.is_requirement_refinement()
                             };
@@ -2498,9 +2506,9 @@ impl GraphRegistry {
             )));
         }
 
-        // '# Documents' files represent exactly one implicit element.
-        // Disallow moving additional elements into an existing documents-format file.
-        if target_has_elements && self.is_documents_format_file(new_file_path) {
+        // '# Element' files represent exactly one implicit element.
+        // Disallow moving additional elements into an existing single-element file.
+        if target_has_elements && self.is_single_element_format_file(new_file_path) {
             let source_file_path = self
                 .nodes
                 .get(element_id)
@@ -2508,7 +2516,7 @@ impl GraphRegistry {
                 .unwrap_or_default();
             if source_file_path != new_file_path {
                 return Err(ReqvireError::InvalidOperation(format!(
-                    "Cannot move element '{}' into '{}': target is a '# Documents' file and can contain only one element.",
+                    "Cannot move element '{}' into '{}': target is a '# Element' file and can contain only one element.",
                     element_id, new_file_path
                 )));
             }
@@ -3090,7 +3098,7 @@ impl GraphRegistry {
         let mut custom_metadata: Vec<_> = element
             .metadata
             .iter()
-            .filter(|(key, _)| *key != "type" && *key != "_document_format") // type is handled separately
+            .filter(|(key, _)| *key != "type" && *key != "_single_element_format") // type is handled separately
             .collect();
         custom_metadata.sort_by_key(|(key, _)| *key);
 
@@ -3496,14 +3504,14 @@ impl GraphRegistry {
         }
     }
 
-    fn document_file_markdown(
+    fn single_element_file_markdown(
         &self,
         file_path: &str,
         element: &Element,
         with_full_relations: bool,
     ) -> String {
         let mut markdown = String::new();
-        markdown.push_str("# Documents\n\n");
+        markdown.push_str("# Element\n\n");
 
         markdown.push_str("## Metadata\n");
         markdown.push_str(&format!(
@@ -3513,7 +3521,7 @@ impl GraphRegistry {
         let mut custom_metadata: Vec<_> = element
             .metadata
             .iter()
-            .filter(|(k, _)| *k != "type" && *k != "_document_format")
+            .filter(|(k, _)| *k != "type" && *k != "_single_element_format")
             .collect();
         custom_metadata.sort_by_key(|(k, _)| *k);
         for (k, v) in custom_metadata {
@@ -3628,11 +3636,11 @@ impl GraphRegistry {
         if elements.len() == 1
             && elements[0]
                 .metadata
-                .get("_document_format")
-                .map(|v| v == "documents")
+                .get("_single_element_format")
+                .map(|v| v == "true")
                 .unwrap_or(false)
         {
-            return self.document_file_markdown(file_path, elements[0], with_full_relations);
+            return self.single_element_file_markdown(file_path, elements[0], with_full_relations);
         }
 
         let mut markdown = String::new();
@@ -3864,11 +3872,11 @@ impl GraphRegistry {
             )));
         }
 
-        // '# Documents' files represent one implicit element.
+        // '# Element' files represent one implicit element.
         // Squashing multiple elements into such file would violate the format.
-        if squash && target_exists && self.is_documents_format_file(target_file) {
+        if squash && target_exists && self.is_single_element_format_file(target_file) {
             return Err(ReqvireError::InvalidOperation(format!(
-                "Cannot use --squash into '{}': target is a '# Documents' file and can contain only one element.",
+                "Cannot use --squash into '{}': target is a '# Element' file and can contain only one element.",
                 target_file
             )));
         }
@@ -5109,7 +5117,7 @@ impl GraphRegistry {
         let target_name = target_node.element.name.clone();
         let target_type = target_node.element.element_type.clone();
         let target_file_path = target_node.element.file_path.clone();
-        let target_is_documents = self.is_documents_format_file(&target_file_path);
+        let target_is_single_element = self.is_single_element_format_file(&target_file_path);
 
         // Validate all sources exist and collect their data
         #[allow(clippy::type_complexity)]
@@ -5127,7 +5135,7 @@ impl GraphRegistry {
 
             let source_element = &source_node.element;
             let source_file_path = source_element.file_path.clone();
-            let source_is_documents = self.is_documents_format_file(&source_file_path);
+            let source_is_single_element = self.is_single_element_format_file(&source_file_path);
 
             // Validate: Check if source would merge into itself
             if source_id == target_id {
@@ -5136,11 +5144,11 @@ impl GraphRegistry {
                 ));
             }
 
-            // Merging document-format source content into # Elements target is disallowed.
-            // '# Documents' bodies permit headers that violate # Elements parsing constraints.
-            if source_is_documents && !target_is_documents {
+            // Merging single-element source content into # Elements target is disallowed.
+            // '# Element' bodies permit headers that violate # Elements parsing constraints.
+            if source_is_single_element && !target_is_single_element {
                 return Err(ReqvireError::InvalidOperation(format!(
-                    "Cannot merge '{}' into '{}': source is in a '# Documents' file and target is in a '# Elements' file. This conversion can break '# Elements' parsing rules and must be performed manually.",
+                    "Cannot merge '{}' into '{}': source is in a '# Element' file and target is in a '# Elements' file. This conversion can break '# Elements' parsing rules and must be performed manually.",
                     source_element.name, target_name
                 )));
             }

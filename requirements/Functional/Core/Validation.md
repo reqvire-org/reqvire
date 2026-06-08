@@ -383,7 +383,7 @@ Implementation details shall follow the associated refinement specifications.
   * satisfiedBy: [graph_registry.rs](../../../core/src/graph_registry.rs)
   * satisfiedBy: [model.rs](../../../core/src/model.rs)
   * satisfiedBy: [parser.rs](../../../core/src/parser.rs)
-  * verifiedBy: [Document Refinement Validation Test](Verifications/ValidationVerifications.md#document-refinement-validation-test)
+  * verifiedBy: [Single Element Refinement Validation Test](Verifications/ValidationVerifications.md#single-element-refinement-validation-test)
   * verifiedBy: [Element Type Relation Compatibility Test](Verifications/ValidationVerifications.md#element-type-relation-compatibility-test)
   * verifiedBy: [Invalid Relations Test](Verifications/ValidationVerifications.md#invalid-relations-test)
 ---

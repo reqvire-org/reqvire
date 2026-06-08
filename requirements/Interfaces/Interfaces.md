@@ -14,7 +14,7 @@ The system shall provide command line interface (CLI) to faciliate model managem
 
 ### Web Interface
 
-The system SHALL provide a web-based interface to browse the System model documentation, including all generated artifacts such as diagrams, reports, and verification traces.
+The system SHALL provide a web-based interface to browse the System model, including Explorer-rendered diagrams, reports, and verification traces.
 
 #### Details
 Implementation details shall follow the associated refinement specifications.
@@ -23,9 +23,9 @@ Implementation details shall follow the associated refinement specifications.
   * type: requirement
 
 #### Relations
-  * derive: [HTML Export](WebInterface/Capabilities.md#html-export)
+  * derive: [Served Explorer Browser Interface](WebInterface/Capabilities.md#served-explorer-browser-interface)
   * derive: [Serve Command](WebInterface/Capabilities.md#serve-command)
-  * specify: [Web Documentation Interface](../Capabilities/Interfaces.md#web-documentation-interface)
+  * specify: [Web Explorer Interface](../Capabilities/Interfaces.md#web-explorer-interface)
   * refinedBy: [Web Interface Refinement Specification](WebInterface/Specifications.md#web-interface-refinement-specification)
 ---
 

@@ -129,7 +129,7 @@ Error message structure for validation issues.
 #### Details
 - File path and line number included
 - Element name and relation details shown
-- Color coding per Color Scheme Specification
+- Optional terminal color coding follows the Functional Output Color Scheme Specification
 - Actionable suggestions when possible
 
 #### Metadata

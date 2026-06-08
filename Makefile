@@ -10,9 +10,9 @@ define update_version
 	sed -i 's/^version = ".*"/version = "$(1)"/' $(CARGO_TOML)
 endef
 
-.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major docs explorer build
+.PHONY: create_tag update-patch update-minor update-major prepare-release release release-patch release-minor release-major explorer build
 
-# Build the React/Vite Explorer SPA bundle. The exported/served index.html is
+# Build the React/Vite Explorer SPA bundle. The served index.html is
 # this bundle; core/build.rs embeds explorer/dist at compile time, so this must
 # run before `cargo build` for the real bundle to be embedded.
 explorer:
@@ -199,9 +199,3 @@ release-major:
 		echo "   Branch: $(BRANCH_NAME) → main"; \
 		echo "   Title: Update version to v$(NEW_VERSION)"; \
 	fi
-
-# Documentation export
-docs:
-	@echo "Exporting documentation to docs/..."
-	cargo run -- export --output docs
-	@echo "Documentation exported to docs/"

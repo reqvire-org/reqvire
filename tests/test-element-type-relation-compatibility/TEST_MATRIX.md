@@ -78,6 +78,13 @@ Based on the Element Type Relation Compatibility specification, the following te
 | behavior | requirement | ❌ FAIL | invalid-refinement/behavior-trace |
 | specification | requirement | ❌ FAIL | invalid-refinement/specification-trace |
 
+## Attachment Author Tests
+
+| Source Type | Target Type | Expected | Test Case |
+|-------------|-------------|----------|-----------|
+| refinement | requirement-owned refinement | ❌ FAIL | invalid-refinement-attachment |
+| test-verification | requirement-owned refinement | ❌ FAIL | invalid-verification-attachment |
+
 ## Refinement Type Tests (Only refine Allowed)
 
 ### Valid Refinement Relations
@@ -120,5 +127,6 @@ Based on the Element Type Relation Compatibility specification, the following te
 | verifiedBy | 6 | 3 | 3 |
 | verify | 4 | 2 | 2 |
 | trace | 9 | 6 | 3 |
+| attachments | 2 | 0 | 2 |
 | Refinement | 9 | 3 | 6 |
-| **TOTAL** | **52** | **23** | **29** |
+| **TOTAL** | **54** | **23** | **31** |

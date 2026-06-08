@@ -1,21 +1,20 @@
-import { useMemo } from "react";
+import { useMemo, type MouseEvent } from "react";
 import {
-  Badge,
-  Box,
-  Button,
-  Code,
-  DataList,
-  Dialog,
-  Flex,
-  Heading,
-  Link,
-  ScrollArea,
-  Separator,
-  Text,
-} from "@radix-ui/themes";
-import { ExternalLinkIcon } from "@radix-ui/react-icons";
+  ElementIcon,
+  Icon,
+  Modal,
+  ModalBody,
+  ModalClose,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
+  RelationPill,
+  TypeBadge,
+} from "@ds";
 import { useStore } from "../store/StoreContext";
-import { routeForElement } from "../router/routes";
+import type { ProjectStoreElement, ProjectStoreRelation, ProjectStoreResource } from "../store/types";
+import { routeForContent, routeForElement } from "../router/routes";
 import { MarkdownContent } from "./MarkdownContent";
 
 /*
@@ -28,6 +27,47 @@ import { MarkdownContent } from "./MarkdownContent";
  * action is not the primary navigation target. Closing returns to the
  * underlying route (handled by the caller via onClose).
  */
+type MetaBadge = { key: string; value: string; provenance: "explicit" | "inherited" };
+
+/* One flat badge row replaces the old governance pills. Authored metadata is
+   explicit; inherited governance keeps only the value here and carries
+   provenance in the badge. The `type` key is skipped — the header type badge
+   already states it. */
+function buildMetaBadges(element: {
+  element_type: string;
+  metadata: Record<string, string>;
+  governance: Record<string, string>;
+}): MetaBadge[] {
+  const badges: MetaBadge[] = [];
+  for (const [key, value] of Object.entries(element.metadata)) {
+    if (key === "type" && value === element.element_type) continue;
+    badges.push({ key, value, provenance: "explicit" });
+  }
+  const seen = new Set(badges.map((badge) => badge.key.toLowerCase()));
+  for (const [key, raw] of Object.entries(element.governance)) {
+    if (seen.has(key.toLowerCase())) continue;
+    const { value, provenance } = cleanGovernanceValue(raw);
+    badges.push({
+      key,
+      value,
+      provenance,
+    });
+  }
+  return badges;
+}
+
+function cleanGovernanceValue(raw: string): Pick<MetaBadge, "value" | "provenance"> {
+  const explicitMatch = raw.match(/^(.*?)\s*\(explicit\)$/);
+  if (explicitMatch) {
+    return { value: explicitMatch[1].trim(), provenance: "explicit" };
+  }
+  const inheritedMatch = raw.match(/^(.*?)\s*\(inherited(?:,\s*from\s+[^)]*)?\)$/);
+  if (inheritedMatch) {
+    return { value: inheritedMatch[1].trim(), provenance: "inherited" };
+  }
+  return { value: raw, provenance: "inherited" };
+}
+
 export function ElementDetailModal({
   identifier,
   onClose,
@@ -39,164 +79,168 @@ export function ElementDetailModal({
 }) {
   const { store, elementById } = useStore();
   const element = identifier ? elementById(identifier) : undefined;
+  const resourceById = useMemo(
+    () => new Map(store.resources.map((resource) => [resource.id, resource])),
+    [store.resources],
+  );
 
-  const { outgoing, incoming, attachments, conceptRefs } = useMemo(() => {
+  const { relations, attachments, conceptRefs } = useMemo(() => {
     if (!identifier) {
-      return { outgoing: [], incoming: [], attachments: [], conceptRefs: [] };
+      return { relations: [], attachments: [], conceptRefs: [] };
     }
     return {
-      outgoing: store.relations.filter((r) => r.source_id === identifier),
-      incoming: store.relations.filter((r) => r.target_id === identifier),
+      relations: store.relations.filter((r) => r.source_id === identifier || r.target_id === identifier),
       attachments: store.attachments.filter((a) => a.source_id === identifier),
       conceptRefs: store.concept_refs.filter((c) => c.source_id === identifier),
     };
   }, [identifier, store]);
 
   const open = identifier !== null;
+  const metaBadges = element ? buildMetaBadges(element) : [];
 
   return (
-    <Dialog.Root open={open} onOpenChange={(v) => !v && onClose()}>
-      <Dialog.Content maxWidth="760px" className="max-h-[85vh]">
+    <Modal open={open} onOpenChange={(v) => !v && onClose()}>
+      <ModalContent className="element-detail-dialog" showCloseButton={false}>
         {!element ? (
-          <Box>
-            <Dialog.Title>Element not found</Dialog.Title>
-            <Text as="p" size="2" color="gray">
+          <>
+            <ModalHeader className="element-detail-header">
+              <ModalTitle>Element not found</ModalTitle>
+            </ModalHeader>
+            <ModalBody className="element-detail-body">
+            <p className="element-detail-muted">
               No Project Store element matches{" "}
-              <Code>{identifier ?? ""}</Code>.
-            </Text>
-          </Box>
+              <code className="rq-coderef">{identifier ?? ""}</code>.
+            </p>
+            </ModalBody>
+          </>
         ) : (
           <>
-            <Flex align="center" gap="2" wrap="wrap" mb="1">
-              <Badge color="gray">{element.element_type}</Badge>
-              <Dialog.Title className="m-0">{element.name}</Dialog.Title>
-            </Flex>
-            <Dialog.Description size="1" color="gray" mb="3">
-              <Code>{element.id}</Code>
-            </Dialog.Description>
+            <ModalHeader className="element-detail-header">
+              <div className="element-detail-title-row">
+                <TypeBadge type={element.type_family} family={element.type_family} tinted className="element-detail-family-badge">
+                  {element.type_family}
+                </TypeBadge>
+                {element.element_type !== element.type_family ? (
+                  <TypeBadge type={element.element_type} family={element.type_family} tinted>
+                    {element.element_type}
+                  </TypeBadge>
+                ) : null}
+                <ModalTitle>{element.name}</ModalTitle>
+                <ModalClose asChild>
+                  <button type="button" className="rq-iconbtn rq-iconbtn--ghost element-detail-close" aria-label="Close">
+                    <Icon name="x" />
+                  </button>
+                </ModalClose>
+              </div>
+            </ModalHeader>
 
-            <ScrollArea type="auto" scrollbars="vertical" className="max-h-[60vh] pr-3">
-              <Flex direction="column" gap="4">
-                <DataList.Root size="2">
-                  <DataList.Item>
-                    <DataList.Label>Type family</DataList.Label>
-                    <DataList.Value>{element.type_family}</DataList.Value>
-                  </DataList.Item>
-                  <DataList.Item>
-                    <DataList.Label>Source file</DataList.Label>
-                    <DataList.Value>
-                      <Code>
-                        {element.file_path}:{element.line_number}
-                      </Code>
-                    </DataList.Value>
-                  </DataList.Item>
-                  {Object.entries(element.metadata).map(([k, v]) => (
-                    <DataList.Item key={`meta-${k}`}>
-                      <DataList.Label>{k}</DataList.Label>
-                      <DataList.Value>{v}</DataList.Value>
-                    </DataList.Item>
-                  ))}
-                  {Object.entries(element.governance).map(([k, v]) => (
-                    <DataList.Item key={`gov-${k}`}>
-                      <DataList.Label>{k}</DataList.Label>
-                      <DataList.Value>{v}</DataList.Value>
-                    </DataList.Item>
-                  ))}
-                </DataList.Root>
+            <ModalBody className="element-detail-body">
+              <div className="element-detail-content-flow">
+                {metaBadges.length > 0 && (
+                  <div className="ex-gov">
+                    {metaBadges.map(({ key, value, provenance }) => (
+                      <span className="ex-gov__item" key={`meta-${key}`}>
+                        <span className="ex-gov__k">{key}</span>
+                        <span className="ex-gov__v">{value}</span>
+                        <span className="ex-explicit">{provenance}</span>
+                      </span>
+                    ))}
+                  </div>
+                )}
 
-                <Section title="Content">
-                  <MarkdownContent
-                    markdown={element.content}
-                    sourceFilePath={element.file_path}
-                    sourceAnchor={element.source_anchor}
+                <div className="element-detail-content-flow">
+                  <Section title="Content">
+                    <MarkdownContent
+                      markdown={element.content}
+                      sourceFilePath={element.file_path}
+                      sourceAnchor={element.source_anchor}
+                    />
+                  </Section>
+
+                  <RelationList
+                    title="Relations"
+                    relations={relations
+                      .map((r) => relationFlowFromSelectedElement(r, element.id, elementById, resourceById))
+                      .filter(isRelationFlow)}
+                    onOpenElement={onOpenElement}
                   />
-                </Section>
 
-                <RelationList
-                  title="Outgoing relations"
-                  relations={outgoing.map((r) => ({
-                    label: r.relation_type,
-                    targetId: r.target_id,
-                    targetKind: r.target_kind,
-                    generated: r.generated_opposite,
-                  }))}
-                  onOpenElement={onOpenElement}
-                />
-                <RelationList
-                  title="Incoming relations"
-                  relations={incoming.map((r) => ({
-                    label: r.relation_type,
-                    targetId: r.source_id,
-                    targetKind: "element",
-                    generated: r.generated_opposite,
-                  }))}
-                  onOpenElement={onOpenElement}
-                />
+                  {attachments.length > 0 && (
+                    <Section title="Attachments">
+                      <div className="ex-rels">
+                        {attachments.map((a) => (
+                          <AttachmentTarget
+                            key={a.id}
+                            attachment={a}
+                            target={attachmentDisplayTarget(a, elementById, resourceById)}
+                            onOpenElement={onOpenElement}
+                          />
+                        ))}
+                      </div>
+                    </Section>
+                  )}
 
-                {attachments.length > 0 && (
-                  <Section title="Attachments">
-                    <Flex direction="column" gap="1">
-                      {attachments.map((a) => (
-                        <Flex key={a.id} gap="2" align="center">
-                          <Badge color="gray" variant="soft">
-                            {a.target_kind}
-                          </Badge>
-                          <Code>{a.target}</Code>
-                        </Flex>
-                      ))}
-                    </Flex>
-                  </Section>
-                )}
+                  {conceptRefs.length > 0 && (
+                    <Section title="Concept references">
+                      <div className="ex-rels">
+                        {conceptRefs.map((c) => (
+                          <div key={c.id} className="element-detail-relation-row">
+                            <span className="element-detail-relation-text">{c.label}</span>
+                            <code className="rq-coderef">{c.iri}</code>
+                          </div>
+                        ))}
+                      </div>
+                    </Section>
+                  )}
+                </div>
+              </div>
+            </ModalBody>
 
-                {conceptRefs.length > 0 && (
-                  <Section title="Concept references">
-                    <Flex direction="column" gap="1">
-                      {conceptRefs.map((c) => (
-                        <Flex key={c.id} gap="2" align="center">
-                          <Text size="2">{c.label}</Text>
-                          <Code>{c.iri}</Code>
-                        </Flex>
-                      ))}
-                    </Flex>
-                  </Section>
-                )}
-              </Flex>
-            </ScrollArea>
-
-            <Separator size="4" my="3" />
-            <Flex justify="between" align="center" gap="2">
-              <Link
-                href={element.source_anchor}
-                size="2"
-                color="gray"
-                target="_blank"
-                rel="noreferrer"
-              >
-                <Flex align="center" gap="1">
-                  <ExternalLinkIcon /> Open source page
-                </Flex>
-              </Link>
-              <Dialog.Close>
-                <Button variant="soft" color="gray">
-                  Close
-                </Button>
-              </Dialog.Close>
-            </Flex>
+            <ModalFooter className="element-detail-footer">
+              <div className="element-detail-footer-row">
+                <a
+                  href={sourceAnchorRoute(element.source_anchor, element.file_path)}
+                  className="element-detail-source-link"
+                  onClick={(event) => {
+                    event.preventDefault();
+                    window.location.hash = sourceAnchorRoute(element.source_anchor, element.file_path);
+                  }}
+                >
+                  <Icon name="external-link" className="ex-icon-sm" /> Open source page
+                </a>
+                <ModalClose asChild>
+                  <button type="button" className="rq-btn rq-btn--primary rq-btn--sm">
+                    Close
+                  </button>
+                </ModalClose>
+              </div>
+            </ModalFooter>
           </>
         )}
-      </Dialog.Content>
-    </Dialog.Root>
+      </ModalContent>
+    </Modal>
   );
+}
+
+function sourceAnchorRoute(sourceAnchor: string, filePath: string): string {
+  if (sourceAnchor.startsWith("#/content/")) return sourceAnchor;
+  if (sourceAnchor.startsWith("#")) return `${routeForContent(filePath)}${sourceAnchor}`;
+
+  const hashIndex = sourceAnchor.indexOf("#");
+  const path = hashIndex === -1 ? sourceAnchor : sourceAnchor.slice(0, hashIndex);
+  const fragment = hashIndex === -1 ? "" : sourceAnchor.slice(hashIndex);
+  const markdownPath = path.endsWith(".html")
+    ? `${path.slice(0, -".html".length)}.md`
+    : path;
+  return `${routeForContent(markdownPath || filePath)}${fragment}`;
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <Box>
-      <Heading as="h3" size="2" mb="1">
-        {title}
-      </Heading>
+    <section className="element-detail-section">
+      <h3>{title}</h3>
       {children}
-    </Box>
+    </section>
   );
 }
 
@@ -206,40 +250,276 @@ function RelationList({
   onOpenElement,
 }: {
   title: string;
-  relations: { label: string; targetId: string; targetKind: string; generated: boolean }[];
+  relations: RelationFlow[];
   onOpenElement: (id: string) => void;
 }) {
   if (relations.length === 0) return null;
   return (
     <Section title={title}>
-      <Flex direction="column" gap="1">
+      <div className="element-detail-relation-list">
         {relations.map((r, i) => (
-          <Flex key={`${r.label}-${r.targetId}-${i}`} gap="2" align="center" wrap="wrap">
-            <Badge color="gray" variant="soft">
+          <div key={`${r.label}-${r.target.id}-${i}`} className="element-detail-relation-row">
+            <span className="element-detail-relation-kind">
               {r.label}
-            </Badge>
-            {r.targetKind === "element" ? (
-              <Link
-                href={routeForElement(r.targetId)}
-                size="2"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onOpenElement(r.targetId);
-                }}
-              >
-                {r.targetId}
-              </Link>
-            ) : (
-              <Code>{r.targetId}</Code>
-            )}
-            {r.generated && (
-              <Text size="1" color="gray">
-                (generated)
-              </Text>
-            )}
-          </Flex>
+            </span>
+            <RelationEndpoint endpoint={r.target} onOpenElement={onOpenElement} />
+          </div>
         ))}
-      </Flex>
+      </div>
     </Section>
   );
+}
+
+type RelationEndpoint = {
+  id: string;
+  label: string;
+  kind: string;
+  elementType?: string;
+  typeFamily?: string;
+  href: string | null;
+  external: boolean;
+};
+
+type RelationFlow = {
+  label: string;
+  target: RelationEndpoint;
+};
+
+function isRelationFlow(value: RelationFlow | null): value is RelationFlow {
+  return value !== null;
+}
+
+function relationFlowFromSelectedElement(
+  relation: ProjectStoreRelation,
+  selectedId: string,
+  elementById: (id: string) => ProjectStoreElement | undefined,
+  resourceById: Map<string, ProjectStoreResource>,
+): RelationFlow | null {
+  if (relation.source_id === selectedId) {
+    return {
+      label: relation.canonical_relation_type,
+      target: relationTargetEndpoint(relation, elementById, resourceById),
+    };
+  }
+  if (relation.target_id === selectedId) {
+    return {
+      label: selectedTargetRelationLabel(relation),
+      target: relationSourceEndpoint(relation, elementById),
+    };
+  }
+  return null;
+}
+
+function selectedTargetRelationLabel(relation: ProjectStoreRelation): string {
+  return (
+    relation.source_relation_types.find((type) => type !== relation.canonical_relation_type)
+    ?? relation.relation_type
+    ?? relation.canonical_relation_type
+  );
+}
+
+function relationSourceEndpoint(
+  relation: ProjectStoreRelation,
+  elementById: (id: string) => ProjectStoreElement | undefined,
+): RelationEndpoint {
+  const element = elementById(relation.source_id);
+  return {
+    id: relation.source_id,
+    label: element?.name ?? relation.source_id,
+    kind: "element",
+    elementType: element?.element_type,
+    typeFamily: element?.type_family,
+    href: routeForElement(relation.source_id),
+    external: false,
+  };
+}
+
+function relationTargetEndpoint(
+  relation: ProjectStoreRelation,
+  elementById: (id: string) => ProjectStoreElement | undefined,
+  resourceById: Map<string, ProjectStoreResource>,
+): RelationEndpoint {
+  if (relation.target_kind === "element") {
+    const element = elementById(relation.target_id);
+    return {
+      id: relation.target_id,
+      label: element?.name ?? relation.target_id,
+      kind: "element",
+      elementType: element?.element_type,
+      typeFamily: element?.type_family,
+      href: routeForElement(relation.target_id),
+      external: false,
+    };
+  }
+  if (relation.resource_id) {
+    const resource = resourceById.get(relation.resource_id);
+    if (resource?.external_url) {
+      return {
+        id: relation.resource_id,
+        label: resource.display || resource.target,
+        kind: resource.kind,
+        href: resource.external_url,
+        external: true,
+      };
+    }
+    if (resource?.file_path) {
+      return {
+        id: relation.resource_id,
+        label: resource.display || resource.target,
+        kind: resource.kind,
+        href: routeForContent(resource.file_path),
+        external: false,
+      };
+    }
+    if (resource) {
+      return {
+        id: relation.resource_id,
+        label: resource.display || resource.target,
+        kind: resource.kind,
+        href: null,
+        external: false,
+      };
+    }
+  }
+  return {
+    id: relation.target_id,
+    label: relation.target_id,
+    kind: relation.target_kind,
+    href: null,
+    external: false,
+  };
+}
+
+function RelationEndpoint({
+  endpoint,
+  onOpenElement,
+}: {
+  endpoint: RelationEndpoint;
+  onOpenElement: (id: string) => void;
+}) {
+  const className = "element-detail-relation-endpoint";
+  const content = (
+    <>
+      {endpoint.kind === "element" ? (
+        <ElementIcon
+          type={endpoint.elementType}
+          family={endpoint.typeFamily}
+          title={endpoint.elementType}
+          size="sm"
+        />
+      ) : (
+        <span className="rq-relation__pip" style={{ background: relationPipColor(endpoint.kind) }} />
+      )}
+      <span className="element-detail-relation-endpoint-label">{endpoint.label}</span>
+    </>
+  );
+  if (endpoint.kind === "element" && endpoint.href) {
+    return (
+      <a
+        className={className}
+        href={endpoint.href}
+        title={endpoint.id}
+        onClick={(event) => {
+          event.preventDefault();
+          onOpenElement(endpoint.id);
+        }}
+      >
+        {content}
+      </a>
+    );
+  }
+  if (endpoint.href) {
+    return (
+      <a
+        className={className}
+        href={endpoint.href}
+        title={endpoint.id}
+        {...(endpoint.external ? { target: "_blank", rel: "noreferrer" } : {})}
+      >
+        {content}
+      </a>
+    );
+  }
+  return (
+    <span className={className} title={endpoint.id}>
+      {content}
+    </span>
+  );
+}
+
+function AttachmentTarget({
+  attachment,
+  target,
+  onOpenElement,
+}: {
+  attachment: { target: string; target_kind: string; resource_id: string | null };
+  target: { label: string; href: string | null; external: boolean };
+  onOpenElement: (id: string) => void;
+}) {
+  if (attachment.target_kind === "element") {
+    return (
+      <RelationPill
+        kind={attachment.target_kind}
+        label={target.label}
+        pipColor={relationPipColor(attachment.target_kind)}
+        href={routeForElement(attachment.target)}
+        title={attachment.target}
+        onClick={(event: MouseEvent<HTMLAnchorElement>) => {
+          event.preventDefault();
+          onOpenElement(attachment.target);
+        }}
+      />
+    );
+  }
+
+  if (target.href) {
+    return (
+      <RelationPill
+        kind={attachment.target_kind}
+        label={target.label}
+        pipColor={relationPipColor(attachment.target_kind)}
+        href={target.href}
+        title={attachment.target}
+        {...(target.external ? { target: "_blank", rel: "noreferrer" } : {})}
+      />
+    );
+  }
+
+  return <RelationPill kind={attachment.target_kind} label={target.label} title={attachment.target} pipColor={relationPipColor(attachment.target_kind)} disabled />;
+}
+
+function relationPipColor(kind: string) {
+  const normalized = kind.toLowerCase();
+  if (normalized.includes("verif") || normalized.includes("satisf")) return "var(--verification)";
+  if (normalized.includes("attach")) return "var(--resource)";
+  if (normalized.includes("derive")) return "var(--requirement)";
+  if (normalized.includes("specif") || normalized.includes("refin")) return "var(--refinement)";
+  return "var(--edge-default)";
+}
+
+function attachmentDisplayTarget(
+  attachment: { target: string; target_kind: string; resource_id: string | null },
+  elementById: (id: string) => { name: string } | undefined,
+  resourceById: Map<string, { display: string; target: string; file_path: string | null; external_url: string | null }>,
+): { label: string; href: string | null; external: boolean } {
+  if (attachment.target_kind === "element") {
+    return {
+      label: elementById(attachment.target)?.name ?? attachment.target,
+      href: routeForElement(attachment.target),
+      external: false,
+    };
+  }
+  if (attachment.resource_id) {
+    const resource = resourceById.get(attachment.resource_id);
+    if (resource) {
+      if (resource.external_url) {
+        return { label: resource.display || resource.target, href: resource.external_url, external: true };
+      }
+      if (resource.file_path) {
+        return { label: resource.display || resource.target, href: routeForContent(resource.file_path), external: false };
+      }
+      return { label: resource.display || resource.target, href: null, external: false };
+    }
+  }
+  return { label: attachment.target, href: null, external: false };
 }

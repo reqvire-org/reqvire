@@ -92,10 +92,10 @@ reqvire:CommentStyleKindShape
 
 ### GitHub Workflow Automation
 
-As a **Contributor**, I want Reqvire to support repository workflow automation, so that model documentation, validation, and review evidence can participate in pull-request and merge workflows.
+As a **Contributor**, I want Reqvire to support repository workflow automation, so that validation and review evidence can participate in pull-request and merge workflows.
 
 #### Details
-GitHub workflow automation is the capability for hosted Git workflow integration, documentation export automation, pull-request validation, and change-log generation.
+GitHub workflow automation is the capability for hosted Git workflow integration, pull-request validation, and change-log generation.
 
 Requirements under this capability define concrete workflow behavior and repository automation evidence.
 
@@ -111,7 +111,6 @@ Requirements under this capability define concrete workflow behavior and reposit
   * [Reqvire GitHub Workflow Ontology](../Ontologies/Integration.md#reqvire-github-workflow-ontology)
 
 #### Relations
-  * specifiedBy: [Automate Documentation Export](../Functional/Integration/GitHubIntegration.md#automate-documentation-export)
   * specifiedBy: [Automate Pull Request Validations](../Functional/Integration/GitHubIntegration.md#automate-pull-request-validations)
   * specifiedBy: [Generate Change Logs for Pull Requests](../Functional/Integration/GitHubIntegration.md#generate-change-logs-for-pull-requests)
 ---

@@ -98,7 +98,6 @@ Implementation details shall follow the associated refinement specifications.
 
 #### Relations
   * derivedFrom: [Model Structure and Summaries](#model-structure-and-summaries)
-  * refinedBy: [ContainmentView](DesignDocuments/ContainmentView.md#containmentview)
   * refinedBy: [Containment View Report Refinement Specification](Specifications.md#containment-view-report-refinement-specification)
   * verifiedBy: [Containment View Design Documents Test](Verifications/ReportingVerifications.md#containment-view-design-documents-test)
 ---
@@ -209,9 +208,9 @@ The default collection shall expose authored ontology RDF content and semantic-c
 
 When full semantic model export is requested, the collection shall also emit RDF triples for Reqvire model elements, element metadata, capability-to-ontology attachments, requirement-to-capability specification relations, requirement-to-semantic-contract refinement relations, ontology hierarchy relations, concept references, ontology term declarations, semantic-contract shape references, and generated ontology projection facts materialized from direct-authored OWL/RDFS/SHACL constructs.
 
-Semantic-query-contract `#### Query` content and query metadata are not part of ontology collection, full semantic export, or `ontologies.ttl`. Generated ontology projection facts may cite the semantic-query-contract IRI that defines the intended construct pattern, but raw query text remains exposed through search JSON until a dedicated query-export command is specified and implemented.
+Semantic-query-contract `#### Query` content and query metadata are not part of ontology collection, full semantic export, or `ontologies.ttl`. Generated ontology projection facts may cite the semantic-query-contract IRI that defines the intended construct pattern, but raw query text remains exposed through search JSON until dedicated query output support is specified and implemented.
 
-The collection shall preserve source element identifiers, source file paths, section kind, and line numbers so CLI, HTML export, and downstream semantic tooling can cite the model source of each RDF block.
+The collection shall preserve source element identifiers, source file paths, section kind, and line numbers so CLI, Explorer rendering, and downstream semantic tooling can cite the model source of each RDF block.
 
 #### Metadata
   * type: requirement
@@ -223,26 +222,26 @@ The collection shall preserve source element identifiers, source file paths, sec
   * specify: [Semantic Model Export](../../Capabilities/ReportsAndQuery.md#semantic-model-export)
   * refinedBy: [Ontology Collection Output Specification](Specifications.md#ontology-collection-output-specification)
   * satisfiedBy: [semantic_contract.rs](../../../core/src/semantic_contract.rs)
-  * satisfiedBy: [export.rs](../../../core/src/export.rs)
+  * satisfiedBy: [explorer_runtime.rs](../../../core/src/explorer_runtime.rs)
   * verifiedBy: [CLI Ontologies Command Verification](../../Interfaces/CLI/Verifications/CLIVerifications.md#cli-ontologies-command-verification)
 ---
 
 ### Ontology Projection Subgraph Materialization
 
-The system shall materialize generated ontology construct facts as a subgraph of the existing in-memory RDF projection so semantic exports and HTML ontology exploration consume the same ontology construct facts.
+The system shall materialize generated ontology construct facts as a subgraph of the existing in-memory RDF projection so semantic exports and the Ontologies Explorer consume the same ontology construct facts.
 
 #### Details
 The ontology projection subgraph shall:
-- Extend the existing in-memory RDF projection used by full semantic export; it is not a separate database, persistent store, or HTML-only model.
-- Be attached to the reusable `SemanticIndex` as structured generated projection data so semantic export, JSON-LD export, and HTML rendering share one authoritative projection source.
+- Extend the existing in-memory RDF projection used by full semantic export; it is not a separate database, persistent store, or route-local model.
+- Be attached to the reusable `SemanticIndex` as structured generated projection data so semantic export, JSON-LD export, and Explorer rendering share one authoritative projection source.
 - Be generated from authored ontology and semantic-contract RDF quads during semantic index processing or immediately after parsing.
 - Materialize direct-authored OWL/RDFS/SHACL constructs into Reqvire ontology projection facts without changing authored Markdown ontology or semantic-contract blocks.
 - Preserve source element identifier, source name, source file, source line, source block kind, construct subject, construct object, construct members, construct property, ordered sequence index when relevant, symbol code point, rendered symbol, and derivation mode.
-- Derive normalized SHACL slot/facet projection records from node-shape target classes and property-shape paths so target class inspectors and named property inspectors can share the same source-backed semantic evidence.
+- Derive normalized SHACL slot/facet projection records from node-shape target classes and property-shape paths so WebInterface ontology views and semantic exports can share the same source-backed semantic evidence.
 - Include constructs for property domain/range, subclass or inclusion, class membership, disjointness, equivalence, inverse properties, property chains, property characteristics, restrictions, intersections, unions, complement or difference-style expressions when authored, and SHACL shape overlays when present.
 - Use semantic-query-contract refinements as declarative pattern contracts for the generated projection facts. The implementation may use native Rust projection over the parsed RDF graph as long as the materialized facts satisfy the same pattern intent.
 - Distinguish direct-authored projection from inferred projection. Direct-authored projection is in scope; OWL reasoning, SHACL-AF rule execution, and inferred materialization require separate inference requirements before they can contribute generated facts.
-- Feed generated facts into `reqvire ontologies --full`, `reqvire ontologies --full --jsonld`, and the Ontologies HTML explorer through the same in-memory projection context. The default `reqvire ontologies` and exported `ontologies.ttl` artifact remain authored ontology/SHACL collection outputs unless full export is requested.
+- Feed generated facts into `reqvire ontologies --full`, `reqvire ontologies --full --jsonld`, and the Ontologies Explorer through the same in-memory projection context. The default `reqvire ontologies` and served `ontologies.ttl` artifact remain authored ontology/SHACL collection outputs unless full semantic output is requested.
 
 #### Metadata
   * type: requirement
@@ -390,7 +389,7 @@ The implementation coverage report shall provide:
 
 ### Resources Report
 
-The system shall provide a resources report showing all files referenced by the model through relations and attachments in text, JSON, and HTML formats.
+The system shall provide a resources report showing all files referenced by the model through relations and attachments in text, JSON, and Explorer views.
 
 #### Metadata
   * type: requirement
@@ -433,7 +432,7 @@ The report helps track verification completeness and identify gaps in requiremen
 
 ### TraceFlow View Report Generation
 
-The system shall seed TraceFlow/Traces SPA route data showing verification traceability flow for an interactive D3.js Sankey diagram visualization. The routed view displays how capabilities are specified by requirements, how requirements flow to verifications, and how capabilities may be directly verified without emitting a standalone TraceFlow artifact.
+The system shall seed TraceFlow/Traces SPA route data showing verification traceability flow for an interactive D3.js Sankey diagram visualization. The routed view displays how capabilities are specified by requirements, how requirements flow to verifications, and how capabilities may be directly verified through served Explorer state.
 
 #### Metadata
   * type: requirement
@@ -443,10 +442,7 @@ The system shall seed TraceFlow/Traces SPA route data showing verification trace
 
 #### Relations
   * derivedFrom: [Verification Coverage Report](#verification-coverage-report)
-  * refinedBy: [TraceFlowView](DesignDocuments/TraceFlowView.md#traceflowview)
-  * refinedBy: [Verification Trace Diagram Specification](Specifications.md#verification-trace-diagram-specification)
-  * satisfiedBy: [export.rs](../../../core/src/export.rs)
-  * verifiedBy: [TraceFlow View Test](Verifications/ReportingVerifications.md#traceflow-view-test)
+  * satisfiedBy: [store.rs](../../../core/src/html/store.rs)
 ---
 
 ### Tracing Structural Changes

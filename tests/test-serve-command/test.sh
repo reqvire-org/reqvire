@@ -5,15 +5,15 @@
 # Satisfies: specifications/Verifications/Misc.md#serve-command-verification
 #
 # Acceptance Criteria:
-# - System exports HTML artifacts to temporary directory
 # - System starts HTTP server on specified host and port
 # - System displays clickable terminal link to server URL
 # - System serves index.html when accessing root URL
-# - System serves all exported HTML files with correct paths
-# - System serves static assets (SVG diagrams, CSS, etc.)
-# - System returns 404 for non-existent files
+# - System serves embedded Explorer assets and generated Project Store data
+# - System serves ontologies.ttl
+# - System returns index.html for non-asset browser routes
+# - System returns 404 for missing asset files
 # - System sets correct Content-Type headers for different file types
-# - System runs in quiet mode (suppress verbose export output)
+# - System runs in quiet mode without verbose runtime-generation output
 # - System displays instructions for Ctrl-C
 #
 # Test Criteria:
@@ -22,8 +22,9 @@
 # - Root URL (/) serves index.html
 # - HTML files are served with text/html content type
 # - SVG files are served with image/svg+xml content type
-# - Non-existent paths return 404 status
-# - Export verbose output is suppressed (quiet mode active)
+# - Missing embedded asset paths return 404 status
+# - Non-asset browser routes return index.html for SPA fallback
+# - Runtime-generation verbose output is suppressed (quiet mode active)
 
 set -e
 
@@ -99,9 +100,29 @@ if ! echo "$CONTENT" | grep -q '<div id="root"></div>' || ! echo "$CONTENT" | gr
     exit 1
 fi
 
-# The SPA bundle must boot from the injected, browser-local Project Store seed.
-if ! echo "$CONTENT" | grep -q "reqvireProjectStore"; then
-    echo "❌ FAILED: Root URL did not return the seeded Project Store"
+STORE_RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/assets/project-store.js")
+STORE_CODE=$(echo "$STORE_RESPONSE" | tail -n1)
+STORE_CONTENT=$(echo "$STORE_RESPONSE" | sed '$d')
+if [ "$STORE_CODE" != "200" ] || ! echo "$STORE_CONTENT" | grep -q "reqvireProjectStore"; then
+    echo "❌ FAILED: Project Store data asset was not served"
+    exit 1
+fi
+
+if ! echo "$STORE_CONTENT" | grep -q '"path": "specifications/Requirements.md"'; then
+    echo "❌ FAILED: Project Store is missing modeled source file records"
+    exit 1
+fi
+
+if ! echo "$STORE_CONTENT" | grep -q '"path": "scripts/evidence.sh"' ||
+   ! echo "$STORE_CONTENT" | grep -q '"parent_folder": "scripts"' ||
+   ! echo "$STORE_CONTENT" | grep -q '"id": "resource:scripts/evidence.sh"' ||
+   ! echo "$STORE_CONTENT" | grep -q 'serve command evidence'; then
+    echo "❌ FAILED: Project Store did not include the existing graph-referenced evidence file as a resource-backed tree file"
+    exit 1
+fi
+
+if echo "$STORE_CONTENT" | grep -q '"path": "notes/unrelated.md"'; then
+    echo "❌ FAILED: Project Store included an unrelated repository file in the model tree"
     exit 1
 fi
 
@@ -112,43 +133,49 @@ if [[ ! "$CONTENT_TYPE" =~ ^text/html ]]; then
     exit 1
 fi
 
-# Test 4: Check that HTML files are accessible
-RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/specifications/Requirements.html")
+# Test 4: Check that ontologies.ttl is generated and served
+RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/ontologies.ttl")
 HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
 
 if [ "$HTTP_CODE" != "200" ]; then
-    echo "❌ FAILED: specifications/Requirements.html returned HTTP $HTTP_CODE"
+    echo "❌ FAILED: ontologies.ttl returned HTTP $HTTP_CODE"
     exit 1
 fi
 
-# Test 5: Check Content-Type for SVG files (if matrix.svg exists)
-RESPONSE=$(curl -s -w "\n%{http_code}" -I "http://$TEST_HOST:$TEST_PORT/matrix.svg")
-HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
-
-if [ "$HTTP_CODE" = "200" ]; then
-    CONTENT_TYPE=$(echo "$RESPONSE" | grep -i "content-type" | cut -d: -f2 | tr -d ' \r')
-    if [[ ! "$CONTENT_TYPE" =~ ^image/svg ]]; then
-        echo "❌ FAILED: SVG file has incorrect Content-Type: $CONTENT_TYPE"
-        exit 1
-    fi
+CONTENT_TYPE=$(curl -s -I "http://$TEST_HOST:$TEST_PORT/ontologies.ttl" | grep -i "content-type" | cut -d: -f2 | tr -d ' \r')
+if [[ ! "$CONTENT_TYPE" =~ ^text/turtle ]]; then
+    echo "❌ FAILED: ontologies.ttl has incorrect Content-Type: $CONTENT_TYPE"
+    exit 1
 fi
 
-# Test 6: Check 404 for non-existent files
+# Test 5: Non-asset browser routes fall back to the SPA shell
+RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/model")
+HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+CONTENT=$(echo "$RESPONSE" | sed '$d')
+
+if [ "$HTTP_CODE" != "200" ] || ! echo "$CONTENT" | grep -q '<div id="root"></div>'; then
+    echo "❌ FAILED: SPA fallback route did not return index.html"
+    exit 1
+fi
+
+# Test 6: Check 404 for non-existent bundled asset files
 RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/nonexistent.html")
 HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
 
+if [ "$HTTP_CODE" != "200" ]; then
+    echo "❌ FAILED: Non-asset route returned HTTP $HTTP_CODE instead of SPA fallback"
+    exit 1
+fi
+
+RESPONSE=$(curl -s -w "\n%{http_code}" "http://$TEST_HOST:$TEST_PORT/assets/missing.js")
+HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+
 if [ "$HTTP_CODE" != "404" ]; then
-    echo "❌ FAILED: Non-existent file returned HTTP $HTTP_CODE instead of 404"
+    echo "❌ FAILED: Missing asset returned HTTP $HTTP_CODE instead of 404"
     exit 1
 fi
 
-# Test 7: Verify quiet mode (no verbose export output)
-if grep -q "✅ Exported:" "${TEST_DIR}/serve_output.log"; then
-    echo "❌ FAILED: Verbose export output present (quiet mode not working)"
-    cat "${TEST_DIR}/serve_output.log"
-    exit 1
-fi
-
+# Test 7: Verify quiet mode (no verbose runtime-generation output)
 if grep -q "Updated diagrams" "${TEST_DIR}/serve_output.log"; then
     echo "❌ FAILED: Diagram update messages present (quiet mode not working)"
     cat "${TEST_DIR}/serve_output.log"

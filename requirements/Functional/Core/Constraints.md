@@ -49,6 +49,8 @@ An attachment target is valid only when it matches the attaching element family:
 - Capability attachments target ontology elements only.
 - Requirements must not attach ontology directly.
 - Requirement attachments target requirement-owned refinements only: `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output`.
+- Only capability and requirement elements may author Attachments subsections.
+- Verification elements must express evidence through `satisfiedBy` and verified targets through `verify`; they must not author attachments.
 - Requirement-owned refinements must have a `refine` relation to exactly one compatible requirement owner before they can be attached.
 - Capabilities must not own refinements; invalid capability refinement ownership edges are not cross-subgraph attachment contracts.
 - Refinements without a valid `refine` relation cannot be attached anywhere.

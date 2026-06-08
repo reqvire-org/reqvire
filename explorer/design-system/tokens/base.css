@@ -1,0 +1,68 @@
+/* ============================================================
+   Reqvire Explorer — Base / reset
+   Minimal, applied to documents that opt in. Components rely on
+   tokens, so this is mostly element defaults + the body shell.
+   ============================================================ */
+
+@layer base {
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--text-body);
+  background: var(--bg-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: "cv05" 1, "ss01" 1;
+}
+
+/* Headings inherit the sans by default, tight tracking at size */
+h1, h2, h3, h4, h5, h6 {
+  margin: 0;
+  font-weight: var(--weight-semibold);
+  color: var(--text-strong);
+  line-height: var(--leading-tight);
+}
+
+a { color: var(--text-link); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, kbd, pre, samp {
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+}
+
+button { font-family: inherit; }
+
+::selection {
+  background: var(--accent-subtle);
+  color: var(--text-strong);
+}
+
+/* Themed scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+}
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: var(--scroll-track); }
+*::-webkit-scrollbar-thumb {
+  background: var(--scroll-thumb);
+  border-radius: var(--radius-pill);
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover { background: var(--text-faint); background-clip: content-box; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+}

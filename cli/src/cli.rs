@@ -10,7 +10,7 @@ use reqvire::diagrams;
 use reqvire::diff::{render_crud_json, render_crud_result};
 use reqvire::element::Element;
 use reqvire::error::ReqvireError;
-use reqvire::export;
+use reqvire::explorer_runtime;
 use reqvire::format::{format_files, render_diff, render_diff_json};
 use reqvire::git_commands;
 use reqvire::graph_registry::Page;
@@ -49,16 +49,9 @@ pub struct Args {
 
 #[derive(Subcommand, Debug)]
 pub enum Commands {
-    /// Export model to browsable HTML documentation with complete traceability
-    Export {
-        /// Output directory for HTML files (defaults to temporary directory if not specified)
-        #[clap(long, help_heading = "EXPORT OPTIONS")]
-        output: Option<String>,
-    },
-
-    /// Serve model as browsable HTML documentation via HTTP server
+    /// Serve the embedded Explorer UI via HTTP server
     #[clap(
-        override_help = "Serve model as browsable HTML documentation via HTTP server\n\nSERVE OPTIONS:\n      --host <HOST>          Bind address (default: localhost)\n      --port <PORT>          Server port (default: 8080)"
+        override_help = "Serve the embedded Explorer UI via HTTP server\n\nThis is intended for release/npm Reqvire binaries. Source builds must build the Explorer bundle before compiling Rust.\n\nSERVE OPTIONS:\n      --host <HOST>          Bind address (default: localhost)\n      --port <PORT>          Server port (default: 8080)"
     )]
     Serve {
         /// Bind address
@@ -1003,22 +996,6 @@ fn handle_json_output(json_content: &str, output: &Option<String>) -> Result<(),
     Ok(())
 }
 
-struct TempDirGuard {
-    path: PathBuf,
-}
-
-impl TempDirGuard {
-    fn new(path: PathBuf) -> Self {
-        Self { path }
-    }
-}
-
-impl Drop for TempDirGuard {
-    fn drop(&mut self) {
-        let _ = std::fs::remove_dir_all(&self.path);
-    }
-}
-
 pub async fn handle_command(
     args: Args,
     excluded_filename_patterns: &GlobSet,
@@ -1453,63 +1430,16 @@ pub async fn handle_command(
 
             Ok(0)
         }
-        Some(Commands::Export { output }) => {
-            let git_root = git_commands::get_git_root_dir()?;
-
-            if let Some(output_dir) = output {
-                // Export to specified directory
-                info!("Exporting model to HTML folder: {}", &output_dir);
-                // Convert to absolute path before export (cwd changes during export)
-                let output_path = if PathBuf::from(&output_dir).is_absolute() {
-                    PathBuf::from(&output_dir)
-                } else {
-                    current_dir.join(&output_dir)
-                };
-                export::export_model_with_artifacts(
-                    &model_manager.graph_registry,
-                    &output_path,
-                    excluded_filename_patterns,
-                    false, // always generate links without blobs for Export
-                    &current_dir,
-                    &git_root,
-                )?;
-                info!(
-                    "✅ Export completed successfully to: {}",
-                    output_path.display()
-                );
-            } else {
-                // Export to temporary directory
-                let temp_dir = export::generate_artifacts_in_temp(
-                    &model_manager.graph_registry,
-                    excluded_filename_patterns,
-                    false, // always generate links without blobs for Export
-                    &current_dir,
-                    &git_root,
-                )?;
-                println!(
-                    "✅ Export completed successfully to: {}",
-                    temp_dir.display()
-                );
-            }
-            Ok(0)
-        }
         Some(Commands::Serve { host, port }) => {
-            // Enable quiet mode for serve command (suppress verbose export output)
+            // Enable quiet mode for serve command runtime generation.
             reqvire::utils::enable_quiet_mode();
 
-            let git_root = git_commands::get_git_root_dir()?;
-            let temp_dir = export::generate_artifacts_in_temp(
-                &model_manager.graph_registry,
-                excluded_filename_patterns,
-                false, // always generate links without blobs for Serve
-                &current_dir,
-                &git_root,
-            )?;
-            let _temp_dir_guard = TempDirGuard::new(temp_dir.clone());
+            let explorer_assets =
+                explorer_runtime::build_runtime_assets(&model_manager.graph_registry)?;
 
             // Start HTTP server (runs until Ctrl-C)
             info!("Starting HTTP server at http://{}:{}/", host, port);
-            serve::serve_directory(&temp_dir, &host, port).await?;
+            serve::serve_explorer(explorer_assets, &host, port).await?;
 
             Ok(0)
         }
@@ -2468,8 +2398,11 @@ mod tests {
 
     #[test]
     fn test_cli_parsing_subcommand() {
-        let args = Args::parse_from(&["reqvire", "export"]);
-        assert!(matches!(args.command, Some(Commands::Export { output: _ })));
+        let args = Args::parse_from(&["reqvire", "serve", "--host", "127.0.0.1", "--port", "9000"]);
+        assert!(matches!(
+            args.command,
+            Some(Commands::Serve { host, port }) if host == "127.0.0.1" && port == 9000
+        ));
     }
 
     #[tokio::test]
@@ -2477,8 +2410,9 @@ mod tests {
         // Mock CLI arguments
         let args = Args {
             workspace: None,
-            command: Some(Commands::Export {
-                output: Some("html".to_string()),
+            command: Some(Commands::Validate {
+                json: false,
+                output: None,
             }),
         };
 

@@ -1,0 +1,121 @@
+import { BulletList, CodeBlock, DetailGrid, Section } from "@/components/Doc";
+import { Footer } from "@/components/Footer";
+
+export default function Verifications() {
+  return (
+    <div className="max-w-[768px]">
+      <h1 className="text-4xl font-bold text-zinc-900 mb-5">Verifications</h1>
+      <p className="text-base text-zinc-600 leading-relaxed mb-10">
+        Verification confirms that system behavior, implementation evidence, or
+        operational evidence satisfies the capabilities and requirements it is
+        linked to. Reqvire keeps those verification links inside the same
+        semantic graph as requirements, refinements, and implementation
+        artifacts.
+      </p>
+
+      <Section title="Verification Types">
+        <DetailGrid
+          items={[
+            {
+              name: "test-verification",
+              desc: "Formal or automated testing with documented expected outcomes. This is evidence-backed and must have satisfiedBy links to test implementations or reports.",
+            },
+            {
+              name: "formal-proof-verification",
+              desc: "Proof, model checking, theorem proving, generated fixtures, or proof reports. This is evidence-backed and must have satisfiedBy proof evidence.",
+            },
+            {
+              name: "analysis-verification",
+              desc: "Systematic analysis, calculation, simulation, or review of documentation or code. It does not require satisfiedBy evidence.",
+            },
+            {
+              name: "inspection-verification",
+              desc: "Formal examination of documentation, code, design, or physical components. It does not require satisfiedBy evidence.",
+            },
+            {
+              name: "demonstration-verification",
+              desc: "Showing the capability or requirement behavior in an operational-like environment. It does not require satisfiedBy evidence.",
+            },
+          ]}
+        />
+      </Section>
+
+      <Section title="Two-Level Evidence Model">
+        <p className="text-zinc-600 mb-4">
+          Capabilities and requirements link to verification elements with{" "}
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
+            verifiedBy
+          </code>
+          . Evidence-backed verification elements then link to concrete test or
+          proof artifacts with{" "}
+          <code className="text-sm bg-zinc-100 px-1.5 py-0.5 rounded">
+            satisfiedBy
+          </code>
+          .
+        </p>
+        <CodeBlock>{`### Response Time Requirement
+The system shall process data within 500ms.
+
+#### Relations
+  * verifiedBy: [Performance Test](Verifications.md#performance-test)
+
+---
+
+### Performance Test
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * verify: [Response Time Requirement](Requirements.md#response-time-requirement)
+  * satisfiedBy: [test_performance.sh](../../tests/test-performance/test_performance.sh)`}</CodeBlock>
+      </Section>
+
+      <Section title="Coverage Philosophy">
+        <BulletList
+          items={[
+            "Leaf requirements are the preferred verification targets because they represent concrete testable obligations.",
+            "Parent requirement coverage rolls up through the requirement hierarchy when leaf requirements are verified.",
+            "Capabilities may be directly verified, and capability coverage can also roll up from the requirements that specify them.",
+            "One verification may verify multiple leaf requirements when a single test or proof covers a coherent behavior.",
+          ]}
+        />
+      </Section>
+
+      <Section title="Coverage Command">
+        <p className="text-zinc-600 mb-4">
+          The coverage report includes verification coverage for leaf
+          requirements plus evidence satisfaction status for test and formal
+          proof verifications.
+        </p>
+        <CodeBlock>{`reqvire coverage
+reqvire coverage --json`}</CodeBlock>
+      </Section>
+
+      <Section title="What Gets Flagged">
+        <DetailGrid
+          items={[
+            {
+              name: "Verified leaf requirements",
+              desc: "Leaf requirements with verifiedBy relations to verification elements.",
+            },
+            {
+              name: "Unsatisfied test verifications",
+              desc: "test-verification elements that are missing satisfiedBy links to test implementations or evidence.",
+            },
+            {
+              name: "Unsatisfied formal proofs",
+              desc: "formal-proof-verification elements that are missing satisfiedBy links to proof artifacts, generated fixtures, or reports.",
+            },
+            {
+              name: "Analysis, inspection, and demonstration",
+              desc: "These verification methods are considered satisfied by the verification element itself and do not require satisfiedBy evidence.",
+            },
+          ]}
+        />
+      </Section>
+
+      <Footer />
+    </div>
+  );
+}

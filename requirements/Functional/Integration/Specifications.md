@@ -1,24 +1,5 @@
 # Elements
 
-### Automated Documentation Export on PR Merge Refinement Specification
-
-#### Details
-GitHub workflow behavior for docs export:
-- Triggers only after pull-request merge to `main`.
-- Checks out post-merge `main` state.
-- Builds Reqvire from repository source.
-- Runs export pipeline with `reqvire export --output docs`.
-- Detects added/updated documentation artifacts.
-- Commits generated documentation changes with a standard commit message.
-- Pushes documentation updates back to `main`.
-
-#### Metadata
-  * type: specification
-
-#### Relations
-  * refine: [Automated Documentation Export on PR Merge](GitHubIntegration.md#automated-documentation-export-on-pr-merge)
----
-
 ### CSS Style Comment Refinement Specification
 
 #### Details

@@ -327,12 +327,12 @@ The system is expected to reject the operation with a clear error message if:
 - Source and target element types are incompatible per Merge Type Compatibility Constraint
 - Merged result would have cross-section duplicates per Merge Content Transformation Behavior
 
-For `# Documents` targets:
-- The merged result is expected to remain serialized as `# Documents` with a single implicit element.
+For `# Element` targets:
+- The merged result is expected to remain serialized as `# Element` with a single implicit element.
 - Merged content is expected to remain inside the `## <Actual Element Name>` body of that element.
 
-For document-to-elements merge direction:
-- If any source element is in a `# Documents` file and the target element is in a `# Elements` file, the merge is expected to be rejected with a clear error.
+For single-element-to-elements merge direction:
+- If any source element is in a `# Element` file and the target element is in a `# Elements` file, the merge is expected to be rejected with a clear error.
 - The error is expected to state that this conversion must be done manually to avoid breaking `# Elements` parsing rules.
 
 #### Metadata
@@ -358,7 +358,7 @@ When moving an element, the system is expected to:
 - Provide updates report following Diff Output Format Specification
 
 Document format rule:
-- If the target file is an existing `# Documents` file, moving an element from a different file into it is expected to be rejected with a clear error, because `# Documents` files contain exactly one element.
+- If the target file is an existing `# Element` file, moving an element from a different file into it is expected to be rejected with a clear error, because `# Element` files contain exactly one element.
 
 **Empty Source File Cleanup:**
 - After moving the element, check if the source file contains any remaining elements
@@ -395,14 +395,14 @@ The system is expected to reject the operation with a clear error message if:
 - The source file does not exist
 - The target file already exists (unless --squash flag is provided)
 - The source or target paths fail validation
-- `--squash` is used with a target that is an existing `# Documents` file
+- `--squash` is used with a target that is an existing `# Element` file
 
 **Squash Mode Behavior:**
 When the --squash flag is provided and the target file already exists, the system is expected to:
 - Move all elements from the source file to the target end of file
 - Remove the source file after all elements have been successfully moved
 - Preserve element ordering from the source file when inserting into target section
-- Reject squash if target is `# Documents` format (single-element document file)
+- Reject squash if target is `# Element` format (single-element file)
 
 #### Metadata
   * type: specification

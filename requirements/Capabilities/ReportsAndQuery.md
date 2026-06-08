@@ -2,10 +2,10 @@
 
 ### Provide Reports
 
-As a **Manager** and **System Engineer**, I want Reqvire to generate structured model reports, so that I can inspect model content, traceability, coverage, resources, submodels, and exported documentation without manually reconstructing the graph.
+As a **Manager** and **System Engineer**, I want Reqvire to generate structured model reports, so that I can inspect model content, traceability, coverage, resources, submodels, and semantic outputs without manually reconstructing the graph.
 
 #### Details
-Provide reports is the capability for search, collect, coverage, traces, model, containment, resources, ontologies, submodels, lint, and export report contracts.
+Provide reports is the capability for search, collect, coverage, traces, model, containment, resources, ontologies, submodels, lint, and semantic output contracts.
 
 Report requirements define traversal direction, output structure, filters, JSON evidence, graph projection, and diagram/report rendering behavior.
 
@@ -120,7 +120,7 @@ As a **System Engineer**, I want Reqvire to expose ontology and shape content as
 #### Details
 Semantic model export is the capability for collecting ontology and SHACL content, exporting Turtle/JSON-LD semantic artifacts, projecting Reqvire model context as RDF, materializing generated ontology projection facts, and keeping semantic exports traceable to their Reqvire source elements.
 
-Semantic query contracts may define the intended graph patterns for generated projection facts. General-purpose query execution, query export, and inferred reasoning remain separate future capabilities unless a requirement explicitly scopes them.
+Semantic query contracts may define the intended graph patterns for generated projection facts. General-purpose query execution, query output, and inferred reasoning remain separate future capabilities unless a requirement explicitly scopes them.
 
 #### Metadata
   * type: capability

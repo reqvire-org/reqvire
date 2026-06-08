@@ -38,20 +38,19 @@ Rules:
   * type: behavior
 ---
 
-### Mermaid Diagram Interaction Behavior
+### Mermaid Diagram Link Behavior
 
-Interactive behavior for Mermaid diagrams in HTML export.
+Link behavior for generated Mermaid diagram source.
 
 #### Details
-**Click Behavior:**
-- Nodes are clickable links to element definition
-- Links use relative paths from output location
-- External links open in new tab
+Generated Mermaid diagrams shall emit click directives for nodes with navigable model targets.
 
-**Zoom/Pan:**
-- Mouse wheel for zoom
-- Click and drag for pan
-- Reset button to restore initial view
+Rules:
+- Element nodes include clickable links to the referenced element or source anchor.
+- Link targets use relative paths or canonical Explorer routes appropriate to the output context.
+- External links remain explicit external targets.
+
+Browser zoom, pan, reset controls, rendered hover behavior, and Mermaid viewport styling are WebInterface presentation concerns.
 
 #### Metadata
   * type: behavior

@@ -30,7 +30,7 @@ export interface ProjectStoreFolder {
 export interface ProjectStoreFile {
   path: string;
   display_path: string;
-  html_path: string;
+  markdown_content: string;
   parent_folder: string;
   element_ids: string[];
   resource_ids: string[];
@@ -42,6 +42,7 @@ export interface ProjectStoreResource {
   target: string;
   display: string;
   file_path: string | null;
+  source_text?: string | null;
   external_url: string | null;
   referring_element_ids: string[];
   relation_types: string[];
@@ -139,9 +140,12 @@ export interface CoverageSummary {
   total_verifications?: number;
   total_test_verifications?: number;
   satisfied_test_verifications?: number;
+  unsatisfied_test_verifications?: number;
   test_verifications_satisfaction_percentage?: number;
   orphaned_verifications?: number;
   orphaned_verifications_percentage?: number;
+  verification_types?: Record<string, number>;
+  coverage_sources?: Record<string, number>;
 }
 
 export interface CoverageProjection {
@@ -153,9 +157,23 @@ export interface TraceVerification {
   identifier: string;
   name: string;
   file: string;
+  type?: string;
   directly_verified_count?: number;
   total_requirements_in_tree?: number;
   directly_verified_requirements?: string[];
+  trace_tree?: TraceTree;
+}
+
+export interface TraceTree {
+  requirements: TraceRequirementNode[];
+}
+
+export interface TraceRequirementNode {
+  id: string;
+  name: string;
+  type: string;
+  is_directly_verified: boolean;
+  children: TraceRequirementNode[];
 }
 
 export interface TraceFileEntry {
@@ -179,10 +197,6 @@ export interface OntologyProjection {
   diagnostics?: unknown[];
   projection?: OntologyConstructProjectionGraph;
   graph_data?: OntologyGraphData;
-  graph_renderer?: {
-    css?: string;
-    js?: string;
-  };
   ttl_href?: string;
 }
 
@@ -415,7 +429,7 @@ export interface ExplorerProjectStore {
   routes: ProjectStoreRoutes;
 }
 
-/** Global injected by the Rust export script tag `#reqvire-project-store`. */
+/** Global loaded from the generated `assets/project-store.js` data asset. */
 declare global {
   interface Window {
     reqvireProjectStore?: unknown;

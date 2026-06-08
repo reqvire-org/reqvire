@@ -1,22 +1,25 @@
-import { useMemo, useState } from "react";
 import {
-  Badge,
-  Box,
-  Card,
-  Code,
-  Flex,
-  Grid,
-  Heading,
-  Text,
-  TextField,
-} from "@radix-ui/themes";
-import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+} from "react";
 import { useStore } from "../store/StoreContext";
 import type { ExplorerViewProps } from "../components/ExplorerViewProps";
 import { useExplorerUiState } from "../components/ExplorerUiState";
-import type { ProjectStoreElement } from "../store/types";
-import { REQVIRE_SURFACE_BASE } from "../theme";
+import type {
+  ProjectStoreElement,
+  TraceRequirementNode,
+} from "../store/types";
 import { ViewFrame } from "./ViewFrame";
+import { MermaidBlock } from "../components/MarkdownContent";
+import { ElementIcon, elementRole, getMermaidClassDefs, Icon, Stat, StatRow, TypeBadge, type ElementRole } from "@ds";
+import { buildTraceFiles, type TraceFileNode, type TraceVerificationNode } from "../lib/traces";
 
 /*
  * Report-projection views (Traces and Coverage).
@@ -27,44 +30,58 @@ import { ViewFrame } from "./ViewFrame";
  * element-detail modal.
  */
 
-function pct(value: number | undefined): string {
-  return typeof value === "number" ? `${value}%` : "—";
+type TraceMermaidQueueTask = (release: () => void) => void;
+
+const traceMermaidRenderQueue: TraceMermaidQueueTask[] = [];
+let traceMermaidRenderActive = false;
+
+function enqueueTraceMermaidRender(task: TraceMermaidQueueTask): () => void {
+  let cancelled = false;
+  const queuedTask: TraceMermaidQueueTask = (release) => {
+    if (cancelled) {
+      release();
+      return;
+    }
+    task(release);
+  };
+
+  traceMermaidRenderQueue.push(queuedTask);
+  scheduleTraceMermaidRenderQueue();
+
+  return () => {
+    cancelled = true;
+    const index = traceMermaidRenderQueue.indexOf(queuedTask);
+    if (index >= 0) {
+      traceMermaidRenderQueue.splice(index, 1);
+    }
+  };
 }
 
-function Metric({ label, value }: { label: string; value: string | number }) {
-  return (
-    <Box className="explorer-metric">
-      <Flex direction="column" gap="1">
-        <Text size="6" weight="bold">
-          {value}
-        </Text>
-        <Text size="1" color="gray">
-          {label}
-        </Text>
-      </Flex>
-    </Box>
-  );
-}
+function scheduleTraceMermaidRenderQueue() {
+  if (traceMermaidRenderActive || traceMermaidRenderQueue.length === 0) return;
 
-interface TraceVerificationNode {
-  id: string;
-  name: string;
-  file: string;
-  directCount: number;
-  totalCount: number;
-  requirementIds: string[];
-}
+  const run = () => {
+    if (traceMermaidRenderActive) return;
+    const task = traceMermaidRenderQueue.shift();
+    if (!task) return;
 
-interface TraceFileNode {
-  file: string;
-  verifications: TraceVerificationNode[];
-}
+    traceMermaidRenderActive = true;
+    let released = false;
+    const release = () => {
+      if (released) return;
+      released = true;
+      traceMermaidRenderActive = false;
+      scheduleTraceMermaidRenderQueue();
+    };
 
-function isVerification(element: ProjectStoreElement): boolean {
-  return (
-    element.type_family === "verification" ||
-    element.element_type.toLowerCase().includes("verification")
-  );
+    task(release);
+  };
+
+  if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+    window.requestIdleCallback(run, { timeout: 600 });
+  } else {
+    globalThis.setTimeout(run, 16);
+  }
 }
 
 export function TracesView({
@@ -73,501 +90,1050 @@ export function TracesView({
   onOpenElement: (id: string) => void;
 } & Partial<ExplorerViewProps>) {
   const { store } = useStore();
-  const { traceMode: mode } = useExplorerUiState();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
+  const {
+    traceFilePath,
+    setTraceFilePath,
+    traceSelectionId,
+    setTraceSelectionId: setSelectedId,
+  } = useExplorerUiState();
   const elementById = useMemo(
     () => new Map(store.elements.map((element) => [element.id, element])),
     [store.elements],
   );
   const traceFiles = useMemo(() => {
-    const files = store.traces?.files ?? {};
-    const entries = Object.entries(files).sort((a, b) => a[0].localeCompare(b[0]));
-    if (entries.length > 0) {
-      return entries.map(([file, entry]) => ({
-        file,
-        verifications: (entry.verifications ?? []).map((verification) => ({
-          id: verification.identifier,
-          name: verification.name,
-          file: verification.file || file,
-          directCount: verification.directly_verified_count ?? 0,
-          totalCount: verification.total_requirements_in_tree ?? 0,
-          requirementIds: verification.directly_verified_requirements ?? [],
-        })),
-      }));
-    }
-
-    const requirementIdsByVerification = new Map<string, string[]>();
-    for (const relation of store.relations) {
-      const relationType =
-        relation.canonical_relation_type || relation.relation_type || "";
-      if (!relationType.toLowerCase().includes("verify")) continue;
-      const source = elementById.get(relation.source_id);
-      const target = elementById.get(relation.target_id);
-      if (!source || !target || !isVerification(source)) continue;
-      const list = requirementIdsByVerification.get(source.id) ?? [];
-      list.push(target.id);
-      requirementIdsByVerification.set(source.id, list);
-    }
-
-    const byFile = new Map<string, TraceVerificationNode[]>();
-    for (const element of store.elements.filter(isVerification)) {
-      const requirementIds = requirementIdsByVerification.get(element.id) ?? [];
-      const list = byFile.get(element.file_path) ?? [];
-      list.push({
-        id: element.id,
-        name: element.name,
-        file: element.file_path,
-        directCount: requirementIds.length,
-        totalCount: requirementIds.length,
-        requirementIds,
-      });
-      byFile.set(element.file_path, list);
-    }
-
-    return [...byFile.entries()]
-      .sort((a, b) => a[0].localeCompare(b[0]))
-      .map(([file, verifications]) => ({ file, verifications }));
-  }, [elementById, store.elements, store.relations, store.traces?.files]);
-  const totalVerifications = traceFiles.reduce(
-    (sum, file) => sum + file.verifications.length,
-    0,
+    return buildTraceFiles(store);
+  }, [store]);
+  const selectedFile = useMemo(
+    () => traceFiles.find((file) => file.file === traceFilePath) ?? traceFiles[0],
+    [traceFilePath, traceFiles],
   );
-  const directRequirementCount = traceFiles.reduce(
-    (sum, file) =>
-      sum +
-      file.verifications.reduce(
-        (inner, verification) => inner + verification.requirementIds.length,
-        0,
-      ),
-    0,
-  );
-  const selected = selectedId ? elementById.get(selectedId) ?? null : null;
-  const traceSearchResults = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    const verificationMatches = traceFiles
-      .flatMap((file) =>
-        file.verifications.map((verification) => ({
-          id: verification.id,
-          label: verification.name,
-          kind: "verification",
-          file: file.file,
-        })),
-      )
-      .filter((item) => `${item.label} ${item.id} ${item.file}`.toLowerCase().includes(q));
-    const requirementMatches = Array.from(
-      new Set(traceFiles.flatMap((file) => file.verifications.flatMap((v) => v.requirementIds))),
-    )
-      .map((id) => {
-        const element = elementById.get(id);
-        return {
-          id,
-          label: element?.name ?? id,
-          kind: "requirement",
-          file: element?.file_path ?? "",
-        };
-      })
-      .filter((item) => `${item.label} ${item.id} ${item.file}`.toLowerCase().includes(q));
-    return [...verificationMatches, ...requirementMatches].slice(0, 30);
-  }, [elementById, query, traceFiles]);
+
+  useEffect(() => {
+    if (traceFiles.length === 0) {
+      if (traceFilePath !== null) setTraceFilePath(null);
+      if (traceSelectionId !== null) setSelectedId(null);
+      return;
+    }
+
+    const selectedExists = traceFilePath
+      ? traceFiles.some((file) => file.file === traceFilePath)
+      : false;
+    if (!selectedExists) {
+      setTraceFilePath(traceFiles[0].file);
+      setSelectedId(null);
+    }
+  }, [setSelectedId, setTraceFilePath, traceFilePath, traceFiles, traceSelectionId]);
 
   return (
     <ViewFrame testId="traces">
-      <Grid
-        columns={{ initial: "1fr", lg: "minmax(0, 1fr) 390px" }}
-        className="explorer-route"
-      >
-        <Box className="explorer-main-panel trace-main-panel">
-          {mode === "flow" ? (
-            <TraceFlow
-              files={traceFiles}
-              elementById={elementById}
-              selectedId={selectedId}
-              onSelect={setSelectedId}
-              onOpenElement={onOpenElement}
-            />
-          ) : (
+      <div className="ex-route ex-route-single">
+        <div className="ex-main-panel trace-main-panel">
+          <div className="trace-content-scroll">
             <TraceRows
-              files={traceFiles}
-              onSelect={setSelectedId}
+              file={selectedFile}
+              elementById={elementById}
               onOpenElement={onOpenElement}
+              onSelect={setSelectedId}
+              selectedVerificationId={traceSelectionId}
             />
-          )}
-          {traceFiles.length === 0 && (
-            <Text color="gray">No verification traces in store.</Text>
-          )}
-        </Box>
-
-        <Box className="graph-sidebar">
-          <div className="graph-search-panel">
-            <TextField.Root
-              aria-label="Search traces"
-              placeholder="Search verifications, requirements, files"
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-            >
-              <TextField.Slot>
-                <MagnifyingGlassIcon />
-              </TextField.Slot>
-            </TextField.Root>
-            {traceSearchResults.length > 0 && (
-              <ul className="graph-results">
-                {traceSearchResults.map((item) => (
-                  <li key={`${item.kind}:${item.id}`}>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setSelectedId(item.id);
-                        onOpenElement(item.id);
-                      }}
-                    >
-                      <span
-                        className="graph-result-swatch"
-                        style={{ backgroundColor: item.kind === "verification" ? "#4caf50" : "#673ab7" }}
-                      />
-                      <span>{item.label}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+            {traceFiles.length === 0 && (
+              <span className="ex-empty-note">No verification traces in store.</span>
             )}
           </div>
-          <div className="graph-inspector-header">
-            <Heading as="h2" size="3">
-              Trace Inspector
-            </Heading>
-          </div>
-          <div className="graph-inspector-body">
-          <Flex direction="column" gap="3">
-            {selected ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => onOpenElement(selected.id)}
-                  className="explorer-command"
-                >
-                  Open element detail
-                </button>
-                <Box>
-                  <Heading as="h2" size="3" mb="2">
-                    {selected.name}
-                  </Heading>
-                  <Flex gap="2" wrap="wrap">
-                    <Badge>{selected.type_family}</Badge>
-                    <Code>{selected.element_type}</Code>
-                  </Flex>
-                </Box>
-                <Text size="1" color="gray">
-                  {selected.file_path}:{selected.line_number}
-                </Text>
-              </>
-            ) : (
-              <Text size="2" color="gray">
-                Select a verification or requirement in the flow to inspect it.
-              </Text>
-            )}
-          </Flex>
-          </div>
-          <div className="graph-summary-strip">
-            <span>
-              Files <strong>{traceFiles.length}</strong>
-            </span>
-            <span>
-              Verifications <strong>{totalVerifications}</strong>
-            </span>
-            <span>
-              Direct reqs <strong>{directRequirementCount}</strong>
-            </span>
-            <span>
-              Elements <strong>{store.elements.length}</strong>
-            </span>
-          </div>
-        </Box>
-      </Grid>
+        </div>
+      </div>
     </ViewFrame>
   );
 }
 
 function TraceRows({
-  files,
-  onSelect,
-  onOpenElement,
-}: {
-  files: TraceFileNode[];
-  onSelect: (id: string) => void;
-  onOpenElement: (id: string) => void;
-}) {
-  return (
-    <Flex data-testid="trace-rows" direction="column" gap="3">
-      {files.map((file) => (
-        <Box key={file.file} className="trace-row-group">
-          <Heading as="h2" size="2" mb="2">
-            <Code>{file.file}</Code>
-          </Heading>
-          <Flex direction="column" gap="1">
-            {file.verifications.map((verification) => (
-              <button
-                key={verification.id}
-                type="button"
-                onClick={() => {
-                  onSelect(verification.id);
-                  onOpenElement(verification.id);
-                }}
-                className="explorer-list-row"
-              >
-                <Text size="2">{verification.name}</Text>
-                <Badge color="green">{verification.directCount} direct</Badge>
-                <Text size="1" color="gray">
-                  {verification.totalCount} in tree
-                </Text>
-              </button>
-            ))}
-          </Flex>
-        </Box>
-      ))}
-    </Flex>
-  );
-}
-
-function TraceFlow({
-  files,
+  file,
   elementById,
-  selectedId,
+  onOpenElement,
   onSelect,
+  selectedVerificationId,
+}: {
+  file: TraceFileNode | undefined;
+  elementById: Map<string, ProjectStoreElement>;
+  onOpenElement: (id: string) => void;
+  onSelect: (id: string) => void;
+  selectedVerificationId: string | null;
+}) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    if (!selectedVerificationId) return;
+    const target = containerRef.current?.querySelector<HTMLElement>(
+      `#${traceVerificationDomId(selectedVerificationId)}`,
+    );
+    target?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, [file?.file, selectedVerificationId]);
+
+  if (!file) {
+    return <div data-testid="trace-rows" className="trace-report-view" />;
+  }
+
+  return (
+    <div ref={containerRef} data-testid="trace-rows" className="trace-report-view">
+      <section className="trace-row-group">
+        <div className="trace-file-header">
+          <h2 className="trace-file-heading">{file.file}</h2>
+          <span className="trace-file-count">
+            {file.verifications.length} {file.verifications.length === 1 ? "verification" : "verifications"}
+          </span>
+        </div>
+        <div className="trace-verification-list">
+          {file.verifications.map((verification) => (
+            <article
+              key={verification.id}
+              id={traceVerificationDomId(verification.id)}
+              className={[
+                "trace-verification-card",
+                selectedVerificationId === verification.id ? "is-selected" : "",
+              ].filter(Boolean).join(" ")}
+            >
+              <div className="trace-verification-header">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSelect(verification.id);
+                  }}
+                  className="trace-verification-title"
+                >
+                  {verification.name}
+                </button>
+                <span className="trace-tree-count-badge">
+                  {verification.totalCount} in tree
+                </span>
+              </div>
+              <dl className="trace-verification-meta">
+                <div>
+                  <dt>Type</dt>
+                  <dd>{verification.verificationType ?? "verification"}</dd>
+                </div>
+                <div>
+                  <dt>Directly Verified</dt>
+                  <dd>{verification.directCount} requirements</dd>
+                </div>
+                <div>
+                  <dt>Total in Tree</dt>
+                  <dd>{verification.totalCount} requirements</dd>
+                </div>
+              </dl>
+              <TraceRollupDiagram
+                verification={verification}
+                elementById={elementById}
+                onOpenElement={onOpenElement}
+              />
+            </article>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+const TraceRollupDiagram = memo(function TraceRollupDiagram({
+  verification,
+  elementById,
   onOpenElement,
 }: {
-  files: TraceFileNode[];
+  verification: TraceVerificationNode;
   elementById: Map<string, ProjectStoreElement>;
-  selectedId: string | null;
-  onSelect: (id: string) => void;
   onOpenElement: (id: string) => void;
 }) {
-  const width = 1050;
-  const rowHeight = 58;
-  const verifications = files.flatMap((file) => file.verifications);
-  const requirementIds = Array.from(
-    new Set(verifications.flatMap((verification) => verification.requirementIds)),
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const cancelQueuedRenderRef = useRef<(() => void) | null>(null);
+  const releaseRenderSlotRef = useRef<(() => void) | null>(null);
+  const [shouldRender, setShouldRender] = useState(false);
+  const [model, setModel] = useState<TraceRollupMermaidModel | null>(null);
+  const startQueuedRender = useCallback(() => {
+    if (shouldRender || model || cancelQueuedRenderRef.current || releaseRenderSlotRef.current) return;
+    cancelQueuedRenderRef.current = enqueueTraceMermaidRender((release) => {
+      cancelQueuedRenderRef.current = null;
+      releaseRenderSlotRef.current = release;
+      setModel(buildTraceRollupMermaidModel(verification, elementById));
+      setShouldRender(true);
+    });
+  }, [elementById, model, shouldRender, verification]);
+
+  const releaseRenderSlot = useCallback(() => {
+    releaseRenderSlotRef.current?.();
+    releaseRenderSlotRef.current = null;
+  }, []);
+  const handleDiagramClick = useCallback((event: ReactMouseEvent<HTMLDivElement>) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const elementTarget = target.closest<HTMLElement>("[data-reqvire-element-id]");
+    const elementId = elementTarget?.dataset.reqvireElementId ?? elementIdFromMermaidAnchor(target);
+    if (!elementId || !elementById.has(elementId)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    onOpenElement(elementId);
+  }, [elementById, onOpenElement]);
+
+  useEffect(
+    () => () => {
+      cancelQueuedRenderRef.current?.();
+      cancelQueuedRenderRef.current = null;
+      releaseRenderSlotRef.current?.();
+      releaseRenderSlotRef.current = null;
+    },
+    [],
   );
-  const rows = Math.max(files.length, verifications.length, requirementIds.length, 1);
-  const height = Math.max(520, rows * rowHeight + 80);
-  const fileY = new Map(
-    files.map((file, index) => [file.file, 60 + index * rowHeight]),
-  );
-  const verificationY = new Map(
-    verifications.map((verification, index) => [
-      verification.id,
-      60 + index * rowHeight,
-    ]),
-  );
-  const requirementY = new Map(
-    requirementIds.map((id, index) => [id, 60 + index * rowHeight]),
-  );
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node || shouldRender) return;
+
+    let timeout: ReturnType<typeof globalThis.setTimeout> | undefined;
+    let idleCallback: ReturnType<typeof window.requestIdleCallback> | undefined;
+    if (!("IntersectionObserver" in window)) {
+      timeout = globalThis.setTimeout(startQueuedRender, 0);
+      return () => globalThis.clearTimeout(timeout);
+    }
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        if ("requestIdleCallback" in window) {
+          idleCallback = window.requestIdleCallback(startQueuedRender, { timeout: 250 });
+        } else {
+          timeout = globalThis.setTimeout(startQueuedRender, 0);
+        }
+      },
+      { rootMargin: "320px 0px" },
+    );
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+      if (idleCallback !== undefined && "cancelIdleCallback" in window) {
+        window.cancelIdleCallback(idleCallback);
+      }
+      if (timeout !== undefined) globalThis.clearTimeout(timeout);
+    };
+  }, [shouldRender, startQueuedRender]);
 
   return (
-    <Box data-testid="trace-flow" className="trace-canvas h-full min-h-[520px]">
-      <svg
-        viewBox={`0 0 ${width} ${height}`}
-        role="img"
-        aria-label="Verification trace flow"
-        className="h-full min-h-[520px] w-full"
-      >
-        <text x="80" y="28" fontSize="12" fontWeight="700" fill="#4b4d4a">
-          Files
-        </text>
-        <text x="440" y="28" fontSize="12" fontWeight="700" fill="#4b4d4a">
-          Verifications
-        </text>
-        <text x="790" y="28" fontSize="12" fontWeight="700" fill="#4b4d4a">
-          Requirements
-        </text>
-        {files.flatMap((file) =>
-          file.verifications.map((verification) => {
-            const y1 = fileY.get(file.file) ?? 60;
-            const y2 = verificationY.get(verification.id) ?? 60;
-            return (
-              <path
-                key={`${file.file}-${verification.id}`}
-                d={`M 260 ${y1} C 330 ${y1}, 330 ${y2}, 400 ${y2}`}
-                fill="none"
-                stroke="#8a8a86"
-                strokeWidth="2"
-                opacity="0.45"
-              />
-            );
-          }),
-        )}
-        {verifications.flatMap((verification) =>
-          verification.requirementIds.map((id) => {
-            const y1 = verificationY.get(verification.id) ?? 60;
-            const y2 = requirementY.get(id) ?? 60;
-            return (
-              <path
-                key={`${verification.id}-${id}`}
-                d={`M 620 ${y1} C 700 ${y1}, 700 ${y2}, 760 ${y2}`}
-                fill="none"
-                stroke="#4caf50"
-                strokeWidth="2.5"
-                opacity="0.5"
-              />
-            );
-          }),
-        )}
-        {files.map((file) => (
-          <TracePill
-            key={file.file}
-            x={40}
-            y={(fileY.get(file.file) ?? 60) - 18}
-            width={220}
-            label={file.file}
-            color="#00897b"
-          />
-        ))}
-        {verifications.map((verification) => (
-          <TracePill
-            key={verification.id}
-            x={400}
-            y={(verificationY.get(verification.id) ?? 60) - 18}
-            width={220}
-            label={verification.name}
-            color="#4caf50"
-            selected={verification.id === selectedId}
-            onClick={() => onSelect(verification.id)}
-            onDoubleClick={() => onOpenElement(verification.id)}
-          />
-        ))}
-        {requirementIds.map((id) => {
-          const requirement = elementById.get(id);
-          return (
-            <TracePill
-              key={id}
-              x={760}
-              y={(requirementY.get(id) ?? 60) - 18}
-              width={240}
-              label={requirement?.name ?? id}
-              color="#673ab7"
-              selected={id === selectedId}
-              onClick={() => onSelect(id)}
-              onDoubleClick={() => onOpenElement(id)}
-            />
-          );
-        })}
-      </svg>
-    </Box>
+    <div ref={containerRef} className="trace-rollup-diagram" onClickCapture={handleDiagramClick}>
+      {shouldRender && model ? (
+        <MermaidBlock
+          code={model.code}
+          nodeClickTargets={model.nodeClickTargets}
+          onNodeClick={onOpenElement}
+          onRenderSettled={releaseRenderSlot}
+        />
+      ) : (
+        <div className="trace-rollup-placeholder">
+          Diagram queued. Rows remain interactive while rendering continues.
+        </div>
+      )}
+    </div>
   );
+});
+
+function elementIdFromMermaidAnchor(target: Element): string | null {
+  const anchor = target.closest<HTMLAnchorElement>("a[href]");
+  if (!anchor) return null;
+  return elementIdFromMermaidHref(anchor.getAttribute("href") ?? anchor.href);
 }
 
-function TracePill({
-  x,
-  y,
-  width,
-  label,
-  color,
-  selected = false,
-  onClick,
-  onDoubleClick,
+function elementIdFromMermaidHref(href: string): string | null {
+  const contentPrefix = "#/content/";
+  let hash = href;
+  if (!hash.startsWith("#")) {
+    try {
+      hash = new URL(href, window.location.href).hash;
+    } catch {
+      return null;
+    }
+  }
+  if (!hash.startsWith(contentPrefix)) return null;
+  const rawId = hash.slice(contentPrefix.length);
+  try {
+    return decodeURIComponent(rawId);
+  } catch {
+    return rawId;
+  }
+}
+
+interface TraceDiagramElement {
+  id: string;
+  name: string;
+  type: string;
+}
+
+interface TraceRollupMermaidModel {
+  code: string;
+  nodeClickTargets: ReadonlyMap<string, string>;
+}
+
+function buildTraceRollupMermaidModel(
+  verification: TraceVerificationNode,
+  elementById: Map<string, ProjectStoreElement>,
+): TraceRollupMermaidModel {
+  const nodeClickTargets = new Map<string, string>();
+  const code = buildTraceRollupMermaid(verification, elementById, nodeClickTargets);
+  return { code, nodeClickTargets };
+}
+
+function buildTraceRollupMermaid(
+  verification: TraceVerificationNode,
+  elementById: Map<string, ProjectStoreElement>,
+  nodeClickTargets = new Map<string, string>(),
+): string {
+  const elements = new Map<string, TraceDiagramElement>();
+  const edges = new Set<string>();
+  const edgeLines: string[] = [];
+
+  const addElement = (element: TraceDiagramElement) => {
+    elements.set(element.id, element);
+  };
+  const addEdge = (source: string, label: string, target: string) => {
+    const key = `${source}\0${label}\0${target}`;
+    if (edges.has(key)) return;
+    edges.add(key);
+    edgeLines.push(`  ${mermaidNodeId(source)} -->|${label}| ${mermaidNodeId(target)};`);
+  };
+
+  addElement({
+    id: verification.id,
+    name: verification.name,
+    type: "verification",
+  });
+
+  const addRequirementNode = (node: TraceRequirementNode) => {
+    addElement({
+      id: node.id,
+      name: node.name,
+      type: node.type,
+    });
+    if (node.is_directly_verified) {
+      addEdge(verification.id, "verifies", node.id);
+    }
+    for (const child of node.children ?? []) {
+      addRequirementNode(child);
+      addEdge(node.id, "derivedFrom", child.id);
+    }
+  };
+
+  if (verification.traceTree?.requirements.length) {
+    for (const requirement of verification.traceTree.requirements) {
+      addRequirementNode(requirement);
+    }
+  } else {
+    for (const requirementId of verification.requirementIds) {
+      const element = elementById.get(requirementId);
+      addElement({
+        id: requirementId,
+        name: element?.name ?? requirementId,
+        type: element?.element_type ?? "requirement",
+      });
+      addEdge(verification.id, "verifies", requirementId);
+    }
+  }
+
+  const grouped = groupTraceDiagramElements([...elements.values()]);
+  const lines = [
+    "graph TD",
+    ...getMermaidClassDefs(),
+    "",
+  ];
+
+  for (const [folder, files] of grouped) {
+    const folderId = mermaidNodeId(`folder:${folder}`);
+    lines.push(`  subgraph ${folderId}["${escapeMermaidLabel(folder || "root")}"]`);
+    for (const [file, fileElements] of files) {
+      const fileId = mermaidNodeId(`file:${folder}:${file}`);
+      lines.push(`    subgraph ${fileId}["${escapeMermaidLabel(file)}"]`);
+      for (const element of fileElements) {
+        const nodeId = mermaidNodeId(element.id);
+        nodeClickTargets.set(nodeId, element.id);
+        lines.push(
+          `      ${nodeId}["${escapeMermaidLabel(element.name)}"]:::${mermaidClassForType(element.type)}`,
+        );
+        lines.push(`      click ${nodeId} "${spaRouteForElement(element.id)}";`);
+      }
+      lines.push("    end");
+    }
+    lines.push("  end");
+  }
+
+  lines.push(...edgeLines);
+  return lines.join("\n");
+}
+
+function groupTraceDiagramElements(elements: TraceDiagramElement[]) {
+  const folders = new Map<string, Map<string, TraceDiagramElement[]>>();
+  for (const element of elements) {
+    const path = element.id.split("#")[0] || element.id;
+    const slash = path.lastIndexOf("/");
+    const folder = slash >= 0 ? path.slice(0, slash) : "";
+    const file = slash >= 0 ? path.slice(slash + 1) : path;
+    const files = folders.get(folder) ?? new Map<string, TraceDiagramElement[]>();
+    const fileElements = files.get(file) ?? [];
+    fileElements.push(element);
+    files.set(file, fileElements);
+    folders.set(folder, files);
+  }
+
+  return [...folders.entries()]
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([folder, files]) => [
+      folder,
+      new Map(
+        [...files.entries()]
+          .sort(([a], [b]) => a.localeCompare(b))
+          .map(([file, fileElements]) => [
+            file,
+            fileElements.sort((a, b) => a.id.localeCompare(b.id)),
+          ]),
+      ),
+    ] as const);
+}
+
+function mermaidClassForType(type: string): string {
+  const normalized = type.toLowerCase();
+  if (normalized === "system-requirement") return "systemRequirement";
+  return mermaidClassForRole(elementRole(type));
+}
+
+function mermaidClassForRole(role: ElementRole): string {
+  switch (role) {
+    case "input-output":
+      return "inputOutput";
+    case "semantic-contract":
+      return "semanticContract";
+    default:
+      return role === "other" ? "default" : role;
+  }
+}
+
+function mermaidNodeId(value: string): string {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `n${(hash >>> 0).toString(16)}`;
+}
+
+function traceVerificationDomId(id: string): string {
+  return `trace-verification-${mermaidNodeId(id).slice(1)}`;
+}
+
+function escapeMermaidLabel(label: string): string {
+  return label.replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, " ");
+}
+
+function spaRouteForElement(id: string): string {
+  const [file, anchor] = id.split("#");
+  return anchor ? `#/content/${file}#${anchor}` : `#/content/${file}`;
+}
+
+export function __testBuildTraceRollupMermaid(
+  verification: TraceVerificationNode,
+  elementById: Map<string, ProjectStoreElement>,
+) {
+  return buildTraceRollupMermaid(verification, elementById);
+}
+
+interface CoverageSummaryLike {
+  total_leaf_requirements?: number;
+  verified_leaf_requirements?: number;
+  unverified_leaf_requirements?: number;
+  leaf_requirements_coverage_percentage?: number;
+  total_test_verifications?: number;
+  satisfied_test_verifications?: number;
+  unsatisfied_test_verifications?: number;
+  test_verifications_satisfaction_percentage?: number;
+  total_verifications?: number;
+  orphaned_verifications?: number;
+  orphaned_verifications_percentage?: number;
+  total_requirements_in_scope?: number;
+  covered_requirements?: number;
+  uncovered_requirements?: number;
+  implementation_coverage_percentage?: number;
+  verification_types?: Record<string, number>;
+  coverage_sources?: Record<string, number>;
+}
+
+interface CoverageProjectionLike {
+  summary?: CoverageSummaryLike;
+  unverified_leaf_requirements?: unknown;
+  unsatisfied_test_verifications?: unknown;
+  orphaned_verifications?: unknown;
+  covered_requirements?: unknown;
+  uncovered_requirements?: unknown;
+  satisfied_test_verifications?: unknown;
+  capability_coverage?: {
+    capabilities?: CapabilityCoverageDetails[];
+  };
+}
+
+interface CapabilityCoverageDetails {
+  identifier: string;
+  name: string;
+  aggregate_leaf_requirements?: number;
+  aggregate_verified_leaf_requirements?: number;
+  verification_coverage_percentage?: number;
+  aggregate_requirements?: number;
+  aggregate_covered_requirements?: number;
+  implementation_coverage_percentage?: number;
+  mark?: string;
+}
+
+interface CoverageRequirementDetails {
+  identifier: string;
+  name: string;
+  verified_by?: string[];
+}
+
+interface CoverageVerificationDetails {
+  identifier: string;
+  name: string;
+  verification_type?: string;
+  satisfied_by?: string[];
+}
+
+interface CoveredRequirementDetails {
+  identifier: string;
+  name: string;
+  coverage_source?: string;
+  evidence?: string[];
+}
+
+type CoverageFileItem<T> = T & { file: string };
+type CoverageSectionId =
+  | "overview"
+  | "capability-coverage"
+  | "unverified-requirements"
+  | "unimplemented-requirements"
+  | "unsatisfied-verifications"
+  | "orphaned-verifications";
+
+export function CoverageView({
+  onOpenElement,
 }: {
-  x: number;
-  y: number;
-  width: number;
-  label: string;
-  color: string;
-  selected?: boolean;
-  onClick?: () => void;
-  onDoubleClick?: () => void;
-}) {
-  return (
-    <g
-      className={onClick ? "cursor-pointer" : undefined}
-      onClick={onClick}
-      onDoubleClick={onDoubleClick}
-    >
-      <rect
-        x={x}
-        y={y}
-        width={width}
-        height="36"
-        rx="6"
-        fill={color}
-        stroke={selected ? "#172027" : REQVIRE_SURFACE_BASE}
-        strokeWidth={selected ? 3 : 1}
-        opacity="0.92"
-      />
-      <text
-        x={x + 10}
-        y={y + 23}
-        fontSize="12"
-        fill="#ffffff"
-        pointerEvents="none"
-      >
-        {label.length > 28 ? `${label.slice(0, 25)}...` : label}
-      </text>
-      <title>{label}</title>
-    </g>
+  onOpenElement?: (id: string) => void;
+} & Partial<ExplorerViewProps> = {}) {
+  const { store, elementById } = useStore();
+  const coverage = (store.coverage ?? {}) as CoverageProjectionLike;
+  const summary = coverage.summary ?? {};
+  const capabilityRows = [...(coverage.capability_coverage?.capabilities ?? [])].sort(
+    (left, right) =>
+      (right.implementation_coverage_percentage ?? 0) -
+        (left.implementation_coverage_percentage ?? 0) ||
+      left.name.localeCompare(right.name),
   );
-}
+  const unverifiedLeaf = coverageFileItems<CoverageRequirementDetails>(coverage.unverified_leaf_requirements);
+  const uncoveredRequirements = coverageFileItems<CoverageRequirementDetails>(coverage.uncovered_requirements);
+  const unsatisfiedTests = coverageFileItems<CoverageVerificationDetails>(coverage.unsatisfied_test_verifications);
+  const orphanedVerifications = coverageFileItems<CoverageVerificationDetails>(coverage.orphaned_verifications);
+  const coveredRequirements = coverageFileItems<CoveredRequirementDetails>(coverage.covered_requirements);
+  const satisfiedTests = coverageFileItems<CoverageVerificationDetails>(coverage.satisfied_test_verifications);
+  const hasCoverageData =
+    Object.keys(summary).length > 0 ||
+    capabilityRows.length > 0 ||
+    unverifiedLeaf.length > 0 ||
+    uncoveredRequirements.length > 0 ||
+    unsatisfiedTests.length > 0 ||
+    orphanedVerifications.length > 0 ||
+    coveredRequirements.length > 0 ||
+    satisfiedTests.length > 0;
 
-export function CoverageView(_: Partial<ExplorerViewProps> = {}) {
-  const { store } = useStore();
-  const summary = store.coverage?.summary ?? {};
+  useEffect(() => {
+    function navigateToCoverageSection(event: Event) {
+      const section = (event as CustomEvent<{ section?: CoverageSectionId }>).detail?.section;
+      if (!section) return;
+      const target = document.getElementById(coverageSectionDomId(section));
+      if (!target) return;
+      target.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+
+    window.addEventListener("reqvire:coverage-navigate", navigateToCoverageSection);
+    return () => window.removeEventListener("reqvire:coverage-navigate", navigateToCoverageSection);
+  }, []);
+
   return (
     <ViewFrame testId="coverage">
-      <Grid columns={{ initial: "1fr", lg: "minmax(0, 1fr) 390px" }} className="explorer-route">
-        <Box className="explorer-document-panel">
-        <Grid columns={{ initial: "2", md: "4" }} gap="3" mb="4">
-          <Metric
-            label="Leaf requirement coverage"
-            value={pct(summary.leaf_requirements_coverage_percentage)}
-          />
-          <Metric
-            label="Implementation coverage"
-            value={pct(summary.implementation_coverage_percentage)}
-          />
-          <Metric
-            label="Test verification satisfaction"
-            value={pct(summary.test_verifications_satisfaction_percentage)}
-          />
-          <Metric
-            label="Orphaned verifications"
-            value={summary.orphaned_verifications ?? 0}
-          />
-        </Grid>
-        <Card variant="surface" className="explorer-card">
-          <Flex direction="column" gap="1">
-            <Text size="2">
-              Requirements in scope:{" "}
-              <strong>{summary.total_requirements_in_scope ?? 0}</strong>
-            </Text>
-            <Text size="2">
-              Covered requirements:{" "}
-              <strong>{summary.covered_requirements ?? 0}</strong> / uncovered{" "}
-              <strong>{summary.uncovered_requirements ?? 0}</strong>
-            </Text>
-            <Text size="2">
-              Leaf requirements:{" "}
-              <strong>{summary.total_leaf_requirements ?? 0}</strong> (verified{" "}
-              {summary.verified_leaf_requirements ?? 0}, unverified{" "}
-              {summary.unverified_leaf_requirements ?? 0})
-            </Text>
-            <Text size="2">
-              Verifications: <strong>{summary.total_verifications ?? 0}</strong>{" "}
-              (test {summary.total_test_verifications ?? 0}, satisfied{" "}
-              {summary.satisfied_test_verifications ?? 0})
-            </Text>
-          </Flex>
-        </Card>
-        </Box>
-        <Box className="graph-sidebar">
-          <div className="graph-inspector-header">
-            <Heading as="h2" size="3">Coverage Inspector</Heading>
-          </div>
-          <div className="graph-inspector-body">
-            <Text size="2" color="gray">
-              Coverage records are generated from the same Project Store relations used by Model and Traces.
-            </Text>
-          </div>
-        </Box>
-      </Grid>
+      <div className="ex-route ex-route-single">
+        <div className="ex-document-panel coverage-dashboard">
+          <header
+            id={coverageSectionDomId("overview")}
+            className="coverage-header"
+          >
+            <div className="coverage-title-block">
+              <span className="rq-eyebrow">Coverage</span>
+              <h1>Verification Coverage</h1>
+            </div>
+            <StatRow className="coverage-header-stats">
+              <Stat label="Requirements" value={formatNumber(summary.total_requirements_in_scope)} />
+              <Stat label="Leaf reqs" value={formatNumber(summary.total_leaf_requirements)} />
+              <Stat label="Verifications" value={formatNumber(summary.total_verifications)} />
+            </StatRow>
+          </header>
+
+          {!hasCoverageData ? (
+            <div className="coverage-empty">
+              <Icon name="pie-chart" />
+              <div>
+                <h2>No coverage report in this Explorer seed</h2>
+                <p>Serve or open a Project Store generated by Reqvire to inspect requirement and verification coverage.</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              <section className="coverage-kpi-grid" aria-label="Coverage summary">
+                <CoverageKpi
+                  label="Leaf verification"
+                  value={summary.leaf_requirements_coverage_percentage}
+                  detail={`${formatNumber(summary.verified_leaf_requirements)} / ${formatNumber(summary.total_leaf_requirements)} verified`}
+                  token="--requirement"
+                />
+                <CoverageKpi
+                  label="Implementation"
+                  value={summary.implementation_coverage_percentage}
+                  detail={`${formatNumber(summary.covered_requirements)} / ${formatNumber(summary.total_requirements_in_scope)} covered`}
+                  token="--resource"
+                />
+                <CoverageKpi
+                  label="Test evidence"
+                  value={summary.test_verifications_satisfaction_percentage}
+                  detail={`${formatNumber(summary.satisfied_test_verifications)} / ${formatNumber(summary.total_test_verifications)} satisfied`}
+                  token="--verification"
+                />
+                <CoverageKpi
+                  label="Orphaned verifications"
+                  value={summary.orphaned_verifications_percentage}
+                  detail={`${formatNumber(summary.orphaned_verifications)} / ${formatNumber(summary.total_verifications)} orphaned`}
+                  token="--refinement"
+                  inverted
+                />
+              </section>
+
+              <section className="coverage-grid" aria-label="Coverage breakdown">
+                <CoveragePanel title="Verification types" className="coverage-panel--compact">
+                  <CoverageBreakdown
+                    values={summary.verification_types ?? {}}
+                    rows={[
+                      ["test", "Test", "--verification"],
+                      ["formal_proof", "Formal proof", "--verification"],
+                      ["analysis", "Analysis", "--capability"],
+                      ["inspection", "Inspection", "--ontology"],
+                      ["demonstration", "Demonstration", "--refinement"],
+                    ]}
+                  />
+                </CoveragePanel>
+                <CoveragePanel title="Coverage sources" className="coverage-panel--compact">
+                  <CoverageSourceBars values={summary.coverage_sources ?? {}} />
+                </CoveragePanel>
+                <CoveragePanel
+                  id={coverageSectionDomId("capability-coverage")}
+                  title="Capability coverage"
+                  className="coverage-panel--wide"
+                >
+                  <CapabilityCoverageList capabilities={capabilityRows} onOpenElement={onOpenElement} />
+                </CoveragePanel>
+              </section>
+
+              <section className="coverage-gap-grid" aria-label="Coverage gaps">
+                <CoverageGapList
+                  id={coverageSectionDomId("unverified-requirements")}
+                  title="Unverified requirements"
+                  items={unverifiedLeaf}
+                  emptyLabel="All leaf requirements have verification."
+                  defaultType="requirement"
+                  elementById={elementById}
+                  onOpenElement={onOpenElement}
+                />
+                <CoverageGapList
+                  id={coverageSectionDomId("unimplemented-requirements")}
+                  title="Unimplemented requirements"
+                  items={uncoveredRequirements}
+                  emptyLabel="All requirements in scope have implementation evidence."
+                  defaultType="requirement"
+                  elementById={elementById}
+                  onOpenElement={onOpenElement}
+                />
+                <CoverageGapList
+                  id={coverageSectionDomId("unsatisfied-verifications")}
+                  title="Unsatisfied verifications"
+                  items={unsatisfiedTests}
+                  emptyLabel="All test verifications have evidence."
+                  defaultType="test-verification"
+                  elementById={elementById}
+                  onOpenElement={onOpenElement}
+                />
+                <CoverageGapList
+                  id={coverageSectionDomId("orphaned-verifications")}
+                  title="Orphaned verifications"
+                  items={orphanedVerifications}
+                  emptyLabel="Every verification links to a requirement or capability."
+                  defaultType="test-verification"
+                  elementById={elementById}
+                  onOpenElement={onOpenElement}
+                />
+              </section>
+            </>
+          )}
+        </div>
+      </div>
     </ViewFrame>
   );
+}
+
+function CoverageKpi({
+  label,
+  value,
+  detail,
+  token,
+  inverted = false,
+}: {
+  label: string;
+  value?: number;
+  detail: string;
+  token: `--${string}`;
+  inverted?: boolean;
+}) {
+  const percent = clampPercent(value ?? 0);
+  const shown = typeof value === "number" ? formatPercent(value) : "—";
+  const ringPercent = inverted ? 100 - percent : percent;
+  return (
+    <div className="coverage-kpi">
+      <div
+        className="coverage-donut"
+        style={{
+          "--coverage-fill-angle": `${ringPercent * 3.6}deg`,
+          "--coverage-color": `var(${token})`,
+        } as CSSProperties}
+        aria-hidden="true"
+      >
+        <span className="coverage-donut__center">{shown}</span>
+      </div>
+      <div className="coverage-kpi__copy">
+        <span className="coverage-kpi__label">{label}</span>
+        <span className="coverage-kpi__detail">{detail}</span>
+      </div>
+    </div>
+  );
+}
+
+function CoveragePanel({
+  id,
+  title,
+  className = "",
+  children,
+}: {
+  id?: string;
+  title: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <section
+      id={id}
+      className={["coverage-panel", className].filter(Boolean).join(" ")}
+    >
+      <header className="coverage-panel__head">
+        <h2>{title}</h2>
+      </header>
+      {children}
+    </section>
+  );
+}
+
+function CoverageBreakdown({
+  values,
+  rows,
+}: {
+  values: Record<string, number>;
+  rows: [string, string, `--${string}`][];
+}) {
+  const total = rows.reduce((sum, [key]) => sum + (values[key] ?? 0), 0);
+  return (
+    <div className="coverage-breakdown">
+      <div
+        className="coverage-breakdown__pie"
+        style={{ background: buildConicGradient(rows, values, total) }}
+        aria-hidden="true"
+      />
+      <div className="coverage-breakdown__legend">
+        {rows.map(([key, label, token]) => (
+          <CoverageLegendRow key={key} label={label} value={values[key] ?? 0} token={token} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CoverageSourceBars({ values }: { values: Record<string, number> }) {
+  const rows: [string, string, `--${string}`][] = [
+    ["direct_satisfied", "Direct evidence", "--resource"],
+    ["refinement_contract_satisfied_via_attachment", "Attached contract", "--ontology"],
+    ["refinement_contract_satisfied_via_child", "Child contract", "--capability"],
+  ];
+  const max = Math.max(1, ...rows.map(([key]) => values[key] ?? 0));
+  return (
+    <div className="coverage-bar-list">
+      {rows.map(([key, label, token]) => {
+        const value = values[key] ?? 0;
+        return (
+          <div key={key} className="coverage-source-row">
+            <div className="coverage-source-row__head">
+              <span>{label}</span>
+              <span>{formatNumber(value)}</span>
+            </div>
+            <CoverageBar value={(value / max) * 100} token={token} />
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function CapabilityCoverageList({
+  capabilities,
+  onOpenElement,
+}: {
+  capabilities: CapabilityCoverageDetails[];
+  onOpenElement?: (id: string) => void;
+}) {
+  if (capabilities.length === 0) {
+    return <p className="coverage-empty-note">No capability coverage rows were reported.</p>;
+  }
+
+  return (
+    <div className="coverage-capability-list">
+      {capabilities.map((capability) => (
+        <button
+          key={capability.identifier}
+          type="button"
+          className="coverage-capability-row"
+          onClick={() => onOpenElement?.(capability.identifier)}
+        >
+          <div className="coverage-capability-row__title">
+            <ElementIcon type="capability" size="sm" />
+            <span>{capability.name || displayIdentifier(capability.identifier)}</span>
+            {capability.mark ? <span className="coverage-mark">{capability.mark}</span> : null}
+          </div>
+          <div className="coverage-capability-row__bars">
+            <LabeledCoverageBar
+              label="Verification"
+              value={capability.verification_coverage_percentage}
+              count={`${formatNumber(capability.aggregate_verified_leaf_requirements)} / ${formatNumber(capability.aggregate_leaf_requirements)}`}
+              token="--requirement"
+            />
+            <LabeledCoverageBar
+              label="Implementation"
+              value={capability.implementation_coverage_percentage}
+              count={`${formatNumber(capability.aggregate_covered_requirements)} / ${formatNumber(capability.aggregate_requirements)}`}
+              token="--resource"
+            />
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function CoverageGapList<T extends { identifier: string; name: string; file: string }>({
+  id,
+  title,
+  items,
+  emptyLabel,
+  defaultType,
+  elementById,
+  onOpenElement,
+}: {
+  id?: string;
+  title: string;
+  items: T[];
+  emptyLabel: string;
+  defaultType: string;
+  elementById: (id: string) => ProjectStoreElement | undefined;
+  onOpenElement?: (id: string) => void;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const visibleLimit = 8;
+  const visible = expanded ? items : items.slice(0, visibleLimit);
+  const hiddenCount = Math.max(0, items.length - visible.length);
+  return (
+    <section
+      id={id}
+      className="coverage-panel coverage-gap-list"
+    >
+      <header className="coverage-gap-list__head">
+        <h3>{title}</h3>
+        <span>{formatNumber(items.length)}</span>
+      </header>
+      {items.length === 0 ? (
+        <p className="coverage-empty-note">{emptyLabel}</p>
+      ) : (
+        <div className="coverage-gap-list__rows">
+          {visible.map((item) => {
+            const element = elementById(item.identifier);
+            const type = element?.element_type ?? defaultType;
+            const family = element?.type_family ?? defaultType;
+            return (
+              <button
+                key={`${item.file}:${item.identifier}`}
+                type="button"
+                className="coverage-gap-row"
+                onClick={() => onOpenElement?.(item.identifier)}
+              >
+                <ElementIcon type={type} family={family} size="sm" />
+                <span className="coverage-gap-row__copy">
+                  <span className="coverage-gap-row__title">{item.name || displayIdentifier(item.identifier)}</span>
+                  <span className="coverage-gap-row__file">{item.file}</span>
+                </span>
+                <TypeBadge type={type} family={family} tinted>
+                  {humanizeType(type)}
+                </TypeBadge>
+              </button>
+            );
+          })}
+          {items.length > visibleLimit ? (
+            <button
+              type="button"
+              className="coverage-more"
+              aria-expanded={expanded}
+              onClick={() => setExpanded((current) => !current)}
+            >
+              {expanded ? "Show fewer" : `+ ${formatNumber(hiddenCount)} more`}
+            </button>
+          ) : null}
+        </div>
+      )}
+    </section>
+  );
+}
+
+function coverageSectionDomId(section: CoverageSectionId) {
+  return `coverage-section-${section}`;
+}
+
+function LabeledCoverageBar({
+  label,
+  value,
+  count,
+  token,
+}: {
+  label: string;
+  value?: number;
+  count: string;
+  token: `--${string}`;
+}) {
+  return (
+    <div className="coverage-labeled-bar">
+      <div className="coverage-labeled-bar__head">
+        <span>{label}</span>
+        <span>
+          {formatPercent(value)} · {count}
+        </span>
+      </div>
+      <CoverageBar value={value ?? 0} token={token} />
+    </div>
+  );
+}
+
+function CoverageBar({ value, token }: { value: number; token: `--${string}` }) {
+  return (
+    <span className="coverage-bar" aria-hidden="true">
+      <span
+        className="coverage-bar__fill"
+        style={{
+          "--coverage-bar-fill": `${clampPercent(value)}%`,
+          "--coverage-color": `var(${token})`,
+        } as CSSProperties}
+      />
+    </span>
+  );
+}
+
+function CoverageLegendRow({
+  label,
+  value,
+  token,
+}: {
+  label: string;
+  value: number;
+  token: `--${string}`;
+}) {
+  return (
+    <div className="coverage-legend-row">
+      <span className="coverage-legend-row__swatch" style={{ background: `var(${token})` }} />
+      <span>{label}</span>
+      <strong>{formatNumber(value)}</strong>
+    </div>
+  );
+}
+
+function coverageFileItems<T>(section: unknown): Array<CoverageFileItem<T>> {
+  if (!isRecord(section) || !isRecord(section.files)) return [];
+  const rows: Array<CoverageFileItem<T>> = [];
+  for (const [file, value] of Object.entries(section.files)) {
+    if (!Array.isArray(value)) continue;
+    for (const item of value) {
+      if (isRecord(item)) {
+        rows.push({ file, ...(item as T) });
+      }
+    }
+  }
+  return rows.sort((left, right) => {
+    const leftName = String((left as { name?: unknown }).name ?? "");
+    const rightName = String((right as { name?: unknown }).name ?? "");
+    return left.file.localeCompare(right.file) || leftName.localeCompare(rightName);
+  });
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null;
+}
+
+function buildConicGradient(
+  rows: [string, string, `--${string}`][],
+  values: Record<string, number>,
+  total: number,
+) {
+  if (total <= 0) return "var(--bg-sunken)";
+  let cursor = 0;
+  const segments = rows
+    .map(([key, , token]) => {
+      const size = ((values[key] ?? 0) / total) * 360;
+      const start = cursor;
+      const end = cursor + size;
+      cursor = end;
+      return `var(${token}) ${start}deg ${end}deg`;
+    })
+    .filter((segment) => !segment.includes(" 0deg 0deg"));
+  return `conic-gradient(${segments.join(", ")})`;
+}
+
+function clampPercent(value: number) {
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.min(100, value));
+}
+
+function formatPercent(value: number | undefined) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "—";
+  return `${roundOne(value)}%`;
+}
+
+function roundOne(value: number) {
+  return Number.isInteger(value) ? value.toString() : value.toFixed(1).replace(/\.0$/, "");
+}
+
+function formatNumber(value: number | undefined) {
+  return typeof value === "number" && Number.isFinite(value) ? value.toLocaleString() : "0";
+}
+
+function displayIdentifier(identifier: string) {
+  const fragment = identifier.split("#").pop();
+  return fragment ? fragment.replace(/-/g, " ") : identifier;
+}
+
+function humanizeType(value: string) {
+  return value.replace(/-/g, " ");
 }

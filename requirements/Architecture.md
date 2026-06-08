@@ -195,13 +195,13 @@ classDiagram
 
     %% Relationships
     UserInteraction --> CLI : "Interacts via CLI"
-    UserInteraction --> WebInterface : "Browses documentation"
+    UserInteraction --> WebInterface : "Browses Explorer"
     UserInteraction --> AI : "Reviews AI suggestions"
     CLI --> ModelManagement
     CLI --> ValidationAndReporting : "Triggers validation/fixing/reporting"
     CLI --> Storage : "Reads/Writes Model Data"
-    WebInterface --> ValidationAndReporting : "Displays generated reports"
-    WebInterface --> Storage : "Reads generated documentation"
+    WebInterface --> ValidationAndReporting : "Displays report projections"
+    WebInterface --> Storage : "Reads Project Store data"
     MCPInterface --> SharedToolContracts : "Adapts MCP protocol"
     SharedToolContracts --> ModelManagement : "Calls core operations"
     SharedToolContracts --> ValidationAndReporting : "Calls report operations"

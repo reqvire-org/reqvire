@@ -1,4 +1,4 @@
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::sync::Arc;
 
 use axum::body::Body;
@@ -8,54 +8,29 @@ use axum::routing::any;
 use axum::Router;
 use percent_encoding::percent_decode_str;
 use reqvire::error::ReqvireError;
-use tokio::sync::Mutex;
+use reqvire::explorer_runtime::{embedded_asset, index_html, ExplorerRuntimeAssets};
 
 #[derive(Clone)]
 pub(crate) struct ServeState {
-    export_root: Arc<PathBuf>,
-    write_lock: Arc<Mutex<()>>,
+    project_store_js: Arc<String>,
+    ontologies_ttl: Arc<String>,
 }
 
-impl ServeState {
-    fn new(export_root: &Path) -> Self {
-        Self {
-            export_root: Arc::new(export_root.to_path_buf()),
-            write_lock: Arc::new(Mutex::new(())),
-        }
-    }
-
-    async fn run_mutation<F, T>(&self, mutation: F) -> Result<T, ReqvireError>
-    where
-        F: FnOnce() -> Result<T, ReqvireError> + Send + 'static,
-        T: Send + 'static,
-    {
-        let _guard = self.write_lock.lock().await;
-        tokio::task::spawn_blocking(mutation)
-            .await
-            .map_err(|e| ReqvireError::ProcessError(format!("Mutation task failed: {}", e)))?
-    }
-}
-
-#[allow(dead_code)]
-pub(crate) async fn run_serialized_mutation<F, T>(
-    state: &ServeState,
-    mutation: F,
-) -> Result<T, ReqvireError>
-where
-    F: FnOnce() -> Result<T, ReqvireError> + Send + 'static,
-    T: Send + 'static,
-{
-    state.run_mutation(mutation).await
-}
-
-/// Starts an HTTP server serving static files from the given directory
-pub async fn serve_directory(directory: &Path, host: &str, port: u16) -> Result<(), ReqvireError> {
+/// Starts an HTTP server for the embedded Explorer SPA and generated runtime data.
+pub async fn serve_explorer(
+    assets: ExplorerRuntimeAssets,
+    host: &str,
+    port: u16,
+) -> Result<(), ReqvireError> {
     let addr = format!("{}:{}", host, port);
     let listener = tokio::net::TcpListener::bind(&addr)
         .await
         .map_err(|e| ReqvireError::ProcessError(format!("Failed to start server: {}", e)))?;
 
-    let state = ServeState::new(directory);
+    let state = ServeState {
+        project_store_js: Arc::new(assets.project_store_js),
+        ontologies_ttl: Arc::new(assets.ontologies_ttl),
+    };
     let app = Router::new()
         .route("/", any(serve_static))
         .route("/{*path}", any(serve_static))
@@ -87,26 +62,46 @@ async fn serve_static(State(state): State<ServeState>, method: Method, uri: Uri)
         return response_with_status(StatusCode::METHOD_NOT_ALLOWED);
     }
 
-    let file_path = match resolve_secure_path(&state.export_root, uri.path()) {
+    let request_path = match resolve_request_path(uri.path()) {
         Ok(path) => path,
         Err(status) => return response_with_status(status),
     };
 
-    let content_type = content_type_for_path(&file_path);
-
-    if method == Method::HEAD {
-        return Response::builder()
-            .status(StatusCode::OK)
-            .header(header::CONTENT_TYPE, content_type)
-            .body(Body::empty())
-            .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR));
+    if request_path == "assets/project-store.js" {
+        return bytes_response(
+            method,
+            "application/javascript",
+            state.project_store_js.as_bytes().to_vec(),
+        );
     }
 
-    let content = match tokio::fs::read(&file_path).await {
-        Ok(bytes) => bytes,
-        Err(_) => return response_with_status(StatusCode::NOT_FOUND),
-    };
+    if request_path == "ontologies.ttl" {
+        return bytes_response(
+            method,
+            "text/turtle; charset=utf-8",
+            state.ontologies_ttl.as_bytes().to_vec(),
+        );
+    }
 
+    if let Some(content) = embedded_asset(&request_path) {
+        return static_response(method, content_type_for_path(&request_path), content);
+    }
+
+    if request_path.starts_with("assets/") {
+        return response_with_status(StatusCode::NOT_FOUND);
+    }
+
+    static_response(method, "text/html; charset=utf-8", index_html())
+}
+
+fn static_response(
+    method: Method,
+    content_type: &'static str,
+    content: &'static [u8],
+) -> Response<Body> {
+    if method == Method::HEAD {
+        return empty_response(content_type);
+    }
     Response::builder()
         .status(StatusCode::OK)
         .header(header::CONTENT_TYPE, content_type)
@@ -114,15 +109,31 @@ async fn serve_static(State(state): State<ServeState>, method: Method, uri: Uri)
         .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR))
 }
 
-fn resolve_secure_path(root: &Path, raw_request_path: &str) -> Result<PathBuf, StatusCode> {
-    let root_canonical =
-        std::fs::canonicalize(root).map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
+fn bytes_response(method: Method, content_type: &'static str, content: Vec<u8>) -> Response<Body> {
+    if method == Method::HEAD {
+        return empty_response(content_type);
+    }
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, content_type)
+        .body(Body::from(content))
+        .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR))
+}
 
+fn empty_response(content_type: &'static str) -> Response<Body> {
+    Response::builder()
+        .status(StatusCode::OK)
+        .header(header::CONTENT_TYPE, content_type)
+        .body(Body::empty())
+        .unwrap_or_else(|_| response_with_status(StatusCode::INTERNAL_SERVER_ERROR))
+}
+
+fn resolve_request_path(raw_request_path: &str) -> Result<String, StatusCode> {
     let decoded = percent_decode_str(raw_request_path)
         .decode_utf8()
         .map_err(|_| StatusCode::BAD_REQUEST)?;
 
-    let mut relative = PathBuf::new();
+    let mut parts = Vec::new();
     for segment in decoded.trim_start_matches('/').split('/') {
         if segment.is_empty() || segment == "." {
             continue;
@@ -130,25 +141,14 @@ fn resolve_secure_path(root: &Path, raw_request_path: &str) -> Result<PathBuf, S
         if segment == ".." || segment.contains('\\') || segment.contains('\0') {
             return Err(StatusCode::NOT_FOUND);
         }
-        relative.push(segment);
+        parts.push(segment);
     }
 
-    if relative.as_os_str().is_empty() {
-        relative.push("index.html");
+    if parts.is_empty() {
+        Ok("index.html".to_string())
+    } else {
+        Ok(parts.join("/"))
     }
-
-    let mut candidate = root.join(relative);
-    if candidate.is_dir() {
-        candidate = candidate.join("index.html");
-    }
-
-    let canonical_candidate =
-        std::fs::canonicalize(&candidate).map_err(|_| StatusCode::NOT_FOUND)?;
-    if !canonical_candidate.starts_with(&root_canonical) || !canonical_candidate.is_file() {
-        return Err(StatusCode::NOT_FOUND);
-    }
-
-    Ok(canonical_candidate)
 }
 
 fn response_with_status(status: StatusCode) -> Response<Body> {
@@ -162,10 +162,13 @@ fn response_with_status(status: StatusCode) -> Response<Body> {
         .unwrap_or_else(|_| Response::new(Body::empty()))
 }
 
-fn content_type_for_path(path: &Path) -> &'static str {
-    match path.extension().and_then(|s| s.to_str()) {
+fn content_type_for_path(path: &str) -> &'static str {
+    match Path::new(path).extension().and_then(|s| s.to_str()) {
         Some("html") => "text/html; charset=utf-8",
         Some("svg") => "image/svg+xml",
+        Some("png") => "image/png",
+        Some("ico") => "image/x-icon",
+        Some("woff2") => "font/woff2",
         Some("css") => "text/css",
         Some("js") => "application/javascript",
         Some("ttl") | Some("turtle") => "text/turtle; charset=utf-8",
