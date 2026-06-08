@@ -1,10 +1,6 @@
 <div align="center">
 
-# Reqvire
-
-<img src="doc/logo-long.png" alt="Reqvire Logo" width="360">
-
-**Semantic engineering framework for building verifiable and traceable systems.**
+<img src="doc/social-card.png" alt="Reqvire - Build verifiable and traceable software" width="100%">
 
 [![Latest Release](https://img.shields.io/github/v/release/Reqvire/reqvire?style=flat-square&logo=github&color=blue)](https://github.com/reqvire-org/reqvire/releases)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](https://opensource.org/licenses/Apache-2.0)

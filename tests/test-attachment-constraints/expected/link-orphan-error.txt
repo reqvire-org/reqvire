@@ -1,1 +1,1 @@
-error: Invalid attachment target: 'Orphan-Spec' has no refine relation. Refinements must refine a capability or requirement before they can be attached.
+error: Invalid attachment target: 'Orphan-Spec' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.

@@ -47,3 +47,4 @@ npm/reqvire/*.tgz
 .index
 .env
 .playwright-cli
+proc-www.reqvire.org

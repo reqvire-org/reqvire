@@ -9,7 +9,6 @@ A capability for type validation error tests.
 
 #### Relations
   * specifiedBy: [Test System Requirement](#test-system-requirement)
-  * refinedBy: [Test Source Refinement](#test-source-refinement)
 
 #### Attachments
   * [Test Ontology](#test-ontology)
@@ -24,6 +23,7 @@ A system requirement specified by the capability.
 
 #### Relations
   * specify: [Test Capability](#test-capability)
+  * refinedBy: [Test Source Refinement](#test-source-refinement)
   * refinedBy: [Test Semantic Contract](#test-semantic-contract)
 ---
 
@@ -69,7 +69,7 @@ A source refinement for positive type validation.
   * type: source
 
 #### Relations
-  * refine: [Test Capability](#test-capability)
+  * refine: [Test System Requirement](#test-system-requirement)
 ---
 
 ### Test Semantic Contract

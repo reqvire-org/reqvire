@@ -307,7 +307,7 @@ if (!service || service.type !== "owl" || service.semantic_type !== "class") {
   process.exit(1);
 }
 const serviceSlot = (service.slot_facets || []).find((slot) =>
-  slot.path_iri === "urn:reqvire:test:api:identifier"
+  slot.slot_iri === "urn:reqvire:test:api:identifier"
     && slot.source_shape_iri === "urn:reqvire:test:api:ServiceEndpointShape"
 );
 if (!serviceSlot) {

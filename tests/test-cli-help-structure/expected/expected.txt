@@ -66,7 +66,7 @@ SEARCH OPTIONS:
       --short                   Output abbreviated format (one-line per element in text, omit fields in JSON)
       --filter-file <GLOB>      Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`
       --filter-name <REGEX>     Only include elements whose name matches this regular expression
-      --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+      --filter-type <TYPE[,TYPE...]> Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, semantic-query-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
       --filter-status <STATUS[,STATUS...]> Only include requirement-family elements with matching effective status values
       --filter-priority <PRIORITY[,PRIORITY...]> Only include requirement-family elements with matching effective priority values
       --filter-risk <RISK[,RISK...]> Only include requirement-family elements with matching effective risk values
@@ -99,7 +99,7 @@ COVERAGE OPTIONS:
 MODEL OPTIONS:
       --from <NAME>             Start from specific element by name
       --reverse                 Traverse from leaves to roots (follow backward relations)
-      --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+      --filter-type <TYPE>      Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, semantic-query-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
       --json                    Output results in JSON format (nested structure)
       --mmd                     Output pure Mermaid flowchart text
       --with-size-estimates     Include element size estimates in JSON output

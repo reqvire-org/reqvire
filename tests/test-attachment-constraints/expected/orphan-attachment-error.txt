@@ -1,4 +1,4 @@
 
 ❌ 1 validation failed with error(s):
 
-  1. Invalid attachment target: 'Orphan-Spec' has no refine relation. Refinements must refine a capability or requirement before they can be attached. (file: specifications/TestOrphanAttachment.md, element: Req Attaching Orphan)
+  1. Invalid attachment target: 'Orphan-Spec' has no refine relation. Refinements must refine a requirement before they can be attached; refinements are requirement-owned only. Capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements. (file: specifications/TestOrphanAttachment.md, element: Req Attaching Orphan)
