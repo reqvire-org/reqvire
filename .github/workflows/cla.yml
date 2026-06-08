@@ -21,6 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "CLA Assistant"
+        id: cla
         if: github.event_name == 'pull_request_target' || github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA'
         uses: contributor-assistant/github-action@v2.6.1
         env:
@@ -40,9 +41,30 @@ jobs:
           remote-repository-name: reqvire-cla
           #create-file-commit-message: 'For example: Creating file for storing CLA Signatures'
           signed-commit-message: '$contributorName signed the Reqvire CLA for $owner/$repo#$pullRequestNo'
-          custom-notsigned-prcomment: 'Thank you for contributing to Reqvire. Before this pull request can be merged, each contributor must read the Reqvire CLA: $pathToCLADocument. To sign, add this exact pull request comment: I have read the CLA Document and I hereby sign the CLA'
+          custom-notsigned-prcomment: 'Thank you for contributing to Reqvire. Before this pull request can be merged, each contributor must read the [Reqvire CLA](https://github.com/reqvire-org/reqvire/blob/main/doc/CLA.md). To sign, add this exact pull request comment: I have read the CLA Document and I hereby sign the CLA'
           custom-pr-sign-comment: 'I have read the CLA Document and I hereby sign the CLA'
           custom-allsigned-prcomment: 'All pull request contributors have signed the Reqvire CLA.'
           lock-pullrequest-aftermerge: true
           use-dco-flag: false
           suggest-recheck: false
+      - name: "Acknowledge CLA signing comment"
+        if: github.event_name == 'issue_comment' && github.event.comment.body == 'I have read the CLA Document and I hereby sign the CLA' && steps.cla.outcome == 'success'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const signingCommentId = context.payload.comment.id;
+
+            try {
+              await github.rest.reactions.createForIssueComment({
+                owner,
+                repo,
+                comment_id: signingCommentId,
+                content: '+1',
+              });
+            } catch (error) {
+              if (error.status !== 422) {
+                throw error;
+              }
+            }
