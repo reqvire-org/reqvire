@@ -9,6 +9,7 @@ on:
 permissions:
   actions: write
   contents: read # this can be 'read' if the signatures are in remote repository
+  issues: write
   pull-requests: write
   statuses: write
 
@@ -26,13 +27,13 @@ jobs:
           PERSONAL_ACCESS_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
         with:
           path-to-signatures: 'signatures/version1/cla.json'
-          path-to-document: 'https://github.com/Reqvire/reqvire/blob/master/doc/CLA.md'
+          path-to-document: 'https://github.com/reqvire-org/reqvire/blob/main/doc/CLA.md'
           # branch should not be protected
           branch: 'main'
           allowlist:
 
          # the followings are the optional inputs - If the optional inputs are not given, then default values will be taken
-          remote-organization-name: Reqvire
+          remote-organization-name: reqvire-org
           remote-repository-name: reqvire-cla
           #create-file-commit-message: 'For example: Creating file for storing CLA Signatures'
           #signed-commit-message: 'For example: $contributorName has signed the CLA in $owner/$repo#$pullRequestNo'
@@ -41,4 +42,3 @@ jobs:
           #custom-allsigned-prcomment: 'pull request comment when all contributors has signed, defaults to **CLA Assistant Lite bot** All Contributors have signed the CLA.'
           #lock-pullrequest-aftermerge: false - if you don't want this bot to automatically lock the pull request after merging (default - true)
           #use-dco-flag: true - If you are using DCO instead of CLA
-
