@@ -59,7 +59,7 @@ As part of the Contributor License Agreement (CLA) process for this project, we 
 - **Your GitHub username**
 - **The timestamp** of your CLA acceptance
 
-This data is stored in a **private repository** within the [Reqvire organization](https://github.com/reqvire) and is used **solely for legal purposes** related to managing contributor agreements. It ensures that all contributions comply with the licensing terms and protects the integrity of the project.
+This data is stored in a **private repository** within the [Reqvire organization](https://github.com/reqvire-org) and is used **solely for legal purposes** related to managing contributor agreements. It ensures that all contributions comply with the licensing terms and protects the integrity of the project.
 
 We do **not collect any additional personal data** (such as your real name or email address), nor do we use this data for any purpose beyond managing contributor agreements. The data will **never be shared or sold** to third parties.
 
@@ -82,4 +82,3 @@ We are committed to handling your data responsibly and transparently.
 ---
 
 This notice is effective as of **[28th April 2025]** and may be updated periodically.
-
