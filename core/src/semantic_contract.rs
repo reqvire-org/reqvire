@@ -620,7 +620,7 @@ fn build_model_context_turtle(registry: &GraphRegistry, index: &SemanticIndex) -
         ));
         output.push_str(&format!(
             "  reqvire:elementType {} ;\n",
-            turtle_string(&element_type_token(&element.element_type))
+            turtle_string(&element.element_type.to_metadata_string())
         ));
         output.push_str(&format!(
             "  reqvire:filePath {} ;\n",
@@ -1225,13 +1225,6 @@ fn element_type_classes(element_type: &ElementType) -> Vec<&'static str> {
         }
         ElementType::File => vec!["reqvire:Artifact", "reqvire:File"],
         ElementType::Other(_) => vec!["reqvire:Element", "reqvire:CustomElement"],
-    }
-}
-
-fn element_type_token(element_type: &ElementType) -> String {
-    match element_type {
-        ElementType::Other(custom_type) => format!("other-{}", custom_type),
-        _ => element_type.as_str().to_string(),
     }
 }
 
