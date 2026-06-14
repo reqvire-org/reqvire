@@ -1,4 +1,13 @@
 import type { ReactNode } from "react";
+import { css, cx } from "@linaria/atomic";
+
+const baseUX = css`
+  box-sizing: border-box;
+`;
+
+const skinX = css`
+  color: inherit;
+`;
 
 export function ExplorerWorkspaceToolbar({
   ariaLabel,
@@ -10,7 +19,7 @@ export function ExplorerWorkspaceToolbar({
   children: ReactNode;
 }) {
   return (
-    <div className={["ex-workspace-toolbar graph-control-panel", className].filter(Boolean).join(" ")} aria-label={ariaLabel}>
+    <div className={cx("ex-workspace-toolbar", "ex-graph-control-panel", baseUX, skinX, className)} aria-label={ariaLabel}>
       {children}
     </div>
   );

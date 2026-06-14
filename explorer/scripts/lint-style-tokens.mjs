@@ -1,18 +1,33 @@
 /*
  * Style token guard.
  *
- * Enforces the design-system token contract on app CSS: raw design values
- * (px lengths, colors, font stacks, numeric weights, durations, easings) are
- * allowed ONLY where values are *defined* — custom-property declarations and
- * @media/@container/@supports conditions. Everything else must reference a
- * token via var(). Any finding fails the run; there is no baseline.
+ * Enforces tokenized visual policy in app CSS, Linaria CSS-in-TS(X), and
+ * reusable DS component CSS. Raw design values are allowed only in source-of-
+ * truth token declarations and at-rule conditions. Showcase examples are
+ * intentionally excluded from this production guard.
  */
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const srcRoot = resolve(root, "src");
+
+const scanRoots = [
+  resolve(root, "src"),
+  resolve(root, "design-system/components"),
+];
+
+const excludedPathParts = [
+  "/node_modules/",
+  "/dist/",
+  "/dist-kit/",
+  "/dist-showcase/",
+  "/showcase/",
+  ".test.",
+  "_ds_bundle.js",
+  "_ds_manifest.json",
+  "_adherence.oxlintrc.json",
+];
 
 const checks = [
   {
@@ -51,10 +66,12 @@ function walk(dir) {
   const files = [];
   for (const name of readdirSync(dir)) {
     const path = resolve(dir, name);
+    const normalized = path.replaceAll("\\", "/");
+    if (excludedPathParts.some((part) => normalized.includes(part))) continue;
     const stat = statSync(path);
     if (stat.isDirectory()) {
       files.push(...walk(path));
-    } else if (stat.isFile() && path.endsWith(".css")) {
+    } else if (stat.isFile() && /\.(css|tsx?|jsx?)$/.test(path)) {
       files.push(path);
     }
   }
@@ -85,21 +102,15 @@ function maskBalancedAtRuleBlocks(source, atRules) {
       }
     }
 
-    for (let i = start; i < end; i += 1) {
-      chars[i] = " ";
-    }
+    for (let i = start; i < end; i += 1) chars[i] = " ";
   }
 
   return chars.join("");
 }
 
-/* Blank out positions where raw values are legitimate:
-   custom-property declarations and at-rule conditions. */
 function maskAllowedRegions(source) {
   let masked = maskBalancedAtRuleBlocks(source, ["theme"]);
-  // --custom-prop: <value>  (the whole declaration)
   masked = masked.replace(/--[\w-]+\s*:[^;{}]*/g, (m) => " ".repeat(m.length));
-  // @media / @container / @supports / @layer / @source <prelude> — up to the opening brace/semicolon
   masked = masked.replace(/@(?:media|container|supports|layer|source)[^{;]*/g, (m) => " ".repeat(m.length));
   return masked;
 }
@@ -112,15 +123,77 @@ function lineInfo(source, index) {
   return { line, column, lineText };
 }
 
-const findings = [];
-for (const file of walk(srcRoot)) {
-  const rel = relative(root, file).replaceAll("\\", "/");
-  const source = readFileSync(file, "utf8");
-  const searchable = maskAllowedRegions(stripComments(source));
+function extractTaggedTemplateBodies(source, tagName) {
+  const bodies = [];
+  const pattern = new RegExp(`\\b${tagName}\\s*\``, "g");
+  for (const match of source.matchAll(pattern)) {
+    const bodyStart = (match.index ?? 0) + match[0].length;
+    let escaped = false;
+    for (let i = bodyStart; i < source.length; i += 1) {
+      const char = source[i];
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (char === "\\") {
+        escaped = true;
+        continue;
+      }
+      if (char === "`") {
+        bodies.push({ source: source.slice(bodyStart, i), offset: bodyStart });
+        break;
+      }
+    }
+  }
+  return bodies;
+}
 
+function extractInlineStyleLiteralBodies(source) {
+  const bodies = [];
+  const marker = "style={{";
+  let index = source.indexOf(marker);
+  while (index !== -1) {
+    const bodyStart = index + marker.length;
+    let depth = 2;
+    let quote = "";
+    let escaped = false;
+    for (let i = bodyStart; i < source.length; i += 1) {
+      const char = source[i];
+      if (escaped) {
+        escaped = false;
+        continue;
+      }
+      if (char === "\\") {
+        escaped = true;
+        continue;
+      }
+      if (quote) {
+        if (char === quote) quote = "";
+        continue;
+      }
+      if (char === "\"" || char === "'" || char === "`") {
+        quote = char;
+        continue;
+      }
+      if (char === "{") depth += 1;
+      if (char === "}") depth -= 1;
+      if (depth === 0) {
+        bodies.push({ source: source.slice(bodyStart, i - 1), offset: bodyStart });
+        index = source.indexOf(marker, i + 1);
+        break;
+      }
+    }
+    if (index !== -1 && index < bodyStart) break;
+  }
+  return bodies;
+}
+
+function recordFindings(fileSource, rel, fragment, context, findings) {
+  const searchable = maskAllowedRegions(stripComments(fragment.source));
   for (const check of checks) {
     for (const match of searchable.matchAll(check.regex)) {
-      const { line, column, lineText } = lineInfo(source, match.index ?? 0);
+      const absoluteIndex = fragment.offset + (match.index ?? 0);
+      const { line, column, lineText } = lineInfo(fileSource, absoluteIndex);
       findings.push({
         file: rel,
         line,
@@ -129,17 +202,41 @@ for (const file of walk(srcRoot)) {
         value: match[0],
         message: check.message,
         source: lineText,
+        context,
       });
+    }
+  }
+}
+
+const findings = [];
+for (const scanRoot of scanRoots) {
+  for (const file of walk(scanRoot)) {
+    const rel = relative(root, file).replaceAll("\\", "/");
+    const source = readFileSync(file, "utf8");
+
+    if (file.endsWith(".css")) {
+      recordFindings(source, rel, { source, offset: 0 }, "css-file", findings);
+      continue;
+    }
+
+    for (const fragment of extractTaggedTemplateBodies(source, "css")) {
+      recordFindings(source, rel, fragment, "linaria-css-template", findings);
+    }
+
+    for (const fragment of extractInlineStyleLiteralBodies(source)) {
+      recordFindings(source, rel, fragment, "inline-style-literal", findings);
     }
   }
 }
 
 if (findings.length > 0) {
   for (const f of findings) {
-    console.error(`${f.file}:${f.line}:${f.column} ${f.kind} ${f.value}\n  ${f.message}\n  ${f.source}`);
+    console.error(`${f.file}:${f.line}:${f.column} ${f.kind} ${f.value} [${f.context}]`);
+    console.error(`  ${f.message}`);
+    console.error(`  ${f.source}`);
   }
-  console.error(`\nStyle token guard failed: ${findings.length} raw value(s) in app CSS.`);
+  console.error(`\nStyle token guard failed: ${findings.length} raw value(s).`);
   process.exit(1);
 }
 
-console.log("Style token guard passed: app CSS is fully token-driven.");
+console.log("Style token guard passed: CSS, Linaria, and inline style literals are token-driven.");

@@ -1,7 +1,11 @@
-import { useMemo, type MouseEvent } from "react";
+import { useMemo, type CSSProperties, type MouseEvent } from "react";
+import { css, cx } from "@linaria/atomic";
 import {
+  Button,
+  CodeRef,
   ElementIcon,
   Icon,
+  IconButton,
   Modal,
   ModalBody,
   ModalClose,
@@ -11,11 +15,319 @@ import {
   ModalTitle,
   RelationPill,
   TypeBadge,
+  type DesignSystemColorToken,
 } from "@ds";
 import { useStore } from "../store/StoreContext";
 import type { ProjectStoreElement, ProjectStoreRelation, ProjectStoreResource } from "../store/types";
 import { routeForContent, routeForElement } from "../router/routes";
 import { MarkdownContent } from "./MarkdownContent";
+
+const detailDialogBaseUX = css`
+  --ex-detail-dialog-w: 1120px;
+  --ex-detail-dialog-max-h: 980px;
+  --ex-detail-dialog-body-max-h: 780px;
+  --ex-detail-dialog-chrome-h: 176px;
+  --ex-detail-chip-link-max-w: 520px;
+  width: min(var(--ex-detail-dialog-w), calc(100vw - var(--space-24)));
+  max-width: min(var(--ex-detail-dialog-w), calc(100vw - var(--space-24)));
+  max-height: min(92vh, var(--ex-detail-dialog-max-h));
+
+  @media (max-width: 720px) {
+    width: calc(100vw - var(--space-10));
+    max-width: calc(100vw - var(--space-10));
+    max-height: calc(100vh - var(--space-10));
+  }
+`;
+
+const detailDialogSkinX = css`
+  border: var(--border-w) solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background: var(--bg-overlay);
+  color: var(--text-body);
+  box-shadow: var(--shadow-xl);
+
+  .ex-markdown pre,
+  .source-code-preview-body {
+    border: var(--border-w) solid var(--border-subtle);
+    background: var(--bg-sunken);
+  }
+
+  .ex-markdown code {
+    background: var(--bg-sunken);
+  }
+
+  .ex-markdown h1,
+  .ex-markdown h2,
+  .ex-markdown h3,
+  .ex-markdown h4 {
+    margin: 0.85em 0 0.4em;
+    color: var(--text-body);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+    letter-spacing: 0.01em;
+    line-height: 1.35;
+  }
+`;
+
+const detailHeaderBaseUX = css`
+  padding: var(--space-10) var(--space-10) var(--space-10) var(--space-14);
+
+  @media (max-width: 720px) {
+    padding: var(--space-8) var(--space-24) var(--space-8) var(--space-8);
+  }
+`;
+
+const detailHeaderSkinX = css`
+  border-bottom: var(--border-w) solid var(--border-subtle);
+  background: var(--bg-overlay);
+`;
+
+const detailBodyBaseUX = css`
+  max-height: min(74vh, var(--ex-detail-dialog-body-max-h));
+  overflow: auto;
+  padding: var(--space-14) var(--space-16);
+
+  @media (max-width: 720px) {
+    max-height: calc(100vh - var(--ex-detail-dialog-chrome-h));
+    padding: var(--space-8);
+  }
+`;
+
+const detailBodySkinX = css`
+  background: var(--bg-surface);
+`;
+
+const detailTitleRowUX = css`
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-8);
+
+  h2 {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+`;
+
+const detailFamilyBadgeUX = css`
+  flex: 0 0 auto;
+`;
+
+const detailCloseUX = css`
+  flex: 0 0 auto;
+  margin-left: auto;
+  margin-right: calc(-1 * var(--space-3));
+
+  svg {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+  }
+`;
+
+const detailContentFlowUX = css`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-14);
+  max-width: 78ch;
+`;
+
+const detailSectionUX = css`
+  display: grid;
+  gap: var(--space-4);
+
+  h3 {
+    margin: 0;
+    color: var(--text-strong);
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0;
+    line-height: var(--leading-tight);
+  }
+`;
+
+const detailMutedUX = css`
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+`;
+
+const governanceListUX = css`
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-5);
+`;
+
+const governanceItemBaseUX = css`
+  display: inline-flex;
+  align-items: baseline;
+  gap: var(--space-5);
+  padding: var(--space-4) var(--space-8);
+  font-size: var(--text-sm);
+`;
+
+const governanceItemSkinX = css`
+  border-radius: var(--radius-md);
+  background: var(--bg-sunken);
+`;
+
+const governanceKeySkinX = css`
+  color: var(--text-muted);
+`;
+
+const governanceValueSkinX = css`
+  color: var(--text-strong);
+  font-weight: var(--weight-medium);
+`;
+
+const explicitBadgeSkinX = css`
+  border: var(--border-w) solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  padding: 0 var(--space-3);
+  color: var(--text-muted);
+  font-size: var(--text-micro);
+`;
+
+const relationStackUX = css`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+`;
+
+const relationListUX = css`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+`;
+
+const relationRowBaseUX = css`
+  display: grid;
+  grid-template-columns: minmax(7.5rem, max-content) minmax(0, 1fr);
+  align-items: start;
+  column-gap: var(--space-5);
+  min-width: 0;
+  padding: var(--space-2) 0;
+`;
+
+const relationRowSkinX = css`
+  border-bottom: var(--border-w) solid color-mix(in srgb, var(--border-subtle) 55%, transparent);
+
+  &:last-child {
+    border-bottom: 0;
+  }
+`;
+
+const relationTextSkinX = css`
+  color: var(--text-body);
+  font-size: var(--text-sm);
+`;
+
+const relationKindBaseUX = css`
+  display: inline-flex;
+  align-items: center;
+  justify-self: start;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-5);
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  line-height: 1.45;
+`;
+
+const relationKindSkinX = css`
+  border-radius: var(--radius-pill);
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+`;
+
+const relationEndpointBaseUX = css`
+  display: inline-flex;
+  justify-self: start;
+  min-width: 0;
+  max-width: min(100%, var(--ex-detail-chip-link-max-w));
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-5);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: 1.45;
+  text-decoration: none;
+  overflow-wrap: anywhere;
+`;
+
+const relationEndpointSkinX = css`
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  color: var(--text-strong);
+
+  &:hover {
+    border-color: var(--border-strong);
+    background: var(--bg-hover);
+    text-decoration: none;
+  }
+`;
+
+const relationEndpointLabelUX = css`
+  min-width: 0;
+  overflow-wrap: anywhere;
+`;
+
+const relationEndpointPipUX = css`
+  display: inline-block;
+  flex-shrink: 0;
+  width: var(--space-3);
+  height: var(--space-3);
+  border-radius: var(--radius-xs);
+  background: var(--ex-relation-endpoint-pip);
+`;
+
+const detailFooterBaseUX = css`
+  padding: var(--space-7) var(--space-16);
+
+  @media (max-width: 720px) {
+    padding: var(--space-6) var(--space-8);
+  }
+`;
+
+const detailFooterSkinX = css`
+  border-top: var(--border-w) solid var(--border-subtle);
+  background: var(--bg-overlay);
+`;
+
+const detailFooterRowUX = css`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+`;
+
+const sourceLinkBaseUX = css`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+`;
+
+const sourceLinkSkinX = css`
+  color: var(--accent);
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: var(--space-1);
+  }
+`;
+
+const iconSmUX = css`
+  width: var(--space-8);
+  height: var(--space-8);
+  flex: none;
+`;
 
 /*
  * Element-detail modal.
@@ -100,24 +412,24 @@ export function ElementDetailModal({
 
   return (
     <Modal open={open} onOpenChange={(v) => !v && onClose()}>
-      <ModalContent className="element-detail-dialog" showCloseButton={false}>
+      <ModalContent className={cx(detailDialogBaseUX, detailDialogSkinX)} showCloseButton={false}>
         {!element ? (
           <>
-            <ModalHeader className="element-detail-header">
+            <ModalHeader className={cx(detailHeaderBaseUX, detailHeaderSkinX)}>
               <ModalTitle>Element not found</ModalTitle>
             </ModalHeader>
-            <ModalBody className="element-detail-body">
-            <p className="element-detail-muted">
+            <ModalBody className={cx(detailBodyBaseUX, detailBodySkinX)}>
+            <p className={cx(detailMutedUX)}>
               No Project Store element matches{" "}
-              <code className="rq-coderef">{identifier ?? ""}</code>.
+              <CodeRef>{identifier ?? ""}</CodeRef>.
             </p>
             </ModalBody>
           </>
         ) : (
           <>
-            <ModalHeader className="element-detail-header">
-              <div className="element-detail-title-row">
-                <TypeBadge type={element.type_family} family={element.type_family} tinted className="element-detail-family-badge">
+            <ModalHeader className={cx(detailHeaderBaseUX, detailHeaderSkinX)}>
+              <div className={cx(detailTitleRowUX)}>
+                <TypeBadge type={element.type_family} family={element.type_family} tinted className={cx(detailFamilyBadgeUX)}>
                   {element.type_family}
                 </TypeBadge>
                 {element.element_type !== element.type_family ? (
@@ -127,28 +439,28 @@ export function ElementDetailModal({
                 ) : null}
                 <ModalTitle>{element.name}</ModalTitle>
                 <ModalClose asChild>
-                  <button type="button" className="rq-iconbtn rq-iconbtn--ghost element-detail-close" aria-label="Close">
+                  <IconButton tone="ghost" className={cx(detailCloseUX)} aria-label="Close">
                     <Icon name="x" />
-                  </button>
+                  </IconButton>
                 </ModalClose>
               </div>
             </ModalHeader>
 
-            <ModalBody className="element-detail-body">
-              <div className="element-detail-content-flow">
+            <ModalBody className={cx(detailBodyBaseUX, detailBodySkinX)}>
+              <div className={cx(detailContentFlowUX)}>
                 {metaBadges.length > 0 && (
-                  <div className="ex-gov">
+                  <div className={cx(governanceListUX)}>
                     {metaBadges.map(({ key, value, provenance }) => (
-                      <span className="ex-gov__item" key={`meta-${key}`}>
-                        <span className="ex-gov__k">{key}</span>
-                        <span className="ex-gov__v">{value}</span>
-                        <span className="ex-explicit">{provenance}</span>
+                      <span className={cx(governanceItemBaseUX, governanceItemSkinX)} key={`meta-${key}`}>
+                        <span className={cx(governanceKeySkinX)}>{key}</span>
+                        <span className={cx(governanceValueSkinX)}>{value}</span>
+                        <span className={cx(explicitBadgeSkinX)}>{provenance}</span>
                       </span>
                     ))}
                   </div>
                 )}
 
-                <div className="element-detail-content-flow">
+                <div className={cx(detailContentFlowUX)}>
                   <Section title="Content">
                     <MarkdownContent
                       markdown={element.content}
@@ -167,7 +479,7 @@ export function ElementDetailModal({
 
                   {attachments.length > 0 && (
                     <Section title="Attachments">
-                      <div className="ex-rels">
+                      <div className={cx(relationStackUX)}>
                         {attachments.map((a) => (
                           <AttachmentTarget
                             key={a.id}
@@ -182,11 +494,11 @@ export function ElementDetailModal({
 
                   {conceptRefs.length > 0 && (
                     <Section title="Concept references">
-                      <div className="ex-rels">
+                      <div className={cx(relationStackUX)}>
                         {conceptRefs.map((c) => (
-                          <div key={c.id} className="element-detail-relation-row">
-                            <span className="element-detail-relation-text">{c.label}</span>
-                            <code className="rq-coderef">{c.iri}</code>
+                          <div key={c.id} className={cx(relationRowBaseUX, relationRowSkinX)}>
+                            <span className={cx(relationTextSkinX)}>{c.label}</span>
+                            <CodeRef>{c.iri}</CodeRef>
                           </div>
                         ))}
                       </div>
@@ -196,22 +508,20 @@ export function ElementDetailModal({
               </div>
             </ModalBody>
 
-            <ModalFooter className="element-detail-footer">
-              <div className="element-detail-footer-row">
+            <ModalFooter className={cx(detailFooterBaseUX, detailFooterSkinX)}>
+              <div className={cx(detailFooterRowUX)}>
                 <a
                   href={sourceAnchorRoute(element.source_anchor, element.file_path)}
-                  className="element-detail-source-link"
+                  className={cx(sourceLinkBaseUX, sourceLinkSkinX)}
                   onClick={(event) => {
                     event.preventDefault();
                     window.location.hash = sourceAnchorRoute(element.source_anchor, element.file_path);
                   }}
                 >
-                  <Icon name="external-link" className="ex-icon-sm" /> Open source page
+                  <Icon name="external-link" className={cx(iconSmUX)} /> Open source page
                 </a>
                 <ModalClose asChild>
-                  <button type="button" className="rq-btn rq-btn--primary rq-btn--sm">
-                    Close
-                  </button>
+                  <Button tone="primary" size="sm">Close</Button>
                 </ModalClose>
               </div>
             </ModalFooter>
@@ -237,7 +547,7 @@ function sourceAnchorRoute(sourceAnchor: string, filePath: string): string {
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="element-detail-section">
+    <section className={cx(detailSectionUX)}>
       <h3>{title}</h3>
       {children}
     </section>
@@ -256,10 +566,10 @@ function RelationList({
   if (relations.length === 0) return null;
   return (
     <Section title={title}>
-      <div className="element-detail-relation-list">
+      <div className={cx(relationListUX)}>
         {relations.map((r, i) => (
-          <div key={`${r.label}-${r.target.id}-${i}`} className="element-detail-relation-row">
-            <span className="element-detail-relation-kind">
+          <div key={`${r.label}-${r.target.id}-${i}`} className={cx(relationRowBaseUX, relationRowSkinX)}>
+            <span className={cx(relationKindBaseUX, relationKindSkinX)}>
               {r.label}
             </span>
             <RelationEndpoint endpoint={r.target} onOpenElement={onOpenElement} />
@@ -397,7 +707,7 @@ function RelationEndpoint({
   endpoint: RelationEndpoint;
   onOpenElement: (id: string) => void;
 }) {
-  const className = "element-detail-relation-endpoint";
+  const className = cx(relationEndpointBaseUX, relationEndpointSkinX);
   const content = (
     <>
       {endpoint.kind === "element" ? (
@@ -408,9 +718,12 @@ function RelationEndpoint({
           size="sm"
         />
       ) : (
-        <span className="rq-relation__pip" style={{ background: relationPipColor(endpoint.kind) }} />
+        <span
+          className={cx("ex-relation-endpoint-pip", relationEndpointPipUX)}
+          style={{ "--ex-relation-endpoint-pip": `var(${relationPipColorToken(endpoint.kind)})` } as CSSProperties}
+        />
       )}
-      <span className="element-detail-relation-endpoint-label">{endpoint.label}</span>
+      <span className={cx(relationEndpointLabelUX)}>{endpoint.label}</span>
     </>
   );
   if (endpoint.kind === "element" && endpoint.href) {
@@ -461,7 +774,7 @@ function AttachmentTarget({
       <RelationPill
         kind={attachment.target_kind}
         label={target.label}
-        pipColor={relationPipColor(attachment.target_kind)}
+        pipColorToken={relationPipColorToken(attachment.target_kind)}
         href={routeForElement(attachment.target)}
         title={attachment.target}
         onClick={(event: MouseEvent<HTMLAnchorElement>) => {
@@ -477,7 +790,7 @@ function AttachmentTarget({
       <RelationPill
         kind={attachment.target_kind}
         label={target.label}
-        pipColor={relationPipColor(attachment.target_kind)}
+        pipColorToken={relationPipColorToken(attachment.target_kind)}
         href={target.href}
         title={attachment.target}
         {...(target.external ? { target: "_blank", rel: "noreferrer" } : {})}
@@ -485,16 +798,16 @@ function AttachmentTarget({
     );
   }
 
-  return <RelationPill kind={attachment.target_kind} label={target.label} title={attachment.target} pipColor={relationPipColor(attachment.target_kind)} disabled />;
+  return <RelationPill kind={attachment.target_kind} label={target.label} title={attachment.target} pipColorToken={relationPipColorToken(attachment.target_kind)} disabled />;
 }
 
-function relationPipColor(kind: string) {
+function relationPipColorToken(kind: string): DesignSystemColorToken {
   const normalized = kind.toLowerCase();
-  if (normalized.includes("verif") || normalized.includes("satisf")) return "var(--verification)";
-  if (normalized.includes("attach")) return "var(--resource)";
-  if (normalized.includes("derive")) return "var(--requirement)";
-  if (normalized.includes("specif") || normalized.includes("refin")) return "var(--refinement)";
-  return "var(--edge-default)";
+  if (normalized.includes("verif") || normalized.includes("satisf")) return "--verification";
+  if (normalized.includes("attach")) return "--resource";
+  if (normalized.includes("derive")) return "--requirement";
+  if (normalized.includes("specif") || normalized.includes("refin")) return "--refinement";
+  return "--edge-default";
 }
 
 function attachmentDisplayTarget(

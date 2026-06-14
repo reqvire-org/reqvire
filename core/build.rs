@@ -24,6 +24,7 @@ fn main() {
     // Re-run whenever Explorer sources change so the embedded bundle stays fresh.
     for p in [
         "src",
+        "design-system",
         "public",
         "index.html",
         "package.json",

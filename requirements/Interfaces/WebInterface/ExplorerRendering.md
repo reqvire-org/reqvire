@@ -45,7 +45,8 @@ Implementation details shall follow the associated refinement specifications.
   * derive: [Explorer Design System Styling](#explorer-design-system-styling)
   * derivedFrom: [Mobile-Friendly Explorer](#mobile-friendly-explorer)
   * refinedBy: [Responsive Explorer Rendering Refinement Specification](Specifications.md#responsive-explorer-rendering-refinement-specification)
-  * satisfiedBy: [styles.css](../../../explorer/src/styles.css)
+  * satisfiedBy: [App.tsx](../../../explorer/src/App.tsx)
+  * satisfiedBy: [index.html](../../../explorer/index.html)
   * verifiedBy: [Responsive Design Verification](Verifications/WebInterfaceVerifications.md#responsive-design-verification)
 ---
 
@@ -62,6 +63,6 @@ Implementation details shall follow the associated refinement specifications.
 #### Relations
   * derivedFrom: [Responsive Explorer Rendering](#responsive-explorer-rendering)
   * refinedBy: [Explorer Design System Styling Refinement Specification](Specifications.md#explorer-design-system-styling-refinement-specification)
-  * satisfiedBy: [styles.css](../../../explorer/src/styles.css)
+  * satisfiedBy: [styles.css](../../../explorer/design-system/styles.css)
   * verifiedBy: [Responsive Design Verification](Verifications/WebInterfaceVerifications.md#responsive-design-verification)
 ---

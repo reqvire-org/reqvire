@@ -238,9 +238,7 @@ describe("MarkdownContent", () => {
     expect(
       unsafeLink?.getAttribute("href"),
     ).not.toContain("javascript:");
-    expect(
-      screen.getByRole("img", { name: "Unsafe image" }).getAttribute("src"),
-    ).not.toContain("javascript:");
+    expect(screen.queryByRole("img", { name: "Unsafe image" })).toBeNull();
   });
 });
 

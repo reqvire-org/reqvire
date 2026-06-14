@@ -1,16 +1,21 @@
 import path from "path";
 import { defineConfig } from "vite";
+import wyw from "@wyw-in-js/vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
 
 const __dirname = import.meta.dirname;
 
 export default defineConfig({
-  root: __dirname,
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    wyw({
+      include: ["**/*.{ts,tsx}"],
+      exclude: ["**/node_modules/**"],
+    }),
+    react(),
+  ],
   build: {
-    outDir: __dirname,
-    emptyOutDir: false,
+    outDir: path.resolve(__dirname, "dist-kit"),
+    emptyOutDir: true,
     minify: false,
     sourcemap: false,
     lib: {

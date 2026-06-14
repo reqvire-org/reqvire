@@ -119,20 +119,20 @@ export function ControlsPage() {
           <div className="sc-col">
             <div className="sc-label">Block (filter panel)</div>
             <div style={{ width: 240, display: "flex", flexDirection: "column", gap: "var(--space-3)" }}>
-              <ToggleRow label="Capability" color="var(--capability)" on={toggles.capability} onToggle={() => toggle("capability")} meta={4} />
-              <ToggleRow label="Requirement" color="var(--requirement)" on={toggles.requirement} onToggle={() => toggle("requirement")} meta={12} />
-              <ToggleRow label="Verification" color="var(--verification)" on={toggles.verification} onToggle={() => toggle("verification")} meta={8} />
-              <ToggleRow label="Refinement" color="var(--refinement)" on={toggles.refinement} onToggle={() => toggle("refinement")} meta={24} />
-              <ToggleRow label="Ontology" color="var(--ontology)" on={toggles.ontology} onToggle={() => toggle("ontology")} meta={1} />
+              <ToggleRow label="Capability" colorToken="--capability" on={toggles.capability} onToggle={() => toggle("capability")} meta={4} />
+              <ToggleRow label="Requirement" colorToken="--requirement" on={toggles.requirement} onToggle={() => toggle("requirement")} meta={12} />
+              <ToggleRow label="Verification" colorToken="--verification" on={toggles.verification} onToggle={() => toggle("verification")} meta={8} />
+              <ToggleRow label="Refinement" colorToken="--refinement" on={toggles.refinement} onToggle={() => toggle("refinement")} meta={24} />
+              <ToggleRow label="Ontology" colorToken="--ontology" on={toggles.ontology} onToggle={() => toggle("ontology")} meta={1} />
             </div>
           </div>
           <div className="sc-col">
             <div className="sc-label">Line (graph overlay legend)</div>
             <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
-              <ToggleRow line label="derivedFrom" color="var(--edge-derive)" on />
-              <ToggleRow line label="verifiedBy" color="var(--edge-satisfy)" on />
-              <ToggleRow line label="attachedTo" color="var(--edge-attach)" on={false} />
-              <ToggleRow line label="trace" color="var(--edge-trace)" on />
+              <ToggleRow line label="derivedFrom" colorToken="--edge-derive" on />
+              <ToggleRow line label="verifiedBy" colorToken="--edge-satisfy" on />
+              <ToggleRow line label="attachedTo" colorToken="--edge-attach" on={false} />
+              <ToggleRow line label="trace" colorToken="--edge-trace" on />
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { css, cx } from "@linaria/atomic";
 import {
   Button,
   ElementIcon,
@@ -13,6 +14,107 @@ import {
   ModalTitle,
   TypeBadge,
 } from "@ds";
+
+const helpModalBaseUX = css`
+  --ex-help-dialog-w: 1120px;
+  width: min(var(--ex-help-dialog-w), calc(100vw - var(--space-24)));
+  max-width: min(var(--ex-help-dialog-w), calc(100vw - var(--space-24)));
+`;
+
+const helpHeaderUX = css`
+  align-items: center;
+
+  h2 {
+    flex: 1 1 auto;
+  }
+`;
+
+const helpBodyUX = css`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-16);
+`;
+
+const helpSectionUX = css`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8);
+
+  h3 {
+    margin: 0;
+    color: var(--text-strong);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+  }
+
+  h4 {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: var(--text-micro);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+`;
+
+const helpLegendGridUX = css`
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+  gap: var(--space-14);
+`;
+
+const helpLegendListUX = css`
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-top: var(--space-5);
+`;
+
+const helpLegendRowUX = css`
+  display: flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: var(--space-6);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+`;
+
+const helpLegendMarkerUX = css`
+  display: inline-flex;
+  width: var(--space-10);
+  align-items: center;
+  justify-content: center;
+  flex: none;
+`;
+
+const helpLegendLabelSkinX = css`
+  min-width: 0;
+  color: var(--text-body);
+  font-size: var(--text-sm);
+`;
+
+const helpColorSwatchUX = css`
+  width: var(--space-6);
+  height: var(--space-6);
+  border-radius: var(--radius-xs);
+  background: var(--help-color);
+  box-shadow: inset 0 0 0 var(--border-w) color-mix(in srgb, var(--help-color) 70%, var(--text-strong));
+`;
+
+const helpNotationGlyphUX = css`
+  display: inline-flex;
+  min-width: var(--space-10);
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+`;
+
+const footerSpacerUX = css`
+  flex: 1 1 auto;
+`;
 
 const ELEMENT_LEGEND = [
   ["capability", "Capability"],
@@ -70,8 +172,8 @@ export function HelpModal({
 }) {
   return (
     <Modal open={open} onOpenChange={onOpenChange}>
-      <ModalContent className="help-modal" aria-label="Help">
-        <ModalHeader className="help-modal-header">
+      <ModalContent className={cx(helpModalBaseUX)} aria-label="Help">
+        <ModalHeader className={cx(helpHeaderUX)}>
           <ModalTitle>Help</ModalTitle>
           <ModalClose asChild>
             <IconButton tone="ghost" aria-label="Close help">
@@ -79,17 +181,17 @@ export function HelpModal({
             </IconButton>
           </ModalClose>
         </ModalHeader>
-        <ModalBody className="help-modal-body">
-          <section className="help-modal-section">
+        <ModalBody className={cx(helpBodyUX)}>
+          <section className={cx(helpSectionUX)}>
             <h3>Model Legend</h3>
-            <div className="help-legend-grid">
+            <div className={cx(helpLegendGridUX)}>
               <div>
                 <h4>Result kinds</h4>
-                <div className="help-legend-list">
+                <div className={cx(helpLegendListUX)}>
                   {RESULT_LEGEND.map(([kind, label, token]) => (
                     <LegendRow
                       key={kind}
-                      marker={<span className="help-color-swatch" style={legendColor(token)} />}
+                      marker={<span className={cx(helpColorSwatchUX)} style={legendColor(token)} />}
                       label={label}
                     />
                   ))}
@@ -98,7 +200,7 @@ export function HelpModal({
 
               <div>
                 <h4>Element types</h4>
-                <div className="help-legend-list">
+                <div className={cx(helpLegendListUX)}>
                   {ELEMENT_LEGEND.map(([type, label]) => (
                     <LegendRow
                       key={type}
@@ -111,16 +213,16 @@ export function HelpModal({
             </div>
           </section>
 
-          <section className="help-modal-section">
+          <section className={cx(helpSectionUX)}>
             <h3>Ontology Legend</h3>
-            <div className="help-legend-grid">
+            <div className={cx(helpLegendGridUX)}>
               <div>
                 <h4>Node types</h4>
-                <div className="help-legend-list">
+                <div className={cx(helpLegendListUX)}>
                   {ONTOLOGY_TYPE_LEGEND.map(([token, label]) => (
                     <LegendRow
                       key={label}
-                      marker={<span className="help-color-swatch" style={legendColor(token)} />}
+                      marker={<span className={cx(helpColorSwatchUX)} style={legendColor(token)} />}
                       label={label}
                     />
                   ))}
@@ -128,11 +230,11 @@ export function HelpModal({
               </div>
               <div>
                 <h4>Notation</h4>
-                <div className="help-legend-list">
+                <div className={cx(helpLegendListUX)}>
                   {ONTOLOGY_NOTATION_LEGEND.map(([glyph, label]) => (
                     <LegendRow
                       key={label}
-                      marker={<span className="help-notation-glyph">{glyph}</span>}
+                      marker={<span className={cx(helpNotationGlyphUX)}>{glyph}</span>}
                       label={label}
                     />
                   ))}
@@ -142,7 +244,7 @@ export function HelpModal({
           </section>
         </ModalBody>
         <ModalFooter>
-          <span className="ex-spacer" />
+          <span className={cx(footerSpacerUX)} />
           <ModalClose asChild>
             <Button tone="primary">Close</Button>
           </ModalClose>
@@ -160,9 +262,9 @@ function LegendRow({
   label: ReactNode;
 }) {
   return (
-    <div className="help-legend-row">
-      <span className="help-legend-marker">{marker}</span>
-      <span className="help-legend-label">{label}</span>
+    <div className={cx(helpLegendRowUX)}>
+      <span className={cx(helpLegendMarkerUX)}>{marker}</span>
+      <span className={cx(helpLegendLabelSkinX)}>{label}</span>
     </div>
   );
 }

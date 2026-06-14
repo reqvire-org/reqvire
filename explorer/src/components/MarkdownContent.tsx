@@ -14,6 +14,7 @@ import ReactMarkdown, {
   type Components,
 } from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { css, cx } from "@linaria/atomic";
 import { cssVar, replaceCssVarsForMermaid } from "@ds";
 
 type MarkdownContentVariant = "detail" | "preview";
@@ -38,6 +39,198 @@ const PREVIEW_ALLOWED_ELEMENTS = [
   "ol",
   "li",
 ];
+
+const markdownBaseUX = css`
+  font-size: var(--text-md);
+  line-height: 1.65;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    margin: 0.9em 0 0.35em;
+    font-weight: var(--weight-semibold);
+    line-height: 1.25;
+  }
+
+  h1 {
+    font-size: var(--text-2xl);
+  }
+
+  h2 {
+    font-size: var(--text-xl);
+  }
+
+  h3 {
+    font-size: var(--text-lg);
+  }
+
+  h4 {
+    font-size: var(--text-base);
+  }
+
+  p,
+  ul,
+  ol,
+  blockquote,
+  pre,
+  .ex-markdown-table-wrap {
+    margin: 0.55em 0;
+  }
+
+  ul,
+  ol {
+    padding-left: var(--space-9);
+  }
+
+  li {
+    margin: 0.2em 0;
+  }
+
+  a {
+    text-decoration: underline;
+    text-underline-offset: var(--space-1);
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: var(--space-5) 0;
+  }
+
+  code {
+    border-radius: var(--radius-md);
+    padding: var(--space-1) var(--space-2);
+    font-size: 0.92em;
+  }
+
+  pre {
+    overflow-x: auto;
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+  }
+
+  pre code {
+    padding: 0;
+  }
+
+  blockquote {
+    padding-left: var(--space-5);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95em;
+  }
+
+  th,
+  td {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    vertical-align: top;
+  }
+`;
+
+const markdownSkinX = css`
+  color: var(--text-body);
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--text-body);
+  }
+
+  a {
+    color: var(--text-link);
+  }
+
+  a:hover {
+    color: var(--accent-hover);
+  }
+
+  img {
+    border: var(--border-w) solid var(--border-subtle);
+  }
+
+  code,
+  pre {
+    background: var(--bg-sunken);
+  }
+
+  pre code {
+    background: transparent;
+  }
+
+  blockquote {
+    border-left: var(--border-w-heavy) solid var(--border-subtle);
+    color: var(--text-muted);
+  }
+
+  th,
+  td {
+    border: var(--border-w) solid var(--border-subtle);
+  }
+
+  th {
+    background: var(--bg-sunken);
+    font-weight: var(--weight-semibold);
+  }
+`;
+
+const markdownPreviewUX = css`
+  margin-top: var(--space-2);
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  p,
+  ul,
+  ol {
+    margin: 0;
+  }
+`;
+
+const markdownPreviewSkinX = css`
+  color: var(--text-muted);
+`;
+
+const markdownTableWrapUX = css`
+  overflow-x: auto;
+`;
+
+const markdownEmptySkinX = css`
+  color: var(--text-muted);
+`;
+
+const diagramBlockUX = css`
+  --ex-markdown-diagram-min-w: 520px;
+  margin: var(--space-5) 0;
+  overflow: auto;
+  padding: var(--space-5);
+
+  svg {
+    display: block;
+    min-width: var(--ex-markdown-diagram-min-w);
+  }
+`;
+
+const diagramBlockSkinX = css`
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+`;
 
 export function MarkdownContent({
   markdown,
@@ -64,11 +257,20 @@ export function MarkdownContent({
   }, [content, scrollToAnchor]);
 
   if (!content) {
-    return <span className="reqvire-markdown-empty">-</span>;
+    return <span className={cx("ex-markdown-empty", markdownEmptySkinX)}>-</span>;
   }
 
   return (
-    <div className={`reqvire-markdown reqvire-markdown-${variant}`}>
+    <div
+      className={cx(
+        "ex-markdown",
+        `ex-markdown-${variant}`,
+        markdownBaseUX,
+        markdownSkinX,
+        variant === "preview" && markdownPreviewUX,
+        variant === "preview" && markdownPreviewSkinX,
+      )}
+    >
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         skipHtml
@@ -294,10 +496,15 @@ function markdownComponents({ variant }: { variant: MarkdownContentVariant }): C
   table({ children, node: _node, ...props }) {
     void _node;
     return (
-      <div className="reqvire-markdown-table-wrap">
+      <div className={cx("ex-markdown-table-wrap", markdownTableWrapUX)}>
         <table {...props}>{children}</table>
       </div>
     );
+  },
+  img({ src, alt, node: _node, ...props }) {
+    void _node;
+    if (!src) return null;
+    return <img {...props} src={src} alt={alt ?? ""} />;
   },
   h1({ children, node: _node, ...props }) {
     void _node;
@@ -482,7 +689,7 @@ function renderMermaidSvg(target: HTMLElement, svg: string) {
 
 function renderDiagramFallback(target: HTMLElement) {
   const fallback = document.createElement("div");
-  fallback.className = "reqvire-diagram-fallback";
+  fallback.className = cx("ex-diagram-fallback", diagramBlockUX, diagramBlockSkinX);
   fallback.textContent = "Unable to render Mermaid diagram.";
   target.replaceChildren(fallback);
 }
@@ -813,7 +1020,7 @@ function enableMermaidEdgeHighlight(svg: SVGSVGElement) {
   nodes.forEach((node) => {
     node.addEventListener("mouseenter", () => {
       clear();
-      node.style.filter = `drop-shadow(0 0 8px ${cssVar("--accent-ring")})`;
+      node.style.filter = `drop-shadow(0 0 var(--space-4) ${cssVar("--accent-ring")})`;
       edges.forEach((edge) => edge.classList.add("edge-highlighted"));
     });
     node.addEventListener("mouseleave", clear);
@@ -853,7 +1060,7 @@ function D3HierarchyBlock({
   }
 
   return (
-    <div className={`reqvire-d3-block reqvire-d3-${mode}`}>
+    <div className={cx("ex-d3-block", `ex-d3-${mode}`, diagramBlockUX, diagramBlockSkinX)}>
       <svg ref={ref} role="img" aria-label={`D3 ${mode} diagram`} />
     </div>
   );
@@ -861,7 +1068,7 @@ function D3HierarchyBlock({
 
 function D3JsonNotice({ code, label }: { code: string; label: string }) {
   return (
-    <div className="reqvire-diagram-fallback">
+    <div className={cx("ex-diagram-fallback", diagramBlockUX, diagramBlockSkinX)}>
       <strong>{label}</strong>
       <pre><code>{code}</code></pre>
     </div>

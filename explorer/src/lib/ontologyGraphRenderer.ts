@@ -2184,7 +2184,7 @@ ${body}
             badge.className = 'ontology-graph-badge';
             badge.style.background = palette.fill;
             badge.style.color = palette.text;
-            badge.style.border = `1px solid ${palette.stroke}`;
+            badge.style.border = `${cssVar('--border-w')} solid ${palette.stroke}`;
             badge.textContent = humanizeSemanticType(node.semantic_type);
 
             item.append(label, badge);

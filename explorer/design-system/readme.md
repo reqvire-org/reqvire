@@ -19,7 +19,7 @@ The **Explorer** is the read/navigate surface over that graph. It is one applica
 
 - **Product site:** https://www.reqvire.org/
 - **Reference UI:** Explorer screenshots provided by the project owner (`uploads/explorer-*.png`) — Model browser, element modal, Graph, Ontologies, Search, and Traces. These are the source of truth for layout and the element-type semantics.
-- No source code or Figma was available; components are faithful recreations from the screenshots, not extracted implementations.
+- The canonical implementation lives in this repository under `explorer/design-system/` and is documented in `../DS.md`.
 
 ---
 
@@ -65,7 +65,7 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), refine
 
 ## Iconography
 
-- **Line icons, Lucide geometry.** The Explorer uses a single stroked line-icon set (2px stroke, round caps, 24px grid) — search, box/cube, network/share, globe, activity, grid, list, table, database, settings-gear, sun/moon, help-circle, chevrons, folder/file, external-link, download. This system ships them CDN-free as the **`Icon`** component (`components/core/Icon.jsx`), whose path data is Lucide-derived (ISC). Use `<Icon name="…" />`; import `ICON_NAMES` for the full list. For anything outside the curated set, pass your own inline SVG to the icon-accepting props — do **not** hand-draw decorative SVG.
+- **Line icons, Lucide geometry.** The Explorer uses a single stroked line-icon set (2px stroke, round caps, 24px grid) — search, box/cube, network/share, globe, activity, grid, list, table, database, settings-gear, sun/moon, help-circle, chevrons, folder/file, external-link, download. This system ships them CDN-free as the **`Icon`** component (`components/core/Icon.tsx`), whose path data is Lucide-derived (ISC). Use `<Icon name="…" />`; import `ICON_NAMES` for the full list. For anything outside the curated set, pass your own inline SVG to the icon-accepting props — do **not** hand-draw decorative SVG.
 - **Element-type glyphs are their own system.** A model element is marked by a colored glyph, *not* a line icon: capability → a dark **hub** square with a blue pip; requirement / verification / ontology / resource → type-colored rounded squares; refinement-family elements → orange diamonds with subtype marks (`source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, `semantic-contract`) so related refinements keep the same hue while remaining visually distinct. This is the **`ElementIcon`** component.
 - **No emoji, no unicode-as-icon.** The only non-icon glyph in the source is the subclass mark `⊆` beside ontology terms.
 - **Logo.** A small **model-hub constellation** — six satellite nodes whose links converge at the model root carrying the element-type colors. `assets/logo-mark.svg`. ⚠ This is a **reconstruction** from the screenshots; replace with the official Reqvire SVG when available (see Caveats).
@@ -77,26 +77,31 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), refine
 **Root**
 - `styles.css` — the single entry point consumers link. `@import`s only.
 - `tokens/` — `colors.css`, `typography.css`, `spacing.css`, `elevation.css`, `fonts.css`, `base.css`.
-- `components/components.css` — class-based component styles (imported by `styles.css`).
-- `assets/logo-mark.svg` — brand mark (reconstruction).
+- `assets/logo-mark.svg` — 200x200 source brand mark (reconstruction); the `BrandMark` component references it and favicon/app-icon PNG/ICO outputs are generated from this file.
 - `SKILL.md` — Agent-Skill manifest for downloading this system into Claude Code.
 
-**Components** (`components/<group>/` — TSX source, each with a `.prompt.md`, one `*.card.html` per group; exported via `index.ts`, bundled to `_ds_bundle.js` by `npm run build:ds-bundle`)
+**Components** (`components/<group>/` — TSX source exported via `index.ts`)
 - `core/` — **Alert**, **Button**, **IconButton**, **Badge**, **Card**, **Icon**, **Modal**
 - `data/` — **ElementIcon**, **TypeBadge**, **RelationPill**, **Chip**, **Stat** (+ **StatRow**), **Table**
 - `controls/` — **ToggleRow**, **SegmentedControl**, **SearchInput**, **Tabs**
 - `navigation/` — **TreeItem**, **Breadcrumb**, **SidebarSection**
 
-**UI kit** (`ui_kits/explorer/`)
-- `index.html` — the interactive app (start here). Top-tab shell over five modes + the element modal; theme toggle and sidebar collapse work.
-- `AppShell.jsx`, `ModelBrowser.jsx`, `GraphCanvas.jsx`, `SearchView.jsx`, `TracesView.jsx`, `ElementModal.jsx`, `data.js`, `explorer.css`.
+**Ownership**
+- `rq-*` classes and `--rq-*` component variables are design-system-only.
+- `ex-*` classes and `--ex-*` variables are Explorer app-only.
+- Consumers import components and palette symbols from `@ds` only.
+- Consumers do not target design-system internals; customization happens through documented props or `--rq-*` variables.
 
-**Foundation cards** (`guidelines/*.card.html`) — the specimens shown in the Design System tab, grouped Colors / Type / Spacing / Brand.
+**Generated artifacts**
+- Generated bundles, generated CSS, and `dist-*` outputs are not tracked source.
+- Favicons and platform app icons are generated from `assets/logo-mark.svg`; do not hand-edit generated PNG/ICO variants in source.
+- There is no release-artifact exception in this repository.
+- Build/runtime outputs are recreated from TS/TSX, CSS tokens, config, and docs.
 
 ---
 
 ## Caveats
 
 1. **Fonts** are Geist and Geist Mono, vendored in `assets/fonts/*.woff2` and referenced relatively from `tokens/fonts.css`, so the kit and standalone artifacts work offline with no app server.
-2. **Logo** is a reconstruction of the dotted-graph mark, built from the element-type palette. Please provide the official Reqvire logo (SVG preferred) to replace `assets/logo-mark.svg` and the inline `BRAND_MARK` in the kit.
-3. **Recreated from screenshots, not code.** Exact hex values, fonts and spacing were sampled/estimated. Flag anything that should track the live product more closely.
+2. **Logo** is a reconstruction of the dotted-graph mark, built from the element-type palette. Please provide the official Reqvire logo (SVG preferred) to replace `assets/logo-mark.svg`, then regenerate browser icons with `npm run generate:icons`.
+3. **Canonical source.** This directory is source, not an exported artifact. Generated bundles, generated CSS, generated browser icons, and showcase dist output must be rebuilt, not edited.

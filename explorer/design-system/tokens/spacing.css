@@ -50,8 +50,6 @@
   --type-icon-lg: 26px;
 
   /* Layout */
-  --sidebar-w:      300px;  /* left model / control sidebar */
-  --sidebar-w-wide: 340px;
   --rail-w:         52px;   /* right icon rail */
   --header-h:       52px;   /* explorer top header */
   --content-max:    1180px; /* main column max readable width */

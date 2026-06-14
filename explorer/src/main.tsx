@@ -3,8 +3,7 @@ import { createRoot } from "react-dom/client";
 import * as d3 from "d3";
 import * as d3Sankey from "d3-sankey";
 import { App } from "./App";
-import "./design-system.css";
-import "./styles.css";
+import "../design-system/styles.css";
 
 type MermaidApi = typeof import("mermaid").default;
 

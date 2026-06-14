@@ -2,6 +2,8 @@ export { Alert } from "./components/core/Alert";
 export type { AlertProps } from "./components/core/Alert";
 export { Badge } from "./components/core/Badge";
 export type { BadgeProps } from "./components/core/Badge";
+export { BrandMark } from "./components/core/BrandMark";
+export type { BrandMarkProps } from "./components/core/BrandMark";
 export { Button } from "./components/core/Button";
 export type { ButtonProps } from "./components/core/Button";
 export { BUTTON_SIZE_CLASSES, BUTTON_TONE_CLASSES } from "./components/core/button_contract";
@@ -34,6 +36,8 @@ export type { ToggleRowProps } from "./components/controls/ToggleRow";
 
 export { Chip } from "./components/data/Chip";
 export type { ChipProps } from "./components/data/Chip";
+export { CodeRef } from "./components/data/CodeRef";
+export type { CodeRefProps } from "./components/data/CodeRef";
 export { ElementIcon } from "./components/data/ElementIcon";
 export type { ElementIconProps, ElementIconSize } from "./components/data/ElementIcon";
 export {

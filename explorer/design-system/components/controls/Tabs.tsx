@@ -1,4 +1,118 @@
+import { css, cx } from "@linaria/atomic";
 import type { HTMLAttributes, ReactNode } from "react";
+
+const baseUX = css`
+  display: flex;
+  align-items: stretch;
+  gap: var(--space-1);
+  position: relative;
+  height: var(--rq-tabs-h);
+
+  svg {
+    display: block;
+    flex: 0 0 auto;
+  }
+`;
+
+const tabBaseUX = css`
+  display: inline-flex;
+  position: relative;
+  align-items: center;
+  gap: var(--space-5);
+  height: var(--rq-tab-h, var(--header-h));
+  padding: 0 var(--space-7);
+  border: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dur-fast);
+
+  svg {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    opacity: 0.85;
+  }
+
+  .rq-tab__icon {
+    display: inline-flex;
+  }
+
+  .rq-tab__badge {
+    color: var(--text-muted);
+    font-size: var(--text-micro);
+    font-variant-numeric: tabular-nums;
+  }
+`;
+
+const skinUnderlineX = css`
+  border-bottom: var(--rq-tabs-border-bottom, var(--border-w) solid var(--border-subtle));
+`;
+
+const tabSkinUnderlineX = css`
+  color: var(--text-secondary);
+  background: transparent;
+
+  &:hover {
+    color: var(--text-strong);
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: var(--space-6);
+    bottom: 0;
+    left: var(--space-6);
+    height: var(--border-w-thick);
+    border-radius: var(--border-w-thick) var(--border-w-thick) 0 0;
+    background: transparent;
+    transition: background var(--dur-fast);
+  }
+
+  &.is-active {
+    color: var(--text-strong);
+  }
+
+  &.is-active svg {
+    color: var(--accent);
+    opacity: 1;
+  }
+
+  &.is-active::after {
+    background: var(--accent);
+  }
+`;
+
+const skinPillX = css`
+  gap: var(--space-2);
+  padding: calc(var(--space-1) + var(--border-w));
+  border: 0;
+  border-radius: var(--radius-md);
+  background: var(--bg-sunken);
+`;
+
+const tabSkinPillX = css`
+  height: var(--control-sm);
+  padding: 0 var(--space-7);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  background: transparent;
+
+  &:hover {
+    color: var(--text-strong);
+  }
+
+  &.is-active {
+    color: var(--text-strong);
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-xs);
+  }
+
+  &.is-active svg {
+    color: var(--accent);
+    opacity: 1;
+  }
+`;
 
 export interface TabItem<T extends string = string> {
   value: T;
@@ -22,18 +136,26 @@ export function Tabs<T extends string = string>({
   className = "",
   ...props
 }: TabsProps<T>) {
-  const cls = ["rq-tabs", `rq-tabs--${variant}`, className].filter(Boolean).join(" ");
+  const cls = cx(
+    "rq-tabs",
+    baseUX,
+    `rq-tabs--${variant}`,
+    variant === "underline" && skinUnderlineX,
+    variant === "pill" && skinPillX,
+    className,
+  );
   return (
     <div className={cls} role="tablist" {...props}>
       {items.map((it) => {
         const active = it.value === value;
+        const tabSkinX = variant === "pill" ? tabSkinPillX : tabSkinUnderlineX;
         return (
           <button
             key={it.value}
             type="button"
             role="tab"
             aria-selected={active}
-            className={["rq-tab", active ? "is-active" : ""].filter(Boolean).join(" ")}
+            className={cx("rq-tab", tabBaseUX, tabSkinX, active && "is-active")}
             onClick={() => onChange?.(it.value)}
           >
             {it.icon ? <span className="rq-tab__icon">{it.icon}</span> : null}

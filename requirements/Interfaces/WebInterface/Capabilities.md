@@ -341,7 +341,8 @@ The system shall ensure color consistency between:
   * derivedFrom: [Served Explorer Browser Interface](#served-explorer-browser-interface)
   * refinedBy: [Explorer Color and Type Palette Specification](Specifications.md#explorer-color-and-type-palette-specification)
   * satisfiedBy: [containment.rs](../../../core/src/containment.rs)
-  * satisfiedBy: [styles.css](../../../explorer/src/styles.css)
+  * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
+  * satisfiedBy: [palette.ts](../../../explorer/design-system/palette.ts)
 ---
 
 ### Serve Command

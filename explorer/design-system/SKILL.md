@@ -12,17 +12,18 @@ If the user invokes this skill without any other guidance, ask them what they wa
 
 ## Where things are
 - `readme.md` — the full design guide: product context, content fundamentals, visual foundations, iconography, and a file manifest. **Start here.**
-- `styles.css` — single CSS entry point; link it to inherit all tokens, fonts and component styles. `@import`s `tokens/*` and `components/components.css`.
+- `styles.css` — single CSS entry point; link it to inherit all tokens, fonts and base styles. It is import-only and guarded.
 - `tokens/` — colors (warm product surfaces, slate text ramps, rose accent, the six element-type hues), typography (Geist/Geist Mono), spacing, elevation, fonts.
-- `components/<group>/` — typed React primitives (TSX; props are the source of truth) (`Alert`, `Badge`, `Button`, `Card`, `Icon`, `IconButton`, `Modal`, `ElementIcon`, `TypeBadge`, `RelationPill`, `Chip`, `Stat`, `Table`, `ToggleRow`, `SegmentedControl`, `SearchInput`, `Tabs`, `TreeItem`, `Breadcrumb`, `SidebarSection`). Each has a `.prompt.md` (usage).
+- `components/<group>/` — typed React primitives (TSX; props are the source of truth) (`Alert`, `Badge`, `Button`, `Card`, `Icon`, `IconButton`, `Modal`, `ElementIcon`, `TypeBadge`, `RelationPill`, `Chip`, `Stat`, `Table`, `ToggleRow`, `SegmentedControl`, `SearchInput`, `Tabs`, `TreeItem`, `Breadcrumb`, `SidebarSection`).
 - `index.ts` — the barrel; production code imports components and the palette API from here (the app aliases it as `@ds`).
 - `palette.ts` — programmatic color API: element-type → token mapping, runtime CSS-variable resolution, Mermaid class defs.
-- `ui_kits/explorer/` — the interactive full-app recreation (top-tab shell over five modes + element modal). The best reference for composing the components.
-- `guidelines/*.card.html` — foundation specimens (Colors / Type / Spacing / Brand).
-- `assets/logo-mark.svg` — brand mark (reconstruction; replace with the official logo when available).
+- `assets/logo-mark.svg` — 200x200 source brand mark (reconstruction; replace with the official logo when available). Favicons and app icons are generated from it by `npm run generate:icons`, not hand-maintained as source.
 
 ## Using the components
-In a plain HTML artifact: link `styles.css`, load React UMD + Babel, load `_ds_bundle.js` (a build artifact — regenerate with `npm run build:ds-bundle`, never edit), then read components from `window.ReqvireExplorerDesignSystem_48409e` inside a `<script type="text/babel">`. See any `*.card.html` or `ui_kits/explorer/index.html` for the exact pattern.
+Production Explorer code imports components and palette symbols from `@ds`.
+For the local showcase, run `npm run dev:showcase` or `npm run build:showcase`.
+Generated bundles, generated CSS, generated browser icons, generated adherence
+config, and dist output are build/runtime artifacts, never tracked source.
 
 ## Non-negotiables
 - Keep the **element-type color code** meaningful: capability=blue, requirement=violet, refinement=orange, verification=green, ontology=gold, resource=amber, other=slate. Never reuse these hues decoratively.

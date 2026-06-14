@@ -81,15 +81,15 @@ export function DataPage() {
         <div className="sc-col">
           <div className="sc-label">Link (href)</div>
           <div className="sc-col">
-            <RelationPill kind="specifiedBy" label="System Modeling Capability" pipColor="var(--capability)" href="#" />
-            <RelationPill kind="verifiedBy" label="Model Structure Test" pipColor="var(--verification)" href="#" />
-            <RelationPill kind="derivedFrom" label="Traceability Coverage Requirement" pipColor="var(--requirement)" href="#" />
-            <RelationPill kind="refinedBy" label="Containment Specification" pipColor="var(--refinement)" href="#" />
+            <RelationPill kind="specifiedBy" label="System Modeling Capability" pipColorToken="--capability" href="#" />
+            <RelationPill kind="verifiedBy" label="Model Structure Test" pipColorToken="--verification" href="#" />
+            <RelationPill kind="derivedFrom" label="Traceability Coverage Requirement" pipColorToken="--requirement" href="#" />
+            <RelationPill kind="refinedBy" label="Containment Specification" pipColorToken="--refinement" href="#" />
           </div>
         </div>
         <div className="sc-col">
           <div className="sc-label">Button (no href)</div>
-          <RelationPill kind="attachedTo" label="Architecture.md" pipColor="var(--resource)" />
+          <RelationPill kind="attachedTo" label="Architecture.md" pipColorToken="--resource" />
           <RelationPill kind="unknown" label="Unresolved element ID" disabled />
         </div>
       </Section>

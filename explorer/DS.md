@@ -16,12 +16,45 @@ the Explorer workspace. It ships:
 - **Barrel export** — a single `index.ts` that re-exports every component and
   palette symbol; the only import surface the app should use
 
+### Ownership contract
+
+The namespace boundary is strict:
+
+- `rq-*` classes and `--rq-*` component variables are owned by
+  `design-system/` only.
+- `ex-*` classes and `--ex-*` application variables are owned by `src/` only.
+- Application code MUST NOT emit new `rq-*` hooks.
+- Design-system code MUST NOT emit `ex-*` hooks.
+- Application CSS and Linaria blocks MUST NOT target design-system internals
+  such as `.rq-treeitem`, `.rq-tabs`, `.rq-search__input`, or
+  `.rq-togglerow__label`.
+
+Explorer customizes design-system components only through documented props or
+documented `--rq-*` component variables set on an application-owned `ex-*`
+wrapper. If a needed customization does not exist, add it to the design-system
+component API instead of reaching into its internal markup.
+
 The app consumes the design system in two ways:
 
 | Surface | How |
 |---------|-----|
-| CSS | `src/design-system.css` does a single `@import "../design-system/styles.css"` |
+| CSS | `src/main.tsx` imports `../design-system/styles.css` directly |
 | Components / palette | `import { … } from "@ds"` (path alias → `design-system/index.ts`) |
+
+The CSS entry is the only direct app import from `design-system/`. Component,
+palette, and helper imports go through `@ds`; direct component paths remain
+forbidden by `lint:adherence`.
+
+Explorer document mount mechanics live inline in `index.html`: `html`, `body`,
+and `#root` height, plus the shell-level body overflow policy. There is no
+`src/styles.css`, `src/global.css`, `src/html.css`, or `src/app-mount.css`
+styling layer. Those names hide ownership and invite product styling to
+accumulate outside component modules. The architecture guard keeps the inline
+HTML style block mount-bootstrap-only.
+
+`@ds` is the only public TypeScript import surface. Application code MUST NOT
+import from `@ds/*`, `design-system/*`, or component/palette implementation
+paths directly.
 
 No third-party UI framework (Tailwind, Radix Themes, etc.) is in the
 dependency tree. All visual primitives are owned here.
@@ -45,28 +78,71 @@ design-system/
 │   └── base.css               # Minimal reset + body defaults
 │
 ├── components/
-│   ├── components.css         # Aggregates all component CSS (imported by styles.css)
-│   ├── core/                  # Alert · Badge · Button · Card · Icon · IconButton · Modal
-│   ├── data/                  # Chip · ElementIcon · RelationPill · Stat · Table · TypeBadge
+│   ├── core/                  # Alert · Badge · BrandMark · Button · Card · Icon · IconButton · Modal
+│   ├── data/                  # Chip · CodeRef · ElementIcon · RelationPill · Stat · Table · TypeBadge
 │   ├── controls/              # SearchInput · SegmentedControl · Tabs · ToggleRow
 │   └── navigation/            # Breadcrumb · SidebarSection · TreeItem
 │
 ├── assets/
-│   └── fonts/                 # Geist-Variable.woff2, GeistMono-Variable.woff2
+│   ├── fonts/                 # Geist-Variable.woff2, GeistMono-Variable.woff2
+│   └── logo-mark.svg          # Canonical reusable Reqvire brand mark
 │
-├── vite.bundle.config.ts      # Builds _ds_bundle.js (standalone kit only)
-├── _ds_bundle.js              # Generated IIFE bundle (not used by the app build)
-└── _adherence.oxlintrc.json   # Generated import-contract config (oxlint)
+└── vite.bundle.config.ts      # Builds standalone kit output when requested
 ```
+
+Generated bundles, generated CSS, generated adherence config, and `dist-*`
+directories are build/runtime artifacts. They MUST NOT be tracked as source in
+this repository, with no release-artifact exception. Source of truth is TS/TSX,
+CSS tokens, config, docs, and explicitly owned static assets.
+
+### Asset ownership
+
+The asset boundary is strict:
+
+| Path | Source of truth for |
+|------|---------------------|
+| `design-system/assets/` | Assets consumed by design-system components or tokens, including fonts and reusable brand source SVGs |
+| `.vite/generated-assets/` | Ignored build output generated from source assets, including favicons and app icons |
+| `public/assets/` | Optional non-DS browser/runtime files that must be referenced by raw URL |
+| `design-system/showcase/public/assets/` | Optional showcase-only mock public resources for raw URL use cases |
+| `dist*/assets/` | Build/serve output assembled from source assets and generated runtime data |
+
+Assets used by reusable components belong in `design-system/assets/`, not
+`src/assets/`. Public assets are only for files that must be browser-addressable
+by raw URL and are not reusable DS/brand assets. The app build merges
+`design-system/assets/`, generated assets, and `public/assets/` into
+`dist/assets/`; matching filenames are an error, not an override. Favicons and
+platform app icons are generated from `design-system/assets/logo-mark.svg` by
+`npm run generate:icons`; do not hand-edit or track those derived PNG/ICO files
+as source. Real Explorer project data is served at `assets/project-store.js`
+by `reqvire serve`; that runtime data file is not checked into
+`public/assets/` or `design-system/assets/`. The showcase renders the real app
+with `src/store/devFixture.ts` injected by
+`design-system/showcase/mocks/MockShell.tsx`; showcase public resources belong
+under `design-system/showcase/public/assets/` only when a mock must use a raw
+browser URL.
 
 ---
 
 ## Token system
 
-Every CSS value in the app must reference a token via `var(--token)`. Raw `px`
-values, hex colors, font stacks, numeric font weights, durations, and easing
-functions are allowed **only** inside custom-property declarations and at-rule
-conditions. Anything else is a lint error.
+Every visual CSS value in the app and design-system source must reference a
+token or component variable via `var(--token)`. Raw `px` values, hex colors,
+font stacks, numeric font weights, durations, and easing functions are allowed
+**only** inside token/custom-property declarations and at-rule conditions.
+Anything else is a lint error.
+
+The checks are intentionally conservative. If a new token category, CSS entry
+layer, raw-value allowance, global selector, generated asset class, import
+surface, or namespace exception is truly needed, the same change must update
+the relevant lint guard and documentation. A passing guard is the approval
+mechanism; do not bypass it with ad hoc exclusions or unguarded conventions.
+
+Design-system components expose visual policy through semantic props and
+`--rq-*` component variables. They MUST NOT expose arbitrary CSS color-string
+props. Dynamic product coloring, such as ontology or graph role colors, is
+mapped by the application into semantic roles, token names, or documented
+component variables before it reaches a design-system primitive.
 
 ### Token taxonomy and naming
 
@@ -76,7 +152,7 @@ Design tokens are organized into three layers. Keep the layers distinct:
 |-------|---------------|---------|
 | Primitive tokens | Raw choices in the visual language | `--rose-600`, `--space-8`, `--text-sm` |
 | Semantic tokens | Product decisions that explain purpose | `--accent`, `--bg-surface`, `--text-muted`, `--border-focus` |
-| Component tokens | Narrow component knobs that still resolve to semantic intent | `--rq-tabs-border-bottom`, `--dialog-w` |
+| Component tokens | Narrow component knobs that still resolve to semantic intent | `--rq-tabs-border-bottom`, `--rq-modal-w` |
 
 Primitive tokens are the available options. Semantic tokens are the choices the
 interface is allowed to make. Components and app CSS should normally use the
@@ -179,7 +255,28 @@ reference tokens defined earlier:
 4. `spacing.css` — spacing grid, radii, control heights, layout constants
 5. `elevation.css` — shadows, motion, z-index
 6. `base.css` — `*` reset + `body` defaults
-7. `components/components.css` — all component styles
+
+Component-specific styling lives with the owning TSX component through Linaria
+and uses `rq-*` hooks internally. Application styling lives with the owning
+Explorer TSX component and uses `ex-*` hooks. The only inline HTML style in
+`index.html` and `design-system/showcase/index.html` is the document mount
+bootstrap:
+
+```css
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  overflow: hidden;
+}
+```
+
+Body typography, colors, background, scrollbar styling, reset rules, and
+selection styling belong to `design-system/tokens/base.css`. Product layout
+dimensions belong to the shell or owning view/component module.
 
 ### Colors (`tokens/colors.css`)
 
@@ -254,8 +351,13 @@ Two utility classes are defined here:
 - **Radii**: `--radius-xs` (4px) → `--radius-xl` (14px) → `--radius-pill` (999px)
 - **Control heights**: `--control-xs` (22px), `--control-sm` (28px), `--control-md` (34px), `--control-lg` (40px)
 - **Icon sizes**: `--icon-xs` (13px) → `--icon-lg` (20px)
-- **Layout**: `--sidebar-w` (300px), `--rail-w` (52px), `--header-h` (52px), `--content-max` (1180px)
+- **Layout**: `--rail-w` (52px), `--header-h` (52px), `--content-max` (1180px), `--row-h` (30px)
 - **Borders**: `--border-w` (1px), `--border-w-thick` (2px), `--border-w-heavy` (3px), `--focus-w` (2px)
+
+Explorer shell pane widths are not design-system tokens. They are
+application-owned `--ex-*` variables defined on the shell root:
+`--ex-left-pane-width`, `--ex-left-pane-collapsed-width`, and
+`--ex-current-left-width`.
 
 ### Elevation (`tokens/elevation.css`)
 
@@ -275,19 +377,21 @@ on its root element unless noted.
 
 | Component | Description |
 |-----------|-------------|
-| `Alert` | Inline status message strip — info / warning / danger / success variants |
+| `Alert` | Inline status message strip — default / info / warning / danger / success variants |
 | `Badge` | Compact count or label pill |
-| `Button` | Primary / secondary / ghost / danger; `sm` / `md` / `lg` sizes |
-| `Card` | White surface card with 1px border and xs shadow; selected state adds accent ring |
+| `BrandMark` | Reqvire brand mark image backed by `design-system/assets/logo-mark.svg`; decorative by default when requested |
+| `Button` | `tone`: primary / accent / secondary / ghost / danger / link; `size`: `sm` / `md` / `lg` |
+| `Card` | Tokenized raised surface card with optional padding, interactivity, selection, and accent strip |
 | `Icon` | Lucide-geometry SVG icons. Props: `name` (see `ICON_NAMES`), `size`, `className` |
-| `IconButton` | Icon-only button wrapper — ghost / subtle / primary; same sizes as Button |
-| `Modal` | Radix Dialog-backed overlay. Sub-components: `ModalContent`, `ModalHeader`, `ModalTitle`, `ModalDescription`, `ModalBody`, `ModalFooter`, `ModalClose` |
+| `IconButton` | Icon-only button wrapper — `tone`: secondary / ghost; `size`: `sm` / `md`; optional active state |
+| `Modal` | In-house portal-backed dialog overlay. Sub-components: `ModalContent`, `ModalHeader`, `ModalTitle`, `ModalDescription`, `ModalBody`, `ModalFooter`, `ModalClose` |
 
 ### Data (`components/data/`)
 
 | Component | Description |
 |-----------|-------------|
-| `Chip` | Small inline label, optionally with a left dot swatch |
+| `Chip` | Button-backed inline label with optional icon, count, and active state |
+| `CodeRef` | Monospace code/path reference with optional line anchor and quiet wrapping |
 | `ElementIcon` | Colored model-element glyph — square / diamond / hub shape; sized `sm/md/lg` |
 | `RelationPill` | Relation row chip: kind label + colored pip + target label; optional href |
 | `Stat` / `StatRow` | Key-value stat pair; `StatRow` renders a horizontal run of stats |
@@ -300,7 +404,7 @@ on its root element unless noted.
 |-----------|-------------|
 | `SearchInput` | Controlled text input with a leading search icon and optional clear button |
 | `SegmentedControl` | Mutually exclusive button group; active segment gets dark-ink fill |
-| `Tabs` | Top tab bar with active underline; each item is `{ id, label }` |
+| `Tabs` | Underline or pill tab bar; each item is `{ value, label, icon, badge }` |
 | `ToggleRow` | Labeled boolean toggle (checkbox-backed) for filter/overlay panels |
 
 ### Navigation (`components/navigation/`)
@@ -375,24 +479,26 @@ npm run build
 
 Runs in sequence:
 
-1. **`npm run lint`** — adherence check + style check (see Lint section below)
-2. **`tsc --noEmit`** — TypeScript type check
-3. **`npm run build:ds-bundle`** — builds `design-system/_ds_bundle.js` (standalone kit)
-4. **`vite build`** — emits `dist/` with deterministic asset names (`assets/explorer.js`, `assets/explorer.css`)
+1. **`npm run lint`** — generated artifact, adherence, and style checks (see Lint section below)
+2. **`npm run generate:icons`** — derives favicon/app-icon PNG/ICO outputs
+   from `design-system/assets/logo-mark.svg` into ignored `.vite/generated-assets/`
+3. **`tsc --noEmit`** — TypeScript type check
+4. **`npm run build:ds-bundle`** — emits generated standalone DS kit artifacts
+   outside tracked source
+5. **`vite build`** — emits `dist/` with deterministic asset names (`assets/explorer.js`, `assets/explorer.css`)
 
-The build fails at the first failing step. All four must pass before `dist/` is emitted.
+The build fails at the first failing step. All steps must pass before `dist/` is emitted.
 
-### DS bundle (`_ds_bundle.js`)
+### Standalone DS artifacts
 
 ```
 npm run build:ds-bundle
 ```
 
-Configured in `design-system/vite.bundle.config.ts`. Produces an IIFE
-(`ReqvireExplorerDesignSystem_48409e`) from `design-system/index.ts`. React and
-ReactDOM are external globals. The bundle is used by the standalone design
-system HTML kit (`design-system/Example.html`) — it is **not** part of the
-application bundle that `vite build` produces.
+Configured in `design-system/vite.bundle.config.ts`. Produces standalone kit
+artifacts from `design-system/index.ts`. React and ReactDOM are external
+globals. These files are generated outputs and are **not** tracked source. They
+are also **not** part of the application bundle that `vite build` produces.
 
 ---
 
@@ -402,54 +508,68 @@ application bundle that `vite build` produces.
 npm run lint
 ```
 
-Runs two checks sequentially.
+Runs three checks sequentially.
 
-### 1. Adherence (import contract)
+### 1. Generated artifact guard
+
+```
+npm run lint:artifacts
+```
+
+`scripts/lint-generated-artifacts.mjs` fails if generated outputs are tracked
+as source, including generated DS bundles, generated DS CSS, generated
+adherence config, `dist/`, `design-system/dist-kit/`, and
+`design-system/dist-showcase/`.
+
+### 2. Adherence (import contract)
 
 ```
 npm run lint:adherence
 ```
 
 ```
-npm run generate:adherence && oxlint --deny-warnings --config design-system/_adherence.oxlintrc.json src design-system
+npm run generate:adherence && oxlint --deny-warnings --ignore-path=.oxlintignore --config .vite/_adherence.oxlintrc.json src design-system
 ```
 
 `scripts/generate-adherence-config.mjs` reads `design-system/index.ts`, extracts
-every exported PascalCase component name, then writes `_adherence.oxlintrc.json`
-with a `no-restricted-imports` rule that bans direct imports from any component
-path. The rule forces all imports to go through `@ds`.
+every exported PascalCase component name, then writes the ignored generated
+file `.vite/_adherence.oxlintrc.json` with a `no-restricted-imports` rule that
+bans direct imports from any component path. The rule forces all imports to go
+through `@ds`.
 
 Banned import patterns:
 ```
+@ds/*
 design-system/components/**
 ../design-system/components/**
+../../design-system/components/**
 components/controls/**
 components/core/**
 components/data/**
 components/navigation/**
-ui_kits/explorer/**
 ```
 
 The barrel file itself (`design-system/index.ts`) is exempted from the rule.
 The config is regenerated on every lint run so it always reflects the current
 barrel.
 
-### 2. Style checks
+### 3. Style checks
 
 ```
 npm run lint:style
 ```
 
 ```
-stylelint "src/**/*.css" && node scripts/lint-style-tokens.mjs
+stylelint "design-system/styles.css" "design-system/tokens/**/*.css" "design-system/components/**/*.css" "design-system/showcase/**/*.css" "src/**/*.css" --allow-empty-input && node scripts/lint-style-tokens.mjs && node scripts/lint-css-architecture.mjs
 ```
 
 **stylelint** checks property/selector correctness via `.stylelintrc.json`.
 
 **Style token guard** (`scripts/lint-style-tokens.mjs`) enforces the token
-contract on all CSS files under `src/`. It walks every `.css` file, strips
-comments, blanks out custom-property declarations and at-rule conditions (where
-raw values are legitimate), then runs six pattern checks on the remainder:
+contract on CSS files, Linaria `css` templates, and inline style literals under
+`src/` and `design-system/components/`. It strips comments, blanks out
+custom-property declarations and at-rule conditions (where raw values are
+legitimate), then runs six pattern checks on the remainder:
 
 | Check | What it flags |
 |-------|--------------|
@@ -462,6 +582,16 @@ raw values are legitimate), then runs six pattern checks on the remainder:
 
 Any finding exits 1. There is no baseline or grandfather list — the check is
 either clean or it fails.
+
+**CSS architecture guard** (`scripts/lint-css-architecture.mjs`) enforces
+namespace ownership (`rq-*` in design-system only, `ex-*` in app code only) and
+keeps `design-system/styles.css` as the import-only public CSS entry. It also
+keeps HTML entry inline styles limited to document mount bootstrap and blocks
+app code from importing direct `design-system/*` paths, except the single
+`../design-system/styles.css` import in `src/main.tsx`. These checks are
+conservative by design: adding a new token layer, entry import, global selector
+allowance, or namespace exception requires updating this guard and this
+document in the same change.
 
 ---
 
@@ -509,13 +639,17 @@ import { Button } from "@ds";
 }
 ```
 
-Custom properties are the one allowed location for raw values:
+Custom-property declarations are the one allowed location for raw values, but
+they still need to live with their owner. Design tokens belong in
+`design-system/tokens/`; application variables belong on the shell root or the
+owning Explorer component module. HTML entry inline styles must not define
+product variables.
 
 ```css
-/* allowed — defining a token */
-:root {
-  --dialog-w: 1120px;
-  --sidebar-custom: 260px;
+/* allowed — component-owned app variable */
+.ex-detail-dialog {
+  --ex-detail-dialog-w: 1120px;
+  width: min(var(--ex-detail-dialog-w), calc(100vw - var(--space-24)));
 }
 ```
 
@@ -559,12 +693,14 @@ No JavaScript color recalculation needed.
 
 ## Dependencies
 
-The design system itself has no runtime dependencies beyond React. The application
-workspace dependencies relevant to the design system:
+The design system itself has no runtime dependencies beyond React and ReactDOM.
+The application workspace dependencies relevant to the design system:
 
 | Package | Role |
 |---------|------|
 | `react`, `react-dom` | Component runtime |
+| `@linaria/atomic`, `@linaria/core`, `@linaria/react` | Component-scoped CSS authoring |
+| `@wyw-in-js/babel-preset`, `@wyw-in-js/vite` | Linaria/WyW extraction in dev + build |
 | `@vitejs/plugin-react` | JSX transform for dev + build |
 | `oxlint` | Import contract enforcement |
 | `stylelint` | CSS property/selector lint |

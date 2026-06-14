@@ -1,4 +1,45 @@
 import type { HTMLAttributes, ReactNode } from "react";
+import { css, cx } from "@linaria/atomic";
+
+const baseUX = css`
+  display: var(--rq-stat-display, inline-flex);
+  min-width: var(--rq-stat-min-w);
+  align-items: baseline;
+  justify-content: var(--rq-stat-jc);
+  gap: var(--space-3);
+
+  &.rq-stat--stacked {
+    flex-direction: column;
+    gap: 0;
+  }
+`;
+
+const skinX = css`
+  .rq-stat__label {
+    color: var(--text-muted);
+    font-size: var(--text-caption);
+  }
+
+  .rq-stat__value {
+    color: var(--text-strong);
+    font-size: var(--text-caption);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--weight-semibold);
+  }
+
+  &.rq-stat--stacked .rq-stat__value {
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    line-height: 1.1;
+  }
+`;
+
+const baseUXRow = css`
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-3) var(--space-8);
+`;
 
 export type StatProps = HTMLAttributes<HTMLSpanElement> & {
   label: ReactNode;
@@ -14,7 +55,7 @@ export function Stat({
   ...props
 }: StatProps) {
   return (
-    <span className={["rq-stat", stacked ? "rq-stat--stacked" : "", className].filter(Boolean).join(" ")} {...props}>
+    <span className={cx("rq-stat", baseUX, skinX, stacked ? "rq-stat--stacked" : undefined, className)} {...props}>
       {stacked ? (
         <>
           <span className="rq-stat__value">{value}</span>
@@ -38,7 +79,7 @@ export function StatRow({
   ...props
 }: StatRowProps) {
   return (
-    <div className={["rq-statrow", className].filter(Boolean).join(" ")} {...props}>
+    <div className={cx("rq-statrow", baseUXRow, className)} {...props}>
       {children}
     </div>
   );

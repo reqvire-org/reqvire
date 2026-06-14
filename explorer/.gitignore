@@ -1,5 +1,14 @@
 node_modules/
 dist/
+design-system/dist-kit/
+design-system/dist-showcase/
+design-system/_ds_bundle.js
+design-system/reqvire-explorer.css
+design-system/_ds_manifest.json
+design-system/_adherence.oxlintrc.json
+_ds_bundle.js
+public/assets/project-store.js
+design-system/showcase/public/assets/project-store.js
 *.local
 .vite/
 coverage/

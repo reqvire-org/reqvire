@@ -1,7 +1,8 @@
 import path from "path";
 import { defineConfig } from "vite";
+import wyw from "@wyw-in-js/vite";
 import react from "@vitejs/plugin-react";
-import tailwindcss from "@tailwindcss/vite";
+import { assetMergePlugin } from "./design-system/vite.assetMerge";
 
 const __dirname = import.meta.dirname;
 
@@ -14,7 +15,19 @@ const __dirname = import.meta.dirname;
 // Vite `defineConfig` typing and avoids Vite/Vitest plugin type conflicts.
 export default defineConfig({
   base: "./",
-  plugins: [react(), tailwindcss()],
+  plugins: [
+    assetMergePlugin({
+      dsAssetsDir: path.resolve(__dirname, "design-system/assets"),
+      publicAssetsDir: path.resolve(__dirname, "public/assets"),
+      generatedAssetsDir: path.resolve(__dirname, ".vite/generated-assets"),
+      label: "Explorer",
+    }),
+    wyw({
+      include: ["**/*.{ts,tsx}"],
+      exclude: ["**/node_modules/**"],
+    }),
+    react(),
+  ],
   resolve: {
     alias: {
       "@ds": path.resolve(__dirname, "./design-system/index.ts"),

@@ -1,5 +1,9 @@
 import { useState, type ReactNode } from "react";
+import { css, cx } from "@linaria/atomic";
 import {
+  Button,
+  IconButton,
+  CodeRef,
   Icon,
   Modal,
   ModalBody,
@@ -17,6 +21,575 @@ import type {
   OntologyGraphSlotFacet,
   OntologyGraphSource,
 } from "../store/types";
+
+const detailDialogBaseUX = css`
+  --ex-ontology-detail-dialog-w: 1120px;
+  --ex-ontology-detail-dialog-max-h: 980px;
+  --ex-ontology-detail-dialog-body-max-h: 780px;
+  --ex-ontology-detail-dialog-chrome-h: 176px;
+  --ex-ontology-meta-key-col: minmax(92px, 160px);
+  --ex-ontology-meta-key-col-narrow: minmax(72px, 0.32fr);
+  --ex-ontology-modal-rail-col: minmax(260px, 320px);
+  width: min(var(--ex-ontology-detail-dialog-w), calc(100vw - var(--space-24)));
+  max-width: min(var(--ex-ontology-detail-dialog-w), calc(100vw - var(--space-24)));
+  max-height: min(92vh, var(--ex-ontology-detail-dialog-max-h));
+
+  @media (max-width: 720px) {
+    width: calc(100vw - var(--space-10));
+    max-width: calc(100vw - var(--space-10));
+    max-height: calc(100vh - var(--space-10));
+  }
+`;
+
+const detailDialogSkinX = css`
+  border: var(--border-w) solid var(--border-default);
+  border-radius: var(--radius-xl);
+  background: var(--bg-overlay);
+  color: var(--text-body);
+  box-shadow: var(--shadow-xl);
+`;
+
+const ontologyDialogBaseUX = css`
+  --ex-ontology-dialog-w-md: 1040px;
+  --ex-ontology-dialog-w-sm: 760px;
+  width: min(var(--ex-ontology-dialog-w-md), calc(100vw - var(--space-24)));
+
+  @media (max-width: 980px) {
+    width: min(var(--ex-ontology-dialog-w-sm), calc(100vw - var(--space-14)));
+  }
+`;
+
+const detailHeaderBaseUX = css`
+  padding: var(--space-10) var(--space-10) var(--space-10) var(--space-14);
+
+  @media (max-width: 720px) {
+    padding: var(--space-8) var(--space-24) var(--space-8) var(--space-8);
+  }
+`;
+
+const detailHeaderSkinX = css`
+  border-bottom: var(--border-w) solid var(--border-subtle);
+  background: var(--bg-overlay);
+`;
+
+const detailBodyBaseUX = css`
+  max-height: min(74vh, var(--ex-ontology-detail-dialog-body-max-h));
+  overflow: auto;
+  padding: var(--space-14) var(--space-16);
+
+  @media (max-width: 720px) {
+    max-height: calc(100vh - var(--ex-ontology-detail-dialog-chrome-h));
+    padding: var(--space-8);
+  }
+`;
+
+const detailBodySkinX = css`
+  background: var(--bg-surface);
+`;
+
+const ontologyBodyUX = css`
+  padding: var(--space-16);
+`;
+
+const detailTitleRowUX = css`
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-8);
+
+  h2 {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+`;
+
+const detailFamilyBadgeUX = css`
+  flex: 0 0 auto;
+`;
+
+const detailCloseUX = css`
+  flex: 0 0 auto;
+  margin-left: auto;
+  margin-right: calc(-1 * var(--space-3));
+
+  svg {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+  }
+`;
+
+const detailSectionUX = css`
+  display: grid;
+  gap: var(--space-4);
+
+  h3 {
+    margin: 0;
+    color: var(--text-strong);
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0;
+    line-height: var(--leading-tight);
+  }
+`;
+
+const detailMutedUX = css`
+  margin: 0;
+  color: var(--text-muted);
+  font-size: var(--text-sm);
+`;
+
+const panelMutedUX = css`
+  color: var(--text-muted);
+  font-size: var(--text-caption);
+  line-height: 1.4;
+`;
+
+const detailFooterBaseUX = css`
+  padding: var(--space-7) var(--space-16);
+
+  @media (max-width: 720px) {
+    padding: var(--space-6) var(--space-8);
+  }
+`;
+
+const detailFooterSkinX = css`
+  border-top: var(--border-w) solid var(--border-subtle);
+  background: var(--bg-overlay);
+`;
+
+const detailFooterRowUX = css`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+`;
+
+const sourceLinkBaseUX = css`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+`;
+
+const sourceLinkSkinX = css`
+  color: var(--accent);
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: var(--space-1);
+  }
+`;
+
+const iconSmUX = css`
+  width: var(--space-8);
+  height: var(--space-8);
+  flex: none;
+`;
+
+const metadataBaseUX = css`
+  overflow: hidden;
+`;
+
+const metadataSkinX = css`
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-surface);
+`;
+
+const metadataRowBaseUX = css`
+  display: grid;
+  grid-template-columns: var(--ex-ontology-meta-key-col) minmax(0, 1fr);
+  gap: var(--space-8);
+  padding: var(--space-6) var(--space-10);
+  font-size: var(--text-sm);
+`;
+
+const metadataRowSkinX = css`
+  & + & {
+    border-top: var(--border-w) solid var(--border-subtle);
+  }
+`;
+
+const metadataRailRowUX = css`
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+`;
+
+const metadataKeySkinX = css`
+  color: var(--text-muted);
+  font-weight: var(--weight-medium);
+`;
+
+const metadataValueBaseUX = css`
+  min-width: 0;
+  overflow-wrap: anywhere;
+`;
+
+const metadataValueSkinX = css`
+  color: var(--text-body);
+`;
+
+const metadataBadgeRowUX = css`
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-bottom: 0;
+`;
+
+const ontologyTypePillBaseUX = css`
+  display: inline-block;
+  padding: var(--space-1) var(--space-4);
+  margin: var(--space-1) var(--space-2) var(--space-1) 0;
+  font-size: var(--text-micro);
+  text-decoration: none;
+`;
+
+const ontologyTypePillSkinX = css`
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  background: var(--bg-sunken);
+  color: var(--text-body);
+
+  &:hover {
+    background: var(--bg-hover);
+  }
+`;
+
+const ontologyUriCopyBaseUX = css`
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0;
+  cursor: pointer;
+  --rq-coderef-min-w: 0;
+  --rq-coderef-ow: anywhere;
+  --rq-coderef-text-align: left;
+  --rq-coderef-ws: normal;
+
+  svg {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    flex: 0 0 auto;
+  }
+`;
+
+const ontologyUriCopySkinX = css`
+  border: 0;
+  border-radius: var(--radius-md);
+  background: transparent;
+  color: var(--text-body);
+
+  svg {
+    color: var(--text-muted);
+  }
+
+  &:hover svg {
+    color: var(--text-strong);
+  }
+`;
+
+const ontologyLayoutUX = css`
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) var(--ex-ontology-modal-rail-col);
+  gap: var(--space-16);
+  align-items: start;
+
+  @media (max-width: 980px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const ontologyColumnUX = css`
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: var(--space-12);
+`;
+
+const ontologyRailUX = css`
+  position: sticky;
+  top: 0;
+
+  @media (max-width: 980px) {
+    position: static;
+    order: -1;
+  }
+`;
+
+const ontologyRailParagraphUX = css`
+  margin: 0;
+  color: var(--text-body);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+`;
+
+const ontologyInlineListUX = css`
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-5);
+`;
+
+const ontologySymbolBaseUX = css`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-4);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+`;
+
+const ontologySymbolSkinX = css`
+  border: var(--border-w) solid var(--border-default);
+  border-radius: var(--radius-pill);
+  background: var(--bg-sunken);
+  color: var(--text-secondary);
+`;
+
+const ontologyGridListUX = css`
+  display: grid;
+  gap: var(--space-7);
+`;
+
+const ontologyCardBaseUX = css`
+  display: grid;
+  min-width: 0;
+  gap: var(--space-6);
+  padding: var(--space-8);
+`;
+
+const ontologyCardSkinX = css`
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: var(--bg-sunken);
+`;
+
+const ontologyCardCompactUX = css`
+  display: flex;
+  align-items: center;
+  gap: var(--space-7);
+  flex-wrap: wrap;
+  padding: var(--space-7) var(--space-8);
+`;
+
+const ontologyCardHeadUX = css`
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+
+  strong {
+    min-width: 0;
+    color: var(--text-strong);
+    overflow-wrap: anywhere;
+  }
+`;
+
+const ontologyKindBaseUX = css`
+  padding: var(--space-1) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-micro);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-mono);
+  line-height: 1.4;
+  white-space: nowrap;
+`;
+
+const ontologyKindSkinX = css`
+  border-radius: var(--radius-sm);
+  background: var(--bg-sunken);
+  color: var(--text-muted);
+`;
+
+const ontologyFacetBaseUX = css`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+
+  span {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    font-weight: var(--weight-medium);
+  }
+`;
+
+const ontologyFacetSkinX = css`
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--text-strong);
+`;
+
+const ontologyConstructTitleUX = css`
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-6);
+  color: var(--text-strong);
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+`;
+
+const ontologyConstructGlyphBaseUX = css`
+  display: inline-flex;
+  min-width: var(--row-h);
+  height: var(--space-12);
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+`;
+
+const ontologyConstructGlyphSkinX = css`
+  border: var(--border-w) solid color-mix(in srgb, var(--rdf-class) 36%, var(--border-default));
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--rdf-class) 12%, var(--bg-surface));
+  color: var(--text-strong);
+`;
+
+const ontologyMetaRowsUX = css`
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+`;
+
+const ontologyMetaRowsMonoUX = css`
+  dd {
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+  }
+`;
+
+const ontologyMetaRowUX = css`
+  display: grid;
+  grid-template-columns: var(--ex-ontology-meta-key-col-narrow) minmax(0, 1fr);
+  gap: var(--space-7);
+  align-items: baseline;
+  min-width: 0;
+  color: var(--text-body);
+  font-size: var(--text-sm);
+
+  dt {
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.02em;
+    text-transform: lowercase;
+  }
+
+  dd {
+    min-width: 0;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+`;
+
+const ontologyTermBaseUX = css`
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-1) var(--space-4);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  overflow-wrap: anywhere;
+
+  span {
+    color: var(--text-muted);
+    font-size: 0.9em;
+    font-weight: var(--weight-medium);
+  }
+`;
+
+const ontologyTermSkinX = css`
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-pill);
+  background: var(--bg-surface);
+  color: var(--text-strong);
+`;
+
+const ontologyRdfBadgeSkinX = css`
+  border: var(--border-w) solid var(--border-default);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+`;
+
+const ontologyRdfBadgeObjPropSkinX = css`
+  border-color: color-mix(in srgb, var(--rdf-objprop) 34%, var(--border-default));
+  color: var(--rdf-objprop);
+`;
+
+const ontologyRdfBadgeDtPropSkinX = css`
+  border-color: color-mix(in srgb, var(--rdf-dtprop) 34%, var(--border-default));
+  color: var(--rdf-dtprop);
+`;
+
+const ontologyRdfBadgeShapeSkinX = css`
+  border-color: color-mix(in srgb, var(--rdf-shacl) 34%, var(--border-default));
+  color: var(--rdf-shacl);
+`;
+
+const ontologySourceBaseUX = css`
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-8);
+  text-decoration: none;
+`;
+
+const ontologySourceSkinX = css`
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--bg-sunken);
+  color: var(--text-body);
+
+  &:hover {
+    border-color: var(--border-default);
+    background: var(--bg-hover);
+  }
+`;
+
+const ontologySourceMainUX = css`
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+`;
+
+const ontologySourceNameUX = css`
+  min-width: 0;
+  color: var(--text-strong);
+  font-weight: var(--weight-semibold);
+  overflow-wrap: anywhere;
+`;
+
+const ontologySourceLocUX = css`
+  color: var(--text-secondary);
+  font-size: var(--text-caption);
+  overflow-wrap: anywhere;
+`;
+
+const monoTextUX = css`
+  font-family: var(--font-mono);
+  font-size: 0.92em;
+  letter-spacing: var(--tracking-mono);
+  font-feature-settings: "zero" 1;
+`;
 
 type MetaRow = { key: string; value: ReactNode };
 
@@ -36,29 +609,29 @@ export function OntologyNodeDetailModal({
 
   return (
     <Modal open={nodeId !== null} onOpenChange={(open) => !open && onClose()}>
-      <ModalContent className="element-detail-dialog ontology-node-detail-dialog" showCloseButton={false}>
+      <ModalContent className={cx(detailDialogBaseUX, detailDialogSkinX, ontologyDialogBaseUX)} showCloseButton={false}>
         {!node ? (
           <>
-            <ModalHeader className="element-detail-header">
+            <ModalHeader className={cx(detailHeaderBaseUX, detailHeaderSkinX)}>
               <ModalTitle>Ontology node not found</ModalTitle>
             </ModalHeader>
-            <ModalBody className="element-detail-body">
-              <p className="element-detail-muted">
+            <ModalBody className={cx(detailBodyBaseUX, detailBodySkinX, ontologyBodyUX)}>
+              <p className={cx(detailMutedUX)}>
                 No exported ontology graph node matches{" "}
-                <code className="rq-coderef">{nodeId ?? ""}</code>.
+                <CodeRef>{nodeId ?? ""}</CodeRef>.
               </p>
             </ModalBody>
           </>
         ) : (
           <>
             <OntologyNodeModalHeader node={node} />
-            <ModalBody className="element-detail-body">
-              <div className="ontology-modal-layout">
-                <main className="ontology-modal-main">
+            <ModalBody className={cx(detailBodyBaseUX, detailBodySkinX, ontologyBodyUX)}>
+              <div className={cx(ontologyLayoutUX)}>
+                <main className={cx(ontologyColumnUX)}>
                   <OntologyPropertyUsages node={node} nodes={graphNodes} />
                   {isPropertyNode(node) && (node.domain?.length || node.range?.length) ? (
                     <Section title="Domain / range">
-                      <div className="ontology-term-grid">
+                      <div className={cx(ontologyGridListUX)}>
                         {node.domain?.length ? <TermRefs kind="domain" terms={node.domain} /> : null}
                         {node.range?.length ? <TermRefs kind="range" terms={node.range} /> : null}
                       </div>
@@ -66,7 +639,7 @@ export function OntologyNodeDetailModal({
                   ) : null}
                   {node.slot_facets?.length ? (
                     <Section title={isPropertyNode(node) ? "Used as slot / facets" : "Slots / facets"}>
-                      <div className="ontology-modal-card-list">
+                      <div className={cx(ontologyGridListUX)}>
                         {node.slot_facets.map((slot, index) => (
                           <SlotFacetCard
                             key={`${slot.slot_iri}-${slot.source_shape_iri}-${index}`}
@@ -79,7 +652,7 @@ export function OntologyNodeDetailModal({
                   ) : null}
                   {node.constructs?.length ? (
                     <Section title="Projection constructs">
-                      <div className="ontology-modal-card-list">
+                      <div className={cx(ontologyGridListUX)}>
                         {visibleConstructs(node).map((construct) => (
                           <ConstructRow key={construct.id} construct={construct} />
                         ))}
@@ -88,10 +661,10 @@ export function OntologyNodeDetailModal({
                   ) : null}
                   {node.literal_values?.length ? (
                     <Section title="Literal values">
-                      <div className="ontology-modal-card-list">
+                      <div className={cx(ontologyGridListUX)}>
                         {node.literal_values.map((literal, index) => (
-                          <div className="ontology-modal-card ontology-modal-card--compact" key={`${literal.predicate}-${index}`}>
-                            <span className="rq-relation__kind">{literal.predicate || "value"}</span>
+                          <div className={cx(ontologyCardBaseUX, ontologyCardSkinX, ontologyCardCompactUX)} key={`${literal.predicate}-${index}`}>
+                            <span className={cx(ontologyKindBaseUX, ontologyKindSkinX)}>{literal.predicate || "value"}</span>
                             <strong>{literal.value}</strong>
                           </div>
                         ))}
@@ -100,11 +673,11 @@ export function OntologyNodeDetailModal({
                   ) : null}
                   {node.constraints?.length ? (
                     <Section title="Raw SHACL evidence">
-                      <div className="ontology-modal-card-list">
+                      <div className={cx(ontologyGridListUX)}>
                         {node.constraints.map((constraint) => (
-                          <div className="ontology-modal-card ontology-modal-card--compact" key={`${constraint.property}-${constraint.value}`}>
-                            <span className="rq-relation__kind">{constraint.property}</span>
-                            <code className="rq-coderef">{constraint.value}</code>
+                          <div className={cx(ontologyCardBaseUX, ontologyCardSkinX, ontologyCardCompactUX)} key={`${constraint.property}-${constraint.value}`}>
+                            <span className={cx(ontologyKindBaseUX, ontologyKindSkinX)}>{constraint.property}</span>
+                            <CodeRef>{constraint.value}</CodeRef>
                           </div>
                         ))}
                       </div>
@@ -112,7 +685,7 @@ export function OntologyNodeDetailModal({
                   ) : null}
                   {node.sources?.length ? (
                     <Section title="Sources">
-                      <div className="ontology-modal-source-list">
+                      <div className={cx(ontologyGridListUX)}>
                         {dedupeSources(node.sources).map((source, index) => (
                           <SourceRow key={`${source.link}-${index}`} source={source} />
                         ))}
@@ -120,7 +693,7 @@ export function OntologyNodeDetailModal({
                     </Section>
                   ) : null}
                 </main>
-                <aside className="ontology-modal-rail">
+                <aside className={cx(ontologyColumnUX, ontologyRailUX)}>
                   <OntologyNodeMetadata
                     node={node}
                     copiedUri={copiedUri}
@@ -133,14 +706,14 @@ export function OntologyNodeDetailModal({
                   />
                   {node.comment ? (
                     <Section title="Description">
-                      <p>{node.comment}</p>
+                      <p className={cx(ontologyRailParagraphUX)}>{node.comment}</p>
                     </Section>
                   ) : null}
                   {node.badges?.length ? (
                     <Section title="Notation">
-                      <div className="ontology-modal-badge-row">
+                      <div className={cx(ontologyInlineListUX)}>
                         {node.badges.map((badge) => (
-                          <span className="ontology-modal-symbol" key={`${badge.kind}-${badge.symbol}`}>
+                          <span className={cx(ontologySymbolBaseUX, ontologySymbolSkinX)} key={`${badge.kind}-${badge.symbol}`}>
                             <span aria-hidden="true">{badge.symbol}</span>
                             {badge.label}
                           </span>
@@ -151,26 +724,24 @@ export function OntologyNodeDetailModal({
                 </aside>
               </div>
             </ModalBody>
-            <ModalFooter className="element-detail-footer">
-              <div className="element-detail-footer-row">
+            <ModalFooter className={cx(detailFooterBaseUX, detailFooterSkinX)}>
+              <div className={cx(detailFooterRowUX)}>
                 {node.sources?.[0]?.link ? (
                   <a
                     href={node.sources[0].link}
-                    className="element-detail-source-link"
+                    className={cx(sourceLinkBaseUX, sourceLinkSkinX)}
                     onClick={(event) => {
                       event.preventDefault();
                       window.location.hash = node.sources[0].link;
                     }}
                   >
-                    <Icon name="external-link" className="ex-icon-sm" /> Open ontology source
+                    <Icon name="external-link" className={cx(iconSmUX)} /> Open ontology source
                   </a>
                 ) : (
                   <span />
                 )}
                 <ModalClose asChild>
-                  <button type="button" className="rq-btn rq-btn--primary rq-btn--sm">
-                    Close
-                  </button>
+                  <Button tone="primary" size="sm">Close</Button>
                 </ModalClose>
               </div>
             </ModalFooter>
@@ -184,9 +755,9 @@ export function OntologyNodeDetailModal({
 function OntologyNodeModalHeader({ node }: { node: OntologyGraphNode }) {
   const kind = ontologyNodeKind(node);
   return (
-    <ModalHeader className="element-detail-header">
-      <div className="element-detail-title-row">
-        <TypeBadge type="ontology" family="ontology" tinted className="element-detail-family-badge">
+    <ModalHeader className={cx(detailHeaderBaseUX, detailHeaderSkinX)}>
+      <div className={cx(detailTitleRowUX)}>
+        <TypeBadge type="ontology" family="ontology" tinted className={cx(detailFamilyBadgeUX)}>
           ontology
         </TypeBadge>
         {kind !== "ontology" ? (
@@ -196,9 +767,9 @@ function OntologyNodeModalHeader({ node }: { node: OntologyGraphNode }) {
         ) : null}
         <ModalTitle>{node.label || node.id}</ModalTitle>
         <ModalClose asChild>
-          <button type="button" className="rq-iconbtn rq-iconbtn--ghost element-detail-close" aria-label="Close">
+          <IconButton tone="ghost" className={cx(detailCloseUX)} aria-label="Close">
             <Icon name="x" />
-          </button>
+          </IconButton>
         </ModalClose>
       </div>
     </ModalHeader>
@@ -223,22 +794,22 @@ function OntologyNodeMetadata({
       .map((type) => String(type).toLowerCase()),
   ));
   return (
-    <div className="ex-meta">
-      <div className="ex-meta__row">
-        <span className="ex-meta__k">RDF type</span>
-        <span className="ex-meta__v ontology-badge-row">
+    <div className={cx(metadataBaseUX, metadataSkinX)}>
+      <div className={cx(metadataRowBaseUX, metadataRowSkinX, metadataRailRowUX)}>
+        <span className={cx(metadataKeySkinX)}>RDF type</span>
+        <span className={cx(metadataValueBaseUX, metadataValueSkinX, metadataBadgeRowUX)}>
           {rdfTypes.map((type) => (
-            <span key={type} className="ontology-type-pill">
+            <span key={type} className={cx(ontologyTypePillBaseUX, ontologyTypePillSkinX)}>
               {type}
             </span>
           ))}
         </span>
       </div>
-      <div className="ex-meta__row">
-        <span className="ex-meta__k">Full URI</span>
-        <span className="ex-meta__v">
-          <button type="button" className="ontology-uri-copy" onClick={onCopyUri} title="Copy URI">
-            <code className="rq-coderef">{node.full_uri || node.id}</code>
+      <div className={cx(metadataRowBaseUX, metadataRowSkinX, metadataRailRowUX)}>
+        <span className={cx(metadataKeySkinX)}>Full URI</span>
+        <span className={cx(metadataValueBaseUX, metadataValueSkinX)}>
+          <button type="button" className={cx(ontologyUriCopyBaseUX, ontologyUriCopySkinX)} onClick={onCopyUri} title="Copy URI">
+            <CodeRef>{node.full_uri || node.id}</CodeRef>
             <Icon name={copiedUri ? "check" : "copy"} />
           </button>
         </span>
@@ -249,7 +820,7 @@ function OntologyNodeMetadata({
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="element-detail-section">
+    <section className={cx(detailSectionUX)}>
       <h3>{title}</h3>
       {children}
     </section>
@@ -266,8 +837,8 @@ function TermRefs({
   return (
     <>
       {terms.map((term) => (
-        <div className="ontology-modal-card ontology-modal-card--compact" key={`${kind}-${term.iri}`}>
-          <span className="rq-relation__kind">{kind}</span>
+        <div className={cx(ontologyCardBaseUX, ontologyCardSkinX, ontologyCardCompactUX)} key={`${kind}-${term.iri}`}>
+          <span className={cx(ontologyKindBaseUX, ontologyKindSkinX)}>{kind}</span>
           <OntologyTerm term={term} />
         </div>
       ))}
@@ -286,11 +857,11 @@ function OntologyPropertyUsages({
   if (!usages.length) return null;
   return (
     <Section title="Properties">
-      <div className="ontology-modal-card-list">
+      <div className={cx(ontologyGridListUX)}>
         {usages.map((usage) => (
-          <div className="ontology-modal-card" key={`${usage.property.id}-${usage.role}`}>
-            <div className="ontology-modal-card-head">
-              <strong className="rq-mono" title={usage.property.full_uri || usage.property.id}>
+          <div className={cx(ontologyCardBaseUX, ontologyCardSkinX)} key={`${usage.property.id}-${usage.role}`}>
+            <div className={cx(ontologyCardHeadUX)}>
+              <strong className={cx(monoTextUX)} title={usage.property.full_uri || usage.property.id}>
                 {usage.property.label || shortLabel(usage.property.id)}
               </strong>
               <TypeBadge type={usage.property.semantic_type} family="ontology" dot={false} className={rdfBadgeClass(usage.property.semantic_type)}>
@@ -305,9 +876,9 @@ function OntologyPropertyUsages({
               ]}
             />
             {usage.facets.length ? (
-              <div className="ontology-modal-facet-row">
+              <div className={cx(ontologyInlineListUX)}>
                 {usage.facets.flatMap((facet) => facet.facets ?? []).map((facet, index) => (
-                  <span className="ontology-modal-facet" key={`${facet.name}-${facet.value}-${index}`}>
+                  <span className={cx(ontologyFacetBaseUX, ontologyFacetSkinX)} key={`${facet.name}-${facet.value}-${index}`}>
                     <span>{facet.name}</span>
                     {facet.value}
                   </span>
@@ -342,24 +913,24 @@ function SlotFacetCard({
       : null,
   ] as Array<MetaRow | null>).filter(isMetaRow);
   return (
-    <div className="ontology-modal-card">
-      <div className="ontology-modal-card-head">
-        <strong className="rq-mono" title={propertyContext ? slot.target_class_iri : slot.slot_iri}>
+    <div className={cx(ontologyCardBaseUX, ontologyCardSkinX)}>
+      <div className={cx(ontologyCardHeadUX)}>
+        <strong className={cx(monoTextUX)} title={propertyContext ? slot.target_class_iri : slot.slot_iri}>
           {title}
         </strong>
       </div>
       {rows.length ? <MetaRows rows={rows} /> : null}
       {slot.facets?.length ? (
-        <div className="ontology-modal-facet-row">
+        <div className={cx(ontologyInlineListUX)}>
           {slot.facets.map((facet) => (
-            <span className="ontology-modal-facet" key={`${facet.name}-${facet.value}`}>
+            <span className={cx(ontologyFacetBaseUX, ontologyFacetSkinX)} key={`${facet.name}-${facet.value}`}>
               <span>{facet.name}</span>
               {facet.value}
             </span>
           ))}
         </div>
       ) : (
-        <span className="ex-panel-muted">No explicit facets.</span>
+        <span className={cx(panelMutedUX)}>No explicit facets.</span>
       )}
     </div>
   );
@@ -383,12 +954,12 @@ function ConstructRow({ construct }: { construct: OntologyGraphConstructDetail }
       : null,
   ] as Array<MetaRow | null>).filter(isMetaRow);
   return (
-    <div className="ontology-modal-card">
-      <div className="ontology-modal-card-head">
-        <span className="ontology-modal-construct-title">
+    <div className={cx(ontologyCardBaseUX, ontologyCardSkinX)}>
+      <div className={cx(ontologyCardHeadUX)}>
+        <span className={cx(ontologyConstructTitleUX)}>
           {glyph ? (
             <span
-              className="ontology-modal-construct-glyph"
+              className={cx(ontologyConstructGlyphBaseUX, ontologyConstructGlyphSkinX)}
               title={glyphLabel}
               aria-label={glyphLabel}
             >
@@ -414,9 +985,9 @@ function MetaRows({
   mono?: boolean;
 }) {
   return (
-    <dl className={["ontology-meta-rows", mono ? "ontology-meta-rows--mono" : ""].filter(Boolean).join(" ")}>
+    <dl className={cx(ontologyMetaRowsUX, mono ? ontologyMetaRowsMonoUX : undefined)}>
       {rows.map((row) => (
-        <div className="ontology-meta-row" key={row.key}>
+        <div className={cx(ontologyMetaRowUX)} key={row.key}>
           <dt>{row.key}</dt>
           <dd>{row.value}</dd>
         </div>
@@ -444,22 +1015,22 @@ function dedupeSources(sources: OntologyGraphSource[]): OntologyGraphSource[] {
 function SourceRow({ source }: { source: OntologyGraphSource }) {
   return (
     <a
-      className="ontology-modal-source"
+      className={cx(ontologySourceBaseUX, ontologySourceSkinX)}
       href={source.link}
       onClick={(event) => {
         event.preventDefault();
         window.location.hash = source.link;
       }}
     >
-      <span className="ontology-modal-source-main">
-        <span className="ontology-modal-source-name">{source.source_name || source.source || source.file_path}</span>
+      <span className={cx(ontologySourceMainUX)}>
+        <span className={cx(ontologySourceNameUX)}>{source.source_name || source.source || source.file_path}</span>
         {source.kind ? (
           <TypeBadge type="ontology" family="ontology" tinted dot={false}>
             {source.kind}
           </TypeBadge>
         ) : null}
       </span>
-      <span className="ontology-modal-source-loc rq-mono">
+      <span className={cx(ontologySourceLocUX, monoTextUX)}>
         {source.file_path}
         {source.line_number ? `:${source.line_number}` : ""}
       </span>
@@ -518,9 +1089,9 @@ function TermList({
   terms: { label: string; iri: string; kind: string }[];
   emptyLabel: string;
 }) {
-  if (!terms.length) return <span className="ex-panel-muted">{emptyLabel}</span>;
+  if (!terms.length) return <span className={cx(panelMutedUX)}>{emptyLabel}</span>;
   return (
-    <span className="ontology-modal-term-list">
+    <span className={cx(ontologyInlineListUX)}>
       {terms.map((term) => (
         <OntologyTerm key={`${term.iri}-${term.kind}`} term={term} />
       ))}
@@ -530,7 +1101,7 @@ function TermList({
 
 function OntologyTerm({ term }: { term: { label: string; iri: string; kind: string } }) {
   return (
-    <span className="ontology-modal-term" title={term.iri || term.label}>
+    <span className={cx(ontologyTermBaseUX, ontologyTermSkinX)} title={term.iri || term.label}>
       {term.label || shortLabel(term.iri)}
       <span>{term.kind || "term"}</span>
     </span>
@@ -539,10 +1110,10 @@ function OntologyTerm({ term }: { term: { label: string; iri: string; kind: stri
 
 function rdfBadgeClass(type: string | undefined) {
   const normalized = type ?? "";
-  if (normalized.includes("object")) return "ontology-rdf-badge ontology-rdf-badge--objprop";
-  if (normalized.includes("datatype")) return "ontology-rdf-badge ontology-rdf-badge--dtprop";
-  if (normalized.includes("shape")) return "ontology-rdf-badge ontology-rdf-badge--shape";
-  return "ontology-rdf-badge";
+  if (normalized.includes("object")) return cx(ontologyRdfBadgeSkinX, ontologyRdfBadgeObjPropSkinX);
+  if (normalized.includes("datatype")) return cx(ontologyRdfBadgeSkinX, ontologyRdfBadgeDtPropSkinX);
+  if (normalized.includes("shape")) return cx(ontologyRdfBadgeSkinX, ontologyRdfBadgeShapeSkinX);
+  return cx(ontologyRdfBadgeSkinX);
 }
 
 function visibleConstructs(node: OntologyGraphNode) {

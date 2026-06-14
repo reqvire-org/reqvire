@@ -9,6 +9,7 @@ import {
   type MouseEvent as ReactMouseEvent,
   type ReactNode,
 } from "react";
+import { css, cx } from "@linaria/atomic";
 import { useStore } from "../store/StoreContext";
 import type { ExplorerViewProps } from "../components/ExplorerViewProps";
 import { useExplorerUiState } from "../components/ExplorerUiState";
@@ -29,6 +30,818 @@ import { buildTraceFiles, type TraceFileNode, type TraceVerificationNode } from 
  * surface store-backed report data and route element rows to the in-shell
  * element-detail modal.
  */
+
+const reportRouteBaseUX = css`
+  box-sizing: border-box;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) !important;
+  column-gap: 0;
+  height: 100vh;
+  min-height: 0;
+  padding-left: var(--ex-current-left-width);
+  padding-right: 0;
+
+  &.ex-route-single {
+    grid-template-columns: minmax(0, 1fr) !important;
+    column-gap: 0;
+  }
+
+  [data-view="traces"] &,
+  .ex-app & {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .ex-app & {
+    padding-left: 0;
+    padding-right: 0;
+  }
+`;
+
+const reportRouteSkinX = css`
+  background: var(--bg-canvas);
+  color: var(--text-body);
+
+  .ex-app & {
+    background: var(--bg-canvas);
+  }
+`;
+
+const tracePanelBaseUX = css`
+  --ex-trace-meta-grid-min-w: 180px;
+  --ex-trace-diagram-min-h: 520px;
+  --ex-trace-rollup-diagram-h: min(82dvh, calc(var(--ex-trace-diagram-min-h) * 2));
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+  gap: var(--space-5);
+  overflow: hidden;
+  padding: var(--space-10);
+
+  [data-view="traces"] & {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .ex-app & {
+    padding: var(--space-12) var(--space-16) var(--space-24);
+  }
+
+  .trace-content-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .trace-content-scroll > .trace-report-view {
+    min-height: 100%;
+  }
+
+  .trace-report-view {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-14);
+  }
+
+  .trace-row-group {
+    padding-top: var(--space-10);
+  }
+
+  .trace-row-group:first-child {
+    padding-top: 0;
+  }
+
+  .trace-file-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-6);
+    margin-bottom: var(--space-6);
+  }
+
+  .trace-file-heading {
+    margin: 0;
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0;
+  }
+
+  .trace-file-count,
+  .trace-tree-count-badge {
+    flex: 0 0 auto;
+    border-radius: var(--radius-pill);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-semibold);
+    line-height: 1;
+  }
+
+  .trace-file-count {
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .trace-tree-count-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-4);
+  }
+
+  .trace-verification-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+
+  .trace-verification-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    outline: var(--border-w) solid transparent;
+    outline-offset: calc(-1 * var(--border-w));
+    padding: var(--space-7) var(--space-8) var(--space-8);
+    transition:
+      background-color var(--dur-fast) var(--ease-standard),
+      border-color var(--dur-fast) var(--ease-standard),
+      outline-color var(--dur-fast) var(--ease-standard),
+      box-shadow var(--dur-fast) var(--ease-standard);
+  }
+
+  .trace-verification-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-6);
+    flex-wrap: wrap;
+  }
+
+  .trace-verification-title {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    cursor: pointer;
+    font-size: var(--text-md);
+    font-weight: var(--weight-semibold);
+    text-align: left;
+  }
+
+  .trace-verification-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--ex-trace-meta-grid-min-w), 1fr));
+    gap: var(--space-3) var(--space-8);
+    margin: 0;
+    font-size: var(--text-caption);
+  }
+
+  .trace-verification-meta div {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .trace-verification-meta dd {
+    margin: 0;
+  }
+
+  .trace-rollup-diagram {
+    position: relative;
+    box-sizing: border-box;
+    display: flex;
+    height: var(--ex-trace-rollup-diagram-h);
+    min-height: 0;
+    max-height: calc(100dvh - var(--space-24));
+    flex-direction: column;
+    overflow: hidden;
+    padding: var(--space-6);
+  }
+
+  .trace-rollup-diagram .mermaid {
+    flex: 1 1 auto;
+    width: 100%;
+    min-height: 0;
+    height: 100%;
+    max-height: 100%;
+    text-align: center;
+  }
+
+  .trace-rollup-diagram .mermaid svg {
+    max-height: 100%;
+  }
+
+  .trace-rollup-diagram .is-reqvire-clickable-node {
+    cursor: pointer;
+  }
+
+  .trace-rollup-placeholder {
+    display: grid;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    place-items: center;
+    font-size: var(--text-sm);
+  }
+`;
+
+const tracePanelSkinX = css`
+  background: var(--bg-canvas);
+
+  .ex-app & {
+    background: var(--bg-surface);
+  }
+
+  .ex-empty-note {
+    color: var(--text-muted);
+    font-size: var(--text-base);
+    line-height: 1.4;
+  }
+
+  .trace-row-group {
+    border-top: var(--border-w) solid var(--border-subtle);
+    background: transparent;
+  }
+
+  .trace-row-group:first-child {
+    border-top: 0;
+  }
+
+  .trace-file-heading,
+  .trace-verification-title,
+  .trace-verification-meta,
+  .trace-verification-meta dt {
+    color: var(--text-body);
+  }
+
+  .trace-file-count {
+    background: var(--bg-sunken);
+    color: var(--text-secondary);
+  }
+
+  .trace-tree-count-badge {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+  }
+
+  .trace-verification-card {
+    border-top: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background-color: transparent;
+  }
+
+  .trace-verification-card:hover {
+    background-color: color-mix(in srgb, var(--accent) 5%, transparent);
+  }
+
+  .trace-verification-card.is-selected,
+  .trace-verification-card.is-selected:hover {
+    background-color: color-mix(in srgb, var(--accent) 10%, transparent);
+    outline-color: transparent;
+  }
+
+  .trace-verification-card:first-child {
+    border-top: 0;
+  }
+
+  .trace-verification-title:hover {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: var(--space-1);
+  }
+
+  .trace-verification-meta dt {
+    font-weight: var(--weight-bold);
+  }
+
+  .trace-verification-meta dd {
+    color: var(--text-muted);
+  }
+
+  .trace-rollup-diagram {
+    border: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+  }
+
+  .trace-rollup-diagram .mermaid {
+    background: var(--bg-surface);
+  }
+
+  .ex-app & .trace-rollup-diagram {
+    border-color: var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+    box-shadow: none;
+  }
+
+  .ex-app & .trace-rollup-diagram .mermaid {
+    background: var(--bg-surface);
+  }
+
+  .trace-rollup-placeholder {
+    border: var(--border-w) dashed var(--border-subtle);
+    border-radius: var(--radius-md);
+    color: var(--text-muted);
+  }
+`;
+
+const coverageDashboardBaseUX = css`
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  flex-direction: column;
+  gap: var(--space-12);
+  overflow: auto;
+  padding: var(--space-14) var(--space-16);
+
+  .ex-app & {
+    height: 100%;
+    min-height: 0;
+    overflow: auto;
+    padding: var(--space-16);
+  }
+
+  .ex-app [data-view="coverage"] & {
+    width: 100%;
+    margin-right: 0;
+  }
+
+  .coverage-header {
+    display: flex;
+    scroll-margin-top: var(--space-12);
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-10);
+    padding-bottom: var(--space-10);
+    transition:
+      outline-color var(--dur-fast) var(--ease-standard),
+      border-color var(--dur-fast) var(--ease-standard),
+      box-shadow var(--dur-fast) var(--ease-standard);
+  }
+
+  .coverage-title-block {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: var(--space-3);
+  }
+
+  .coverage-title-block h1 {
+    margin: 0;
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+  }
+
+  .ex-coverage-eyebrow {
+    font-size: var(--text-micro);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-label);
+    line-height: var(--leading-tight);
+    text-transform: uppercase;
+  }
+
+  .coverage-header-stats {
+    flex: none;
+  }
+
+  .coverage-kpi-grid,
+  .coverage-grid,
+  .coverage-gap-grid {
+    display: grid;
+    gap: var(--space-8);
+  }
+
+  .coverage-kpi-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .coverage-grid,
+  .coverage-gap-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .coverage-panel--wide {
+    grid-column: 1 / -1;
+  }
+
+  .coverage-panel {
+    display: flex;
+    scroll-margin-top: var(--space-12);
+    flex-direction: column;
+    gap: var(--space-8);
+    padding: var(--space-10);
+    transition:
+      background-color var(--dur-fast) var(--ease-standard),
+      border-color var(--dur-fast) var(--ease-standard),
+      box-shadow var(--dur-fast) var(--ease-standard);
+  }
+
+  .coverage-panel__head,
+  .coverage-gap-list__head,
+  .coverage-legend-row,
+  .coverage-source-row__head,
+  .coverage-labeled-bar__head,
+  .coverage-capability-row__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+  }
+
+  .coverage-panel__head {
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-6);
+  }
+
+  .coverage-panel__head h2,
+  .coverage-gap-list__head h3 {
+    margin: 0;
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+  }
+
+  .coverage-panel__head h2 {
+    font-size: var(--text-lg);
+  }
+
+  .coverage-kpi {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-8);
+  }
+
+  .coverage-donut,
+  .coverage-breakdown__pie {
+    display: grid;
+    flex: none;
+    place-items: center;
+    border-radius: var(--radius-pill);
+  }
+
+  .coverage-donut {
+    width: var(--space-28);
+    height: var(--space-28);
+  }
+
+  .coverage-donut::after,
+  .coverage-breakdown__pie::after {
+    content: "";
+    grid-area: 1 / 1;
+    border-radius: inherit;
+  }
+
+  .coverage-donut::after {
+    width: calc(100% - var(--space-8));
+    height: calc(100% - var(--space-8));
+  }
+
+  .coverage-breakdown__pie::after {
+    width: calc(100% - var(--space-10));
+    height: calc(100% - var(--space-10));
+  }
+
+  .coverage-donut__center {
+    z-index: 1;
+    grid-area: 1 / 1;
+    font-size: var(--text-sm);
+    font-weight: var(--weight-bold);
+  }
+
+  .coverage-kpi__copy,
+  .coverage-source-row,
+  .coverage-labeled-bar,
+  .coverage-gap-row__copy {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .coverage-kpi__copy {
+    min-width: 0;
+    gap: var(--space-2);
+  }
+
+  .coverage-kpi__label {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+  }
+
+  .coverage-kpi__detail,
+  .coverage-empty-note,
+  .coverage-gap-row__file,
+  .coverage-labeled-bar__head,
+  .coverage-source-row__head,
+  .coverage-more {
+    font-size: var(--text-caption);
+    line-height: var(--leading-normal);
+  }
+
+  .coverage-breakdown {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-8);
+  }
+
+  .coverage-breakdown__pie {
+    width: var(--space-32);
+    height: var(--space-32);
+  }
+
+  .coverage-breakdown__legend,
+  .coverage-bar-list,
+  .coverage-capability-list,
+  .coverage-gap-list,
+  .coverage-gap-list__rows {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .coverage-breakdown__legend,
+  .coverage-bar-list,
+  .coverage-capability-list,
+  .coverage-gap-list__rows {
+    gap: var(--space-5);
+  }
+
+  .coverage-legend-row,
+  .coverage-source-row__head,
+  .coverage-labeled-bar__head,
+  .coverage-gap-list__head {
+    justify-content: space-between;
+  }
+
+  .coverage-legend-row__swatch {
+    width: var(--space-4);
+    height: var(--space-4);
+    flex: none;
+    border-radius: var(--radius-xs);
+  }
+
+  .coverage-legend-row span:nth-child(2),
+  .coverage-gap-row__copy,
+  .coverage-capability-row__title span:nth-child(2) {
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .coverage-source-row,
+  .coverage-labeled-bar {
+    gap: var(--space-3);
+  }
+
+  .coverage-bar {
+    display: block;
+    overflow: hidden;
+    width: 100%;
+    height: var(--space-3);
+    border-radius: var(--radius-pill);
+  }
+
+  .coverage-bar__fill {
+    display: block;
+    width: var(--coverage-bar-fill);
+    height: 100%;
+    border-radius: inherit;
+  }
+
+  .coverage-capability-row,
+  .coverage-gap-row {
+    width: 100%;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+    text-align: left;
+  }
+
+  .coverage-capability-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+    align-items: center;
+    gap: var(--space-8);
+    padding: var(--space-6);
+  }
+
+  .coverage-capability-row__title {
+    min-width: 0;
+    font-weight: var(--weight-semibold);
+  }
+
+  .coverage-capability-row__bars {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-8);
+  }
+
+  .coverage-mark,
+  .coverage-gap-list__head span,
+  .coverage-more {
+    flex: none;
+    border-radius: var(--radius-pill);
+    padding: var(--space-1) var(--space-4);
+    font-size: var(--text-caption);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+  }
+
+  .coverage-more {
+    align-self: flex-start;
+    border: 0;
+    cursor: pointer;
+    font: inherit;
+  }
+
+  .coverage-gap-list {
+    gap: var(--space-6);
+    min-width: 0;
+  }
+
+  .coverage-gap-list__head h3 {
+    font-size: var(--text-sm);
+  }
+
+  .coverage-gap-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+    padding: var(--space-5);
+  }
+
+  .coverage-gap-row__copy {
+    gap: var(--space-1);
+  }
+
+  .coverage-gap-row__title {
+    overflow: hidden;
+    font-weight: var(--weight-semibold);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .coverage-empty {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-8);
+    padding: var(--space-12);
+  }
+
+  .coverage-empty svg {
+    width: var(--icon-lg);
+    height: var(--icon-lg);
+    flex: none;
+  }
+
+  .coverage-empty h2 {
+    margin: 0 0 var(--space-3);
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+  }
+
+  .coverage-empty p,
+  .coverage-empty-note {
+    margin: 0;
+  }
+
+  @media (max-width: 1200px) {
+    .coverage-kpi-grid,
+    .coverage-grid,
+    .coverage-gap-grid,
+    .coverage-capability-row,
+    .coverage-capability-row__bars {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+`;
+
+const coverageDashboardSkinX = css`
+  border-left: var(--border-w) solid color-mix(in srgb, var(--border-subtle) 65%, transparent);
+  border-right: var(--border-w) solid color-mix(in srgb, var(--border-subtle) 65%, transparent);
+  background: var(--bg-surface);
+
+  .ex-app & {
+    border-right: 0;
+    border-left: 0;
+    background: var(--bg-surface);
+  }
+
+  .coverage-header {
+    border-bottom: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    outline: var(--border-w) solid transparent;
+    outline-offset: calc(-1 * var(--border-w));
+  }
+
+  .coverage-title-block h1,
+  .coverage-panel__head h2,
+  .coverage-gap-list__head h3,
+  .coverage-donut__center,
+  .coverage-kpi__label,
+  .coverage-capability-row__title,
+  .coverage-gap-row__title,
+  .coverage-empty h2 {
+    color: var(--text-strong);
+  }
+
+  .coverage-header-stats,
+  .coverage-bar,
+  .coverage-mark,
+  .coverage-gap-list__head span,
+  .coverage-more {
+    background: var(--bg-sunken);
+  }
+
+  .ex-coverage-eyebrow {
+    color: var(--text-muted);
+  }
+
+  .coverage-panel,
+  .coverage-kpi,
+  .coverage-empty {
+    border: var(--border-w) solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-surface);
+  }
+
+  .coverage-panel {
+    box-shadow: var(--shadow-xs);
+  }
+
+  .coverage-donut,
+  .coverage-breakdown__pie {
+    background:
+      conic-gradient(
+        var(--coverage-color) var(--coverage-fill-angle),
+        var(--bg-sunken) var(--coverage-fill-angle)
+      );
+  }
+
+  .coverage-donut::after,
+  .coverage-breakdown__pie::after {
+    background: var(--bg-surface);
+  }
+
+  .coverage-kpi__detail,
+  .coverage-empty-note,
+  .coverage-gap-row__file,
+  .coverage-labeled-bar__head,
+  .coverage-source-row__head,
+  .coverage-more {
+    color: var(--text-muted);
+  }
+
+  .coverage-bar__fill {
+    background: var(--coverage-color);
+  }
+
+  .coverage-capability-row,
+  .coverage-gap-row {
+    background: transparent;
+    color: var(--text-body);
+  }
+
+  .coverage-capability-row {
+    border-radius: var(--radius-md);
+  }
+
+  .coverage-capability-row:hover,
+  .coverage-gap-row:hover {
+    background: color-mix(in srgb, var(--accent) 5%, transparent);
+  }
+
+  .coverage-mark,
+  .coverage-gap-list__head span,
+  .coverage-more {
+    color: var(--text-secondary);
+  }
+
+  .coverage-more:hover {
+    background: var(--bg-hover);
+    color: var(--text-strong);
+  }
+
+  .coverage-more:focus-visible {
+    outline: var(--focus-ring-w) solid var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  .coverage-gap-row {
+    border-radius: var(--radius-md);
+  }
+
+  .coverage-empty svg {
+    color: var(--text-muted);
+  }
+`;
 
 type TraceMermaidQueueTask = (release: () => void) => void;
 
@@ -126,8 +939,8 @@ export function TracesView({
 
   return (
     <ViewFrame testId="traces">
-      <div className="ex-route ex-route-single">
-        <div className="ex-main-panel trace-main-panel">
+      <div className={cx("ex-route", "ex-route-single", reportRouteBaseUX, reportRouteSkinX)}>
+        <div className={cx("ex-main-panel", "trace-main-panel", tracePanelBaseUX, tracePanelSkinX)}>
           <div className="trace-content-scroll">
             <TraceRows
               file={selectedFile}
@@ -137,7 +950,7 @@ export function TracesView({
               selectedVerificationId={traceSelectionId}
             />
             {traceFiles.length === 0 && (
-              <span className="ex-empty-note">No verification traces in store.</span>
+              <span className={cx("ex-empty-note")}>No verification traces in store.</span>
             )}
           </div>
         </div>
@@ -186,10 +999,10 @@ function TraceRows({
             <article
               key={verification.id}
               id={traceVerificationDomId(verification.id)}
-              className={[
+              className={cx(
                 "trace-verification-card",
-                selectedVerificationId === verification.id ? "is-selected" : "",
-              ].filter(Boolean).join(" ")}
+                selectedVerificationId === verification.id ? "is-selected" : undefined,
+              )}
             >
               <div className="trace-verification-header">
                 <button
@@ -316,7 +1129,7 @@ const TraceRollupDiagram = memo(function TraceRollupDiagram({
   }, [shouldRender, startQueuedRender]);
 
   return (
-    <div ref={containerRef} className="trace-rollup-diagram" onClickCapture={handleDiagramClick}>
+    <div ref={containerRef} className={cx("trace-rollup-diagram")} onClickCapture={handleDiagramClick}>
       {shouldRender && model ? (
         <MermaidBlock
           code={model.code}
@@ -658,14 +1471,21 @@ export function CoverageView({
 
   return (
     <ViewFrame testId="coverage">
-      <div className="ex-route ex-route-single">
-        <div className="ex-document-panel coverage-dashboard">
+      <div className={cx("ex-route", "ex-route-single", reportRouteBaseUX, reportRouteSkinX)}>
+        <div
+          className={cx(
+            "ex-document-panel",
+            "coverage-dashboard",
+            coverageDashboardBaseUX,
+            coverageDashboardSkinX,
+          )}
+        >
           <header
             id={coverageSectionDomId("overview")}
             className="coverage-header"
           >
             <div className="coverage-title-block">
-              <span className="rq-eyebrow">Coverage</span>
+              <span className="ex-coverage-eyebrow">Coverage</span>
               <h1>Verification Coverage</h1>
             </div>
             <StatRow className="coverage-header-stats">
@@ -834,7 +1654,7 @@ function CoveragePanel({
   return (
     <section
       id={id}
-      className={["coverage-panel", className].filter(Boolean).join(" ")}
+      className={cx("coverage-panel", className)}
     >
       <header className="coverage-panel__head">
         <h2>{title}</h2>

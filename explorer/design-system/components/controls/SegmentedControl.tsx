@@ -1,4 +1,65 @@
+import { css, cx } from "@linaria/atomic";
 import type { ReactNode } from "react";
+
+const baseUX = css`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: calc(var(--space-1) + var(--border-w));
+  border: var(--border-w) solid var(--border-subtle);
+  border-radius: var(--radius-md);
+
+  svg {
+    display: block;
+    flex: 0 0 auto;
+  }
+`;
+
+const itemBaseUX = css`
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: var(--rq-segmented-item-h, calc(var(--control-xs) + var(--space-2)));
+  padding: 0 var(--space-7);
+  border: 0;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-caption);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--dur-fast),
+    color var(--dur-fast),
+    box-shadow var(--dur-fast);
+
+  .rq-segmented__icon {
+    display: inline-flex;
+  }
+
+  svg {
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+  }
+`;
+
+const skinX = css`
+  background: var(--bg-sunken);
+
+  .rq-segmented__item {
+    color: var(--text-secondary);
+    background: transparent;
+  }
+
+  .rq-segmented__item:hover {
+    color: var(--text-strong);
+  }
+
+  .rq-segmented__item.is-active {
+    color: var(--text-inverse);
+    background: var(--text-strong);
+    box-shadow: var(--shadow-xs);
+  }
+`;
 
 export interface SegmentedControlItem<T extends string> {
   value: T;
@@ -22,7 +83,7 @@ export function SegmentedControl<T extends string>({
   ariaLabel,
 }: SegmentedControlProps<T>) {
   return (
-    <div className={["rq-segmented", className].filter(Boolean).join(" ")} role="group" aria-label={ariaLabel}>
+    <div className={cx("rq-segmented", baseUX, skinX, className)} role="group" aria-label={ariaLabel}>
       {items.map((item) => {
         const active = item.value === value;
         return (
@@ -30,7 +91,7 @@ export function SegmentedControl<T extends string>({
             key={item.value}
             type="button"
             aria-pressed={active}
-            className={["rq-segmented__item", active ? "is-active" : ""].filter(Boolean).join(" ")}
+            className={cx("rq-segmented__item", itemBaseUX, active && "is-active")}
             onClick={() => onChange(item.value)}
           >
             {item.icon ? <span className="rq-segmented__icon">{item.icon}</span> : null}

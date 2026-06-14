@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { css, cx } from "@linaria/atomic";
 import Graph from "graphology";
 import Sigma from "sigma";
 import forceAtlas2 from "graphology-layout-forceatlas2";
@@ -32,6 +33,62 @@ const STRUCTURAL_RELATIONS = new Set<RelationCategory>([
   "verify",
   "satisfy",
 ]);
+
+const graphRouteUX = css`
+  box-sizing: border-box;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) !important;
+  column-gap: 0;
+  height: 100vh;
+  min-height: 0;
+  padding-left: var(--ex-current-left-width);
+  padding-right: 0;
+
+  .ex-app & {
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding-left: 0;
+    padding-right: 0;
+  }
+`;
+
+const graphRouteSkinX = css`
+  background: var(--bg-surface);
+  color: var(--text-body);
+`;
+
+const graphCanvasWrapUX = css`
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+`;
+
+const graphCanvasWrapSkinX = css`
+  background: var(--bg-canvas);
+`;
+
+const graphCanvasUX = css`
+  --ex-graph-diagram-min-h: 520px;
+  width: 100%;
+  height: 100%;
+  min-height: var(--ex-graph-diagram-min-h);
+`;
+
+const graphNoticeUX = css`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  font-size: var(--text-base);
+  font-style: italic;
+  transform: translate(-50%, -50%);
+`;
+
+const graphNoticeSkinX = css`
+  color: var(--text-muted);
+`;
 
 function nodeKind(node: KnowledgeGraphNode): string {
   return node.element_type || node.node_type || node.type || "other";
@@ -237,7 +294,6 @@ export function KnowledgeGraphView({
       return undefined;
     }
 
-    let disposed = false;
     let graph: Graph | null = null;
     let renderer: Sigma | null = null;
     let suppressNextStageClear = false;
@@ -493,8 +549,14 @@ export function KnowledgeGraphView({
     }
 
     return () => {
-      disposed = true;
-      if (!disposed) return;
+      // Lose all WebGL contexts before removal so the GPU compositor immediately
+      // drops the cached texture — prevents stale-frame bleed onto the next view.
+      containerRef.current?.querySelectorAll("canvas").forEach((canvas) => {
+        const gl =
+          (canvas.getContext("webgl") as WebGLRenderingContext | null) ??
+          (canvas.getContext("webgl2") as WebGL2RenderingContext | null);
+        gl?.getExtension("WEBGL_lose_context")?.loseContext();
+      });
       if (suppressStageClearTimer !== null) {
         window.clearTimeout(suppressStageClearTimer);
         suppressStageClearTimer = null;
@@ -509,16 +571,16 @@ export function KnowledgeGraphView({
   }, [edges, nodeById, nodes, onOpenElement, setSelectedId]);
 
   const graph = (
-    <div className="graph-route">
-      <div className="graph-canvas-wrap">
+    <div className={cx("graph-route", graphRouteUX, graphRouteSkinX)}>
+      <div className={cx("graph-canvas-wrap", graphCanvasWrapUX, graphCanvasWrapSkinX)}>
         <div
           ref={containerRef}
           data-testid="kg-sigma-canvas"
           role="img"
           aria-label="Actual project elements and facts graph"
-          className="graph-library-canvas"
+          className={cx("graph-library-canvas", graphCanvasUX)}
         />
-        {notice && <div className="graph-render-notice">{notice}</div>}
+        {notice && <div className={cx("graph-render-notice", graphNoticeUX, graphNoticeSkinX)}>{notice}</div>}
       </div>
     </div>
   );

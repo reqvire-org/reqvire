@@ -1,10 +1,10 @@
-import { readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const barrelPath = resolve(root, "design-system/index.ts");
-const configPath = resolve(root, "design-system/_adherence.oxlintrc.json");
+const configPath = resolve(root, ".vite/_adherence.oxlintrc.json");
 
 const barrel = readFileSync(barrelPath, "utf8");
 
@@ -32,6 +32,7 @@ const config = {
         patterns: [
           {
             group: [
+              "@ds/*",
               "design-system/components/**",
               "../design-system/components/**",
               "../../design-system/components/**",
@@ -39,9 +40,8 @@ const config = {
               "components/core/**",
               "components/data/**",
               "components/navigation/**",
-              "ui_kits/explorer/**",
             ],
-            message: "Import design-system components from design-system/index.ts or the @ds alias, not component internals.",
+            message: "Import design-system components from the @ds public barrel, not @ds/* or component internals.",
           },
         ],
       },
@@ -64,5 +64,6 @@ const config = {
   },
 };
 
+mkdirSync(dirname(configPath), { recursive: true });
 writeFileSync(configPath, `${JSON.stringify(config, null, 2)}\n`);
 console.log(`Generated ${configPath} from ${barrelPath} (${Object.keys(components).length} components).`);

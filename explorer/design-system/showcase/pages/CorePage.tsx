@@ -114,7 +114,7 @@ export function CorePage() {
             <div style={{ fontSize: "var(--text-sm)", color: "var(--text-body)" }}>Selected</div>
             <div style={{ fontSize: "var(--text-caption)", color: "var(--text-muted)" }}>Accent ring</div>
           </Card>
-          <Card accentColor="var(--requirement)" style={{ width: 200 }}>
+          <Card accentColorToken="--requirement" style={{ width: 200 }}>
             <div style={{ fontSize: "var(--text-sm)", color: "var(--text-body)" }}>Accent bar</div>
             <div style={{ fontSize: "var(--text-caption)", color: "var(--text-muted)" }}>Left color rail</div>
           </Card>
