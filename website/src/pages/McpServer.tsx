@@ -107,7 +107,7 @@ reqvire mcp --host 127.0.0.1 --port 8081`}</CodeBlock>
             },
             {
               name: "Collect",
-              desc: "reqvire.collect includes reachable ontology context for capability and requirement elements.",
+              desc: "reqvire.collect includes capability-attached ontology context for capability and requirement elements, and semantic-contract use context where the underlying operation returns it.",
             },
             {
               name: "Ontologies",

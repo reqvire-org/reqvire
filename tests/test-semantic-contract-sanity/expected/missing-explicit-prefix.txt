@@ -1,0 +1,1 @@
+Missing explicit SHACL project prefix is rejected

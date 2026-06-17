@@ -20,14 +20,17 @@ Access ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Ontology
 ```turtle
-@prefix access: <urn:reqvire:test:access:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-access:AccessToken a owl:Class .
-access:expiresAt a owl:DatatypeProperty .
+<https://example.test/ontology> a owl:Ontology .
+test:AccessToken a owl:Class .
+test:expiresAt a owl:DatatypeProperty .
 ```
 ---
 
@@ -40,7 +43,7 @@ The system shall produce token responses with expiry information.
 
 #### Relations
   * specify: [Access Capability](#access-capability)
-  * refinedBy: [Token Response Shape Contract](#token-response-shape-contract)
+  * constrainedBy: [Token Response Shape Contract](#token-response-shape-contract)
 ---
 
 ### Token Response Shape Contract
@@ -51,19 +54,20 @@ Token response shape.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Token Response Requirement](#token-response-requirement)
+  * constrain: [Token Response Requirement](#token-response-requirement)
+  * use: [Access Ontology](#access-ontology)
 
 #### Shapes
 ```turtle
-@prefix access: <urn:reqvire:test:access:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-access:AccessTokenShape
+test:AccessTokenShape
   a sh:NodeShape ;
-  sh:targetClass access:AccessToken ;
+  sh:targetClass test:AccessToken ;
   sh:property [
-    sh:path access:expiresAt ;
+    sh:path test:expiresAt ;
     sh:minCount 1 ;
     sh:datatype xsd:string ;
   ] .

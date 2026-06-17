@@ -55,13 +55,16 @@ API ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+<https://example.test/ontology> a owl:Ontology .
 
-api:ServiceEndpoint a owl:Class .
+testonto:ServiceEndpoint a owl:Class .
 ```
 ---
 
@@ -92,6 +95,8 @@ Missing ontology section.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 ---
 EOF
 assert_invalid_model "must contain exactly one #### Ontology fenced Turtle block"
@@ -105,6 +110,8 @@ Duplicate ontology section.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
@@ -130,19 +137,21 @@ Ontology with shapes.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-api:ServiceEndpoint a owl:Class .
+testonto:ServiceEndpoint a owl:Class .
 ```
 
 #### Shapes
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
-api:ServiceEndpointShape a sh:NodeShape ; sh:targetClass api:ServiceEndpoint .
+testonto:ServiceEndpointShape a sh:NodeShape ; sh:targetClass testonto:ServiceEndpoint .
 ```
 ---
 EOF
@@ -157,15 +166,17 @@ Ontology with attachments.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Attachments
   * [Other Ontology](#other-ontology)
 
 #### Ontology
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
-api:ServiceEndpoint a owl:Class .
+testonto:ServiceEndpoint a owl:Class .
 ```
 ---
 
@@ -175,6 +186,8 @@ Other ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Relations
   * derivedFrom: [Ontology With Attachments](#ontology-with-attachments)

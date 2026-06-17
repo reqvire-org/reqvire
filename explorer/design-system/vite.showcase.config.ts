@@ -5,11 +5,23 @@ import react from "@vitejs/plugin-react";
 import { assetMergePlugin } from "./vite.assetMerge";
 
 const __dirname = import.meta.dirname;
+const explorerRoot = path.resolve(__dirname, "..");
+
+const watchIgnored = [
+  "**/.git/**",
+  "**/node_modules/**",
+  "**/.vite/**",
+  "**/dist/**",
+  "**/dist-kit/**",
+  "**/dist-showcase/**",
+  "**/target/**",
+];
 
 export default defineConfig({
   root: path.resolve(__dirname, "showcase"),
   base: "./",
   publicDir: path.resolve(__dirname, "showcase/public"),
+  cacheDir: path.resolve(explorerRoot, ".vite/showcase-cache"),
   plugins: [
     assetMergePlugin({
       dsAssetsDir: path.resolve(__dirname, "assets"),
@@ -26,6 +38,20 @@ export default defineConfig({
   resolve: {
     alias: {
       "@ds": path.resolve(__dirname, "index.ts"),
+    },
+  },
+  server: {
+    fs: {
+      allow: [
+        path.resolve(__dirname),
+        path.resolve(explorerRoot, "src"),
+        path.resolve(explorerRoot, ".vite/generated-assets"),
+      ],
+    },
+    watch: {
+      ignored: watchIgnored,
+      usePolling: true,
+      interval: 500,
     },
   },
   build: {

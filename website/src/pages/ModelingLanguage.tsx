@@ -30,8 +30,12 @@ export default function ModelingLanguage() {
               "implementable obligations, constraints, guarantees, and behavioral expectations that specify capabilities.",
             ],
             [
+              "Semantic contracts",
+              "reusable SHACL profiles that use ontology vocabulary and constrain requirements.",
+            ],
+            [
               "Refinements",
-              "requirement-owned source, semantic-contract, semantic-query-contract, specification, constraint, behavior, state, and input-output detail.",
+              "requirement-owned source, specification, constraint, behavior, state, and input-output detail.",
             ],
             [
               "Verifications",
@@ -104,15 +108,15 @@ and signature before the request reaches protected application logic.`}</CodeBlo
           The layout below is a suggested convention, not a schema obligation.
         </p>
         <CodeBlock>{`<model-root>/
-  Capabilities/
+  <Area>/<CapabilityName>/
   Ontologies/
   Verifications/`}</CodeBlock>
         <div className="mt-4">
           <TermList
             items={[
               [
-                "Capabilities/",
-                "capability-rooted subgraphs with child capabilities, specifying requirements, and requirement-owned refinements.",
+                "<Area>/<CapabilityName>/",
+                "root-level capability subgraphs with child capabilities, specifying requirements, and requirement-owned refinements.",
               ],
               [
                 "Ontologies/",
@@ -139,7 +143,7 @@ The system shall reject API requests whose access token does not conform to the 
 
 #### Relations
   * specify: [API Authentication](#api-authentication)
-  * refinedBy: [Access Token Validation Shape Contract](#access-token-validation-shape-contract)
+  * constrainedBy: [Access Token Validation Shape Contract](#access-token-validation-shape-contract)
   * verifiedBy: [Access Token Contract Test](#access-token-contract-test)
   * satisfiedBy: [auth_middleware.rs](../src/auth_middleware.rs)
 
@@ -151,7 +155,8 @@ The system shall reject API requests whose access token does not conform to the 
   * type: semantic-contract
 
 #### Relations
-  * refine: [API Access Token Validation](#api-access-token-validation)
+  * constrain: [API Access Token Validation](#api-access-token-validation)
+  * use: [Auth Ontology](#auth-ontology)
 
 #### Shapes
 \`\`\`turtle

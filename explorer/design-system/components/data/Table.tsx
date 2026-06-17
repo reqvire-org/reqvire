@@ -14,15 +14,15 @@ const baseUXViewport = css`
 `;
 
 const skinXViewport = css`
-  background: var(--rq-tablewrap-bg, var(--bg-surface));
-  border: var(--rq-tablewrap-border, var(--border-w) solid var(--border-subtle));
-  border-radius: var(--rq-tablewrap-radius, var(--radius-lg));
+  background: var(--ds-tablewrap-bg, var(--bg-surface));
+  border: var(--ds-tablewrap-border, var(--border-w) solid var(--border-subtle));
+  border-radius: var(--ds-tablewrap-radius, var(--radius-lg));
 `;
 
 const baseUXTable = css`
   display: table;
   width: 100%;
-  min-width: var(--rq-table-min-w, var(--content-max));
+  min-width: var(--ds-table-min-w, var(--content-max));
   border-collapse: collapse;
   font-size: var(--text-sm);
 `;
@@ -45,43 +45,43 @@ const baseUXRow = css`
 
 const skinXRow = css`
   &:hover td {
-    background: var(--rq-table-row-hover-bg, var(--bg-hover));
+    background: var(--ds-table-row-hover-bg, var(--bg-hover));
   }
 
   &.is-selected td {
     color: var(--text-strong);
-    background: var(--rq-table-sel-bg, var(--bg-active));
+    background: var(--ds-table-sel-bg, var(--bg-selected));
   }
 `;
 
 const baseUXHead = css`
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: var(--z-local-base);
   display: table-cell;
   padding: var(--space-5) var(--space-7);
   text-align: left;
 
-  &:has(.rq-table__sort) {
+  &:has(.ds-table__sort) {
     padding: 0;
   }
 `;
 
 const skinXHead = css`
   color: var(--text-secondary);
-  background: var(--rq-table-th-bg, var(--bg-sunken));
-  border-bottom: var(--border-w) solid var(--rq-table-th-border, var(--border-subtle));
-  font-weight: var(--rq-table-th-fw, var(--weight-semibold));
+  background: var(--ds-table-th-bg, var(--bg-sunken));
+  border-bottom: var(--border-w) solid var(--ds-table-th-border, var(--border-subtle));
+  font-weight: var(--ds-table-th-fw, var(--weight-semibold));
 `;
 
 const baseUXCell = css`
   display: table-cell;
-  padding: var(--rq-table-td-p, var(--space-5) var(--space-7));
+  padding: var(--ds-table-td-p, var(--space-5) var(--space-7));
   vertical-align: middle;
 `;
 
 const skinXCell = css`
-  border-bottom: var(--border-w) solid var(--rq-table-td-border, var(--border-subtle));
+  border-bottom: var(--border-w) solid var(--ds-table-td-border, var(--border-subtle));
 
   tr:last-child & {
     border-bottom: 0;
@@ -100,7 +100,7 @@ const baseUXSort = css`
   font: inherit;
   cursor: pointer;
 
-  .rq-table__sortdir {
+  .ds-table__sortdir {
     font-size: var(--text-micro);
     font-weight: var(--weight-semibold);
   }
@@ -114,19 +114,19 @@ const skinXSort = css`
     color: var(--text-strong);
   }
 
-  .rq-table__sortdir {
+  .ds-table__sortdir {
     color: var(--text-strong);
   }
 `;
 
-export type TableViewportProps = HTMLAttributes<HTMLDivElement> & { children: ReactNode };
-export type TableProps = TableHTMLAttributes<HTMLTableElement> & { children: ReactNode };
-export type TableHeaderProps = HTMLAttributes<HTMLTableSectionElement> & { children: ReactNode };
-export type TableBodyProps = HTMLAttributes<HTMLTableSectionElement> & { children: ReactNode };
-export type TableRowProps = HTMLAttributes<HTMLTableRowElement> & { children: ReactNode; selected?: boolean };
-export type TableHeadProps = ThHTMLAttributes<HTMLTableCellElement> & { children: ReactNode };
-export type TableCellProps = TdHTMLAttributes<HTMLTableCellElement> & { children: ReactNode };
-export type TableSortButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+export type TableViewportProps = Omit<HTMLAttributes<HTMLDivElement>, "style"> & { children: ReactNode };
+export type TableProps = Omit<TableHTMLAttributes<HTMLTableElement>, "style"> & { children: ReactNode };
+export type TableHeaderGroupProps = Omit<HTMLAttributes<HTMLTableSectionElement>, "style"> & { children: ReactNode };
+export type TableBodyProps = Omit<HTMLAttributes<HTMLTableSectionElement>, "style"> & { children: ReactNode };
+export type TableRowProps = Omit<HTMLAttributes<HTMLTableRowElement>, "style"> & { children: ReactNode; selected?: boolean };
+export type TableHeaderCellProps = Omit<ThHTMLAttributes<HTMLTableCellElement>, "style"> & { children: ReactNode };
+export type TableCellProps = Omit<TdHTMLAttributes<HTMLTableCellElement>, "style"> & { children: ReactNode };
+export type TableSortButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> & {
   children: ReactNode;
   direction?: "asc" | "desc";
 };
@@ -137,7 +137,7 @@ export function TableViewport({
   ...props
 }: TableViewportProps) {
   return (
-    <div className={cx("rq-tablewrap", baseUXViewport, skinXViewport, className)} {...props}>
+    <div className={cx("ds-tablewrap", baseUXViewport, skinXViewport, className)} {...props}>
       {children}
     </div>
   );
@@ -149,17 +149,17 @@ export function Table({
   ...props
 }: TableProps) {
   return (
-    <table className={cx("rq-table", baseUXTable, skinXTable, className)} {...props}>
+    <table className={cx("ds-table", baseUXTable, skinXTable, className)} {...props}>
       {children}
     </table>
   );
 }
 
-export function TableHeader({
+export function TableHeaderGroup({
   children,
   className = "",
   ...props
-}: TableHeaderProps) {
+}: TableHeaderGroupProps) {
   return (
     <thead className={cx(baseUXHeader, className)} {...props}>
       {children}
@@ -192,11 +192,11 @@ export function TableRow({
   );
 }
 
-export function TableHead({
+export function TableHeaderCell({
   children,
   className = "",
   ...props
-}: TableHeadProps) {
+}: TableHeaderCellProps) {
   return (
     <th className={cx(baseUXHead, skinXHead, className)} {...props}>
       {children}
@@ -223,9 +223,9 @@ export function TableSortButton({
   ...props
 }: TableSortButtonProps) {
   return (
-    <button type="button" className={cx("rq-table__sort", baseUXSort, skinXSort, className)} {...props}>
+    <button type="button" className={cx("ds-table__sort", baseUXSort, skinXSort, className)} {...props}>
       <span>{children}</span>
-      {direction ? <span className="rq-table__sortdir">{direction}</span> : null}
+      {direction ? <span className="ds-table__sortdir">{direction}</span> : null}
     </button>
   );
 }

@@ -29,14 +29,14 @@ export const ELEMENT_ROLE_TOKENS = {
   "input-output": { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
   verification: { fill: "--verification", ink: "--verification-ink", tint: "--verification-tint" },
   specification: { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
-  "semantic-contract": { fill: "--refinement", ink: "--refinement-ink", tint: "--refinement-tint" },
+  "semantic-contract": { fill: "--semantic-contract", ink: "--semantic-contract-ink", tint: "--semantic-contract-tint" },
   ontology: { fill: "--ontology", ink: "--ontology-ink", tint: "--ontology-tint" },
   resource: { fill: "--resource", ink: "--resource-ink", tint: "--resource-tint" },
   other: { fill: "--other", ink: "--other-ink", tint: "--other-tint" },
 } as const;
 
 export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementIconShape; role: ElementRole; glyph?: string }> = {
-  capability: { color: "var(--capability)", shape: "hub", role: "capability" },
+  capability: { color: "var(--capability)", shape: "square", role: "capability" },
   requirement: { color: "var(--requirement)", shape: "square", role: "requirement" },
   refinement: { color: "var(--refinement)", shape: "diamond", role: "refinement", glyph: "R" },
   source: { color: "var(--refinement)", shape: "diamond", role: "source", glyph: "↗" },
@@ -46,18 +46,30 @@ export const ELEMENT_TYPES: Record<ElementType, { color: string; shape: ElementI
   "input-output": { color: "var(--refinement)", shape: "diamond", role: "input-output", glyph: "↔" },
   verification: { color: "var(--verification)", shape: "square", role: "verification" },
   specification: { color: "var(--refinement)", shape: "diamond", role: "specification", glyph: "≡" },
-  "semantic-contract": { color: "var(--refinement)", shape: "diamond", role: "semantic-contract", glyph: "SH" },
+  "semantic-contract": { color: "var(--semantic-contract)", shape: "square", role: "semantic-contract" },
   ontology: { color: "var(--ontology)", shape: "square", role: "ontology" },
   resource: { color: "var(--resource)", shape: "square", role: "resource" },
 };
 
 export const DESIGN_SYSTEM_COLOR_TOKENS = [
   "--accent",
+  "--accent-active",
+  "--accent-hover",
   "--accent-ring",
+  "--accent-subtle",
+  "--bg-active",
   "--bg-canvas",
+  "--bg-hover",
+  "--bg-overlay",
+  "--bg-raised",
+  "--bg-selected",
   "--bg-sunken",
   "--bg-surface",
   "--border-default",
+  "--border-focus",
+  "--border-selected",
+  "--border-strong",
+  "--border-subtle",
   "--edge-attach",
   "--edge-default",
   "--edge-derive",
@@ -81,10 +93,21 @@ export const DESIGN_SYSTEM_COLOR_TOKENS = [
   "--slate-0",
   "--slate-950",
   "--success",
+  "--success-tint",
   "--text-body",
+  "--text-code",
   "--text-faint",
+  "--text-inverse",
+  "--text-link",
   "--text-muted",
+  "--text-secondary",
   "--text-strong",
+  "--warning",
+  "--warning-tint",
+  "--danger",
+  "--danger-tint",
+  "--info",
+  "--info-tint",
 ] as const satisfies readonly CssTokenName[];
 
 type ElementRoleToken = {
@@ -104,6 +127,9 @@ const CSS_TOKEN_FALLBACKS: Partial<Record<DesignSystemColorToken, string>> = {
   "--refinement": "#ff9800",
   "--refinement-ink": "#e65100",
   "--refinement-tint": "#fff3e0",
+  "--semantic-contract": "#d32f2f",
+  "--semantic-contract-ink": "#b71c1c",
+  "--semantic-contract-tint": "#ffebee",
   "--verification": "#4caf50",
   "--verification-ink": "#2e7d32",
   "--verification-tint": "#e8f5e9",
@@ -156,8 +182,6 @@ const REFINEMENT_TYPES = new Set([
   "behavior",
   "state",
   "input-output",
-  "semantic-contract",
-  "semantic-query-contract",
 ]);
 
 export function elementRole(type?: string | null, family?: string | null): ElementRole {
@@ -170,6 +194,8 @@ export function elementRole(type?: string | null, family?: string | null): Eleme
   if (normalizedType.includes("capability") || normalizedFamily === "capability") return "capability";
   if (normalizedType.includes("verification") || normalizedFamily === "verification") return "verification";
   if (normalizedType.includes("ontology") || normalizedFamily === "ontology") return "ontology";
+  if (normalizedType === "evidence-file" || normalizedType.includes("evidence")) return "other";
+  if (normalizedType === "concept-reference" || normalizedType.includes("concept-reference")) return "resource";
   if (normalizedType.includes("resource") || normalizedType === "file" || normalizedFamily === "resource") {
     return "resource";
   }
@@ -241,7 +267,6 @@ export function getMermaidClassDefs() {
     classDef("inputOutput", "input-output", "2px"),
     classDef("specification", "specification", "2px"),
     classDef("semanticContract", "semantic-contract", "2px"),
-    classDef("semanticQueryContract", "semantic-contract", "2px"),
     classDef("verification", "verification", "2px"),
     classDef("ontology", "ontology", "2px"),
     classDef("resource", "resource", "2px"),

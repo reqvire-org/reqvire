@@ -109,6 +109,48 @@ pub static RELATION_TYPES: LazyLock<HashMap<&'static str, RelationTypeInfo>> =
             },
         );
 
+        // Semantic contract relations
+        m.insert(
+            "constrainedBy",
+            RelationTypeInfo {
+                name: "constrainedBy",
+                opposite: Some("constrain"),
+                description: "A requirement is constrained by a semantic contract.",
+                arrow: "-->",
+                label: "constrainedBy",
+            },
+        );
+        m.insert(
+            "constrain",
+            RelationTypeInfo {
+                name: "constrain",
+                opposite: Some("constrainedBy"),
+                description: "A semantic contract constrains a requirement.",
+                arrow: "-->",
+                label: "constrains",
+            },
+        );
+        m.insert(
+            "use",
+            RelationTypeInfo {
+                name: "use",
+                opposite: Some("usedBy"),
+                description: "A semantic contract uses ontology vocabulary.",
+                arrow: "-->",
+                label: "uses",
+            },
+        );
+        m.insert(
+            "usedBy",
+            RelationTypeInfo {
+                name: "usedBy",
+                opposite: Some("use"),
+                description: "An ontology is used by a semantic contract.",
+                arrow: "-->",
+                label: "usedBy",
+            },
+        );
+
         // Verify relations
         m.insert(
             "verifiedBy",
@@ -153,7 +195,9 @@ pub const DIAGRAM_RELATIONS: &[&str] = &[
     "specifiedBy", // Not specify
     "satisfiedBy", // Not satisfy
     "refinedBy",   // Not refine
-    "verifiedBy",  // Not verify
+    "constrainedBy",
+    "use",
+    "verifiedBy", // Not verify
     "trace",
 ];
 
@@ -165,7 +209,11 @@ pub const IMPACT_PROPAGATION_RELATIONS: &[&str] = &[
     "satisfiedBy", // Requirement changes affect implementations
     "refine",      // Refinement changes affect its owning requirement or capability
     "refinedBy",   // Requirement changes affect refinements
-    "verifiedBy",  // Requirement changes invalidate verifications
+    "constrainedBy",
+    "constrain",
+    "use",
+    "usedBy",
+    "verifiedBy", // Requirement changes invalidate verifications
 ];
 
 /// Backward relations for reverse model traversal (opposite of DIAGRAM_RELATIONS)
@@ -175,6 +223,8 @@ pub const BACKWARD_RELATIONS: &[&str] = &[
     "specify",     // Opposite of specifiedBy
     "satisfy",     // Opposite of satisfiedBy
     "refine",      // Opposite of refinedBy
+    "constrain",   // Opposite of constrainedBy
+    "usedBy",      // Opposite of use
     "verify",      // Opposite of verifiedBy
 ];
 
@@ -430,8 +480,12 @@ pub fn is_refinement_relation(rtype: &RelationTypeInfo) -> bool {
 /// - verify: Source must be verification, target must be capability or requirement
 /// - satisfiedBy: Source must be system requirement (requirement) or test-verification, target must be file (implementation)
 /// - satisfy: Inverse of satisfiedBy (auto-generated)
-/// - refinedBy: Source must be requirement, target must be compatible refinement element
-/// - refine: Source must be refinement element, target must be requirement
+/// - refinedBy: Source must be requirement, target must be compatible non-semantic-contract refinement element
+/// - refine: Source must be compatible non-semantic-contract refinement element, target must be requirement
+/// - constrainedBy: Source must be requirement, target must be semantic-contract
+/// - constrain: Source must be semantic-contract, target must be requirement
+/// - use: Source must be semantic-contract, target must be ontology
+/// - usedBy: Source must be ontology, target must be semantic-contract
 /// - trace: Any non-refinement element type can use trace
 /// - Refinement types (constraint, behavior, specification): Can only have refine relations
 /// - Other type: Can only use trace relations
@@ -535,8 +589,6 @@ pub fn validate_relation_element_types(
                 ElementType::Requirement(_),
                 ElementType::Refinement(
                     RefinementType::Source
-                    | RefinementType::SemanticContract
-                    | RefinementType::SemanticQueryContract
                     | RefinementType::Constraint
                     | RefinementType::Behavior
                     | RefinementType::Specification
@@ -550,8 +602,6 @@ pub fn validate_relation_element_types(
             (
                 ElementType::Refinement(
                     RefinementType::Source
-                    | RefinementType::SemanticContract
-                    | RefinementType::SemanticQueryContract
                     | RefinementType::Constraint
                     | RefinementType::Behavior
                     | RefinementType::Specification
@@ -560,6 +610,22 @@ pub fn validate_relation_element_types(
                 ),
                 ElementType::Requirement(_),
             ) => true,
+            _ => false,
+        },
+        "constrainedBy" => match (source_type, target_type) {
+            (ElementType::Requirement(_), ElementType::SemanticContract) => true,
+            _ => false,
+        },
+        "constrain" => match (source_type, target_type) {
+            (ElementType::SemanticContract, ElementType::Requirement(_)) => true,
+            _ => false,
+        },
+        "use" => match (source_type, target_type) {
+            (ElementType::SemanticContract, ElementType::Ontology) => true,
+            _ => false,
+        },
+        "usedBy" => match (source_type, target_type) {
+            (ElementType::Ontology, ElementType::SemanticContract) => true,
             _ => false,
         },
         "trace" => {
@@ -584,8 +650,12 @@ pub fn get_relation_element_type_description(relation_type: &str) -> Option<Stri
         "verify" => Some("'verify' should connect a verification element to a capability or requirement".to_string()),
         "satisfiedBy" => Some("'satisfiedBy' should connect a requirement, test-verification, or formal-proof-verification to an implementation/evidence file; capability is not allowed".to_string()),
         "satisfy" => Some("'satisfy' should connect an implementation/evidence file to a requirement, test-verification, or formal-proof-verification; capability is not allowed".to_string()),
-        "refinedBy" => Some("'refinedBy' should connect a requirement to a compatible refinement element. Refinements are requirement-owned only; capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.".to_string()),
-        "refine" => Some("'refine' should connect a compatible refinement element to a requirement. Refinements are requirement-owned only; capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.".to_string()),
+        "refinedBy" => Some("'refinedBy' should connect a requirement to a compatible non-semantic-contract refinement element. Semantic contracts use constrainedBy/constrain instead.".to_string()),
+        "refine" => Some("'refine' should connect a compatible non-semantic-contract refinement element to a requirement. Semantic contracts use constrain/constrainedBy instead.".to_string()),
+        "constrainedBy" => Some("'constrainedBy' should connect a requirement to a semantic-contract element".to_string()),
+        "constrain" => Some("'constrain' should connect a semantic-contract element to a requirement".to_string()),
+        "use" => Some("'use' should connect a semantic-contract element to an ontology element".to_string()),
+        "usedBy" => Some("'usedBy' should connect an ontology element to a semantic-contract element".to_string()),
         "trace" => Some("'trace' can be used by any element type except refinement types".to_string()),
         _ => None
     }

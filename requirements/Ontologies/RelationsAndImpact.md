@@ -1,5 +1,479 @@
 # Elements
 
+### Change Impact Analysis Shape
+
+Defines SHACL constraints for change-impact analysis records, impact edges, and semantic dependency resolution.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:ChangeImpactAnalysisShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ChangeImpactAnalysis ;
+  sh:property [
+    sh:path reqvire:changedElement ;
+    sh:minCount 1 ;
+    sh:class reqvire:Element ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactedElement ;
+    sh:class reqvire:Element ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactPath ;
+    sh:class reqvire:ChangeImpactPath ;
+  ] ;
+  sh:property [
+    sh:path reqvire:requiresReview ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] .
+
+reqvire:ChangeImpactPathShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ChangeImpactPath ;
+  sh:property [
+    sh:path reqvire:impactEdge ;
+    sh:class reqvire:ChangeImpactEdge ;
+  ] .
+
+reqvire:ChangeImpactEdgeShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ChangeImpactEdge ;
+  sh:property [
+    sh:path reqvire:impactRelation ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactDirection ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("upstream" "downstream" "bidirectional") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactReason ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:SemanticDependencyShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:SemanticDependency ;
+  sh:property [
+    sh:path reqvire:semanticDependency ;
+    sh:class reqvire:SemanticContract ;
+  ] ;
+  sh:property [
+    sh:path reqvire:dependencyResolution ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("native" "attached" "not-found" "found-outside-context") ;
+  ] .
+
+reqvire:ImpactReviewShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ImpactReview ;
+  sh:property [
+    sh:path reqvire:reviewedByVerification ;
+    sh:class reqvire:Verification ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactScope ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactSeverity ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ChangePropagationRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ChangePropagationRule ;
+  sh:property [
+    sh:path reqvire:changeRuleName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in (
+      "parent-to-child-impact"
+      "capability-to-specified-requirement-impact"
+      "requirement-to-implementation-impact"
+      "requirement-to-verification-impact"
+      "owner-to-refinement-impact"
+      "ontology-to-semantic-contract-impact"
+      "semantic-contract-to-requirement-impact"
+      "semantic-contract-ontology-use-dependency"
+      "requirement-to-semantic-contract-review"
+      "attachment-content-impact"
+      "semantic-reference-reachability"
+      "relocation-without-content-change"
+    ) ;
+  ] ;
+  sh:property [
+    sh:path reqvire:changedThing ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:propagationTarget ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:propagationMode ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactRelation ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactDirection ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("upstream" "downstream" "bidirectional" "none") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactReason ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ChangeKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ChangeKind ;
+  sh:property [
+    sh:path reqvire:changeKindName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("content-change" "addition" "removal" "relocation" "attachment-content-change") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:changeKindMeaning ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ImpactClassificationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ImpactClassification ;
+  sh:property [
+    sh:path reqvire:impactClassificationName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("direct" "indirect" "potential") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:impactClassificationMeaning ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Tracing Structural Changes](../Reports/ModelReports/ReportingRequirements.md#tracing-structural-changes)
+  * use: [Reqvire Change Impact Ontology](#reqvire-change-impact-ontology)
+---
+
+### Relation Compatibility Shape
+
+Defines SHACL constraints for Reqvire relation usage across capabilities, requirements, verifications, and relation-rule metadata.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:CapabilityRelationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Capability ;
+  sh:property [
+    sh:path reqvire:derive ;
+    sh:class reqvire:Capability ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:class reqvire:Capability ;
+  ] ;
+  sh:property [
+    sh:path reqvire:specifiedBy ;
+    sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:class reqvire:Verification ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:RequirementRelationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Requirement ;
+  sh:or (
+    [
+      sh:property [
+        sh:path reqvire:specify ;
+        sh:minCount 1 ;
+        sh:class reqvire:Capability ;
+      ]
+    ]
+    [
+      sh:property [
+        sh:path reqvire:derivedFrom ;
+        sh:minCount 1 ;
+        sh:class reqvire:Requirement ;
+      ]
+    ]
+  ) ;
+  sh:property [
+    sh:path reqvire:derive ;
+    sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:specify ;
+    sh:class reqvire:Capability ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:class reqvire:Verification ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:class reqvire:Artifact ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:VerificationRelationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Verification ;
+  sh:property [
+    sh:path reqvire:verify ;
+    sh:or (
+      [ sh:class reqvire:Capability ]
+      [ sh:class reqvire:Requirement ]
+    ) ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:EvidenceBackedVerificationRelationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:TestVerification, reqvire:FormalProofVerification ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:minCount 1 ;
+    sh:class reqvire:Artifact ;
+  ] .
+
+reqvire:NonEvidenceBackedVerificationRelationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:AnalysisVerification, reqvire:InspectionVerification, reqvire:DemonstrationVerification ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:CapabilityAttachmentShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Capability ;
+  sh:property [
+    sh:path reqvire:attaches ;
+    sh:class reqvire:Ontology ;
+  ] .
+
+reqvire:RequirementAttachmentShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Requirement ;
+  sh:property [
+    sh:path reqvire:attaches ;
+    sh:or (
+      [ sh:class reqvire:Constraint ]
+      [ sh:class reqvire:Behavior ]
+      [ sh:class reqvire:Specification ]
+      [ sh:class reqvire:State ]
+      [ sh:class reqvire:InputOutput ]
+    ) ;
+  ] .
+
+reqvire:NonAttachmentElementShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Refinement, reqvire:Verification, reqvire:Ontology, reqvire:CustomElement ;
+  sh:property [
+    sh:path reqvire:attaches ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:RelationRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:RelationRule ;
+  sh:property [
+    sh:path reqvire:relationName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "refinedBy" "refine" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:allowedSourceType ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:allowedTargetType ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:relationDirection ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("forward" "inverse" "non-directional") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:inverseRelation ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+  ] ;
+  sh:property [
+    sh:path reqvire:relationConstraint ;
+    sh:class reqvire:RelationConstraint ;
+  ] ;
+  sh:property [
+    sh:path reqvire:propagatesChangeImpact ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] ;
+  sh:property [
+    sh:path reqvire:createsOwnership ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] ;
+  sh:property [
+    sh:path reqvire:relationRuleDescription ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:TraversalRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:TraversalRule ;
+  sh:property [
+    sh:path reqvire:traversalDirection ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("forward" "reverse" "bidirectional") ;
+  ] .
+
+reqvire:AttachmentCompatibilityRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:AttachmentCompatibilityRule ;
+  sh:property [
+    sh:path reqvire:attachmentSourceType ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:attachmentTargetType ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:attachmentOwnerType ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:attachmentRuleDescription ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:RelationUsageCategoryShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:RelationUsageCategory ;
+  sh:property [
+    sh:path reqvire:usageCategoryName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("diagram-rendering-forward" "reverse-traversal" "change-propagation" "verification-rollup") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:usageCategoryRelationName ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "refinedBy" "refine" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:usageCategoryMeaning ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:RelationSemanticCategoryShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:RelationSemanticCategory ;
+  sh:property [
+    sh:path reqvire:semanticCategoryName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("hierarchy" "capability-specification" "satisfaction" "refinement-ownership" "verification" "traceability" "attachment-dependency") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:semanticCategoryRelationName ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("derive" "derivedFrom" "specifiedBy" "specify" "refinedBy" "refine" "constrainedBy" "constrain" "use" "usedBy" "verifiedBy" "verify" "satisfiedBy" "satisfy" "trace" "attachment") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:semanticCategoryMeaning ;
+    sh:datatype xsd:string ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Ontology and Semantic Contract Model](../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * use: [Reqvire Requirement Ontology](CapabilityRequirementModel.md#reqvire-requirement-ontology)
+  * use: [Reqvire Semantic Contract Ontology](CapabilityRequirementModel.md#reqvire-semantic-contract-ontology)
+  * use: [Reqvire Relation Ontology](#reqvire-relation-ontology)
+  * use: [Reqvire Verification Ontology](Verification.md#reqvire-verification-ontology)
+---
+
 ### Reqvire Change Impact Ontology
 
 The Reqvire change impact ontology defines impact analysis concepts and propagation rules.
@@ -24,7 +498,7 @@ reqvire:ChangeImpactEdge a owl:Class ;
   rdfs:comment "Single propagation step in a change-impact path." .
 reqvire:SemanticDependency a owl:Class ;
   rdfs:label "Semantic dependency" ;
-  rdfs:comment "Resolved dependency from a semantic contract to ontology terms reachable through native context or attachment context." .
+  rdfs:comment "Resolved dependency from a semantic contract to ontology terms reachable through explicit ontology-use context." .
 reqvire:ImpactReview a owl:Class ;
   rdfs:label "Impact review" ;
   rdfs:comment "Review record for impact scope, severity, and verification evidence used to assess a change." .
@@ -216,6 +690,46 @@ reqvire:ownerToRefinementImpactRule a reqvire:ChangePropagationRule ;
   reqvire:propagationMode "review-required" ;
   reqvire:impactReason "Owner changes can change the scope or meaning of owned refinement contracts." .
 
+reqvire:ontologyToSemanticContractImpactRule a reqvire:ChangePropagationRule ;
+  rdfs:label "Ontology to semantic contract impact" ;
+  reqvire:changeRuleName "ontology-to-semantic-contract-impact" ;
+  reqvire:changedThing "ontology" ;
+  reqvire:impactRelation "usedBy" ;
+  reqvire:impactDirection "downstream" ;
+  reqvire:propagationTarget "semantic-contract" ;
+  reqvire:propagationMode "review-required" ;
+  reqvire:impactReason "Ontology vocabulary changes can invalidate SHACL shape profiles that explicitly use that vocabulary." .
+
+reqvire:semanticContractToRequirementImpactRule a reqvire:ChangePropagationRule ;
+  rdfs:label "Semantic contract to requirement impact" ;
+  reqvire:changeRuleName "semantic-contract-to-requirement-impact" ;
+  reqvire:changedThing "semantic-contract" ;
+  reqvire:impactRelation "constrain" ;
+  reqvire:impactDirection "downstream" ;
+  reqvire:propagationTarget "requirement" ;
+  reqvire:propagationMode "review-required" ;
+  reqvire:impactReason "Semantic contract changes can alter the constraints imposed on the requirement they constrain." .
+
+reqvire:semanticContractOntologyUseDependencyRule a reqvire:ChangePropagationRule ;
+  rdfs:label "Semantic contract ontology use dependency" ;
+  reqvire:changeRuleName "semantic-contract-ontology-use-dependency" ;
+  reqvire:changedThing "semantic-contract-use-relation" ;
+  reqvire:impactRelation "use" ;
+  reqvire:impactDirection "dependency" ;
+  reqvire:propagationTarget "ontology-context" ;
+  reqvire:propagationMode "dependency-record" ;
+  reqvire:impactReason "Semantic contracts record ontology vocabulary dependencies through use relations, while ontology content changes propagate back through the inverse usedBy relation." .
+
+reqvire:requirementToSemanticContractReviewRule a reqvire:ChangePropagationRule ;
+  rdfs:label "Requirement to semantic contract review" ;
+  reqvire:changeRuleName "requirement-to-semantic-contract-review" ;
+  reqvire:changedThing "requirement" ;
+  reqvire:impactRelation "constrainedBy" ;
+  reqvire:impactDirection "downstream" ;
+  reqvire:propagationTarget "semantic-contract" ;
+  reqvire:propagationMode "consistency-review-required" ;
+  reqvire:impactReason "Requirement obligation changes can make existing semantic contract constraints inconsistent with the requirement text." .
+
 reqvire:attachmentContentImpactRule a reqvire:ChangePropagationRule ;
   rdfs:label "Attachment content impact" ;
   reqvire:changeRuleName "attachment-content-impact" ;
@@ -317,6 +831,26 @@ reqvire:refinedBy a owl:ObjectProperty ;
   rdfs:range reqvire:Refinement ;
   owl:inverseOf reqvire:refine ;
   rdfs:comment "Forward ownership relation from a requirement to an owned refinement." .
+reqvire:constrain a owl:ObjectProperty ;
+  rdfs:domain reqvire:SemanticContract ;
+  rdfs:range reqvire:Requirement ;
+  owl:inverseOf reqvire:constrainedBy ;
+  rdfs:comment "Relation from a semantic contract to a requirement constrained by that contract." .
+reqvire:constrainedBy a owl:ObjectProperty ;
+  rdfs:domain reqvire:Requirement ;
+  rdfs:range reqvire:SemanticContract ;
+  owl:inverseOf reqvire:constrain ;
+  rdfs:comment "Relation from a requirement to a semantic contract that constrains it." .
+reqvire:use a owl:ObjectProperty ;
+  rdfs:domain reqvire:SemanticContract ;
+  rdfs:range reqvire:Ontology ;
+  owl:inverseOf reqvire:usedBy ;
+  rdfs:comment "Relation from a semantic contract to ontology vocabulary it uses." .
+reqvire:usedBy a owl:ObjectProperty ;
+  rdfs:domain reqvire:Ontology ;
+  rdfs:range reqvire:SemanticContract ;
+  owl:inverseOf reqvire:use ;
+  rdfs:comment "Relation from ontology vocabulary to a semantic contract that uses it." .
 reqvire:verify a owl:ObjectProperty ;
   rdfs:domain reqvire:Verification ;
   rdfs:range [ a owl:Class ; owl:unionOf (reqvire:Capability reqvire:Requirement) ] ;
@@ -443,19 +977,19 @@ reqvire:diagramRenderingRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:comment "Forward relation names rendered in diagrams and root-to-leaf model views to avoid duplicate inverse arrows." ;
   reqvire:usageCategoryName "diagram-rendering-forward" ;
   reqvire:usageCategoryMeaning "Forward relation names rendered in diagrams and root-to-leaf model views to avoid duplicate inverse arrows." ;
-  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "refinedBy", "verifiedBy", "trace" .
+  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "refinedBy", "constrainedBy", "use", "verifiedBy", "trace" .
 reqvire:reverseTraversalRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:label "Reverse traversal relations" ;
   rdfs:comment "Inverse relation names used for leaf-to-root traversal and upward traceability." ;
   reqvire:usageCategoryName "reverse-traversal" ;
   reqvire:usageCategoryMeaning "Inverse relation names used for leaf-to-root traversal and upward traceability." ;
-  reqvire:usageCategoryRelationName "derivedFrom", "specify", "satisfy", "refine", "verify" .
+  reqvire:usageCategoryRelationName "derivedFrom", "specify", "satisfy", "refine", "constrain", "usedBy", "verify" .
 reqvire:changePropagationRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:label "Change propagation relations" ;
   rdfs:comment "Relation names through which changed upstream model meaning propagates to dependent downstream elements." ;
   reqvire:usageCategoryName "change-propagation" ;
   reqvire:usageCategoryMeaning "Relation names through which changed upstream model meaning propagates to dependent downstream elements." ;
-  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "refinedBy", "verifiedBy", "attachment" .
+  reqvire:usageCategoryRelationName "derive", "specifiedBy", "satisfiedBy", "refinedBy", "constrainedBy", "constrain", "use", "usedBy", "verifiedBy", "attachment" .
 reqvire:verificationRollupRelationUsageCategory a reqvire:RelationUsageCategory ;
   rdfs:label "Verification rollup relations" ;
   rdfs:comment "Relation names used to roll verification state from requirement leaves toward ancestors." ;
@@ -487,6 +1021,18 @@ reqvire:refinementRelationCategory a reqvire:RelationSemanticCategory ;
   reqvire:semanticCategoryName "refinement-ownership" ;
   reqvire:semanticCategoryMeaning "Ownership of requirement-owned refinements." ;
   reqvire:semanticCategoryRelationName "refine", "refinedBy" .
+reqvire:semanticContractConstraintRelationCategory a reqvire:RelationSemanticCategory ;
+  rdfs:label "Semantic contract constraint relations" ;
+  rdfs:comment "Application of reusable semantic contracts to constrained requirements." ;
+  reqvire:semanticCategoryName "semantic-contract-constraint" ;
+  reqvire:semanticCategoryMeaning "Application of reusable semantic contracts to constrained requirements." ;
+  reqvire:semanticCategoryRelationName "constrain", "constrainedBy" .
+reqvire:semanticContractOntologyUseRelationCategory a reqvire:RelationSemanticCategory ;
+  rdfs:label "Semantic contract ontology use relations" ;
+  rdfs:comment "Explicit ontology vocabulary dependencies used by semantic contracts." ;
+  reqvire:semanticCategoryName "semantic-contract-ontology-use" ;
+  reqvire:semanticCategoryMeaning "Explicit ontology vocabulary dependencies used by semantic contracts." ;
+  reqvire:semanticCategoryRelationName "use", "usedBy" .
 reqvire:verificationRelationCategory a reqvire:RelationSemanticCategory ;
   rdfs:label "Verification relations" ;
   rdfs:comment "Links between capabilities or requirements and verification elements that verify them." ;
@@ -555,22 +1101,66 @@ reqvire:refinedByRelationRule a reqvire:RelationRule ;
   reqvire:relationName "refinedBy" ;
   reqvire:inverseRelation reqvire:refine ;
   reqvire:allowedSourceType "requirement" ;
-  reqvire:allowedTargetType "subtype-compatible-refinement" ;
+  reqvire:allowedTargetType "subtype-compatible-non-semantic-contract-refinement" ;
   reqvire:relationDirection "forward" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact true ;
-  reqvire:relationRuleDescription "Requirement owns a subtype-compatible refinement element." .
+  reqvire:relationRuleDescription "Requirement owns a subtype-compatible non-semantic-contract refinement element." .
 
 reqvire:refineRelationRule a reqvire:RelationRule ;
   rdfs:label "refine" ;
   reqvire:relationName "refine" ;
   reqvire:inverseRelation reqvire:refinedBy ;
-  reqvire:allowedSourceType "refinement" ;
+  reqvire:allowedSourceType "non-semantic-contract-refinement" ;
   reqvire:allowedTargetType "requirement-owner" ;
   reqvire:relationDirection "inverse" ;
   reqvire:createsOwnership true ;
   reqvire:propagatesChangeImpact false ;
-  reqvire:relationRuleDescription "Refinement element points to its single valid owner." .
+  reqvire:relationRuleDescription "Non-semantic-contract refinement element points to its single valid owner." .
+
+reqvire:constrainedByRelationRule a reqvire:RelationRule ;
+  rdfs:label "constrainedBy" ;
+  reqvire:relationName "constrainedBy" ;
+  reqvire:inverseRelation reqvire:constrain ;
+  reqvire:allowedSourceType "requirement" ;
+  reqvire:allowedTargetType "semantic-contract" ;
+  reqvire:relationDirection "forward" ;
+  reqvire:createsOwnership false ;
+  reqvire:propagatesChangeImpact true ;
+  reqvire:relationRuleDescription "Requirement points to a semantic contract that constrains it." .
+
+reqvire:constrainRelationRule a reqvire:RelationRule ;
+  rdfs:label "constrain" ;
+  reqvire:relationName "constrain" ;
+  reqvire:inverseRelation reqvire:constrainedBy ;
+  reqvire:allowedSourceType "semantic-contract" ;
+  reqvire:allowedTargetType "requirement" ;
+  reqvire:relationDirection "inverse" ;
+  reqvire:createsOwnership false ;
+  reqvire:propagatesChangeImpact true ;
+  reqvire:relationRuleDescription "Semantic contract points to a requirement constrained by the contract." .
+
+reqvire:useRelationRule a reqvire:RelationRule ;
+  rdfs:label "use" ;
+  reqvire:relationName "use" ;
+  reqvire:inverseRelation reqvire:usedBy ;
+  reqvire:allowedSourceType "semantic-contract" ;
+  reqvire:allowedTargetType "ontology" ;
+  reqvire:relationDirection "forward" ;
+  reqvire:createsOwnership false ;
+  reqvire:propagatesChangeImpact true ;
+  reqvire:relationRuleDescription "Semantic contract points to ontology vocabulary used by its SHACL shapes." .
+
+reqvire:usedByRelationRule a reqvire:RelationRule ;
+  rdfs:label "usedBy" ;
+  reqvire:relationName "usedBy" ;
+  reqvire:inverseRelation reqvire:use ;
+  reqvire:allowedSourceType "ontology" ;
+  reqvire:allowedTargetType "semantic-contract" ;
+  reqvire:relationDirection "inverse" ;
+  reqvire:createsOwnership false ;
+  reqvire:propagatesChangeImpact true ;
+  reqvire:relationRuleDescription "Ontology points to a semantic contract that uses its vocabulary." .
 
 reqvire:verifiedByRelationRule a reqvire:RelationRule ;
   rdfs:label "verifiedBy" ;
@@ -646,7 +1236,7 @@ reqvire:capabilityAttachmentCompatibilityRule a reqvire:AttachmentCompatibilityR
 reqvire:requirementAttachmentCompatibilityRule a reqvire:AttachmentCompatibilityRule ;
   rdfs:label "Requirement attachment compatibility" ;
   reqvire:attachmentSourceType "requirement" ;
-  reqvire:attachmentTargetType "semantic-contract", "semantic-query-contract", "constraint", "behavior", "specification", "state", "input-output" ;
+  reqvire:attachmentTargetType "constraint", "behavior", "specification", "state", "input-output" ;
   reqvire:attachmentOwnerType "requirement" ;
   reqvire:attachmentRuleDescription "Requirement attachments reference requirement-owned refinements from explicit dependency contexts." .
 
@@ -663,3 +1253,4 @@ reqvire:ownedRefinementAttachmentRule a reqvire:AttachmentCompatibilityRule ;
 #### Relations
   * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
 ---
+

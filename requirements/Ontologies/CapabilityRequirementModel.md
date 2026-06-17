@@ -1,5 +1,406 @@
 # Elements
 
+### Capability Structure and Relation Shape
+
+Defines SHACL constraints for capability structure, ontology attachment context, specification, verification, and forbidden implementation satisfaction or refinement ownership edges.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:CapabilityShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Capability ;
+  sh:property [
+    sh:path reqvire:derive ;
+    sh:class reqvire:Capability ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:class reqvire:Capability ;
+  ] ;
+  sh:property [
+    sh:path reqvire:refinedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:specifiedBy ;
+    sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:class reqvire:Verification ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:specify ;
+    sh:maxCount 0 ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Ontology and Semantic Contract Model](../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * use: [Reqvire Capability Ontology](#reqvire-capability-ontology)
+  * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
+---
+
+### Custom Element Trace Boundary Shape
+
+Defines SHACL constraints for custom `other-*` elements as trace-only extension nodes.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:CustomElementShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:CustomElement ;
+  sh:property [
+    sh:path reqvire:elementType ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:pattern "^other-.+" ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derive ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:specify ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:specifiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:refinedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verify ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:attaches ;
+    sh:maxCount 0 ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Refinement Element Structure Constraints](../ModelStructure/ModelManagement.md#refinement-element-structure-constraints)
+  * use: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
+  * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
+---
+
+### Ontology Element Vocabulary Shape
+
+Defines SHACL constraints for ontology elements as vocabulary-bearing graph nodes.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:OntologyElementShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Ontology ;
+  sh:property [
+    sh:path reqvire:ontologyText ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:shapesText ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:attaches ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derive ;
+    sh:class reqvire:Ontology ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:class reqvire:Ontology ;
+  ] ;
+  sh:property [
+    sh:path reqvire:refinedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Ontology and Semantic Contract Model](../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * use: [Reqvire Semantic Contract Ontology](#reqvire-semantic-contract-ontology)
+  * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
+---
+
+### Refinement Ownership Shape
+
+Defines SHACL constraints for concrete refinement subtype ownership and traceability.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+reqvire:RefinementShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Refinement ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derive ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:specify ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:specifiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verify ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:SourceShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Source ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] .
+
+reqvire:SpecificationShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Specification ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] .
+
+reqvire:ConstraintShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Constraint ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] .
+
+reqvire:BehaviorShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Behavior ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] .
+
+reqvire:StateShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:State ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] .
+
+reqvire:InputOutputShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:InputOutput ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Refinement Element Structure Constraints](../ModelStructure/ModelManagement.md#refinement-element-structure-constraints)
+  * use: [Reqvire Capability Ontology](#reqvire-capability-ontology)
+  * use: [Reqvire Requirement Ontology](#reqvire-requirement-ontology)
+  * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
+---
+
+### Requirement Ownership and Coverage Shape
+
+Defines SHACL constraints for requirement ownership, hierarchy, refinements, verification, and capability specification.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:RequirementShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Requirement ;
+  sh:or (
+    [
+      sh:property [
+        sh:path reqvire:specify ;
+        sh:minCount 1 ;
+        sh:class reqvire:Capability ;
+      ]
+    ]
+    [
+      sh:property [
+        sh:path reqvire:derivedFrom ;
+        sh:minCount 1 ;
+        sh:class reqvire:Requirement ;
+      ]
+    ]
+  ) ;
+  sh:property [
+    sh:path reqvire:specify ;
+    sh:class reqvire:Capability ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derivedFrom ;
+    sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:derive ;
+    sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:refinedBy ;
+    sh:class reqvire:Refinement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:verifiedBy ;
+    sh:class reqvire:Verification ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfiedBy ;
+    sh:class reqvire:Artifact ;
+  ] ;
+  sh:property [
+    sh:path reqvire:requirementObligationText ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:satisfy ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:specifiedBy ;
+    sh:maxCount 0 ;
+  ] .
+
+reqvire:RequirementOwnedRefinementShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:RequirementOwnedRefinement ;
+  sh:property [
+    sh:path reqvire:refine ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Ontology and Semantic Contract Model](../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * use: [Reqvire Requirement Ontology](#reqvire-requirement-ontology)
+  * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
+---
+
 ### Reqvire Capability Ontology
 
 The Reqvire capability ontology defines capability elements as first-class operational, product, business, regulatory, or system abilities.
@@ -35,7 +436,7 @@ reqvire:sourceType a reqvire:RefinementElementType ;
 
 The Reqvire requirement ontology defines requirement obligations and requirement-owned refinement types.
 
-Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, input-output contracts, shapes-only semantic contracts, and query-backed semantic contracts. Capabilities attach ontology, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own refinement elements through `refinedBy`/`refine`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
+Requirements are implementation-facing obligations. They can own source context, specifications, constraints, behavior descriptions, state contracts, and input-output contracts. Requirements may also be constrained by reusable shapes-only semantic contracts. Capabilities attach ontology, derive child capabilities, are specified by requirements, and may be verified; capabilities must not own refinement elements through `refinedBy`/`refine`. Requirements are verified by verification elements and may be satisfied by implementation or evidence artifacts.
 
 #### Ontology
 ```turtle
@@ -116,9 +517,9 @@ reqvire:inputOutputType a reqvire:RefinementElementType ;
 
 ### Reqvire Semantic Contract Ontology
 
-The Reqvire semantic contract ontology defines semantic-contract and semantic-query-contract elements as first-class requirement-owned semantic refinements.
+The Reqvire semantic contract ontology defines semantic-contract elements as reusable SHACL constraint contracts.
 
-Ontology elements define reusable vocabulary and contain `#### Ontology`. Semantic contracts define SHACL profiles without local `#### Ontology`. Semantic query contracts define declarative graph queries in a generic `#### Query` subsection with one fenced `sparql` block, without local `#### Ontology`, `#### Shapes`, or query-kind classification. The semantic contract element IRI is derived from the Reqvire element id as `urn:reqvire:semantic-contract:<element.id>`. The semantic query contract element IRI is derived from the Reqvire element id as `urn:reqvire:semantic-query-contract:<element.id>`.
+Ontology elements define reusable vocabulary and contain `#### Ontology`. Semantic contracts define SHACL profiles without local `#### Ontology`. The semantic contract element IRI is derived from the Reqvire element id as `urn:reqvire:semantic-contract:<element.id>`.
 
 #### Ontology
 ```turtle
@@ -128,17 +529,14 @@ Ontology elements define reusable vocabulary and contain `#### Ontology`. Semant
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 reqvire:SemanticContract a owl:Class ;
-  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
-  rdfs:comment "Requirement-owned refinement that defines SHACL profiles over reachable ontology terms." .
+  rdfs:subClassOf reqvire:Element ;
+  rdfs:comment "Reusable semantic contract that defines SHACL profiles over ontology terms reached through explicit use relations." .
 reqvire:Ontology a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "First-class ontology element that defines reusable RDF/OWL vocabulary." .
 reqvire:ShapeContract a owl:Class ;
   rdfs:subClassOf reqvire:SemanticContract ;
-  rdfs:comment "Requirement-owned semantic contract that defines SHACL shapes over reachable ontology terms." .
-reqvire:SemanticQueryContract a owl:Class ;
-  rdfs:subClassOf reqvire:RequirementOwnedRefinement ;
-  rdfs:comment "Requirement-owned semantic refinement that carries a graph query contract over reachable semantic model context." .
+  rdfs:comment "Semantic contract that defines SHACL shapes over ontology terms reached through explicit use relations." .
 reqvire:semanticContractIri a owl:DatatypeProperty ;
   rdfs:domain reqvire:SemanticContract ;
   rdfs:range xsd:anyURI ;
@@ -151,32 +549,31 @@ reqvire:ontologyText a owl:DatatypeProperty ;
   rdfs:domain reqvire:Ontology ;
   rdfs:range xsd:string ;
   rdfs:comment "Inline Turtle ontology text carried by an ontology element." .
+reqvire:ontologyBase a owl:DatatypeProperty ;
+  rdfs:domain owl:Ontology ;
+  rdfs:range xsd:anyURI ;
+  rdfs:comment "Canonical ontology document IRI base resolved from the root ontology element metadata." .
+reqvire:ontologyPrefix a owl:DatatypeProperty ;
+  rdfs:domain owl:Ontology ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical CURIE prefix label resolved from the root ontology element metadata." .
+reqvire:termNamespace a owl:DatatypeProperty ;
+  rdfs:domain owl:Ontology ;
+  rdfs:range xsd:anyURI ;
+  rdfs:comment "Hash namespace used for terms contributed to a generated ontology document." .
+reqvire:ontologyElement a owl:ObjectProperty ;
+  rdfs:domain owl:Ontology ;
+  rdfs:range reqvire:Ontology ;
+  rdfs:comment "Reqvire ontology element that contributes authored vocabulary to the generated ontology document." .
 reqvire:shapesText a owl:DatatypeProperty ;
   rdfs:domain reqvire:SemanticContract ;
   rdfs:range xsd:string ;
   rdfs:comment "Inline Turtle SHACL shape text carried by a semantic contract." .
-reqvire:queryContractIri a owl:DatatypeProperty ;
-  rdfs:domain reqvire:SemanticQueryContract ;
-  rdfs:range xsd:anyURI ;
-  rdfs:comment "Stable RDF IRI assigned to a semantic-query-contract element." .
-reqvire:queryLanguage a owl:DatatypeProperty ;
-  rdfs:domain reqvire:SemanticQueryContract ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Query language token declared by the Query subsection fenced code info string, such as sparql." .
-reqvire:queryText a owl:DatatypeProperty ;
-  rdfs:domain reqvire:SemanticQueryContract ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Raw query text carried by a semantic query contract." .
 
-reqvire:semanticContractType a reqvire:RefinementElementType ;
+reqvire:semanticContractType a reqvire:SemanticContractElementType ;
   reqvire:elementTypeName "semantic-contract" ;
-  reqvire:elementTypeCategory "refinement" ;
-  rdfs:comment "Requirement-owned semantic refinement that carries a SHACL shape profile over reachable ontology." ;
-  reqvire:defaultElementType false .
-reqvire:semanticQueryContractType a reqvire:RefinementElementType ;
-  reqvire:elementTypeName "semantic-query-contract" ;
-  reqvire:elementTypeCategory "refinement" ;
-  rdfs:comment "Requirement-owned semantic refinement that carries a declarative query in a Query subsection over reachable semantic model context." ;
+  reqvire:elementTypeCategory "semantic-contract" ;
+  rdfs:comment "Reusable semantic-contract element that carries a SHACL shape profile over explicitly used ontology." ;
   reqvire:defaultElementType false .
 ```
 
@@ -184,5 +581,63 @@ reqvire:semanticQueryContractType a reqvire:RefinementElementType ;
   * type: ontology
 
 #### Relations
-  * derivedFrom: [Reqvire Requirement Ontology](CapabilityRequirementModel.md#reqvire-requirement-ontology)
+  * derivedFrom: [Reqvire Requirement Ontology](#reqvire-requirement-ontology)
 ---
+
+### Semantic Contract Structure Shape
+
+Defines SHACL constraints for semantic-contract identity, profile kind, shape content, constrained requirements, and explicit ontology use.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:SemanticContractShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:SemanticContract ;
+  sh:property [
+    sh:path reqvire:semanticContractIri ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:anyURI ;
+  ] ;
+  sh:property [
+    sh:path reqvire:semanticContractKind ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("semantic-contract") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:ontologyText ;
+    sh:maxCount 0 ;
+  ] ;
+  sh:property [
+    sh:path reqvire:shapesText ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:constrain ;
+    sh:minCount 1 ;
+    sh:class reqvire:Requirement ;
+  ] ;
+  sh:property [
+    sh:path reqvire:use ;
+    sh:minCount 1 ;
+    sh:class reqvire:Ontology ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Ontology and Semantic Contract Model](../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * use: [Reqvire Semantic Contract Ontology](#reqvire-semantic-contract-ontology)
+  * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
+---
+

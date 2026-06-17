@@ -27,7 +27,7 @@ SUMMARY=$(echo "$OUTPUT" | jq '{
   ontology_name: (.files | to_entries[] | .value.elements[] | select(.name == "API Ontology") | .name),
   ontology_iri: (.files | to_entries[] | .value.elements[] | select(.name == "API Ontology") | .ontology.iri),
   ontology_language: (.files | to_entries[] | .value.elements[] | select(.name == "API Ontology") | .ontology.ontology.language),
-  ontology_contains_class: (.files | to_entries[] | .value.elements[] | select(.name == "API Ontology") | .ontology.ontology.content | contains("api:ServiceEndpoint")),
+  ontology_contains_class: (.files | to_entries[] | .value.elements[] | select(.name == "API Ontology") | .ontology.ontology.content | contains("testonto:ServiceEndpoint")),
   ontology_has_line_number: (.files | to_entries[] | .value.elements[] | select(.name == "API Ontology") | .ontology.ontology.line_number > 0),
   semantic_contract_name: (.files | to_entries[] | .value.elements[] | select(.name == "API Endpoint Shape Contract") | .name),
   semantic_contract_iri: (.files | to_entries[] | .value.elements[] | select(.name == "API Endpoint Shape Contract") | .semantic_contract.iri),

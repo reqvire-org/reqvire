@@ -56,11 +56,11 @@ export default function SemanticModel() {
             },
             {
               name: "Refinement ownership",
-              desc: "A refinement is owned by exactly one compatible requirement through refine or refinedBy. Requirement-owned refinements carry detailed contracts, not governance metadata.",
+              desc: "A non-semantic-contract refinement is owned by exactly one compatible requirement through refine or refinedBy. Semantic contracts constrain requirements through constrain and constrainedBy.",
             },
             {
               name: "Cross-boundary reuse",
-              desc: "Cross-capability semantic dependencies stay explicit through attachments so context, review impact, and AI collection remain auditable.",
+              desc: "Cross-capability semantic dependencies stay explicit through attachments and semantic-contract use relations so context, review impact, and AI collection remain auditable.",
             },
           ]}
         />
@@ -90,8 +90,8 @@ export default function SemanticModel() {
             </h4>
             <p className="text-sm text-zinc-600">
               Requirements attach reusable requirement-owned contracts such as
-              semantic contracts, semantic query contracts, specifications,
-              constraints, behaviors, states, and input/output definitions. The
+              semantic contracts, specifications, constraints, behaviors,
+              states, and input/output definitions. The
               attaching requirement declares that its subgraph must fulfill the
               attached contract across that requirement, its child requirements,
               and the refinements that detail those obligations.
@@ -142,7 +142,7 @@ export default function SemanticModel() {
             },
             {
               name: "Refinement",
-              desc: "Adds specification, constraint, behavior, state, input/output, and semantic-contract detail to obligations.",
+              desc: "Adds source, specification, constraint, behavior, state, and input/output detail to obligations.",
             },
             {
               name: "Verification",
@@ -163,9 +163,9 @@ export default function SemanticModel() {
       <Section title="Ontology Contracts">
         <p className="text-zinc-600 mb-4">
           Ontology and semantic contracts are separate layers of meaning.
-          Ontology defines reusable vocabulary. Requirement-owned contracts use
-          reachable ontology context to make obligations precise and
-          machine-checkable.
+          Ontology defines reusable vocabulary. Semantic contracts explicitly
+          use ontology and constrain requirements to make obligations precise
+          and machine-checkable.
         </p>
         <p className="text-zinc-600 mb-4">
           For ontology authoring rules, examples, validation, and export
@@ -187,11 +187,7 @@ export default function SemanticModel() {
             },
             {
               name: "Semantic Contract",
-              desc: "Use semantic-contract for a requirement-owned SHACL profile over reachable ontology. It requires Shapes and must not contain Ontology.",
-            },
-            {
-              name: "Semantic Query Contract",
-              desc: "Use semantic-query-contract for a requirement-owned SPARQL query contract. It requires one Query section with one fenced sparql block.",
+              desc: "Use semantic-contract for a reusable SHACL profile that constrains requirements and explicitly uses ontology. It requires Shapes and must not contain Ontology.",
             },
           ]}
         />

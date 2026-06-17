@@ -148,7 +148,7 @@ if [ $EXIT_CODE_CAPABILITY_REFINEMENTS -eq 0 ]; then
   exit 1
 fi
 
-if ! echo "$OUTPUT_CAPABILITY_REFINEMENTS" | grep -qi "requirement-owned only"; then
+if ! echo "$OUTPUT_CAPABILITY_REFINEMENTS" | grep -qi "refinedBy.*should connect a requirement\\|refine.*should connect.*to a requirement"; then
   echo "FAILED: Expected error message about capability-owned refinement restrictions"
   echo "Output: $OUTPUT_CAPABILITY_REFINEMENTS"
   exit 1

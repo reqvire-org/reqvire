@@ -481,6 +481,23 @@ pub fn normalize_identifier(identifier: &str, base_path: &Path) -> Result<String
     Ok(final_result)
 }
 
+/// Normalizes a relation identifier using the source file as context.
+///
+/// Fragment-only targets are resolved relative to the source file path.
+/// All other identifiers are normalized through the shared path normalization
+/// flow so relation handling stays consistent across CRUD and graph rewrite code.
+pub fn normalize_relation_identifier_for_registry(
+    source_file_path: &str,
+    target_id: &str,
+) -> String {
+    if target_id.starts_with('#') {
+        return format!("{}{}", source_file_path, target_id);
+    }
+
+    let source_folder = get_parent_dir(source_file_path);
+    normalize_identifier(target_id, &source_folder).unwrap_or_else(|_| target_id.to_string())
+}
+
 pub fn to_relative_identifier(
     identifier: &str,
     base_path: &PathBuf,

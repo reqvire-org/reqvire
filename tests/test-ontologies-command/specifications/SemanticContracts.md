@@ -20,66 +20,73 @@ API vocabulary.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+<https://example.test/ontology> a owl:Ontology ;
+  owl:imports <https://example.test/imported> ;
+  owl:imports <https://example.test/imported> ;
+  rdfs:label "Test ontology" .
+
 # Classes
-api:ServiceEndpoint a owl:Class .
-api:Request a owl:Class .
-api:Response a owl:Class .
-api:ServiceEndpointAlias a owl:Class ;
-  owl:equivalentClass api:ServiceEndpoint .
-api:VerifiedEndpoint a owl:Class ;
+testonto:ServiceEndpoint a owl:Class .
+testonto:Request a owl:Class .
+testonto:Response a owl:Class .
+testonto:ServiceEndpointAlias a owl:Class ;
+  owl:equivalentClass testonto:ServiceEndpoint .
+testonto:VerifiedEndpoint a owl:Class ;
   rdfs:subClassOf [
     a owl:Restriction ;
-    owl:onProperty api:produces ;
-    owl:someValuesFrom api:Response
+    owl:onProperty testonto:produces ;
+    owl:someValuesFrom testonto:Response
   ] .
 
 # Individuals
-api:ProductionEndpoint a owl:NamedIndividual ;
-  owl:sameAs api:PrimaryEndpoint .
-api:PrimaryEndpoint a owl:NamedIndividual .
-api:SecondaryEndpoint a api:ServiceEndpoint ;
-  api:identifier "secondary" .
+testonto:ProductionEndpoint a owl:NamedIndividual ;
+  owl:sameAs testonto:PrimaryEndpoint .
+testonto:PrimaryEndpoint a owl:NamedIndividual .
+testonto:SecondaryEndpoint a testonto:ServiceEndpoint ;
+  testonto:identifier "secondary" .
 
 # Object properties
-api:accepts a owl:ObjectProperty, owl:FunctionalProperty ;
-  rdfs:domain api:ServiceEndpoint ;
-  rdfs:range api:Request .
+testonto:accepts a owl:ObjectProperty, owl:FunctionalProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range testonto:Request .
 
-api:produces a owl:ObjectProperty ;
-  rdfs:domain api:ServiceEndpoint ;
-  rdfs:range api:Response .
+testonto:produces a owl:ObjectProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range testonto:Response .
 
-api:exposes a owl:ObjectProperty, owl:TransitiveProperty ;
-  rdfs:domain api:ServiceEndpoint ;
-  rdfs:range [ a owl:Class ; owl:unionOf ( api:ServiceEndpoint api:ServiceEndpointAlias ) ] ;
-  owl:inverseOf api:isExposedBy ;
-  owl:propertyChainAxiom ( api:accepts api:produces ) .
+testonto:exposes a owl:ObjectProperty, owl:TransitiveProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range [ a owl:Class ; owl:unionOf ( testonto:ServiceEndpoint testonto:ServiceEndpointAlias ) ] ;
+  owl:inverseOf testonto:isExposedBy ;
+  owl:propertyChainAxiom ( testonto:accepts testonto:produces ) .
 
-api:isExposedBy a owl:ObjectProperty, owl:InverseFunctionalProperty ;
-  rdfs:domain api:ServiceEndpoint ;
-  rdfs:range api:ServiceEndpoint .
+testonto:isExposedBy a owl:ObjectProperty, owl:InverseFunctionalProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range testonto:ServiceEndpoint .
 
-api:relatedEndpoint a owl:ObjectProperty, owl:SymmetricProperty, owl:ReflexiveProperty ;
-  rdfs:domain api:ServiceEndpoint ;
-  rdfs:range api:ServiceEndpoint .
+testonto:relatedEndpoint a owl:ObjectProperty, owl:SymmetricProperty, owl:ReflexiveProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
+  rdfs:range testonto:ServiceEndpoint .
 
 # Datatype properties
-api:identifier a owl:DatatypeProperty ;
-  rdfs:domain api:ServiceEndpoint ;
+testonto:identifier a owl:DatatypeProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
   rdfs:range xsd:string .
 
-api:endpointName a owl:DatatypeProperty ;
-  rdfs:domain api:ServiceEndpoint ;
+testonto:endpointName a owl:DatatypeProperty ;
+  rdfs:domain testonto:ServiceEndpoint ;
   rdfs:range xsd:string ;
-  owl:equivalentProperty api:identifier .
+  owl:equivalentProperty testonto:identifier .
 ```
 ---
 
@@ -92,8 +99,7 @@ The system shall expose service endpoint contracts.
 
 #### Relations
   * specify: [API Capability](#api-capability)
-  * refinedBy: [API Endpoint Shape Contract](#api-endpoint-shape-contract)
-  * refinedBy: [API Projection Query Sentinel](#api-projection-query-sentinel)
+  * constrainedBy: [API Endpoint Shape Contract](#api-endpoint-shape-contract)
 ---
 
 ### API Endpoint Shape Contract
@@ -104,40 +110,22 @@ API endpoint shape contract.
   * type: semantic-contract
 
 #### Relations
-  * refine: [API Endpoint Requirement](#api-endpoint-requirement)
+  * constrain: [API Endpoint Requirement](#api-endpoint-requirement)
+  * use: [API Ontology](#api-ontology)
 
 #### Shapes
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-api:ServiceEndpointShape
+testonto:ServiceEndpointShape
   a sh:NodeShape ;
-  sh:targetClass api:ServiceEndpoint ;
+  sh:targetClass testonto:ServiceEndpoint ;
   sh:property [
-    sh:path api:identifier ;
+    sh:path testonto:identifier ;
     sh:datatype xsd:string ;
     sh:minCount 1 ;
   ] .
-```
----
-
-### API Projection Query Sentinel
-
-Semantic query sentinel for ontology export exclusion checks.
-
-#### Metadata
-  * type: semantic-query-contract
-
-#### Relations
-  * refine: [API Endpoint Requirement](#api-endpoint-requirement)
-
-#### Query
-```sparql
-SELECT ?marker
-WHERE {
-  BIND("REQVIRE_ONTOLOGY_EXPORT_RAW_QUERY_SENTINEL" AS ?marker)
-}
 ```
 ---

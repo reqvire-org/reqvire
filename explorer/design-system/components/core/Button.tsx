@@ -3,7 +3,7 @@ import { css, cx } from "@linaria/atomic";
 import type { ButtonSize, ButtonTone } from "./button_contract";
 import { BUTTON_SIZE_CLASSES, BUTTON_TONE_CLASSES } from "./button_contract";
 
-export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
   children?: ReactNode;
   tone?: ButtonTone;
   size?: ButtonSize;
@@ -130,7 +130,7 @@ const dangerSkinX = css`
   color: var(--slate-0);
 
   &:hover {
-    filter: brightness(0.94);
+    filter: var(--filter-danger-hover);
   }
 `;
 
@@ -198,21 +198,21 @@ export function Button({
     <button
       type={type}
       className={cx(
-        "rq-btn",
+        "ds-btn",
         baseUX,
         toneSkinX[tone],
         BUTTON_TONE_CLASSES[tone],
         sizeUX[size],
         BUTTON_SIZE_CLASSES[size],
         block ? blockUX : "",
-        block ? "rq-btn--block" : "",
+        block ? "ds-btn--block" : "",
         className,
       )}
       {...props}
     >
-      {iconLeft ? <span className={cx("rq-btn__icon", iconUX)}>{iconLeft}</span> : null}
-      {children ? <span className="rq-btn__label">{children}</span> : null}
-      {iconRight ? <span className={cx("rq-btn__icon", iconUX)}>{iconRight}</span> : null}
+      {iconLeft ? <span className={cx("ds-btn__icon", iconUX)}>{iconLeft}</span> : null}
+      {children ? <span className="ds-btn__label">{children}</span> : null}
+      {iconRight ? <span className={cx("ds-btn__icon", iconUX)}>{iconRight}</span> : null}
     </button>
   );
 }

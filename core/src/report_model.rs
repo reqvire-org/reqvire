@@ -163,25 +163,9 @@ fn build_model_report(
             // For reverse, filter leaf elements by type
             registry.find_leaf_elements(Some(types.as_slice()))
         } else {
-            // For forward, filter root elements by type
-            // First get all elements of the types, then filter to those that are roots
-            let type_elements = registry.find_elements_by_type(types.as_slice());
-            let hierarchical_relations = relation::get_hierarchical_relation_types();
-
-            type_elements
-                .into_iter()
-                .filter(|id| {
-                    if let Some(element) = registry.get_element(id) {
-                        // Check if has any hierarchical parent relation
-                        let has_parent = element
-                            .relations
-                            .iter()
-                            .any(|r| hierarchical_relations.contains(&r.relation_type.name));
-                        !has_parent
-                    } else {
-                        false
-                    }
-                })
+            types
+                .iter()
+                .flat_map(|element_type| registry.find_root_elements_by_type(element_type))
                 .collect()
         }
     } else if reverse {
@@ -230,32 +214,13 @@ fn build_model_report(
 }
 
 fn find_default_model_roots(registry: &GraphRegistry) -> Vec<String> {
-    let mut roots = find_root_elements_of_type(registry, "ontology");
+    let mut roots = registry.find_root_elements_by_type("ontology");
     let mut seen: HashSet<String> = roots.iter().cloned().collect();
     for capability_id in registry.find_root_capabilities() {
         if seen.insert(capability_id.clone()) {
             roots.push(capability_id);
         }
     }
-    roots
-}
-
-fn find_root_elements_of_type(registry: &GraphRegistry, element_type: &str) -> Vec<String> {
-    let hierarchical_relations = relation::get_hierarchical_relation_types();
-    let mut roots: Vec<String> = registry
-        .nodes
-        .values()
-        .map(|node| &node.element)
-        .filter(|element| element.element_type.as_str() == element_type)
-        .filter(|element| {
-            !element
-                .relations
-                .iter()
-                .any(|r| hierarchical_relations.contains(&r.relation_type.name))
-        })
-        .map(|element| element.identifier.clone())
-        .collect();
-    roots.sort();
     roots
 }
 

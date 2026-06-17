@@ -20,16 +20,19 @@ Billing ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Ontology
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-billing:CorrectiveInvoice a owl:Class .
-billing:CorrectedInvoiceRef a owl:Class .
-billing:correctedInvoiceRef a owl:ObjectProperty .
-billing:status a owl:DatatypeProperty .
+<https://example.test/ontology> a owl:Ontology .
+test:CorrectiveInvoice a owl:Class .
+test:CorrectedInvoiceRef a owl:Class .
+test:correctedInvoiceRef a owl:ObjectProperty .
+test:status a owl:DatatypeProperty .
 ```
 
 ---
@@ -43,7 +46,7 @@ The system shall validate billing payloads against the billing shape contract.
 
 #### Relations
   * specify: [Billing Capability](#billing-capability)
-  * refinedBy: [Billing Shape Contract](#billing-shape-contract)
+  * constrainedBy: [Billing Shape Contract](#billing-shape-contract)
 ---
 
 ### Billing Shape Contract
@@ -54,18 +57,19 @@ Billing shape contract.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Billing Ontology](#billing-ontology)
 
 #### Shapes
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-billing:CorrectiveInvoiceShape
+test:CorrectiveInvoiceShape
   a sh:NodeShape ;
-  sh:targetClass billing:CorrectiveInvoice ;
+  sh:targetClass test:CorrectiveInvoice ;
   sh:property [
     sh:path rdfs:label ;
     sh:minCount 1 ;
@@ -77,13 +81,13 @@ billing:CorrectiveInvoiceShape
     sh:datatype xsd:string ;
   ] ;
   sh:property [
-    sh:path billing:correctedInvoiceRef ;
+    sh:path test:correctedInvoiceRef ;
     sh:minCount 1 ;
     sh:maxCount 1 ;
-    sh:class billing:CorrectedInvoiceRef ;
+    sh:class test:CorrectedInvoiceRef ;
   ] ;
   sh:property [
-    sh:path billing:status ;
+    sh:path test:status ;
     sh:datatype xsd:string ;
     sh:in ("draft" "issued" "corrected") ;
   ] .

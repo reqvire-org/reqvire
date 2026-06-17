@@ -2,32 +2,32 @@ import type { HTMLAttributes, ReactNode } from "react";
 import { css, cx } from "@linaria/atomic";
 
 const baseUX = css`
-  display: var(--rq-stat-display, inline-flex);
-  min-width: var(--rq-stat-min-w);
+  display: var(--ds-stat-display, inline-flex);
+  min-width: var(--ds-stat-min-w);
   align-items: baseline;
-  justify-content: var(--rq-stat-jc);
+  justify-content: var(--ds-stat-jc);
   gap: var(--space-3);
 
-  &.rq-stat--stacked {
+  &.ds-stat--stacked {
     flex-direction: column;
-    gap: 0;
+    gap: var(--gap-list-stack);
   }
 `;
 
 const skinX = css`
-  .rq-stat__label {
+  .ds-stat__label {
     color: var(--text-muted);
     font-size: var(--text-caption);
   }
 
-  .rq-stat__value {
+  .ds-stat__value {
     color: var(--text-strong);
     font-size: var(--text-caption);
     font-variant-numeric: tabular-nums;
     font-weight: var(--weight-semibold);
   }
 
-  &.rq-stat--stacked .rq-stat__value {
+  &.ds-stat--stacked .ds-stat__value {
     font-size: var(--text-2xl);
     font-weight: var(--weight-semibold);
     line-height: 1.1;
@@ -41,7 +41,7 @@ const baseUXRow = css`
   gap: var(--space-3) var(--space-8);
 `;
 
-export type StatProps = HTMLAttributes<HTMLSpanElement> & {
+export type StatProps = Omit<HTMLAttributes<HTMLSpanElement>, "style"> & {
   label: ReactNode;
   value: ReactNode;
   stacked?: boolean;
@@ -55,23 +55,23 @@ export function Stat({
   ...props
 }: StatProps) {
   return (
-    <span className={cx("rq-stat", baseUX, skinX, stacked ? "rq-stat--stacked" : undefined, className)} {...props}>
+    <span className={cx("ds-stat", baseUX, skinX, stacked ? "ds-stat--stacked" : undefined, className)} {...props}>
       {stacked ? (
         <>
-          <span className="rq-stat__value">{value}</span>
-          <span className="rq-stat__label">{label}</span>
+          <span className="ds-stat__value">{value}</span>
+          <span className="ds-stat__label">{label}</span>
         </>
       ) : (
         <>
-          <span className="rq-stat__label">{label}</span>
-          <span className="rq-stat__value">{value}</span>
+          <span className="ds-stat__label">{label}</span>
+          <span className="ds-stat__value">{value}</span>
         </>
       )}
     </span>
   );
 }
 
-export type StatRowProps = HTMLAttributes<HTMLDivElement> & { children: ReactNode };
+export type StatRowProps = Omit<HTMLAttributes<HTMLDivElement>, "style"> & { children: ReactNode };
 
 export function StatRow({
   children,
@@ -79,7 +79,7 @@ export function StatRow({
   ...props
 }: StatRowProps) {
   return (
-    <div className={cx("rq-statrow", baseUXRow, className)} {...props}>
+    <div className={cx("ds-statrow", baseUXRow, className)} {...props}>
       {children}
     </div>
   );

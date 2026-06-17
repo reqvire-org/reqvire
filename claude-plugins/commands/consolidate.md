@@ -282,7 +282,7 @@ Support `--from-folder` option that specifies relative path for portable links:
   * type: requirement
 
 #### Relations
-  * derivedFrom: [Verification Trace Builder](../Capabilities.md#verification-trace-builder)
+  * derivedFrom: [Verification Trace Builder](../Capabilities/Verification/Traceability/VerificationTracesRequirements.md#verification-trace-builder)
   * satisfiedBy: [cli.rs](../../cli/src/cli.rs)
 ---
 EOF

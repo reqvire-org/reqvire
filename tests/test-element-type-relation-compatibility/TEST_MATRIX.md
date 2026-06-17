@@ -85,7 +85,7 @@ Based on the Element Type Relation Compatibility specification, the following te
 | refinement | requirement-owned refinement | ❌ FAIL | invalid-refinement-attachment |
 | test-verification | requirement-owned refinement | ❌ FAIL | invalid-verification-attachment |
 
-## Refinement Type Tests (Only refine Allowed)
+## Ordinary Refinement Type Tests (Only refine Allowed)
 
 ### Valid Refinement Relations
 
@@ -93,13 +93,22 @@ Based on the Element Type Relation Compatibility specification, the following te
 |--------------|----------|-------------|----------|-----------|
 | source | refine | requirement | ✅ PASS | valid-refinement/source-refine-requirement |
 | ontology | derivedFrom | ontology | ✅ PASS | valid-hierarchy/ontology-derived-from-ontology |
-| semantic-contract | refine | requirement | ✅ PASS | valid-refinement/semantic-contract-refine-requirement |
-| semantic-query-contract | refine | requirement | ✅ PASS | valid-refinement/semantic-query-contract-refine-requirement |
 | constraint | refine | requirement | ✅ PASS | valid-refinement/constraint-refine-requirement |
 | behavior | refine | requirement | ✅ PASS | valid-refinement/behavior-refine-requirement |
 | specification | refine | requirement | ✅ PASS | valid-refinement/specification-refine-requirement |
 | state | refine | requirement | ✅ PASS | valid-refinement/state-refine-requirement |
 | input-output | refine | requirement | ✅ PASS | valid-refinement/input-output-refine-requirement |
+
+## Semantic Contract Relation Tests
+
+| Source Type | Relation | Target Type | Expected | Test Case |
+|-------------|----------|-------------|----------|-----------|
+| requirement | constrainedBy | semantic-contract | ✅ PASS | valid-cases/requirement-constrainedby-semantic-contract |
+| semantic-contract | constrain | requirement | ✅ PASS | valid-cases/semantic-contract-constrain-requirement |
+| semantic-contract | use | ontology | ✅ PASS | valid-cases/semantic-contract-use-ontology |
+| ontology | usedBy | semantic-contract | ✅ PASS | valid-cases/ontology-usedby-semantic-contract |
+| semantic-contract | refine | requirement | ❌ FAIL | invalid-refinement/semantic-contract-refine-requirement |
+| requirement | refinedBy | semantic-contract | ❌ FAIL | invalid-refinement/requirement-refinedby-semantic-contract |
 
 ### Invalid Refinement Relations
 
@@ -112,6 +121,7 @@ Based on the Element Type Relation Compatibility specification, the following te
 | specification | derivedFrom | ❌ FAIL | invalid-refinement/specification-derivedfrom |
 | specification | trace | ❌ FAIL | invalid-refinement/specification-trace |
 | source | refine capability | ❌ FAIL | invalid-capability-refinements/source-refine-capability |
+| semantic-contract | refine requirement | ❌ FAIL | invalid-refinement/semantic-contract-refine-requirement |
 | constraint | refine capability | ❌ FAIL | invalid-capability-refinements/constraint-refine-capability |
 | behavior | refine capability | ❌ FAIL | invalid-capability-refinements/behavior-refine-capability |
 | specification | refine capability | ❌ FAIL | invalid-capability-refinements/specification-refine-capability |

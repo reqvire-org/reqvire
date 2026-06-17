@@ -153,14 +153,14 @@ Do not use capability attachments as a substitute for ontology hierarchy.
 When refactoring ontology terms:
 
 - update `sh:targetClass`, `sh:path`, and `sh:class` references
-- keep referenced terms reachable from the semantic-contract owner through capability ontology context
+- keep referenced terms reachable through the semantic contract's explicit ontology `use` graph
 - keep built-in annotation paths such as `rdfs:label` and `rdfs:comment` only when annotation validation is the intended contract
 
 ## Common Refactors
 
 ### Move Validation Out of OWL
 
-If an ontology block contains operational validation language or SHACL-like constraints, move that behavior to a requirement-owned `semantic-contract`.
+If an ontology block contains operational validation language or SHACL-like constraints, move that behavior to a `semantic-contract` that explicitly uses ontology and constrains the governed requirements.
 
 Keep in OWL:
 

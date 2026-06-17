@@ -1,20 +1,16 @@
 import { useState } from "react";
 import { Icon, Tabs } from "@ds";
-import { CorePage } from "./pages/CorePage";
-import { ControlsPage } from "./pages/ControlsPage";
-import { DataPage } from "./pages/DataPage";
+import { ComponentsPage } from "./pages/ComponentsPage";
 import { MocksPage } from "./pages/MocksPage";
-import { NavigationPage } from "./pages/NavigationPage";
+import { ProductPatternsPage } from "./pages/ProductPatternsPage";
 import { TokensPage } from "./pages/TokensPage";
 
-type Tab = "tokens" | "core" | "data" | "controls" | "navigation" | "mocks";
+type Tab = "tokens" | "components" | "patterns" | "mocks";
 
 const TABS = [
   { value: "tokens" as Tab, label: "Tokens", icon: <Icon name="layers" size={14} /> },
-  { value: "core" as Tab, label: "Core", icon: <Icon name="box" size={14} /> },
-  { value: "data" as Tab, label: "Data", icon: <Icon name="database" size={14} /> },
-  { value: "controls" as Tab, label: "Controls", icon: <Icon name="sliders" size={14} /> },
-  { value: "navigation" as Tab, label: "Navigation", icon: <Icon name="git-branch" size={14} /> },
+  { value: "components" as Tab, label: "Components", icon: <Icon name="box" size={14} /> },
+  { value: "patterns" as Tab, label: "Patterns", icon: <Icon name="layout-grid" size={14} /> },
   { value: "mocks" as Tab, label: "Mocks", icon: <Icon name="grid" size={14} /> },
 ];
 
@@ -23,20 +19,18 @@ export function ShowcaseApp() {
   const isMocks = tab === "mocks";
 
   return (
-    <div className="sc-app">
-      <div className="sc-topbar">
-        <div className="sc-topbar__brand">
-          <span className="sc-topbar__brand-mark">RQ</span>
+    <div className="showcase-app">
+      <div className="showcase-topbar">
+        <div className="showcase-topbar__brand">
+          <span className="showcase-topbar__brand-mark">RQ</span>
           Design System
         </div>
         <Tabs items={TABS} value={tab} onChange={setTab} />
       </div>
-      <div className={isMocks ? "sc-body sc-body--full" : "sc-body"}>
+      <div className={isMocks ? "showcase-body showcase-body--full" : "showcase-body"}>
         {tab === "tokens" && <TokensPage />}
-        {tab === "core" && <CorePage />}
-        {tab === "data" && <DataPage />}
-        {tab === "controls" && <ControlsPage />}
-        {tab === "navigation" && <NavigationPage />}
+        {tab === "components" && <ComponentsPage />}
+        {tab === "patterns" && <ProductPatternsPage />}
         {tab === "mocks" && <MocksPage />}
       </div>
     </div>

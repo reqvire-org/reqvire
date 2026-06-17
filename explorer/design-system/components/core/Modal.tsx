@@ -22,7 +22,8 @@ const ModalContext = createContext<ModalContextValue | null>(null);
 const ModalContentContext = createContext<ModalContextValue | null>(null);
 
 const overlayBaseUX = css`
-  --rq-modal-overlay-backdrop-filter: blur(1.5px);
+  --ds-modal-overlay-backdrop-filter: var(--filter-scrim-blur);
+  --ds-modal-overlay-bg: var(--bg-scrim);
   position: fixed;
   inset: 0;
   z-index: var(--z-modal);
@@ -32,14 +33,14 @@ const overlayBaseUX = css`
   justify-content: center;
   overflow: auto;
   padding: var(--space-24) var(--space-10);
-  background: color-mix(in srgb, var(--slate-950) 48%, transparent);
-  backdrop-filter: var(--rq-modal-overlay-backdrop-filter);
+  background: var(--ds-modal-overlay-bg);
+  backdrop-filter: var(--ds-modal-overlay-backdrop-filter);
 `;
 
 const baseUX = css`
-  --rq-modal-w: var(--content-max);
+  --ds-modal-w: var(--content-max);
   display: flex;
-  width: min(var(--rq-modal-w), 92vw);
+  width: min(var(--ds-modal-w), 92vw);
   max-height: calc(100vh - 2 * var(--space-24));
   flex-direction: column;
   overflow: hidden;
@@ -136,14 +137,14 @@ export function ModalContent({
   return createPortal(
     <ModalContentContext.Provider value={context}>
       <div
-        className={cx("rq-modal__overlay", overlayBaseUX)}
+        className={cx("ds-modal__overlay", overlayBaseUX)}
         role="presentation"
         onMouseDown={(event) => {
           if (event.target === event.currentTarget) context.onOpenChange?.(false);
         }}
       >
         <div
-          className={cx("rq-modal", baseUX, className)}
+          className={cx("ds-modal", baseUX, className)}
           role="dialog"
           aria-modal="true"
           aria-describedby={ariaDescribedBy}
@@ -164,7 +165,7 @@ export function ModalHeader({
   ...props
 }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
   return (
-    <div className={cx("rq-modal__head", headerBaseUX, className)} {...props}>
+    <div className={cx("ds-modal__head", headerBaseUX, className)} {...props}>
       {children}
     </div>
   );
@@ -176,7 +177,7 @@ export function ModalBody({
   ...props
 }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
   return (
-    <div className={cx("rq-modal__body", bodyBaseUX, className)} {...props}>
+    <div className={cx("ds-modal__body", bodyBaseUX, className)} {...props}>
       {children}
     </div>
   );
@@ -188,7 +189,7 @@ export function ModalFooter({
   ...props
 }: HTMLAttributes<HTMLDivElement> & { children: ReactNode }) {
   return (
-    <div className={cx("rq-modal__foot", footerBaseUX, className)} {...props}>
+    <div className={cx("ds-modal__foot", footerBaseUX, className)} {...props}>
       {children}
     </div>
   );
@@ -200,7 +201,7 @@ export function ModalTitle({
   ...props
 }: HTMLAttributes<HTMLHeadingElement> & { children: ReactNode }) {
   return (
-    <h2 className={cx("rq-modal__title", titleBaseUX, className)} {...props}>
+    <h2 className={cx("ds-modal__title", titleBaseUX, className)} {...props}>
       {children}
     </h2>
   );
@@ -212,7 +213,7 @@ export function ModalDescription({
   ...props
 }: HTMLAttributes<HTMLParagraphElement> & { children: ReactNode }) {
   return (
-    <p className={cx("rq-modal__description", descriptionBaseUX, className)} {...props}>
+    <p className={cx("ds-modal__description", descriptionBaseUX, className)} {...props}>
       {children}
     </p>
   );

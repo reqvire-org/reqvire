@@ -27,7 +27,7 @@ Before applying refactor operations, confirm with the user:
 - Submodel ownership map (who owns which folders/elements)
 - Which cross-submodel dependencies are allowed as attachments
 - Which relation types are forbidden across submodels (`derive`, `derivedFrom`, `refinedBy`, `verifiedBy`)
-- Where shared contracts live (ontology elements for vocabulary, requirement-owned semantic contracts for shape profiles, or other compatible requirement-owned refinement elements)
+- Where shared contracts live (ontology elements for vocabulary, reusable semantic contracts for shape profiles, or other compatible requirement-owned refinement elements)
 
 Do not run bulk unlink/move operations before this confirmation.
 
@@ -70,7 +70,7 @@ A submodel may contain internal sub-boundaries (nested domains) with separate ow
    - Preserve dependency visibility: if a requirement relied on a moved concept, add concept references, a local refinement, or an attachment so `collect` still explains the dependency
 
 4. **Validate semantic completeness**
-   - `reqvire collect "<capability-or-requirement>" --json` must include required capability-attached ontology, specs, and semantic contracts
+   - `reqvire collect "<capability-or-requirement>" --json` must include required capability-attached ontology, attached/refining specs, and explicitly constraining semantic contracts
    - `reqvire change-impact --git-commit="<base>"` must report impacts when attached contracts change
    - Repeat `reqvire lint --json` — target: fewer or no `cross_submodel_hierarchical_relation` findings
 

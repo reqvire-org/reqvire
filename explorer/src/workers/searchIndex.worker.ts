@@ -5,7 +5,7 @@ import {
   type ProjectSearchIndex,
 } from "../lib/searchIndex";
 import type { ProjectStoreSearchDocument } from "../store/types";
-import type { SearchKind } from "../components/ExplorerUiState";
+import type { SearchKind } from "../search/searchKinds";
 
 type SearchWorkerRequest =
   | { type: "build"; documents: ProjectSearchDocument[] }

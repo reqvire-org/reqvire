@@ -144,6 +144,7 @@ Ontologies define:
 - semantic meaning
 
 Reqvire supports ontology modeling directly inside the engineering workflow.
+Ontology boundary metadata and Turtle are explicit: a top ontology element declares `ontology_base` and `ontology_prefix`, and its Turtle must agree with the generated ontology IRI and term namespace.
 
 This enables:
 - semantic consistency
@@ -197,6 +198,7 @@ Requirements are first-class semantic graph elements that:
 - derive from capabilities
 - connect to ontology concepts
 - refine into structured engineering contracts
+- can be constrained by reusable semantic contracts
 - trace to implementation artifacts
 - link directly to verification evidence
 - propagate change impact throughout the engineering graph
@@ -218,10 +220,10 @@ This enables:
 Requirements can evolve from lightweight statements into progressively refined engineering semantics through:
 - behavioral refinements
 - state models
-- semantic contracts
 - I/O contracts
 - constraints
 - detailed specifications
+- reusable semantic contracts that explicitly use ontology and constrain requirements
 
 Examples:
 - latency limits
@@ -247,12 +249,13 @@ This transforms requirements from static documentation into living engineering i
 Requirements can be refined into structured engineering contracts such as:
 - behavioral contracts
 - state models
-- semantic contracts
 - input/output contracts
 - constraints
 - detailed specifications
 
 This allows requirements to evolve into precise, machine-readable engineering semantics while remaining Git-native and human-readable.
+
+Semantic contracts are separate reusable SHACL profiles. They use ontology through `use`/`usedBy` relations and constrain requirements through `constrain`/`constrainedBy`; requirements may still exist without ontology or semantic-contract links.
 
 ---
 

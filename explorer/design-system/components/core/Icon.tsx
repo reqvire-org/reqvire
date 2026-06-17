@@ -1,4 +1,4 @@
-import type { CSSProperties, SVGAttributes } from "react";
+import type { SVGAttributes } from "react";
 import { css, cx } from "@linaria/atomic";
 
 const PATHS = {
@@ -52,7 +52,7 @@ const PATHS = {
 export type IconName = keyof typeof PATHS;
 export const ICON_NAMES = Object.keys(PATHS) as IconName[];
 
-export interface IconProps extends SVGAttributes<SVGSVGElement> {
+export interface IconProps extends Omit<SVGAttributes<SVGSVGElement>, "style"> {
   name: IconName;
   size?: number;
   strokeWidth?: number;
@@ -60,29 +60,24 @@ export interface IconProps extends SVGAttributes<SVGSVGElement> {
 
 const baseUX = css`
   display: block;
-  width: var(--rq-icon-size);
-  height: var(--rq-icon-size);
   flex: 0 0 auto;
 `;
 
-export function Icon({ name, size = 18, strokeWidth = 2, className = "", style, ...props }: IconProps) {
+export function Icon({ name, size = 18, strokeWidth = 2, className = "", ...props }: IconProps) {
   const inner = PATHS[name];
-  const iconStyle = {
-    "--rq-icon-size": `${size}px`,
-    ...style,
-  } as CSSProperties;
 
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
       viewBox="0 0 24 24"
+      width={size}
+      height={size}
       fill="none"
       stroke="currentColor"
       strokeWidth={strokeWidth}
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={cx("rq-icon", baseUX, className)}
-      style={iconStyle}
+      className={cx("ds-icon", baseUX, className)}
       aria-hidden="true"
       dangerouslySetInnerHTML={{ __html: inner }}
       {...props}

@@ -1,12 +1,12 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { css, cx } from "@linaria/atomic";
-import { elementRole, roleColorToken } from "../../palette";
+import { ELEMENT_TYPES, elementRole, type ElementType } from "../../palette";
 
 const baseUX = css`
   display: inline-flex;
   align-items: center;
   gap: var(--space-3);
-  height: var(--rq-typebadge-h, calc(var(--space-8) + var(--space-2)));
+  height: var(--ds-typebadge-h, calc(var(--space-8) + var(--space-2)));
   padding: 0 var(--space-5);
   border-radius: var(--radius-sm);
   font-size: var(--text-micro);
@@ -14,11 +14,15 @@ const baseUX = css`
   line-height: 1;
   white-space: nowrap;
 
-  .rq-typebadge__dot {
+  .ds-typebadge__dot {
     flex: none;
-    width: var(--rq-typebadge-dot-size, calc(var(--space-3) + var(--space-1) / 2));
-    height: var(--rq-typebadge-dot-size, calc(var(--space-3) + var(--space-1) / 2));
-    border-radius: var(--rq-typebadge-dot-radius, calc(var(--radius-xs) / 2));
+    width: var(--ds-typebadge-dot-size, calc(var(--space-3) + var(--space-1) / 2));
+    height: var(--ds-typebadge-dot-size, calc(var(--space-3) + var(--space-1) / 2));
+    border-radius: var(--ds-typebadge-dot-radius, calc(var(--radius-xs) / 2));
+  }
+
+  .ds-typebadge__dot--diamond {
+    transform: rotate(45deg) scale(0.8);
   }
 `;
 
@@ -26,17 +30,73 @@ const skinX = css`
   color: var(--text-secondary);
   background: var(--bg-sunken);
 
-  .rq-typebadge__dot {
-    background: var(--rq-typebadge-color);
+  .ds-typebadge__dot {
+    background: var(--ds-typebadge-color);
   }
 
-  &.rq-typebadge--tinted {
-    color: var(--rq-typebadge-ink);
-    background: var(--rq-typebadge-tint);
+  &.ds-typebadge--tinted {
+    color: var(--ds-typebadge-ink);
+    background: var(--ds-typebadge-tint);
   }
 `;
 
-export interface TypeBadgeProps extends HTMLAttributes<HTMLSpanElement> {
+const roleSkinX = css`
+  &[data-element-role="capability"] {
+    --ds-typebadge-color: var(--capability);
+    --ds-typebadge-tint: var(--capability-tint);
+    --ds-typebadge-ink: var(--capability-ink);
+  }
+
+  &[data-element-role="requirement"] {
+    --ds-typebadge-color: var(--requirement);
+    --ds-typebadge-tint: var(--requirement-tint);
+    --ds-typebadge-ink: var(--requirement-ink);
+  }
+
+  &[data-element-role="refinement"],
+  &[data-element-role="source"],
+  &[data-element-role="constraint"],
+  &[data-element-role="behavior"],
+  &[data-element-role="state"],
+  &[data-element-role="input-output"],
+  &[data-element-role="specification"] {
+    --ds-typebadge-color: var(--refinement);
+    --ds-typebadge-tint: var(--refinement-tint);
+    --ds-typebadge-ink: var(--refinement-ink);
+  }
+
+  &[data-element-role="semantic-contract"] {
+    --ds-typebadge-color: var(--semantic-contract);
+    --ds-typebadge-tint: var(--semantic-contract-tint);
+    --ds-typebadge-ink: var(--semantic-contract-ink);
+  }
+
+  &[data-element-role="verification"] {
+    --ds-typebadge-color: var(--verification);
+    --ds-typebadge-tint: var(--verification-tint);
+    --ds-typebadge-ink: var(--verification-ink);
+  }
+
+  &[data-element-role="ontology"] {
+    --ds-typebadge-color: var(--ontology);
+    --ds-typebadge-tint: var(--ontology-tint);
+    --ds-typebadge-ink: var(--ontology-ink);
+  }
+
+  &[data-element-role="resource"] {
+    --ds-typebadge-color: var(--resource);
+    --ds-typebadge-tint: var(--resource-tint);
+    --ds-typebadge-ink: var(--resource-ink);
+  }
+
+  &[data-element-role="other"] {
+    --ds-typebadge-color: var(--other);
+    --ds-typebadge-tint: var(--other-tint);
+    --ds-typebadge-ink: var(--other-ink);
+  }
+`;
+
+export interface TypeBadgeProps extends Omit<HTMLAttributes<HTMLSpanElement>, "style"> {
   type?: string | null;
   family?: string | null;
   children?: ReactNode;
@@ -51,27 +111,20 @@ export function TypeBadge({
   dot = true,
   tinted = false,
   className = "",
-  style,
   ...props
 }: TypeBadgeProps) {
   const role = elementRole(type, family);
-  const color = `var(${roleColorToken(role)})`;
-  const badgeStyle = tinted
-    ? ({
-        "--rq-typebadge-color": color,
-        "--rq-typebadge-tint": `color-mix(in srgb, ${color} 16%, transparent)`,
-        "--rq-typebadge-ink": `color-mix(in srgb, ${color} 78%, var(--text-strong))`,
-        ...style,
-      } as CSSProperties)
-    : ({ "--rq-typebadge-color": color, ...style } as CSSProperties);
+  const normalizedType = (type ?? "").toLowerCase();
+  const explicitType = normalizedType in ELEMENT_TYPES ? ELEMENT_TYPES[normalizedType as ElementType] : null;
+  const markerShape = explicitType?.shape ?? "square";
 
   return (
     <span
-      className={cx("rq-typebadge", baseUX, skinX, tinted ? "rq-typebadge--tinted" : undefined, className)}
-      style={badgeStyle}
+      className={cx("ds-typebadge", baseUX, skinX, roleSkinX, tinted ? "ds-typebadge--tinted" : undefined, className)}
+      data-element-role={role}
       {...props}
     >
-      {dot ? <span className="rq-typebadge__dot" /> : null}
+      {dot ? <span className={cx("ds-typebadge__dot", markerShape === "diamond" ? "ds-typebadge__dot--diamond" : undefined)} /> : null}
       {children ?? type}
     </span>
   );

@@ -1,0 +1,3 @@
+Validation failed with 2 error(s):
+1. Invalid markdown structure: File specifications.md: semantic model element 'specifications.md#root-ontology' at line 18: Element 'Root Ontology' must contain at most one #### Ontology fenced Turtle block.
+2. Invalid markdown structure: File specifications.md: semantic model element 'specifications.md#root-ontology' at line 3: Ontology element 'Root Ontology' must contain exactly one #### Ontology fenced Turtle block.

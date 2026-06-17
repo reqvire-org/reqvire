@@ -2,9 +2,10 @@
  * Style token guard.
  *
  * Enforces tokenized visual policy in app CSS, Linaria CSS-in-TS(X), and
- * reusable DS component CSS. Raw design values are allowed only in source-of-
- * truth token declarations and at-rule conditions. Showcase examples are
- * intentionally excluded from this production guard.
+ * reusable DS component/showcase CSS. Raw design values are allowed only in
+ * source-of-truth token declarations, local component variables, and at-rule
+ * conditions. Showcase examples are scanned too because they are the visual
+ * regression surface for the design system.
  */
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
@@ -15,6 +16,8 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const scanRoots = [
   resolve(root, "src"),
   resolve(root, "design-system/components"),
+  resolve(root, "design-system/product-patterns"),
+  resolve(root, "design-system/showcase"),
 ];
 
 const excludedPathParts = [
@@ -22,7 +25,6 @@ const excludedPathParts = [
   "/dist/",
   "/dist-kit/",
   "/dist-showcase/",
-  "/showcase/",
   ".test.",
   "_ds_bundle.js",
   "_ds_manifest.json",
@@ -36,9 +38,24 @@ const checks = [
     message: "Use a spacing, size, radius, border, or typography token instead of raw px.",
   },
   {
+    kind: "raw-rem",
+    regex: /-?\b\d+(?:\.\d+)?rem\b/g,
+    message: "Use a spacing, size, or component variable instead of raw rem.",
+  },
+  {
     kind: "raw-color",
     regex: /#[0-9a-fA-F]{3,8}\b|\b(?:rgba?|hsla?|hwb|lab|lch|oklab|oklch)\(/g,
     message: "Use a design-system color token instead of a raw color value.",
+  },
+  {
+    kind: "color-mix",
+    regex: /\bcolor-mix\(/g,
+    message: "Define mixed colors in design-system tokens, then consume the semantic token here.",
+  },
+  {
+    kind: "raw-filter-function",
+    regex: /\b(?:blur|brightness|contrast|drop-shadow|grayscale|hue-rotate|invert|saturate|sepia)\(/g,
+    message: "Define visual filter effects in design-system tokens, then consume the semantic token here.",
   },
   {
     kind: "raw-font-family",
@@ -59,6 +76,11 @@ const checks = [
     kind: "raw-easing",
     regex: /\bcubic-bezier\(|(?<=[\s,:])ease(?:-in|-out|-in-out)?\b/g,
     message: "Use an --ease-* token instead of a raw easing.",
+  },
+  {
+    kind: "raw-z-index",
+    regex: /z-index\s*:\s*(?!\s*(?:var\(|auto\b|calc\(\s*var\())[^;]+/gi,
+    message: "Use a --z-* token instead of a raw z-index value.",
   },
 ];
 

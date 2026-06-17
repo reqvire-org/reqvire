@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
-import { ExplorerUiStateProvider } from "../components/ExplorerUiState";
+import { ExplorerUiStateProvider } from "../state/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import type { ExplorerProjectStore } from "../store/types";

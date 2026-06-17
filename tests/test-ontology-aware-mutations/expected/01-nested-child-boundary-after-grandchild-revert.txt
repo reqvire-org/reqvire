@@ -1,0 +1,62 @@
+# Elements
+
+### Root Ontology
+
+Root ontology.
+
+#### Ontology
+```turtle
+@prefix root: <https://example.test/root#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/root> a owl:Ontology .
+root:RootThing a owl:Class .
+```
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/root
+  * ontology_prefix: root
+---
+
+### Child Ontology
+
+Child ontology boundary.
+
+#### Ontology
+```turtle
+@prefix child: <https://example.test/child#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/child> a owl:Ontology ;
+  owl:imports <https://example.test/root> .
+child:ChildThing a owl:Class .
+```
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/child
+  * ontology_prefix: child
+
+#### Relations
+  * derivedFrom: [Root Ontology](#root-ontology)
+---
+
+### Grandchild Ontology
+
+Grandchild ontology contribution again.
+
+#### Ontology
+```turtle
+@prefix child: <https://example.test/child#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+child:GrandchildThing a owl:Class .
+```
+
+#### Metadata
+  * type: ontology
+
+#### Relations
+  * derivedFrom: [Child Ontology](#child-ontology)
+---
+

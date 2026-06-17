@@ -231,7 +231,7 @@ No type metadata - should default to requirement.
   * refinedBy: [Source Refinement](#source-refinement)
   * refinedBy: [State Refinement](#state-refinement)
   * refinedBy: [Input Output Refinement](#input-output-refinement)
-  * refinedBy: [Semantic Contract Refinement](#semantic-contract-refinement)
+  * constrainedBy: [Semantic Contract Refinement](#semantic-contract-refinement)
 
 ### Capability
 
@@ -255,10 +255,12 @@ No type metadata - should default to requirement.
   * type: semantic-contract
 
 #### Relations
-  * refine: #explicit-requirement
+  * constrain: #explicit-requirement
+  * use: #ontology-element
 
 #### Shapes
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix reqvire: <urn:reqvire:test#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
@@ -271,12 +273,16 @@ reqvire:DefaultTypeShape
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix reqvire: <urn:reqvire:test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
+<https://example.test/ontology> a owl:Ontology .
 reqvire:DefaultTypeContract a owl:Class .
 ```
 

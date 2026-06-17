@@ -1,6 +1,35 @@
 # Elements
 
-# Interfaces
+### MCP Tool Side-Effect Shape
+
+Defines SHACL constraints for MCP tool side-effect class vocabulary tokens.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:McpToolSideEffectClassShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:McpReadOnlyToolClass, reqvire:McpConditionalMutationToolClass, reqvire:McpMutationToolClass ;
+  sh:property [
+    sh:path reqvire:mcpSideEffectClassName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("read_only" "conditional_mutation" "mutation") ;
+    sh:message "MCP side-effect classes must use a supported tool discovery side-effect token." ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [MCP Tool Side Effect Classification](../Interfaces/MCP/Tools.md#mcp-tool-side-effect-classification)
+  * use: [Reqvire Interface Ontology](#reqvire-interface-ontology)
+---
 
 ### Reqvire Interface Ontology
 
@@ -115,3 +144,4 @@ reqvire:mcpMutationSideEffectClass a reqvire:McpMutationToolClass ;
 #### Relations
   * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
 ---
+

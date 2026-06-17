@@ -127,3 +127,47 @@ reqvire:ChangeLogContract a owl:Class ;
 #### Relations
   * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
 ---
+
+### Source Marker Traceability Shape
+
+Defines SHACL constraints for code traceability relation kinds and supported comment style vocabulary.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:TraceabilityRelationKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:TraceabilityRelationKind ;
+  sh:property [
+    sh:path reqvire:traceabilityRelationKindName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("satisfies" "trace") ;
+    sh:message "Traceability relation kinds must use a supported code marker relation token." ;
+  ] .
+
+reqvire:CommentStyleKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:CommentStyleKind ;
+  sh:property [
+    sh:path reqvire:commentStyleName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("hash-line" "slash-line" "dash-line" "batch-line" "css-block" "xml-block") ;
+    sh:message "Comment style kinds must use a supported source marker comment style token." ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Code Traceability](../Integration/CodeAlignment/CodeAlignmentRequirements.md#code-traceability)
+  * use: [Reqvire Code Traceability Ontology](#reqvire-code-traceability-ontology)
+---
+

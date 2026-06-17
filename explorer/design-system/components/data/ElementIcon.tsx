@@ -1,17 +1,20 @@
-import type { CSSProperties, HTMLAttributes } from "react";
+import type { HTMLAttributes } from "react";
 import { css, cx } from "@linaria/atomic";
-import { ELEMENT_TYPES, elementRole, roleColorToken, type ElementIconShape, type ElementType } from "../../palette";
+import { ELEMENT_TYPES, elementRole, type ElementIconShape, type ElementType } from "../../palette";
 
 export type { ElementIconShape, ElementRole, ElementType } from "../../palette";
 export type ElementIconSize = "sm" | "md" | "lg";
 
 const baseUX = css`
+  --ds-elemicon-size: var(--type-icon-md);
+  --ds-elemicon-glyph-fs: calc(var(--ds-elemicon-size) * 0.46);
+  --ds-elemicon-wide-glyph-fs: calc(var(--ds-elemicon-size) * 0.36);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   flex: none;
-  width: var(--type-icon-md);
-  height: var(--type-icon-md);
+  width: var(--ds-elemicon-size);
+  height: var(--ds-elemicon-size);
   border-radius: var(--radius-xs);
 
   svg {
@@ -19,49 +22,46 @@ const baseUX = css`
     height: 60%;
   }
 
-  .rq-elemicon__glyph {
+  .ds-elemicon__glyph {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 100%;
     height: 100%;
     font-family: var(--font-mono);
-    font-size: var(--rq-elemicon-glyph-fs, calc(var(--text-micro) - var(--space-1)));
+    font-size: var(--ds-elemicon-glyph-fs);
     font-weight: var(--weight-bold);
+    letter-spacing: 0;
     line-height: 1;
   }
 
-  &.rq-elemicon--sm {
-    width: var(--type-icon-sm);
-    height: var(--type-icon-sm);
-    border-radius: var(--rq-elemicon-sm-radius, var(--radius-xs));
+  &.ds-elemicon--sm {
+    --ds-elemicon-size: var(--type-icon-sm);
+    border-radius: var(--ds-elemicon-sm-radius, var(--radius-xs));
   }
 
-  &.rq-elemicon--lg {
-    width: var(--type-icon-lg);
-    height: var(--type-icon-lg);
+  &.ds-elemicon--lg {
+    --ds-elemicon-size: var(--type-icon-lg);
     border-radius: var(--radius-sm);
   }
 
-  &.rq-elemicon--sm .rq-elemicon__glyph {
-    font-size: var(--rq-elemicon-sm-glyph-fs, calc(var(--text-micro) - var(--space-2)));
-  }
-
-  &.rq-elemicon--lg .rq-elemicon__glyph {
-    font-size: var(--rq-elemicon-lg-glyph-fs, calc(var(--text-micro) - var(--space-1) / 2));
-  }
-
-  &.rq-elemicon--diamond {
-    border-radius: var(--rq-elemicon-diamond-radius, var(--radius-xs));
+  &.ds-elemicon--diamond {
+    --ds-elemicon-glyph-fs: calc(var(--ds-elemicon-size) * 0.72);
+    --ds-elemicon-wide-glyph-fs: calc(var(--ds-elemicon-size) * 0.54);
+    border-radius: var(--ds-elemicon-diamond-radius, var(--radius-xs));
     transform: rotate(45deg) scale(0.74);
   }
 
-  &.rq-elemicon--diamond svg,
-  &.rq-elemicon--diamond .rq-elemicon__glyph {
+  &.ds-elemicon--diamond svg,
+  &.ds-elemicon--diamond .ds-elemicon__glyph {
     transform: rotate(-45deg);
   }
 
-  &.rq-elemicon--hub .rq-elemicon__pip {
+  &.ds-elemicon--wide-glyph .ds-elemicon__glyph {
+    font-size: var(--ds-elemicon-wide-glyph-fs);
+  }
+
+  &.ds-elemicon--hub .ds-elemicon__pip {
     width: 36%;
     height: 36%;
     border-radius: 50%;
@@ -70,21 +70,38 @@ const baseUX = css`
 
 const skinX = css`
   color: var(--slate-0);
-  background: var(--rq-elemicon-color, var(--other));
-  box-shadow: inset 0 0 0 var(--border-w) color-mix(in srgb, var(--slate-950) 18%, transparent);
+  background: var(--ds-elemicon-color, var(--other));
+  box-shadow: inset 0 0 0 var(--border-w) var(--element-icon-ring);
 
-  .rq-elemicon__glyph {
+  .ds-elemicon__glyph {
     color: var(--text-strong);
   }
 
-  &.rq-elemicon--hub {
+  &.ds-elemicon--hub {
     background: var(--slate-900);
-    box-shadow: inset 0 0 0 var(--border-w) color-mix(in srgb, var(--slate-0) 10%, transparent);
+    box-shadow: inset 0 0 0 var(--border-w) var(--element-icon-ring-inverse);
   }
 
-  &.rq-elemicon--hub .rq-elemicon__pip {
-    background: var(--rq-elemicon-color, var(--capability));
+  &.ds-elemicon--hub .ds-elemicon__pip {
+    background: var(--ds-elemicon-color, var(--capability));
   }
+`;
+
+const roleSkinX = css`
+  &[data-element-role="capability"] { --ds-elemicon-color: var(--capability); }
+  &[data-element-role="requirement"] { --ds-elemicon-color: var(--requirement); }
+  &[data-element-role="refinement"],
+  &[data-element-role="source"],
+  &[data-element-role="constraint"],
+  &[data-element-role="behavior"],
+  &[data-element-role="state"],
+  &[data-element-role="input-output"],
+  &[data-element-role="specification"] { --ds-elemicon-color: var(--refinement); }
+  &[data-element-role="semantic-contract"] { --ds-elemicon-color: var(--semantic-contract); }
+  &[data-element-role="verification"] { --ds-elemicon-color: var(--verification); }
+  &[data-element-role="ontology"] { --ds-elemicon-color: var(--ontology); }
+  &[data-element-role="resource"] { --ds-elemicon-color: var(--resource); }
+  &[data-element-role="other"] { --ds-elemicon-color: var(--other); }
 `;
 
 const DIAMOND_TYPES = new Set([
@@ -94,11 +111,9 @@ const DIAMOND_TYPES = new Set([
   "behavior",
   "state",
   "input-output",
-  "semantic-contract",
-  "semantic-query-contract",
 ]);
 
-export interface ElementIconProps extends HTMLAttributes<HTMLSpanElement> {
+export interface ElementIconProps extends Omit<HTMLAttributes<HTMLSpanElement>, "style"> {
   type?: string | null;
   family?: string | null;
   size?: ElementIconSize;
@@ -112,7 +127,6 @@ export function ElementIcon({
   size = "md",
   className = "",
   title,
-  style,
   shape,
   glyph,
   ...props
@@ -120,25 +134,27 @@ export function ElementIcon({
   const role = elementRole(type, family);
   const normalizedType = (type ?? "").toLowerCase();
   const explicitType = normalizedType in ELEMENT_TYPES ? ELEMENT_TYPES[normalizedType as ElementType] : null;
-  const resolvedShape = shape ?? explicitType?.shape ?? (DIAMOND_TYPES.has(normalizedType) ? "diamond" : role === "capability" ? "hub" : "square");
+  const resolvedShape = shape ?? explicitType?.shape ?? (DIAMOND_TYPES.has(normalizedType) ? "diamond" : "square");
   const resolvedGlyph = glyph ?? explicitType?.glyph ?? null;
   const isDiamond = resolvedShape === "diamond";
   const isCapability = resolvedShape === "hub";
+  const isWideGlyph = Boolean(resolvedGlyph && [...resolvedGlyph].length > 1);
   const classes = cx(
-    "rq-elemicon",
+    "ds-elemicon",
     baseUX,
     skinX,
-    size !== "md" ? `rq-elemicon--${size}` : undefined,
-    isDiamond ? "rq-elemicon--diamond" : undefined,
-    isCapability ? "rq-elemicon--hub" : undefined,
+    roleSkinX,
+    size !== "md" ? `ds-elemicon--${size}` : undefined,
+    isDiamond ? "ds-elemicon--diamond" : undefined,
+    isCapability ? "ds-elemicon--hub" : undefined,
+    isWideGlyph ? "ds-elemicon--wide-glyph" : undefined,
     className,
   );
-  const iconStyle = { "--rq-elemicon-color": `var(${roleColorToken(role)})`, ...style } as CSSProperties;
 
   return (
-    <span className={classes} style={iconStyle} title={title ?? type ?? role} aria-label={type ?? role} {...props}>
-      {isCapability ? <span className="rq-elemicon__pip" /> : null}
-      {!isCapability && resolvedGlyph ? <span className="rq-elemicon__glyph">{resolvedGlyph}</span> : null}
+    <span className={classes} data-element-role={role} title={title ?? type ?? role} aria-label={type ?? role} {...props}>
+      {isCapability ? <span className="ds-elemicon__pip" /> : null}
+      {!isCapability && resolvedGlyph ? <span className="ds-elemicon__glyph">{resolvedGlyph}</span> : null}
     </span>
   );
 }

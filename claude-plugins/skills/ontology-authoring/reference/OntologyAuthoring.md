@@ -9,9 +9,14 @@
 
 The Managed Platform Domain ontology defines the first domain-level vocabulary for a Reqvire-managed system of interest. It starts with reusable classes that can later be specialized into product, engineering, operations, interface, governance, support, billing, or verification concepts.
 
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.org/ontology/managed-platform
+  * ontology_prefix: ex
+
 #### Ontology
 ```turtle
-@prefix ex: <https://example.org/ontology#> .
+@prefix ex: <https://example.org/ontology/managed-platform#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
@@ -38,9 +43,6 @@ ex:LifecycleState a owl:Class ;
   rdfs:subClassOf ex:DomainConcept ;
   rdfs:comment "Named state used to classify readiness, availability, operation, or lifecycle of a modeled thing." .
 ```
-
-#### Metadata
-  * type: ontology
 
 #### Relations
   * derivedFrom: [Parent Ontology](Parent.md#parent-ontology)
@@ -84,6 +86,33 @@ Then specialize the hierarchy for the actual system of interest. For example, a 
 
 For refactoring existing ontology/source material, first inventory the existing leaves bottom-up, identify duplicates and mixed abstractions, then place them under the top-down domain hierarchy. Do not preserve existing structure just because it exists.
 
+## Ontology From Existing Model Content
+
+Ontology work does not have to be first in the systems-engineering process. Reqvire models may start with capabilities, requirements, specifications, behaviors, constraints, input/output refinements, verifications, and evidence. Ontology and semantic contracts can be extracted later from that authored model.
+
+Use this workflow when requirements or refinements exist but ontology coverage is missing, partial, or uneven:
+
+1. Read the capability and requirement subgraph before creating ontology.
+2. Inventory repeated nouns, states, lifecycle labels, role names, relation words, artifact types, interface concepts, payload fields, governed tokens, and validation conditions.
+3. Separate reusable meaning from one-off implementation detail.
+4. Promote stable shared vocabulary into ontology elements when it improves shared meaning, queryability, semantic validation, change impact, or agent retrieval.
+5. Promote repeated closed-world validation rules into semantic-contract SHACL shapes only when machine-checkable constraints add value.
+6. Keep implementation-specific details in requirements, specifications, behaviors, constraints, state, or input/output refinements.
+7. Leave requirements prose-only when formal ontology or SHACL modeling does not add enough value.
+8. Keep verification traceability anchored on requirements.
+
+The target semantic-contract model is:
+
+```text
+Requirement --constrainedBy--> Semantic Contract
+Semantic Contract --constrain--> Requirement
+Semantic Contract --use--> Ontology
+```
+
+In that model, the shape may come before the requirement as the formal rule, and the requirement is the human-facing obligation/interface. The inverse workflow is also valid: write requirements first, then extract ontology and semantic contracts later.
+
+Do not force every requirement into ontology terms or semantic contracts. Ontology and SHACL are semantic enrichment, not mandatory structure.
+
 ## Competency Questions
 
 After the domain frame exists, sketch competency questions: questions an ontology-backed model should be able to answer. Use them to decide scope, detail level, and whether a term belongs in ontology, requirement, or semantic contract.
@@ -112,9 +141,26 @@ Use the answers to identify ontology elements:
 | Literal facts | Datatype properties such as identifier, criticality, protocol, modeName, environmentName |
 | Enumerated project vocabulary | Typed individuals such as lifecycle states, risk levels, interface kinds, verification methods |
 | Closed-world validity | A semantic-contract SHACL shape, not local ontology text |
-| Declarative semantic questions | A requirement-owned semantic-query-contract `#### Query` block, not ontology text or SHACL shapes |
 
 Treat the list as a litmus test. After drafting the ontology, check whether a model using it can answer the competency questions without relying on raw prose only.
+
+## Ontology IRI And Term Namespace
+
+Use a canonical split between root ontology metadata and the term namespace:
+
+```turtle
+@prefix ex: <https://example.org/ontology/managed-platform#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+ex:ManagedResource a owl:Class .
+```
+
+The top parent ontology element defines `ontology_base` metadata, normally as an absolute IRI without a fragment, and `ontology_prefix` metadata, the canonical CURIE label for authored terms. The prefix namespace identifies terms in that ontology and normally uses the ontology base plus `#`. A parser expands `ex:ManagedResource` to `<https://example.org/ontology/managed-platform#ManagedResource>`; it does not infer term existence from the prefix alone. The class exists because the ontology asserts `ex:ManagedResource a owl:Class`. If authored Turtle uses the inherited `ontology_prefix`, it must explicitly declare that prefix to the canonical namespace. Missing or conflicting declarations fail validation.
+
+The root ontology block should declare the document IRI itself, for example `<https://example.org/ontology/managed-platform> a owl:Ontology`. Do not use `ex:ManagedPlatformOntology a owl:Ontology` as the default pattern. That makes the ontology itself look like a named term inside the vocabulary namespace.
+
+When one ontology element depends on another, model the hierarchy with `derivedFrom`. Reqvire emits one generated `owl:Ontology` document declaration per resolved `ontology_base`; ontology elements that inherit the same base contribute vocabulary to that same document. A hierarchy edge becomes `owl:imports` only when the source and target ontology elements resolve to different ontology bases.
 
 ## Class Hierarchy And Slots
 
@@ -437,7 +483,7 @@ Value type describes what kind of value can fill the slot.
 | Enumerated value | One value from a controlled set. | lifecycle state: active, paused, failed, terminated; risk level: low, medium, high, critical |
 | Instance value | Link to an individual of an allowed class. | deployment belongs to an `Environment`; resource owned by an `Actor`; interface exposes a `ManagedResource` |
 
-For datatype properties, express value type with an RDF datatype such as `xsd:string`, `xsd:boolean`, `xsd:integer`, or `xsd:decimal` when appropriate. For object properties, express the allowed class with `rdfs:range` when the range is stable. Use requirement-owned SHACL shapes when a requirement needs closed-world cardinality, datatype, enumeration, numeric range, regex, or allowed-class validation.
+For datatype properties, express value type with an RDF datatype such as `xsd:string`, `xsd:boolean`, `xsd:integer`, or `xsd:decimal` when appropriate. For object properties, express the allowed class with `rdfs:range` when the range is stable. Use semantic-contract SHACL shapes when one or more requirements need closed-world cardinality, datatype, enumeration, numeric range, regex, or allowed-class validation.
 
 ### OWL / SHACL Hybrid Datatype Pattern
 
@@ -456,8 +502,8 @@ Common XSD ranges for OWL datatype properties:
 In Reqvire, keep the split at the element boundary:
 
 - `ontology` elements under `requirements/Ontologies` own `#### Ontology` Turtle blocks with OWL class declarations plus `owl:DatatypeProperty`/`owl:ObjectProperty` declarations and stable `rdfs:domain`/`rdfs:range`.
-- `semantic-contract` refinements own `#### Shapes` Turtle blocks.
-- The SHACL block declares `sh:NodeShape` resources that use `sh:targetClass` and `sh:path` over OWL classes and properties declared by reachable ontology context.
+- `semantic-contract` elements own `#### Shapes` Turtle blocks.
+- The SHACL block declares `sh:NodeShape` resources that use `sh:targetClass` and `sh:path` over OWL classes and properties declared by ontology elements reached through explicit `use` relations.
 - Do not redeclare `ex:Employee a owl:Class` or another OWL class inside the SHACL block just to make a shape parse.
 
 OWL ontology example:
@@ -512,7 +558,8 @@ ex:EmployeeValidationShape a sh:NodeShape ;
   * type: semantic-contract
 
 #### Relations
-  * refine: [Owning Requirement](../Functional/Example.md#owning-requirement)
+  * constrain: [Owning Requirement](../Product/Example/Requirements.md#owning-requirement)
+  * use: [Example Domain Ontology](../Ontologies/Example.md#example-domain-ontology)
 ---
 ~~~
 
@@ -853,7 +900,6 @@ ex:BusinessArtifact owl:disjointWith ex:LifecycleState .
 - Use `derivedFrom` only to relate ontology elements to ontology parents.
 - Keep shared ontology roots independent from capability roots; capabilities consume ontology through `#### Attachments`.
 - Do not put `#### Shapes` in ontology elements.
-- Do not put `#### Ontology` or `#### Shapes` in semantic-query-contract elements.
 
 Capability attachment example:
 
@@ -862,11 +908,11 @@ Capability attachment example:
   * [Example Domain Ontology](../Ontologies/Example.md#example-domain-ontology)
 ```
 
-Requirement prose can bind readable terms with `#### Concept References` when useful, but the referenced IRI must be reachable through the owning capability ontology context.
+Requirement prose can bind readable terms with `#### Concept References` when useful, but the referenced IRI must be reachable through the owning capability ontology context. Markdown concept references should use an absolute term IRI unless the referenced prefix is explicitly declared in reachable ontology Turtle.
 
 ## Semantic Contract Boundary
 
-Use SHACL in `semantic-contract` refinements when a requirement needs closed-world validation rules.
+Use SHACL in `semantic-contract` elements when requirements need closed-world validation rules. Link each semantic contract to ontology with `use` and to governed requirements with `constrain`.
 
 ~~~markdown
 ### Interface Contract Shape
@@ -892,42 +938,8 @@ ex:SystemInterfaceShape
   * type: semantic-contract
 
 #### Relations
-  * refine: [Owning Requirement](../Functional/Example.md#owning-requirement)
----
-~~~
-
-## Semantic Query Contract Boundary
-
-Use `semantic-query-contract` refinements only for requirement-owned declarative graph queries over reachable semantic model context.
-
-Authoring rules:
-- Refine exactly one requirement.
-- Use the generic `#### Query` heading.
-- Include exactly one fenced code block with info string `sparql`.
-- Do not declare a query kind or query-purpose metadata.
-- Do not include `#### Ontology` or `#### Shapes`.
-- Expect search JSON to expose the parsed query contract.
-- Do not expect `reqvire ontologies`, full semantic export, query execution, inference, or persistent RDF store behavior for query contracts until dedicated query support exists.
-
-~~~markdown
-### Requirement Coverage Query
-
-#### Query
-```sparql
-PREFIX reqvire: <https://www.reqvire.org/ontology#>
-
-SELECT ?requirement
-WHERE {
-  ?requirement a reqvire:Requirement .
-  FILTER NOT EXISTS { ?requirement reqvire:verifiedBy ?verification . }
-}
-```
-
-#### Metadata
-  * type: semantic-query-contract
-
-#### Relations
-  * refine: [Owning Requirement](../Functional/Example.md#owning-requirement)
+  * constrain: [Owning Requirement](../Product/Example/Requirements.md#owning-requirement)
+  * use: [Example Domain Ontology](../Ontologies/Example.md#example-domain-ontology)
 ---
 ~~~
 

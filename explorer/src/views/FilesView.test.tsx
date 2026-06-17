@@ -30,8 +30,8 @@ describe("FilesView", () => {
     expect(screen.getByRole("button", { name: "Grid" })).toBeTruthy();
     expect(screen.queryByLabelText("File manager legend")).toBeNull();
     expect(container.querySelector("iframe")).toBeNull();
-    expect(container.querySelector(".ex-left-panel")).toBeNull();
-    expect(container.querySelector(".ex-workspace-toolbar")).toBeNull();
+    expect(container.querySelector('[data-product-pattern="side-pane-frame"]')).toBeNull();
+    expect(container.querySelector('[data-product-pattern="workspace-toolbar"]')).toBeNull();
   });
 
   it("preserves file selection and modeled element detail routing", () => {

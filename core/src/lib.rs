@@ -13,7 +13,6 @@ pub mod format;
 pub mod git_commands;
 pub mod graph_registry;
 pub mod html;
-pub mod index_generator;
 pub mod lint;
 pub mod model;
 pub mod ontology_graph;

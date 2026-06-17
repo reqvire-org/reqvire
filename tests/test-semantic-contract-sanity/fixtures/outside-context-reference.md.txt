@@ -20,13 +20,16 @@ Billing ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Ontology
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-billing:BillingPayload a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+test:BillingPayload a owl:Class .
 ```
 
 ---
@@ -40,7 +43,7 @@ The system shall validate billing payloads.
 
 #### Relations
   * specify: [Billing Capability](#billing-capability)
-  * refinedBy: [Billing Shape Contract](#billing-shape-contract)
+  * constrainedBy: [Billing Shape Contract](#billing-shape-contract)
 ---
 
 ### Billing Shape Contract
@@ -51,19 +54,20 @@ Billing shape contract.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Billing Ontology](#billing-ontology)
 
 #### Shapes
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
-@prefix tax: <urn:reqvire:test:tax:> .
+@prefix test: <https://example.test/ontology#> .
+@prefix test: <https://example.test/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
-billing:BillingPayloadShape
+test:BillingPayloadShape
   a sh:NodeShape ;
-  sh:targetClass billing:BillingPayload ;
+  sh:targetClass test:BillingPayload ;
   sh:property [
-    sh:path tax:VatRate ;
+    sh:path test:VatRate ;
     sh:minCount 1 ;
   ] .
 ```
@@ -86,15 +90,18 @@ Tax ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Relations
   * derivedFrom: [Billing Ontology](#billing-ontology)
 
 #### Ontology
 ```turtle
-@prefix tax: <urn:reqvire:test:tax:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-tax:VatRate a owl:DatatypeProperty .
+<https://example.test/ontology> a owl:Ontology .
+test:VatRate a owl:DatatypeProperty .
 ```
 ---

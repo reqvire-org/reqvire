@@ -19,7 +19,7 @@ const itemBaseUX = css`
   display: inline-flex;
   align-items: center;
   gap: var(--space-4);
-  height: var(--rq-segmented-item-h, calc(var(--control-xs) + var(--space-2)));
+  height: var(--ds-segmented-item-h, calc(var(--control-xs) + var(--space-2)));
   padding: 0 var(--space-7);
   border: 0;
   border-radius: var(--radius-sm);
@@ -32,7 +32,7 @@ const itemBaseUX = css`
     color var(--dur-fast),
     box-shadow var(--dur-fast);
 
-  .rq-segmented__icon {
+  .ds-segmented__icon {
     display: inline-flex;
   }
 
@@ -45,16 +45,16 @@ const itemBaseUX = css`
 const skinX = css`
   background: var(--bg-sunken);
 
-  .rq-segmented__item {
+  .ds-segmented__item {
     color: var(--text-secondary);
     background: transparent;
   }
 
-  .rq-segmented__item:hover {
+  .ds-segmented__item:hover {
     color: var(--text-strong);
   }
 
-  .rq-segmented__item.is-active {
+  .ds-segmented__item.is-active {
     color: var(--text-inverse);
     background: var(--text-strong);
     box-shadow: var(--shadow-xs);
@@ -83,7 +83,7 @@ export function SegmentedControl<T extends string>({
   ariaLabel,
 }: SegmentedControlProps<T>) {
   return (
-    <div className={cx("rq-segmented", baseUX, skinX, className)} role="group" aria-label={ariaLabel}>
+    <div className={cx("ds-segmented", baseUX, skinX, className)} role="group" aria-label={ariaLabel}>
       {items.map((item) => {
         const active = item.value === value;
         return (
@@ -91,10 +91,10 @@ export function SegmentedControl<T extends string>({
             key={item.value}
             type="button"
             aria-pressed={active}
-            className={cx("rq-segmented__item", itemBaseUX, active && "is-active")}
+            className={cx("ds-segmented__item", itemBaseUX, active && "is-active")}
             onClick={() => onChange(item.value)}
           >
-            {item.icon ? <span className="rq-segmented__icon">{item.icon}</span> : null}
+            {item.icon ? <span className="ds-segmented__icon">{item.icon}</span> : null}
             {item.label ? <span>{item.label}</span> : null}
           </button>
         );

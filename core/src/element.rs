@@ -40,8 +40,7 @@ pub const ELEMENT_TYPES: &[&str] = &[
     "inspection-verification",    // VerificationType::Inspection
     "demonstration-verification", // VerificationType::Demonstration
     "source",                     // RefinementType::Source
-    "semantic-contract",          // RefinementType::SemanticContract
-    "semantic-query-contract",    // RefinementType::SemanticQueryContract
+    "semantic-contract",          // ElementType::SemanticContract
     "constraint",                 // RefinementType::Constraint
     "behavior",                   // RefinementType::Behavior
     "specification",              // RefinementType::Specification
@@ -146,13 +145,6 @@ pub struct SemanticContract {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
-pub struct SemanticQueryContract {
-    pub iri: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub query: Option<FencedBlock>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub struct Ontology {
     pub iri: String,
     pub ontology: Option<FencedBlock>,
@@ -246,8 +238,6 @@ pub enum VerificationType {
 #[derive(Debug, Clone, PartialEq, Eq, Serialize)]
 pub enum RefinementType {
     Source,
-    SemanticContract,
-    SemanticQueryContract,
     Constraint,
     Behavior,
     Specification,
@@ -260,6 +250,7 @@ pub enum ElementType {
     Capability,
     Requirement(RequirementType),
     Ontology,
+    SemanticContract,
     Verification(VerificationType),
     Refinement(RefinementType),
     File,
@@ -281,6 +272,7 @@ impl ElementType {
                 RequirementType::System => "requirement",
             },
             ElementType::Ontology => "ontology",
+            ElementType::SemanticContract => "semantic-contract",
             ElementType::Verification(ver) => match ver {
                 VerificationType::Default => "test-verification",
                 VerificationType::Test => "test-verification",
@@ -291,8 +283,6 @@ impl ElementType {
             },
             ElementType::Refinement(ref_type) => match ref_type {
                 RefinementType::Source => "source",
-                RefinementType::SemanticContract => "semantic-contract",
-                RefinementType::SemanticQueryContract => "semantic-query-contract",
                 RefinementType::Constraint => "constraint",
                 RefinementType::Behavior => "behavior",
                 RefinementType::Specification => "specification",
@@ -335,12 +325,10 @@ impl ElementType {
                 ElementType::Verification(VerificationType::Demonstration)
             }
 
+            "semantic-contract" => ElementType::SemanticContract,
+
             // Refinement types
             "source" => ElementType::Refinement(RefinementType::Source),
-            "semantic-contract" => ElementType::Refinement(RefinementType::SemanticContract),
-            "semantic-query-contract" => {
-                ElementType::Refinement(RefinementType::SemanticQueryContract)
-            }
             "constraint" => ElementType::Refinement(RefinementType::Constraint),
             "behavior" => ElementType::Refinement(RefinementType::Behavior),
             "specification" => ElementType::Refinement(RefinementType::Specification),
@@ -355,7 +343,7 @@ impl ElementType {
         }
     }
 
-    /// Returns true if this element type is a Refinement type
+    /// Returns true if this element type is a requirement-owned refinement type.
     pub fn is_refinement(&self) -> bool {
         matches!(self, ElementType::Refinement(_))
     }
@@ -386,8 +374,6 @@ impl ElementType {
             ElementType::Refinement(
                 RefinementType::Source
                     | RefinementType::Constraint
-                    | RefinementType::SemanticContract
-                    | RefinementType::SemanticQueryContract
                     | RefinementType::Behavior
                     | RefinementType::Specification
                     | RefinementType::State
@@ -397,17 +383,7 @@ impl ElementType {
     }
 
     pub fn is_semantic_contract(&self) -> bool {
-        matches!(
-            self,
-            ElementType::Refinement(RefinementType::SemanticContract)
-        )
-    }
-
-    pub fn is_semantic_query_contract(&self) -> bool {
-        matches!(
-            self,
-            ElementType::Refinement(RefinementType::SemanticQueryContract)
-        )
+        matches!(self, ElementType::SemanticContract)
     }
 
     /// Returns the main type category for merge compatibility
@@ -416,6 +392,7 @@ impl ElementType {
             ElementType::Capability => "capability",
             ElementType::Requirement(_) => "requirement",
             ElementType::Ontology => "ontology",
+            ElementType::SemanticContract => "semantic-contract",
             ElementType::Verification(_) => "verification",
             ElementType::Refinement(_) => "refinement",
             ElementType::File => "file",
@@ -459,12 +436,9 @@ pub struct Element {
     // Optional model-build metadata for JSON evidence consumers.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub size_estimate: Option<SizeEstimate>,
-    // Parsed ADT for semantic-contract refinements.
+    // Parsed ADT for semantic-contract elements.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub semantic_contract: Option<SemanticContract>,
-    // Parsed ADT for semantic-query-contract refinements.
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub semantic_query_contract: Option<SemanticQueryContract>,
     // Parsed ADT for ontology elements.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ontology: Option<Ontology>,
@@ -503,7 +477,6 @@ impl Element {
             attachments: vec![],
             size_estimate: None,
             semantic_contract: None,
-            semantic_query_contract: None,
             ontology: None,
             concept_references: Vec::new(),
         }
@@ -528,7 +501,6 @@ impl Element {
         self.hash_impact_content = utils::hash_content(&normalized);
         self.populate_ontology();
         self.populate_semantic_contract();
-        self.populate_semantic_query_contract();
         self.populate_concept_references();
     }
 
@@ -547,10 +519,6 @@ impl Element {
 
     pub fn semantic_contract_iri(&self) -> String {
         format!("urn:reqvire:semantic-contract:{}", self.id)
-    }
-
-    pub fn semantic_query_contract_iri(&self) -> String {
-        format!("urn:reqvire:semantic-query-contract:{}", self.id)
     }
 
     pub fn ontology_iri(&self) -> String {
@@ -583,21 +551,6 @@ impl Element {
             self.semantic_contract = Some(SemanticContract {
                 iri: self.semantic_contract_iri(),
                 shapes: shapes.into_iter().next(),
-            });
-        }
-    }
-
-    fn populate_semantic_query_contract(&mut self) {
-        self.semantic_query_contract = None;
-        if !self.element_type.is_semantic_query_contract() {
-            return;
-        }
-
-        let query = extract_single_fenced_subsection(&self.content, "Query");
-        if query.len() <= 1 && !query.is_empty() {
-            self.semantic_query_contract = Some(SemanticQueryContract {
-                iri: self.semantic_query_contract_iri(),
-                query: query.into_iter().next(),
             });
         }
     }

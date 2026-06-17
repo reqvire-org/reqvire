@@ -5,9 +5,10 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::LazyLock;
 
+use crate::crud::replace_prefix_token;
 use crate::element::{
-    Element, ElementType, GovernanceMetadataEntry, GovernanceMetadataSource,
-    RequirementGovernanceMetadata, SizeEstimate,
+    extract_single_fenced_subsection, Element, ElementType, GovernanceMetadataEntry,
+    GovernanceMetadataSource, RequirementGovernanceMetadata, SizeEstimate,
 };
 use crate::error::ReqvireError;
 use crate::git_commands;
@@ -116,6 +117,11 @@ impl GraphRegistry {
         excluded_filename_patterns: &GlobSet,
     ) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("GraphRegistry: Building relations and validating graph structure");
+
+        // Normalize any non-canonical relation references before validation:
+        // keep canonical full identifiers in-memory and keep markdown rendering compact
+        // through serialization-time relative-link conversion.
+        self.normalize_element_relation_targets();
 
         // First build the relation graph
         self.build_relation_graph();
@@ -235,7 +241,11 @@ impl GraphRegistry {
                         if relation::IMPACT_PROPAGATION_RELATIONS
                             .contains(&relation.relation_type.name)
                         {
-                            if let Some(target_node) = self.nodes.get(target_id) {
+                            let resolved_target = self
+                                .resolve_relation_identifier(&source_node.element, target_id)
+                                .unwrap_or_else(|| target_id.to_string());
+
+                            if let Some(target_node) = self.nodes.get(&resolved_target) {
                                 relation_nodes.push(RelationNode {
                                     relation_trigger: relation.relation_type.name.to_string(),
                                     element_node: target_node.clone(),
@@ -263,18 +273,35 @@ impl GraphRegistry {
                     if let crate::relation::LinkType::Identifier(ref target_id) =
                         relation.target.link
                     {
-                        if !MD_FILE_RE.is_match(target_id)
-                            || excluded_filename_patterns.is_match(target_id)
+                        let source_identifier = source_node.element.identifier.clone();
+                        let resolved_target = self
+                            .resolve_relation_identifier(&source_node.element, target_id)
+                            .unwrap_or_else(|| target_id.to_string());
+
+                        if !MD_FILE_RE.is_match(&resolved_target)
+                            || excluded_filename_patterns.is_match(&resolved_target)
                         {
                             continue;
                         }
 
                         if let Some(opposite_name) = relation.relation_type.opposite {
-                            if let Some(target_node) = self.nodes.get(target_id) {
-                                let already_present = target_node.element.relations.iter().any(|r| {
-                                    matches!(&r.target.link, crate::relation::LinkType::Identifier(id) if id == source_id)
-                                        && r.relation_type.name.eq_ignore_ascii_case(opposite_name)
-                                });
+                            if let Some(target_node) = self.nodes.get(&resolved_target) {
+                                let already_present =
+                                    target_node.element.relations.iter().any(|r| {
+                                        matches!(
+                                            &r.target.link,
+                                            crate::relation::LinkType::Identifier(id)
+                                                if self
+                                                    .normalize_relation_identifier_for_source(
+                                                        &target_node.element.file_path,
+                                                        id
+                                                    )
+                                                    == Some(source_identifier.clone())
+                                        ) && r
+                                            .relation_type
+                                            .name
+                                            .eq_ignore_ascii_case(opposite_name)
+                                    });
 
                                 if !already_present {
                                     if let Some(opposite_relation) = relation.to_opposite(
@@ -282,7 +309,7 @@ impl GraphRegistry {
                                         &source_node.element.identifier,
                                         &source_node.element.id,
                                     ) {
-                                        to_add.push((target_id.clone(), opposite_relation));
+                                        to_add.push((resolved_target.clone(), opposite_relation));
                                     }
                                 }
                             }
@@ -1008,6 +1035,126 @@ impl GraphRegistry {
         None
     }
 
+    /// Canonicalize an identifier-style relation target for a given source context.
+    ///
+    /// Returns the full canonical identifier when possible, including same-file fragments.
+    fn normalize_relation_identifier_for_source(
+        &self,
+        source_file_path: &str,
+        target_id: &str,
+    ) -> Option<String> {
+        if self.nodes.contains_key(target_id) {
+            return Some(target_id.to_string());
+        }
+
+        let (_, fragment_opt) = crate::utils::extract_path_and_fragment(target_id);
+
+        // Same-file fragment references stay local to the source file.
+        if target_id.starts_with('#') {
+            if let Some(fragment) = fragment_opt {
+                let same_file_identifier = format!("{}#{}", source_file_path, fragment);
+                if self.nodes.contains_key(&same_file_identifier) {
+                    return Some(same_file_identifier);
+                }
+            }
+        }
+
+        // For relative references such as "../File.md#x" and "File.md#x", resolve from source file.
+        let base_path = std::path::Path::new(source_file_path)
+            .parent()
+            .unwrap_or_else(|| std::path::Path::new("."));
+        if let Ok(normalized) = crate::utils::normalize_identifier(target_id, base_path) {
+            if self.nodes.contains_key(&normalized) {
+                return Some(normalized);
+            }
+        }
+
+        // For root-relative references like "/dir/File.md#x"
+        if target_id.starts_with('/') {
+            if let Ok(normalized) = crate::utils::normalize_identifier(target_id, &std::path::Path::new("/")) {
+                if self.nodes.contains_key(&normalized) {
+                    return Some(normalized);
+                }
+            }
+        }
+
+        None
+    }
+
+    /// Returns true if `target_id`, after canonicalization in the source context,
+    /// resolves to `expected_target`.
+    fn relation_targets_same_identifier(
+        &self,
+        source_file_path: &str,
+        target_id: &str,
+        expected_target: &str,
+    ) -> bool {
+        // Graph mutation callers should normally see already-canonical identifiers.
+        if target_id == expected_target {
+            return true;
+        }
+
+        // Keep fragment-only support for CRUD inputs that are scoped to the source file.
+        if target_id.starts_with('#') {
+            return format!("{}{}", source_file_path, target_id) == expected_target;
+        }
+
+        let base_path = std::path::Path::new(source_file_path)
+            .parent()
+            .unwrap_or_else(|| std::path::Path::new("."));
+        if let Ok(normalized) = crate::utils::normalize_identifier(target_id, base_path) {
+            return normalized == expected_target;
+        }
+
+        self.normalize_relation_identifier_for_source(source_file_path, target_id)
+            .is_some_and(|resolved| resolved == expected_target)
+    }
+
+    fn normalize_element_relation_targets(&mut self) {
+        let element_ids: Vec<String> = self.nodes.keys().cloned().collect();
+
+        for source_id in &element_ids {
+            let source_file_path = self
+                .nodes
+                .get(source_id)
+                .map(|source_node| source_node.element.file_path.clone());
+            let current_relations = self
+                .nodes
+                .get(source_id)
+                .map(|source_node| source_node.element.relations.clone());
+
+            let (Some(source_file_path), Some(mut normalized_relations)) =
+                (source_file_path, current_relations)
+            else {
+                continue;
+            };
+
+            if normalized_relations.is_empty() {
+                continue;
+            }
+
+            let mut changed = false;
+            for relation in &mut normalized_relations {
+                if let crate::relation::LinkType::Identifier(target_id) = &relation.target.link {
+                    if let Some(canonical_id) =
+                        self.normalize_relation_identifier_for_source(&source_file_path, target_id)
+                    {
+                        relation.target.link =
+                            crate::relation::LinkType::Identifier(canonical_id.clone());
+                        relation.target.element_id = Some(canonical_id);
+                        changed = true;
+                    }
+                }
+            }
+
+            if changed {
+                if let Some(mut_node) = self.nodes.get_mut(source_id) {
+                    mut_node.element.relations = normalized_relations;
+                }
+            }
+        }
+    }
+
     /// Validates attachment targets and scope rules.
     fn validate_attachments(&self) -> Result<Vec<ReqvireError>, ReqvireError> {
         debug!("Validating attachment targets...");
@@ -1067,7 +1214,7 @@ impl GraphRegistry {
                             if !attachment_type_valid {
                                 errors.push(ReqvireError::InvalidAttachmentTarget(
                                     format!(
-                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned source, semantic-contract, semantic-query-contract, constraint, behavior, specification, state, or input-output.",
+                                        "File {}: Element '{}' (type: {}) has invalid attachment to '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned source, constraint, behavior, specification, state, or input-output. Semantic contracts constrain requirements through constrainedBy/constrain.",
                                         element.file_path,
                                         element.name,
                                         element.element_type.as_str(),
@@ -1408,6 +1555,17 @@ impl GraphRegistry {
                     stack.push(target_id.clone());
                 }
             }
+            for (candidate_id, candidate_node) in &self.nodes {
+                if !candidate_node.element.element_type.is_ontology() {
+                    continue;
+                }
+                if candidate_node.element.relations.iter().any(|relation| {
+                    relation.relation_type.name == "derive"
+                        && matches!(&relation.target.link, LinkType::Identifier(target_id) if target_id == &ontology_id)
+                }) {
+                    stack.push(candidate_id.clone());
+                }
+            }
         }
 
         context.into_iter().collect()
@@ -1680,7 +1838,36 @@ impl GraphRegistry {
         for element_node in self.nodes.values() {
             let element = &element_node.element;
 
-            // Check if this is a Refinement element type
+            if element.element_type.is_semantic_contract() {
+                let invalid_relations: Vec<_> = element
+                    .relations
+                    .iter()
+                    .filter(|r| r.user_created)
+                    .filter(|r| !matches!(r.relation_type.name, "constrain" | "use"))
+                    .collect();
+
+                if !invalid_relations.is_empty() {
+                    let invalid_types: Vec<_> = invalid_relations
+                        .iter()
+                        .map(|r| &r.relation_type.name)
+                        .collect();
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "File {}: Semantic contract element '{}' can only have constrain and use relations. Invalid relations: {:?}",
+                        element.file_path, element.name, invalid_types
+                    )));
+                }
+
+                if !element.attachments.is_empty() {
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "File {}: Semantic contract element '{}' cannot have attachments. Semantic contracts use ontology through use relations and constrain requirements through constrain/constrainedBy.",
+                        element.file_path, element.name
+                    )));
+                }
+
+                continue;
+            }
+
+            // Check if this is a non-semantic-contract Refinement element type
             if element.element_type.is_refinement() {
                 // Refinement elements can only have refine relations
                 let invalid_relations: Vec<_> = element
@@ -1764,13 +1951,61 @@ impl GraphRegistry {
             for relation in element.relations.iter().filter(|r| r.user_created) {
                 if !matches!(
                     relation.relation_type.name,
-                    "derive" | "derivedFrom" | "trace"
+                    "derive" | "derivedFrom" | "trace" | "usedBy"
                 ) {
                     errors.push(ReqvireError::IncompatibleElementTypes(format!(
-                        "Ontology element '{}' can only use derive, derivedFrom, or trace relations. Invalid relation: {}.",
+                        "Ontology element '{}' can only use derive, derivedFrom, trace, or usedBy relations. Invalid relation: {}.",
                         element.identifier, relation.relation_type.name
                     )));
                 }
+            }
+
+            let has_ontology_base = element
+                .metadata
+                .get("ontology_base")
+                .map(|value| !value.trim().is_empty())
+                .unwrap_or(false);
+            let has_ontology_prefix = element
+                .metadata
+                .get("ontology_prefix")
+                .map(|value| !value.trim().is_empty())
+                .unwrap_or(false);
+            if has_ontology_base && !has_ontology_prefix {
+                errors.push(ReqvireError::InvalidMetadataFormat(format!(
+                    "File {}: Ontology element '{}' with ontology_base metadata must define non-empty ontology_prefix metadata.",
+                    element.file_path, element.name
+                )));
+            }
+        }
+
+        for ontology_id in self.find_root_elements_by_type("ontology") {
+            let Some(node) = self.nodes.get(&ontology_id) else {
+                continue;
+            };
+            let element = &node.element;
+            if element
+                .metadata
+                .get("ontology_base")
+                .map(|value| value.trim())
+                .filter(|value| !value.is_empty())
+                .is_none()
+            {
+                errors.push(ReqvireError::InvalidMetadataFormat(format!(
+                    "File {}: Top parent ontology element '{}' must define non-empty ontology_base metadata.",
+                    element.file_path, element.name
+                )));
+            }
+            if element
+                .metadata
+                .get("ontology_prefix")
+                .map(|value| value.trim())
+                .filter(|value| !value.is_empty())
+                .is_none()
+            {
+                errors.push(ReqvireError::InvalidMetadataFormat(format!(
+                    "File {}: Top parent ontology element '{}' must define non-empty ontology_prefix metadata.",
+                    element.file_path, element.name
+                )));
             }
         }
 
@@ -1928,41 +2163,13 @@ impl GraphRegistry {
         for node in self.nodes.values() {
             let element = &node.element;
             if element.element_type.is_semantic_contract() {
-                let owners = self.get_refinement_owners(&element.identifier);
-                if owners.len() != 1 {
+                if self
+                    .semantic_contract_used_ontology_context(&element.identifier)
+                    .is_empty()
+                {
                     errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic contract '{}' must refine exactly one requirement.",
+                        "Semantic contract '{}' must use at least one ontology element through a use/usedBy relation.",
                         element.identifier
-                    )));
-                    continue;
-                }
-                let Some(owner) = self.nodes.get(&owners[0]) else {
-                    continue;
-                };
-                if !owner.element.element_type.is_requirement() {
-                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic contract '{}' must refine a requirement, not '{}'. Refinements are requirement-owned only; capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.",
-                        element.identifier,
-                        owner.element.element_type.as_str()
-                    )));
-                }
-            } else if element.element_type.is_semantic_query_contract() {
-                let owners = self.get_refinement_owners(&element.identifier);
-                if owners.len() != 1 {
-                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic query contract '{}' must refine exactly one requirement.",
-                        element.identifier
-                    )));
-                    continue;
-                }
-                let Some(owner) = self.nodes.get(&owners[0]) else {
-                    continue;
-                };
-                if !owner.element.element_type.is_requirement() {
-                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic query contract '{}' must refine a requirement, not '{}'. Refinements are requirement-owned only; capabilities attach ontology and are specified/verified, not refined by implementation-detail refinements.",
-                        element.identifier,
-                        owner.element.element_type.as_str()
                     )));
                 }
             }
@@ -1973,11 +2180,11 @@ impl GraphRegistry {
                 .ontology_declarations
                 .contains_key(&reference.iri)
             {
-                let Some((owner_id, context)) =
-                    self.semantic_contract_owner_context(&reference.element_identifier)
-                else {
+                let context =
+                    self.semantic_contract_used_ontology_context(&reference.element_identifier);
+                if context.is_empty() {
                     continue;
-                };
+                }
                 let context: BTreeSet<String> = context.into_iter().collect();
                 let declaration_sources: BTreeSet<String> = semantic_index
                     .ontology_declarations
@@ -2002,12 +2209,11 @@ impl GraphRegistry {
                     .cloned()
                     .unwrap_or_else(|| "unknown semantic contract".to_string());
                 errors.push(ReqvireError::InvalidMarkdownStructure(format!(
-                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable from owning requirement '{}' through capability-attached ontology context. Attach the declaring ontology to the owning or consuming capability, or move the declaration into reachable capability ontology context.",
+                        "Semantic reference outside context: semantic contract '{}' references {} <{}>, declared by ontology '{}', but that ontology is not reachable through the contract's use relations. Add a use relation to the declaring ontology or an ontology descendant with the declaring ontology in its hierarchy.",
                         reference.element_identifier,
                         reference.kind,
                         reference.iri,
-                        declaring_contract,
-                        owner_id
+                        declaring_contract
                     )));
                 continue;
             }
@@ -2020,6 +2226,8 @@ impl GraphRegistry {
                     reference.element_identifier, reference.kind, reference.iri, removed_source
                 )));
         }
+
+        errors.extend(self.validate_semantic_contract_shape_prefixes(&semantic_index));
 
         errors
             .extend(self.validate_concept_references(&semantic_index, removed_declaration_source));
@@ -2062,6 +2270,96 @@ impl GraphRegistry {
         }
 
         Ok(errors)
+    }
+
+    fn validate_semantic_contract_shape_prefixes(
+        &self,
+        semantic_index: &semantic_contract::SemanticIndex,
+    ) -> Vec<ReqvireError> {
+        let mut errors = Vec::new();
+        let mut references_by_contract: HashMap<&str, Vec<&semantic_contract::ShapeIriReference>> =
+            HashMap::new();
+
+        for reference in &semantic_index.shape_references {
+            references_by_contract
+                .entry(reference.element_identifier.as_str())
+                .or_default()
+                .push(reference);
+        }
+
+        for block in &semantic_index.blocks {
+            if !matches!(block.kind, semantic_contract::SemanticBlockKind::Shapes) {
+                continue;
+            }
+
+            let context = self.semantic_contract_used_ontology_context(&block.source);
+            if context.is_empty() {
+                continue;
+            }
+
+            let context_set: BTreeSet<&str> = context.iter().map(String::as_str).collect();
+            let project_namespaces =
+                self.used_ontology_project_namespaces(&context_set, semantic_index);
+            if project_namespaces.is_empty() {
+                continue;
+            }
+
+            let shape_prefixes = parse_turtle_prefixes(&block.content);
+            let mut declared_namespaces = BTreeSet::new();
+            for (prefix, namespace) in &shape_prefixes {
+                declared_namespaces.insert(namespace.clone());
+                if let Some(expected_namespaces) = project_namespaces.by_prefix.get(prefix) {
+                    if !expected_namespaces.contains(namespace) {
+                        let expected = expected_namespaces
+                            .iter()
+                            .cloned()
+                            .collect::<Vec<_>>()
+                            .join(", ");
+                        errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                            "Shapes prefix validation failed: semantic contract '{}' declares prefix '{}' as '{}', but the used ontology graph defines that prefix as {}.",
+                            block.source, prefix, namespace, expected
+                        )));
+                    }
+                }
+            }
+
+            let Some(references) = references_by_contract.get(block.source.as_str()) else {
+                continue;
+            };
+
+            for reference in references {
+                let Some(declarations) = semantic_index.ontology_declarations.get(&reference.iri)
+                else {
+                    continue;
+                };
+                let declared_in_context = declarations.iter().any(|declaration| {
+                    context_set.contains(declaration.element_identifier.as_str())
+                });
+                if !declared_in_context {
+                    continue;
+                }
+
+                for namespace in project_namespaces.namespaces_for_iri(&reference.iri) {
+                    if declared_namespaces.contains(namespace) {
+                        continue;
+                    }
+                    let preferred_prefix = project_namespaces
+                        .prefix_for_namespace(namespace)
+                        .unwrap_or("project");
+                    errors.push(ReqvireError::InvalidMarkdownStructure(format!(
+                        "Shapes prefix validation failed: semantic contract '{}' references {} <{}> from used ontology namespace '{}', but its Shapes block does not explicitly declare a prefix for that namespace. Add `@prefix {}: <{}> .`; Reqvire does not inject hidden SHACL prefixes.",
+                        block.source,
+                        reference.kind,
+                        reference.iri,
+                        namespace,
+                        preferred_prefix,
+                        namespace
+                    )));
+                }
+            }
+        }
+
+        errors
     }
 
     fn validate_concept_references(
@@ -2172,6 +2470,9 @@ impl GraphRegistry {
         if element.element_type.is_requirement() {
             return self.build_requirement_ontology_context(element_id);
         }
+        if element.element_type.is_semantic_contract() {
+            return self.semantic_contract_used_ontology_context(element_id);
+        }
         if element.element_type.is_refinement() {
             let owners = self.get_refinement_owners(element_id);
             if owners.len() == 1 {
@@ -2234,22 +2535,92 @@ impl GraphRegistry {
             }
         }
 
+        for declaration in &semantic_index.ontology_documents {
+            if declaration
+                .element_identifiers
+                .iter()
+                .any(|identifier| context.contains(identifier.as_str()))
+            {
+                prefixes
+                    .entry(declaration.ontology_prefix.clone())
+                    .or_insert(declaration.term_namespace.clone());
+            }
+        }
+
         prefixes
     }
 
-    fn semantic_contract_owner_context(&self, contract_id: &str) -> Option<(String, Vec<String>)> {
-        let owners = self.get_refinement_owners(contract_id);
-        if owners.len() != 1 {
-            return None;
+    fn semantic_contract_used_ontology_context(&self, contract_id: &str) -> Vec<String> {
+        let Some(contract) = self.nodes.get(contract_id) else {
+            return Vec::new();
+        };
+        if !contract.element.element_type.is_semantic_contract() {
+            return Vec::new();
         }
-        let owner = self.nodes.get(&owners[0])?;
-        if owner.element.element_type.is_requirement() {
-            return Some((
-                owners[0].clone(),
-                self.build_requirement_ontology_context(&owners[0]),
-            ));
+
+        let mut context = BTreeSet::new();
+        for relation in &contract.element.relations {
+            if relation.relation_type.name != "use" {
+                continue;
+            }
+            let LinkType::Identifier(ontology_id) = &relation.target.link else {
+                continue;
+            };
+            if self
+                .nodes
+                .get(ontology_id)
+                .is_some_and(|target| target.element.element_type.is_ontology())
+            {
+                context.insert(ontology_id.clone());
+            }
         }
-        None
+
+        for (ontology_id, ontology_node) in &self.nodes {
+            if !ontology_node.element.element_type.is_ontology() {
+                continue;
+            }
+            if ontology_node.element.relations.iter().any(|relation| {
+                relation.relation_type.name == "usedBy"
+                    && matches!(&relation.target.link, LinkType::Identifier(target_id) if target_id == contract_id)
+            }) {
+                context.insert(ontology_id.clone());
+            }
+        }
+
+        self.expand_ontology_context(context)
+    }
+
+    fn used_ontology_project_namespaces(
+        &self,
+        ontology_context: &BTreeSet<&str>,
+        semantic_index: &semantic_contract::SemanticIndex,
+    ) -> UsedOntologyProjectNamespaces {
+        let mut by_prefix: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+        let mut prefix_by_namespace: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+
+        for declaration in &semantic_index.ontology_documents {
+            if !declaration
+                .element_identifiers
+                .iter()
+                .any(|identifier| ontology_context.contains(identifier.as_str()))
+            {
+                continue;
+            }
+
+            by_prefix
+                .entry(declaration.ontology_prefix.clone())
+                .or_default()
+                .insert(declaration.term_namespace.clone());
+            prefix_by_namespace
+                .entry(declaration.term_namespace.clone())
+                .or_default()
+                .insert(declaration.ontology_prefix.clone());
+        }
+
+        UsedOntologyProjectNamespaces {
+            by_prefix,
+            prefix_by_namespace,
+        }
     }
 
     /// Validates that each refinement is owned by at most one requirement via refinedBy.
@@ -2830,8 +3201,8 @@ impl GraphRegistry {
         parents.into_iter().collect()
     }
 
-    /// Find all capabilities without hierarchical parent relations (capability roots)
-    pub fn find_root_capabilities(&self) -> Vec<String> {
+    /// Find all elements of a type without hierarchical parent relations.
+    pub fn find_root_elements_by_type(&self, element_type: &str) -> Vec<String> {
         let hierarchical_relations = relation::get_hierarchical_relation_types();
 
         let mut roots: Vec<String> = self
@@ -2839,7 +3210,7 @@ impl GraphRegistry {
             .values()
             .map(|node| &node.element)
             .filter(|element| {
-                if !matches!(element.element_type, ElementType::Capability) {
+                if element.element_type.as_str() != element_type {
                     return false;
                 }
 
@@ -2855,6 +3226,11 @@ impl GraphRegistry {
 
         roots.sort();
         roots
+    }
+
+    /// Find all capabilities without hierarchical parent relations (capability roots).
+    pub fn find_root_capabilities(&self) -> Vec<String> {
+        self.find_root_elements_by_type("capability")
     }
 
     /// Find leaf elements for reverse traversal
@@ -3205,8 +3581,10 @@ impl GraphRegistry {
         };
         // Sort relations for deterministic output: by relation type name, then by target link
         relations_to_include.sort_by(|a, b| {
-            (&a.relation_type.name, a.target.link.as_str())
-                .cmp(&(&b.relation_type.name, b.target.link.as_str()))
+            a.relation_type
+                .name
+                .cmp(&b.relation_type.name)
+                .then(a.target.link.as_str().cmp(&b.target.link.as_str()))
         });
         // Remove duplicate relations (same relation_type + same target), keeping first occurrence
         relations_to_include.dedup_by(|a, b| {
@@ -3539,8 +3917,10 @@ impl GraphRegistry {
                 .collect()
         };
         relations_to_include.sort_by(|a, b| {
-            (&a.relation_type.name, a.target.link.as_str())
-                .cmp(&(&b.relation_type.name, b.target.link.as_str()))
+            a.relation_type
+                .name
+                .cmp(&b.relation_type.name)
+                .then(a.target.link.as_str().cmp(&b.target.link.as_str()))
         });
         relations_to_include.dedup_by(|a, b| {
             a.relation_type.name == b.relation_type.name
@@ -4123,82 +4503,95 @@ impl GraphRegistry {
             .unwrap_or(moved_element_id);
 
         // 1. Update relations FROM other elements TO the moved element
-        for (_id, node) in self.nodes.iter_mut() {
-            // Skip the moved element itself for now
-            if node.element.identifier == moved_element_id {
+        let source_node_ids: Vec<String> = self.nodes.keys().cloned().collect();
+        for source_id in source_node_ids {
+            if source_id == moved_element_id {
                 continue;
             }
 
-            // Update relations in the Element object (for markdown generation)
-            for relation in &mut node.element.relations {
+            let source_file_path = self
+                .nodes
+                .get(&source_id)
+                .map(|node| node.element.file_path.clone());
+            let mut relations = self
+                .nodes
+                .get(&source_id)
+                .map(|node| node.element.relations.clone())
+                .unwrap_or_default();
+
+            if relations.is_empty() {
+                continue;
+            }
+
+            let Some(source_file_path) = source_file_path else {
+                continue;
+            };
+
+            let mut changed = false;
+            let canonical_target = format!("{}#{}", new_file_path, moved_fragment);
+            for relation in &mut relations {
                 if let crate::relation::LinkType::Identifier(ref mut target_id) =
                     relation.target.link
                 {
-                    if target_id == moved_element_id {
-                        if node.element.file_path != new_file_path {
-                            // Cross-file reference needed
-                            *target_id = format!("{}#{}", new_file_path, moved_fragment);
-                            relation.target.text = format!("{}#{}", new_file_path, moved_fragment);
-                        } else {
-                            // Same file now — update to fragment-only reference
-                            *target_id = moved_fragment.to_string();
-                            relation.target.text = moved_fragment.to_string();
-                        }
+                    if self.relation_targets_same_identifier(
+                        &source_file_path,
+                        target_id,
+                        moved_element_id,
+                    ) {
+                        *target_id = canonical_target.clone();
+                        relation.target.text = canonical_target.clone();
+                        relation.target.element_id = Some(canonical_target.clone());
+                        changed = true;
                     }
+                }
+            }
+
+            if changed {
+                if let Some(source_node) = self.nodes.get_mut(&source_id) {
+                    source_node.element.relations = relations;
                 }
             }
         }
 
         // 2. Update relations FROM the moved element TO other elements
-        // Build lookup maps: full identifier -> file_path, and fragment -> (full_id, file_path)
-        // This allows resolving both full identifiers and bare fragments
-        let mut id_to_file: std::collections::HashMap<String, String> =
-            std::collections::HashMap::new();
-        let mut fragment_to_id_file: std::collections::HashMap<String, (String, String)> =
-            std::collections::HashMap::new();
-        for node in self.nodes.values() {
-            let id = node.element.identifier.clone();
-            let file = node.element.file_path.clone();
-            id_to_file.insert(id.clone(), file.clone());
-            // Also index by bare fragment for fallback lookup
-            let fragment = id.split('#').next_back().unwrap_or(&id).to_string();
-            fragment_to_id_file.insert(fragment, (id, file));
-        }
-
-        if let Some(moved_node) = self.nodes.get_mut(moved_element_id) {
-            for relation in &mut moved_node.element.relations {
+        let moved_node_file = self
+            .nodes
+            .get(moved_element_id)
+            .map(|node| node.element.file_path.clone());
+        if let (Some(moved_node_file), Some(mut relations)) = (
+            moved_node_file,
+            self.nodes
+                .get(moved_element_id)
+                .map(|node| node.element.relations.clone()),
+        ) {
+            let mut changed = false;
+            for relation in &mut relations {
                 if let crate::relation::LinkType::Identifier(ref mut target_id) =
                     relation.target.link
                 {
-                    // Extract the bare fragment (element name) from the target
-                    let fragment = target_id
-                        .split('#')
-                        .next_back()
-                        .unwrap_or(target_id)
-                        .to_string();
-
-                    // Resolve target's file path: try full target_id first, then bare fragment
-                    let resolved = id_to_file
-                        .get(target_id.as_str())
-                        .map(|file| (fragment.clone(), file.clone()))
-                        .or_else(|| {
-                            fragment_to_id_file
-                                .get(&fragment)
-                                .map(|(_full_id, file)| (fragment.clone(), file.clone()))
-                        });
-
-                    if let Some((target_fragment, target_file_path)) = resolved {
-                        if new_file_path != target_file_path {
-                            // Cross-file reference needed
-                            *target_id = format!("{}#{}", target_file_path, target_fragment);
-                            relation.target.text =
+                    if let Some(resolved_target) =
+                        self.normalize_relation_identifier_for_source(&moved_node_file, target_id)
+                    {
+                        if let Some(target_node) = self.nodes.get(&resolved_target) {
+                            let target_file_path = target_node.element.file_path.clone();
+                            let target_fragment =
+                                crate::utils::extract_path_and_fragment(&resolved_target)
+                                    .1
+                                    .unwrap_or(&resolved_target);
+                            let canonical_target =
                                 format!("{}#{}", target_file_path, target_fragment);
-                        } else {
-                            // Same file, use simple fragment reference
-                            *target_id = target_fragment.clone();
-                            relation.target.text = target_fragment;
+                            *target_id = canonical_target.clone();
+                            relation.target.text = canonical_target;
+                            relation.target.element_id = Some(resolved_target);
+                            changed = true;
                         }
                     }
+                }
+            }
+
+            if changed {
+                if let Some(moved_node) = self.nodes.get_mut(moved_element_id) {
+                    moved_node.element.relations = relations;
                 }
             }
         }
@@ -4279,16 +4672,36 @@ impl GraphRegistry {
         }
 
         // Remove all relations pointing to this element from element's own relations list
-        for node in self.nodes.values_mut() {
-            node.element.relations.retain(|rel| {
-                match &rel.target.link {
-                    crate::relation::LinkType::Identifier(target) => {
-                        // Remove if it points to the deleted element (handle both forms)
-                        target != element_id && !target.ends_with(&format!("#{}", element_id))
-                    }
-                    _ => true, // Keep external links
+        let mut node_ids: Vec<String> = self.nodes.keys().cloned().collect();
+        for node_id in node_ids.drain(..) {
+            let source_file_path = self
+                .nodes
+                .get(&node_id)
+                .map(|node| node.element.file_path.clone());
+            let mut relations = self
+                .nodes
+                .get(&node_id)
+                .map(|node| node.element.relations.clone())
+                .unwrap_or_default();
+
+            let Some(source_file_path) = source_file_path else {
+                continue;
+            };
+
+            let mut filtered = Vec::new();
+            for relation in relations.drain(..) {
+                let keep = match &relation.target.link {
+                    crate::relation::LinkType::Identifier(target) => !self
+                        .relation_targets_same_identifier(&source_file_path, target, element_id),
+                    _ => true,
+                };
+                if keep {
+                    filtered.push(relation);
                 }
-            });
+            }
+            if let Some(mut_node) = self.nodes.get_mut(&node_id) {
+                mut_node.element.relations = filtered;
+            }
         }
 
         Ok(())
@@ -4575,7 +4988,6 @@ impl GraphRegistry {
 
                 let target_id = target_element.identifier.clone();
                 let target_display_name = target_element.name.clone();
-                let target_file_path = target_element.file_path.clone();
                 let target_type = target_element.element_type.clone();
 
                 // Validate type compatibility for element-to-element relations
@@ -4591,21 +5003,7 @@ impl GraphRegistry {
                     );
                 }
 
-                // Calculate relative identifier from source element's file to target element
-                let source_folder = crate::utils::get_parent_dir(&source_file_path);
-
-                let relation_target = if source_file_path == target_file_path {
-                    // Same file - use just the fragment
-                    let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
-                    let fragment = fragment_opt.unwrap_or(&target_id);
-                    LinkType::Identifier(format!("#{}", fragment))
-                } else {
-                    // Different files - calculate relative path
-                    let relative_id =
-                        crate::utils::to_relative_identifier(&target_id, &source_folder, true)
-                            .unwrap_or_else(|_| target_id.clone());
-                    LinkType::Identifier(relative_id)
-                };
+                let relation_target = LinkType::Identifier(target_id.clone());
 
                 // Extract element ID (fragment) for change tracking
                 let (_path, fragment_opt) = crate::utils::extract_path_and_fragment(&target_id);
@@ -4706,8 +5104,14 @@ impl GraphRegistry {
         let target_id_to_find = if let Some(target_element) = self.get_element_by_name(target) {
             target_element.identifier.clone()
         } else {
-            // Not an element name - could be URL or path
-            target.to_string()
+            let normalized_target =
+                crate::utils::normalize_relation_identifier_for_registry(&source_file_path, target);
+
+            if self.nodes.contains_key(&normalized_target) {
+                normalized_target
+            } else {
+                target.to_string()
+            }
         };
 
         // Find matching relation (check both user_created and auto-generated)
@@ -4948,9 +5352,18 @@ impl GraphRegistry {
         // Find all elements with relations pointing to this element
         for (other_id, node) in self.nodes.iter() {
             if other_id != element_id {
-                let has_relation_to_target = node.element.relations.iter().any(
-                    |rel| matches!(&rel.target.link, LinkType::Identifier(id) if id == element_id),
-                );
+                let source_file_path = node.element.file_path.clone();
+                let has_relation_to_target = node.element.relations.iter().any(|rel| {
+                    matches!(
+                        &rel.target.link,
+                        LinkType::Identifier(target_id)
+                            if self.relation_targets_same_identifier(
+                                &source_file_path,
+                                target_id,
+                                element_id,
+                            )
+                    )
+                });
 
                 if has_relation_to_target {
                     let other_file = node.element.file_path.clone();
@@ -5037,9 +5450,18 @@ impl GraphRegistry {
         }
 
         for node in self.nodes.values() {
-            let has_relation = node.element.relations.iter().any(
-                |rel| matches!(&rel.target.link, LinkType::Identifier(id) if id == &old_identifier),
-            );
+            let source_file_path = node.element.file_path.clone();
+            let has_relation = node.element.relations.iter().any(|rel| {
+                matches!(
+                    &rel.target.link,
+                    LinkType::Identifier(target_id)
+                        if self.relation_targets_same_identifier(
+                            &source_file_path,
+                            target_id,
+                            &old_identifier,
+                        )
+                )
+            });
 
             if has_relation {
                 let file = node.element.file_path.clone();
@@ -5127,6 +5549,7 @@ impl GraphRegistry {
             String,
             Vec<crate::relation::Relation>,
             Vec<crate::element::Attachment>,
+            Element,
         )> = Vec::new();
         for source_id in source_ids {
             let source_node = self.nodes.get(source_id).ok_or_else(|| {
@@ -5174,6 +5597,7 @@ impl GraphRegistry {
                     .cloned()
                     .collect(),
                 source_element.attachments.clone(),
+                source_element.clone(),
             ));
         }
 
@@ -5189,13 +5613,28 @@ impl GraphRegistry {
             .collect();
         let mut merged_attachments: Vec<crate::element::Attachment> =
             target_node.element.attachments.clone();
+        let target_is_ontology = target_type.is_ontology();
+        let target_element_for_merge = target_node.element.clone();
+        let mut merged_source_ids: HashSet<String> = source_ids.iter().cloned().collect();
+        merged_source_ids.insert(target_id.to_string());
 
         // Process each source element
-        for (source_id, source_name, source_content, source_relations, source_attachments) in
-            &source_data
+        for (
+            source_id,
+            source_name,
+            source_content,
+            source_relations,
+            source_attachments,
+            source_element,
+        ) in &source_data
         {
             // Extract main content and details from source
-            let (main_content, details_content) = extract_content_parts(source_content);
+            let (main_content, details_content) =
+                if target_is_ontology && source_element.element_type.is_ontology() {
+                    (extract_leading_prose(source_content), String::new())
+                } else {
+                    extract_content_parts(source_content)
+                };
 
             // Add main content to merged content (will go into target's Details)
             if !main_content.trim().is_empty() {
@@ -5213,7 +5652,17 @@ impl GraphRegistry {
 
             // Collect relations
             for rel in source_relations {
-                merged_relations.push(rel.clone());
+                let skip_relation = match &rel.target.link {
+                    LinkType::Identifier(relation_target) => {
+                        self.resolve_relation_identifier(source_element, relation_target)
+                            .is_some_and(|resolved| merged_source_ids.contains(&resolved))
+                            || merged_source_ids.contains(relation_target)
+                    }
+                    _ => false,
+                };
+                if !skip_relation {
+                    merged_relations.push(rel.clone());
+                }
             }
 
             // Collect attachments
@@ -5330,6 +5779,22 @@ impl GraphRegistry {
                     merge_content_into_details(&target_element.content, &merged_content);
             }
 
+            if target_is_ontology {
+                let merged_ontology_block = merge_ontology_blocks_into_target(
+                    &target_element.content,
+                    &target_element_for_merge,
+                    &source_data
+                        .iter()
+                        .map(|(_, _, _, _, _, element)| element.clone())
+                        .collect::<Vec<_>>(),
+                )?;
+                target_element.content = replace_single_fenced_subsection(
+                    &target_element.content,
+                    "Ontology",
+                    &merged_ontology_block,
+                )?;
+            }
+
             target_element.relations = merged_relations;
             target_element.attachments = merged_attachments;
         }
@@ -5342,7 +5807,7 @@ impl GraphRegistry {
         let target_name = target_node.element.name.clone();
         let target_element_id = target_node.element.id.clone();
 
-        for (source_id, _, _, _, _) in &source_data {
+        for (source_id, _, _, _, _, _) in &source_data {
             // Find all elements that have user_created relations pointing TO this source
             let elements_with_relations_to_source: Vec<(String, Vec<Relation>)> = self.nodes.iter()
                 .filter(|(id, _)| *id != source_id && *id != target_id)
@@ -5386,12 +5851,12 @@ impl GraphRegistry {
         }
 
         // Redirect relations from other elements pointing to sources to point to target
-        for (source_id, _, _, _, _) in &source_data {
+        for (source_id, _, _, _, _, _) in &source_data {
             self.redirect_relations_to_target(source_id, target_id)?;
         }
 
         // Remove source elements (this also removes them from the graph)
-        for (source_id, _, _, _, _) in &source_data {
+        for (source_id, _, _, _, _, _) in &source_data {
             self.remove_element(source_id)?;
         }
 
@@ -5412,9 +5877,11 @@ impl GraphRegistry {
                 *id != source_id
                     && *id != target_id
                     && node.element.relations.iter().any(|r| match &r.target.link {
-                        LinkType::Identifier(ref id) => {
-                            id == source_id || id.ends_with(&format!("#{}", source_id))
-                        }
+                        LinkType::Identifier(ref id) => self.relation_targets_same_identifier(
+                            &node.element.file_path,
+                            id,
+                            source_id,
+                        ),
                         _ => false,
                     })
             })
@@ -5422,21 +5889,34 @@ impl GraphRegistry {
             .collect();
 
         for node_id in nodes_to_update {
-            if let Some(node) = self.nodes.get_mut(&node_id) {
-                let file_path = node.element.file_path.clone();
-                for relation in &mut node.element.relations {
-                    if let LinkType::Identifier(ref id) = relation.target.link {
-                        if id == source_id || id.ends_with(&format!("#{}", source_id)) {
-                            // Update to point to target
-                            relation.target = crate::relation::RelationTarget {
-                                text: target_id.to_string(),
-                                link: LinkType::Identifier(target_id.to_string()),
-                                element_id: Some(target_id.to_string()),
-                            };
-                        }
+            let mut relations = self
+                .nodes
+                .get(&node_id)
+                .map(|node| node.element.relations.clone())
+                .unwrap_or_default();
+            let file_path = self
+                .nodes
+                .get(&node_id)
+                .map(|node| node.element.file_path.clone())
+                .unwrap_or_default();
+            let mut changed = false;
+            for relation in &mut relations {
+                if let LinkType::Identifier(ref id) = relation.target.link {
+                    if self.relation_targets_same_identifier(&file_path, id, source_id) {
+                        relation.target = crate::relation::RelationTarget {
+                            text: target_id.to_string(),
+                            link: LinkType::Identifier(target_id.to_string()),
+                            element_id: Some(target_id.to_string()),
+                        };
+                        changed = true;
                     }
                 }
-                self.modified_files.insert(file_path);
+            }
+            if changed {
+                if let Some(node) = self.nodes.get_mut(&node_id) {
+                    node.element.relations = relations;
+                    self.modified_files.insert(file_path);
+                }
             }
         }
 
@@ -5453,26 +5933,47 @@ impl GraphRegistry {
         };
 
         // Find and update opposite relations pointing to source
-        for (node_id, node) in self.nodes.iter_mut() {
-            if *node_id == source_id || *node_id == target_id {
+        for node_id in self.nodes.keys().cloned().collect::<Vec<_>>() {
+            if node_id == source_id || node_id == target_id {
                 continue;
             }
 
+            let source_file_path = self
+                .nodes
+                .get(&node_id)
+                .map(|node| node.element.file_path.clone());
+            let mut relations = self
+                .nodes
+                .get(&node_id)
+                .map(|node| node.element.relations.clone())
+                .unwrap_or_default();
+
+            let Some(source_file_path) = source_file_path else {
+                continue;
+            };
+
+            let mut changed = false;
+
             // Update auto-generated opposite relations pointing to source
-            for relation in &mut node.element.relations {
+            for relation in &mut relations {
                 if !relation.user_created {
                     // Only auto-generated opposites
                     if let LinkType::Identifier(ref id) = relation.target.link {
-                        if id == source_id || id.ends_with(&format!("#{}", source_id)) {
-                            // Update opposite to point to target
+                        if self.relation_targets_same_identifier(&source_file_path, id, source_id) {
                             relation.target = crate::relation::RelationTarget {
                                 text: target_name.clone(),
                                 link: LinkType::Identifier(target_id.to_string()),
                                 element_id: Some(target_element_id.clone()),
                             };
                             // Note: Do NOT mark file as modified - opposite is user_created=false
+                            changed = true;
                         }
                     }
+                }
+            }
+            if changed {
+                if let Some(node) = self.nodes.get_mut(&node_id) {
+                    node.element.relations = relations;
                 }
             }
         }
@@ -5533,6 +6034,17 @@ fn extract_content_parts(content: &str) -> (String, String) {
     }
 }
 
+fn extract_leading_prose(content: &str) -> String {
+    let mut lines = Vec::new();
+    for line in content.lines() {
+        if line.trim_start().starts_with("#### ") {
+            break;
+        }
+        lines.push(line);
+    }
+    lines.join("\n")
+}
+
 /// Merge additional content into the Details section of target content
 fn merge_content_into_details(target_content: &str, additional: &str) -> String {
     if additional.trim().is_empty() {
@@ -5561,6 +6073,225 @@ fn merge_content_into_details(target_content: &str, additional: &str) -> String 
             target_content.trim_end(),
             additional
         )
+    }
+}
+
+fn merge_ontology_blocks_into_target(
+    target_content: &str,
+    target_element: &Element,
+    source_elements: &[Element],
+) -> Result<String, ReqvireError> {
+    let mut merged_blocks = Vec::new();
+
+    let target_block = extract_single_fenced_subsection(target_content, "Ontology")
+        .into_iter()
+        .next()
+        .ok_or_else(|| {
+            ReqvireError::InvalidOperation(format!(
+                "Ontology element '{}' must contain exactly one #### Ontology fenced Turtle block.",
+                target_element.name
+            ))
+        })?;
+    merged_blocks.push(target_block.content.trim_end().to_string());
+
+    for source_element in source_elements {
+        let Some(source_block) =
+            extract_single_fenced_subsection(&source_element.content, "Ontology")
+                .into_iter()
+                .next()
+        else {
+            continue;
+        };
+        let rewritten =
+            rewrite_ontology_block_for_merge(&source_block.content, source_element, target_element);
+        if !rewritten.trim().is_empty() {
+            merged_blocks.push(rewritten);
+        }
+    }
+
+    Ok(dedupe_turtle_block(merged_blocks.join("\n\n").trim_end()))
+}
+
+fn rewrite_ontology_block_for_merge(
+    block: &str,
+    source_element: &Element,
+    target_element: &Element,
+) -> String {
+    let source_base = source_element
+        .metadata
+        .get("ontology_base")
+        .cloned()
+        .unwrap_or_default();
+    let source_prefix = source_element
+        .metadata
+        .get("ontology_prefix")
+        .cloned()
+        .unwrap_or_default();
+    let target_base = target_element
+        .metadata
+        .get("ontology_base")
+        .cloned()
+        .unwrap_or_default();
+    let target_prefix = target_element
+        .metadata
+        .get("ontology_prefix")
+        .cloned()
+        .unwrap_or_default();
+
+    let mut rewritten_lines = Vec::new();
+    let source_namespace = if source_base.is_empty() {
+        String::new()
+    } else {
+        format!("{}#", source_base)
+    };
+
+    for line in block.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with(&format!("@prefix {}: <", source_prefix))
+            && trimmed.contains(&format!("<{}> .", source_namespace))
+        {
+            continue;
+        }
+        if trimmed.starts_with("@prefix owl: ") || trimmed.starts_with("prefix owl: ") {
+            continue;
+        }
+        if trimmed.contains("owl:Ontology")
+            || trimmed.contains("owl#imports")
+            || trimmed.contains("owl:imports")
+        {
+            continue;
+        }
+        rewritten_lines.push(line.to_string());
+    }
+
+    let mut rewritten = rewritten_lines.join("\n");
+    if !source_base.is_empty() && !target_base.is_empty() {
+        rewritten = rewritten.replace(&source_base, &target_base);
+    }
+    if !source_prefix.is_empty() && !target_prefix.is_empty() && source_prefix != target_prefix {
+        rewritten = replace_prefix_token(&rewritten, &source_prefix, &target_prefix);
+    }
+
+    rewritten.trim().to_string()
+}
+
+fn dedupe_turtle_block(block: &str) -> String {
+    let mut seen_prefix_lines = HashSet::new();
+    let mut seen_exact_lines = HashSet::new();
+    let mut output = Vec::new();
+
+    for line in block.lines() {
+        let trimmed = line.trim();
+        if trimmed.is_empty() {
+            if output
+                .last()
+                .map(|prev: &String| prev.trim().is_empty())
+                .unwrap_or(false)
+            {
+                continue;
+            }
+            output.push(String::new());
+            continue;
+        }
+
+        if trimmed.starts_with("@prefix ") || trimmed.starts_with("prefix ") {
+            if !seen_prefix_lines.insert(trimmed.to_string()) {
+                continue;
+            }
+        } else if !seen_exact_lines.insert(trimmed.to_string()) {
+            continue;
+        }
+
+        output.push(line.to_string());
+    }
+
+    output.join("\n").trim_end().to_string()
+}
+
+fn replace_single_fenced_subsection(
+    content: &str,
+    subsection: &str,
+    replacement: &str,
+) -> Result<String, ReqvireError> {
+    let header = format!("#### {}", subsection);
+    let mut output = String::new();
+    let mut in_target_section = false;
+    let mut saw_fence = false;
+    let mut skipping_block = false;
+    let mut replaced = false;
+
+    for line in content.lines() {
+        let trimmed = line.trim();
+        if !replaced && trimmed == header {
+            in_target_section = true;
+            output.push_str(line);
+            output.push('\n');
+            continue;
+        }
+
+        if in_target_section && !saw_fence {
+            output.push_str(line);
+            output.push('\n');
+            if trimmed.starts_with("```") {
+                saw_fence = true;
+                if !replacement.trim().is_empty() {
+                    output.push_str(replacement.trim_end());
+                    output.push('\n');
+                }
+                skipping_block = true;
+            }
+            continue;
+        }
+
+        if skipping_block {
+            if trimmed.starts_with("```") {
+                output.push_str(line);
+                output.push('\n');
+                skipping_block = false;
+                in_target_section = false;
+                replaced = true;
+            }
+            continue;
+        }
+
+        output.push_str(line);
+        output.push('\n');
+    }
+
+    if !replaced {
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Expected to replace #### {} fenced Turtle block but the section was not found.",
+            subsection
+        )));
+    }
+
+    Ok(output.trim_end_matches('\n').to_string())
+}
+
+struct UsedOntologyProjectNamespaces {
+    by_prefix: BTreeMap<String, BTreeSet<String>>,
+    prefix_by_namespace: BTreeMap<String, BTreeSet<String>>,
+}
+
+impl UsedOntologyProjectNamespaces {
+    fn is_empty(&self) -> bool {
+        self.by_prefix.is_empty()
+    }
+
+    fn namespaces_for_iri(&self, iri: &str) -> Vec<&str> {
+        self.prefix_by_namespace
+            .keys()
+            .filter(|namespace| iri.starts_with(namespace.as_str()))
+            .map(String::as_str)
+            .collect()
+    }
+
+    fn prefix_for_namespace(&self, namespace: &str) -> Option<&str> {
+        self.prefix_by_namespace
+            .get(namespace)?
+            .iter()
+            .next()
+            .map(String::as_str)
     }
 }
 

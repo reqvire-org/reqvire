@@ -706,6 +706,26 @@ fn convert_relation_to_summary(rel: &Relation) -> RelationSummary {
     }
 }
 
+fn should_traverse_change_impact_relation(source: &element::Element, rel: &Relation) -> bool {
+    let relation_name = rel.relation_type.name;
+    if !relation::IMPACT_PROPAGATION_RELATIONS.contains(&relation_name) {
+        return false;
+    }
+
+    match relation_name {
+        // A semantic contract depends on ontology vocabulary; a contract change
+        // does not make the ontology an impacted downstream review target.
+        "use" => false,
+        // Ontology changes flow to semantic contracts that use that ontology.
+        "usedBy" => matches!(source.element_type, element::ElementType::Ontology),
+        // Requirement changes should flag semantic-contract consistency review.
+        "constrainedBy" => matches!(source.element_type, element::ElementType::Requirement(_)),
+        // Semantic-contract changes flow to constrained requirements.
+        "constrain" => matches!(source.element_type, element::ElementType::SemanticContract),
+        _ => true,
+    }
+}
+
 /// Builds the change impact tree recursively using `ElementNode` and keeps only forward relations.
 pub fn build_change_impact_tree(
     current: &graph_registry::GraphRegistry,
@@ -754,21 +774,25 @@ pub fn build_change_impact_tree(
     let relations = impact_relations
         .into_iter()
         .filter_map(|(impacted_id, rels)| {
+            let impact_relations: Vec<_> = rels
+                .into_iter()
+                .filter(|rel| should_traverse_change_impact_relation(&element, rel))
+                .collect();
+            if impact_relations.is_empty() {
+                return None;
+            }
+
             // Skip cycles
             if !visited.insert(impacted_id.clone()) {
                 return None;
             }
 
             // Use the text from the first relation as a fallback display name
-            let fallback_name = rels.first().map(|rel| rel.target.text.clone());
+            let fallback_name = impact_relations.first().map(|rel| rel.target.text.clone());
             let child_node =
                 build_change_impact_tree(current, impacted_id.clone(), visited, fallback_name);
-            // Only include relations that propagate changes
-            let forward_relations: Vec<_> = rels
+            let forward_relations: Vec<_> = impact_relations
                 .into_iter()
-                .filter(|rel| {
-                    relation::IMPACT_PROPAGATION_RELATIONS.contains(&rel.relation_type.name)
-                })
                 .map(|rel| RelationNode {
                     relation_trigger: rel.relation_type.name.to_string(),
                     element_node: child_node.clone(),
@@ -886,7 +910,15 @@ fn collect_tree_ids_recursively(node: &ElementNode, set: &mut HashSet<String>) {
 fn is_smart_filter_child_relation(relation_type: &str) -> bool {
     matches!(
         relation_type,
-        "derive" | "specifiedBy" | "satisfiedBy" | "refinedBy" | "verifiedBy"
+        "derive"
+            | "specifiedBy"
+            | "satisfiedBy"
+            | "refinedBy"
+            | "constrainedBy"
+            | "constrain"
+            | "use"
+            | "usedBy"
+            | "verifiedBy"
     )
 }
 
@@ -1544,15 +1576,21 @@ mod tests {
 
     /// Helper function to create a simple element.
     fn create_element(identifier: &str, name: &str, content: &str) -> Element {
-        let mut element = Element::new(
-            name,
+        create_typed_element(
             identifier,
-            "test.md",
-            1,
-            Some(crate::element::ElementType::Requirement(
-                crate::element::RequirementType::System,
-            )),
-        );
+            name,
+            content,
+            crate::element::ElementType::Requirement(crate::element::RequirementType::System),
+        )
+    }
+
+    fn create_typed_element(
+        identifier: &str,
+        name: &str,
+        content: &str,
+        element_type: crate::element::ElementType,
+    ) -> Element {
+        let mut element = Element::new(name, identifier, "test.md", 1, Some(element_type));
         element.add_content(content);
         element.freeze_content();
         element
@@ -1577,6 +1615,176 @@ mod tests {
             },
             user_created: true,
         });
+    }
+
+    fn relation_type(name: &str) -> &'static RelationTypeInfo {
+        relation::RELATION_TYPES
+            .get(name)
+            .unwrap_or_else(|| panic!("missing relation type {name}"))
+    }
+
+    fn tree_contains_name(node: &ElementNode, name: &str) -> bool {
+        node.element.name == name
+            || node
+                .relations
+                .iter()
+                .any(|rel| tree_contains_name(&rel.element_node, name))
+    }
+
+    fn changed_tree_for<'a>(report: &'a ChangeImpactReport, name: &str) -> &'a ElementNode {
+        &report
+            .changed
+            .iter()
+            .find(|element| element.name == name)
+            .unwrap_or_else(|| panic!("missing changed element {name}"))
+            .change_impact_tree
+    }
+
+    fn register_semantic_contract_impact_fixture(
+        registry: &mut GraphRegistry,
+        ontology_content: &str,
+        contract_content: &str,
+        requirement_content: &str,
+    ) {
+        let mut ontology = create_typed_element(
+            "test.md#payload-ontology",
+            "Payload Ontology",
+            ontology_content,
+            crate::element::ElementType::Ontology,
+        );
+        add_relation(
+            &mut ontology,
+            relation_type("usedBy"),
+            "test.md#payload-contract",
+        );
+
+        let mut contract = create_typed_element(
+            "test.md#payload-contract",
+            "Payload Contract",
+            contract_content,
+            crate::element::ElementType::SemanticContract,
+        );
+        add_relation(
+            &mut contract,
+            relation_type("use"),
+            "test.md#payload-ontology",
+        );
+        add_relation(
+            &mut contract,
+            relation_type("constrain"),
+            "test.md#payload-requirement",
+        );
+
+        let mut requirement = create_typed_element(
+            "test.md#payload-requirement",
+            "Payload Requirement",
+            requirement_content,
+            crate::element::ElementType::Requirement(crate::element::RequirementType::System),
+        );
+        add_relation(
+            &mut requirement,
+            relation_type("constrainedBy"),
+            "test.md#payload-contract",
+        );
+        add_relation(
+            &mut requirement,
+            relation_type("verifiedBy"),
+            "test.md#payload-verification",
+        );
+
+        let mut verification = create_typed_element(
+            "test.md#payload-verification",
+            "Payload Verification",
+            "verification",
+            crate::element::ElementType::Verification(crate::element::VerificationType::Test),
+        );
+        add_relation(
+            &mut verification,
+            relation_type("verify"),
+            "test.md#payload-requirement",
+        );
+
+        registry.register_element(ontology, "test.md").unwrap();
+        registry.register_element(contract, "test.md").unwrap();
+        registry.register_element(requirement, "test.md").unwrap();
+        registry.register_element(verification, "test.md").unwrap();
+    }
+
+    #[test]
+    fn test_ontology_change_propagates_to_contract_requirement_and_verification() {
+        let mut current = GraphRegistry::new();
+        let mut reference = GraphRegistry::new();
+        register_semantic_contract_impact_fixture(
+            &mut current,
+            "ontology v2",
+            "contract",
+            "requirement",
+        );
+        register_semantic_contract_impact_fixture(
+            &mut reference,
+            "ontology v1",
+            "contract",
+            "requirement",
+        );
+
+        let report = compute_change_impact(&current, &reference).unwrap();
+        let tree = changed_tree_for(&report, "Payload Ontology");
+
+        assert!(tree_contains_name(tree, "Payload Contract"));
+        assert!(tree_contains_name(tree, "Payload Requirement"));
+        assert!(tree_contains_name(tree, "Payload Verification"));
+    }
+
+    #[test]
+    fn test_semantic_contract_change_propagates_to_requirement_not_ontology() {
+        let mut current = GraphRegistry::new();
+        let mut reference = GraphRegistry::new();
+        register_semantic_contract_impact_fixture(
+            &mut current,
+            "ontology",
+            "contract v2",
+            "requirement",
+        );
+        register_semantic_contract_impact_fixture(
+            &mut reference,
+            "ontology",
+            "contract v1",
+            "requirement",
+        );
+
+        let report = compute_change_impact(&current, &reference).unwrap();
+        let tree = changed_tree_for(&report, "Payload Contract");
+
+        assert!(tree_contains_name(tree, "Payload Requirement"));
+        assert!(tree_contains_name(tree, "Payload Verification"));
+        assert!(
+            !tree_contains_name(tree, "Payload Ontology"),
+            "semantic-contract changes should not propagate through use to ontology"
+        );
+    }
+
+    #[test]
+    fn test_requirement_change_flags_semantic_contract_consistency_review() {
+        let mut current = GraphRegistry::new();
+        let mut reference = GraphRegistry::new();
+        register_semantic_contract_impact_fixture(
+            &mut current,
+            "ontology",
+            "contract",
+            "requirement v2",
+        );
+        register_semantic_contract_impact_fixture(
+            &mut reference,
+            "ontology",
+            "contract",
+            "requirement v1",
+        );
+
+        let report = compute_change_impact(&current, &reference).unwrap();
+        let tree = changed_tree_for(&report, "Payload Requirement");
+
+        assert!(tree_contains_name(tree, "Payload Contract"));
+        assert!(tree_contains_name(tree, "Payload Verification"));
     }
 
     #[test]

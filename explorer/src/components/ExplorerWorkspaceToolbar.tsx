@@ -1,26 +1,20 @@
 import type { ReactNode } from "react";
-import { css, cx } from "@linaria/atomic";
+import { WorkspaceToolbar } from "@ds";
 
-const baseUX = css`
-  box-sizing: border-box;
-`;
-
-const skinX = css`
-  color: inherit;
-`;
+export interface ExplorerWorkspaceToolbarProps {
+  ariaLabel: string;
+  className?: string;
+  children: ReactNode;
+}
 
 export function ExplorerWorkspaceToolbar({
   ariaLabel,
   className = "",
   children,
-}: {
-  ariaLabel: string;
-  className?: string;
-  children: ReactNode;
-}) {
+}: ExplorerWorkspaceToolbarProps) {
   return (
-    <div className={cx("ex-workspace-toolbar", "ex-graph-control-panel", baseUX, skinX, className)} aria-label={ariaLabel}>
+    <WorkspaceToolbar className={className} aria-label={ariaLabel}>
       {children}
-    </div>
+    </WorkspaceToolbar>
   );
 }

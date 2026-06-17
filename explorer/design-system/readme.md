@@ -43,11 +43,11 @@ How Reqvire writes copy — match this when generating product text.
 **Palette.** Warm product surfaces (`--warm-*`) for canvas, panels, hover fills and borders, with slate ramps (`--slate-*`) for text and dark surfaces. A single **rose** brand accent (`--accent`, rose-600 · #e11d48) for interactive chrome — focus rings, selection, links, the active tab underline. A separate **dark slate ink** (`--slate-900`) fills primary buttons and active segmented controls (the product fills these with near-black, not the accent). Color is otherwise reserved for **meaning**: the six-hue element-type code.
 
 **Element-type semantics** (the heart of the system — never repurpose these hues for decoration):
-capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), refinement = **#FF9800** (orange — covers source, specification, constraint, behavior, state, input-output, semantic-contract, semantic-query-contract), verification = **#4CAF50** (green — all verification sub-types), ontology = fill **#F4E3A1** + stroke **#B08A00**, file/resource = **#FFCA28** (amber), other = **#9E9E9E** (gray). These are the authoritative Reqvire element-type colors. Each ships a solid plus a light tint for chips and node fills. The Ontologies mode adds an extended RDF/SHACL palette (`--rdf-*`).
+capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), semantic-contract = SHACL red (`--semantic-contract`), refinement = **#FF9800** (orange — covers source, specification, constraint, behavior, state, input-output), verification = **#4CAF50** (green — all verification sub-types), ontology = fill **#F4E3A1** + stroke **#B08A00**, file/resource/concept-reference = **#FFCA28** (amber), evidence-file/artifact/other = **#9E9E9E** (gray). These are the authoritative Reqvire element-type colors. Each ships a solid plus a light tint for chips and node fills. The Ontologies mode adds an extended RDF/SHACL palette (`--rdf-*`).
 
 **Typography.** **Geist** for all UI and display; **Geist Mono** for IDs, source paths, type/relation slugs and ontology terms. The product is **dense** — default UI text is **13px** (`--text-sm`), reading copy 14px, sidebar section labels 11px uppercase with `0.07em` tracking. Weights live at 400/500/600; 700 is rare.
 
-**Spacing & shape.** 4px base grid (`--space-*`). Radii step from 4px (type-icon chips) → 6px (tags/inputs) → 8px (buttons/toggles) → 10px (cards) → 14px (dialogs) → pill. Controls are compact: 34px default height, 28px small.
+**Spacing & shape.** 4px base grid (`--space-*`). Radii step from 4px (type-icon chips) → 6px (tags/inputs) → 8px (buttons/toggles) → 10px (cards) → 14px (dialogs) → pill. Controls are compact: 34px default height, 28px small. List-like UI is contiguous by default: menu items, table/list rows, filters, legends, and relation rows use `--gap-list-stack` so boxes sit directly next to each other vertically.
 
 **Surfaces & elevation.** Light, near-white canvas (`--bg-canvas`) with white panels/cards. Borders do most of the structural work; **shadows are soft and low** (`--shadow-xs/sm` on cards, `--shadow-lg/xl` only for popovers and modals). Cards are white with a 1px subtle border and `xs` shadow; **selected** cards switch to a dark 1px ring + a faint sunken fill (no accent border). No heavy gradients — the only gradient is a barely-there radial wash behind the graph canvas.
 
@@ -66,7 +66,7 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), refine
 ## Iconography
 
 - **Line icons, Lucide geometry.** The Explorer uses a single stroked line-icon set (2px stroke, round caps, 24px grid) — search, box/cube, network/share, globe, activity, grid, list, table, database, settings-gear, sun/moon, help-circle, chevrons, folder/file, external-link, download. This system ships them CDN-free as the **`Icon`** component (`components/core/Icon.tsx`), whose path data is Lucide-derived (ISC). Use `<Icon name="…" />`; import `ICON_NAMES` for the full list. For anything outside the curated set, pass your own inline SVG to the icon-accepting props — do **not** hand-draw decorative SVG.
-- **Element-type glyphs are their own system.** A model element is marked by a colored glyph, *not* a line icon: capability → a dark **hub** square with a blue pip; requirement / verification / ontology / resource → type-colored rounded squares; refinement-family elements → orange diamonds with subtype marks (`source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, `semantic-contract`) so related refinements keep the same hue while remaining visually distinct. This is the **`ElementIcon`** component.
+- **Element-type glyphs are their own system.** A model element is marked by a colored glyph, *not* a line icon: capability / requirement / verification / ontology / resource / semantic-contract → type-colored rounded squares with no text mark; refinement-family elements → orange diamonds with subtype marks (`source`, `specification`, `constraint`, `behavior`, `state`, `input-output`) so related refinements keep the same hue while remaining visually distinct. This is the **`ElementIcon`** component.
 - **No emoji, no unicode-as-icon.** The only non-icon glyph in the source is the subclass mark `⊆` beside ontology terms.
 - **Logo.** A small **model-hub constellation** — six satellite nodes whose links converge at the model root carrying the element-type colors. `assets/logo-mark.svg`. ⚠ This is a **reconstruction** from the screenshots; replace with the official Reqvire SVG when available (see Caveats).
 
@@ -81,16 +81,21 @@ capability = **#BBDEFB** (blue), requirement = **#673AB7** (deep purple), refine
 - `SKILL.md` — Agent-Skill manifest for downloading this system into Claude Code.
 
 **Components** (`components/<group>/` — TSX source exported via `index.ts`)
-- `core/` — **Alert**, **Button**, **IconButton**, **Badge**, **Card**, **Icon**, **Modal**
-- `data/` — **ElementIcon**, **TypeBadge**, **RelationPill**, **Chip**, **Stat** (+ **StatRow**), **Table**
+- `core/` — **Alert**, **Button**, **IconButton**, **Badge**, **BrandMark**, **Card**, **Icon**, **Modal**
+- `data/` — **CodeRef**, **ElementIcon**, **TypeBadge**, **RelationPill**, **Chip**, **Stat** (+ **StatRow**), **Table**
 - `controls/` — **ToggleRow**, **SegmentedControl**, **SearchInput**, **Tabs**
 - `navigation/` — **TreeItem**, **Breadcrumb**, **SidebarSection**
 
+**Product patterns** (`product-patterns/<group>/` — reusable UX/product patterns exported via `index.ts`)
+- `shell/` — **AppShell**, **ShellPane**, **PaneResizer**, **ShellMain**, **RouteFrame**, **RouteLayout**, **RoutePanel**
+- `chrome/`, `files/`, `resources/`, `search/`, `reports/`, `side-pane/`, `detail/`, `content/`, `feedback/` — reusable UX/product visual patterns
+
 **Ownership**
-- `rq-*` classes and `--rq-*` component variables are design-system-only.
-- `ex-*` classes and `--ex-*` variables are Explorer app-only.
-- Consumers import components and palette symbols from `@ds` only.
-- Consumers do not target design-system internals; customization happens through documented props or `--rq-*` variables.
+- `ds-*` classes and `--ds-*` component variables are design-system-only.
+- `ux-*` classes and `--ux-*` variables are owned by the UX/product-pattern layer,
+  under `design-system/product-patterns/`.
+- Consumers import primitives, product patterns, and palette symbols from `@ds` only.
+- Consumers do not target design-system internals; customization happens through documented props or `--ds-*` variables.
 
 **Generated artifacts**
 - Generated bundles, generated CSS, and `dist-*` outputs are not tracked source.

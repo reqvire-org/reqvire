@@ -57,6 +57,7 @@
     --color-requirement: oklch(47.42% 0.1862 294.78);
     --color-verification:oklch(67.31% 0.1624 144.21);
     --color-refinement:  oklch(77.03% 0.1741 64.05);
+    --color-semantic-contract: oklch(63.68% 0.2078 25.33);
     --color-ontology:    oklch(65.1%  0.133  89.06);
     --color-resource:    oklch(86.22% 0.1681 88.31);
     --color-other:       oklch(69.93% 0 0);
@@ -158,6 +159,10 @@
     --refinement-ink: #e65100;
     --refinement-tint: color-mix(in oklch, var(--refinement) 15%, var(--bg-surface));
 
+    --semantic-contract:     var(--color-semantic-contract);
+    --semantic-contract-ink: #b71c1c;
+    --semantic-contract-tint: color-mix(in oklch, var(--semantic-contract) 15%, var(--bg-surface));
+
     --verification:     var(--color-verification);
     --verification-ink: #2e7d32;
     --verification-tint: color-mix(in oklch, var(--verification) 15%, var(--bg-surface));
@@ -189,6 +194,11 @@
     --rdf-propshape:   var(--color-rdf-propshape);
     --rdf-resource:    var(--color-rdf-resource);
     --rdf-shacl:       var(--color-rdf-shacl);
+    --rdf-class-tint:       color-mix(in srgb, var(--rdf-class) 12%, var(--bg-surface));
+    --rdf-class-border:     color-mix(in srgb, var(--rdf-class) 36%, var(--border-default));
+    --rdf-objprop-border:   color-mix(in srgb, var(--rdf-objprop) 34%, var(--border-default));
+    --rdf-dtprop-border:    color-mix(in srgb, var(--rdf-dtprop) 34%, var(--border-default));
+    --rdf-shacl-border:     color-mix(in srgb, var(--rdf-shacl) 34%, var(--border-default));
 
     /* ── Status ─────────────────────────────────────────────────── */
     --success: var(--color-success);
@@ -199,6 +209,10 @@
     --warning-tint: color-mix(in oklch, var(--warning) 15%, var(--bg-surface));
     --danger-tint:  color-mix(in oklch, var(--danger)  15%, var(--bg-surface));
     --info-tint:    color-mix(in oklch, var(--info)    15%, var(--bg-surface));
+    --success-border: color-mix(in srgb, var(--success) 34%, var(--border-default));
+    --warning-border: color-mix(in srgb, var(--warning) 34%, var(--border-default));
+    --danger-border:  color-mix(in srgb, var(--danger)  34%, var(--border-default));
+    --info-border:    color-mix(in srgb, var(--info)    34%, var(--border-default));
 
     /* ── Graph edge colors ───────────────────────────────────────── */
     --edge-default: var(--color-edge-default);
@@ -207,17 +221,23 @@
     --edge-trace:   var(--color-slate-400);
     --edge-attach:  var(--color-edge-attach);
 
+    /* ── Accent state surfaces ──────────────────────────────────── */
+    --accent-bg-hover:   color-mix(in srgb, var(--accent) 5%, transparent);
+    --accent-bg-selected: var(--rose-50);
+
     /* ── Semantic surface / text / border aliases ────────────────── */
     --bg-canvas:      var(--warm-25);
     --bg-surface:     var(--warm-0);
     --bg-raised:      var(--warm-0);
     --bg-overlay:     var(--warm-0);
     --bg-sunken:      var(--warm-100);
-    --bg-hover:       var(--warm-50);
+    --bg-hover:       var(--accent-bg-hover);
     --bg-active:      var(--warm-150);
     --bg-rail:        var(--warm-25);
+    --bg-floating:    color-mix(in srgb, var(--bg-overlay) 94%, transparent);
+    --bg-scrim:       color-mix(in srgb, var(--slate-950) 48%, transparent);
 
-    --bg-selected:      var(--rose-50);
+    --bg-selected:      var(--accent-bg-selected);
     --border-selected:  var(--rose-600);
     --ring-selected:    rgba(225,29,72,0.28);
 
@@ -229,17 +249,23 @@
     --text-inverse:   var(--slate-0);
     --text-link:      var(--rose-600);
     --text-code:      var(--slate-700);
+    --text-separator: color-mix(in srgb, var(--text-muted) 70%, transparent);
+    --text-disabled-decoration: color-mix(in srgb, var(--text-faint), transparent 35%);
 
     --border-subtle:  var(--warm-200);
     --border-default: var(--warm-300);
     --border-strong:  var(--slate-300);
+    --border-panel:   color-mix(in srgb, var(--border-subtle) 65%, transparent);
     --border-focus:   var(--rose-600);
+    --control-swatch-ring: color-mix(in srgb, var(--slate-950) 8%, transparent);
+    --element-icon-ring: color-mix(in srgb, var(--slate-950) 18%, transparent);
+    --element-icon-ring-inverse: color-mix(in srgb, var(--slate-0) 10%, transparent);
 
     --accent:         var(--rose-600);
     --accent-hover:   var(--rose-700);
     --accent-active:  var(--rose-800);
     --accent-fg:      #ffffff;
-    --accent-subtle:  var(--rose-50);
+    --accent-subtle:  var(--accent-bg-selected);
     --accent-ring:    rgba(225,29,72,0.32);
 
     --focus-ring:     rgba(225,29,72,0.38);
@@ -259,6 +285,7 @@
       --capability-ink:    #90caf9;
       --requirement-ink:   #b39ddb;
       --refinement-ink:    #ffb74d;
+      --semantic-contract-ink: #ef9a9a;
       --verification-ink:  #81c784;
       --ontology-ink:      #e3cd7b;
       --resource-ink:      #ffd95e;
@@ -266,16 +293,19 @@
 
       --edge-default: #3a4555;
 
+      --accent-bg-hover:    color-mix(in srgb, var(--accent) 12%, transparent);
+      --accent-bg-selected: rgba(251,113,133,0.18);
+
       --bg-canvas:   #0e141d;
       --bg-surface:  #131b26;
       --bg-raised:   #18212e;
       --bg-overlay:  #1e2836;
       --bg-sunken:   #0b1119;
-      --bg-hover:    #1d2735;
+      --bg-hover:    var(--accent-bg-hover);
       --bg-active:   #243040;
       --bg-rail:     #10171f;
 
-      --bg-selected:     rgba(251,113,133,0.18);
+      --bg-selected:     var(--accent-bg-selected);
       --border-selected: var(--rose-500);
       --ring-selected:   rgba(251,113,133,0.45);
 
@@ -297,7 +327,7 @@
       --accent-hover:  #fda4af;
       --accent-active: #ffccd4;
       --accent-fg:     #ffffff;
-      --accent-subtle: rgba(251,113,133,0.20);
+      --accent-subtle: var(--accent-bg-selected);
       --accent-ring:   rgba(251,113,133,0.50);
 
       --focus-ring:    rgba(251,113,133,0.55);
@@ -311,6 +341,7 @@
     --capability-ink:    #90caf9;
     --requirement-ink:   #b39ddb;
     --refinement-ink:    #ffb74d;
+    --semantic-contract-ink: #ef9a9a;
     --verification-ink:  #81c784;
     --ontology-ink:      #e3cd7b;
     --resource-ink:      #ffd95e;
@@ -318,16 +349,19 @@
 
     --edge-default: #3a4555;
 
+    --accent-bg-hover:    color-mix(in srgb, var(--accent) 12%, transparent);
+    --accent-bg-selected: rgba(251,113,133,0.18);
+
     --bg-canvas:   #0e141d;
     --bg-surface:  #131b26;
     --bg-raised:   #18212e;
     --bg-overlay:  #1e2836;
     --bg-sunken:   #0b1119;
-    --bg-hover:    #1d2735;
+    --bg-hover:    var(--accent-bg-hover);
     --bg-active:   #243040;
     --bg-rail:     #10171f;
 
-    --bg-selected:     rgba(251,113,133,0.18);
+    --bg-selected:     var(--accent-bg-selected);
     --border-selected: var(--rose-500);
     --ring-selected:   rgba(251,113,133,0.45);
 
@@ -349,7 +383,7 @@
     --accent-hover:  #fda4af;
     --accent-active: #ffccd4;
     --accent-fg:     #ffffff;
-    --accent-subtle: rgba(251,113,133,0.20);
+    --accent-subtle: var(--accent-bg-selected);
     --accent-ring:   rgba(251,113,133,0.50);
 
     --focus-ring:    rgba(251,113,133,0.55);

@@ -15,7 +15,6 @@ Capability root for invalid capability-owned refinement cases.
   * refinedBy: [Capability State](#capability-state)
   * refinedBy: [Capability Input Output](#capability-input-output)
   * refinedBy: [Capability Semantic Contract](#capability-semantic-contract)
-  * refinedBy: [Capability Semantic Query Contract](#capability-semantic-query-contract)
 ---
 
 ### Capability Source
@@ -100,21 +99,5 @@ INVALID: capability-owned semantic-contract is not allowed.
 @prefix ex: <urn:reqvire:test:capability-refinement:> .
 
 ex:CapabilityShape a sh:NodeShape .
-```
----
-
-### Capability Semantic Query Contract
-
-INVALID: capability-owned semantic-query-contract is not allowed.
-
-#### Metadata
-  * type: semantic-query-contract
-
-#### Relations
-  * refine: [Test Capability Invalid Capability Refinements](#test-capability-invalid-capability-refinements)
-
-#### Query
-```sparql
-SELECT ?s WHERE { ?s ?p ?o . }
 ```
 ---

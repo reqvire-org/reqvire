@@ -7,7 +7,7 @@ This repository includes Codex skill packages for Reqvire MBSE workflows.
 - `codex-skills/reqvire-syseng`
   - Use for requirements and specifications work, verification modeling and coverage checks, model exploration and impact analysis, and MBSE-first change workflows in Reqvire.
 - `codex-skills/reqvire-ontology-authoring`
-  - Use for competency-question-driven creation, extension, and validation of Reqvire ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest models with OWL/Turtle vocabulary, capability attachment context, semantic-contract and semantic-query-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, and semantic export readiness.
+  - Use for competency-question-driven creation, extension, and validation of Reqvire ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest models with OWL/Turtle vocabulary, capability attachment context, semantic-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, and semantic export readiness.
 
 The skills use the Reqvire npm package by default:
 

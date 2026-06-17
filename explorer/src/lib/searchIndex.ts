@@ -1,6 +1,6 @@
 import MiniSearch from "minisearch";
 import type { ProjectStoreSearchDocument } from "../store/types";
-import type { SearchKind } from "../components/ExplorerUiState";
+import type { SearchKind } from "../search/searchKinds";
 
 const EMPTY_RESULT_LIMIT = 50;
 const QUERY_RESULT_LIMIT = 100;

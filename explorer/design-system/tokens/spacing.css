@@ -54,6 +54,7 @@
   --header-h:       52px;   /* explorer top header */
   --content-max:    1180px; /* main column max readable width */
   --row-h:          30px;   /* tree row / list row height */
+  --gap-list-stack: var(--space-0); /* default vertical gap for contiguous menu/list/filter rows */
 
   /* Borders */
   --border-w:       1px;

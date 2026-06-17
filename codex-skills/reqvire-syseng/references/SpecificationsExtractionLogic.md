@@ -404,8 +404,8 @@ reqvire search --filter-type="requirement" --filter-file="requirements/System/**
 # Find requirements with attachments (may need conversion to satisfiedBy)
 reqvire search --filter-type="requirement" --has-attachments --short
 
-# Find refinements without refine relations (orphaned specifications, constraints, behaviors, state, input-output, semantic contracts)
-reqvire search --filter-type="specification,constraint,behavior,state,input-output,semantic-contract,source" --not-have-relations="refine" --short
+# Find refinements without refine relations (orphaned specifications, constraints, behaviors, state, input-output, sources, and )
+reqvire search --filter-type="specification,constraint,behavior,state,input-output,source" --not-have-relations="refine" --short
 ```
 
 ### Validation Commands (Phase 5)

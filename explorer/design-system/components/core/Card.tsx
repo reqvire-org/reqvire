@@ -1,8 +1,8 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from "react";
+import type { HTMLAttributes, ReactNode } from "react";
 import { css, cx } from "@linaria/atomic";
 import type { DesignSystemColorToken } from "../../palette";
 
-export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+export interface CardProps extends Omit<HTMLAttributes<HTMLDivElement>, "style"> {
   children: ReactNode;
   interactive?: boolean;
   selected?: boolean;
@@ -44,13 +44,13 @@ const interactiveSkinX = css`
 `;
 
 const selectedSkinX = css`
-  background: var(--rq-card-selected-bg, color-mix(in srgb, var(--accent) 6%, var(--bg-raised)));
-  border-color: var(--rq-card-selected-border, var(--accent));
-  box-shadow: var(--rq-card-selected-shadow, 0 0 0 var(--border-w) var(--accent), var(--shadow-md));
+  background: var(--ds-card-selected-bg, var(--bg-selected));
+  border-color: var(--ds-card-selected-border, var(--accent));
+  box-shadow: var(--ds-card-selected-shadow, 0 0 0 var(--border-w) var(--accent), var(--shadow-md));
 
   &:hover {
-    border-color: var(--rq-card-selected-hover-border, var(--rq-card-selected-border, var(--accent)));
-    box-shadow: var(--rq-card-selected-hover-shadow, 0 0 0 var(--border-w) var(--accent), var(--shadow-lg));
+    border-color: var(--ds-card-selected-hover-border, var(--ds-card-selected-border, var(--accent)));
+    box-shadow: var(--ds-card-selected-hover-shadow, 0 0 0 var(--border-w) var(--accent), var(--shadow-lg));
   }
 `;
 
@@ -59,9 +59,21 @@ const accentUX = css`
   top: 0;
   bottom: 0;
   left: 0;
-  width: var(--rq-card-accent-w, var(--border-w-heavy));
+  width: var(--ds-card-accent-w, var(--border-w-heavy));
   border-radius: var(--radius-lg) 0 0 var(--radius-lg);
-  background: var(--rq-card-accent-color);
+  background: var(--ds-card-accent-color);
+`;
+
+const accentTokenSkinX = css`
+  &[data-accent-token="--accent"] { --ds-card-accent-color: var(--accent); }
+  &[data-accent-token="--capability"] { --ds-card-accent-color: var(--capability); }
+  &[data-accent-token="--requirement"] { --ds-card-accent-color: var(--requirement); }
+  &[data-accent-token="--refinement"] { --ds-card-accent-color: var(--refinement); }
+  &[data-accent-token="--semantic-contract"] { --ds-card-accent-color: var(--semantic-contract); }
+  &[data-accent-token="--verification"] { --ds-card-accent-color: var(--verification); }
+  &[data-accent-token="--ontology"] { --ds-card-accent-color: var(--ontology); }
+  &[data-accent-token="--resource"] { --ds-card-accent-color: var(--resource); }
+  &[data-accent-token="--other"] { --ds-card-accent-color: var(--other); }
 `;
 
 export function Card({
@@ -71,31 +83,27 @@ export function Card({
   padded = true,
   accentColorToken,
   className = "",
-  style,
   ...props
 }: CardProps) {
-  const cardStyle = accentColorToken
-    ? ({ "--rq-card-accent-color": `var(${accentColorToken})`, ...style } as CSSProperties)
-    : style;
-
   return (
     <div
       className={cx(
-        "rq-card",
+        "ds-card",
         baseUX,
         skinX,
         padded ? paddedUX : "",
-        padded ? "rq-card--pad" : "",
+        padded ? "ds-card--pad" : "",
         interactive ? interactiveSkinX : "",
-        interactive ? "rq-card--interactive" : "",
+        interactive ? "ds-card--interactive" : "",
         selected ? selectedSkinX : "",
-        selected ? "rq-card--selected" : "",
+        selected ? "ds-card--selected" : "",
+        accentColorToken ? accentTokenSkinX : "",
         className,
       )}
-      style={cardStyle}
+      data-accent-token={accentColorToken}
       {...props}
     >
-      {accentColorToken ? <span className={cx("rq-card__accent", accentUX)} /> : null}
+      {accentColorToken ? <span className={cx("ds-card__accent", accentUX)} /> : null}
       {children}
     </div>
   );

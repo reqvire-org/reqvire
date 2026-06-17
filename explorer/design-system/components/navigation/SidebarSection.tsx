@@ -5,9 +5,9 @@ const baseUX = css`
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: var(--rq-section-gap, var(--space-5));
+  gap: var(--ds-section-gap, var(--space-5));
 
-  .rq-section__head {
+  .ds-section__head {
     display: flex;
     min-width: 0;
     align-items: center;
@@ -15,24 +15,24 @@ const baseUX = css`
     gap: var(--space-6);
   }
 
-  .rq-section__title {
+  .ds-section__title {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .rq-section__action {
+  .ds-section__action {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
   }
 
-  .rq-section__body {
+  .ds-section__body {
     display: flex;
     min-width: 0;
     flex-direction: column;
-    gap: var(--rq-section-body-gap, var(--space-4));
+    gap: var(--ds-section-body-gap, var(--gap-list-stack));
   }
 
   svg {
@@ -42,11 +42,11 @@ const baseUX = css`
 `;
 
 const skinX = css`
-  .rq-section__head {
-    padding: var(--rq-section-head-p, 0 var(--space-2));
+  .ds-section__head {
+    padding: var(--ds-section-head-p, 0 var(--space-2));
   }
 
-  .rq-section__title {
+  .ds-section__title {
     color: var(--text-muted);
     font-size: var(--text-micro);
     font-weight: var(--weight-semibold);
@@ -55,14 +55,14 @@ const skinX = css`
     text-transform: uppercase;
   }
 
-  .rq-section__action {
+  .ds-section__action {
     color: var(--text-link);
     font-size: var(--text-caption);
     line-height: var(--leading-tight);
   }
 `;
 
-export type SidebarSectionProps = HTMLAttributes<HTMLElement> & {
+export type SidebarSectionProps = Omit<HTMLAttributes<HTMLElement>, "style"> & {
   title?: ReactNode;
   action?: ReactNode;
   children: ReactNode;
@@ -76,14 +76,14 @@ export function SidebarSection({
   ...props
 }: SidebarSectionProps) {
   return (
-    <section className={cx("rq-section", baseUX, skinX, className)} {...props}>
+    <section className={cx("ds-section", baseUX, skinX, className)} {...props}>
       {title || action ? (
-        <div className="rq-section__head">
-          {title ? <span className="rq-section__title">{title}</span> : <span />}
-          {action ? <span className="rq-section__action">{action}</span> : null}
+        <div className="ds-section__head">
+          {title ? <span className="ds-section__title">{title}</span> : <span />}
+          {action ? <span className="ds-section__action">{action}</span> : null}
         </div>
       ) : null}
-      <div className="rq-section__body">{children}</div>
+      <div className="ds-section__body">{children}</div>
     </section>
   );
 }

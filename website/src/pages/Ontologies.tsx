@@ -8,8 +8,7 @@ export default function Ontologies() {
       <p className="text-base text-zinc-600 leading-relaxed mb-10">
         Ontologies are Reqvire&apos;s reusable semantic vocabulary layer. They
         define domain meaning, model terms, relationships, and semantic rules
-        as first-class OWL/Turtle content that capabilities can attach and
-        requirements can use through reachable context.
+        as first-class OWL/Turtle content with explicit boundary metadata.
       </p>
 
       <Section title="What Belongs Here">
@@ -41,7 +40,7 @@ export default function Ontologies() {
           items={[
             "Author shared ontology elements under the ontology plane, commonly requirements/Ontologies.",
             "Capabilities attach ontology elements to make vocabulary reachable for descendant capabilities and specifying requirements.",
-            "Requirements do not attach ontology directly; requirement attachments are for reusable requirement-owned contracts.",
+            "Requirements do not attach ontology directly; requirement attachments are for reusable requirement-owned non-semantic-contract refinements.",
             "Ontology hierarchy uses derive or derivedFrom only with other ontology elements.",
             "Ontology elements do not author attachments.",
           ]}
@@ -62,12 +61,16 @@ Defines access token domain meaning.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.org/ontology/auth
+  * ontology_prefix: auth
 
 #### Ontology
 \`\`\`turtle
-@prefix auth: <urn:reqvire:auth:> .
+@prefix auth: <https://example.org/ontology/auth#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://example.org/ontology/auth> a owl:Ontology .
 
 auth:AccessToken a owl:Class ;
   rdfs:label "Access token" ;
@@ -115,16 +118,16 @@ The system shall reject API requests whose access token is invalid.
 
       <Section title="Semantic Contracts">
         <p className="text-zinc-600 mb-4">
-          Semantic contracts are requirement-owned SHACL profiles over reachable
-          ontology. They make obligations machine-checkable without redefining
-          ontology locally.
+          Semantic contracts are reusable SHACL profiles that explicitly use
+          ontology and constrain requirements. They make obligations
+          machine-checkable without redefining ontology locally.
         </p>
         <BulletList
           items={[
-            "semantic-contract must refine exactly one requirement.",
+            "semantic-contract may constrain zero, one, or many requirements.",
             "semantic-contract requires one Shapes block.",
             "semantic-contract must not contain an Ontology block.",
-            "SHACL references must resolve through the owning requirement's reachable ontology context.",
+            "semantic-contract must use ontology through explicit use relations, and SHACL references must resolve through that used ontology graph.",
           ]}
         />
         <div className="mt-4">
@@ -134,7 +137,8 @@ The system shall reject API requests whose access token is invalid.
   * type: semantic-contract
 
 #### Relations
-  * refine: [API Access Token Validation](#api-access-token-validation)
+  * constrain: [API Access Token Validation](#api-access-token-validation)
+  * use: [Auth Ontology](#auth-ontology)
 
 #### Shapes
 \`\`\`turtle
@@ -152,20 +156,6 @@ auth:AccessTokenValidationShape
         </div>
       </Section>
 
-      <Section title="Semantic Query Contracts">
-        <p className="text-zinc-600 mb-4">
-          Semantic query contracts are requirement-owned SPARQL query
-          refinements over reachable semantic model context.
-        </p>
-        <BulletList
-          items={[
-            "semantic-query-contract must refine exactly one requirement.",
-            "It requires one Query section with one fenced sparql block.",
-            "It must not contain Ontology or Shapes blocks.",
-          ]}
-        />
-      </Section>
-
       <Section title="Validation">
         <DetailGrid
           items={[
@@ -179,7 +169,7 @@ auth:AccessTokenValidationShape
             },
             {
               name: "SHACL reachability",
-              desc: "A SHACL reference must point to a term declared by reachable ontology context. Missing or outside-context references are validation errors.",
+              desc: "A SHACL reference must point to a term declared by the semantic contract's explicit ontology-use graph. Missing or outside-context references are validation errors.",
             },
             {
               name: "Change impact",

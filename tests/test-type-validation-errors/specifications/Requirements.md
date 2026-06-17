@@ -24,7 +24,7 @@ A system requirement specified by the capability.
 #### Relations
   * specify: [Test Capability](#test-capability)
   * refinedBy: [Test Source Refinement](#test-source-refinement)
-  * refinedBy: [Test Semantic Contract](#test-semantic-contract)
+  * constrainedBy: [Test Semantic Contract](#test-semantic-contract)
 ---
 
 ### Test State Refinement
@@ -80,10 +80,12 @@ A semantic contract for positive type validation.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Test System Requirement](#test-system-requirement)
+  * constrain: [Test System Requirement](#test-system-requirement)
+  * use: [Test Ontology](#test-ontology)
 
 #### Shapes
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix reqvire: <urn:reqvire:test#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
@@ -99,12 +101,16 @@ An ontology for positive type validation.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix reqvire: <urn:reqvire:test#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
+<https://example.test/ontology> a owl:Ontology .
 reqvire:TypeValidationContract a owl:Class .
 ```
 ---

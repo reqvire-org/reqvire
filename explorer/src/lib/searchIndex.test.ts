@@ -5,7 +5,7 @@ import {
   tokenizeSearchText,
   type ProjectSearchDocument,
 } from "./searchIndex";
-import type { SearchKind } from "../components/ExplorerUiState";
+import type { SearchKind } from "../search/searchKinds";
 
 const allKinds = new Set<SearchKind>(["element", "file", "resource", "ontology"]);
 

@@ -225,7 +225,7 @@ pub fn tool_definitions(enable_mutations: bool) -> Vec<Value> {
         ),
         read_tool(
             "reqvire.collect",
-            "Collect element trace context upstream or downstream.",
+            "Collect capability, requirement, or ontology context upstream or downstream.",
             required_object_schema(
                 vec![
                     ("element_name", json!({ "type": "string" })),
@@ -745,6 +745,7 @@ fn ontologies_tool(
             "summary": index.summary,
             "blocks": index.blocks,
             "diagnostics": index.diagnostics,
+            "ontology_documents": index.ontology_documents,
             "ontology_declarations": index.ontology_declarations,
             "shape_references": index.shape_references
         })),
@@ -764,6 +765,7 @@ fn ontologies_tool(
                 "summary": index.summary,
                 "blocks": index.blocks,
                 "diagnostics": index.diagnostics,
+                "ontology_documents": index.ontology_documents,
                 "ontology_declarations": index.ontology_declarations,
                 "shape_references": index.shape_references
             }))

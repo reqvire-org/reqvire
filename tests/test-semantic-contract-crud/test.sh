@@ -34,10 +34,12 @@ Bad semantic contract with a dangling reference.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Billing Ontology](#billing-ontology)
 
 #### Shapes
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix billing: <urn:reqvire:test:billing:> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
@@ -88,10 +90,12 @@ Bad semantic contract with a reference declared outside the reachable capability
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Billing Ontology](#billing-ontology)
 
 #### Shapes
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix billing: <urn:reqvire:test:billing:> .
 @prefix customer: <urn:reqvire:test:customer:> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
@@ -122,8 +126,8 @@ for marker in \
   "sh:path" \
   "urn:reqvire:test:customer:customerId" \
   "specifications/SemanticContracts.md#customer-ontology" \
-  "owning requirement 'specifications/SemanticContracts.md#billing-requirement'" \
-  "Attach the declaring ontology"
+  "not reachable through the contract's use relations" \
+  "Add a use relation"
 do
   if ! echo "$OUTSIDE_ADD_OUTPUT" | grep -Fq "$marker"; then
     echo "FAILED: outside-context add error missing marker: $marker"
@@ -143,12 +147,12 @@ assert_diff \
   "failed outside-context semantic add should not persist file changes"
 
 set +e
-UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Billing Capability" "Tax Ontology" 2>&1)
+UNLINK_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Billing Shape Contract" "Tax Ontology" 2>&1)
 UNLINK_EXIT=$?
 set -e
 
 if [ $UNLINK_EXIT -eq 0 ]; then
-  echo "FAILED: unlinking Tax Ontology attachment should fail because it makes the VAT reference outside-context"
+  echo "FAILED: unlinking Tax Ontology use should fail because it makes the VAT reference outside-context"
   echo "$UNLINK_OUTPUT"
   exit 1
 fi
@@ -159,8 +163,8 @@ for marker in \
   "sh:path" \
   "urn:reqvire:test:tax:VatRate" \
   "specifications/SemanticContracts.md#tax-ontology" \
-  "owning requirement 'specifications/SemanticContracts.md#billing-requirement'" \
-  "Attach the declaring ontology"
+  "not reachable through the contract's use relations" \
+  "Add a use relation"
 do
   if ! echo "$UNLINK_OUTPUT" | grep -Fq "$marker"; then
     echo "FAILED: unlink error missing marker: $marker"
@@ -218,15 +222,19 @@ Tax ontology terms without the VAT rate declaration.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Relations
   * derivedFrom: [Billing Ontology](#billing-ontology)
 
 #### Ontology
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix tax: <urn:reqvire:test:tax:> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
+<https://example.test/ontology> a owl:Ontology .
 tax:OtherRate a owl:DatatypeProperty .
 ```'
 

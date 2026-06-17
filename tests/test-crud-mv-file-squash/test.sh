@@ -129,6 +129,16 @@ if ! grep -q "### Source Element Two" "$TEST_DIR/specifications/Target.md"; then
   exit 1
 fi
 
+if ! grep -q "### Source Ontology" "$TEST_DIR/specifications/Target.md"; then
+  echo "❌ FAILED: Source Ontology not found in target file"
+  exit 1
+fi
+
+if ! grep -q "<https://example.test/source-ontology> a owl:Ontology" "$TEST_DIR/specifications/Target.md"; then
+  echo "❌ FAILED: Source Ontology Turtle block was not preserved in target file"
+  exit 1
+fi
+
 echo "✓ All elements found in target file"
 echo ""
 
@@ -139,7 +149,7 @@ echo "Test 5: Verify correct element count after squash..."
 
 # Count total elements (both existing and moved)
 ELEMENT_COUNT=$(grep -c "^### " "$TEST_DIR/specifications/Target.md")
-EXPECTED_COUNT=5  # capability + 2 existing + 2 moved
+EXPECTED_COUNT=6  # capability + 2 existing + 3 moved
 
 if [ "$ELEMENT_COUNT" -ne "$EXPECTED_COUNT" ]; then
   echo "❌ FAILED: Expected $EXPECTED_COUNT elements, found $ELEMENT_COUNT"
@@ -157,6 +167,13 @@ echo "Test 6: Verify relations updated in Related.md..."
 # Check that the relation now points to Target.md
 if ! grep -q "derivedFrom:.*Target.md#source-element-one" "$TEST_DIR/specifications/Related.md"; then
   echo "❌ FAILED: Relation in Related.md was not updated to point to Target.md"
+  echo "Content:"
+  cat "$TEST_DIR/specifications/Related.md"
+  exit 1
+fi
+
+if ! grep -q "derivedFrom:.*Target.md#source-ontology" "$TEST_DIR/specifications/Related.md"; then
+  echo "❌ FAILED: Ontology relation in Related.md was not updated to point to Target.md"
   echo "Content:"
   cat "$TEST_DIR/specifications/Related.md"
   exit 1

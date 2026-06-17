@@ -10,7 +10,8 @@
 1. Capability first       → Define the coherent operational/system ability
 2. Semantic context    → Attach ontology when shared domain meaning matters
 3. Requirements        → Define what the system shall do (never skip implementable obligations)
-4. Refinements         → Add specifications, constraints, behaviors, state, input-output, and semantic-contract refinements as needed
+4. Refinements         → Add specifications, constraints, behaviors, state, and input-output refinements as needed
+   Semantic contracts  → Add reusable SHACL contracts with explicit ontology use when closed-world checks are needed
 5. Verifications       → Add verification elements for capabilities or leaf requirements
 6. Implementation      → Connect `requirement` elements and evidence-backed verifications to code/evidence via `satisfiedBy`
 ```
@@ -26,7 +27,7 @@ When constructing or refactoring a system model, work from model boundaries inwa
 5. Put shared vocabulary and stable semantic relationships in ontology; attach that ontology from the owning or consuming capability so requirements inherit it through capability context.
 6. Put implementable obligations in requirements that `specify` the local capability.
 7. Put local details in compatible refinements owned by the relevant requirement.
-8. Use attachments, not hierarchy, when another capability root needs ontology or reusable requirement-owned contracts from this one.
+8. Use attachments, not hierarchy, when another capability root needs ontology or reusable requirement-owned non-semantic-contract refinements from this one. Use `use`/`usedBy` for semantic-contract ontology dependencies and `constrain`/`constrainedBy` for semantic-contract requirement dependencies.
 9. Validate `submodels`, `collect`, and change-impact paths after each boundary slice.
 
 ## Capability Design Rules
@@ -57,7 +58,7 @@ Optional subsections such as `#### Stakeholder Need`, `#### Feature`, `#### Oper
 
 Before creating requirements, answer:
 - What coherent operational, product, business, regulatory, or system ability does this address? (`capability`)
-- What semantic meaning, domain vocabulary, data shape, or policy contract must be shared? (`ontology` for vocabulary attached by capabilities, `semantic-contract` for requirement-owned SHACL profiles)
+- What semantic meaning, domain vocabulary, data shape, or policy contract must be shared? (`ontology` for vocabulary attached by capabilities, `semantic-contract` for reusable SHACL profiles that explicitly use ontology and constrain requirements)
 - What technical capabilities are needed? (`requirement`)
 - Are there constraints or limits to define?
 - How will this be verified?
@@ -66,11 +67,12 @@ Before creating requirements, answer:
 
 ```
 Capability (coherent operational/system ability)
-    ├── refinedBy → source / semantic-contract / specification / constraint / behavior / state / input-output
     ├── attach → ontology
     ├── derive → Subcapability
     ├── verifiedBy → Verification
     └── specifiedBy ← Requirement
+                     ├── refinedBy → source / specification / constraint / behavior / state / input-output
+                     ├── constrainedBy → semantic-contract → use → ontology
                      └── derive → Child Requirement
 ```
 
@@ -78,10 +80,10 @@ Capability (coherent operational/system ability)
 - Start with `capability` for the coherent ability, not a UI screen, task, module, or implementation detail
 - Check existing capability roots before adding a new one; preserve independent submodels unless the new work truly belongs in the same capability root
 - Use child capabilities for real independently verifiable operational, product, interface, stakeholder, regulatory, or domain slices
-- Use `source` refinements for stakeholder, regulatory, contractual, or external context
-- Use `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements when capability-level context needs additional operational detail before requirements are derived
+- Use `source` refinements on requirements for stakeholder, regulatory, contractual, or external context
+- Use `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements when requirement-level context needs additional operational detail
 - Use `ontology` elements for ontology/vocabulary contracts
-- Use requirement-owned `semantic-contract` refinements for SHACL shape profiles over reachable ontology context
+- Use `semantic-contract` elements for SHACL shape profiles over explicitly used ontology; link them to requirements with `constrain`/`constrainedBy`
 - Use `specify` / `specifiedBy` to connect requirements to capabilities
 - Derive `requirement` elements only from other requirements
 - Keep requirements atomic and testable
@@ -114,7 +116,7 @@ Use an `ontology` element when the content defines domain meaning or a machine-c
 - domain term meaning: "this term means..."
 - external or cross-subgraph ontology terms that multiple requirements should apply
 
-Use a `semantic-contract` when a specific requirement obligation needs a SHACL shape profile over reachable ontology concepts. Semantic contracts must have `#### Shapes`, must refine exactly one compatible requirement owner, and must not have `#### Ontology`.
+Use a `semantic-contract` when a requirement obligation needs a SHACL shape profile over ontology concepts. Semantic contracts must have `#### Shapes`, must use ontology through `use`/`usedBy`, constrain one or more requirements with `constrain`/`constrainedBy`, and must not have `#### Ontology`.
 
 A feature is often user-facing, roadmap-oriented, or product-oriented. Capabilities are broader and more stable. Features may be described inside capability content, but the `capability` element remains the primary traceable graph node.
 
@@ -152,7 +154,7 @@ Create requirements using the `--content` flag or by piping element content to t
 
 ```bash
 # Add capability using --content flag (preferred)
-reqvire add requirements/Capabilities.md --content '### Capability Name
+reqvire add requirements/Product/CapabilityName/CapabilityFeature.md --content '### Capability Name
 
 Capability scope and purpose. Describe what the system is able to accomplish, not how it is implemented.
 
@@ -168,11 +170,13 @@ Defines shared domain meaning for the capability.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.org/ontology/capability-name
+  * ontology_prefix: ex
 
 #### Ontology
 
 ```turtle
-@prefix ex: <urn:reqvire:example:> .
+@prefix ex: <https://example.org/ontology/capability-name#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 ex:DomainConcept a owl:Class .
@@ -180,7 +184,7 @@ ex:DomainConcept a owl:Class .
 EOF
 
 # Add requirement using heredoc (stdin)
-reqvire add requirements/System/Capabilities.md <<'EOF'
+reqvire add requirements/Product/CapabilityName/Requirements.md <<'EOF'
 ### System Capability Implementation
 
 The system shall implement the capability using defined algorithms.
@@ -189,7 +193,7 @@ The system shall implement the capability using defined algorithms.
   * type: requirement
 
 #### Relations
-  * specify: [Capability Name](../Capabilities.md#capability-name)
+  * specify: [Capability Name](CapabilityFeature.md#capability-name)
 EOF
 
 # Override existing element (replace by name) - useful for cleanup after merge
@@ -228,9 +232,9 @@ Add refinements only when:
 - **State** - State machines, lifecycle states, and state-dependent contracts
 - **Input-output** - Payloads, messages, schemas, examples, and fixtures
 - **Ontology** - Shared semantic meaning and vocabulary attached by capabilities
-- **Semantic contracts** - Requirement-owned SHACL shape profiles for one requirement obligation
+- **Semantic contracts** - Reusable SHACL shape profiles over explicitly used ontology that constrain requirements
 
-Link requirement-owned refinements via `refinedBy` from the requirement that owns the refinement. Attach ontology elements from capabilities; link `semantic-contract` refinements from the owning requirement when they define shapes.
+Link requirement-owned non-semantic-contract refinements via `refinedBy` from the requirement that owns the refinement. Attach ontology elements from capabilities. Link semantic contracts to ontology with `use` and to requirements with `constrain`/`constrainedBy`.
 
 ### Refinement Best Practices
 
@@ -238,7 +242,7 @@ Link requirement-owned refinements via `refinedBy` from the requirement that own
 - Group constraints in single file (e.g., `Constraints.md` in requirements root)
 - Define **Behaviors** and **Specifications** as elements only if other requirements depend on them
 - Define **ontology** elements when requirements need shared domain meaning or ontology vocabulary
-- Define **semantic contracts** as requirement-owned refinements when one requirement obligation needs a SHACL shape profile over reachable ontology context
+- Define **semantic contracts** as reusable SHACL contracts when one or more requirement obligations need a shape profile over explicitly used ontology context
 - Otherwise define them under `#### Behaviors` or `#### Specifications` subsection of the requirement
 
 ### Adding Refinement Elements
@@ -290,8 +294,9 @@ reqvire link "Other Capability Requirement" attaching "Performance Constraint"
 # Attach ontology element across capability subgraph boundaries
 reqvire link "Other Capability" attaching "Capability Ontology"
 
-# Attach requirement-owned semantic contract across requirement subgraph boundaries
-reqvire link "Other Capability Requirement" attaching "Requirement Shape Contract"
+# Link a reusable semantic contract to a requirement and ontology
+reqvire link "Requirement Shape Contract" "constrain" "Other Capability Requirement"
+reqvire link "Requirement Shape Contract" "use" "Capability Ontology"
 
 # Attach file (design document, specification document)
 reqvire link "Architecture Requirement" attaching "docs/architecture.pdf"
@@ -305,7 +310,7 @@ reqvire link "Compliance Requirement" "trace" "https://example.com/spec.html"
 **Attachment constraints:**
 - Refinements must have a `refine` relation before being attached
 - Capabilities may attach only `ontology` elements
-- Requirements may attach only requirement-owned `semantic-contract`, `specification`, `constraint`, `behavior`, `state`, or `input-output` refinements
+- Requirements may attach only requirement-owned `specification`, `constraint`, `behavior`, `state`, or `input-output` refinements
 - Cross-capability semantic dependencies must be explicit attachments so change impact is preserved
 
 ## Step 4: Add Verifications
@@ -329,7 +334,7 @@ Create verification elements for leaf requirements:
 
 ```bash
 # Add test verification
-reqvire add requirements/Verifications/CapabilityTests.md <<'EOF'
+reqvire add requirements/Verifications/Product/CapabilityName/CapabilityTests.md <<'EOF'
 ### Capability Test
 
 Test verifies the capability works correctly:
@@ -341,8 +346,8 @@ Test verifies the capability works correctly:
   * type: test-verification
 
 #### Relations
-  * verify: [Capability Requirement](../System/Capabilities.md#capability-requirement)
-  * satisfiedBy: [test_capability.rs](../../tests/test_capability.rs)
+  * verify: [Capability Requirement](../../../Product/CapabilityName/Requirements.md#capability-requirement)
+  * satisfiedBy: [test_capability.rs](../../../../tests/test_capability.rs)
 EOF
 
 # Add analysis verification
@@ -410,11 +415,13 @@ Defines the shared authentication domain vocabulary.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.org/ontology/auth
+  * ontology_prefix: auth
 
 #### Ontology
 
 ```turtle
-@prefix auth: <urn:reqvire:auth:> .
+@prefix auth: <https://example.org/ontology/auth#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
 auth:AuthenticatedSession a owl:Class .
@@ -432,8 +439,8 @@ The system shall validate user credentials against stored password hashes.
   * type: requirement
 
 #### Relations
-  * specify: [User Authentication](../Capabilities.md#user-authentication)
-  * refinedBy: [Password Authentication Semantic Contract](../Contracts/Auth.md#password-authentication-semantic-contract)
+  * specify: [User Authentication](Feature.md#user-authentication)
+  * constrainedBy: [Password Authentication Semantic Contract](../../../Ontologies/Auth.md#password-authentication-semantic-contract)
   * satisfiedBy: [auth.rs](../../src/auth.rs)
 ```
 
@@ -447,12 +454,13 @@ Defines the closed-world SHACL profile used by the password-authentication oblig
   * type: semantic-contract
 
 #### Relations
-  * refine: [Password Authentication](../System/Auth.md#password-authentication)
+  * constrain: [Password Authentication](../Product/Auth/Requirements.md#password-authentication)
+  * use: [Authentication Ontology](../Ontologies/Auth.md#authentication-ontology)
 
 #### Shapes
 
 ```turtle
-@prefix auth: <urn:reqvire:auth:> .
+@prefix auth: <https://example.org/ontology/auth#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
 auth:UserCredentialShape
@@ -470,8 +478,8 @@ The system shall create and manage user sessions after successful authentication
   * type: requirement
 
 #### Relations
-  * specify: [User Authentication](../Capabilities.md#user-authentication)
-  * refinedBy: [Session Timeout Constraint](../Constraints.md#session-timeout)
+  * specify: [User Authentication](Feature.md#user-authentication)
+  * refinedBy: [Session Timeout Constraint](Constraints.md#session-timeout)
 ```
 
 ### 5. Constraint
@@ -500,8 +508,8 @@ Test verifies user authentication flow:
   * type: test-verification
 
 #### Relations
-  * verify: [Password Authentication](../System/Auth.md#password-authentication)
-  * verify: [Session Management](../System/Auth.md#session-management)
+  * verify: [Password Authentication](../Requirements.md#password-authentication)
+  * verify: [Session Management](../Requirements.md#session-management)
   * satisfiedBy: [test_auth.rs](../../tests/test_auth.rs)
 ```
 
@@ -510,17 +518,15 @@ Test verifies user authentication flow:
 Typical structure:
 ```
 requirements/
-├── Capabilities.md              # Capability roots
-├── Constraints.md           # Shared requirement constraints
-├── Ontologies/              # Canonical home for ontology elements
-├── System/
-│   ├── CapabilityA.md          # System requirements for capability A
-│   └── CapabilityB.md
-├── Verifications/
-│   ├── CapabilityATests.md     # Verifications for capability A
-│   └── CapabilityBTests.md
-└── DesignDocuments/         # Design docs (not parsed as elements)
-    └── Architecture.md
+├── Product/
+│   └── CapabilityA/
+│       ├── Feature.md          # Capability roots and child capabilities
+│       ├── Requirements.md     # Requirements that specify this capability
+│       └── Specifications.md   # Requirement-owned refinements
+├── Operations/
+│   └── CapabilityB/
+├── Ontologies/                  # Canonical home for ontology and semantic-contract elements
+└── Verifications/               # Central verification plane, grouped by domain
 ```
 
 ### Reorganizing Elements
@@ -529,13 +535,13 @@ Move elements between files or reposition within files:
 
 ```bash
 # Move element to different file
-reqvire mv "Capability Requirement" "requirements/System/NewFile.md"
+reqvire mv "Capability Requirement" "requirements/Product/CapabilityName/NewFile.md"
 
 # Move element to specific position (0-based index)
-reqvire mv "Capability Requirement" "requirements/System/Capabilities.md" 0  # Move to top
+reqvire mv "Capability Requirement" "requirements/Product/CapabilityName/Requirements.md" 0  # Move to top
 
 # Move entire file to new location
-reqvire mv-file "requirements/Old.md" "requirements/System/New.md"
+reqvire mv-file "requirements/Old.md" "requirements/Product/CapabilityName/New.md"
 
 # Merge file into existing file (squash - combine contents)
 reqvire mv-file --squash "requirements/Source.md" "requirements/Target.md"

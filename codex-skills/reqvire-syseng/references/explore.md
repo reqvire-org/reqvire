@@ -43,7 +43,7 @@ reqvire model --filter-type="test-verification"
 reqvire model --reverse --filter-type="test-verification"
 ```
 
-**Element types for `--filter-type`:** capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
+**Element types for `--filter-type`:** capability, requirement, ontology, semantic-contract, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
 ## Searching Elements
 
@@ -70,7 +70,7 @@ Use `--short` when analyzing model structure without needing full content. Use `
 | `--has-attachments` | Elements with attachments | `--has-attachments` |
 | `--filter-attachment` | Filter by attachment pattern | `--filter-attachment="*.pdf"` |
 
-**Element types for --filter-type (supports comma-separated list):** capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
+**Element types for --filter-type (supports comma-separated list):** capability, requirement, ontology, semantic-contract, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, state, input-output, constraint, behavior, specification. For custom types: `other-TYPENAME`
 
 ### By Type
 ```bash
@@ -95,7 +95,7 @@ reqvire search --filter-type="semantic-contract" --short
 reqvire search --filter-file="requirements/System/**" --short
 
 # Elements in specific file
-reqvire search --filter-file="**/Capabilities.md" --short
+reqvire search --filter-file="requirements/**/*.md" --short
 ```
 
 ### By Name or Content
@@ -129,7 +129,7 @@ reqvire search --has-attachments --short
 
 # Find elements with specific attachment type
 reqvire search --filter-attachment="*.pdf" --short
-reqvire search --filter-attachment="**/DesignDocuments/**" --short
+reqvire search --filter-type="specification" --short
 ```
 
 ## Understanding Traceability

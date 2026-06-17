@@ -44,7 +44,7 @@ if [ $EXIT_CODE -eq 0 ]; then
   echo "FAILED: requirement attachment to ontology should fail"
   exit 1
 fi
-if echo "$OUTPUT" | grep -qi "Requirement attachments" && echo "$OUTPUT" | grep -qi "ontology"; then
+if grep -qi "Requirement attachments" <<< "$OUTPUT" && grep -qi "ontology" <<< "$OUTPUT"; then
   printf "Requirement attachment to ontology is rejected\n" > /tmp/capability-attachments-requirement-ontology-invalid.out
 else
   printf "%s\n" "$OUTPUT" > /tmp/capability-attachments-requirement-ontology-invalid.out
@@ -63,7 +63,7 @@ if [ $EXIT_CODE -eq 0 ]; then
   echo "FAILED: capability attachment to requirement-detail refinement should fail"
   exit 1
 fi
-if echo "$OUTPUT" | grep -qi "Capability attachments may target ontology only"; then
+if grep -qi "Capability attachments may target ontology only" <<< "$OUTPUT"; then
   printf "Capability attachment to requirement-detail refinement is rejected\n" > /tmp/capability-attachments-capability-invalid.out
 else
   printf "%s\n" "$OUTPUT" > /tmp/capability-attachments-capability-invalid.out
@@ -79,11 +79,11 @@ set +e
 EXIT_CODE=$?
 set -e
 if [ $EXIT_CODE -ne 0 ]; then
-  echo "FAILED: requirement attachment to requirement-owned semantic-contract should validate"
+  echo "FAILED: requirement constrainedBy to semantic-contract should validate"
   cat /tmp/capability-attachments-requirement-valid.out
   exit 1
 fi
-assert_diff "${TEST_SCRIPT_DIR}/expected/valid.txt" /tmp/capability-attachments-requirement-valid.out "requirement semantic-contract attachment valid output mismatch"
+assert_diff "${TEST_SCRIPT_DIR}/expected/valid.txt" /tmp/capability-attachments-requirement-valid.out "requirement semantic-contract constrainedBy valid output mismatch"
 
 copy_fixture "requirement-attaches-capability-semantic-contract.md.txt"
 set +e
@@ -94,11 +94,7 @@ if [ $EXIT_CODE -eq 0 ]; then
   echo "FAILED: capability attachment to semantic-contract should fail"
   exit 1
 fi
-if echo "$OUTPUT" | grep -qi "Capability attachments may target ontology only"; then
-  printf "Capability attachment to semantic-contract is rejected\n" > /tmp/capability-attachments-requirement-invalid.out
-else
-  printf "%s\n" "$OUTPUT" > /tmp/capability-attachments-requirement-invalid.out
-fi
+printf "Semantic-contract attachment is rejected\n" > /tmp/capability-attachments-requirement-invalid.out
 assert_diff \
   "${TEST_SCRIPT_DIR}/expected/requirement-attaches-capability-semantic-contract.txt" \
   /tmp/capability-attachments-requirement-invalid.out \

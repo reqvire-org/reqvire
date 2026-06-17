@@ -1,10 +1,144 @@
 # Elements
 
+### Element Identity and Metadata Shape
+
+Defines SHACL constraints for shared Reqvire element identity, type, file location, and structural metadata.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:ElementShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Element ;
+  sh:property [
+    sh:path reqvire:identifier ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:name ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:elementType ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:id ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:filePath ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:fragment ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:content ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ArtifactShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Artifact ;
+  sh:property [
+    sh:path reqvire:externalUrl ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:anyURI ;
+  ] .
+
+reqvire:ElementTypeShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ElementType ;
+  sh:property [
+    sh:path reqvire:elementTypeName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:elementTypeCategory ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:defaultElementType ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] .
+
+reqvire:CustomElementTypeShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:CustomElementType ;
+  sh:property [
+    sh:path reqvire:customElementTypePattern ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ReservedSubsectionShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ReservedSubsection ;
+  sh:property [
+    sh:path reqvire:subsectionName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ElementIdentityShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ElementIdentity ;
+  sh:property [
+    sh:path reqvire:identitySource ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:identityStability ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:ReferenceTargetKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ReferenceTargetKind ;
+  sh:property [
+    sh:path reqvire:referenceTargetKindName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Ontology and Semantic Contract Model](../ModelStructure/ModelManagement.md#ontology-and-semantic-contract-model)
+  * use: [Reqvire Core Element Ontology](#reqvire-core-element-ontology)
+---
+
 ### Reqvire Core Element Ontology
 
 The Reqvire core element ontology defines the shared base vocabulary for all Reqvire model elements.
 
-This is the foundation ontology used by the rest of the Reqvire ontology set. Other ontology elements and semantic contracts may reference these terms through reachable ontology context.
+This is the foundation ontology used by the rest of the Reqvire ontology set. Other ontology elements may derive from this vocabulary, and semantic contracts may reference these terms through explicit `use`/`usedBy` ontology context.
 
 #### Ontology
 ```turtle
@@ -12,6 +146,10 @@ This is the foundation ontology used by the rest of the Reqvire ontology set. Ot
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://www.reqvire.org/ontology> a owl:Ontology ;
+  rdfs:label "Reqvire ontology" ;
+  rdfs:comment "Canonical ontology document for same-base Reqvire ontology elements; derived ontology elements contribute vocabulary to this document." .
 
 reqvire:Element a owl:Class ;
   rdfs:comment "Base class for addressable Reqvire model elements and related model artifacts." .
@@ -23,7 +161,7 @@ reqvire:Requirement a owl:Class ;
   rdfs:comment "Implementation-facing obligation that can be verified and satisfied by implementation or evidence." .
 reqvire:Refinement a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
-  rdfs:comment "Requirement-owned detail element that refines a requirement with source, semantic, behavioral, structural, or contract information." .
+  rdfs:comment "Requirement-owned detail element that refines a requirement with source, behavioral, structural, query, or contract information." .
 reqvire:Verification a owl:Class ;
   rdfs:subClassOf reqvire:Element ;
   rdfs:comment "Evidence or method used to verify a capability or requirement." .
@@ -46,6 +184,9 @@ reqvire:RequirementElementType a owl:Class ;
 reqvire:RefinementElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for requirement-owned refinements." .
+reqvire:SemanticContractElementType a owl:Class ;
+  rdfs:subClassOf reqvire:ElementType ;
+  rdfs:comment "Element type category for reusable semantic-contract SHACL profile elements." .
 reqvire:VerificationElementType a owl:Class ;
   rdfs:subClassOf reqvire:ElementType ;
   rdfs:comment "Element type category for verification methods and evidence records." .
@@ -200,12 +341,12 @@ reqvire:ontologySubsection a reqvire:ReservedSubsection ;
   rdfs:comment "Inline Turtle ontology content for ontology elements." .
 reqvire:shapesSubsection a reqvire:ReservedSubsection ;
   reqvire:subsectionName "Shapes" ;
-  rdfs:comment "Inline SHACL shape content for requirement-owned semantic contracts." .
-reqvire:querySubsection a reqvire:ReservedSubsection ;
-  reqvire:subsectionName "Query" ;
-  rdfs:comment "Inline semantic query content for requirement-owned semantic query contracts; the fenced code info string declares the query language." .
+  rdfs:comment "Inline SHACL shape content for reusable semantic contracts." .
 ```
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://www.reqvire.org/ontology
+  * ontology_prefix: reqvire
 ---
+

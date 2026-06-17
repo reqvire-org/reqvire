@@ -9,6 +9,7 @@ use std::sync::{LazyLock, Mutex};
 static REPO_URL: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
 static COMMIT_HASH: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
 static GIT_ROOT_DIR: LazyLock<Mutex<Option<PathBuf>>> = LazyLock::new(|| Mutex::new(None));
+static BRANCH_NAME: LazyLock<Mutex<Option<String>>> = LazyLock::new(|| Mutex::new(None));
 static GIT_ROOT_CACHE: LazyLock<Mutex<HashMap<PathBuf, String>>> =
     LazyLock::new(|| Mutex::new(HashMap::new()));
 
@@ -19,6 +20,7 @@ pub fn clear_git_cache() {
     REPO_URL.lock().unwrap().take();
     COMMIT_HASH.lock().unwrap().take();
     GIT_ROOT_DIR.lock().unwrap().take();
+    BRANCH_NAME.lock().unwrap().take();
     GIT_ROOT_CACHE.lock().unwrap().clear();
 }
 
@@ -111,6 +113,35 @@ pub fn get_commit_hash() -> Result<String, ReqvireError> {
     *cached = Some(hash.clone());
 
     Ok(hash)
+}
+
+/// Retrieves the current Git branch name.
+pub fn get_branch_name() -> Result<String, ReqvireError> {
+    let mut cached = BRANCH_NAME.lock().unwrap();
+    if let Some(ref branch) = *cached {
+        return Ok(branch.clone());
+    }
+
+    let output = Command::new("git")
+        .args(["branch", "--show-current"])
+        .output()?;
+    if !output.status.success() {
+        let err = String::from_utf8_lossy(&output.stderr);
+        return Err(ReqvireError::GitCommandError(format!(
+            "Failed to get current branch: {}",
+            err
+        )));
+    }
+
+    let mut branch = String::from_utf8_lossy(&output.stdout).trim().to_string();
+    if branch.is_empty() {
+        let commit = get_commit_hash()?;
+        branch = format!("detached@{}", commit.chars().take(7).collect::<String>());
+    }
+
+    *cached = Some(branch.clone());
+
+    Ok(branch)
 }
 
 /// Retrieves the content of a file at a given commit (e.g. "HEAD~1").

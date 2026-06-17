@@ -47,12 +47,11 @@ This guide is split into domain-specific guides for better organization:
 For comprehensive command reference, see the Reqvire skills.
 
 ### Key File Locations
-- Core specifications structure: [SpecificationsRequirements.md](requirements/SpecificationsRequirements.md)
-- Capability roots: [Capabilities.md](requirements/Capabilities.md)
-- Mission requirements: [MissionRequirements.md](requirements/MissionRequirements.md)
-- System requirements: [SystemRequirements/Requirements.md](requirements/SystemRequirements/Requirements.md)
-- Verification specifications: [Verifications folder](requirements/Verifications)
-- Relationship types: [Relation Types and Behaviors](requirements/SpecificationsRequirements.md#relation-types-and-behaviors)
+- Capability-rooted model: root-level scope folders under [requirements](requirements)
+- Shared ontology plane: [Ontologies folder](requirements/Ontologies)
+- Refinements: capability-local files next to the requirements they refine
+- Architecture documentation: [Architecture.md](requirements/Architecture.md)
+- Relationship behavior: [Relation Types and Behaviors](requirements/ModelStructure/ModelManagement.md#relation-types-and-behaviors)
 - Architecture documentation: [Architecture.md](requirements/Architecture.md)
 
 
@@ -121,9 +120,9 @@ cli/src/
 
 The Reqvire system model has four first-class layers: ontology, capability, requirement, and verification. Refinements are requirement-owned subordinate details/contracts only, not a system-model layer.
 
-Capabilities may derive child capabilities, attach ontology, be specified by requirements, and be verified. Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, `semantic-contract`, or `semantic-query-contract` refinements through `refinedBy`/`refine`.
+Capabilities may derive child capabilities, attach ontology, be specified by requirements, and be verified. Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, or `semantic-contract` elements through `refinedBy`/`refine`.
 
-Requirement-owned refinement types are `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, `semantic-contract`, and `semantic-query-contract`.
+Requirement-owned refinement types are `source`, `constraint`, `behavior`, `specification`, `state`, and `input-output`. Semantic contracts are first-class ontology-plane elements, not requirement-owned refinements.
 
 ## Important Notes
 

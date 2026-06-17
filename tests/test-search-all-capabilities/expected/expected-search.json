@@ -415,6 +415,9 @@
       "capability": 1,
       "system-requirement": 6
     },
+    "total_semantic_contract_types": {
+      "semantic-contract": 0
+    },
     "total_verifications_types": {
       "analysis-verification": 0,
       "demonstration-verification": 0,
@@ -426,8 +429,6 @@
       "behavior": 0,
       "constraint": 0,
       "input-output": 0,
-      "semantic-contract": 0,
-      "semantic-query-contract": 0,
       "source": 0,
       "specification": 0,
       "state": 0

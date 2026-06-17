@@ -2,7 +2,7 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { useEffect } from "react";
 import { describe, expect, it, vi } from "vitest";
 import { ExplorerSidePane } from "../components/ExplorerSidePane";
-import { ExplorerUiStateProvider, useExplorerUiState } from "../components/ExplorerUiState";
+import { ExplorerUiStateProvider, useExplorerUiState } from "../state/ExplorerUiState";
 import { StoreProvider } from "../store/StoreContext";
 import { devFixture } from "../store/devFixture";
 import {

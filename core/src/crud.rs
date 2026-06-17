@@ -5,10 +5,58 @@
 use crate::diff::{generate_crud_diffs, generate_file_diff, CrudOperation, CrudResult, FileDiff};
 use crate::element::{Attachment, AttachmentTarget};
 use crate::error::ReqvireError;
+use crate::graph_registry::GraphRegistry;
 use crate::model::ModelManager;
+use crate::relation::LinkType;
 use globset::GlobSet;
-use std::collections::HashSet;
+use std::collections::{BTreeMap, BTreeSet, HashMap, HashSet};
 use std::path::Path;
+
+#[derive(Clone, Debug, Eq, Hash, PartialEq)]
+struct OntologyTermKey {
+    element_identifier: String,
+    local_name: String,
+    role: String,
+}
+
+#[derive(Clone, Debug)]
+struct OntologyTermState {
+    iri: String,
+    prefix: String,
+    namespace: String,
+}
+
+#[derive(Clone, Debug)]
+struct OntologyDocumentState {
+    iri: String,
+    prefix: String,
+    namespace: String,
+}
+
+#[derive(Clone, Debug, Default)]
+struct OntologyMutationSnapshot {
+    terms: HashMap<OntologyTermKey, OntologyTermState>,
+    documents_by_element: HashMap<String, OntologyDocumentState>,
+    ambiguous_terms: BTreeSet<String>,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
+struct TermRewrite {
+    element_identifier: String,
+    old_iri: String,
+    new_iri: String,
+    old_prefix: String,
+    new_prefix: String,
+    old_namespace: String,
+    new_namespace: String,
+    local_name: String,
+}
+
+#[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd)]
+struct PrefixBinding {
+    prefix: String,
+    namespace: String,
+}
 
 fn snapshot_modified_files(model_manager: &ModelManager) -> HashSet<String> {
     model_manager
@@ -34,13 +82,727 @@ fn collect_new_modified_files(
     modified_files
 }
 
+fn snapshot_ontology_mutation_state(registry: &GraphRegistry) -> OntologyMutationSnapshot {
+    let semantic_index = crate::semantic_contract::build_semantic_index(registry);
+    let mut snapshot = OntologyMutationSnapshot::default();
+
+    for document in &semantic_index.ontology_documents {
+        let state = OntologyDocumentState {
+            iri: document.iri.clone(),
+            prefix: document.ontology_prefix.clone(),
+            namespace: document.term_namespace.clone(),
+        };
+        for element_identifier in &document.element_identifiers {
+            snapshot
+                .documents_by_element
+                .insert(element_identifier.clone(), state.clone());
+        }
+    }
+
+    for declarations in semantic_index.ontology_declarations.values() {
+        for declaration in declarations {
+            let Some(local_name) = local_name_from_iri(&declaration.iri) else {
+                continue;
+            };
+            let Some(document) = snapshot
+                .documents_by_element
+                .get(&declaration.element_identifier)
+            else {
+                continue;
+            };
+            let key = OntologyTermKey {
+                element_identifier: declaration.element_identifier.clone(),
+                local_name,
+                role: declaration.role.to_string(),
+            };
+            let state = OntologyTermState {
+                iri: declaration.iri.clone(),
+                prefix: document.prefix.clone(),
+                namespace: document.namespace.clone(),
+            };
+            if let Some(existing) = snapshot.terms.insert(key.clone(), state.clone()) {
+                if existing.iri != state.iri {
+                    snapshot.ambiguous_terms.insert(format!(
+                        "{}#{} ({})",
+                        key.element_identifier, key.local_name, key.role
+                    ));
+                }
+            }
+        }
+    }
+
+    snapshot
+}
+
+fn apply_ontology_aware_rewrites(
+    registry: &mut GraphRegistry,
+    before: &OntologyMutationSnapshot,
+) -> Result<(), ReqvireError> {
+    log::debug!(
+        "Applying ontology-aware rewrite: {} terms, {} ontology documents before mutation",
+        before.terms.len(),
+        before.documents_by_element.len()
+    );
+    let after = snapshot_ontology_mutation_state(registry);
+    log::debug!(
+        "After mutation: {} terms, {} ontology documents",
+        after.terms.len(),
+        after.documents_by_element.len()
+    );
+
+    log::debug!(
+        "Term rewrites candidate count before prefix mapping/filtering: {}",
+        before
+            .terms
+            .iter()
+            .filter(|(key, before_state)| {
+                after
+                    .terms
+                    .get(&OntologyTermKey {
+                        element_identifier: key.element_identifier.clone(),
+                        local_name: key.local_name.clone(),
+                        role: key.role.clone(),
+                    })
+                    .map(|after_state| before_state.iri != after_state.iri)
+                    .unwrap_or(false)
+            })
+            .count()
+    );
+    if !before.ambiguous_terms.is_empty() || !after.ambiguous_terms.is_empty() {
+        let mut terms: Vec<String> = before
+            .ambiguous_terms
+            .iter()
+            .chain(after.ambiguous_terms.iter())
+            .cloned()
+            .collect();
+        terms.sort();
+        terms.dedup();
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Ontology-aware mutation rewrite is unsafe because term ownership is ambiguous: {}",
+            terms.join(", ")
+        )));
+    }
+
+    let mut term_rewrites = BTreeSet::new();
+    let mut term_rewrite_preview = Vec::new();
+    for (key, old_state) in &before.terms {
+        let Some(new_state) = after.terms.get(key) else {
+            continue;
+        };
+        if old_state.iri == new_state.iri {
+            continue;
+        }
+        term_rewrite_preview.push(format!(
+            "{}:{} -> {} ({})",
+            key.element_identifier, key.local_name, old_state.iri, new_state.iri
+        ));
+        term_rewrites.insert(TermRewrite {
+            element_identifier: key.element_identifier.clone(),
+            old_iri: old_state.iri.clone(),
+            new_iri: new_state.iri.clone(),
+            old_prefix: old_state.prefix.clone(),
+            new_prefix: new_state.prefix.clone(),
+            old_namespace: old_state.namespace.clone(),
+            new_namespace: new_state.namespace.clone(),
+            local_name: key.local_name.clone(),
+        });
+    }
+
+    let mut affected_ontology_elements: BTreeSet<String> = BTreeSet::new();
+    for (element_identifier, old_document) in &before.documents_by_element {
+        let Some(new_document) = after.documents_by_element.get(element_identifier) else {
+            continue;
+        };
+        if old_document.iri != new_document.iri {
+            affected_ontology_elements.insert(element_identifier.clone());
+        }
+    }
+    for rewrite in &term_rewrites {
+        affected_ontology_elements.insert(rewrite.element_identifier.clone());
+    }
+
+    let mut document_rewrites: BTreeMap<String, String> = BTreeMap::new();
+    let mut conflicting_document_rewrites: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+    for (element_identifier, old_document) in &before.documents_by_element {
+        let Some(new_document) = after.documents_by_element.get(element_identifier) else {
+            continue;
+        };
+        if old_document.iri == new_document.iri {
+            continue;
+        }
+        if let Some(existing) =
+            document_rewrites.insert(old_document.iri.clone(), new_document.iri.clone())
+        {
+            if existing != new_document.iri {
+                conflicting_document_rewrites
+                    .entry(old_document.iri.clone())
+                    .or_default()
+                    .extend([existing, new_document.iri.clone()]);
+            }
+        }
+    }
+    if !conflicting_document_rewrites.is_empty() {
+        let conflicts: Vec<String> = conflicting_document_rewrites
+            .into_iter()
+            .map(|(old, news)| {
+                format!(
+                    "{} -> {}",
+                    old,
+                    news.into_iter().collect::<Vec<_>>().join(", ")
+                )
+            })
+            .collect();
+        return Err(ReqvireError::InvalidOperation(format!(
+            "Ontology-aware mutation rewrite is unsafe because ontology document IRI rewrites are ambiguous: {}",
+            conflicts.join("; ")
+        )));
+    }
+
+    if term_rewrites.is_empty() && document_rewrites.is_empty() {
+        add_required_cross_boundary_imports(registry, &after)?;
+        return Ok(());
+    }
+
+    log::debug!("Ontology-aware term rewrites: {:?}", term_rewrite_preview);
+    if !document_rewrites.is_empty() {
+        log::debug!("Ontology-aware document rewrites: {:?}", document_rewrites);
+    }
+
+    let document_rewrites: Vec<(String, String)> = document_rewrites.into_iter().collect();
+    let prefix_rewrites: Vec<(String, String)> = before
+        .documents_by_element
+        .iter()
+        .filter_map(|(element_identifier, old_document)| {
+            let new_document = after.documents_by_element.get(element_identifier)?;
+            if old_document.prefix == new_document.prefix {
+                None
+            } else {
+                Some((old_document.prefix.clone(), new_document.prefix.clone()))
+            }
+        })
+        .collect();
+
+    let element_ids: Vec<String> = registry.nodes.keys().cloned().collect();
+    for element_id in element_ids {
+        let Some(node) = registry.nodes.get_mut(&element_id) else {
+            continue;
+        };
+        let rewritten = if node.element.element_type.is_ontology() {
+            if !affected_ontology_elements.contains(&element_id) {
+                continue;
+            }
+            rewrite_semantic_turtle_blocks(
+                &node.element.content,
+                &term_rewrites,
+                &document_rewrites,
+            )
+        } else if node.element.element_type.is_semantic_contract() {
+            if term_rewrites.is_empty() {
+                continue;
+            }
+            rewrite_semantic_turtle_blocks(&node.element.content, &term_rewrites, &[])
+        } else {
+            if term_rewrites.is_empty() && document_rewrites.is_empty() {
+                continue;
+            }
+            let rewritten = rewrite_concept_reference_sections(
+                &node.element.content,
+                &term_rewrites,
+                &document_rewrites,
+                &prefix_rewrites,
+            );
+            if element_id.ends_with("#billing-requirement") {
+                log::debug!(
+                    "billing-requirement concept refs rewritten: {}",
+                    if rewritten != node.element.content {
+                        "changed"
+                    } else {
+                        "unchanged"
+                    }
+                );
+            }
+            if rewritten != node.element.content && element_id.contains("#billing-requirement") {
+                log::debug!("Rewritten requirement before: {:?}", node.element.content);
+                log::debug!("Rewritten requirement after: {:?}", rewritten);
+            }
+            rewritten
+        };
+
+        if rewritten != node.element.content {
+            node.element.content = rewritten;
+            node.element.freeze_content();
+            registry
+                .modified_files
+                .insert(node.element.file_path.clone());
+        }
+    }
+
+    add_required_cross_boundary_imports(registry, &after)?;
+    Ok(())
+}
+
+fn add_required_cross_boundary_imports(
+    registry: &mut GraphRegistry,
+    snapshot: &OntologyMutationSnapshot,
+) -> Result<(), ReqvireError> {
+    let mut additions_by_element: BTreeMap<String, BTreeSet<String>> = BTreeMap::new();
+
+    for (element_id, node) in &registry.nodes {
+        if !node.element.element_type.is_ontology() {
+            continue;
+        }
+        let Some(source_document) = snapshot.documents_by_element.get(element_id) else {
+            continue;
+        };
+        for relation in node
+            .element
+            .relations
+            .iter()
+            .filter(|relation| relation.relation_type.name == "derivedFrom")
+        {
+            let LinkType::Identifier(target_id) = &relation.target.link else {
+                continue;
+            };
+            let normalized_target_id = crate::utils::normalize_relation_identifier_for_registry(
+                &node.element.file_path,
+                target_id,
+            );
+            let Some(target_node) = registry.nodes.get(&normalized_target_id) else {
+                continue;
+            };
+            if !target_node.element.element_type.is_ontology() {
+                continue;
+            }
+            let Some(target_document) = snapshot.documents_by_element.get(&normalized_target_id)
+            else {
+                continue;
+            };
+            if source_document.iri != target_document.iri {
+                additions_by_element
+                    .entry(element_id.clone())
+                    .or_default()
+                    .insert(target_document.iri.clone());
+            }
+        }
+    }
+
+    for (element_id, import_iris) in additions_by_element {
+        let Some(node) = registry.nodes.get_mut(&element_id) else {
+            continue;
+        };
+        let Some(source_document) = snapshot.documents_by_element.get(&element_id) else {
+            continue;
+        };
+        let rewritten = ensure_ontology_imports_in_content(
+            &node.element.content,
+            &source_document.iri,
+            &import_iris,
+        );
+        if rewritten != node.element.content {
+            node.element.content = rewritten;
+            node.element.freeze_content();
+            registry
+                .modified_files
+                .insert(node.element.file_path.clone());
+        }
+    }
+
+    Ok(())
+}
+
+fn local_name_from_iri(iri: &str) -> Option<String> {
+    let value = iri.rsplit(['#', '/']).next()?.trim();
+    if value.is_empty() {
+        None
+    } else {
+        Some(value.to_string())
+    }
+}
+
+fn rewrite_semantic_turtle_blocks(
+    content: &str,
+    term_rewrites: &BTreeSet<TermRewrite>,
+    document_rewrites: &[(String, String)],
+) -> String {
+    rewrite_selected_fenced_blocks(content, |block| {
+        let mut rewritten = block.to_string();
+        let mut required_prefixes = BTreeSet::new();
+        let mut prefix_rewrites: BTreeMap<String, PrefixBinding> = BTreeMap::new();
+
+        for (old_iri, new_iri) in document_rewrites {
+            rewritten = rewritten.replace(&format!("<{}>", old_iri), &format!("<{}>", new_iri));
+        }
+
+        for rewrite in term_rewrites {
+            let before = rewritten.clone();
+            rewritten = rewritten.replace(
+                &format!("<{}>", rewrite.old_iri),
+                &format!("<{}>", rewrite.new_iri),
+            );
+            rewritten = replace_curie_token(
+                &rewritten,
+                &rewrite.old_prefix,
+                &rewrite.local_name,
+                &rewrite.new_prefix,
+            );
+            if rewritten != before {
+                required_prefixes.insert(PrefixBinding {
+                    prefix: rewrite.new_prefix.clone(),
+                    namespace: rewrite.new_namespace.clone(),
+                });
+            }
+            if rewrite.old_prefix == rewrite.new_prefix
+                && rewrite.old_namespace != rewrite.new_namespace
+            {
+                required_prefixes.insert(PrefixBinding {
+                    prefix: rewrite.new_prefix.clone(),
+                    namespace: rewrite.new_namespace.clone(),
+                });
+            }
+            prefix_rewrites.insert(
+                rewrite.old_prefix.clone(),
+                PrefixBinding {
+                    prefix: rewrite.new_prefix.clone(),
+                    namespace: rewrite.new_namespace.clone(),
+                },
+            );
+        }
+
+        for (old_prefix, binding) in prefix_rewrites {
+            let before = rewritten.clone();
+            rewritten = replace_prefix_token(&rewritten, &old_prefix, &binding.prefix);
+            if rewritten != before {
+                required_prefixes.insert(binding);
+            }
+        }
+
+        for binding in required_prefixes {
+            rewritten = ensure_prefix_binding(&rewritten, &binding.prefix, &binding.namespace);
+        }
+        rewritten
+    })
+}
+
+fn ensure_ontology_imports_in_content(
+    content: &str,
+    ontology_iri: &str,
+    import_iris: &BTreeSet<String>,
+) -> String {
+    rewrite_selected_fenced_blocks(content, |block| {
+        let mut rewritten = block.to_string();
+        let mut additions = Vec::new();
+        for import_iri in import_iris {
+            if rewritten.contains(&format!("owl:imports <{}>", import_iri))
+                || rewritten.contains(&format!(
+                    "<http://www.w3.org/2002/07/owl#imports> <{}>",
+                    import_iri
+                ))
+            {
+                continue;
+            }
+            additions.push(format!(
+                "<{}> <http://www.w3.org/2002/07/owl#imports> <{}> .",
+                ontology_iri, import_iri
+            ));
+        }
+        if !additions.is_empty() {
+            if !rewritten.ends_with('\n') && !rewritten.is_empty() {
+                rewritten.push('\n');
+            }
+            rewritten.push_str(&additions.join("\n"));
+        }
+        rewritten
+    })
+}
+
+fn rewrite_selected_fenced_blocks<F>(content: &str, mut rewrite_block: F) -> String
+where
+    F: FnMut(&str) -> String,
+{
+    let mut output = String::new();
+    let mut in_semantic_subsection = false;
+    let mut in_fence = false;
+    let mut block = String::new();
+
+    for line in content.lines() {
+        let trimmed = line.trim();
+        if !in_fence {
+            if trimmed == "#### Ontology" || trimmed == "#### Shapes" {
+                in_semantic_subsection = true;
+            } else if trimmed.starts_with("#### ") {
+                in_semantic_subsection = false;
+            }
+        }
+
+        if in_semantic_subsection && trimmed.starts_with("```") {
+            if in_fence {
+                output.push_str(&rewrite_block(block.trim_end_matches('\n')));
+                output.push('\n');
+                output.push_str(line);
+                output.push('\n');
+                block.clear();
+                in_fence = false;
+            } else {
+                in_fence = true;
+                output.push_str(line);
+                output.push('\n');
+            }
+            continue;
+        }
+
+        if in_fence {
+            block.push_str(line);
+            block.push('\n');
+        } else {
+            output.push_str(line);
+            output.push('\n');
+        }
+    }
+
+    if in_fence {
+        output.push_str(&block);
+    }
+
+    output.trim_end_matches('\n').to_string()
+}
+
+fn replace_curie_token(
+    input: &str,
+    old_prefix: &str,
+    local_name: &str,
+    new_prefix: &str,
+) -> String {
+    let old = format!("{}:{}", old_prefix, local_name);
+    let new = format!("{}:{}", new_prefix, local_name);
+    let mut output = String::with_capacity(input.len());
+    let mut index = 0;
+
+    while let Some(relative_start) = input[index..].find(&old) {
+        let start = index + relative_start;
+        let end = start + old.len();
+        if is_token_boundary(input, start, end) {
+            output.push_str(&input[index..start]);
+            output.push_str(&new);
+            index = end;
+        } else {
+            output.push_str(&input[index..end]);
+            index = end;
+        }
+    }
+    output.push_str(&input[index..]);
+    output
+}
+
+pub(crate) fn replace_prefix_token(input: &str, old_prefix: &str, new_prefix: &str) -> String {
+    if old_prefix == new_prefix {
+        return input.to_string();
+    }
+
+    let old = format!("{}:", old_prefix);
+    let new = format!("{}:", new_prefix);
+    let mut output = String::with_capacity(input.len());
+    let mut index = 0;
+
+    while let Some(relative_start) = input[index..].find(&old) {
+        let start = index + relative_start;
+        let end = start + old.len();
+        let before = input[..start].chars().next_back();
+        let after = input[end..].chars().next();
+        if !before.map(is_curie_char).unwrap_or(false) && after.map(is_curie_char).unwrap_or(false)
+        {
+            output.push_str(&input[index..start]);
+            output.push_str(&new);
+            index = end;
+        } else {
+            output.push_str(&input[index..end]);
+            index = end;
+        }
+    }
+    output.push_str(&input[index..]);
+    output
+}
+
+fn is_token_boundary(input: &str, start: usize, end: usize) -> bool {
+    let before = input[..start].chars().next_back();
+    let after = input[end..].chars().next();
+    !before.map(is_curie_char).unwrap_or(false) && !after.map(is_curie_char).unwrap_or(false)
+}
+
+fn is_curie_char(ch: char) -> bool {
+    ch.is_ascii_alphanumeric() || matches!(ch, '_' | '-' | ':' | '.')
+}
+
+fn ensure_prefix_binding(block: &str, prefix: &str, namespace: &str) -> String {
+    let binding = format!("@prefix {}: <{}> .", prefix, namespace);
+    let mut found = false;
+    let mut lines = Vec::new();
+
+    for line in block.lines() {
+        if let Some((line_prefix, line_namespace)) = parse_turtle_prefix_line_local(line.trim()) {
+            if line_prefix == prefix {
+                found = true;
+                if line_namespace == namespace {
+                    lines.push(line.to_string());
+                } else {
+                    lines.push(binding.clone());
+                }
+                continue;
+            }
+        }
+        lines.push(line.to_string());
+    }
+
+    if !found {
+        let insert_at = lines
+            .iter()
+            .position(|line| parse_turtle_prefix_line_local(line.trim()).is_none())
+            .unwrap_or(lines.len());
+        lines.insert(insert_at, binding);
+    }
+
+    lines.join("\n")
+}
+
+fn parse_turtle_prefix_line_local(line: &str) -> Option<(String, String)> {
+    let rest = line
+        .strip_prefix("@prefix ")
+        .or_else(|| line.strip_prefix("@PREFIX "))
+        .or_else(|| line.strip_prefix("PREFIX "))?;
+    let rest = rest.trim_start();
+    let (prefix, rest) = rest.split_once(':')?;
+    let rest = rest.trim_start();
+    let namespace_start = rest.find('<')? + 1;
+    let namespace_end = rest[namespace_start..].find('>')? + namespace_start;
+    Some((
+        prefix.trim().to_string(),
+        rest[namespace_start..namespace_end].to_string(),
+    ))
+}
+
+fn rewrite_concept_reference_sections(
+    content: &str,
+    term_rewrites: &BTreeSet<TermRewrite>,
+    document_rewrites: &[(String, String)],
+    prefix_rewrites: &[(String, String)],
+) -> String {
+    if term_rewrites.is_empty() && document_rewrites.is_empty() {
+        return content.to_string();
+    }
+
+    let mut output = String::new();
+    let mut in_concept_references = false;
+
+    for line in content.lines() {
+        let trimmed = line.trim();
+        if trimmed.starts_with("#### ") {
+            in_concept_references = trimmed == "#### Concept References";
+            output.push_str(line);
+            output.push('\n');
+            continue;
+        }
+
+        if in_concept_references && trimmed.starts_with("*") {
+            let trimmed_line = line.trim_start();
+            let mut label_part = None;
+            let mut value_part = None;
+
+            if let Some((label, value)) = trimmed_line.split_once(": ") {
+                label_part = Some(label);
+                value_part = Some(value);
+            } else if let Some((label, value)) = trimmed_line.split_once(':') {
+                label_part = Some(label);
+                value_part = Some(value.trim_start());
+            }
+
+            let Some(label_part) = label_part else {
+                output.push_str(line);
+                output.push('\n');
+                continue;
+            };
+            let value_part = value_part.unwrap_or_default();
+            let mut rewritten_value = value_part.to_string();
+            if !rewritten_value.is_empty() {
+                rewritten_value = rewrite_concept_reference_target(
+                    rewritten_value.as_str(),
+                    term_rewrites,
+                    document_rewrites,
+                    prefix_rewrites,
+                );
+            }
+
+            let rewritten_label = label_part.trim_start().trim_start_matches('*').trim();
+
+            if rewritten_value == value_part {
+                output.push_str(line);
+            } else {
+                let indent_len = line.len() - trimmed_line.len();
+                output.push_str(&line[..indent_len]);
+                output.push_str("* ");
+                output.push_str(rewritten_label);
+                output.push_str(": ");
+                output.push_str(&rewritten_value);
+            }
+            output.push('\n');
+            continue;
+        }
+
+        output.push_str(line);
+        output.push('\n');
+    }
+
+    output.trim_end_matches('\n').to_string()
+}
+
+fn rewrite_concept_reference_target(
+    value: &str,
+    term_rewrites: &BTreeSet<TermRewrite>,
+    document_rewrites: &[(String, String)],
+    prefix_rewrites: &[(String, String)],
+) -> String {
+    let mut rewritten = value.to_string();
+
+    for (old_doc, new_doc) in document_rewrites {
+        if rewritten.starts_with('<') && rewritten.ends_with('>') {
+            let inner = &rewritten[1..rewritten.len().saturating_sub(1)];
+            if let Some(suffix) = inner.strip_prefix(old_doc) {
+                rewritten = format!("<{}{}>", new_doc, suffix);
+            }
+        }
+    }
+
+    for rewrite in term_rewrites {
+        rewritten = rewritten.replace(
+            &format!("<{}>", rewrite.old_iri),
+            &format!("<{}>", rewrite.new_iri),
+        );
+        rewritten = replace_curie_token(
+            &rewritten,
+            &rewrite.old_prefix,
+            &rewrite.local_name,
+            &rewrite.new_prefix,
+        );
+        rewritten = replace_prefix_token(&rewritten, &rewrite.old_prefix, &rewrite.new_prefix);
+    }
+
+    for (old_prefix, new_prefix) in prefix_rewrites {
+        rewritten = replace_prefix_token(&rewritten, old_prefix, new_prefix);
+    }
+
+    rewritten
+}
+
 fn finalize_crud_operation(
     model_manager: &mut ModelManager,
     modified_before: &HashSet<String>,
     git_root: &Path,
     dry_run: bool,
     removed_declaration_source: Option<&str>,
+    ontology_before: Option<&OntologyMutationSnapshot>,
 ) -> Result<Vec<FileDiff>, ReqvireError> {
+    if let Some(ontology_before) = ontology_before {
+        apply_ontology_aware_rewrites(&mut model_manager.graph_registry, ontology_before)?;
+    }
+
     validate_semantic_contracts_after_mutation(model_manager, removed_declaration_source)?;
 
     let modified_files = collect_new_modified_files(model_manager, modified_before);
@@ -169,6 +931,7 @@ pub fn add_element(
     // IMPORTANT: Must track BEFORE any modifications (including override removal)
     let modified_before = snapshot_modified_files(model_manager);
     let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
     let mut removed_declaration_source = None;
 
     // If override is requested, extract element name and remove existing element first
@@ -203,6 +966,7 @@ pub fn add_element(
         git_root,
         dry_run,
         removed_declaration_source.as_deref(),
+        Some(&ontology_before),
     ) {
         Ok(diffs) => diffs,
         Err(err) => {
@@ -270,6 +1034,7 @@ pub fn remove_element(
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
     let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Remove element using core business logic (includes orphan validation)
     let _affected_files = model_manager
@@ -282,6 +1047,7 @@ pub fn remove_element(
         git_root,
         dry_run,
         Some(element_id),
+        Some(&ontology_before),
     ) {
         Ok(diffs) => diffs,
         Err(err) => {
@@ -340,6 +1106,7 @@ pub fn move_element(
     let modified_before = snapshot_modified_files(model_manager);
 
     let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Move element using core business logic
     let (new_id, _affected_files) = model_manager.graph_registry.move_element_comprehensive(
@@ -353,14 +1120,20 @@ pub fn move_element(
         return Err(err);
     }
 
-    let diffs =
-        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
-            Ok(diffs) => diffs,
-            Err(err) => {
-                model_manager.graph_registry = registry_snapshot;
-                return Err(err);
-            }
-        };
+    let diffs = match finalize_crud_operation(
+        model_manager,
+        &modified_before,
+        git_root,
+        dry_run,
+        None,
+        Some(&ontology_before),
+    ) {
+        Ok(diffs) => diffs,
+        Err(err) => {
+            model_manager.graph_registry = registry_snapshot;
+            return Err(err);
+        }
+    };
 
     // Create result structure
     Ok(CrudResult {
@@ -400,20 +1173,27 @@ pub fn rename_element(
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
     let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Rename element using core business logic
     let new_id = model_manager
         .graph_registry
         .rename_element(element_id, new_name)?;
 
-    let diffs =
-        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
-            Ok(diffs) => diffs,
-            Err(err) => {
-                model_manager.graph_registry = registry_snapshot;
-                return Err(err);
-            }
-        };
+    let diffs = match finalize_crud_operation(
+        model_manager,
+        &modified_before,
+        git_root,
+        dry_run,
+        None,
+        Some(&ontology_before),
+    ) {
+        Ok(diffs) => diffs,
+        Err(err) => {
+            model_manager.graph_registry = registry_snapshot;
+            return Err(err);
+        }
+    };
 
     // Create result structure showing the rename
     Ok(CrudResult {
@@ -450,6 +1230,7 @@ pub fn move_file(
     // Track which files were modified before the operation
     let modified_before = snapshot_modified_files(model_manager);
     let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Move file using core business logic
     let identifier_mappings = model_manager.graph_registry.move_file(
@@ -458,14 +1239,20 @@ pub fn move_file(
         squash,
     )?;
 
-    let diffs =
-        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
-            Ok(diffs) => diffs,
-            Err(err) => {
-                model_manager.graph_registry = registry_snapshot;
-                return Err(err);
-            }
-        };
+    let diffs = match finalize_crud_operation(
+        model_manager,
+        &modified_before,
+        git_root,
+        dry_run,
+        None,
+        Some(&ontology_before),
+    ) {
+        Ok(diffs) => diffs,
+        Err(err) => {
+            model_manager.graph_registry = registry_snapshot;
+            return Err(err);
+        }
+    };
 
     if !dry_run {
         // Delete the source file from disk
@@ -739,7 +1526,7 @@ pub fn attach_element_identifier(
 
     if !attachment_type_valid {
         return Err(ReqvireError::InvalidAttachmentTarget(format!(
-            "Element '{}' (type: {}) cannot attach '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned source, semantic-contract, semantic-query-contract, constraint, behavior, specification, state, or input-output.",
+            "Element '{}' (type: {}) cannot attach '{}' (type: {}). Capability attachments may target ontology only; requirement attachments may target requirement-owned source, constraint, behavior, specification, state, or input-output. Semantic contracts constrain requirements through constrainedBy/constrain.",
             element_name,
             target_element.element_type.as_str(),
             attachment_element.name,
@@ -1304,6 +2091,7 @@ pub fn merge_elements(
     }
 
     let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Perform the merge in graph_registry
     model_manager
@@ -1311,6 +2099,13 @@ pub fn merge_elements(
         .merge_elements(&target_id, &source_ids)?;
 
     if let Err(err) = enforce_single_root_after_mutation(model_manager) {
+        model_manager.graph_registry = registry_snapshot;
+        return Err(err);
+    }
+
+    if let Err(err) =
+        apply_ontology_aware_rewrites(&mut model_manager.graph_registry, &ontology_before)
+    {
         model_manager.graph_registry = registry_snapshot;
         return Err(err);
     }
@@ -1863,6 +2658,7 @@ pub fn link(
     let modified_before = snapshot_modified_files(model_manager);
 
     let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Delegate to graph_registry (includes all validation and target resolution)
     // NOTE: This will mutate the in-memory graph even in dry-run mode
@@ -1882,14 +2678,20 @@ pub fn link(
         return Err(err);
     }
 
-    let diffs =
-        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
-            Ok(diffs) => diffs,
-            Err(err) => {
-                model_manager.graph_registry = registry_snapshot;
-                return Err(err);
-            }
-        };
+    let diffs = match finalize_crud_operation(
+        model_manager,
+        &modified_before,
+        git_root,
+        dry_run,
+        None,
+        Some(&ontology_before),
+    ) {
+        Ok(diffs) => diffs,
+        Err(err) => {
+            model_manager.graph_registry = registry_snapshot;
+            return Err(err);
+        }
+    };
 
     Ok(CrudResult {
         operation: CrudOperation::Update,
@@ -1967,6 +2769,7 @@ pub fn relink(
 
     let modified_before = snapshot_modified_files(model_manager);
     let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     let mutation_result = (|| -> Result<(), ReqvireError> {
         let removed = model_manager
@@ -1994,14 +2797,20 @@ pub fn relink(
         return Err(err);
     }
 
-    let diffs =
-        match finalize_crud_operation(model_manager, &modified_before, git_root, dry_run, None) {
-            Ok(diffs) => diffs,
-            Err(err) => {
-                model_manager.graph_registry = registry_snapshot;
-                return Err(err);
-            }
-        };
+    let diffs = match finalize_crud_operation(
+        model_manager,
+        &modified_before,
+        git_root,
+        dry_run,
+        None,
+        Some(&ontology_before),
+    ) {
+        Ok(diffs) => diffs,
+        Err(err) => {
+            model_manager.graph_registry = registry_snapshot;
+            return Err(err);
+        }
+    };
 
     Ok(CrudResult {
         operation: CrudOperation::Update,
@@ -2046,6 +2855,7 @@ pub fn unlink(
     // Track modified files before
     let modified_before = snapshot_modified_files(model_manager);
     let registry_snapshot = model_manager.graph_registry.clone();
+    let ontology_before = snapshot_ontology_mutation_state(&model_manager.graph_registry);
 
     // Try to remove relation via graph_registry
     // This handles element-to-element relations (NOT attachments)
@@ -2062,6 +2872,7 @@ pub fn unlink(
                 git_root,
                 dry_run,
                 None,
+                Some(&ontology_before),
             ) {
                 Ok(diffs) => diffs,
                 Err(err) => {

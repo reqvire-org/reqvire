@@ -1,1 +1,1 @@
-Capability attachment to semantic-contract is rejected
+Semantic-contract attachment is rejected

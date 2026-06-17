@@ -127,19 +127,19 @@ The system shall reject API requests whose access token is invalid.
         </div>
       </Section>
 
-      <Section title="Requirement-Owned Refinements">
+      <Section title="Requirement-Owned Refinements and Semantic Contracts">
         <p className="text-zinc-600 mb-4">
-          Refinements carry detailed engineering contracts for a capability or
-          requirement. They are owned through refine or refinedBy and should not
-          author governance metadata. The owning capability or requirement
-          supplies governance context.
+          Refinements carry detailed engineering contracts for a requirement.
+          Non-semantic-contract refinements are owned through refine or refinedBy
+          and should not author governance metadata. Semantic contracts are separate
+          ontology-plane elements that constrain requirements through constrainedBy and constrain,
+          and use ontology through use and usedBy.
         </p>
         <BulletList
           items={[
             "source captures stakeholder, regulatory, policy, contractual, or external source material.",
             "specification, constraint, behavior, state, and input-output refinements carry detailed contract content.",
-            "semantic-contract carries a SHACL profile over reachable ontology and must include Shapes.",
-            "semantic-query-contract carries a SPARQL query contract and must include one Query section.",
+            "semantic-contract is a reusable SHACL profile over explicitly used ontology and must include Shapes.",
           ]}
         />
         <div className="mt-5">
@@ -161,8 +161,9 @@ and signature before the request reaches protected application logic.`}</CodeBlo
       <Section title="Attachments as Contracts">
         <p className="text-zinc-600 mb-4">
           Attachments make cross-boundary context explicit. A capability imports
-          ontology context. A requirement imports a one-way contract dependency
-          from a compatible requirement-owned refinement in another subgraph.
+          ontology context. A requirement can import a one-way contract dependency
+          from a compatible requirement-owned non-semantic-contract refinement in another subgraph;
+          semantic-contract dependencies use constrainedBy/constrain and use/usedBy instead.
         </p>
         <DetailGrid
           items={[
@@ -172,7 +173,7 @@ and signature before the request reaches protected application logic.`}</CodeBlo
             },
             {
               name: "Requirement attachments",
-              desc: "Requirements attach semantic contracts, semantic query contracts, specifications, constraints, behaviors, states, and input-output refinements owned by requirement subgraphs.",
+              desc: "Requirements attach specifications, constraints, behaviors, states, and input-output refinements owned by requirement subgraphs. Semantic contracts are linked through constrainedBy/constrain.",
             },
             {
               name: "One-way flow",
@@ -260,18 +261,17 @@ reqvire search --filter-owner "Identity Team"`}</CodeBlock>
           relations, and attachments.
         </p>
         <CodeBlock>{`requirements/
-  Capabilities/
-    Product/
-      Collaboration/
-        Collaboration.md
-        CollaborationRequirements.md
-        CollaborationBehaviors.md
-        Architecture/
-          CollaborationServiceSpecifications.md
-    Platform/
-      Identity/
-        Identity.md
-        IdentityRequirements.md
+  Product/
+    Collaboration/
+      Collaboration.md
+      CollaborationRequirements.md
+      CollaborationBehaviors.md
+      Architecture/
+        CollaborationServiceSpecifications.md
+  Platform/
+    Identity/
+      Identity.md
+      IdentityRequirements.md
   Ontologies/
     Collaboration.md
     Identity.md

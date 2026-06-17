@@ -1,0 +1,1 @@
+Missing semantic-contract use relation is rejected

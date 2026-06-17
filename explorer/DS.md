@@ -11,50 +11,69 @@ The design system is a self-contained subdirectory (`design-system/`) inside
 the Explorer workspace. It ships:
 
 - **CSS tokens** — the complete visual language as CSS custom properties
-- **TSX components** — all UI primitives as typed React components
+- **TSX components** — UI primitives and reusable UX/product patterns as typed React components
 - **Palette API** — a TypeScript module for programmatic color access
-- **Barrel export** — a single `index.ts` that re-exports every component and
-  palette symbol; the only import surface the app should use
+- **Barrel export** — a single `index.ts` that re-exports every component,
+  product pattern, and palette symbol; the only import surface the app should
+  use
 
 ### Ownership contract
 
 The namespace boundary is strict:
 
-- `rq-*` classes and `--rq-*` component variables are owned by
-  `design-system/` only.
-- `ex-*` classes and `--ex-*` application variables are owned by `src/` only.
-- Application code MUST NOT emit new `rq-*` hooks.
-- Design-system code MUST NOT emit `ex-*` hooks.
+- `ds-*` classes and `--ds-*` component variables are owned by reusable
+  primitives under `design-system/components/`.
+- `ux-*` classes and `--ux-*` product variables are owned by the reusable
+  UX/product-pattern layer: `design-system/product-patterns/`.
+- Application code MUST NOT emit new `ds-*` hooks.
+- After migration, application code MUST NOT emit `ux-*` hooks either; `src/`
+  consumes product patterns through props, data, state, callbacks, and
+  composition.
+- Primitive design-system components MUST NOT emit `ux-*` hooks.
+- Product patterns MUST NOT emit `ds-*` hooks. They customize primitives only
+  through documented props or documented `--ds-*` variables on `ux-*` wrappers.
+- Product patterns and showcase examples MUST NOT assign primitive
+  interaction/state policy variables such as `--ds-*-sel-*`,
+  `--ds-*-hover-*`, `--ds-*-active-*`, `--ds-*-focus-*`, or
+  `--ds-*-off-*`. If a product pattern needs different selected, hover,
+  active, focus, off, or disabled behavior, add a typed primitive prop or
+  variant such as `density` or `variant` and implement that state CSS inside
+  `design-system/components/`.
+- After the product-pattern refactor, `src/` MUST NOT define visual CSS rules;
+  it should own behavior, routing, store access, state, effects, workers, and
+  callback wiring only.
 - Application CSS and Linaria blocks MUST NOT target design-system internals
-  such as `.rq-treeitem`, `.rq-tabs`, `.rq-search__input`, or
-  `.rq-togglerow__label`.
+  such as `.ds-treeitem`, `.ds-tabs`, `.ds-search__input`, or
+  `.ds-togglerow__label`.
 
-Explorer customizes design-system components only through documented props or
-documented `--rq-*` component variables set on an application-owned `ex-*`
-wrapper. If a needed customization does not exist, add it to the design-system
-component API instead of reaching into its internal markup.
+UX/product patterns customize design-system primitives only through documented
+props or documented `--ds-*` component variables. If a needed customization
+does not exist, add it to the design-system component API instead of reaching
+into its internal markup.
 
 The app consumes the design system in two ways:
 
 | Surface | How |
 |---------|-----|
 | CSS | `src/main.tsx` imports `../design-system/styles.css` directly |
-| Components / palette | `import { … } from "@ds"` (path alias → `design-system/index.ts`) |
+| Components / product patterns / palette | `import { … } from "@ds"` (path alias → `design-system/index.ts`) |
 
 The CSS entry is the only direct app import from `design-system/`. Component,
-palette, and helper imports go through `@ds`; direct component paths remain
-forbidden by `lint:adherence`.
+product-pattern, palette, and helper imports go through `@ds`; direct
+implementation paths remain forbidden by the public import contract.
 
-Explorer document mount mechanics live inline in `index.html`: `html`, `body`,
-and `#root` height, plus the shell-level body overflow policy. There is no
-`src/styles.css`, `src/global.css`, `src/html.css`, or `src/app-mount.css`
-styling layer. Those names hide ownership and invite product styling to
-accumulate outside component modules. The architecture guard keeps the inline
-HTML style block mount-bootstrap-only.
+Explorer document mount mechanics currently live inline in `index.html`:
+`html`, `body`, and `#root` height, plus the shell-level body overflow policy.
+There is no `src/styles.css`, `src/global.css`, or `src/html.css` styling
+layer. If `src/app-mount.css` is introduced, it is the only app-side CSS file
+exception and must contain only the same mount bootstrap. Those names hide
+ownership and invite product styling to accumulate outside component modules.
+The architecture and CSS ownership guards keep document bootstrap separate
+from product styling.
 
 `@ds` is the only public TypeScript import surface. Application code MUST NOT
-import from `@ds/*`, `design-system/*`, or component/palette implementation
-paths directly.
+import from `@ds/*`, `design-system/*`, or component/product-pattern/palette
+implementation paths directly.
 
 No third-party UI framework (Tailwind, Radix Themes, etc.) is in the
 dependency tree. All visual primitives are owned here.
@@ -72,7 +91,7 @@ design-system/
 ├── tokens/
 │   ├── fonts.css              # @font-face for Geist + Geist Mono
 │   ├── colors.css             # Color ramps + semantic aliases + dark theme
-│   ├── typography.css         # Type scale, weights, line heights, .rq-eyebrow / .rq-mono
+│   ├── typography.css         # Type scale, weights, line heights, .ds-eyebrow / .ds-mono
 │   ├── spacing.css            # 4px grid, radii, control heights, icon sizes, layout
 │   ├── elevation.css          # Shadows, motion, z-index stack
 │   └── base.css               # Minimal reset + body defaults
@@ -82,6 +101,14 @@ design-system/
 │   ├── data/                  # Chip · CodeRef · ElementIcon · RelationPill · Stat · Table · TypeBadge
 │   ├── controls/              # SearchInput · SegmentedControl · Tabs · ToggleRow
 │   └── navigation/            # Breadcrumb · SidebarSection · TreeItem
+│
+├── product-patterns/
+│   ├── shell/                 # AppShell · ShellPane · PaneResizer · ShellMain · route frames
+│   ├── chrome/                # WorkspaceToolbar and later pane chrome
+│   ├── side-pane/             # Explorer side-pane frames, filters, trees, legends
+│   ├── detail/                # Detail dialog bodies and relation/detail lists
+│   ├── content/               # Document, markdown, diagram, and code preview frames
+│   └── feedback/              # Product notices and help content
 │
 ├── assets/
 │   ├── fonts/                 # Geist-Variable.woff2, GeistMono-Variable.woff2
@@ -118,7 +145,7 @@ as source. Real Explorer project data is served at `assets/project-store.js`
 by `reqvire serve`; that runtime data file is not checked into
 `public/assets/` or `design-system/assets/`. The showcase renders the real app
 with `src/store/devFixture.ts` injected by
-`design-system/showcase/mocks/MockShell.tsx`; showcase public resources belong
+`design-system/showcase/MockShell.tsx`; showcase public resources belong
 under `design-system/showcase/public/assets/` only when a mock must use a raw
 browser URL.
 
@@ -139,10 +166,13 @@ the relevant lint guard and documentation. A passing guard is the approval
 mechanism; do not bypass it with ad hoc exclusions or unguarded conventions.
 
 Design-system components expose visual policy through semantic props and
-`--rq-*` component variables. They MUST NOT expose arbitrary CSS color-string
+`--ds-*` component variables. They MUST NOT expose arbitrary CSS color-string
 props. Dynamic product coloring, such as ontology or graph role colors, is
 mapped by the application into semantic roles, token names, or documented
-component variables before it reaches a design-system primitive.
+component variables before it reaches a design-system primitive. Interaction
+state policy remains primitive-owned: product patterns and showcase examples
+may set documented context, density, and composition variables, but selected,
+hover, active, focus, off, and disabled styling belongs in the primitive API.
 
 ### Token taxonomy and naming
 
@@ -152,7 +182,7 @@ Design tokens are organized into three layers. Keep the layers distinct:
 |-------|---------------|---------|
 | Primitive tokens | Raw choices in the visual language | `--rose-600`, `--space-8`, `--text-sm` |
 | Semantic tokens | Product decisions that explain purpose | `--accent`, `--bg-surface`, `--text-muted`, `--border-focus` |
-| Component tokens | Narrow component knobs that still resolve to semantic intent | `--rq-tabs-border-bottom`, `--rq-modal-w` |
+| Component tokens | Narrow component knobs that still resolve to semantic intent | `--ds-tabs-border-bottom`, `--ds-modal-w` |
 
 Primitive tokens are the available options. Semantic tokens are the choices the
 interface is allowed to make. Components and app CSS should normally use the
@@ -256,9 +286,11 @@ reference tokens defined earlier:
 5. `elevation.css` — shadows, motion, z-index
 6. `base.css` — `*` reset + `body` defaults
 
-Component-specific styling lives with the owning TSX component through Linaria
-and uses `rq-*` hooks internally. Application styling lives with the owning
-Explorer TSX component and uses `ex-*` hooks. The only inline HTML style in
+Component-specific styling lives with the owning TSX component through Linaria:
+primitive components use `ds-*` hooks, while UX/product patterns use `ux-*`
+hooks. Application `src/` code should not be a styling layer; it consumes
+product patterns and owns behavior, routing, store access, state, and effects.
+The only inline HTML style in
 `index.html` and `design-system/showcase/index.html` is the document mount
 bootstrap:
 
@@ -340,8 +372,8 @@ Weights: `--weight-regular` (400), `--weight-medium` (500), `--weight-semibold`
 (600), `--weight-bold` (700).
 
 Two utility classes are defined here:
-- `.rq-eyebrow` — 11px semibold uppercase with `0.07em` tracking; sidebar section labels
-- `.rq-mono` — Geist Mono at 0.92em; IDs, paths, relation slugs
+- `.ds-eyebrow` — 11px semibold uppercase with `0.07em` tracking; sidebar section labels
+- `.ds-mono` — Geist Mono at 0.92em; IDs, paths, relation slugs
 
 ### Spacing (`tokens/spacing.css`)
 
@@ -352,18 +384,32 @@ Two utility classes are defined here:
 - **Control heights**: `--control-xs` (22px), `--control-sm` (28px), `--control-md` (34px), `--control-lg` (40px)
 - **Icon sizes**: `--icon-xs` (13px) → `--icon-lg` (20px)
 - **Layout**: `--rail-w` (52px), `--header-h` (52px), `--content-max` (1180px), `--row-h` (30px)
+- **List rhythm**: `--gap-list-stack` (`0`) — default vertical gap for contiguous menu, table, filter, legend, and relation rows
 - **Borders**: `--border-w` (1px), `--border-w-thick` (2px), `--border-w-heavy` (3px), `--focus-w` (2px)
 
+List-like UI is contiguous by default: menu items, table/list rows, filter
+rows, legend rows, and relation rows sit directly next to each other
+vertically. Use section margins, row padding, borders, or selection/hover fills
+for structure; add vertical row gaps only when the component is explicitly a
+card grid or tile layout.
+
 Explorer shell pane widths are not design-system tokens. They are
-application-owned `--ex-*` variables defined on the shell root:
-`--ex-left-pane-width`, `--ex-left-pane-collapsed-width`, and
-`--ex-current-left-width`.
+application-owned `--ux-*` variables defined on the shell root:
+`--ux-left-pane-width`, `--ux-left-pane-collapsed-width`, and
+`--ux-current-left-width`.
 
 ### Elevation (`tokens/elevation.css`)
 
 - **Shadows**: `--shadow-xs` → `--shadow-xl`. Cards use `xs/sm`; popovers/modals use `lg/xl`. Dark mode re-pitches all shadows to black alpha.
+- **Effects**: filter/effect formulas such as `--filter-danger-hover`, `--filter-scrim-blur`, and `--filter-highlight-glow`. Raw `blur(...)`, `brightness(...)`, `drop-shadow(...)`, etc. belong here, not in component CSS.
 - **Motion**: `--dur-fast` (130ms), `--dur-base` (200ms), `--dur-slow` (320ms). Easing: `--ease-standard` (`cubic-bezier(0.2,0,0,1)`). Quick and mechanical — no bounce.
 - **Z-index stack**: `--z-rail` (20) → `--z-sticky` (40) → `--z-popover` (60) → `--z-overlay` (80) → `--z-modal` (90) → `--z-toast` (100)
+- **Local layering**: `--z-local-base`, `--z-local-raised`, and `--z-local-overlay` for component-internal stacking. Raw numeric `z-index` values are not allowed in component/app CSS.
+
+Token-only visual formulas are deliberate: color derivation (`color-mix(...)`),
+filter/effect functions, raw shadow recipes, motion curves/durations, and
+z-index numbers are source-of-truth values. Components consume semantic tokens
+or component variables that resolve to these tokens.
 
 ---
 
@@ -393,9 +439,9 @@ on its root element unless noted.
 | `Chip` | Button-backed inline label with optional icon, count, and active state |
 | `CodeRef` | Monospace code/path reference with optional line anchor and quiet wrapping |
 | `ElementIcon` | Colored model-element glyph — square / diamond / hub shape; sized `sm/md/lg` |
-| `RelationPill` | Relation row chip: kind label + colored pip + target label; optional href |
+| `RelationPill` | Relation row chip: kind label + `ElementIcon` marker + target label; optional href |
 | `Stat` / `StatRow` | Key-value stat pair; `StatRow` renders a horizontal run of stats |
-| `Table` | Full table set: `TableViewport` (scroll container), `TableHead`, `TableBody`, `TableRow`, `TableHeader`, `TableCell`, `TableSortButton` |
+| `Table` | Full table set: `TableViewport` (scroll container), `TableHeaderGroup`, `TableBody`, `TableRow`, `TableHeaderCell`, `TableCell`, `TableSortButton` |
 | `TypeBadge` | Element-type badge with optional tinted fill; uses the element-type color system |
 
 ### Controls (`components/controls/`)
@@ -412,8 +458,54 @@ on its root element unless noted.
 | Component | Description |
 |-----------|-------------|
 | `Breadcrumb` | Slash-delimited path bar; last item is active (non-link) |
-| `SidebarSection` | Collapsible section with `.rq-eyebrow` header and optional action slot |
+| `SidebarSection` | Collapsible section with `.ds-eyebrow` header and optional action slot |
 | `TreeItem` | Indented tree row: indent level, expand chevron, icon slot, label, optional count |
+
+### Product Patterns (`product-patterns/`)
+
+Product patterns are Explorer-specific visual patterns exported through `@ds`.
+They may use domain-shaped props and callback props, but they must not import
+from `src/`, use store/router hooks, access workers, or read `window`.
+They may customize primitives only through documented props or documented
+context/density/composition `--ds-*` variables. They must not redefine primitive
+state policy variables; state variants belong in primitive props and primitive
+CSS.
+
+They must not use inline `style={...}`, `CSSProperties`, ad hoc CSS-variable
+objects, computed colors, or imperative `.style.*` mutations. Dynamic visual
+values belong behind reusable primitive APIs in `design-system/components/**`;
+product patterns compose those primitives through typed semantic/token props.
+
+| Group | Exported targets |
+|-------|------------------|
+| `shell/` | `AppShell`, `ShellPane`, `PaneResizer`, `ShellMain`, `RouteFrame`, `RouteLayout`, `RoutePanel` |
+| `chrome/` | `WorkspaceToolbar`, `PaneChromeHeader`, `ReqvireRailMark` |
+| `side-pane/` | `SidePaneFrame`, pane filters, summaries, selections, trees, legends, and action rows |
+| `detail/` | `DetailDialog`, element detail content, relation and attachment lists, concept references, and ontology detail bodies |
+| `content/` | `DocumentPanel`, `MarkdownFrame`, `DiagramBlockFrame`, `CodePreviewFrame`, `CodeToolbar`, `CodeBody`, `RendererNotice` |
+| `feedback/` | `StoreNotice`, `HelpContent`, `HelpDialog` |
+
+Product-pattern names should be general inside their folder context. Do not
+repeat `Explorer` or `Reqvire` unless the name would be ambiguous without it.
+Domain nouns such as `Element`, `Relation`, and `Ontology` are fine when they
+name actual product concepts.
+
+The showcase must import product patterns from `@ds` and drive examples from
+showcase-local fixtures. It must not import store hooks, router state, or app
+containers. The full-app mock harness is isolated to
+`design-system/showcase/MockShell.tsx`, which injects fixture data and renders
+`src/App`.
+
+Showcase primitive pages demonstrate primitives only. They may show states,
+props, and generic composition mechanics, but they must not present product
+vocabulary or product compositions as raw primitive examples. Product concepts
+such as panes, filters, graph legends, model trees, detail dialogs, reports,
+and Explorer chrome belong in `ProductPatternsPage` and must use exported
+product-pattern components from `@ds`.
+Showcase scaffolding can wrap those components with `showcase-*` containers,
+but it must not reach into their internals with `.ds-*`, `.ux-*`,
+`[data-product-pattern]`, element selectors, or DOM descendants. Move that
+behavior into the owning component/pattern contract instead.
 
 ---
 
@@ -489,6 +581,19 @@ Runs in sequence:
 
 The build fails at the first failing step. All steps must pass before `dist/` is emitted.
 
+### Showcase dev/build
+
+```
+npm run dev:showcase
+npm run build:showcase
+```
+
+Both commands run `npm run lint` first, then generate browser icons and start
+or build the Vite showcase. This is intentional: showcase pages exercise the
+same design-system contracts as the real Explorer, so namespace, token,
+product-pattern, and primitive-state-policy violations must fail before a
+developer can preview the showcase.
+
 ### Standalone DS artifacts
 
 ```
@@ -508,7 +613,200 @@ are also **not** part of the application bundle that `vite build` produces.
 npm run lint
 ```
 
-Runs three checks sequentially.
+Runs four checks sequentially.
+
+### Scripted guard rules
+
+Current scripted guard rules under `explorer/scripts/`:
+
+**Default lint pipeline**
+
+`npm run lint` runs:
+
+1. `lint:artifacts`
+2. `lint:adherence`
+3. `lint:style`
+4. `lint:css-ownership`
+
+**1. Generated artifacts**
+
+`lint-generated-artifacts.mjs`
+
+Rejects tracked/generated source artifacts:
+
+- `explorer/_ds_bundle.js`
+- `explorer/design-system/_ds_bundle.js`
+- `explorer/design-system/reqvire-explorer.css`
+- `explorer/design-system/_ds_manifest.json`
+- `explorer/design-system/_adherence.oxlintrc.json`
+- `explorer/design-system/dist-kit/`
+- `explorer/design-system/dist-showcase/`
+- `explorer/dist/`
+
+Rejects generated assets in source asset roots:
+
+- `project-store.js`
+- generated favicon/app-icon files
+- `site.webmanifest`
+- `browserconfig.xml`
+
+Rejects asset collisions between:
+
+- `design-system/assets/`
+- `public/assets/`
+- `design-system/showcase/public/assets/`
+
+**2. Import adherence**
+
+`generate-adherence-config.mjs` + oxlint
+
+Generated oxlint config rejects direct DS internal imports:
+
+- `@ds/*`
+- `design-system/components/**`
+- `../design-system/components/**`
+- `../../design-system/components/**`
+- `design-system/product-patterns/**`
+- `../design-system/product-patterns/**`
+- `../../design-system/product-patterns/**`
+- `components/controls/**`
+- `components/core/**`
+- `components/data/**`
+- `components/navigation/**`
+- `product-patterns/**`
+
+Allowed public import surface is `@ds`.
+
+**3. Product pattern boundaries**
+
+`lint-product-pattern-boundaries.mjs`
+
+Rejects:
+
+- `design-system/product-patterns/**` importing anything from `src/`
+- product patterns importing through relative paths into `src`
+- product patterns importing `src/*`
+- product patterns importing `@/*`
+- showcase files importing `src/App`, except `design-system/showcase/MockShell.tsx`
+
+**4. Style token guard**
+
+`lint-style-tokens.mjs`
+
+Scans:
+
+- `src`
+- `design-system/components`
+- `design-system/product-patterns`
+- `design-system/showcase`
+
+Checks CSS files, Linaria `css` templates, and inline style literals.
+
+Rejects raw visual values outside allowed token/custom-property/at-rule regions:
+
+- raw `px`
+- raw `rem`
+- raw colors: hex, `rgb()`, `hsl()`, `oklch()`, etc.
+- `color-mix(...)`
+- raw filter functions: `blur()`, `brightness()`, `drop-shadow()`, etc.
+- raw `font-family`
+- numeric `font-weight`
+- raw durations: `ms`, `s`
+- raw easing: `ease`, `ease-in`, `cubic-bezier(...)`
+- raw `z-index`
+
+**5. CSS architecture**
+
+`lint-css-architecture.mjs`
+
+Rejects namespace ownership violations:
+
+- `ds-*` emitted from `src/`
+- `ux-*` emitted from `src/`
+- `ux-*` emitted from primitive DS code outside `design-system/product-patterns/`
+- `ds-*` emitted from `design-system/product-patterns/`
+
+Enforces import surface:
+
+- app code must import DS TypeScript through `@ds`
+- only direct DS import allowed in `src/` is `../design-system/styles.css` from `src/main.tsx`
+
+Enforces CSS entry files:
+
+- `design-system/styles.css` must contain only approved token imports, in order
+- `index.html` and `design-system/showcase/index.html` inline styles must be mount bootstrap only
+
+Rejects undocumented primitive variable customization:
+
+- any `--ds-*` assignment in `src/`, product patterns, or showcase unless allowlisted
+- always rejects primitive state-policy vars outside primitives:
+  - `--ds-*-sel-*`
+  - `--ds-*-hover-*`
+  - `--ds-*-active-*`
+  - `--ds-*-focus-*`
+  - `--ds-*-off-*`
+
+Rejects inline visual styling:
+
+- `style={...}`
+- `CSSProperties`
+- `.style.*`
+- `.style.setProperty(...)`
+
+Applies to:
+
+- DS components
+- product patterns
+- showcase
+- app UI
+
+With explicit renderer-boundary allowlist:
+
+- `src/App.tsx`
+- `src/lib/ontologyGraphRenderer.ts`
+- `src/rendering/MarkdownContent.tsx`
+- `src/test/setupCssTokens.ts`
+- `src/views/GraphLibraryViews.tsx`
+
+Rejects public API shape problems:
+
+- exported DS/product-pattern prop types extending React DOM attrs must omit `"style"`
+- arbitrary visual string props are rejected, e.g. `color?: string`, `background?: string`, `pipColorToken`, `accentColorToken`, unconstrained token strings
+
+Showcase-specific rules:
+
+- showcase page scaffolding classes must be `showcase-*`
+- primitive showcase pages must not import product-pattern components
+- `showcase-*` CSS must not target:
+  - `.ds-*`
+  - `.ux-*`
+  - `[data-product-pattern]`
+  - DOM elements inside rendered components, e.g. `svg`, `button`, `table`, etc.
+
+**6. CSS ownership**
+
+`lint-css-ownership.mjs`
+
+Rejects:
+
+- `.css` files outside `design-system/`, except strict bootstrap-only `src/app-mount.css`
+- `ux-*` hooks emitted from `src/`
+- Linaria `css` templates outside:
+  - `design-system/components`
+  - `design-system/product-patterns`
+  - `design-system/showcase`
+- Linaria `styled` definitions outside the same allowed ownership roots
+
+So the big picture is:
+
+- generated output is not source
+- imports must go through public DS surfaces
+- app `src/` is behavior/state, not visual ownership
+- primitives own `ds-*`
+- product patterns own `ux-*`
+- showcase owns only `showcase-*` scaffolding
+- visual values must be tokenized
+- customization APIs are deny-by-default and documented through guards
 
 ### 1. Generated artifact guard
 
@@ -519,7 +817,11 @@ npm run lint:artifacts
 `scripts/lint-generated-artifacts.mjs` fails if generated outputs are tracked
 as source, including generated DS bundles, generated DS CSS, generated
 adherence config, `dist/`, `design-system/dist-kit/`, and
-`design-system/dist-showcase/`.
+`design-system/dist-showcase/`. It also rejects generated runtime/browser
+assets such as `project-store.js`, generated favicon/app-icon variants, and
+manifest/browserconfig files when they appear under source asset roots, and it
+fails asset-name collisions between `design-system/assets/` and raw public
+asset roots.
 
 ### 2. Adherence (import contract)
 
@@ -528,14 +830,22 @@ npm run lint:adherence
 ```
 
 ```
-npm run generate:adherence && oxlint --deny-warnings --ignore-path=.oxlintignore --config .vite/_adherence.oxlintrc.json src design-system
+npm run generate:adherence && oxlint --deny-warnings --ignore-path=.oxlintignore --config .vite/_adherence.oxlintrc.json src design-system && node scripts/lint-product-pattern-boundaries.mjs
 ```
 
 `scripts/generate-adherence-config.mjs` reads `design-system/index.ts`, extracts
 every exported PascalCase component name, then writes the ignored generated
 file `.vite/_adherence.oxlintrc.json` with a `no-restricted-imports` rule that
-bans direct imports from any component path. The rule forces all imports to go
-through `@ds`.
+bans direct imports from component and product-pattern paths. The rule forces
+application and showcase imports to go through `@ds`.
+
+`scripts/lint-product-pattern-boundaries.mjs` is the path-aware import guard
+for product ownership. It rejects `design-system/product-patterns/` imports
+that resolve into `src/`, including relative paths, baseUrl `src/*` paths, and
+the `@/*` alias. It also keeps the full-app showcase harness isolated:
+`design-system/showcase/MockShell.tsx` is the only showcase file allowed to
+import `src/App`, including through relative paths, baseUrl paths, or the
+`@/*` alias.
 
 Banned import patterns:
 ```
@@ -543,15 +853,24 @@ Banned import patterns:
 design-system/components/**
 ../design-system/components/**
 ../../design-system/components/**
+design-system/product-patterns/**
+../design-system/product-patterns/**
+../../design-system/product-patterns/**
 components/controls/**
 components/core/**
 components/data/**
 components/navigation/**
+product-patterns/**
+../src/**
+../../src/**
+../../../src/**
 ```
 
-The barrel file itself (`design-system/index.ts`) is exempted from the rule.
-The config is regenerated on every lint run so it always reflects the current
-barrel.
+The barrel file itself (`design-system/index.ts`) is exempted from the DS
+internals rule. `design-system/showcase/MockShell.tsx` is the only showcase
+file exempted from the relative `src/` import rule, because it is the full-app
+mock integration harness. The config is regenerated on every lint run so it
+always reflects the current barrel.
 
 ### 3. Style checks
 
@@ -567,40 +886,93 @@ stylelint "design-system/styles.css" "design-system/tokens/**/*.css" "design-sys
 
 **Style token guard** (`scripts/lint-style-tokens.mjs`) enforces the token
 contract on CSS files, Linaria `css` templates, and inline style literals under
-`src/` and `design-system/components/`. It strips comments, blanks out
-custom-property declarations and at-rule conditions (where raw values are
-legitimate), then runs six pattern checks on the remainder:
+`src/`, `design-system/components/`, `design-system/product-patterns/`, and
+`design-system/showcase/`. It
+strips comments, blanks out custom-property declarations and at-rule conditions
+(where raw values are legitimate), then runs conservative pattern checks on the
+remainder:
 
 | Check | What it flags |
 |-------|--------------|
 | `raw-px` | Raw `px` lengths not inside a custom-property or at-rule |
+| `raw-rem` | Raw `rem` lengths not inside a custom-property or at-rule |
 | `raw-color` | Hex colors, `rgb()`, `hsl()`, `oklch()`, etc. |
+| `color-mix` | `color-mix(...)` outside token/source-of-truth files |
+| `raw-filter-function` | `blur(...)`, `brightness(...)`, `drop-shadow(...)`, etc. outside token/source-of-truth files |
 | `raw-font-family` | `font-family:` not starting with `var(` or `inherit` |
 | `raw-font-weight` | `font-weight:` with a numeric value |
 | `raw-duration` | Raw `ms` / `s` durations |
 | `raw-easing` | `cubic-bezier(` or `ease(-in|-out|-in-out)` |
+| `raw-z-index` | `z-index:` not using `var(--z-*)`, `auto`, or `calc(var(...))` |
 
 Any finding exits 1. There is no baseline or grandfather list — the check is
 either clean or it fails.
 
 **CSS architecture guard** (`scripts/lint-css-architecture.mjs`) enforces
-namespace ownership (`rq-*` in design-system only, `ex-*` in app code only) and
-keeps `design-system/styles.css` as the import-only public CSS entry. It also
-keeps HTML entry inline styles limited to document mount bootstrap and blocks
-app code from importing direct `design-system/*` paths, except the single
-`../design-system/styles.css` import in `src/main.tsx`. These checks are
-conservative by design: adding a new token layer, entry import, global selector
-allowance, or namespace exception requires updating this guard and this
+namespace ownership (`ds-*` only in primitive design-system components and
+`ux-*` only in `design-system/product-patterns/`). It also keeps
+`design-system/styles.css` as the import-only public CSS entry, keeps HTML entry
+inline styles limited to document mount bootstrap, and blocks app code from
+importing direct `design-system/*` paths, except the single
+`../design-system/styles.css` import in `src/main.tsx`. The same guard scans
+application code, `design-system/product-patterns/`, and
+`design-system/showcase/` for
+`--ds-*` assignments: customizations are deny-by-default, and primitive
+interaction/state policy variables such as `--ds-*-sel-*`,
+`--ds-*-hover-*`, `--ds-*-active-*`, `--ds-*-focus-*`, and `--ds-*-off-*`
+are forbidden outside primitive components. The guard also rejects inline
+visual styling in reusable components, product patterns, showcase pages, and
+application UI: `style={...}`, `CSSProperties`, and imperative `.style.*` /
+`setProperty(...)` mutation must live behind reusable primitive APIs such as
+`ElementIcon`, `TypeBadge`, `TokenSwatch`, `DonutMeter`, or `BarMeterFill`, or
+inside an explicitly allowlisted renderer boundary. Exported DS/product-pattern
+prop types that extend React DOM attributes must omit `"style"`, and public
+visual props must not accept arbitrary strings such as `color?: string`,
+`background?: string`, or unconstrained ``--${string}`` token names; use
+semantic variants or typed token unions such as `DesignSystemColorToken`.
+Showcase page scaffolding must use `showcase-*` classes, and primitive showcase pages
+may import primitives/tokens only. Product vocabulary and Explorer
+compositions belong in product-pattern or mock showcase pages.
+`showcase-*` is not a styling escape hatch: showcase CSS may style only the
+demo scaffold around examples. It must not target `.ds-*`, `.ux-*`,
+`[data-product-pattern]`, or DOM elements inside rendered components. If the
+showcase needs a different size, placement, or state, add or use a public
+primitive/product-pattern API and exercise that API from the page.
+These checks are conservative by design: adding a new token layer, entry import,
+global selector allowance, documented `--ds-*` customization, primitive
+dynamic-style API, or namespace exception requires updating this guard and this
 document in the same change.
+
+### CSS ownership guard
+
+```
+npm run lint:css-ownership
+```
+
+`scripts/lint-css-ownership.mjs` is default-enforced by `npm run lint` so src
+visual CSS regressions fail normal validation. It fails on:
+
+- `.css` files outside `design-system/`, except a strictly bootstrap-only
+  `src/app-mount.css` if that file exists
+- `ux-*` product class hooks emitted from `src/`
+- Linaria `css` and `styled` definitions outside
+  `design-system/components/` and `design-system/product-patterns/`
+
+`App.tsx` is not a visual exception. It may own route/store/bootstrap/event
+wiring, pane width state, graph state, and callbacks, but shell layout rules
+belong in `design-system/product-patterns/shell`.
+
+Findings include file, line, column, evidence, and ownership guidance. Current
+violations are lint failures, not allowlist targets.
 
 ---
 
 ## How to use
 
-### Importing components
+### Importing components and product patterns
 
 ```tsx
-import { Button, Icon, TypeBadge, ElementIcon } from "@ds";
+import { AppShell, Button, ElementIcon, Icon, TypeBadge, WorkspaceToolbar } from "@ds";
 import { cssVar, elementRole, roleColorValue } from "@ds";
 import type { ElementRole, PaletteChannel } from "@ds";
 ```
@@ -610,9 +982,11 @@ Never import from a component path directly:
 ```tsx
 // wrong
 import { Button } from "../../design-system/components/core/Button";
+import { AppShell } from "../design-system/product-patterns/shell";
 
 // correct
 import { Button } from "@ds";
+import { AppShell } from "@ds";
 ```
 
 ### Using tokens in CSS
@@ -647,9 +1021,9 @@ product variables.
 
 ```css
 /* allowed — component-owned app variable */
-.ex-detail-dialog {
-  --ex-detail-dialog-w: 1120px;
-  width: min(var(--ex-detail-dialog-w), calc(100vw - var(--space-24)));
+.ux-detail-dialog {
+  --ux-detail-dialog-w: 1120px;
+  width: min(var(--ux-detail-dialog-w), calc(100vw - var(--space-24)));
 }
 ```
 
@@ -688,6 +1062,16 @@ No JavaScript color recalculation needed.
 3. Run `npm run lint:adherence` — the config regenerates from the barrel
 4. Style the component using only `var(--token)` references
 5. Run `npm run lint:style` to verify the CSS is token-clean
+
+### Adding a new product pattern
+
+1. Create `design-system/product-patterns/<group>/MyPattern.tsx`
+2. Export it from the group barrel and `design-system/product-patterns/index.ts`
+3. Add an explicit public export to `design-system/index.ts`
+4. Keep behavior, store access, routing, workers, and browser globals in `src/`
+5. Use `ux-*` class hooks and `--ux-*` variables only inside product patterns
+6. Add showcase coverage with mock data under `design-system/showcase/fixtures`
+   when the pattern changes user-visible Explorer UI
 
 ---
 

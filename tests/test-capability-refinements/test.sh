@@ -40,12 +40,16 @@ Billing vocabulary.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix billing: <urn:reqvire:test:billing:> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
+<https://example.test/ontology> a owl:Ontology .
 billing:CorrectiveInvoice a owl:Class .
 billing:Invoice a owl:Class .
 ```
@@ -61,7 +65,7 @@ The system shall produce billing invoices.
 #### Relations
   * specify: [Billing Capability](#billing-capability)
   * refinedBy: [Billing Source](#billing-source)
-  * refinedBy: [Billing Invoice Shape Contract](#billing-invoice-shape-contract)
+  * constrainedBy: [Billing Invoice Shape Contract](#billing-invoice-shape-contract)
 ---
 
 ### Billing Invoice Shape Contract
@@ -72,7 +76,8 @@ Billing invoice shape contract.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Billing Ontology](#billing-ontology)
 
 #### Shapes
 ```turtle
@@ -91,15 +96,19 @@ Shared tax vocabulary.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Relations
   * derivedFrom: [Billing Ontology](#billing-ontology)
 
 #### Ontology
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix tax: <urn:reqvire:test:tax:> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
+<https://example.test/ontology> a owl:Ontology .
 tax:TaxInvoice a owl:Class .
 ```
 ---
@@ -174,7 +183,7 @@ assert_invalid_model() {
 }
 
 assert_invalid_requirement_owned_only() {
-  assert_invalid_model "requirement-owned only"
+  assert_invalid_model "non-semantic-contract refinement element to a requirement"
 }
 
 rm -rf "${TEST_DIR}/specifications"
@@ -202,11 +211,16 @@ Billing vocabulary.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix billing: <urn:reqvire:test:billing:> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/ontology> a owl:Ontology .
 billing:Invoice a owl:Class .
 ```
 ---
@@ -220,7 +234,7 @@ The system shall bill customers.
 
 #### Relations
   * specify: [Billing Capability](#billing-capability)
-  * refinedBy: [Bad Semantic Contract](#bad-semantic-contract)
+  * constrainedBy: [Bad Semantic Contract](#bad-semantic-contract)
 ---
 
 ### Bad Semantic Contract
@@ -231,7 +245,8 @@ Bad ownership.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Billing Ontology](#billing-ontology)
 
 #### Ontology
 ```turtle
@@ -274,7 +289,7 @@ The system shall bill customers.
 
 #### Relations
   * specify: [Billing Capability](#billing-capability)
-  * refinedBy: [Missing Shapes Contract](#missing-shapes-contract)
+  * constrainedBy: [Missing Shapes Contract](#missing-shapes-contract)
 ---
 
 ### Missing Shapes Contract
@@ -285,7 +300,7 @@ Missing shapes.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
 ---
 EOF
 assert_invalid_model "Shapes"
@@ -301,6 +316,8 @@ Missing ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 ---
 EOF
 assert_invalid_model "Ontology"
@@ -318,7 +335,7 @@ Capability.
   * type: capability
 
 #### Relations
-  * refinedBy: [Capability Semantic Contract](#capability-semantic-contract)
+  * constrainedBy: [Capability Semantic Contract](#capability-semantic-contract)
 ---
 
 ### Capability Semantic Contract
@@ -329,7 +346,7 @@ Capability-owned semantic contract is invalid in the ontology split model.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Capability](#billing-capability)
+  * constrain: [Billing Capability](#billing-capability)
 
 #### Shapes
 ```turtle
@@ -339,7 +356,7 @@ billing:InvoiceShape a sh:NodeShape ; sh:targetClass billing:Invoice .
 ```
 ---
 EOF
-assert_invalid_requirement_owned_only
+assert_invalid_model "semantic-contract element to a requirement"
 
 assert_capability_owned_refinement_invalid() {
   local refinement_type="$1"
@@ -383,8 +400,6 @@ assert_capability_owned_refinement_invalid "behavior" "Capability Behavior"
 assert_capability_owned_refinement_invalid "specification" "Capability Specification"
 assert_capability_owned_refinement_invalid "state" "Capability State"
 assert_capability_owned_refinement_invalid "input-output" "Capability Input Output"
-assert_capability_owned_refinement_invalid "semantic-contract" "Capability Semantic Contract"
-assert_capability_owned_refinement_invalid "semantic-query-contract" "Capability Semantic Query Contract"
 
 rm -rf "${TEST_DIR}/specifications"
 mkdir -p "${TEST_DIR}/specifications"
@@ -397,6 +412,8 @@ Bad turtle.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
@@ -418,6 +435,8 @@ Bad language.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```json

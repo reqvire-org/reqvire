@@ -84,6 +84,7 @@ sed -i 's/The system shall produce payloads conforming to the product semantic c
 REQUIREMENT_JSON=$(run_change_impact_json "$REQUIREMENT_WORK")
 assert_changed_element "$REQUIREMENT_JSON" "Payload Requirement"
 REQUIREMENT_TREE=$(echo "$REQUIREMENT_JSON" | jq '.changed[] | select(.name == "Payload Requirement") | .change_impact_tree')
+assert_tree_contains "$REQUIREMENT_TREE" "Payload Shape Contract" "Payload Requirement change should flag Payload Shape Contract consistency review through constrainedBy"
 assert_tree_contains "$REQUIREMENT_TREE" "Payload Verification" "Payload Requirement change should invalidate Payload Verification through verifiedBy"
 
 SHAPE_CONTRACT_WORK=$(create_workspace "shape-contract-change")
@@ -91,8 +92,22 @@ sed -i 's/sh:minCount 1/sh:minCount 2/' "${SHAPE_CONTRACT_WORK}/Requirements.md"
 SHAPE_CONTRACT_JSON=$(run_change_impact_json "$SHAPE_CONTRACT_WORK")
 assert_changed_element "$SHAPE_CONTRACT_JSON" "Payload Shape Contract"
 SHAPE_CONTRACT_TREE=$(echo "$SHAPE_CONTRACT_JSON" | jq '.changed[] | select(.name == "Payload Shape Contract") | .change_impact_tree')
-assert_tree_contains "$SHAPE_CONTRACT_TREE" "Payload Requirement" "Payload Shape Contract change should impact owning Payload Requirement through refine"
+assert_tree_contains "$SHAPE_CONTRACT_TREE" "Payload Requirement" "Payload Shape Contract change should impact owning Payload Requirement through constrain"
 assert_tree_contains "$SHAPE_CONTRACT_TREE" "Payload Verification" "Payload Shape Contract change should propagate from requirement to verification"
+if echo "$SHAPE_CONTRACT_TREE" | jq -e '.. | objects | select(.name? == "Contract Only Ontology")' >/dev/null; then
+  echo "FAILED: Payload Shape Contract change should not propagate back to used ontology"
+  echo "$SHAPE_CONTRACT_TREE"
+  exit 1
+fi
+
+CONTRACT_ONTOLOGY_WORK=$(create_workspace "contract-ontology-change")
+sed -i 's/contract:Initial/contract:Changed/' "${CONTRACT_ONTOLOGY_WORK}/Requirements.md"
+CONTRACT_ONTOLOGY_JSON=$(run_change_impact_json "$CONTRACT_ONTOLOGY_WORK")
+assert_changed_element "$CONTRACT_ONTOLOGY_JSON" "Contract Only Ontology"
+CONTRACT_ONTOLOGY_TREE=$(echo "$CONTRACT_ONTOLOGY_JSON" | jq '.changed[] | select(.name == "Contract Only Ontology") | .change_impact_tree')
+assert_tree_contains "$CONTRACT_ONTOLOGY_TREE" "Payload Shape Contract" "Contract Only Ontology change should impact Payload Shape Contract through usedBy"
+assert_tree_contains "$CONTRACT_ONTOLOGY_TREE" "Payload Requirement" "Contract Only Ontology change should propagate through Payload Shape Contract to Payload Requirement"
+assert_tree_contains "$CONTRACT_ONTOLOGY_TREE" "Payload Verification" "Contract Only Ontology change should propagate to downstream Payload Verification"
 
 ATTACHED_ONTOLOGY_WORK=$(create_workspace "attached-ontology-change")
 sed -i 's/shared:Initial/shared:Changed/' "${ATTACHED_ONTOLOGY_WORK}/Requirements.md"

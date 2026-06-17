@@ -348,8 +348,6 @@ struct ElementSearchResult {
     #[serde(skip_serializing_if = "Option::is_none")]
     semantic_contract: Option<element::SemanticContract>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    semantic_query_contract: Option<element::SemanticQueryContract>,
-    #[serde(skip_serializing_if = "Option::is_none")]
     ontology: Option<element::Ontology>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     concept_references: Vec<element::ConceptReference>,
@@ -377,6 +375,7 @@ struct GlobalSearchCounters {
     total_files: usize,
     total_ontology_types: BTreeMap<String, usize>,
     total_requirements_types: BTreeMap<String, usize>,
+    total_semantic_contract_types: BTreeMap<String, usize>,
     total_verifications_types: BTreeMap<String, usize>,
     total_refinements_types: BTreeMap<String, usize>,
     total_governance_metadata: GovernanceMetadataCounters,
@@ -402,6 +401,9 @@ impl Default for GlobalSearchCounters {
         let mut ontology = BTreeMap::new();
         ontology.insert("ontology".to_string(), 0);
 
+        let mut semantic_contracts = BTreeMap::new();
+        semantic_contracts.insert("semantic-contract".to_string(), 0);
+
         let mut verifications = BTreeMap::new();
         verifications.insert("test-verification".to_string(), 0);
         verifications.insert("formal-proof-verification".to_string(), 0);
@@ -411,8 +413,6 @@ impl Default for GlobalSearchCounters {
 
         let mut refinements = BTreeMap::new();
         refinements.insert("source".to_string(), 0);
-        refinements.insert("semantic-contract".to_string(), 0);
-        refinements.insert("semantic-query-contract".to_string(), 0);
         refinements.insert("behavior".to_string(), 0);
         refinements.insert("constraint".to_string(), 0);
         refinements.insert("specification".to_string(), 0);
@@ -442,6 +442,7 @@ impl Default for GlobalSearchCounters {
             total_files: 0,
             total_ontology_types: ontology,
             total_requirements_types: requirements,
+            total_semantic_contract_types: semantic_contracts,
             total_verifications_types: verifications,
             total_refinements_types: refinements,
             total_governance_metadata: GovernanceMetadataCounters {
@@ -570,11 +571,14 @@ fn build_search_result(
                         .entry(type_name.to_string())
                         .or_insert(0) += 1;
                 }
+                element::ElementType::SemanticContract => {
+                    *c.total_semantic_contract_types
+                        .entry("semantic-contract".to_string())
+                        .or_insert(0) += 1;
+                }
                 element::ElementType::Refinement(ref_t) => {
                     let type_name = match ref_t {
                         element::RefinementType::Source => "source",
-                        element::RefinementType::SemanticContract => "semantic-contract",
-                        element::RefinementType::SemanticQueryContract => "semantic-query-contract",
                         element::RefinementType::Constraint => "constraint",
                         element::RefinementType::Behavior => "behavior",
                         element::RefinementType::Specification => "specification",
@@ -651,11 +655,6 @@ fn build_search_result(
                 None
             } else {
                 elem.semantic_contract.clone()
-            },
-            semantic_query_contract: if short_mode {
-                None
-            } else {
-                elem.semantic_query_contract.clone()
             },
             ontology: if short_mode {
                 None
@@ -811,6 +810,15 @@ fn generate_search_text(result: &SearchResult, short_mode: bool) -> String {
             if !c.total_verifications_types.is_empty() {
                 output.push_str("📋 Verification Types:\n");
                 for (type_name, count) in &c.total_verifications_types {
+                    output.push_str(&format!("  {}: {}\n", type_name, count));
+                }
+                output.push('\n');
+            }
+
+            // Semantic contract types
+            if !c.total_semantic_contract_types.is_empty() {
+                output.push_str("📋 Semantic Contract Types:\n");
+                for (type_name, count) in &c.total_semantic_contract_types {
                     output.push_str(&format!("  {}: {}\n", type_name, count));
                 }
                 output.push('\n');

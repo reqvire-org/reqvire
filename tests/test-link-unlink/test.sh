@@ -307,85 +307,13 @@ echo "Test 14: Unlink from opposite side (with only in-memory opposite)..."
 # Setup: Create state where Child has derivedFrom (user_created) but Parent has NO derive in file
 # Remove Verifications.md to avoid validation errors (it references elements that won't exist)
 rm -f "$TEST_DIR/specifications/Verifications.md"
-
-cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
-# Elements
-
-### Test Capability
-
-Capability root.
-
-#### Metadata
-  * type: capability
----
-
-### Parent Req
-
-Parent.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [Test Capability](#test-capability)
----
-
-### Child Req
-
-Child.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [Test Capability](#test-capability)
-  * derivedFrom: [Parent Req](#parent-req)
----
-EOF
+cp "${TEST_SCRIPT_DIR}/fixtures/opposite-side-unlink.md.txt" "$TEST_DIR/specifications/Requirements.md"
 
 # Unlink from Parent side (which has only in-memory opposite derive)
 # This should remove Child's derivedFrom from file
 cd "$TEST_DIR" && "$REQVIRE_BIN" unlink "Parent Req" "Child Req" > /dev/null 2>&1
 
-# Expected: Child's derivedFrom removed, Parent unchanged (never had derive in file)
-# Note: Elements sorted alphabetically after unlink (no parent-child hierarchy)
-cat > "$TEST_DIR/expected-test14.md" << 'EOF'
-# Elements
-
-### Child Req
-
-Child.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [Test Capability](#test-capability)
----
-
-### Parent Req
-
-Parent.
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [Test Capability](#test-capability)
----
-
-### Test Capability
-
-Capability root.
-
-#### Metadata
-  * type: capability
----
-
-EOF
-
-assert_file_matches "$TEST_DIR/expected-test14.md" "$TEST_DIR/specifications/Requirements.md" "Unlink from opposite side should remove user-created relation"
-rm -f "$TEST_DIR/expected-test14.md"
+assert_file_matches "${TEST_SCRIPT_DIR}/expected/14-unlink-opposite-side.md" "$TEST_DIR/specifications/Requirements.md" "Unlink from opposite side should remove user-created relation"
 
 echo "Test 14 passed"
 echo ""
@@ -397,50 +325,7 @@ echo "Test 15: Link rejects multi-root hierarchy ownership violation..."
 
 # Keep fixture valid so this test asserts the command-level single-root rejection only.
 rm -f "$TEST_DIR/specifications/Verifications.md"
-
-cat > "$TEST_DIR/specifications/Requirements.md" << 'EOF'
-# Elements
-
-### Capability A
-
-#### Metadata
-  * type: capability
----
-
-### Capability B
-
-#### Metadata
-  * type: capability
----
-
-### Parent A
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [Capability A](#capability-a)
----
-
-### Parent B
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [Capability B](#capability-b)
----
-
-### Child
-
-#### Metadata
-  * type: requirement
-
-#### Relations
-  * specify: [Capability A](#capability-a)
-  * derivedFrom: [Parent A](#parent-a)
----
-EOF
+cp "${TEST_SCRIPT_DIR}/fixtures/multiroot-violation.md.txt" "$TEST_DIR/specifications/Requirements.md"
 
 BEFORE_TEST15="$(mktemp /tmp/reqvire-link-before15-XXXXXX.md)"
 cp "$TEST_DIR/specifications/Requirements.md" "$BEFORE_TEST15"
@@ -471,6 +356,44 @@ assert_file_matches "$BEFORE_TEST15" "$TEST_DIR/specifications/Requirements.md" 
 rm -f "$BEFORE_TEST15"
 
 echo "Test 15 passed"
+echo ""
+
+# ==================================
+# Test 16: Link semantic-contract relation types
+# ==================================
+echo "Test 16: Link semantic-contract relation types..."
+
+rm -f "$TEST_DIR/specifications/Verifications.md"
+cp "${TEST_SCRIPT_DIR}/fixtures/semantic-contract-relations.md.txt" "$TEST_DIR/specifications/Requirements.md"
+
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "API Shape Contract" use "Extra Semantic Ontology" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "API Requirement" constrainedBy "API Shape Contract" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Audit Shape Contract" constrain "Audit Requirement" > /dev/null 2>&1
+cd "$TEST_DIR" && "$REQVIRE_BIN" link "Extra Semantic Ontology" usedBy "Audit Shape Contract" > /dev/null 2>&1
+
+if ! grep -Fq "  * use: [Extra Semantic Ontology](#extra-semantic-ontology)" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "FAILED: CLI link did not write semantic-contract use relation"
+  exit 1
+fi
+
+if ! grep -Fq "  * constrainedBy: [API Shape Contract](#api-shape-contract)" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "FAILED: CLI link did not write requirement constrainedBy relation"
+  exit 1
+fi
+
+if ! grep -Fq "  * constrain: [Audit Requirement](#audit-requirement)" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "FAILED: CLI link did not write semantic-contract constrain relation"
+  exit 1
+fi
+
+if ! grep -Fq "  * usedBy: [Audit Shape Contract](#audit-shape-contract)" "$TEST_DIR/specifications/Requirements.md"; then
+  echo "FAILED: CLI link did not write ontology usedBy relation"
+  exit 1
+fi
+
+cd "$TEST_DIR" && "$REQVIRE_BIN" validate > /dev/null 2>&1
+
+echo "Test 16 passed"
 echo ""
 
 echo "===================================="

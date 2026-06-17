@@ -63,6 +63,21 @@ pub enum Commands {
         port: u16,
     },
 
+    /// Export the Explorer SPA as a static site to a directory
+    #[clap(
+        override_help = "Export the Explorer SPA as a static site to a directory\n\nWrites the embedded Explorer bundle and generated model data to <OUTPUT>.\nThe result is a self-contained static site suitable for GitHub Pages or any static host.\n\nEXPORT OPTIONS:\n      --output <DIR>    Output directory (default: site)"
+    )]
+    Export {
+        /// Output directory
+        #[clap(
+            long,
+            short = 'o',
+            default_value = "site",
+            help_heading = "EXPORT OPTIONS"
+        )]
+        output: String,
+    },
+
     /// Start Reqvire MCP server
     #[clap(
         name = "mcp",
@@ -124,7 +139,7 @@ pub enum Commands {
 
     /// Search and filter model elements with comprehensive filtering options
     #[clap(
-        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, semantic-query-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
+        override_help = "Search and filter model elements with comprehensive filtering options\n\nSEARCH OPTIONS:\n      --json                            Output results in JSON format\n      --output <FILE>                   Save JSON output to file (requires --json)\n      --short                           Output abbreviated format (one-line per element)\n      --filter-file <GLOB>              Only include files whose path matches this glob pattern e.g. `src/**/*Reqs.md`\n      --filter-name <REGEX>             Only include elements whose name matches this regular expression\n      --filter-type <TYPE>              Only include elements of the given type. Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --filter-status <LIST>            Only include requirement-family elements with effective status values (draft, review, approved)\n      --filter-priority <LIST>          Only include requirement-family elements with effective priority values (low, medium, high, critical)\n      --filter-risk <LIST>              Only include requirement-family elements with effective risk values (low, medium, high, critical)\n      --filter-owner <REGEX>            Only include requirement-family elements whose effective owner matches this regex\n      --filter-content <REGEX>          Only include elements whose content matches this regular expression\n      --filter-page-content <REGEX>     Only include elements whose parent file page content matches this regular expression\n      --have-relations <LIST>           Only include elements that have ALL specified relations (comma-separated)\n      --not-have-relations <LIST>       Only include elements that do NOT have ALL specified relations (comma-separated)"
     )]
     Search {
         /// Output results in JSON format
@@ -147,7 +162,7 @@ pub enum Commands {
         #[clap(long, value_name = "REGEX", help_heading = "SEARCH OPTIONS")]
         filter_name: Option<String>,
 
-        /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, semantic-query-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+        /// Only include elements of the given type(s). Supports comma-separated list. Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE[,TYPE...]", help_heading = "SEARCH OPTIONS")]
         filter_type: Option<String>,
 
@@ -277,7 +292,7 @@ pub enum Commands {
     /// - Markdown: Mermaid diagrams with all nested relationships
     /// - Mermaid: pure Mermaid flowchart text with --mmd
     #[clap(
-        override_help = "Generate model-centric structure with nested relations\n\nBy default, shows ontology roots and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n  - Mermaid: pure Mermaid flowchart text with --mmd\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, semantic-query-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --mmd                       Output pure Mermaid flowchart text\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save output to file (requires --json or --mmd)"
+        override_help = "Generate model-centric structure with nested relations\n\nBy default, shows ontology roots and capability roots.\nUse --from <NAME> to start from specific element.\nUse --reverse for leaf-to-root traversal.\n\nOutput formats:\n  - JSON: Nested structure with element details in relations\n  - Markdown: Mermaid diagrams with all nested relationships\n  - Mermaid: pure Mermaid flowchart text with --mmd\n\nMODEL OPTIONS:\n      --from <NAME>               Start from specific element by name\n      --reverse                   Traverse from leaves to roots (follow backward relations)\n      --filter-type <TYPE>        Filter starting elements by type (comma-separated). Valid types: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. For custom types use: other-TYPENAME\n      --json                      Output results in JSON format (nested structure)\n      --mmd                       Output pure Mermaid flowchart text\n      --with-size-estimates       Include element size estimates in JSON output\n      --output <FILE>             Save output to file (requires --json or --mmd)"
     )]
     Model {
         /// Start from specific element by name
@@ -288,7 +303,7 @@ pub enum Commands {
         #[clap(long, help_heading = "MODEL OPTIONS")]
         reverse: bool,
 
-        /// Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, semantic-query-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
+        /// Filter starting elements by type (comma-separated). Valid: capability, requirement, ontology, test-verification, formal-proof-verification, analysis-verification, inspection-verification, demonstration-verification, source, semantic-contract, constraint, behavior, specification, state, input-output. Custom: other-TYPENAME
         #[clap(long, value_name = "TYPE", help_heading = "MODEL OPTIONS")]
         filter_type: Option<String>,
 
@@ -490,18 +505,18 @@ pub enum Commands {
     /// Add relation or attachment between elements
     #[clap(
         name = "link",
-        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom  - Source is derived from target within its hierarchy family\n    derive       - Source derives target within its hierarchy family\n    specify      - Source requirement specifies a capability\n    specifiedBy  - Source capability is specified by a requirement\n    satisfiedBy  - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy      - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy   - Source requirement is verified by verification\n    verify       - Source verification verifies requirement\n    trace        - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach capability ontology context or compatible requirement-owned refinement contracts\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: capability may attach ontology; requirement may attach compatible requirement-owned refinement element identifiers (file.md#element-id or #element-id)\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"Billing Capability\" attaching \"ontology.md#billing-ontology\"\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\""
+        override_help = "Add relation or attachment between elements\n\nLINK OPTIONS:\n       <SOURCE>                 Source element name\n       <RELATION_TYPE or attaching>  Relation type OR 'attaching' keyword for attachments\n       <TARGET>                 Target: element name, internal path, or external URL\n      --dry-run                 Preview changes without applying\n      --json                    Output results in JSON format\n      --output <FILE>           Save JSON output to file (requires --json)\n\nRELATION TYPES:\n    derivedFrom   - Source is derived from target within its hierarchy family\n    derive        - Source derives target within its hierarchy family\n    specify       - Source requirement specifies a capability\n    specifiedBy   - Source capability is specified by a requirement\n    refine        - Source refinement is owned by a requirement\n    refinedBy     - Source requirement owns a compatible refinement\n    constrain     - Source semantic contract constrains a requirement\n    constrainedBy - Source requirement is constrained by a semantic contract\n    use           - Source semantic contract uses ontology vocabulary\n    usedBy        - Source ontology vocabulary is used by a semantic contract\n    satisfiedBy   - Source requirement or evidence-backed verification is satisfied by implementation/evidence\n    satisfy       - Source implementation/evidence satisfies a requirement or evidence-backed verification\n    verifiedBy    - Source requirement is verified by verification\n    verify        - Source verification verifies requirement\n    trace         - Generic traceability link\n\nATTACHING:\n    Use 'attaching' keyword to attach capability ontology context or compatible requirement-owned refinement elements\n\nTARGET TYPES:\n    For relations: element name, internal file path, or external URL (http/https)\n    For attaching: capability may attach ontology; requirement may attach compatible requirement-owned source, constraint, behavior, specification, state, or input-output refinement element identifiers (file.md#element-id or #element-id)\n\nUSAGE:\n    reqvire link \"Billing Requirement\" specify \"Billing Capability\"\n    reqvire link \"Billing Capability\" specifiedBy \"Billing Requirement\"\n    reqvire link \"Billing Requirement\" constrainedBy \"Billing Shape Contract\"\n    reqvire link \"Billing Shape Contract\" use \"Billing Ontology\"\n    reqvire link \"Test Verification\" verify \"Billing Requirement\"\n    reqvire link \"Requirement\" satisfiedBy src/impl.rs\n    reqvire link \"Requirement\" trace https://example.com/spec.html\n    reqvire link \"Billing Capability\" attaching \"ontology.md#billing-ontology\"\n    reqvire link \"System Requirement\" attaching \"constraints.md#latency-limit\""
     )]
     Link {
         /// Source element name
         source: String,
 
         /// Relation type OR 'attaching'.
-        /// Relations: derivedFrom, derive, satisfiedBy, satisfy, verifiedBy, verify, trace.
-        /// Use 'attaching' to attach capability ontology context or compatible requirement-owned refinement contracts
+        /// Relations: derivedFrom, derive, specify, specifiedBy, refine, refinedBy, constrain, constrainedBy, use, usedBy, satisfiedBy, satisfy, verifiedBy, verify, trace.
+        /// Use 'attaching' to attach capability ontology context or compatible requirement-owned refinement elements
         relation_type: String,
 
-        /// Target: element name, internal path, or external URL (for relations); ontology for capability attachments or compatible refinement element identifier for requirement attachments
+        /// Target: element name, internal path, or external URL (for relations); ontology identifier for capability attachments or compatible refinement element identifier for requirement attachments
         target: String,
 
         /// Preview changes without applying
@@ -654,14 +669,14 @@ pub enum Commands {
 
     /// Collect ontology elements and semantic-contract SHACL shapes
     #[clap(
-        override_help = "Collect ontology elements and semantic-contract SHACL shapes\n\nONTOLOGIES OPTIONS:\n      --jsonld            Output JSON-LD format instead of RDF/Turtle (.ttl)\n      --full              Include Reqvire model context triples in the semantic export\n      --output <FILE>     Save output to file"
+        override_help = "Collect ontology elements and semantic-contract SHACL shapes\n\nONTOLOGIES OPTIONS:\n      --jsonld            Output JSON-LD format instead of RDF/Turtle (.ttl)\n      --full              Include Reqvire model context triples and ontology projection facts in the semantic export\n      --output <FILE>     Save output to file"
     )]
     Ontologies {
         /// Output JSON-LD format instead of RDF/Turtle (.ttl)
         #[clap(long, help_heading = "ONTOLOGIES OPTIONS")]
         jsonld: bool,
 
-        /// Include Reqvire model context triples in the semantic export
+        /// Include Reqvire model context triples and ontology projection facts in the semantic export
         #[clap(long, help_heading = "ONTOLOGIES OPTIONS")]
         full: bool,
 
@@ -670,12 +685,12 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Analyze independent requirement submodels and cross-submodel couplings
+    /// Analyze independent capability-rooted submodels and cross-submodel couplings
     #[clap(
-        override_help = "Analyze independent requirement submodels and cross-submodel couplings\n\nSUBMODELS OPTIONS:\n      --from <NAME>      Scope report to a specific requirement subtree by name\n      --json              Output results in JSON output format\n      --output <FILE>     Save JSON output to file (requires --json)"
+        override_help = "Analyze independent capability-rooted submodels and cross-submodel couplings\n\nSUBMODELS OPTIONS:\n      --from <NAME>      Scope report to a capability subtree or requirement subtree by name\n      --json              Output results in JSON output format\n      --output <FILE>     Save JSON output to file (requires --json)"
     )]
     Submodels {
-        /// Scope report to a specific requirement subtree by name
+        /// Scope report to a capability subtree or requirement subtree by name
         #[clap(long, value_name = "NAME", help_heading = "SUBMODELS OPTIONS")]
         from: Option<String>,
 
@@ -688,12 +703,12 @@ pub enum Commands {
         output: Option<String>,
     },
 
-    /// Collect content from capability or requirement context
+    /// Collect content from capability, requirement, or ontology context
     #[clap(
-        override_help = "Collect content from capability or requirement context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the capability or requirement element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)"
+        override_help = "Collect content from capability, requirement, or ontology context\n\nCOLLECT OPTIONS:\n      <ELEMENT_NAME>        Name of the capability, requirement, or ontology element to collect from\n      --direction <DIR>     Traversal direction: UPSTREAM (default) or DOWNSTREAM\n      --json                Output results in JSON format\n      --output <FILE>       Save JSON output to file (requires --json)\n\nCOLLECTED CONTEXT:\n    Capability/requirement starts include traversed elements, requirement refinements, attachments, and reachable ontology context.\n    Ontology starts include ontology hierarchy and downstream semantic contracts that use reachable ontology."
     )]
     Collect {
-        /// Name of the capability or requirement element to collect from
+        /// Name of the capability, requirement, or ontology element to collect from
         element_name: String,
 
         /// Traversal direction: UPSTREAM (ancestors) or DOWNSTREAM (descendants)
@@ -1441,6 +1456,18 @@ pub async fn handle_command(
             info!("Starting HTTP server at http://{}:{}/", host, port);
             serve::serve_explorer(explorer_assets, &host, port).await?;
 
+            Ok(0)
+        }
+        Some(Commands::Export { output }) => {
+            reqvire::utils::enable_quiet_mode();
+
+            let explorer_assets =
+                explorer_runtime::build_runtime_assets(&model_manager.graph_registry)?;
+
+            let output_dir = std::path::Path::new(&output);
+            explorer_runtime::export_to_dir(&explorer_assets, output_dir)?;
+
+            println!("Exported Explorer site to: {}", output_dir.display());
             Ok(0)
         }
         Some(Commands::Add {

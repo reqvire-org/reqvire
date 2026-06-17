@@ -34,6 +34,8 @@ Billing ontology terms.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
@@ -51,6 +53,8 @@ Customer ontology terms.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Relations
   * derivedFrom: [Billing Ontology](#billing-ontology)
@@ -70,6 +74,8 @@ Tax ontology terms.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Relations
   * derivedFrom: [Billing Ontology](#billing-ontology)
@@ -91,7 +97,8 @@ Billing shape references native and attached ontology terms.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Tax Ontology](#tax-ontology)
 
 #### Shapes
 ```turtle

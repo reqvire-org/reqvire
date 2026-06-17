@@ -1,6 +1,6 @@
-import type { AnchorHTMLAttributes, ButtonHTMLAttributes, CSSProperties, ReactNode } from "react";
+import type { AnchorHTMLAttributes, ButtonHTMLAttributes, ReactNode } from "react";
 import { css, cx } from "@linaria/atomic";
-import type { DesignSystemColorToken } from "../../palette";
+import { ElementIcon } from "./ElementIcon";
 
 const baseUX = css`
   display: inline-flex;
@@ -8,7 +8,7 @@ const baseUX = css`
   max-width: 100%;
   gap: var(--space-4);
 
-  .rq-relation__kind {
+  .ds-relation__kind {
     padding: var(--space-1) var(--space-4);
     border-radius: var(--radius-sm);
     font-family: var(--font-mono);
@@ -19,7 +19,7 @@ const baseUX = css`
     white-space: nowrap;
   }
 
-  .rq-relation__target {
+  .ds-relation__target {
     display: inline-flex;
     min-width: 0;
     align-items: center;
@@ -35,24 +35,20 @@ const baseUX = css`
       border-color var(--dur-fast);
   }
 
-  .rq-relation__target:disabled {
+  .ds-relation__target:disabled {
     cursor: default;
     opacity: 0.72;
     pointer-events: none;
   }
 
-  .rq-relation__target .rq-relation__txt {
+  .ds-relation__target .ds-relation__txt {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  .rq-relation__pip {
+  .ds-relation__marker {
     flex: none;
-    width: var(--rq-relation-pip-size, calc(var(--space-3) + var(--space-1) / 2));
-    height: var(--rq-relation-pip-size, calc(var(--space-3) + var(--space-1) / 2));
-    border-radius: var(--rq-relation-pip-radius, calc(var(--radius-xs) / 2));
-    background: var(--rq-relation-pip-color);
   }
 
   svg {
@@ -62,22 +58,22 @@ const baseUX = css`
 `;
 
 const skinX = css`
-  .rq-relation__kind {
+  .ds-relation__kind {
     color: var(--text-muted);
     background: var(--bg-sunken);
   }
 
-  .rq-relation__target {
+  .ds-relation__target {
     color: var(--text-body);
     background: transparent;
     border: none;
   }
 
-  .rq-relation__target:hover {
+  .ds-relation__target:hover {
     background: var(--bg-hover);
   }
 
-  .rq-relation__target:disabled:hover {
+  .ds-relation__target:disabled:hover {
     background: transparent;
   }
 `;
@@ -86,7 +82,8 @@ export type RelationPillProps = {
   kind?: ReactNode;
   label: ReactNode;
   className?: string;
-  pipColorToken?: DesignSystemColorToken;
+  targetType?: string | null;
+  targetFamily?: string | null;
 } & (
   | ({ href: string } & AnchorHTMLAttributes<HTMLAnchorElement>)
   | ({ href?: undefined } & ButtonHTMLAttributes<HTMLButtonElement>)
@@ -96,23 +93,28 @@ export function RelationPill({
   kind,
   label,
   className = "",
-  pipColorToken,
+  targetType,
+  targetFamily,
   ...props
 }: RelationPillProps) {
-  const style = pipColorToken
-    ? ({ "--rq-relation-pip-color": `var(${pipColorToken})` } as CSSProperties)
-    : undefined;
+  const markerType = targetType ?? targetFamily ?? "other";
   const content = (
     <>
-      {pipColorToken ? <span className="rq-relation__pip" /> : null}
-      <span className="rq-relation__txt">{label}</span>
+      <ElementIcon
+        type={markerType}
+        family={targetFamily}
+        title={markerType}
+        size="sm"
+        className="ds-relation__marker"
+      />
+      <span className="ds-relation__txt">{label}</span>
     </>
   );
   if ("href" in props && props.href) {
     return (
-      <span className={cx("rq-relation", baseUX, skinX, className)} style={style}>
-        {kind ? <span className="rq-relation__kind">{kind}</span> : null}
-        <a className="rq-relation__target" {...props}>
+      <span className={cx("ds-relation", baseUX, skinX, className)}>
+        {kind ? <span className="ds-relation__kind">{kind}</span> : null}
+        <a className="ds-relation__target" {...props}>
           {content}
         </a>
       </span>
@@ -120,9 +122,9 @@ export function RelationPill({
   }
   const buttonProps = props as ButtonHTMLAttributes<HTMLButtonElement>;
   return (
-    <span className={cx("rq-relation", baseUX, skinX, className)} style={style}>
-      {kind ? <span className="rq-relation__kind">{kind}</span> : null}
-      <button className="rq-relation__target" {...buttonProps} type={buttonProps.type ?? "button"}>
+    <span className={cx("ds-relation", baseUX, skinX, className)}>
+      {kind ? <span className="ds-relation__kind">{kind}</span> : null}
+      <button className="ds-relation__target" {...buttonProps} type={buttonProps.type ?? "button"}>
         {content}
       </button>
     </span>

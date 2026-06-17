@@ -1,4 +1,5 @@
 use crate::element::{AttachmentTarget, Element, GovernanceMetadataSource};
+use crate::git_commands;
 use crate::graph_registry::GraphRegistry;
 use crate::ontology_graph::build_graph_data;
 use crate::relation::{self, LinkType};
@@ -7,7 +8,7 @@ use serde::Serialize;
 use serde_json::{json, Value};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
-use std::path::{Component, Path};
+use std::path::{Component, Path, PathBuf};
 
 const SCHEMA_VERSION: &str = "2026-06-07.project-store.v1";
 
@@ -36,6 +37,8 @@ pub struct ExplorerProjectStore {
 pub struct ProjectStoreProject {
     pub name: String,
     pub root_label: String,
+    pub repository: Option<String>,
+    pub branch: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -200,12 +203,11 @@ pub fn build_project_store(
         shape_blocks: semantic_index.summary.shape_blocks,
     };
 
+    let project = build_project_metadata();
+
     ExplorerProjectStore {
         schema_version: SCHEMA_VERSION,
-        project: ProjectStoreProject {
-            name: "Reqvire project".to_string(),
-            root_label: "Reqvire root".to_string(),
-        },
+        project,
         folders,
         files,
         resources: resources.into_values().collect(),
@@ -222,6 +224,47 @@ pub fn build_project_store(
         summaries,
         routes: default_routes(),
     }
+}
+
+fn build_project_metadata() -> ProjectStoreProject {
+    let repository = resolve_repository_name();
+    let branch = git_commands::get_branch_name().ok();
+    let name = repository
+        .clone()
+        .unwrap_or_else(|| "Reqvire project".to_string());
+    let root_label = match (&repository, &branch) {
+        (Some(repo), Some(branch)) => format!("{repo} @ {branch}"),
+        (Some(repo), None) => repo.clone(),
+        (None, Some(branch)) => format!("Reqvire project @ {branch}"),
+        (None, None) => "Reqvire root".to_string(),
+    };
+
+    ProjectStoreProject {
+        name,
+        root_label,
+        repository,
+        branch,
+    }
+}
+
+fn resolve_repository_name() -> Option<String> {
+    git_commands::get_repository_base_url()
+        .ok()
+        .and_then(|url| repository_name_from_url(&url))
+        .or_else(|| {
+            git_commands::get_git_root_dir().ok().and_then(|root| {
+                root.file_name()
+                    .map(|name| name.to_string_lossy().into_owned())
+            })
+        })
+}
+
+fn repository_name_from_url(url: &str) -> Option<String> {
+    url.trim_end_matches('/')
+        .rsplit('/')
+        .next()
+        .map(|name| name.trim_end_matches(".git").to_string())
+        .filter(|name| !name.is_empty())
 }
 
 pub fn project_store_javascript(
@@ -617,12 +660,31 @@ fn is_existing_local_project_file_path(path: &str) -> bool {
     if !is_local_project_file_path(path) {
         return false;
     }
-    let Ok(git_root) = crate::git_commands::get_git_root_dir() else {
+    let Some(project_root) = project_root_dir() else {
         return false;
     };
-    fs::metadata(git_root.join(path))
+    fs::metadata(project_root.join(path))
         .map(|metadata| metadata.is_file())
         .unwrap_or(false)
+}
+
+fn project_root_dir() -> Option<PathBuf> {
+    #[cfg(test)]
+    {
+        project_root_dir_from_manifest().or_else(|| crate::git_commands::get_git_root_dir().ok())
+    }
+    #[cfg(not(test))]
+    {
+        crate::git_commands::get_git_root_dir()
+            .ok()
+            .or_else(project_root_dir_from_manifest)
+    }
+}
+
+fn project_root_dir_from_manifest() -> Option<PathBuf> {
+    option_env!("CARGO_MANIFEST_DIR")
+        .map(PathBuf::from)
+        .and_then(|manifest_dir| manifest_dir.parent().map(Path::to_path_buf))
 }
 
 fn add_folder_ancestors(folder: &str, folder_children: &mut BTreeMap<String, BTreeSet<String>>) {
@@ -819,14 +881,12 @@ fn build_search_documents(
             text: file.display_path.clone(),
         });
     }
+    let included_resource_ids: BTreeSet<&str> = files
+        .iter()
+        .flat_map(|file| file.resource_ids.iter().map(String::as_str))
+        .collect();
     for resource in resources.values() {
-        if resource.file_path.is_some()
-            && !resource
-                .file_path
-                .as_deref()
-                .map(is_existing_local_project_file_path)
-                .unwrap_or(false)
-        {
+        if resource.file_path.is_some() && !included_resource_ids.contains(resource.id.as_str()) {
             continue;
         }
         docs.push(ProjectStoreSearchDocument {
@@ -914,7 +974,7 @@ fn ensure_resource(
 }
 
 fn enrich_resource_sources(resources: &mut BTreeMap<String, ProjectStoreResource>) {
-    let Ok(git_root) = crate::git_commands::get_git_root_dir() else {
+    let Some(project_root) = project_root_dir() else {
         return;
     };
     for resource in resources.values_mut() {
@@ -925,7 +985,7 @@ fn enrich_resource_sources(resources: &mut BTreeMap<String, ProjectStoreResource
         if source_path.is_absolute() || file_path.contains("..") {
             continue;
         }
-        let absolute_path = git_root.join(source_path);
+        let absolute_path = project_root.join(source_path);
         let Ok(metadata) = fs::metadata(&absolute_path) else {
             continue;
         };

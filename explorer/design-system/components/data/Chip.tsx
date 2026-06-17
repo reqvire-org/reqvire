@@ -8,7 +8,7 @@ const baseUX = css`
   height: var(--control-sm);
   padding: 0 var(--space-7);
   border-radius: var(--radius-pill);
-  cursor: var(--rq-chip-cursor, pointer);
+  cursor: var(--ds-chip-cursor, pointer);
   white-space: nowrap;
   transition:
     background var(--dur-fast),
@@ -23,7 +23,7 @@ const baseUX = css`
     opacity: 0.8;
   }
 
-  .rq-chip__count {
+  .ds-chip__count {
     font-variant-numeric: tabular-nums;
     opacity: 0.7;
   }
@@ -31,16 +31,16 @@ const baseUX = css`
 
 const skinX = css`
   color: var(--text-secondary);
-  background: var(--rq-chip-bg, var(--bg-surface));
-  border: var(--border-w) solid var(--rq-chip-border-color, var(--border-default));
-  box-shadow: var(--rq-chip-shadow);
+  background: var(--ds-chip-bg, var(--bg-surface));
+  border: var(--border-w) solid var(--ds-chip-border-color, var(--border-default));
+  box-shadow: var(--ds-chip-shadow);
   font-size: var(--text-caption);
   font-weight: var(--weight-medium);
 
   &:hover {
-    color: var(--rq-chip-hover-color);
-    background: var(--rq-chip-hover-bg, var(--bg-hover));
-    border-color: var(--rq-chip-hover-border, var(--border-strong));
+    color: var(--ds-chip-hover-color);
+    background: var(--ds-chip-hover-bg, var(--bg-hover));
+    border-color: var(--ds-chip-hover-border, var(--border-strong));
   }
 
   &[aria-pressed="true"],
@@ -58,7 +58,7 @@ const skinX = css`
   }
 `;
 
-export interface ChipProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ChipProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
   active?: boolean;
   icon?: ReactNode;
   count?: ReactNode;
@@ -77,12 +77,12 @@ export function Chip({
     <button
       type="button"
       aria-pressed={active}
-      className={cx("rq-chip", baseUX, skinX, active ? "is-active" : undefined, className)}
+      className={cx("ds-chip", baseUX, skinX, active ? "is-active" : undefined, className)}
       {...props}
     >
       {icon}
       <span>{children}</span>
-      {count != null ? <span className="rq-chip__count">{count}</span> : null}
+      {count != null ? <span className="ds-chip__count">{count}</span> : null}
     </button>
   );
 }

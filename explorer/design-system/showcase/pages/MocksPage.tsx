@@ -1,22 +1,14 @@
 import { useState } from "react";
 import { Icon } from "@ds";
-import { routeForView, type ViewId } from "../../../src/router/routes";
-import { MockShell } from "../mocks/MockShell";
-
-const MOCKS: { id: ViewId; label: string; desc: string; icon: string }[] = [
-  { id: "model",      label: "Model View",      desc: "File tree + element grid. The primary workspace.",         icon: "folder"   },
-  { id: "traces",     label: "Traces View",     desc: "Coverage Sankey — requirements → verifications.",         icon: "activity" },
-  { id: "ontologies", label: "Ontologies View", desc: "RDF/SHACL class hierarchy and node inspector.",            icon: "globe"    },
-  { id: "search",     label: "Search View",     desc: "Full-text element search with live filtering.",            icon: "search"   },
-  { id: "coverage",   label: "Coverage View",   desc: "Coverage KPIs, evidence bars, capability rollups, and gaps.", icon: "pie-chart" },
-];
+import { FULL_APP_MOCKS, type ShowcaseMockViewId } from "../fixtures/productPatterns";
+import { MockShell } from "../MockShell";
 
 function Section({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) {
   return (
-    <section className="sc-section">
-      <div className="sc-section__heading">
-        <div className="sc-section__title">{title}</div>
-        {desc && <div className="sc-section__desc">{desc}</div>}
+    <section className="showcase-section">
+      <div className="showcase-section__heading">
+        <div className="showcase-section__title">{title}</div>
+        {desc && <div className="showcase-section__desc">{desc}</div>}
       </div>
       {children}
     </section>
@@ -24,29 +16,29 @@ function Section({ title, desc, children }: { title: string; desc?: string; chil
 }
 
 export function MocksPage() {
-  const [selected, setSelected] = useState<ViewId | null>(null);
+  const [selected, setSelected] = useState<ShowcaseMockViewId | null>(null);
 
   if (selected) return <MockShell />;
 
   return (
-    <div className="sc-page">
+    <div className="showcase-page">
       <Section
         title="Explorer Mocks"
         desc="Each card launches the real App with devFixture data, pre-navigated to that view. Use the Mocks tab above to return."
       >
-        <div className="sc-mocks-grid">
-          {MOCKS.map((m) => (
+        <div className="showcase-mocks-grid">
+          {FULL_APP_MOCKS.map((m) => (
             <button
               key={m.id}
-              className="sc-mock-card"
+              className="showcase-mock-card"
               onClick={() => {
-                window.location.hash = routeForView(m.id);
+                window.location.hash = m.hash;
                 setSelected(m.id);
               }}
             >
-              <Icon name={m.icon as Parameters<typeof Icon>[0]["name"]} size={20} style={{ color: "var(--text-secondary)" }} />
-              <div className="sc-mock-card__label">{m.label}</div>
-              <div className="sc-mock-card__desc">{m.desc}</div>
+              <Icon name={m.icon} size={20} className="showcase-mock-card__icon" />
+              <div className="showcase-mock-card__label">{m.label}</div>
+              <div className="showcase-mock-card__desc">{m.desc}</div>
             </button>
           ))}
         </div>

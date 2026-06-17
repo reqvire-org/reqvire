@@ -102,7 +102,8 @@ if [[ $# -eq 1 ]]; then
     fi
     # Run specific test
     if [[ -d "$ROOT_DIR/$1" ]]; then
-        run_test_case "$ROOT_DIR/$1"        
+        run_test_case "$ROOT_DIR/$1"
+        exit $?
     else
         echo "❌ Error: Test case $1 not found!"
         exit 1
@@ -112,11 +113,17 @@ else
 
     # Run all test suites
     echo "🔄 Running all test suites..."
+    overall_status=0
     for test_folder in "$ROOT_DIR/"test-*; do
         if [[ -d "$test_folder" ]]; then
             run_test_case "$test_folder"
+            status=$?
+            if [ $status -ne 0 ]; then
+                overall_status=1
+            fi
         fi
     done
+    exit $overall_status
 fi
 
 exit 0

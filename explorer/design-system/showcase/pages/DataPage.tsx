@@ -1,14 +1,14 @@
 import {
   Chip,
+  CodeRef,
   ElementIcon,
-  RelationPill,
   Stat,
   StatRow,
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
+  TableHeaderCell,
+  TableHeaderGroup,
   TableRow,
   TableSortButton,
   TableViewport,
@@ -17,10 +17,10 @@ import {
 
 function Section({ title, desc, children }: { title: string; desc?: string; children: React.ReactNode }) {
   return (
-    <section className="sc-section">
-      <div className="sc-section__heading">
-        <div className="sc-section__title">{title}</div>
-        {desc && <div className="sc-section__desc">{desc}</div>}
+    <section className="showcase-section">
+      <div className="showcase-section__heading">
+        <div className="showcase-section__title">{title}</div>
+        {desc && <div className="showcase-section__desc">{desc}</div>}
       </div>
       {children}
     </section>
@@ -34,29 +34,29 @@ const ELEMENT_ROLES = [
 ] as const;
 
 const TABLE_ROWS = [
-  { id: "CAP-001", name: "System Modeling Capability", type: "capability", file: "Capabilities.md", status: "active" },
-  { id: "REQ-001", name: "Model Structure Specification", type: "requirement", file: "SystemRequirements.md", status: "draft" },
-  { id: "REQ-002", name: "Traceability Coverage Requirement", type: "requirement", file: "SystemRequirements.md", status: "active" },
-  { id: "VER-001", name: "Model Structure Test", type: "test-verification", file: "Verifications/ModelStructure.md", status: "active" },
-  { id: "SPEC-001", name: "Containment Specification", type: "specification", file: "Specifications.md", status: "active" },
+  { id: "ROW-001", name: "Workspace index", category: "Catalog", owner: "Platform", status: "Ready" },
+  { id: "ROW-002", name: "Review queue", category: "Workflow", owner: "Modeling", status: "Draft" },
+  { id: "ROW-003", name: "Coverage snapshot", category: "Report", owner: "Verification", status: "Ready" },
+  { id: "ROW-004", name: "Import job", category: "Pipeline", owner: "Tools", status: "Running" },
+  { id: "ROW-005", name: "Archive export", category: "Artifact", owner: "Release", status: "Ready" },
 ];
 
 export function DataPage() {
   return (
-    <div className="sc-page">
+    <div className="showcase-page">
 
-      <Section title="TypeBadge" desc="Element-type chip with colored dot. Use tinted for header badges.">
-        <div className="sc-col">
-          <div className="sc-label">Plain</div>
-          <div className="sc-row sc-row--center">
+      <Section title="TypeBadge" desc="Element-type chip with the same marker shape contract as ElementIcon, without glyph text inside the marker. Use tinted for header badges.">
+        <div className="showcase-col">
+          <div className="showcase-label">Plain</div>
+          <div className="showcase-row showcase-row--center">
             {ELEMENT_ROLES.map((role) => (
               <TypeBadge key={role} type={role} dot />
             ))}
           </div>
         </div>
-        <div className="sc-col">
-          <div className="sc-label">Tinted</div>
-          <div className="sc-row sc-row--center">
+        <div className="showcase-col">
+          <div className="showcase-label">Tinted</div>
+          <div className="showcase-row showcase-row--center">
             {ELEMENT_ROLES.map((role) => (
               <TypeBadge key={role} type={role} tinted dot />
             ))}
@@ -64,11 +64,11 @@ export function DataPage() {
         </div>
       </Section>
 
-      <Section title="ElementIcon" desc="Colored model-element glyph. Capability = hub, refinements = diamond, rest = square.">
+      <Section title="ElementIcon" desc="Colored model-element marker. Refinements = diamond with subtype glyph, other element families = square.">
         {(["sm", "md", "lg"] as const).map((size) => (
-          <div key={size} className="sc-col">
-            <div className="sc-label">{size}</div>
-            <div className="sc-row sc-row--center">
+          <div key={size} className="showcase-col">
+            <div className="showcase-label">{size}</div>
+            <div className="showcase-row showcase-row--center">
               {ELEMENT_ROLES.map((role) => (
                 <ElementIcon key={role} type={role} size={size} />
               ))}
@@ -77,25 +77,8 @@ export function DataPage() {
         ))}
       </Section>
 
-      <Section title="RelationPill" desc="Relation row: kind label + colored pip + target.">
-        <div className="sc-col">
-          <div className="sc-label">Link (href)</div>
-          <div className="sc-col">
-            <RelationPill kind="specifiedBy" label="System Modeling Capability" pipColorToken="--capability" href="#" />
-            <RelationPill kind="verifiedBy" label="Model Structure Test" pipColorToken="--verification" href="#" />
-            <RelationPill kind="derivedFrom" label="Traceability Coverage Requirement" pipColorToken="--requirement" href="#" />
-            <RelationPill kind="refinedBy" label="Containment Specification" pipColorToken="--refinement" href="#" />
-          </div>
-        </div>
-        <div className="sc-col">
-          <div className="sc-label">Button (no href)</div>
-          <RelationPill kind="attachedTo" label="Architecture.md" pipColorToken="--resource" />
-          <RelationPill kind="unknown" label="Unresolved element ID" disabled />
-        </div>
-      </Section>
-
       <Section title="Chip" desc="Filter chip with active toggle.">
-        <div className="sc-row sc-row--center">
+        <div className="showcase-row showcase-row--center">
           <Chip>All types</Chip>
           <Chip className="is-active">Requirement</Chip>
           <Chip>Verification</Chip>
@@ -106,8 +89,8 @@ export function DataPage() {
       </Section>
 
       <Section title="Stat &amp; StatRow" desc="Key-value stat pairs. stacked=true for dashboard counts.">
-        <div className="sc-col">
-          <div className="sc-label">Inline (default)</div>
+        <div className="showcase-col">
+          <div className="showcase-label">Inline (default)</div>
           <StatRow>
             <Stat label="Elements" value={640} />
             <Stat label="Relations" value={1090} />
@@ -115,9 +98,9 @@ export function DataPage() {
             <Stat label="Coverage" value="86%" />
           </StatRow>
         </div>
-        <div className="sc-col">
-          <div className="sc-label">Stacked (dashboard)</div>
-          <div className="sc-row">
+        <div className="showcase-col">
+          <div className="showcase-label">Stacked (dashboard)</div>
+          <div className="showcase-row">
             <Stat label="Elements" value={640} stacked />
             <Stat label="Relations" value={1090} stacked />
             <Stat label="Submodels" value={13} stacked />
@@ -125,27 +108,27 @@ export function DataPage() {
         </div>
       </Section>
 
-      <Section title="Table" desc="Sortable, scrollable data table with sticky header.">
+      <Section title="Table" desc="Primitive sortable, scrollable table with sticky header. Explorer file/model tables are product patterns.">
         <TableViewport>
           <Table>
-            <TableHead>
+            <TableHeaderGroup>
               <TableRow>
-                <TableHeader><TableSortButton direction="asc">ID</TableSortButton></TableHeader>
-                <TableHeader><TableSortButton>Name</TableSortButton></TableHeader>
-                <TableHeader><TableSortButton>Type</TableSortButton></TableHeader>
-                <TableHeader>File</TableHeader>
-                <TableHeader>Status</TableHeader>
+                <TableHeaderCell><TableSortButton direction="asc">ID</TableSortButton></TableHeaderCell>
+                <TableHeaderCell><TableSortButton>Name</TableSortButton></TableHeaderCell>
+                <TableHeaderCell><TableSortButton>Category</TableSortButton></TableHeaderCell>
+                <TableHeaderCell>Owner</TableHeaderCell>
+                <TableHeaderCell>Status</TableHeaderCell>
               </TableRow>
-            </TableHead>
+            </TableHeaderGroup>
             <TableBody>
               {TABLE_ROWS.map((row) => (
                 <TableRow key={row.id}>
-                  <TableCell><code className="rq-coderef">{row.id}</code></TableCell>
-                  <TableCell style={{ fontWeight: "var(--weight-medium)", color: "var(--text-strong)" }}>{row.name}</TableCell>
-                  <TableCell><TypeBadge type={row.type} tinted dot /></TableCell>
-                  <TableCell><span style={{ fontFamily: "var(--font-mono)", fontSize: "var(--text-caption)", color: "var(--text-muted)" }}>{row.file}</span></TableCell>
+                  <TableCell><CodeRef>{row.id}</CodeRef></TableCell>
+                  <TableCell className="showcase-table-strong">{row.name}</TableCell>
+                  <TableCell>{row.category}</TableCell>
+                  <TableCell>{row.owner}</TableCell>
                   <TableCell>
-                    <span style={{ color: row.status === "active" ? "var(--success)" : "var(--text-muted)", fontSize: "var(--text-caption)" }}>
+                    <span className={row.status === "Ready" ? "showcase-status showcase-status--ready" : "showcase-status"}>
                       {row.status}
                     </span>
                   </TableCell>

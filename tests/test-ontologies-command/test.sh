@@ -1,8 +1,6 @@
 #!/bin/bash
 set -uo pipefail
 
-RAW_QUERY_SENTINEL="REQVIRE_ONTOLOGY_EXPORT_RAW_QUERY_SENTINEL"
-
 set +e
 TTL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies 2>&1)
 TTL_EXIT=$?
@@ -14,19 +12,89 @@ if [ $TTL_EXIT -ne 0 ]; then
   exit 1
 fi
 
-if ! grep -q "api:ServiceEndpoint a owl:Class" <<< "$TTL_OUTPUT"; then
+count_occurrences() {
+  { grep -oF "$1" <<< "$2" || true; } | wc -l | tr -d ' '
+}
+
+if ! grep -q "<https://example.test/ontology#ServiceEndpoint> a <http://www.w3.org/2002/07/owl#Class>" <<< "$TTL_OUTPUT"; then
   echo "FAILED: Turtle output missing ontology class"
   echo "$TTL_OUTPUT"
   exit 1
 fi
 
-if ! grep -q "owl:someValuesFrom api:Response" <<< "$TTL_OUTPUT"; then
+if ! grep -q "<https://example.test/ontology> a owl:Ontology" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: Turtle output missing generated ontology document declaration"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+if grep -q "<https://example.test/ontology/api-ontology> a owl:Ontology" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: Turtle output should declare the ontology document at ontology_base, not per element"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "reqvire:termNamespace \"https://example.test/ontology#\"" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: Turtle output missing generated ontology term namespace"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "reqvire:ontologyPrefix \"testonto\"" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: Turtle output missing generated ontology prefix"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+for prefix in \
+  "@prefix owl:" \
+  "@prefix rdfs:" \
+  "@prefix reqvire:" \
+  "@prefix testonto:" \
+  "@prefix sh:" \
+  "@prefix xsd:"; do
+  PREFIX_COUNT=$(count_occurrences "$prefix" "$TTL_OUTPUT")
+  if [ "$PREFIX_COUNT" -gt 1 ]; then
+    echo "FAILED: Turtle output contains duplicate prefix declaration for $prefix"
+    echo "$TTL_OUTPUT"
+    exit 1
+  fi
+done
+
+ONTOLOGY_DECL_COUNT=$(( \
+  $(count_occurrences "<https://example.test/ontology> a owl:Ontology" "$TTL_OUTPUT") + \
+  $(count_occurrences "<https://example.test/ontology> a <http://www.w3.org/2002/07/owl#Ontology>" "$TTL_OUTPUT") \
+))
+if [ "$ONTOLOGY_DECL_COUNT" -ne 1 ]; then
+  echo "FAILED: Turtle output should contain exactly one ontology document type declaration"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+IMPORT_COUNT=$(( \
+  $(count_occurrences "owl:imports <https://example.test/imported>" "$TTL_OUTPUT") + \
+  $(count_occurrences "<http://www.w3.org/2002/07/owl#imports> <https://example.test/imported>" "$TTL_OUTPUT") \
+))
+if [ "$IMPORT_COUNT" -ne 1 ]; then
+  echo "FAILED: Turtle output should contain the duplicated authored owl:imports statement exactly once"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+if grep -q "owl:imports <https://example.test/ontology>" <<< "$TTL_OUTPUT" || \
+   grep -q "<http://www.w3.org/2002/07/owl#imports> <https://example.test/ontology>" <<< "$TTL_OUTPUT"; then
+  echo "FAILED: Turtle output must not synthesize ontology imports"
+  echo "$TTL_OUTPUT"
+  exit 1
+fi
+
+if ! grep -q "<http://www.w3.org/2002/07/owl#someValuesFrom> <https://example.test/ontology#Response>" <<< "$TTL_OUTPUT"; then
   echo "FAILED: Turtle output missing ontology restriction construct fixture"
   echo "$TTL_OUTPUT"
   exit 1
 fi
 
-if ! grep -q "sh:targetClass api:ServiceEndpoint" <<< "$TTL_OUTPUT"; then
+if ! grep -q "<http://www.w3.org/ns/shacl#targetClass> <https://example.test/ontology#ServiceEndpoint>" <<< "$TTL_OUTPUT"; then
   echo "FAILED: Turtle output missing SHACL target class"
   echo "$TTL_OUTPUT"
   exit 1
@@ -46,12 +114,6 @@ for forbidden in \
   fi
 done
 
-if grep -qF "$RAW_QUERY_SENTINEL" <<< "$TTL_OUTPUT"; then
-  echo "FAILED: default Turtle output must not contain raw semantic-query-contract text"
-  echo "$TTL_OUTPUT"
-  exit 1
-fi
-
 set +e
 JSONLD_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --jsonld 2>&1)
 JSONLD_EXIT=$?
@@ -69,6 +131,31 @@ if ! jq . >/dev/null 2>&1 <<< "$JSONLD_OUTPUT"; then
   exit 1
 fi
 
+if ! jq -e 'any(.[]; .["@id"] == "https://example.test/ontology" and ((.["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"] // []) | map(.["@id"]) | index("http://www.w3.org/2002/07/owl#Ontology")))' >/dev/null 2>&1 <<< "$JSONLD_OUTPUT"; then
+  echo "FAILED: JSON-LD output missing generated ontology document declaration"
+  echo "$JSONLD_OUTPUT"
+  exit 1
+fi
+
+if jq -e 'any(.[]; .["@id"] == "https://example.test/ontology/api-ontology" and ((.["http://www.w3.org/1999/02/22-rdf-syntax-ns#type"] // []) | map(.["@id"]) | index("http://www.w3.org/2002/07/owl#Ontology")))' >/dev/null 2>&1 <<< "$JSONLD_OUTPUT"; then
+  echo "FAILED: JSON-LD output should declare the ontology document at ontology_base, not per element"
+  echo "$JSONLD_OUTPUT"
+  exit 1
+fi
+
+if ! grep -qF '"@value":"testonto"' <<< "$JSONLD_OUTPUT"; then
+  echo "FAILED: JSON-LD output missing generated ontology prefix"
+  echo "$JSONLD_OUTPUT"
+  exit 1
+fi
+
+JSONLD_IMPORT_COUNT=$(jq '[.[] | select(.["@id"] == "https://example.test/ontology") | .["http://www.w3.org/2002/07/owl#imports"][]? | select(.["@id"] == "https://example.test/imported")] | length' <<< "$JSONLD_OUTPUT")
+if [ "$JSONLD_IMPORT_COUNT" -ne 1 ]; then
+  echo "FAILED: JSON-LD output should contain the duplicated authored owl:imports statement exactly once"
+  echo "$JSONLD_OUTPUT"
+  exit 1
+fi
+
 for forbidden in \
   "OntologyProjectionGraph" \
   "OntologyConstruct" \
@@ -82,12 +169,6 @@ for forbidden in \
     exit 1
   fi
 done
-
-if grep -qF "$RAW_QUERY_SENTINEL" <<< "$JSONLD_OUTPUT"; then
-  echo "FAILED: default JSON-LD output must not contain raw semantic-query-contract text"
-  echo "$JSONLD_OUTPUT"
-  exit 1
-fi
 
 set +e
 FULL_TTL_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --full 2>&1)
@@ -118,17 +199,29 @@ if ! grep -q "reqvire:specifiedBy <urn:reqvire:element:api-endpoint-requirement>
   exit 1
 fi
 
-if ! grep -q "reqvire:declaresTerm <urn:reqvire:test:api:ServiceEndpoint>" <<< "$FULL_TTL_OUTPUT"; then
-  echo "FAILED: full Turtle output missing ontology declaration edge"
+if ! grep -q "reqvire:declaresTerm <https://example.test/ontology#ServiceEndpoint>" <<< "$FULL_TTL_OUTPUT"; then
+  echo "FAILED: full Turtle output missing ontology term declaration edge"
   echo "$FULL_TTL_OUTPUT"
   exit 1
 fi
 
-if ! grep -q "reqvire:referencesTerm <urn:reqvire:test:api:ServiceEndpoint>" <<< "$FULL_TTL_OUTPUT"; then
+if ! grep -q "reqvire:referencesTerm <https://example.test/ontology#ServiceEndpoint>" <<< "$FULL_TTL_OUTPUT"; then
   echo "FAILED: full Turtle output missing semantic-contract reference edge"
   echo "$FULL_TTL_OUTPUT"
   exit 1
 fi
+
+for relation_fact in \
+  "reqvire:constrainedBy <urn:reqvire:element:api-endpoint-shape-contract>" \
+  "reqvire:constrain <urn:reqvire:element:api-endpoint-requirement>" \
+  "reqvire:use <urn:reqvire:element:api-ontology>" \
+  "reqvire:usedBy <urn:reqvire:element:api-endpoint-shape-contract>"; do
+  if ! grep -qF "$relation_fact" <<< "$FULL_TTL_OUTPUT"; then
+    echo "FAILED: full Turtle output missing semantic-contract relation fact: $relation_fact"
+    echo "$FULL_TTL_OUTPUT"
+    exit 1
+  fi
+done
 
 for token in \
   "reqvire:OntologyProjectionGraph" \
@@ -156,12 +249,6 @@ for token in \
     exit 1
   fi
 done
-
-if grep -qF "$RAW_QUERY_SENTINEL" <<< "$FULL_TTL_OUTPUT"; then
-  echo "FAILED: full Turtle output must not contain raw semantic-query-contract text"
-  echo "$FULL_TTL_OUTPUT"
-  exit 1
-fi
 
 set +e
 FULL_JSONLD_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" ontologies --full --jsonld 2>&1)
@@ -200,9 +287,52 @@ for token in \
   fi
 done
 
-if grep -qF "$RAW_QUERY_SENTINEL" <<< "$FULL_JSONLD_OUTPUT"; then
-  echo "FAILED: full JSON-LD output must not contain raw semantic-query-contract text"
-  echo "$FULL_JSONLD_OUTPUT"
+set +e
+SEARCH_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" search --filter-name "API Endpoint Requirement|API Endpoint Shape Contract|API Ontology" --json 2>&1)
+SEARCH_JSON_EXIT=$?
+set -e
+
+if [ $SEARCH_JSON_EXIT -ne 0 ]; then
+  echo "FAILED: search --json command failed"
+  echo "$SEARCH_JSON_OUTPUT"
+  exit 1
+fi
+
+if ! jq -e '
+  any(.files[].elements[];
+    .name == "API Endpoint Requirement"
+    and any(.relations[]; .relation_type == "constrainedBy" and (.target.target | endswith("SemanticContracts.md#api-endpoint-shape-contract"))))
+  and any(.files[].elements[];
+    .name == "API Endpoint Shape Contract"
+    and (.semantic_contract.shapes.content | contains("sh:NodeShape"))
+    and any(.relations[]; .relation_type == "constrain" and (.target.target | endswith("SemanticContracts.md#api-endpoint-requirement")))
+    and any(.relations[]; .relation_type == "use" and (.target.target | endswith("SemanticContracts.md#api-ontology"))))
+  and any(.files[].elements[];
+    .name == "API Ontology"
+    and any(.relations[]; .relation_type == "usedBy" and (.target.target | endswith("SemanticContracts.md#api-endpoint-shape-contract"))))
+' >/dev/null 2>&1 <<< "$SEARCH_JSON_OUTPUT"; then
+  echo "FAILED: search JSON output missing semantic-contract shape artifacts or relation edges"
+  echo "$SEARCH_JSON_OUTPUT"
+  exit 1
+fi
+
+set +e
+MODEL_JSON_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" model --from "API Endpoint Requirement" --json 2>&1)
+MODEL_JSON_EXIT=$?
+set -e
+
+if [ $MODEL_JSON_EXIT -ne 0 ]; then
+  echo "FAILED: model --json command failed"
+  echo "$MODEL_JSON_OUTPUT"
+  exit 1
+fi
+
+if ! jq -e '
+  any(.. | objects; .relation_type? == "constrainedBy")
+  and any(.. | objects; .relation_type? == "use")
+' >/dev/null 2>&1 <<< "$MODEL_JSON_OUTPUT"; then
+  echo "FAILED: model JSON output missing semantic-contract constrainedBy/use relation chain"
+  echo "$MODEL_JSON_OUTPUT"
   exit 1
 fi
 
@@ -214,15 +344,10 @@ for forbidden in \
   "urn:reqvire:ontology-symbol" \
   "projectionDerivationMode"; do
   if grep -qF "$forbidden" <<< "$TTL_OUTPUT"; then
-    echo "FAILED: default Turtle output must remain authored ontology/SHACL only: $forbidden"
+    echo "FAILED: default Turtle output must include document declarations and authored ontology/SHACL only, without projection facts: $forbidden"
     exit 1
   fi
 done
-
-if grep -qF "$RAW_QUERY_SENTINEL" <<< "$TTL_OUTPUT"; then
-  echo "FAILED: default Turtle output must not contain raw semantic-query-contract text"
-  exit 1
-fi
 
 # Default Turtle output must carry the representative OWL/RDFS constructs.
 for construct in \

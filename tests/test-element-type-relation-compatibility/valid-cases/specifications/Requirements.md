@@ -195,6 +195,68 @@ A source element describing requirement-owned source material.
 
 ---
 
+### Semantic Contract Ontology
+
+Ontology vocabulary used by the semantic contract relation fixture.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/semantic-contract
+  * ontology_prefix: screl
+
+#### Ontology
+```turtle
+@prefix screl: <https://example.test/semantic-contract#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/semantic-contract> a owl:Ontology .
+screl:Payload a owl:Class .
+screl:payloadId a owl:DatatypeProperty .
+```
+
+---
+
+### Requirement Constrained By Semantic Contract
+
+Requirement constrained by a reusable semantic contract.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * derivedFrom: [Capability Parent](#capability-parent)
+  * constrainedBy: [Reusable Semantic Contract](#reusable-semantic-contract)
+
+---
+
+### Reusable Semantic Contract
+
+Reusable semantic contract that constrains a requirement and uses ontology vocabulary.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Requirement Constrained By Semantic Contract](#requirement-constrained-by-semantic-contract)
+  * use: [Semantic Contract Ontology](#semantic-contract-ontology)
+
+#### Shapes
+```turtle
+@prefix screl: <https://example.test/semantic-contract#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+screl:PayloadShape
+  a sh:NodeShape ;
+  sh:targetClass screl:Payload ;
+  sh:property [
+    sh:path screl:payloadId ;
+    sh:datatype xsd:string ;
+  ] .
+```
+
+---
+
 ### Requirement Refined By Behavior
 
 Requirement that asks for behavior definition, refined by a behavior element.

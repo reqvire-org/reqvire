@@ -1,0 +1,41 @@
+# Elements
+
+### Capability A
+
+#### Metadata
+  * type: capability
+---
+
+### Capability B
+
+#### Metadata
+  * type: capability
+---
+
+### Parent A
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Capability A](#capability-a)
+---
+
+### Parent B
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Capability B](#capability-b)
+---
+
+### Child
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Capability A](#capability-a)
+  * derivedFrom: [Parent A](#parent-a)
+---

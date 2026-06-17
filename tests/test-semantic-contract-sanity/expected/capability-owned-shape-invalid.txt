@@ -1,1 +1,1 @@
-Capability-owned semantic contract is rejected
+Semantic contract cannot constrain a capability

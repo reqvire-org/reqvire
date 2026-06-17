@@ -1,11 +1,11 @@
 ---
 name: reqvire-ontology-authoring
-description: Expert workflow for creating, extending, and validating Reqvire ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest modeling. Use for competency-question-driven ontology scoping, OWL/Turtle vocabulary, capability attachment context, semantic-contract and semantic-query-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, and Reqvire validation; trigger when Codex needs to add or revise files under requirements/Ontologies, author #### Ontology Turtle blocks or requirement-owned #### Query sparql blocks, decide whether meaning belongs in ontology vs requirement/specification/semantic-contract/semantic-query-contract, or prepare ontology terms for Reqvire HTML visualization and semantic export.
+description: Expert workflow for creating, extending, and validating Reqvire ontology elements for IT engineering, systems engineering, MBSE, and system-of-interest modeling. Use for competency-question-driven ontology scoping, OWL/Turtle vocabulary, capability attachment context, semantic-contract boundaries, ontology hierarchy, domain/range/property modeling, individuals, axioms, and Reqvire validation; trigger when Codex needs to add or revise files under requirements/Ontologies, author #### Ontology Turtle blocks, decide whether meaning belongs in ontology vs requirement/specification/semantic-contract, or prepare ontology terms for Reqvire HTML visualization and semantic export.
 ---
 
 # Reqvire Ontology Authoring
 
-Author Reqvire ontology content as reusable building blocks for system-of-interest models, not implementation detail. Reqvire managed-project ontologies are primarily for IT engineering, systems engineering, MBSE, architecture, interfaces, verification, operations, and other system model concerns. Use ontology elements for stable nouns, relationships, categories, and model meaning; use requirements for obligations; use requirement-owned semantic-contract elements for SHACL profiles over reachable ontology context; use semantic-query-contract elements for requirement-owned declarative semantic queries over reachable context.
+Author Reqvire ontology content as reusable building blocks for system-of-interest models, not implementation detail. Reqvire managed-project ontologies are primarily for IT engineering, systems engineering, MBSE, architecture, interfaces, verification, operations, and other system model concerns. Use ontology elements for stable nouns, relationships, categories, and model meaning; use requirements for obligations; use semantic-contract elements for reusable SHACL profiles that explicitly `use` ontology and `constrain` requirements.
 
 ## Workflow
 
@@ -31,17 +31,31 @@ Author Reqvire ontology content as reusable building blocks for system-of-intere
    - Extend when the new terms belong to an existing vocabulary root.
    - Create a new ontology when the terms form a coherent reusable vocabulary with separate ownership, lifecycle, or capability attachment scope.
 6. Derive candidate classes, properties, individuals, and axioms from the domain frame and competency questions.
-7. Place ontology elements under `requirements/Ontologies`.
-8. Author exactly one `#### Ontology` fenced Turtle block per ontology element.
-9. Link ontology hierarchy with `derivedFrom` only between ontology elements.
-10. Attach ontology from consuming capabilities. Do not attach ontology directly from requirements.
-11. Add or update semantic contracts only when a closed-world SHACL profile is needed.
-12. Add or update semantic query contracts only when a requirement owns a declarative semantic query over reachable ontology context.
+7. For a top parent ontology element, define `ontology_base` and `ontology_prefix` metadata before authoring Turtle. Descendant ontology elements inherit both through `derivedFrom` hierarchy. Use the corresponding hash namespace for terms, normally `<ontology_base>#`, with the inherited prefix as the canonical CURIE label. When rebasing an existing ontology element, use `add --override` as the command path and require it to rewrite the dependent ontology boundary chain atomically, including `ontology_base`, `ontology_prefix`, inherited prefix bindings, imports, and any reachable SHACL references.
+8. Place ontology elements under `requirements/Ontologies`.
+9. Author exactly one `#### Ontology` fenced Turtle block per ontology element.
+10. Link ontology hierarchy with `derivedFrom` only between ontology elements.
+11. Attach ontology from consuming capabilities. Do not attach ontology directly from requirements.
+12. Add or update semantic contracts only when a closed-world SHACL profile is needed; link each contract to ontology with `use`/`usedBy` and to governed requirements with `constrain`/`constrainedBy`.
 13. Validate before finishing.
+
+## Ontology From Existing Model Content
+
+Ontology work does not have to come first. If capabilities, requirements, specifications, behaviors, constraints, input/output refinements, or verifications already exist, derive ontology and semantic contracts from that authored model rather than forcing a greenfield ontology pass.
+
+Use this workflow when a project has partial or no ontology coverage:
+
+1. Read the existing capability and requirement subgraph first.
+2. Extract repeated domain nouns, states, relation words, artifact types, payload concepts, governed tokens, and validation conditions from requirements and refinements.
+3. Promote stable reusable vocabulary into ontology elements only where it improves shared meaning, queryability, impact analysis, or semantic validation.
+4. Promote repeated closed-world validation rules into semantic-contract SHACL shapes only when machine-checkable constraints add value.
+5. Leave requirements prose-only when ontology or SHACL formalization is not useful.
+6. Link requirements to reusable shapes with `constrainedBy`/`constrain` and link shapes to ontology with `use`/`usedBy`.
 
 ## Modeling Split
 
 Use `ontology` for:
+- Reusable ontology vocabulary under root `ontology_base` and `ontology_prefix` metadata values. Authored Turtle normally declares terms in the hash namespace such as `@prefix ex: <https://example.org/ontology/managed-platform#>`; Reqvire emits one generated `owl:Ontology` document declaration per resolved `ontology_base`, with same-base child ontology elements contributing vocabulary to that document. Cross-base ontology hierarchy can become `owl:imports`. If authored Turtle uses the inherited prefix, it must explicitly declare that prefix to `<ontology_base>#`; missing or conflicting declarations fail validation.
 - Classes/concepts, such as `reqvire:RequirementCoverage a owl:Class`.
 - Object properties and datatype properties declared in `#### Ontology` blocks with stable `rdfs:domain` and `rdfs:range` when those semantics are true.
 - Stable vocabulary individuals, such as element type records, rule records, report kinds, governance values, and enum-like categories. For new controlled vocabulary records, explicitly type the record as both `owl:NamedIndividual` and its domain class, for example `ex:collectReportKind a owl:NamedIndividual, ex:ReportKind`.
@@ -52,9 +66,7 @@ Use `requirement` for implementable obligations, especially statements that natu
 
 Use `specification`, `behavior`, `constraint`, `state`, or `input-output` for exact commands, file paths, outputs, workflows, schemas, UI behavior, and implementation-specific details.
 
-Use `semantic-contract` for requirement-owned SHACL `sh:NodeShape` profiles. A semantic contract must have `#### Shapes`, use `sh:targetClass` and `sh:path` over reachable ontology terms, refine exactly one requirement owner, and must not contain `#### Ontology`.
-
-Use `semantic-query-contract` for requirement-owned declarative graph queries. A semantic query contract must refine exactly one requirement, use the generic `#### Query` heading, contain exactly one fenced code block with info string `sparql`, and must not declare a query kind. It must not contain `#### Ontology` or `#### Shapes`. Search JSON exposes parsed query-contract fields; ontology collection and full semantic export do not emit query contracts until dedicated query output support is specified. The initial feature does not define execution, inference strategy, or persistent RDF store behavior.
+Use `semantic-contract` for reusable SHACL `sh:NodeShape` profiles. A semantic contract is a first-class ontology-plane element and should be authored under `requirements/Ontologies` near the ontology it uses. It must have `#### Shapes`, use `sh:targetClass` and `sh:path` over ontology terms reachable through explicit `use` relations, constrain requirements through `constrain`/`constrainedBy`, and must not contain `#### Ontology`.
 
 For greenfield ontology creation templates and examples, read `references/OntologyAuthoring.md`.
 
@@ -89,8 +101,16 @@ Use OWL datatype/object properties for slots and relationships with stable domai
 
 Reqvire ontology blocks are Turtle using OWL/RDFS vocabulary. Prefer compact, stable CURIEs and define terms explicitly before referencing them.
 
+Use canonical Reqvire ontology identity boundaries:
+
+- The top parent ontology element in an ontology subgraph must define non-empty `ontology_base` and `ontology_prefix` metadata, for example `ontology_base: https://example.org/ontology/managed-platform` and `ontology_prefix: ex`. When rebasing an existing ontology element, use `add --override` instead of hand-editing metadata so the rewrite chain remains atomic.
+- The term namespace identifies classes, properties, and individuals and normally uses the inherited ontology base plus `#`, for example `@prefix ex: <https://example.org/ontology/managed-platform#>`. The prefix label comes from inherited `ontology_prefix`; the namespace comes from inherited `ontology_base`.
+- Authored Turtle that uses the inherited prefix must explicitly declare it to `<ontology_base>#`; missing or conflicting declarations fail validation.
+- The root ontology Turtle block should declare `<ontology_base> a owl:Ontology` for authored OWL document identity. Child ontology blocks normally define vocabulary terms only. Do not manually model the ontology itself as a vocabulary term inside the term namespace, such as `ex:ManagedPlatformOntology a owl:Ontology`.
+- Link ontology hierarchy with `derivedFrom` between ontology elements. Reqvire derives one ontology document declaration per resolved `ontology_base`; same-base `derivedFrom` contributes to the same document, while cross-base hierarchy can become `owl:imports`.
+
 ```turtle
-@prefix ex: <https://example.org/ontology#> .
+@prefix ex: <https://example.org/ontology/managed-platform#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .

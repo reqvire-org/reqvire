@@ -46,14 +46,13 @@ Version policy:
 | Capabilities | `capability` | Coherent operational, product, business, regulatory, or system ability that bridges ontology, requirements, and verification |
 | Requirements | `requirement` | Implementable system obligations (functional, performance, interface, compliance) |
 | Ontology | `ontology` | First-class OWL/Turtle vocabulary and semantic model terms reusable by capabilities and requirements |
+| | `semantic-contract` | Reusable SHACL shape profile that uses ontology and constrains requirements |
 | Refinements | `source` | External need, regulation, policy, or source material owned by a requirement |
 | | `specification` | Detailed definitions refining a requirement |
 | | `constraint` | Limits and boundaries on system behavior |
 | | `behavior` | How the system behaves in specific conditions |
 | | `state` | Lifecycle states, state machines, transitions, and state-dependent contracts |
 | | `input-output` | Payloads, messages, documents, schemas, fixtures, and data contracts |
-| | `semantic-contract` | Requirement-owned SHACL shape profile over reachable ontology context |
-| | `semantic-query-contract` | Requirement-owned declarative semantic query contract with exactly one `#### Query` fenced `sparql` block over reachable ontology context |
 | Verifications | `test-verification` | Automated/manual testing (evidence-backed; requires satisfiedBy) |
 | | `formal-proof-verification` | Formal proof, model checking, theorem proving, generated fixtures, or proof reports (evidence-backed; requires satisfiedBy) |
 | | `analysis-verification` | Review, calculation, simulation |
@@ -95,13 +94,11 @@ Use an `ontology` when content defines reusable domain or model meaning:
 - `X relates to Y`
 - this domain term means...
 
-Use a `semantic-contract` when one requirement obligation needs a closed-world SHACL profile over reachable ontology terms. Semantic contracts must have `#### Shapes`, must refine exactly one requirement owner, and must not contain `#### Ontology`.
+Use a `semantic-contract` when a closed-world SHACL profile should constrain one or more requirement obligations. Semantic contracts are first-class elements in the ontology plane; author them under `requirements/Ontologies` near the ontology they use. They must have `#### Shapes`, must not contain `#### Ontology`, must use one or more ontology elements through `use`/`usedBy`, and constrain requirements through `constrain`/`constrainedBy`.
 
-Use a `semantic-query-contract` when one requirement needs to record a declarative semantic query over reachable ontology context. Semantic query contracts must refine exactly one requirement, must have exactly one `#### Query` fenced `sparql` block, must not contain `#### Ontology` or `#### Shapes`, must not declare query kind/purpose, and are exposed through full search JSON. Ontology collection and full semantic export do not emit semantic-query-contract query content or metadata until dedicated query output support is specified.
+Use `#### Concept References` when readable prose should bind human labels to ontology terms without filling the requirement text with CURIEs. The referenced IRI or CURIE must be declared by reachable ontology context. Markdown concept references should use an absolute term IRI unless the referenced prefix is explicitly declared in reachable ontology Turtle.
 
-Use `#### Concept References` when readable prose should bind human labels to ontology terms without filling the requirement text with CURIEs. The referenced IRI or CURIE must be declared by reachable ontology context.
-
-Cleanup rule: ontology should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Requirement-owned `semantic-contract` and `semantic-query-contract` refinements capture requirement-specific semantic checks.
+Cleanup rule: ontology should define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Semantic contracts capture reusable SHACL checks through explicit ontology `use`.
 
 Use a `requirement` when the statement says what the system must do, especially when it naturally reads as `The system shall...`.
 
@@ -111,11 +108,11 @@ When constructing or refactoring a Reqvire system model:
 
 1. Inspect capability-root subgraphs with `submodels` and inspect the ontology plane with `search --filter-type=ontology`.
 2. Decide whether work belongs to an existing capability root, a child capability, a new independent capability root, or the shared ontology hierarchy.
-3. Keep ontology elements in `requirements/Ontologies`; capabilities attach ontology from there instead of nesting ontology in capability files.
+3. Keep ontology and semantic-contract elements in `requirements/Ontologies`; capabilities attach ontology from there instead of nesting ontology in capability files, and requirements link to semantic contracts there through `constrainedBy`.
 4. Treat ontology as first-class and orthogonal to capability/requirement structure: ontology defines reusable terms and relationships; capabilities attach ontology so child capabilities and specifying requirements inherit it through the owning capability path.
 5. Keep hierarchy inside capability, requirement, or ontology families; cross-root reuse must be explicit attachments.
 6. Move stable reusable meaning to ontology; keep obligations in requirements and exact implementation/interface behavior in requirement-owned refinements.
-7. Attach ontology to the consuming capability, or attach reusable requirement-owned contracts to consuming requirements, instead of using hierarchy to cross submodel boundaries.
+7. Attach ontology to the consuming capability, use `use`/`usedBy` for semantic-contract ontology dependencies, constrain requirements with `constrain`/`constrainedBy`, or attach reusable requirement-owned non-semantic-contract refinements to consuming requirements instead of using hierarchy to cross submodel boundaries.
 8. Update verifications and e2e fixtures in the same slice when requirements, report shape, names, or output expectations change.
 9. Validate in slices with `validate`, `lint`, `submodels`, and focused tests before broadening the refactor.
 
@@ -129,7 +126,16 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" ontologies --full
 ```
 
-For MCP workflows, use the read-only `reqvire.ontologies` tool. It accepts optional `format: "turtle"` or `format: "jsonld"` and optional `full: true`. Default mode returns serialized authored ontology/SHACL content plus semantic index summary, source block metadata, diagnostics, ontology declarations, and SHACL references. Full mode also includes generated Reqvire model context triples for elements, relations, attachments, concept references, ontology declarations, and shape references. Semantic-query-contract query content and metadata remain search-only and are not emitted by default or full ontology export until query-export is specified.
+For MCP workflows, use the read-only `reqvire.ontologies` tool. It accepts optional `format: "turtle"` or `format: "jsonld"` and optional `full: true`. Default mode returns generated ontology document declarations plus serialized authored ontology/SHACL content, semantic index summary, source block metadata, diagnostics, ontology term declarations, and SHACL references. Each generated ontology document declaration uses the resolved `ontology_base` as the `owl:Ontology` IRI and lists same-base ontology elements as contributors. Full mode also includes generated Reqvire model context triples for elements, relations, attachments, concept references, ontology term declarations, shape references, and ontology projection facts.
+
+## Ontology Mutation Semantics
+
+Ontology elements are first-class mutation targets and need boundary-safe rewrites:
+
+- Use `add --override` to rebase an ontology element (`ontology_base` or `ontology_prefix` changes) so dependent boundaries, inherited prefix bindings, imports, and reachable SHACL references are rewritten together.
+- `relink` is the way to re-point ontology hierarchy edges such as `derivedFrom`.
+- `merge` for ontology elements folds source `#### Ontology` content into the target element’s single `#### Ontology` block (source ontology block does not stay separate).
+- `mv-file --squash` moves ontology elements at file level only; it does not fold ontology content, it relocates elements and keeps each ontology block in its element.
 
 ## Model Commands
 
@@ -149,9 +155,11 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 | `specify` / `specifiedBy` | `requirement` / `capability` | Bridge from requirements to their owning capability |
 | `satisfiedBy` / `satisfy` | `requirement`, `test-verification`, `formal-proof-verification` only | Link to implementation or evidence artifacts |
 | `verifiedBy` / `verify` | `capability`, `requirement` / verification element | Link capabilities and requirements to verification elements |
-| `refinedBy` / `refine` | `requirement` | Ownership of subtype-compatible refinement elements |
+| `refinedBy` / `refine` | `requirement` | Ownership of subtype-compatible non-semantic-contract refinement elements |
+| `constrainedBy` / `constrain` | `requirement` / `semantic-contract` | Link requirements to semantic contracts that constrain them |
+| `use` / `usedBy` | `semantic-contract` / `ontology` | Link semantic contracts to the ontology vocabulary they use |
 | `trace` | Any | Non-directional traceability |
-| Attachments | `capability`, `requirement` | Reference existing ontology or compatible requirement-owned refinement contracts across explicit subgraph boundaries |
+| Attachments | `capability`, `requirement` | Reference existing ontology or compatible requirement-owned non-semantic-contract refinement contracts across explicit subgraph boundaries |
 
 **Key constraints:**
 - Requirements specify capabilities through `specify`; capabilities point back to those requirements with `specifiedBy`
@@ -160,10 +168,11 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 - Ontology hierarchy uses `derivedFrom`/`derive` only between ontology elements; ontology elements do not author attachments
 - Capabilities may be directly verified but are not directly satisfied; capability coverage also rolls up from requirements that specify them
 - Among verification types, only evidence-backed verifications (`test-verification`, `formal-proof-verification`) may use `satisfiedBy`/`satisfy`
-- Each refinement is owned by exactly one valid requirement owner via `refinedBy`
-- Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, `semantic-contract`, or `semantic-query-contract` refinements
+- Each non-semantic-contract refinement is owned by exactly one valid requirement owner via `refinedBy`
+- Semantic contracts must use `constrain`/`constrainedBy` for requirement application and `use`/`usedBy` for ontology vocabulary context; they must not use `refine`/`refinedBy`
+- Capabilities must not own `source`, `constraint`, `behavior`, `specification`, `state`, `input-output`, or `semantic-contract` elements through `refinedBy`/`refine`
 - Capability attachments may target `ontology` elements only
-- Requirement attachments may target compatible requirement-owned `source`, `semantic-contract`, `semantic-query-contract`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements only
+- Requirement attachments may target compatible requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements only
 
 **Traceability flow:**
 ```
@@ -176,8 +185,9 @@ Capability
 Requirement
   ├── specify → Capability
   ├── derive → Child Requirement
-  ├── attach → Reusable Requirement Contract
-  ├── refinedBy → Source/Semantic-Contract/Semantic-Query-Contract/Spec/Constraint/Behavior/State/Input-Output
+  ├── attach → Reusable Non-Semantic Requirement Contract
+  ├── refinedBy → Source/Spec/Constraint/Behavior/State/Input-Output
+  ├── constrainedBy → Semantic Contract → use → Ontology
   ├── satisfiedBy → Code
   └── verifiedBy → Verification → satisfiedBy → Test/Proof evidence
 ```
@@ -187,7 +197,7 @@ Requirement
 - Files begin with `# Elements` (multi-element) or `# Element` (single-element)
 - Elements are `###` headers with unique names per file
 - Reserved `####` subsections: **Metadata**, **Relations**, **Details**, **Attachments**, **Concept References**
-- Ontology elements require exactly one `#### Ontology` fenced Turtle block; semantic contracts require exactly one `#### Shapes` fenced Turtle block; semantic-query-contract elements require exactly one `#### Query` fenced `sparql` block
+- Ontology elements require exactly one `#### Ontology` fenced Turtle block; semantic contracts require exactly one `#### Shapes` fenced Turtle block
 - Non-reserved `####` subsections become element content (use for inline specs/behaviors)
 - Relations syntax: `  * derivedFrom: [Parent](path.md#parent)`
 - Attachments syntax: `  * [Name](path.md#element)`
@@ -243,9 +253,11 @@ Requirements should contain EARS statements only (body + `#### Details`). Techni
 3. Never guess — read files before making changes
 4. Validate after each significant change
 5. When reading requirements, always check for **attachments**
-6. Use the Reqvire `collect` command to gather full context from requirement chains
-   - **Upstream** (default): ancestors via `derivedFrom` + attachments
-   - **Downstream**: `collect "Element" --direction DOWNSTREAM` — all children to leaves
+6. Use the Reqvire `collect` command to gather full context from capability, requirement, or ontology starts
+   - **Requirement upstream** (default): requirement ancestors, owning capability context, attachments, and ontology context
+   - **Capability downstream**: child capabilities and specified requirements
+   - **Ontology downstream**: child ontology elements and semantic contracts that use reachable ontology
+   - **Downstream**: `collect "Element" --direction DOWNSTREAM`
 7. Use the Reqvire `submodels` command to inspect independent subgraphs before refactors
    - `submodels --from "<ROOT>"`: scoped view (root excluded from reported submodels)
 8. Implementation coverage (`coverage`) applies to `requirement` elements only
@@ -267,7 +279,7 @@ Load the right reference file for your task — don't work from memory on comple
 | **Add capabilities** | [AddCapability.md](references/AddCapability.md) | New functionality, MBSE workflow, requirements hierarchy |
 | **Refactor model** | [ConsolidateRequirements.md](references/ConsolidateRequirements.md) | Cluttered/duplicated model, fixing relations/ownership |
 | **Refactor containment structure** | [ContainmentStructureRefactor.md](references/ContainmentStructureRefactor.md) | Reorganize folders/files around capability, ontology, and verification planes without changing model intent |
-| **Refactor ontology/contracts** | [CapabilitySemanticContractRefactor.md](references/CapabilitySemanticContractRefactor.md) | Separate capability scope, reusable ontology terms, requirement obligations, and requirement-owned semantic contracts |
+| **Refactor ontology/contracts** | [CapabilitySemanticContractRefactor.md](references/CapabilitySemanticContractRefactor.md) | Separate capability scope, reusable ontology terms, requirement obligations, and reusable semantic contracts |
 | **Extract specs** | [SpecificationsExtractionLogic.md](references/SpecificationsExtractionLogic.md) | Embedded details in requirements, separating EARS from specs |
 | **Clean language** | [SpecificationLanguageCleanup.md](references/SpecificationLanguageCleanup.md) | Normative wording in refinements, language ownership |
 | **Generate tasks** | [CreatingTasks.md](references/CreatingTasks.md) | Implementation plans from capability-scoped changes |

@@ -8,8 +8,8 @@ Top-level container for test requirements.
   * type: requirement
 
 #### Relations
-  * derive: [No Relations Requirement](#no-relations-requirement)
   * derive: [Capability Requirement](#capability-requirement)
+  * derive: [No Relations Requirement](#no-relations-requirement)
   * specify: [Test Capability Test Link Unlink Specifications Requirements Md](#test-capability-test-link-unlink-specifications-requirements-md)
 ---
 

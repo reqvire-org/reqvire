@@ -29,13 +29,16 @@ API ontology terms.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-api:ServiceEndpoint a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+testonto:ServiceEndpoint a owl:Class .
 ```
 ---
 
@@ -47,7 +50,7 @@ The system shall publish service endpoint contracts.
   * type: requirement
 
 #### Concept References
-  * Service Endpoint: api:ServiceEndpoint
+  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
 
 #### Relations
   * specify: [API Capability](#api-capability)
@@ -99,7 +102,6 @@ if ! diff -u "${TEST_SCRIPT_DIR}/expected/search-summary.json" /tmp/concept-refe
   exit 1
 fi
 
-sed -i 's/Service Endpoint: api:ServiceEndpoint/Service Endpoint: urn:reqvire:test:api:ServiceEndpoint/' "$TEST_DIR/specifications/ConceptReferences.md"
 cp "$TEST_DIR/specifications/ConceptReferences.md" /tmp/concept-references-before-delete.md
 set +e
 DELETE_OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" rm "API Ontology" 2>&1)
@@ -114,7 +116,7 @@ for marker in \
   "Concept reference not found" \
   "specifications/ConceptReferences.md#api-requirement" \
   "Service Endpoint" \
-  "urn:reqvire:test:api:ServiceEndpoint" \
+  "https://example.test/ontology#ServiceEndpoint" \
   "Removed declaration source: specifications/ConceptReferences.md#api-ontology"
 do
   if ! echo "$DELETE_OUTPUT" | grep -Fq "$marker"; then
@@ -153,13 +155,16 @@ API ontology terms.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-api:ServiceEndpoint a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+testonto:ServiceEndpoint a owl:Class .
 ```
 ---
 
@@ -171,7 +176,7 @@ The system shall publish service endpoint contracts.
   * type: requirement
 
 #### Concept References
-  * Missing Term: api:MissingTerm
+  * Missing Term: https://example.test/ontology#MissingTerm
 
 #### Relations
   * specify: [API Capability](#api-capability)
@@ -204,13 +209,16 @@ API ontology terms.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-api:ServiceEndpoint a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+testonto:ServiceEndpoint a owl:Class .
 ```
 ---
 
@@ -220,16 +228,19 @@ Infrastructure ontology terms.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Relations
   * derivedFrom: [API Ontology](#api-ontology)
 
 #### Ontology
 ```turtle
-@prefix infra: <urn:reqvire:test:infra:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-infra:Region a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+testonto:Region a owl:Class .
 ```
 ---
 
@@ -241,7 +252,7 @@ The system shall publish service endpoint contracts.
   * type: requirement
 
 #### Concept References
-  * Region: urn:reqvire:test:infra:Region
+  * Region: https://example.test/ontology#Region
 
 #### Relations
   * specify: [API Capability](#api-capability)
@@ -260,16 +271,19 @@ API ontology terms.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Concept References
-  * Service Endpoint: api:ServiceEndpoint
+  * Service Endpoint: https://example.test/ontology#ServiceEndpoint
 
 #### Ontology
 ```turtle
-@prefix api: <urn:reqvire:test:api:> .
+@prefix testonto: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-api:ServiceEndpoint a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+testonto:ServiceEndpoint a owl:Class .
 ```
 ---
 EOF

@@ -17,13 +17,16 @@ Billing ontology terms.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Ontology
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-billing:Invoice a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+test:Invoice a owl:Class .
 ```
 ---
 
@@ -48,16 +51,19 @@ Corrective invoice ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Relations
   * derivedFrom: [Billing Terms Ontology](#billing-terms-ontology)
 
 #### Ontology
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-billing:CorrectiveInvoice a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+test:CorrectiveInvoice a owl:Class .
 ```
 
 ---
@@ -71,7 +77,7 @@ The system shall validate corrective invoice payloads.
 
 #### Relations
   * specify: [Corrective Invoice Capability](#corrective-invoice-capability)
-  * refinedBy: [Corrective Invoice Shape Contract](#corrective-invoice-shape-contract)
+  * constrainedBy: [Corrective Invoice Shape Contract](#corrective-invoice-shape-contract)
 ---
 
 ### Corrective Invoice Shape Contract
@@ -82,15 +88,16 @@ Corrective invoice shape contract.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Corrective Invoice Requirement](#corrective-invoice-requirement)
+  * constrain: [Corrective Invoice Requirement](#corrective-invoice-requirement)
+  * use: [Corrective Invoice Ontology](#corrective-invoice-ontology)
 
 #### Shapes
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
-billing:CorrectiveInvoiceShape
+test:CorrectiveInvoiceShape
   a sh:NodeShape ;
-  sh:targetClass billing:Invoice .
+  sh:targetClass test:Invoice .
 ```
 ---

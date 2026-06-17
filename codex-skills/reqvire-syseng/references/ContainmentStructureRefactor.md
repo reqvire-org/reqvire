@@ -30,18 +30,17 @@ Recommended top-level model planes:
 
 ```text
 ./
-  Capabilities/
+  <Area>/<CapabilityName>/
   Ontologies/
-  Verifications/
 ```
 
-Optional project-level files such as `UseCases.md`, `Stakeholders.md`, or `Glossary.md` may remain at `./` when they intentionally sit outside one capability folder. If content becomes independently traceable, verifiable, or requirement-owned, move it into the appropriate capability subgraph.
+Optional project-level files such as `UseCases.md`, `Stakeholders.md`, or `Glossary.md` may remain at `./` when they intentionally sit outside one capability folder. If content becomes independently traceable, verifiable, or requirement-owned, move it into the appropriate capability-rooted subgraph.
 
 ## Model Planes
 
-### Capabilities
+### Capability-Rooted Scope Folders
 
-`Capabilities/` contains capability-rooted subgraphs.
+Root-level area folders contain capability-rooted subgraphs directly under the model root.
 
 A capability represents a coherent operational, product, business, regulatory, or system ability. Capability folders group the requirements, refinements, architecture notes, and local contracts that belong to that ability.
 
@@ -62,7 +61,7 @@ Verification elements prove capabilities or requirements through `verify` / `ver
 Recommended pattern:
 
 ```text
-Capabilities/<Area>/<CapabilityName>/
+<Area>/<CapabilityName>/
   <CapabilityName>.md
   <CapabilityName>Requirements.md
   <Topic>Requirements.md
@@ -104,7 +103,7 @@ A capability subgraph may own:
 - child capabilities when decomposition is useful
 - requirements that specify the capability
 - requirement-owned refinements
-- requirement-owned semantic contracts for specific requirement obligations
+- reusable semantic contracts that explicitly use ontology and constrain requirements
 - local architecture or design specifications that refine elements in that subgraph
 - verification links to external verification elements
 
@@ -154,7 +153,7 @@ Refinement files usually use names like:
 
 Refinements are owned by exactly one compatible requirement through `refine` / `refinedBy`. Use refinements when content is too detailed for a requirement statement but still needs traceability.
 
-Use semantic contracts when one requirement needs a machine-readable SHACL profile over reachable ontology terms. Semantic contracts must refine exactly one compatible requirement owner, contain `#### Shapes`, and not contain `#### Ontology`.
+Use semantic contracts when requirements need a machine-readable SHACL profile over ontology terms. Semantic contracts must use ontology through `use`/`usedBy`, constrain requirements through `constrain`/`constrainedBy`, contain `#### Shapes`, and not contain `#### Ontology`.
 
 ## Architecture Folders
 
@@ -228,7 +227,7 @@ Avoid cross-submodel requirement hierarchy. If a requirement in one capability n
 When adding or moving model content:
 
 1. If it defines reusable meaning, put it in `Ontologies/`.
-2. If it defines a system ability, put it as a `capability` under `Capabilities/<Area>/<CapabilityName>/`.
+2. If it defines a system ability, put it as a `capability` under `<Area>/<CapabilityName>/` at the model root.
 3. If it states an obligation, put it as a `requirement` in the owning capability folder.
 4. If it elaborates an obligation or capability, put it as a refinement in the same capability folder.
 5. If it is service or architecture detail for one capability, put it under that capability's `Architecture/` folder.

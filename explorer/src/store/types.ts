@@ -19,6 +19,8 @@ export const EXPECTED_SCHEMA_VERSION = "2026-06-07.project-store.v1";
 export interface ProjectStoreProject {
   name: string;
   root_label: string;
+  repository?: string | null;
+  branch?: string | null;
 }
 
 export interface ProjectStoreFolder {

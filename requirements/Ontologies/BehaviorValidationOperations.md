@@ -1,5 +1,154 @@
 # Elements
 
+### Behavior Rule Structure Shape
+
+Defines SHACL constraints for behavior rules, state transitions, and behavior refinements.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:BehaviorRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:BehaviorRule ;
+  sh:property [
+    sh:path reqvire:ruleName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:ruleCondition ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:ruleOutcome ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:sourceBehavior ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:behaviorPhase ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:rulePriority ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:precondition ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:postcondition ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:StateTransitionShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:StateTransition ;
+  sh:property [
+    sh:path reqvire:fromState ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:toState ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:trigger ;
+    sh:datatype xsd:string ;
+  ] .
+
+reqvire:BehaviorShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:Behavior ;
+  sh:property [
+    sh:path reqvire:hasRule ;
+    sh:class reqvire:BehaviorRule ;
+  ] ;
+  sh:property [
+    sh:path reqvire:hasTransition ;
+    sh:class reqvire:StateTransition ;
+  ] .
+
+reqvire:InputOutputMappingShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:InputOutputMapping ;
+  sh:property [
+    sh:path reqvire:usesInput ;
+    sh:class reqvire:Element ;
+  ] ;
+  sh:property [
+    sh:path reqvire:producesOutput ;
+    sh:class reqvire:Element ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Validate Cross-Component Dependencies](../Operations/Validation/ValidationRequirements.md#validate-cross-component-dependencies)
+  * use: [Reqvire Behavior Rule Ontology](#reqvire-behavior-rule-ontology)
+---
+
+### Lint Rule Metadata Shape
+
+Defines SHACL constraints for linting rule metadata and repair-mode semantics.
+
+#### Shapes
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:LintingRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:LintingRule ;
+  sh:property [
+    sh:path reqvire:lintRuleName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:lintScope ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:lintCondition ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:lintFindingKind ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:lintRepairMode ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
+```
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * constrain: [Model Linting](../Operations/Linting/LintingRequirements.md#model-linting)
+  * use: [Reqvire Linting Ontology](#reqvire-linting-ontology)
+---
+
 ### Reqvire Behavior Rule Ontology
 
 The Reqvire behavior rule ontology defines behavior rules, state transitions, and input-output mappings used by requirement refinements.
@@ -94,32 +243,6 @@ reqvire:toState a owl:DatatypeProperty ;
   * derivedFrom: [Reqvire Requirement Ontology](CapabilityRequirementModel.md#reqvire-requirement-ontology)
 ---
 
-### Reqvire Formatting Ontology
-
-The Reqvire formatting ontology defines document normalization rule categories and semantic preservation invariants.
-
-Formatting is separate from general model-element operations because its primary concern is preserving model meaning while normalizing Markdown structure. This ontology defines reusable formatting rule categories and invariants.
-
-#### Ontology
-```turtle
-@prefix reqvire: <https://www.reqvire.org/ontology#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-
-reqvire:FormattingRule a owl:Class ;
-  rdfs:comment "Rule category for deterministic Markdown normalization behavior." .
-reqvire:FormattingInvariant a owl:Class ;
-  rdfs:comment "Semantic preservation invariant that formatting must maintain." .
-
-```
-
-#### Metadata
-  * type: ontology
-
-#### Relations
-  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
----
-
 ### Reqvire Linting Ontology
 
 The Reqvire linting ontology defines auditable model quality checks and lint findings.
@@ -181,6 +304,212 @@ reqvire:redundantRelationLintRule a reqvire:LintingRule ;
 
 #### Relations
   * derivedFrom: [Reqvire Behavior Rule Ontology](#reqvire-behavior-rule-ontology)
+---
+
+### Reqvire Validation Ontology
+
+The Reqvire validation ontology defines validation issues, validation rules, lint issues, and mutation safety gates.
+
+Validation is the canonical guardrail layer for the model. This ontology defines the validation rule vocabulary and rule definitions used by validation requirements.
+
+#### Ontology
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+reqvire:ValidationRule a owl:Class ;
+  rdfs:subClassOf reqvire:ContractRule ;
+  rdfs:comment "Validation guardrail rule that can block invalid model states." .
+reqvire:ValidationIssue a owl:Class ;
+  rdfs:comment "Diagnostic issue reported by structural or semantic validation." .
+reqvire:LintIssue a owl:Class ;
+  rdfs:subClassOf reqvire:ValidationIssue ;
+  rdfs:comment "Validation issue that represents a lint finding rather than a hard invalid state." .
+reqvire:MutationSafetyGate a owl:Class ;
+  rdfs:comment "Validation gate that determines whether a mutation may persist changes." .
+reqvire:ValidationIssueKind a owl:Class ;
+  rdfs:comment "Controlled validation issue kind identified by a canonical diagnostic token." .
+
+reqvire:validationRuleName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical validation rule token used by diagnostics, output, and queries." .
+reqvire:validationScope a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Model scope over which a validation rule applies." .
+reqvire:validationSeverity a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Severity token emitted for issues from a validation rule." .
+reqvire:validationCondition a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Condition that causes a validation rule to report an issue." .
+reqvire:validationOutcome a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Expected validation outcome when the rule condition is met." .
+reqvire:validationRepair a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationRule ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Repair guidance associated with a validation rule." .
+reqvire:validationIssueKindName a owl:DatatypeProperty ;
+  rdfs:domain reqvire:ValidationIssueKind ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical validation issue-kind token used by parser output, diagnostics, and queries." .
+reqvire:lintIssueKind a owl:DatatypeProperty ;
+  rdfs:domain reqvire:LintIssue ;
+  rdfs:range xsd:string ;
+  rdfs:comment "Canonical lint issue-kind token carried by a lint issue." .
+reqvire:blocksPersistence a owl:DatatypeProperty ;
+  rdfs:domain reqvire:MutationSafetyGate ;
+  rdfs:range xsd:boolean ;
+  rdfs:comment "Indicates whether the safety gate blocks persistence of a mutation." .
+
+reqvire:semanticReferenceNotFoundIssueKind a reqvire:ValidationIssueKind ;
+  reqvire:validationIssueKindName "semantic-reference-not-found" ;
+  rdfs:comment "A semantic-contract SHACL reference points to an IRI that no Reqvire ontology element declares." .
+reqvire:semanticReferenceOutsideContextIssueKind a reqvire:ValidationIssueKind ;
+  reqvire:validationIssueKindName "semantic-reference-found-outside-context" ;
+  rdfs:comment "A semantic-contract SHACL reference points to an IRI declared by an ontology element that is outside the contract's explicit ontology-use context." .
+reqvire:semanticDuplicateDeclarationIssueKind a reqvire:ValidationIssueKind ;
+  reqvire:validationIssueKindName "semantic-duplicate-declaration" ;
+  rdfs:comment "The same ontology term IRI is declared by multiple ontology elements." .
+reqvire:semanticConflictingDeclarationIssueKind a reqvire:ValidationIssueKind ;
+  reqvire:validationIssueKindName "semantic-conflicting-declaration" ;
+  rdfs:comment "The same ontology term IRI is declared with incompatible semantic roles across ontology elements." .
+
+reqvire:globalElementNameUniquenessRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "global-element-name-uniqueness" ;
+  reqvire:validationScope "model" ;
+  reqvire:validationSeverity "error" ;
+  reqvire:validationCondition "Two parsed elements have the same element name." ;
+  reqvire:validationOutcome "Validation fails because element names are stable global identity keys." ;
+  reqvire:validationRepair "Rename one element and update incoming references." .
+
+reqvire:singleRootHierarchyOwnershipRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "single-root-hierarchy-ownership" ;
+  reqvire:validationScope "capability-requirement-graph" ;
+  reqvire:validationSeverity "error" ;
+  reqvire:validationCondition "A requirement hierarchy resolves to zero or more than one owning capability root." ;
+  reqvire:validationOutcome "Validation fails because each requirement hierarchy must belong to exactly one capability root." ;
+  reqvire:validationRepair "Add or repair specify/derivedFrom relations so the hierarchy resolves to one capability root." .
+
+reqvire:relationTypeCompatibilityRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "relation-type-compatibility" ;
+  reqvire:validationScope "relations" ;
+  reqvire:validationSeverity "error" ;
+  reqvire:validationCondition "A relation source, relation type, or target violates relation compatibility rules." ;
+  reqvire:validationOutcome "Validation fails before the graph is used." ;
+  reqvire:validationRepair "Use a compatible relation type or change element types/ownership." .
+
+reqvire:attachmentHierarchyIndependenceRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "attachment-hierarchy-independence" ;
+  reqvire:validationScope "attachments" ;
+  reqvire:validationSeverity "error" ;
+  reqvire:validationCondition "An element attaches a refinement already available through owner hierarchy or ancestor attachment propagation." ;
+  reqvire:validationOutcome "Validation fails because the attachment is redundant or hides the intended dependency boundary." ;
+  reqvire:validationRepair "Remove the redundant attachment or attach the contract at the highest valid boundary." .
+
+reqvire:attachmentSubgraphDirectionRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "attachment-subgraph-direction" ;
+  reqvire:validationScope "capability-root-subgraphs" ;
+  reqvire:validationSeverity "error" ;
+  reqvire:validationCondition "Two capability-root subgraphs attach refinements to each other in both directions." ;
+  reqvire:validationOutcome "Validation fails because cross-subgraph attachment contracts must be one-directional." ;
+  reqvire:validationRepair "Keep one dependency direction and move shared contracts into a common attached source if needed." .
+
+reqvire:crossSectionDuplicateRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "cross-section-duplicate" ;
+  reqvire:validationScope "element-subsections" ;
+  reqvire:validationSeverity "error" ;
+  reqvire:validationCondition "The same target appears in both Relations and Attachments for one element." ;
+  reqvire:validationOutcome "Validation fails because the model cannot infer which semantic channel is intended." ;
+  reqvire:validationRepair "Remove either the relation entry or the attachment entry." .
+
+reqvire:semanticReferenceReachabilityValidationRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "semantic-reference-reachability-validation" ;
+  reqvire:validationScope "semantic-contract-use-ontology-context" ;
+  reqvire:validationSeverity "error" ;
+  reqvire:validationCondition "A SHACL reference points to an ontology term that is not declared or is declared outside the semantic contract's explicit use graph." ;
+  reqvire:validationOutcome "Validation fails because semantic dependencies must remain visible to change impact." ;
+  reqvire:validationRepair "Declare the term in ontology used by the semantic contract, add a use relation to the declaring ontology or an ontology descendant whose hierarchy reaches it, or remove/update the reference." .
+
+reqvire:lintManualReviewRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "lint-manual-review" ;
+  reqvire:validationScope "lint" ;
+  reqvire:validationSeverity "warning" ;
+  reqvire:validationCondition "A model quality issue is auditable but not safely auto-fixable." ;
+  reqvire:validationOutcome "Report as manual review issue and do not auto-modify the model." ;
+  reqvire:validationRepair "User reviews context and applies an explicit model change." .
+
+reqvire:crossSubmodelHierarchicalLintRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "lint-cross-submodel-hierarchical-relation" ;
+  reqvire:validationScope "lint" ;
+  reqvire:validationSeverity "warning" ;
+  reqvire:validationCondition "A user-authored hierarchical relation crosses capability-root submodel ownership boundaries." ;
+  reqvire:validationOutcome "Report as manual review because ownership boundary intent is ambiguous." ;
+  reqvire:validationRepair "Replace with attachment/trace or remodel hierarchy under one capability root." .
+
+reqvire:redundantHierarchicalLintRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "lint-redundant-hierarchical-relation" ;
+  reqvire:validationScope "lint" ;
+  reqvire:validationSeverity "warning" ;
+  reqvire:validationCondition "An element has direct hierarchical relations to both an ancestor and descendant path already reachable through hierarchy." ;
+  reqvire:validationOutcome "Report as auto-fixable when the redundant relation can be removed without changing reachability." ;
+  reqvire:validationRepair "Remove the redundant direct derivedFrom/derive relation." .
+
+reqvire:redundantVerifyLintRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "lint-redundant-verify-relation" ;
+  reqvire:validationScope "lint" ;
+  reqvire:validationSeverity "warning" ;
+  reqvire:validationCondition "A verification directly verifies both an element and an ancestor covered by that element's verification path." ;
+  reqvire:validationOutcome "Report as manual review or auto-fixable depending on whether removing the ancestor verify relation preserves intended evidence scope." ;
+  reqvire:validationRepair "Keep verification at the most precise capability or requirement scope, or document why broader verification is intended." .
+
+reqvire:multiBranchConvergenceLintRule a reqvire:ValidationRule ;
+  reqvire:validationRuleName "lint-multi-branch-convergence" ;
+  reqvire:validationScope "lint" ;
+  reqvire:validationSeverity "warning" ;
+  reqvire:validationCondition "An element reaches a common ancestor through multiple distinct branch paths." ;
+  reqvire:validationOutcome "Report as manual review because both paths may be meaningful or one may be a modeling error." ;
+  reqvire:validationRepair "Retain both paths only when they represent distinct valid semantics." .
+```
+
+#### Metadata
+  * type: ontology
+
+#### Relations
+  * derivedFrom: [Reqvire Behavior Rule Ontology](#reqvire-behavior-rule-ontology)
+---
+
+### Reqvire Formatting Ontology
+
+The Reqvire formatting ontology defines document normalization rule categories and semantic preservation invariants.
+
+Formatting is separate from general model-element operations because its primary concern is preserving model meaning while normalizing Markdown structure. This ontology defines reusable formatting rule categories and invariants.
+
+#### Ontology
+```turtle
+@prefix reqvire: <https://www.reqvire.org/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+reqvire:FormattingRule a owl:Class ;
+  rdfs:comment "Rule category for deterministic Markdown normalization behavior." .
+reqvire:FormattingInvariant a owl:Class ;
+  rdfs:comment "Semantic preservation invariant that formatting must maintain." .
+
+```
+
+#### Metadata
+  * type: ontology
+
+#### Relations
+  * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
 ---
 
 ### Reqvire Operation Ontology
@@ -265,14 +594,13 @@ reqvire:requirementRefinementMergeCategory a reqvire:MergeCompatibilityCategory 
 reqvire:semanticContractMergeCategory a reqvire:MergeCompatibilityCategory ;
   rdfs:label "semantic-contract" ;
   reqvire:mergeCategoryElementType "semantic-contract" ;
-  rdfs:comment "Semantic-contract merge compatibility applies to requirement-owned SHACL profile refinements." ;
+  rdfs:comment "Semantic-contract merge compatibility applies to reusable SHACL profile contracts." ;
   reqvire:mergeRequiresSameCategory true .
-reqvire:semanticQueryContractMergeCategory a reqvire:MergeCompatibilityCategory ;
-  rdfs:label "semantic-query-contract" ;
-  reqvire:mergeCategoryElementType "semantic-query-contract" ;
-  rdfs:comment "Semantic-query-contract merge compatibility applies to requirement-owned query-backed semantic refinements." ;
+reqvire:ontologyMergeCategory a reqvire:MergeCompatibilityCategory ;
+  rdfs:label "ontology" ;
+  reqvire:mergeCategoryElementType "ontology" ;
+  rdfs:comment "Ontology elements merge only with ontology elements and fold authored Turtle into the target ontology block." ;
   reqvire:mergeRequiresSameCategory true .
-
 ```
 
 #### Metadata
@@ -282,182 +610,87 @@ reqvire:semanticQueryContractMergeCategory a reqvire:MergeCompatibilityCategory 
   * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
 ---
 
-### Reqvire Validation Ontology
+### Validation Rule Diagnostic Shape
 
-The Reqvire validation ontology defines validation issues, validation rules, lint issues, and mutation safety gates.
+Defines SHACL constraints for validation rule metadata and validation outcomes.
 
-Validation is the canonical guardrail layer for the model. This ontology defines the validation rule vocabulary and rule definitions used by validation requirements.
-
-#### Ontology
+#### Shapes
 ```turtle
 @prefix reqvire: <https://www.reqvire.org/ontology#> .
-@prefix owl: <http://www.w3.org/2002/07/owl#> .
-@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-reqvire:ValidationRule a owl:Class ;
-  rdfs:subClassOf reqvire:ContractRule ;
-  rdfs:comment "Validation guardrail rule that can block invalid model states." .
-reqvire:ValidationIssue a owl:Class ;
-  rdfs:comment "Diagnostic issue reported by structural or semantic validation." .
-reqvire:LintIssue a owl:Class ;
-  rdfs:subClassOf reqvire:ValidationIssue ;
-  rdfs:comment "Validation issue that represents a lint finding rather than a hard invalid state." .
-reqvire:MutationSafetyGate a owl:Class ;
-  rdfs:comment "Validation gate that determines whether a mutation may persist changes." .
-reqvire:ValidationIssueKind a owl:Class ;
-  rdfs:comment "Controlled validation issue kind identified by a canonical diagnostic token." .
+reqvire:ValidationRuleShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ValidationRule ;
+  sh:property [
+    sh:path reqvire:validationRuleName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:validationScope ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:validationSeverity ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:in ("error" "warning" "info") ;
+  ] ;
+  sh:property [
+    sh:path reqvire:validationCondition ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:validationOutcome ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] ;
+  sh:property [
+    sh:path reqvire:validationRepair ;
+    sh:datatype xsd:string ;
+  ] .
 
-reqvire:validationRuleName a owl:DatatypeProperty ;
-  rdfs:domain reqvire:ValidationRule ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Canonical validation rule token used by diagnostics, output, and queries." .
-reqvire:validationScope a owl:DatatypeProperty ;
-  rdfs:domain reqvire:ValidationRule ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Model scope over which a validation rule applies." .
-reqvire:validationSeverity a owl:DatatypeProperty ;
-  rdfs:domain reqvire:ValidationRule ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Severity token emitted for issues from a validation rule." .
-reqvire:validationCondition a owl:DatatypeProperty ;
-  rdfs:domain reqvire:ValidationRule ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Condition that causes a validation rule to report an issue." .
-reqvire:validationOutcome a owl:DatatypeProperty ;
-  rdfs:domain reqvire:ValidationRule ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Expected validation outcome when the rule condition is met." .
-reqvire:validationRepair a owl:DatatypeProperty ;
-  rdfs:domain reqvire:ValidationRule ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Repair guidance associated with a validation rule." .
-reqvire:validationIssueKindName a owl:DatatypeProperty ;
-  rdfs:domain reqvire:ValidationIssueKind ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Canonical validation issue-kind token used by parser output, diagnostics, and queries." .
-reqvire:lintIssueKind a owl:DatatypeProperty ;
-  rdfs:domain reqvire:LintIssue ;
-  rdfs:range xsd:string ;
-  rdfs:comment "Canonical lint issue-kind token carried by a lint issue." .
-reqvire:blocksPersistence a owl:DatatypeProperty ;
-  rdfs:domain reqvire:MutationSafetyGate ;
-  rdfs:range xsd:boolean ;
-  rdfs:comment "Indicates whether the safety gate blocks persistence of a mutation." .
+reqvire:ValidationIssueKindShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:ValidationIssueKind ;
+  sh:property [
+    sh:path reqvire:validationIssueKindName ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
 
-reqvire:semanticReferenceNotFoundIssueKind a reqvire:ValidationIssueKind ;
-  reqvire:validationIssueKindName "semantic-reference-not-found" ;
-  rdfs:comment "A semantic-contract SHACL reference points to an IRI that no Reqvire ontology element declares." .
-reqvire:semanticReferenceOutsideContextIssueKind a reqvire:ValidationIssueKind ;
-  reqvire:validationIssueKindName "semantic-reference-found-outside-context" ;
-  rdfs:comment "A semantic-contract SHACL reference points to an IRI declared by an ontology element that is outside the owning requirement's reachable capability ontology context." .
-reqvire:semanticDuplicateDeclarationIssueKind a reqvire:ValidationIssueKind ;
-  reqvire:validationIssueKindName "semantic-duplicate-declaration" ;
-  rdfs:comment "The same ontology term IRI is declared by multiple ontology elements." .
-reqvire:semanticConflictingDeclarationIssueKind a reqvire:ValidationIssueKind ;
-  reqvire:validationIssueKindName "semantic-conflicting-declaration" ;
-  rdfs:comment "The same ontology term IRI is declared with incompatible semantic roles across ontology elements." .
+reqvire:LintIssueShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:LintIssue ;
+  sh:property [
+    sh:path reqvire:lintIssueKind ;
+    sh:minCount 1 ;
+    sh:datatype xsd:string ;
+  ] .
 
-reqvire:globalElementNameUniquenessRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "global-element-name-uniqueness" ;
-  reqvire:validationScope "model" ;
-  reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "Two parsed elements have the same element name." ;
-  reqvire:validationOutcome "Validation fails because element names are stable global identity keys." ;
-  reqvire:validationRepair "Rename one element and update incoming references." .
+reqvire:MutationSafetyGateShape
+  a sh:NodeShape ;
+  sh:targetClass reqvire:MutationSafetyGate ;
+  sh:property [
+    sh:path reqvire:blocksPersistence ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:boolean ;
+  ] .
 
-reqvire:singleRootHierarchyOwnershipRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "single-root-hierarchy-ownership" ;
-  reqvire:validationScope "capability-requirement-graph" ;
-  reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "A requirement hierarchy resolves to zero or more than one owning capability root." ;
-  reqvire:validationOutcome "Validation fails because each requirement hierarchy must belong to exactly one capability root." ;
-  reqvire:validationRepair "Add or repair specify/derivedFrom relations so the hierarchy resolves to one capability root." .
-
-reqvire:relationTypeCompatibilityRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "relation-type-compatibility" ;
-  reqvire:validationScope "relations" ;
-  reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "A relation source, relation type, or target violates relation compatibility rules." ;
-  reqvire:validationOutcome "Validation fails before the graph is used." ;
-  reqvire:validationRepair "Use a compatible relation type or change element types/ownership." .
-
-reqvire:attachmentHierarchyIndependenceRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "attachment-hierarchy-independence" ;
-  reqvire:validationScope "attachments" ;
-  reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "An element attaches a refinement already available through owner hierarchy or ancestor attachment propagation." ;
-  reqvire:validationOutcome "Validation fails because the attachment is redundant or hides the intended dependency boundary." ;
-  reqvire:validationRepair "Remove the redundant attachment or attach the contract at the highest valid boundary." .
-
-reqvire:attachmentSubgraphDirectionRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "attachment-subgraph-direction" ;
-  reqvire:validationScope "capability-root-subgraphs" ;
-  reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "Two capability-root subgraphs attach refinements to each other in both directions." ;
-  reqvire:validationOutcome "Validation fails because cross-subgraph attachment contracts must be one-directional." ;
-  reqvire:validationRepair "Keep one dependency direction and move shared contracts into a common attached source if needed." .
-
-reqvire:crossSectionDuplicateRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "cross-section-duplicate" ;
-  reqvire:validationScope "element-subsections" ;
-  reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "The same target appears in both Relations and Attachments for one element." ;
-  reqvire:validationOutcome "Validation fails because the model cannot infer which semantic channel is intended." ;
-  reqvire:validationRepair "Remove either the relation entry or the attachment entry." .
-
-reqvire:semanticReferenceReachabilityValidationRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "semantic-reference-reachability-validation" ;
-  reqvire:validationScope "reachable-ontology-context" ;
-  reqvire:validationSeverity "error" ;
-  reqvire:validationCondition "A SHACL reference points to an ontology term that is not declared or is declared outside reachable capability-root context." ;
-  reqvire:validationOutcome "Validation fails because semantic dependencies must remain visible to change impact." ;
-  reqvire:validationRepair "Declare the term in reachable ontology context, attach the declaring ontology to the owning or consuming capability, or remove/update the reference." .
-
-reqvire:lintManualReviewRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "lint-manual-review" ;
-  reqvire:validationScope "lint" ;
-  reqvire:validationSeverity "warning" ;
-  reqvire:validationCondition "A model quality issue is auditable but not safely auto-fixable." ;
-  reqvire:validationOutcome "Report as manual review issue and do not auto-modify the model." ;
-  reqvire:validationRepair "User reviews context and applies an explicit model change." .
-
-reqvire:crossSubmodelHierarchicalLintRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "lint-cross-submodel-hierarchical-relation" ;
-  reqvire:validationScope "lint" ;
-  reqvire:validationSeverity "warning" ;
-  reqvire:validationCondition "A user-authored hierarchical relation crosses capability-root submodel ownership boundaries." ;
-  reqvire:validationOutcome "Report as manual review because ownership boundary intent is ambiguous." ;
-  reqvire:validationRepair "Replace with attachment/trace or remodel hierarchy under one capability root." .
-
-reqvire:redundantHierarchicalLintRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "lint-redundant-hierarchical-relation" ;
-  reqvire:validationScope "lint" ;
-  reqvire:validationSeverity "warning" ;
-  reqvire:validationCondition "An element has direct hierarchical relations to both an ancestor and descendant path already reachable through hierarchy." ;
-  reqvire:validationOutcome "Report as auto-fixable when the redundant relation can be removed without changing reachability." ;
-  reqvire:validationRepair "Remove the redundant direct derivedFrom/derive relation." .
-
-reqvire:redundantVerifyLintRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "lint-redundant-verify-relation" ;
-  reqvire:validationScope "lint" ;
-  reqvire:validationSeverity "warning" ;
-  reqvire:validationCondition "A verification directly verifies both an element and an ancestor covered by that element's verification path." ;
-  reqvire:validationOutcome "Report as manual review or auto-fixable depending on whether removing the ancestor verify relation preserves intended evidence scope." ;
-  reqvire:validationRepair "Keep verification at the most precise capability or requirement scope, or document why broader verification is intended." .
-
-reqvire:multiBranchConvergenceLintRule a reqvire:ValidationRule ;
-  reqvire:validationRuleName "lint-multi-branch-convergence" ;
-  reqvire:validationScope "lint" ;
-  reqvire:validationSeverity "warning" ;
-  reqvire:validationCondition "An element reaches a common ancestor through multiple distinct branch paths." ;
-  reqvire:validationOutcome "Report as manual review because both paths may be meaningful or one may be a modeling error." ;
-  reqvire:validationRepair "Retain both paths only when they represent distinct valid semantics." .
 ```
 
 #### Metadata
-  * type: ontology
+  * type: semantic-contract
 
 #### Relations
-  * derivedFrom: [Reqvire Behavior Rule Ontology](#reqvire-behavior-rule-ontology)
+  * constrain: [Validate Cross-Component Dependencies](../Operations/Validation/ValidationRequirements.md#validate-cross-component-dependencies)
+  * use: [Reqvire Validation Ontology](#reqvire-validation-ontology)
 ---

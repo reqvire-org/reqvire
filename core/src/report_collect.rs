@@ -77,7 +77,7 @@ pub struct CollectReport {
     pub metadata: CollectMetadata,
 }
 
-/// Generate a collect report for a capability or requirement element
+/// Generate a collect report for a capability, requirement, or ontology element
 pub fn generate_collect_report(
     registry: &GraphRegistry,
     element_name: &str,
@@ -107,12 +107,12 @@ pub fn generate_collect_report(
         ReqvireError::ElementError(format!("Element '{}' not found in registry", element_id))
     })?;
 
-    // Validate element type is a capability or requirement
+    // Validate element type is supported by collect.
     match &element.element_type {
-        ElementType::Capability | ElementType::Requirement(_) => {}
+        ElementType::Capability | ElementType::Requirement(_) | ElementType::Ontology => {}
         _ => {
             return Err(ReqvireError::ElementError(format!(
-                "Element '{}' is not a capability or requirement type (found: {}). Only capability and requirement types are supported.",
+                "Element '{}' is not a capability, requirement, or ontology type (found: {}). Only capability, requirement, and ontology types are supported.",
                 element_name,
                 element.element_type.as_str()
             )));
@@ -246,6 +246,7 @@ pub fn generate_collect_report(
 ///
 /// Capability starts traverse capability parents only.
 /// Requirement starts traverse requirement parents, then cross to owning capability and capability parents.
+/// Ontology starts traverse ontology parents.
 fn collect_upstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let Some(start) = registry.get_element(start_id) else {
         return Vec::new();
@@ -272,6 +273,9 @@ fn collect_upstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Strin
             }
             chain
         }
+        ElementType::Ontology => {
+            collect_parent_chain_by_type(registry, start_id, ElementTypeKind::Ontology)
+        }
         _ => Vec::new(),
     }
 }
@@ -280,6 +284,7 @@ fn collect_upstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Strin
 enum ElementTypeKind {
     Capability,
     Requirement,
+    Ontology,
 }
 
 fn collect_parent_chain_by_type(
@@ -332,6 +337,7 @@ fn collect_parent_chain_by_type(
 ///
 /// Capability starts traverse child capabilities and requirements that specify each capability.
 /// Requirement starts traverse requirement descendants only.
+/// Ontology starts traverse ontology descendants and semantic contracts that use reachable ontology.
 fn collect_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
     let Some(start) = registry.get_element(start_id) else {
         return Vec::new();
@@ -340,6 +346,7 @@ fn collect_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<Str
     match &start.element_type {
         ElementType::Capability => collect_capability_downstream_chain(registry, start_id),
         ElementType::Requirement(_) => collect_requirement_downstream_chain(registry, start_id),
+        ElementType::Ontology => collect_ontology_downstream_chain(registry, start_id),
         _ => Vec::new(),
     }
 }
@@ -452,6 +459,95 @@ fn collect_capability_downstream_chain(registry: &GraphRegistry, start_id: &str)
     chain
 }
 
+fn collect_ontology_downstream_chain(registry: &GraphRegistry, start_id: &str) -> Vec<String> {
+    let mut chain = Vec::new();
+    let mut visited = HashSet::new();
+    let mut current_level = vec![start_id.to_string()];
+
+    while !current_level.is_empty() {
+        let mut sorted_level = current_level.clone();
+        sorted_level.sort();
+
+        let mut next_level = Vec::new();
+        for elem_id in &sorted_level {
+            if visited.contains(elem_id) {
+                continue;
+            }
+            visited.insert(elem_id.clone());
+            chain.push(elem_id.clone());
+
+            let Some(elem) = registry.get_element(elem_id) else {
+                continue;
+            };
+
+            if elem.element_type.is_ontology() {
+                for rel in &elem.relations {
+                    if rel.relation_type.name == "derive" {
+                        if let relation::LinkType::Identifier(target_id) = &rel.target.link {
+                            if !visited.contains(target_id)
+                                && element_matches_kind(
+                                    registry,
+                                    target_id,
+                                    ElementTypeKind::Ontology,
+                                )
+                            {
+                                next_level.push(target_id.clone());
+                            }
+                        }
+                    }
+                }
+
+                for contract_id in semantic_contracts_using_ontology(registry, elem_id) {
+                    if !visited.contains(&contract_id) {
+                        next_level.push(contract_id);
+                    }
+                }
+            }
+        }
+
+        current_level = next_level;
+    }
+
+    chain
+}
+
+fn semantic_contracts_using_ontology(registry: &GraphRegistry, ontology_id: &str) -> Vec<String> {
+    let mut contracts = Vec::new();
+    let mut seen = HashSet::new();
+
+    if let Some(ontology) = registry.get_element(ontology_id) {
+        for rel in &ontology.relations {
+            if rel.relation_type.name == "usedBy" {
+                if let relation::LinkType::Identifier(target_id) = &rel.target.link {
+                    if registry
+                        .get_element(target_id)
+                        .is_some_and(|element| element.element_type.is_semantic_contract())
+                        && seen.insert(target_id.clone())
+                    {
+                        contracts.push(target_id.clone());
+                    }
+                }
+            }
+        }
+    }
+
+    for element in registry.get_all_elements() {
+        if !element.element_type.is_semantic_contract() {
+            continue;
+        }
+        let uses_ontology = element.relations.iter().any(|rel| {
+            rel.relation_type.name == "use"
+                && matches!(&rel.target.link, relation::LinkType::Identifier(target_id) if target_id == ontology_id)
+        });
+        if uses_ontology && seen.insert(element.identifier.clone()) {
+            contracts.push(element.identifier.clone());
+        }
+    }
+
+    contracts.sort();
+    contracts
+}
+
 fn element_matches_kind(registry: &GraphRegistry, element_id: &str, kind: ElementTypeKind) -> bool {
     registry
         .get_element(element_id)
@@ -460,6 +556,7 @@ fn element_matches_kind(registry: &GraphRegistry, element_id: &str, kind: Elemen
             ElementTypeKind::Requirement => {
                 matches!(element.element_type, ElementType::Requirement(_))
             }
+            ElementTypeKind::Ontology => matches!(element.element_type, ElementType::Ontology),
         })
 }
 

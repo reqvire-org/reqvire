@@ -32,7 +32,7 @@ npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" 
 This command collects:
 - The target element's content and metadata
 - Full upstream trace chain, including owning capabilities and ancestor requirements
-- Attached/refining specifications, constraints, behaviors, states, input-output contracts, and semantic contracts
+- Attached/refining specifications, constraints, behaviors, states, and input-output contracts, plus semantic contracts reached through explicit `constrain`/`constrainedBy` relations
 - Related documentation files
 - Source citations and file paths
 - Verification, satisfaction, and refinement relations
@@ -53,7 +53,7 @@ Read the collected JSON file:
 The JSON structure includes:
 - **`element`**: The target element's content, metadata, and type
 - **`ancestors`**: Array of upstream trace elements from root to target
-- **`attachments`**: Specifications, constraints, behaviors, states, input-output contracts, and semantic contracts refining the context
+- **`attachments`**: Specifications, constraints, behaviors, states, and input-output contracts refining the context; semantic contracts are reached through explicit `constrain`/`constrainedBy` relations
 - **`documents`**: Related markdown documentation files with content
 - **`citations`**: Source file paths and anchors for traceability
 - **`relations`**: verifiedBy, satisfiedBy, and refinedBy links to other elements
@@ -111,11 +111,11 @@ Create a complete, readable markdown document that synthesizes all collected inf
 
 ### Constraints and Validation
 
-[Detail all constraints, state rules, semantic contracts, and validation rules from attached refinement elements. Explain what each rule means, why it exists, and what it prevents or ensures.]
+[Detail all constraints, state rules, semantic contracts, and validation rules from attached refinements and explicit semantic-contract constraint/use relations. Explain what each rule means, why it exists, and what it prevents or ensures.]
 
 ### Attached Specifications
 
-[Include content from all attached specifications, constraints, behaviors, states, input-output contracts, and semantic contracts. Rephrase this content to flow naturally as part of the document narrative. Synthesize related refinements together rather than treating them as separate items.]
+[Include content from all attached specifications, constraints, behaviors, states, input-output contracts, , and explicitly constraining semantic contracts. Rephrase this content to flow naturally as part of the document narrative. Synthesize related refinements together rather than treating them as separate items.]
 
 ## Verification
 

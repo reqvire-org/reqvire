@@ -1,0 +1,132 @@
+# Elements
+
+### Semantic Capability
+
+Capability root.
+
+#### Metadata
+  * type: capability
+
+#### Attachments
+  * [Semantic Ontology](#semantic-ontology)
+---
+
+### API Requirement
+
+Requirement constrained through direct constrainedBy command.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Semantic Capability](#semantic-capability)
+---
+
+### Audit Requirement
+
+Requirement constrained through inverse constrain command.
+
+#### Metadata
+  * type: requirement
+
+#### Relations
+  * specify: [Semantic Capability](#semantic-capability)
+---
+
+### Semantic Ontology
+
+Ontology vocabulary used by linked semantic contracts.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/link-semantic
+  * ontology_prefix: lsc
+
+#### Ontology
+```turtle
+@prefix lsc: <https://example.test/link-semantic#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<https://example.test/link-semantic> a owl:Ontology .
+
+lsc:APIRequirement a owl:Class .
+lsc:AuditRequirement a owl:Class .
+lsc:hasEvidence a owl:ObjectProperty .
+```
+---
+
+### Extra Semantic Ontology
+
+Additional ontology used to prove CLI `use` and `usedBy` relation writes.
+
+#### Metadata
+  * type: ontology
+  * ontology_base: https://example.test/link-semantic-extra
+  * ontology_prefix: lscx
+
+#### Relations
+  * derivedFrom: [Semantic Ontology](#semantic-ontology)
+
+#### Ontology
+```turtle
+@prefix lscx: <https://example.test/link-semantic-extra#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+<https://example.test/link-semantic-extra> a owl:Ontology .
+
+<https://example.test/link-semantic-extra> owl:imports <https://example.test/link-semantic> .
+
+lscx:ExtraContext a owl:Class .
+```
+---
+
+### API Shape Contract
+
+Shape linked through `use` and direct requirement `constrainedBy`.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * use: [Semantic Ontology](#semantic-ontology)
+
+#### Shapes
+```turtle
+@prefix lsc: <https://example.test/link-semantic#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+lsc:APIRequirementShape
+  a sh:NodeShape ;
+  sh:targetClass lsc:APIRequirement ;
+  sh:property [
+    sh:path lsc:hasEvidence ;
+    sh:minCount 1 ;
+  ] .
+```
+---
+
+### Audit Shape Contract
+
+Shape linked through inverse ontology `usedBy` and semantic-contract `constrain`.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * use: [Semantic Ontology](#semantic-ontology)
+
+#### Shapes
+```turtle
+@prefix lsc: <https://example.test/link-semantic#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+lsc:AuditRequirementShape
+  a sh:NodeShape ;
+  sh:targetClass lsc:AuditRequirement ;
+  sh:property [
+    sh:path lsc:hasEvidence ;
+    sh:minCount 1 ;
+  ] .
+```
+---

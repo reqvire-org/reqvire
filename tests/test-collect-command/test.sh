@@ -98,6 +98,43 @@ for name in "Product Capability" "Child Capability" "Root Requirement" "Leaf Req
   fi
 done
 
+# Ontology upstream follows ontology hierarchy.
+cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Collect Child Ontology" --direction UPSTREAM --json > /tmp/collect-ontology-upstream.json 2>&1
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "FAILED: collect ontology upstream returned error: $EXIT_CODE"
+  cat /tmp/collect-ontology-upstream.json
+  exit 1
+fi
+for name in "Collect Ontology" "Collect Child Ontology"; do
+  if ! jq -e --arg name "$name" '.items[] | select(.name == $name and .element_type == "ontology")' /tmp/collect-ontology-upstream.json >/dev/null; then
+    echo "FAILED: ontology upstream JSON missing ${name}"
+    cat /tmp/collect-ontology-upstream.json
+    exit 1
+  fi
+done
+
+# Ontology downstream follows child ontology and semantic contracts that use the ontology context.
+cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Collect Ontology" --direction DOWNSTREAM --json > /tmp/collect-ontology-downstream.json 2>&1
+EXIT_CODE=$?
+if [ $EXIT_CODE -ne 0 ]; then
+  echo "FAILED: collect ontology downstream returned error: $EXIT_CODE"
+  cat /tmp/collect-ontology-downstream.json
+  exit 1
+fi
+for name in "Collect Ontology" "Collect Child Ontology" "Collect Shape Contract"; do
+  if ! jq -e --arg name "$name" '.items[] | select(.name == $name)' /tmp/collect-ontology-downstream.json >/dev/null; then
+    echo "FAILED: ontology downstream JSON missing ${name}"
+    cat /tmp/collect-ontology-downstream.json
+    exit 1
+  fi
+done
+if ! jq -e '.items[] | select(.name == "Collect Shape Contract" and .element_type == "semantic-contract")' /tmp/collect-ontology-downstream.json >/dev/null; then
+  echo "FAILED: ontology downstream JSON should include semantic-contract users"
+  cat /tmp/collect-ontology-downstream.json
+  exit 1
+fi
+
 # Error handling - element not found.
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Non Existent Element" 2>&1)
 EXIT_CODE=$?
@@ -110,7 +147,7 @@ fi
 # Error handling - non capability/requirement type.
 OUTPUT=$(cd "$TEST_DIR" && "$REQVIRE_BIN" collect "Test Verification" 2>&1)
 EXIT_CODE=$?
-if [ $EXIT_CODE -eq 0 ] || ! echo "$OUTPUT" | grep -q "not a capability or requirement type"; then
+if [ $EXIT_CODE -eq 0 ] || ! echo "$OUTPUT" | grep -q "not a capability, requirement, or ontology type"; then
   echo "FAILED: verification collect should return type error"
   echo "$OUTPUT"
   exit 1

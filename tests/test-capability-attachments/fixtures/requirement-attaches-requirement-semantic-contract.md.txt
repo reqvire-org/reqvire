@@ -21,12 +21,16 @@ Billing ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
 
 #### Ontology
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix billing: <urn:reqvire:test:billing:> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
+<https://example.test/ontology> a owl:Ontology .
 billing:Invoice a owl:Class .
 ```
 ---
@@ -40,7 +44,7 @@ The system shall support billing.
 
 #### Relations
   * specify: [Billing Capability](#billing-capability)
-  * refinedBy: [Billing Shape Contract](#billing-shape-contract)
+  * constrainedBy: [Billing Shape Contract](#billing-shape-contract)
 ---
 
 ### Billing Shape Contract
@@ -51,7 +55,8 @@ Billing shape contract.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Billing Ontology](#billing-ontology)
 
 #### Shapes
 ```turtle
@@ -71,9 +76,7 @@ The system shall report billing.
 #### Metadata
   * type: requirement
 
-#### Attachments
-  * [Billing Shape Contract](#billing-shape-contract)
-
 #### Relations
   * specify: [Billing Capability](#billing-capability)
+  * constrainedBy: [Billing Shape Contract](#billing-shape-contract)
 ---

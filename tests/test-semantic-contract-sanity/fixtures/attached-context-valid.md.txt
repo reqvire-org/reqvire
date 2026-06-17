@@ -21,13 +21,16 @@ Billing ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Ontology
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-billing:BillingPayload a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+test:BillingPayload a owl:Class .
 ```
 
 ---
@@ -41,7 +44,7 @@ The system shall validate billing payloads with customer identifiers.
 
 #### Relations
   * specify: [Billing Capability](#billing-capability)
-  * refinedBy: [Billing Shape Contract](#billing-shape-contract)
+  * constrainedBy: [Billing Shape Contract](#billing-shape-contract)
 ---
 
 ### Billing Shape Contract
@@ -52,19 +55,20 @@ Billing shape contract.
   * type: semantic-contract
 
 #### Relations
-  * refine: [Billing Requirement](#billing-requirement)
+  * constrain: [Billing Requirement](#billing-requirement)
+  * use: [Customer Ontology](#customer-ontology)
 
 #### Shapes
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
-@prefix customer: <urn:reqvire:test:customer:> .
+@prefix test: <https://example.test/ontology#> .
+@prefix test: <https://example.test/ontology#> .
 @prefix sh: <http://www.w3.org/ns/shacl#> .
 
-billing:BillingPayloadShape
+test:BillingPayloadShape
   a sh:NodeShape ;
-  sh:targetClass billing:BillingPayload ;
+  sh:targetClass test:BillingPayload ;
   sh:property [
-    sh:path customer:customerId ;
+    sh:path test:customerId ;
     sh:minCount 1 ;
   ] .
 ```
@@ -87,15 +91,18 @@ Customer ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Relations
   * derivedFrom: [Billing Ontology](#billing-ontology)
 
 #### Ontology
 ```turtle
-@prefix customer: <urn:reqvire:test:customer:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-customer:customerId a owl:DatatypeProperty .
+<https://example.test/ontology> a owl:Ontology .
+test:customerId a owl:DatatypeProperty .
 ```
 ---

@@ -6,7 +6,7 @@ const baseUX = css`
   align-items: stretch;
   gap: var(--space-1);
   position: relative;
-  height: var(--rq-tabs-h);
+  height: var(--ds-tabs-h);
 
   svg {
     display: block;
@@ -19,7 +19,7 @@ const tabBaseUX = css`
   position: relative;
   align-items: center;
   gap: var(--space-5);
-  height: var(--rq-tab-h, var(--header-h));
+  height: var(--ds-tab-h, var(--header-h));
   padding: 0 var(--space-7);
   border: 0;
   font-size: var(--text-sm);
@@ -34,11 +34,11 @@ const tabBaseUX = css`
     opacity: 0.85;
   }
 
-  .rq-tab__icon {
+  .ds-tab__icon {
     display: inline-flex;
   }
 
-  .rq-tab__badge {
+  .ds-tab__badge {
     color: var(--text-muted);
     font-size: var(--text-micro);
     font-variant-numeric: tabular-nums;
@@ -46,7 +46,7 @@ const tabBaseUX = css`
 `;
 
 const skinUnderlineX = css`
-  border-bottom: var(--rq-tabs-border-bottom, var(--border-w) solid var(--border-subtle));
+  border-bottom: var(--ds-tabs-border-bottom, var(--border-w) solid var(--border-subtle));
 `;
 
 const tabSkinUnderlineX = css`
@@ -103,13 +103,21 @@ const tabSkinPillX = css`
   }
 
   &.is-active {
-    color: var(--text-strong);
-    background: var(--bg-surface);
+    color: var(--text-inverse);
+    background: var(--text-strong);
     box-shadow: var(--shadow-xs);
   }
 
+  &.is-active:hover {
+    color: var(--text-inverse);
+  }
+
+  &.is-active span {
+    color: var(--text-inverse);
+  }
+
   &.is-active svg {
-    color: var(--accent);
+    color: var(--text-inverse);
     opacity: 1;
   }
 `;
@@ -121,7 +129,7 @@ export interface TabItem<T extends string = string> {
   badge?: ReactNode;
 }
 
-export interface TabsProps<T extends string = string> extends Omit<HTMLAttributes<HTMLDivElement>, "onChange"> {
+export interface TabsProps<T extends string = string> extends Omit<HTMLAttributes<HTMLDivElement>, "onChange" | "style"> {
   items?: TabItem<T>[];
   value?: T;
   onChange?: (value: T) => void;
@@ -137,9 +145,9 @@ export function Tabs<T extends string = string>({
   ...props
 }: TabsProps<T>) {
   const cls = cx(
-    "rq-tabs",
+    "ds-tabs",
     baseUX,
-    `rq-tabs--${variant}`,
+    `ds-tabs--${variant}`,
     variant === "underline" && skinUnderlineX,
     variant === "pill" && skinPillX,
     className,
@@ -155,12 +163,12 @@ export function Tabs<T extends string = string>({
             type="button"
             role="tab"
             aria-selected={active}
-            className={cx("rq-tab", tabBaseUX, tabSkinX, active && "is-active")}
+            className={cx("ds-tab", tabBaseUX, tabSkinX, active && "is-active")}
             onClick={() => onChange?.(it.value)}
           >
-            {it.icon ? <span className="rq-tab__icon">{it.icon}</span> : null}
+            {it.icon ? <span className="ds-tab__icon">{it.icon}</span> : null}
             <span>{it.label ?? it.value}</span>
-            {it.badge != null ? <span className="rq-tab__badge">{it.badge}</span> : null}
+            {it.badge != null ? <span className="ds-tab__badge">{it.badge}</span> : null}
           </button>
         );
       })}

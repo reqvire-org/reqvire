@@ -35,9 +35,9 @@ Apply these boundaries:
 - Capability: coherent operational/system ability, stakeholder/regulatory/source scope, ownership, ontology context, optional semantic-enrichment context, and direct verification context.
 - `ontology`: reusable ontology/domain meaning and shared semantic structures.
 - Requirement: implementable, testable system obligation.
-- `semantic-contract`: requirement-owned SHACL `Shapes` profile over reachable ontology context.
+- `semantic-contract`: reusable SHACL `Shapes` profile over explicitly used ontology context; constrains requirements through `constrain`/`constrainedBy`.
 
-Ontology attached by capabilities should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Shape-only `semantic-contract` refinements are requirement-owned checks.
+Ontology attached by capabilities should live under `requirements/Ontologies` and define nouns, relationships, allowed semantic categories, and stable model rules. Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Shape-only `semantic-contract` elements are reusable checks with explicit ontology `use` and requirement `constrain` relations.
 
 ## Procedure
 
@@ -63,7 +63,8 @@ For each touched capability root:
 ```bash
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-type="requirement" --filter-content="(?i)(\\bis a\\b|\\bhas property\\b|\\bvocabulary\\b|\\bontology\\b|\\bsemantic contract\\b|\\bdefines\\b)" --short
 npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-type="semantic-contract" --short
-npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-type="semantic-contract" --not-have-relations="refine" --short
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-type="semantic-contract" --not-have-relations="use" --short
+npx -y "${REQVIRE_NPX_PACKAGE:-@reqvire-org/reqvire@latest}" --workspace "$PWD" search --filter-type="semantic-contract" --not-have-relations="constrain" --short
 ```
 
 Before editing a candidate, collect context:
@@ -79,7 +80,7 @@ For each candidate, classify each sentence:
 - Capability/source context goes to capability text or requirement-owned source refinements.
 - Stable semantic meaning goes to `ontology`.
 - System obligation stays in requirement.
-- Local SHACL profile goes to a requirement-owned `semantic-contract`.
+- Local SHACL profile goes to a reusable `semantic-contract` with explicit `use` and `constrain` relations.
 - Verification criteria stays in verification elements.
 - Exact commands, fields, URI patterns, workflow steps, output formats, file paths, persistence behavior, and reject/write/emit behavior stay in compatible requirement-owned refinements, not ontology.
 
@@ -92,8 +93,9 @@ Use:
 - `requirement specify capability`
 - `capability specifiedBy requirement`
 - capability `Attachments` to ontology elements
-- `requirement refinedBy semantic-contract` for shape profiles
-- Attachments for intentional cross-capability ontology dependencies and reusable requirement-owned contracts
+- `semantic-contract use ontology` for vocabulary context
+- `semantic-contract constrain requirement` or `requirement constrainedBy semantic-contract` for shape profile application
+- Attachments for intentional cross-capability ontology dependencies and reusable requirement-owned non-semantic-contract refinements
 
 Do not use `trace` to replace ownership or dependency.
 Do not remove a cross-root dependency unless an explicit attachment preserves the dependency for `collect` and change impact.

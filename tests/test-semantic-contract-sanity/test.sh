@@ -76,8 +76,8 @@ done
 
 assert_invalid_contains \
   "capability-owned-shape-invalid.md.txt" \
-  "Capability-owned semantic contract is rejected" \
-  "requirement-owned only" \
+  "Semantic contract cannot constrain a capability" \
+  "semantic-contract element to a requirement" \
   /tmp/semantic-contract-sanity-capability-owned.out
 assert_diff \
   "${TEST_SCRIPT_DIR}/expected/capability-owned-shape-invalid.txt" \
@@ -133,6 +133,26 @@ assert_diff \
   "${TEST_SCRIPT_DIR}/expected/outside-context-reference.txt" \
   /tmp/semantic-contract-sanity-outside-context.out \
   "outside-context semantic reference output mismatch"
+
+assert_invalid_contains \
+  "missing-use-relation.md.txt" \
+  "Missing semantic-contract use relation is rejected" \
+  "must use at least one ontology element" \
+  /tmp/semantic-contract-sanity-missing-use.out
+assert_diff \
+  "${TEST_SCRIPT_DIR}/expected/missing-use-relation.txt" \
+  /tmp/semantic-contract-sanity-missing-use.out \
+  "missing semantic-contract use relation output mismatch"
+
+assert_invalid_contains \
+  "missing-explicit-prefix.md.txt" \
+  "Missing explicit SHACL project prefix is rejected" \
+  "does not explicitly declare a prefix" \
+  /tmp/semantic-contract-sanity-missing-prefix.out
+assert_diff \
+  "${TEST_SCRIPT_DIR}/expected/missing-explicit-prefix.txt" \
+  /tmp/semantic-contract-sanity-missing-prefix.out \
+  "missing explicit SHACL project prefix output mismatch"
 
 assert_invalid_contains \
   "invalid-cardinality.md.txt" \

@@ -32,13 +32,61 @@ Ontology content for collect traversal.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: testonto
+
+#### Relations
+  * derive: [Collect Child Ontology](#collect-child-ontology)
 
 #### Ontology
 ```turtle
+@prefix testonto: <https://example.test/ontology#> .
 @prefix ex: <urn:reqvire:test:collect:> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
+<https://example.test/ontology> a owl:Ontology .
 ex:CollectContract a owl:Class .
+```
+---
+
+### Collect Child Ontology
+
+Child ontology content for ontology-start collect traversal.
+
+#### Metadata
+  * type: ontology
+
+#### Relations
+  * derivedFrom: [Collect Ontology](#collect-ontology)
+
+#### Ontology
+```turtle
+@prefix testonto: <https://example.test/ontology#> .
+@prefix ex: <urn:reqvire:test:collect:> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+
+ex:CollectChildTerm a owl:Class .
+```
+---
+
+### Collect Shape Contract
+
+Semantic contract content for ontology-start collect traversal.
+
+#### Metadata
+  * type: semantic-contract
+
+#### Relations
+  * use: [Collect Child Ontology](#collect-child-ontology)
+
+#### Shapes
+```turtle
+@prefix ex: <urn:reqvire:test:collect:> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+
+ex:CollectContractShape
+  a sh:NodeShape ;
+  sh:targetClass ex:CollectChildTerm .
 ```
 ---
 

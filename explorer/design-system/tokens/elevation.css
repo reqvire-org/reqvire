@@ -22,6 +22,9 @@
     --ring-selected: 0 0 0 1px var(--border-selected),
       0 0 0 4px var(--ring-selected);
     --inset-hairline: inset 0 0 0 1px var(--border-subtle);
+    --filter-danger-hover: brightness(0.94);
+    --filter-scrim-blur: blur(1.5px);
+    --filter-highlight-glow: drop-shadow(0 0 var(--space-4) var(--accent-ring));
 
     /* Motion - quick, mechanical, no bounce */
     --ease-standard: cubic-bezier(0.2, 0, 0, 1);   /* @kind other */
@@ -36,10 +39,14 @@
     /* Layering */
     --z-rail: 20;    /* @kind other */
     --z-sticky: 40;  /* @kind other */
+    --z-pane-resizer: 45; /* @kind other */
     --z-popover: 60; /* @kind other */
     --z-overlay: 80; /* @kind other */
     --z-modal: 90;   /* @kind other */
     --z-toast: 100;  /* @kind other */
+    --z-local-base: 1;    /* @kind other */
+    --z-local-raised: 2;  /* @kind other */
+    --z-local-overlay: 3; /* @kind other */
   }
 
   @media (prefers-color-scheme: dark) {

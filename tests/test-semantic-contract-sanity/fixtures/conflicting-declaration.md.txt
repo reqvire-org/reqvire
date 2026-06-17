@@ -17,13 +17,16 @@ Billing ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Ontology
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-billing:Invoice a owl:Class .
+<https://example.test/ontology> a owl:Ontology .
+test:Invoice a owl:Class .
 ```
 ---
 
@@ -44,15 +47,18 @@ Broken ontology.
 
 #### Metadata
   * type: ontology
+  * ontology_base: https://example.test/ontology
+  * ontology_prefix: test
 
 #### Relations
   * derivedFrom: [Billing Ontology](#billing-ontology)
 
 #### Ontology
 ```turtle
-@prefix billing: <urn:reqvire:test:billing:> .
+@prefix test: <https://example.test/ontology#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 
-billing:Invoice a owl:DatatypeProperty .
+<https://example.test/ontology> a owl:Ontology .
+test:Invoice a owl:DatatypeProperty .
 ```
 ---

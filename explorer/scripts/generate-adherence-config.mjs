@@ -23,31 +23,40 @@ function exportedComponentNames(source) {
 
 const components = Object.fromEntries(exportedComponentNames(barrel).map((name) => [name, { replaces: [] }]));
 
+const publicDsImportRule = {
+  group: [
+    "@ds/*",
+    "design-system/components/**",
+    "../design-system/components/**",
+    "../../design-system/components/**",
+    "design-system/product-patterns/**",
+    "../design-system/product-patterns/**",
+    "../../design-system/product-patterns/**",
+    "components/controls/**",
+    "components/core/**",
+    "components/data/**",
+    "components/navigation/**",
+    "product-patterns/**",
+  ],
+  message: "Import design-system components and product patterns from the @ds public barrel, not @ds/* or internals.",
+};
+
+const showcaseSrcImportRule = {
+  group: ["../src/**", "../../src/**", "../../../src/**"],
+  message: "Showcase pages must use @ds exports and showcase-local fixtures; keep the full App harness isolated to design-system/showcase/MockShell.tsx.",
+};
+
 const config = {
   $schema: "https://raw.githubusercontent.com/oxc-project/oxc/main/npm/oxlint/configuration_schema.json",
   rules: {
     "no-restricted-imports": [
       "error",
       {
-        patterns: [
-          {
-            group: [
-              "@ds/*",
-              "design-system/components/**",
-              "../design-system/components/**",
-              "../../design-system/components/**",
-              "components/controls/**",
-              "components/core/**",
-              "components/data/**",
-              "components/navigation/**",
-            ],
-            message: "Import design-system components from the @ds public barrel, not @ds/* or component internals.",
-          },
-        ],
+        patterns: [publicDsImportRule, showcaseSrcImportRule],
       },
     ],
   },
-  ignorePatterns: ["design-system/_ds_bundle.js"],
+  ignorePatterns: ["design-system/_ds_bundle.js", "design-system/showcase/MockShell.tsx"],
   overrides: [
     {
       files: ["design-system/index.ts"],

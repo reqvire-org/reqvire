@@ -9,9 +9,9 @@ Separate three concerns without losing traceability:
 - Capabilities own coherent operational/system ability, reusable ontology attachment context, and direct verification context.
 - `ontology` elements own stable model/domain meaning: `X is`, `X has`, `X relates to Y`, allowed semantic structure, and shared OWL/Turtle vocabulary.
 - Requirements own implementable obligations: what the system shall do, what can satisfy it, and what verification proves it.
-- Requirement-owned `semantic-contract` refinements own SHACL shape profiles over reachable ontology terms.
+- Reusable `semantic-contract` elements own SHACL shape profiles over ontology terms reached through explicit `use`/`usedBy` relations and constrain requirements through `constrain`/`constrainedBy`.
 - Ontology attached by capabilities should define nouns, relationships, allowed semantic categories, and stable model rules.
-- Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, `input-output`, or shape-only `semantic-contract` refinements.
+- Exact commands, fields, URI patterns, workflow steps, outputs, file paths, and reject/write/emit behavior belong in compatible requirement-owned `source`, `specification`, `constraint`, `behavior`, `state`, and `input-output` refinements. Shape-only `semantic-contract` elements capture reusable SHACL profiles through explicit ontology use.
 
 ## Capability Modeling Philosophy
 
@@ -31,7 +31,7 @@ Use this method when building or refactoring a system model, not only when clean
    - Run `reqvire submodels --json`.
    - Run `reqvire search --filter-type="ontology" --short`.
    - Treat each capability root as an independent coherent operational/system ability.
-   - Keep ontology elements under `requirements/Ontologies`; capability files consume ontology through attachments.
+   - Keep ontology and semantic-contract elements under `requirements/Ontologies`; capability files consume ontology through attachments, and requirements consume semantic contracts through `constrainedBy`.
    - Treat ontology as a first-class semantic plane: it defines reusable terms and relationships that capabilities explicitly attach so requirements inherit them through capability context.
    - Do not create one universal top capability just to reuse vocabulary. Shared meaning crosses roots through attachments.
 
@@ -43,19 +43,20 @@ Use this method when building or refactoring a system model, not only when clean
 3. **Shape the ontology hierarchy before writing local profiles**
    - Put nouns, classes, properties, semantic categories, and stable relationship rules in `ontology`.
    - Reuse existing ontology terms when they already describe the concept.
-   - Add ontology terms before adding `#### Concept References` or requirement-owned SHACL shapes that depend on those terms.
+   - Add ontology terms before adding `#### Concept References` or SHACL shapes that depend on those terms.
    - Keep exact command names, fields, URI patterns, workflow steps, output formats, persistence behavior, and reject/write/emit behavior out of ontology.
    - If prose moved out of a requirement still matters to implementation, preserve it as a requirement-owned refinement instead of deleting it.
 
 4. **Keep obligations in requirements**
    - Requirements state what the system shall do.
    - Requirements may use `#### Concept References` to bind readable text to ontology terms.
-   - `semantic-contract` elements contain `#### Shapes` only and profile reachable ontology terms for one requirement obligation.
+   - `semantic-contract` elements contain `#### Shapes` only, never `#### Ontology`, use ontology through `use`/`usedBy`, and constrain requirements through `constrain`/`constrainedBy`.
 
 5. **Preserve boundaries through attachments**
    - Use hierarchy only inside a capability, requirement, or ontology family.
    - Use capability attachments for cross-root ontology reuse.
-   - Use requirement attachments for cross-root reusable requirement-owned contracts.
+   - Use requirement attachments for cross-root reusable requirement-owned non-semantic-contract refinements.
+   - Use `use` for semantic-contract ontology dependencies and `constrain` for semantic-contract requirement dependencies.
    - After changing attachments or hierarchy, check `submodels --json` for unintended cross-submodel couplings.
 
 6. **Update verification and tests in the same slice**
@@ -69,7 +70,7 @@ Use this workflow when:
 
 - A requirement reads like a vocabulary catalog, domain definition, type taxonomy, relation dictionary, or data-shape definition.
 - A capability contains implementable system obligations instead of capability scope.
-- A semantic contract is attached or referenced without a clear owning requirement.
+- A semantic contract lacks explicit ontology `use` relations or requirement `constrain`/`constrainedBy` relations where it is intended to govern requirements.
 - A capability-root subgraph has no concrete requirements.
 - A requirement duplicates ontology facts already present in an ontology element.
 - A semantic contract needs local `Ontology`; it should usually become ontology element plus shape-only `semantic-contract`.
@@ -105,8 +106,8 @@ Put content in a requirement when it says:
 
 Put content in a semantic contract when:
 
-- One requirement obligation needs a closed-world SHACL profile.
-- The profile only uses ontology terms reachable through the owning requirement context.
+- One or more requirement obligations need a closed-world SHACL profile.
+- The profile only uses ontology terms reachable through the semantic contract's explicit ontology-use graph.
 - The contract contains `#### Shapes` and no `#### Ontology`.
 
 ## Audit Commands
@@ -119,7 +120,8 @@ reqvire submodels
 reqvire search --filter-type="capability" --short
 reqvire search --filter-type="semantic-contract" --short
 reqvire search --filter-type="requirement" --filter-content="(?i)(\\bis a\\b|\\bhas property\\b|\\bvocabulary\\b|\\bontology\\b|\\bsemantic contract\\b|\\bdefines\\b)" --short
-reqvire search --filter-type="semantic-contract" --not-have-relations="refine" --short
+reqvire search --filter-type="semantic-contract" --not-have-relations="use" --short
+reqvire search --filter-type="semantic-contract" --not-have-relations="constrain" --short
 ```
 
 Use `collect` before editing a candidate:
@@ -160,12 +162,12 @@ Do not delete meaning. Move it to the correct element type.
 If stable semantic meaning is currently in a requirement:
 
 - Add or update an `ontology` element.
-- Place authored ontology elements in `requirements/Ontologies`, grouped by semantic area.
+- Place authored ontology and semantic-contract elements in `requirements/Ontologies`, grouped by semantic area.
 - Put ontology vocabulary in `#### Ontology`.
 - Do not put `#### Shapes` in ontology.
 - Attach the ontology from the capability that needs that vocabulary.
 - Remove duplicated semantic prose from the requirement after preserving the obligation.
-- Keep ontology focused on terms and relationships. If a statement names concrete CLI/MCP commands, exact output fields, file paths, report sections, validation messages, or mutation steps, move it to `specification`, `behavior`, `state`, `input-output`, or a requirement-owned shape profile instead.
+- Keep ontology focused on terms and relationships. If a statement names concrete CLI/MCP commands, exact output fields, file paths, report sections, validation messages, or mutation steps, move it to `specification`, `behavior`, `state`, `input-output`, or a semantic-contract shape profile instead.
 
 ### 4. Keep Obligations In Requirements
 
@@ -182,8 +184,8 @@ The system shall reject API requests whose access token does not conform to the 
   * type: requirement
 
 #### Relations
-  * specify: [API Authentication](../Capabilities.md#api-authentication)
-  * refinedBy: [Access Token Request Shape](#access-token-request-shape)
+  * specify: [API Authentication](Feature.md#api-authentication)
+  * constrainedBy: [Access Token Request Shape](#access-token-request-shape)
   * verifiedBy: [Access Token Rejection Test](Verifications.md#access-token-rejection-test)
 ---
 ```
@@ -192,10 +194,11 @@ The system shall reject API requests whose access token does not conform to the 
 
 When an obligation needs specific closed-world validation:
 
-- Create a `semantic-contract` refining the requirement.
+- Create a `semantic-contract` under `requirements/Ontologies` near the ontology it uses, then link it to the requirement with `constrain`/`constrainedBy`.
 - Include `#### Shapes`.
 - Do not include `#### Ontology`.
-- Use only ontology terms declared by reachable ontology context.
+- Add `use` relations to the ontology elements that declare the SHACL terms.
+- Use only ontology terms declared by the semantic contract's explicit ontology-use graph.
 
 ### 6. Wire Relations And Attachments
 
@@ -203,9 +206,10 @@ Use:
 
 - `capability specifiedBy requirement` or `requirement specify capability` for ownership.
 - capability `Attachments` to ontology elements.
-- `requirement refinedBy semantic-contract` for obligation-specific SHACL profiles.
+- `semantic-contract constrain requirement` or `requirement constrainedBy semantic-contract` for SHACL profile application.
+- `semantic-contract use ontology` or `ontology usedBy semantic-contract` for ontology vocabulary dependencies.
 - Capability attachments only for ontology elements from other capability roots.
-- Requirement attachments only for requirement-owned semantic contracts or requirement-detail refinements.
+- Requirement attachments only for compatible requirement-owned `source`, `constraint`, `behavior`, `specification`, `state`, or `input-output` refinements.
 
 Do not use `trace` as a substitute for ownership or dependency.
 Do not remove a cross-root dependency unless the consumer now has an explicit attachment that gives `collect` and change impact the same dependency path.
@@ -238,7 +242,7 @@ Run focused e2e tests for touched behavior, then full e2e before finishing.
 - Capability roots have specifying requirements, child capabilities, or intentional direct verification. Pure vocabulary belongs in ontology and is attached by consuming capabilities.
 - Semantic meaning is not duplicated in requirements and ontology elements.
 - Semantic contracts contain `Shapes` only and no `Ontology`.
-- Semantic references resolve through reachable ontology context and explicit ontology attachments.
+- Semantic-contract references resolve through explicit ontology `use` context and ontology hierarchy.
 - `reqvire validate`, `reqvire lint`, and relevant tests pass.
 
 ## Pitfalls

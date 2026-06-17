@@ -10,7 +10,12 @@ import { EXPECTED_SCHEMA_VERSION } from "./types";
 
 export const devFixture: ExplorerProjectStore = {
   schema_version: EXPECTED_SCHEMA_VERSION,
-  project: { name: "Reqvire project (dev fixture)", root_label: "Reqvire root" },
+  project: {
+    name: "reqvire",
+    root_label: "reqvire @ dev-fixture",
+    repository: "reqvire",
+    branch: "dev-fixture",
+  },
   folders: [
     { path: "requirements", parent: null, children: ["requirements/Specifications.md"] },
   ],

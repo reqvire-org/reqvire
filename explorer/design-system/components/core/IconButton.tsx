@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from "react";
 import { css, cx } from "@linaria/atomic";
 import type { ButtonSize, ButtonTone } from "./button_contract";
 
-export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+export interface IconButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
   children: ReactNode;
   size?: Extract<ButtonSize, "sm" | "md">;
   tone?: Extract<ButtonTone, "secondary" | "ghost">;
@@ -91,13 +91,13 @@ export function IconButton({
     <button
       type={type}
       className={cx(
-        "rq-iconbtn",
+        "ds-iconbtn",
         baseUX,
         skinX,
         size === "sm" ? smUX : "",
-        size === "sm" ? "rq-iconbtn--sm" : "",
+        size === "sm" ? "ds-iconbtn--sm" : "",
         tone === "ghost" ? ghostSkinX : "",
-        tone === "ghost" ? "rq-iconbtn--ghost" : "",
+        tone === "ghost" ? "ds-iconbtn--ghost" : "",
         active ? "is-active" : "",
         className,
       )}
