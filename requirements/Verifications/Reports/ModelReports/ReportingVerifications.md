@@ -1315,4 +1315,3 @@ This test verifies that the --from-folder option correctly generates relative li
   * satisfiedBy: [test.sh](../../../../tests/test-verification-traces/test.sh)
   * verify: [CLI Traces Command](../../../Interfaces/CLI/Commands.md#cli-traces-command)
 ---
-

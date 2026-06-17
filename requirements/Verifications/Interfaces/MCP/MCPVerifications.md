@@ -421,4 +421,3 @@ Expected checks:
 #### Relations
   * verify: [MCP Workspace Session Tools](../../../Interfaces/MCP/Tools.md#mcp-workspace-session-tools)
 ---
-

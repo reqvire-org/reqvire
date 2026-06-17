@@ -344,7 +344,7 @@ Implementation details shall follow the associated refinement specifications. Th
   * derivedFrom: [CLI Interface Structure](#cli-interface-structure)
   * refinedBy: [CLI Migrate Command Refinement Specification](Specifications.md#cli-migrate-command-refinement-specification)
   * satisfiedBy: [cli.rs](../../../cli/src/cli.rs)
-  * satisfiedBy: [migrations](../../../core/src/migrations/mod.rs)
+  * satisfiedBy: [mod.rs](../../../core/src/migrations/mod.rs)
   * verifiedBy: [CLI Help Structure Verification](../../Verifications/Interfaces/CLI/CLIVerifications.md#cli-help-structure-verification)
 ---
 

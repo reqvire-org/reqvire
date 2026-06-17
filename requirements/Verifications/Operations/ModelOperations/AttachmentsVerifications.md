@@ -324,4 +324,3 @@ Test cases for filesystem and reporting:
   * satisfiedBy: [test.sh](../../../../tests/test-assets/test.sh)
   * verify: [CLI Remove Asset Command](../../../Interfaces/CLI/Commands.md#cli-remove-asset-command)
 ---
-

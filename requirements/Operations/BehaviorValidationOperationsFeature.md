@@ -109,4 +109,3 @@ Validation requirements define when model state is acceptable, when a mutation m
   * specifiedBy: [Validate Markdown Structure](Validation/ValidationRequirements.md#validate-markdown-structure)
   * specifiedBy: [Validate Relation Types](Validation/ValidationRequirements.md#validate-relation-types)
 ---
-

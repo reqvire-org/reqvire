@@ -624,4 +624,3 @@ These tools are read-only and must not mutate the model.
 #### Relations
   * refine: [MCP Workspace Session Tools](Tools.md#mcp-workspace-session-tools)
 ---
-

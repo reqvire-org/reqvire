@@ -63,8 +63,8 @@ Implementation details shall follow the associated refinement specifications.
 #### Relations
   * derivedFrom: [Responsive Explorer Rendering](#responsive-explorer-rendering)
   * refinedBy: [Explorer Design System Styling Refinement Specification](Specifications.md#explorer-design-system-styling-refinement-specification)
-  * satisfiedBy: [styles.css](../../../explorer/design-system/styles.css)
   * satisfiedBy: [ElementIcon.tsx](../../../explorer/design-system/components/data/ElementIcon.tsx)
   * satisfiedBy: [DetailDialog.tsx](../../../explorer/design-system/product-patterns/detail/DetailDialog.tsx)
+  * satisfiedBy: [styles.css](../../../explorer/design-system/styles.css)
   * verifiedBy: [Responsive Design Verification](../../Verifications/Interfaces/WebExplorer/WebInterfaceVerifications.md#responsive-design-verification)
 ---

@@ -61,4 +61,3 @@ Deduplication rules for format fix operations.
 #### Metadata
   * type: behavior
 ---
-

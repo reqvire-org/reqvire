@@ -157,4 +157,3 @@ The rule is intentionally strict:
 #### Relations
   * refine: [Semantic Contract Reference Context Validation](ValidationRequirements.md#semantic-contract-reference-context-validation)
 ---
-

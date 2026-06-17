@@ -36,7 +36,6 @@ Canonical merge compatibility categories are defined by the Reqvire operation on
 - When incompatible: "Cannot merge {source_type} into {target_type}: type mismatch"
 
 #### Ontology Merge Category
-
 Ontology elements are merge-compatible only with ontology elements, and merge shall fold authored Turtle into the target ontology block after rewriting to the target boundary.
 
 #### Metadata

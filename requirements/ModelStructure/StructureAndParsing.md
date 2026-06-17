@@ -109,4 +109,3 @@ Each reserved subsection has specific parsing rules, validation requirements, an
   * verifiedBy: [Attachments Subsection Parsing Verification](../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachments-subsection-parsing-verification)
   * verifiedBy: [Attachments Validation Verification](../Verifications/Operations/ModelOperations/AttachmentsVerifications.md#attachments-validation-verification)
 ---
-

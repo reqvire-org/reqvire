@@ -46,4 +46,3 @@ The system shall provide functionality to build upward trace trees from verifica
   * derivedFrom: [Verification Upward Traceability](#verification-upward-traceability)
   * refinedBy: [Verification Trace Tree Construction](Specifications.md#verification-trace-tree-construction)
 ---
-

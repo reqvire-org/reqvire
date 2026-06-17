@@ -181,4 +181,3 @@ When changing ontology rendering:
 #### Relations
   * refine: [Ontologies View Generation](Capabilities.md#ontologies-view-generation)
 ---
-

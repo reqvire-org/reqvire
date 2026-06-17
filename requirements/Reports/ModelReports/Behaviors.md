@@ -110,4 +110,3 @@ Coverage evaluation philosophy for verification reporting.
 #### Metadata
   * type: behavior
 ---
-

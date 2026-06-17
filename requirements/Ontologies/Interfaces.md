@@ -144,4 +144,3 @@ reqvire:mcpMutationSideEffectClass a reqvire:McpMutationToolClass ;
 #### Relations
   * derivedFrom: [Reqvire Core Element Ontology](Core.md#reqvire-core-element-ontology)
 ---
-

@@ -255,4 +255,3 @@ reqvire:governancePersistenceRule a reqvire:GovernanceRule ;
 #### Relations
   * derivedFrom: [Reqvire Behavior Rule Ontology](BehaviorValidationOperations.md#reqvire-behavior-rule-ontology)
 ---
-

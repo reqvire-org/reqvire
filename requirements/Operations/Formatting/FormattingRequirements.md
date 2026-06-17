@@ -180,4 +180,3 @@ The system shall replace absolute links with relative links, where applicable an
   * specify: [Formatting Model Documents](../BehaviorValidationOperationsFeature.md#formatting-model-documents)
   * verifiedBy: [Format Command Requirements Verification](../../Verifications/Operations/Formatting/FormattingVerifications.md#format-command-requirements-verification)
 ---
-

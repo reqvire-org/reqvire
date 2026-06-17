@@ -118,4 +118,3 @@ Implementation details shall follow the associated refinement specifications.
   * satisfiedBy: [trace_tree_builder.rs](../../../core/src/trace_tree_builder.rs)
   * verifiedBy: [Lint Command Verification](../../Verifications/Operations/Linting/LintingVerifications.md#lint-command-verification)
 ---
-

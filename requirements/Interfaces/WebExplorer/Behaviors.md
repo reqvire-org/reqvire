@@ -25,4 +25,3 @@ Navigation behavior in the served Explorer.
 #### Metadata
   * type: behavior
 ---
-

@@ -435,4 +435,3 @@ The system shall expose MCP-only workspace/session tools for workspace status, t
   * satisfiedBy: [mcp.rs](../../../cli/src/mcp.rs)
   * verifiedBy: [MCP Workspace Session Tools Verification](../../Verifications/Interfaces/MCP/MCPVerifications.md#mcp-workspace-session-tools-verification)
 ---
-

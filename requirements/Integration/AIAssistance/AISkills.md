@@ -98,4 +98,3 @@ Artifact contract rules:
 #### Relations
   * refine: [AI Skills Markdown Implementation Artifacts](#ai-skills-markdown-implementation-artifacts)
 ---
-

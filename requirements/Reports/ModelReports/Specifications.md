@@ -969,4 +969,3 @@ Reqvire supports verification coverage analysis for requirement verification and
 #### Relations
   * refine: [Verification Coverage Report](ReportingRequirements.md#verification-coverage-report)
 ---
-

@@ -398,4 +398,3 @@ The system shall ensure color consistency between:
   * satisfiedBy: [RelationEndpoint.tsx](../../../explorer/design-system/product-patterns/detail/RelationEndpoint.tsx)
   * satisfiedBy: [colors.css](../../../explorer/design-system/tokens/colors.css)
 ---
-

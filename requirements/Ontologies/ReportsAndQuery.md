@@ -812,4 +812,3 @@ reqvire:SemanticBlockShape
   * constrain: [Ontology and Shapes Collection](../Reports/ModelReports/ReportingRequirements.md#ontology-and-shapes-collection)
   * use: [Reqvire Semantic Export Ontology](#reqvire-semantic-export-ontology)
 ---
-

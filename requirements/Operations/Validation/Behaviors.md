@@ -56,4 +56,3 @@ Error message structure for validation issues.
 #### Metadata
   * type: behavior
 ---
-

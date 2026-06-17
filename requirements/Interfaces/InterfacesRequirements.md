@@ -65,4 +65,3 @@ Implementation details shall follow the associated refinement specifications.
   * refinedBy: [Web Interface Refinement Specification](Specifications.md#web-interface-refinement-specification)
   * specify: [Web Explorer Interface](InterfacesFeature.md#web-explorer-interface)
 ---
-

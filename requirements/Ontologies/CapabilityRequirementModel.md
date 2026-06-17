@@ -640,4 +640,3 @@ reqvire:SemanticContractShape
   * use: [Reqvire Semantic Contract Ontology](#reqvire-semantic-contract-ontology)
   * use: [Reqvire Relation Ontology](RelationsAndImpact.md#reqvire-relation-ontology)
 ---
-

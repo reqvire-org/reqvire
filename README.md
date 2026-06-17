@@ -12,6 +12,21 @@ Explore Reqvire > [📖 **Documentation**](https://www.reqvire.org) • [🔍 **
 
 ---
 
+# Latest Changes
+
+Reqvire 1.0.0 is the first stable release. It formalizes the current model around ontologies, capabilities, requirements, semantic contracts, verification objectives, and concrete verification evidence.
+
+For workspaces created with older Reqvire versions, use the migration command to preview and apply supported breaking model updates:
+
+```bash
+reqvire migrate
+reqvire migrate --fix
+```
+
+`reqvire migrate` is dry-run by default. It reports planned source changes before writing anything; `--fix` applies deterministic migrations such as legacy document header cleanup and verification-objective holder creation.
+
+---
+
 # What is Reqvire?
 
 Build verifiable and traceable software.

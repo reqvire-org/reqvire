@@ -349,4 +349,3 @@ reqvire:shapesSubsection a reqvire:ReservedSubsection ;
   * ontology_base: https://www.reqvire.org/ontology
   * ontology_prefix: reqvire
 ---
-

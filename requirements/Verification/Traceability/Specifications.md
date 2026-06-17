@@ -62,4 +62,3 @@ For hierarchical relation analysis (not verification-specific), create a virtual
 #### Metadata
   * type: specification
 ---
-

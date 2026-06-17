@@ -90,4 +90,3 @@ Implementation details shall follow the associated refinement specifications.
   * satisfiedBy: [model.rs](../../core/src/model.rs)
   * verifiedBy: [Requirements Files Search and Detection Test](../Verifications/Operations/Validation/ValidationVerifications.md#requirements-files-search-and-detection-test)
 ---
-

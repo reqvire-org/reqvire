@@ -49,4 +49,3 @@ Pull request validation workflow behavior:
 #### Relations
   * refine: [Automate Pull Request Validations](GitHubWorkflowRequirements.md#automate-pull-request-validations)
 ---
-

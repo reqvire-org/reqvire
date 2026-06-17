@@ -57,4 +57,3 @@ Short mode reduces output verbosity for quick scanning:
 #### Metadata
   * type: behavior
 ---
-

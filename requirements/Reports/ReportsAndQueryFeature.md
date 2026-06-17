@@ -51,4 +51,3 @@ Semantic export contracts may define the intended graph patterns for generated p
 #### Relations
   * specifiedBy: [Ontology and Shapes Collection](ModelReports/ReportingRequirements.md#ontology-and-shapes-collection)
 ---
-

@@ -116,77 +116,6 @@ This test verifies atomic relation relink behavior, including hierarchical subgr
   * verify: [Atomic Relation Relink Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-relation-relink-operation)
 ---
 
-### Ontology Boundary-Changing Mutation Test
-
-This test verifies ontology-aware mutation rewrites when a CRUD change crosses ontology boundaries or creates a new boundary inside an existing hierarchy.
-
-#### Details
-
-##### Acceptance Criteria
-- Converting a child ontology contribution into an explicit boundary rewrites `ontology_base` and `ontology_prefix` consistently in authored Turtle.
-- Converting a grandchild contribution into an explicit boundary rewrites only the affected ontology block and preserves the parent boundary declarations.
-- When a grandchild creates a new boundary under an already bounded child ontology, the resulting export declares the direct parent import for the child boundary and preserves the child boundary's import to its own parent.
-- Converting an explicit boundary back into a contribution removes the boundary declaration and removes now-unnecessary imports.
-- Deleting an ontology contribution preserves the remaining ontology boundary and keeps validation green.
-- Moving an ontology contribution preserves its inherited ontology prefix/base bindings and keeps validation green after the move.
-- Renaming an ontology contribution updates the element heading without corrupting inherited ontology bindings or validation.
-- Merging ontology blocks is rejected when it would violate the one-ontology-block-per-element structure.
-- Validation passes after each successful mutation.
-
-##### Test Criteria
-1. **Child boundary conversion**
-   - Start with a root ontology and a child contribution that inherits the root base.
-   - Run `add --override` to convert the child into an explicit boundary.
-   - Verify the child block now declares its own `ontology_base` and `ontology_prefix`.
-   - Verify the child block includes the required `owl:imports` to the root ontology.
-
-2. **Grandchild boundary conversion under a bounded child**
-   - Start with a bounded child ontology that imports the root ontology and a grandchild contribution derived from the child.
-   - Run `add --override` to convert the grandchild into an explicit boundary.
-   - Verify the grandchild block declares its own `ontology_base` and `ontology_prefix`.
-   - Verify the grandchild block imports the child ontology base.
-   - Verify the child boundary still imports the root ontology base.
-
-3. **Boundary revert**
-   - Run `add --override` to convert the grandchild boundary back into a contribution.
-   - Verify the grandchild block no longer declares its own boundary.
-   - Verify the grandchild block no longer carries a redundant cross-boundary import.
-
-4. **Ontology delete**
-   - Run `rm` on an ontology contribution.
-   - Verify the deleted ontology block is removed.
-   - Verify the remaining ontology boundary still validates.
-
-5. **Ontology rename**
-   - Run `rename` on an ontology contribution.
-   - Verify the heading changes and the inherited ontology binding remains valid.
-
-6. **Ontology move**
-   - Run `mv` on an ontology contribution into a new file.
-   - Verify the moved file contains the ontology contribution and the source file no longer does.
-   - Verify the moved contribution keeps its inherited ontology binding.
-
-7. **Ontology merge**
-   - Run `merge` on ontology blocks and verify the target element remains a single ontology element with one `#### Ontology` block.
-   - Verify all source authored Turtle is rewritten to the target ontology boundary before consolidation.
-   - Verify the merged result preserves the target ontology metadata and recalculates inherited prefix bindings, document declarations, `owl:imports`, and reachable SHACL references as needed.
-   - Verify source ontology elements are removed after successful merge and the model still validates.
-
-##### Success Criteria
-- The mutation keeps ontology export valid after each step.
-- Boundary-changing rewrites remain scoped to the affected ontology element.
-- Explicit authored prefixes and imports are rewritten consistently with the resolved ontology base.
-- The suite covers the ontology-specific mutation cases currently exercised by the test file, including a positive ontology merge path.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-ontology-aware-mutations/test.sh)
-  * verify: [CRUD Semantic Contract Mutation Validation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#crud-semantic-contract-mutation-validation)
-  * verify: [Ontology and Shapes Collection](../../../Reports/ModelReports/ReportingRequirements.md#ontology-and-shapes-collection)
----
-
 ### CLI Add Element Test
 
 The test shall verify that the `add` command creates new elements from stdin or inline string input, validates structure, inserts following Element Ordering Behavior, and outputs git-style diffs.
@@ -884,34 +813,6 @@ The test shall verify that the `link` command adds relations to elements followi
   * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
 ---
 
-### Verification Objective Mutation Test
-
-The test shall verify that verification-objective elements participate in verification-family hierarchy mutations while remaining separate from concrete verification evidence and verification semantics.
-
-#### Details
-Test cases:
-1. **Objective hierarchy link**: `link` permits `verification-objective` to derive from another verification-family element and persists the relation.
-2. **Objective hierarchy unlink**: `unlink` removes the objective hierarchy relation and keeps the model valid.
-3. **Concrete verification relink**: `relink` can move a concrete verification from one verification objective parent to another.
-4. **Objective move**: `mv` moves a verification objective to another file and updates incoming concrete verification `derivedFrom` relations.
-5. **Objective merge**: `merge` permits objective-to-objective merge and removes the merged source element.
-6. **Mixed merge rejection**: `merge` rejects verification-objective to concrete-verification merge as a type mismatch.
-7. **Verification relation rejection**: `link` rejects `verify` and `verifiedBy` relations involving verification-objective as the verification endpoint.
-8. **Evidence relation rejection**: `link` rejects `satisfiedBy` evidence relations from verification-objective to internal file targets.
-9. **Dry-run move**: `mv --dry-run` reports the operation without mutating source or target files.
-
-#### Metadata
-  * type: test-verification
-
-#### Relations
-  * satisfiedBy: [test.sh](../../../../tests/test-verification-objective-mutations/test.sh)
-  * verify: [Atomic Relation Relink Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-relation-relink-operation)
-  * verify: [Element Type Relation Compatibility](../../../ModelStructure/ModelManagement.md#element-type-relation-compatibility)
-  * verify: [Merge Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#merge-element-operation)
-  * verify: [Move Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-element-operation)
-  * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
----
-
 ### Merge Elements Test
 
 Test verifies that the merge command correctly combines elements.
@@ -1089,6 +990,77 @@ The test shall verify that the `mv-file --squash` command moves all elements fro
   * verify: [Move File Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-file-operation)
 ---
 
+### Ontology Boundary-Changing Mutation Test
+
+This test verifies ontology-aware mutation rewrites when a CRUD change crosses ontology boundaries or creates a new boundary inside an existing hierarchy.
+
+#### Details
+
+##### Acceptance Criteria
+- Converting a child ontology contribution into an explicit boundary rewrites `ontology_base` and `ontology_prefix` consistently in authored Turtle.
+- Converting a grandchild contribution into an explicit boundary rewrites only the affected ontology block and preserves the parent boundary declarations.
+- When a grandchild creates a new boundary under an already bounded child ontology, the resulting export declares the direct parent import for the child boundary and preserves the child boundary's import to its own parent.
+- Converting an explicit boundary back into a contribution removes the boundary declaration and removes now-unnecessary imports.
+- Deleting an ontology contribution preserves the remaining ontology boundary and keeps validation green.
+- Moving an ontology contribution preserves its inherited ontology prefix/base bindings and keeps validation green after the move.
+- Renaming an ontology contribution updates the element heading without corrupting inherited ontology bindings or validation.
+- Merging ontology blocks is rejected when it would violate the one-ontology-block-per-element structure.
+- Validation passes after each successful mutation.
+
+##### Test Criteria
+1. **Child boundary conversion**
+   - Start with a root ontology and a child contribution that inherits the root base.
+   - Run `add --override` to convert the child into an explicit boundary.
+   - Verify the child block now declares its own `ontology_base` and `ontology_prefix`.
+   - Verify the child block includes the required `owl:imports` to the root ontology.
+
+2. **Grandchild boundary conversion under a bounded child**
+   - Start with a bounded child ontology that imports the root ontology and a grandchild contribution derived from the child.
+   - Run `add --override` to convert the grandchild into an explicit boundary.
+   - Verify the grandchild block declares its own `ontology_base` and `ontology_prefix`.
+   - Verify the grandchild block imports the child ontology base.
+   - Verify the child boundary still imports the root ontology base.
+
+3. **Boundary revert**
+   - Run `add --override` to convert the grandchild boundary back into a contribution.
+   - Verify the grandchild block no longer declares its own boundary.
+   - Verify the grandchild block no longer carries a redundant cross-boundary import.
+
+4. **Ontology delete**
+   - Run `rm` on an ontology contribution.
+   - Verify the deleted ontology block is removed.
+   - Verify the remaining ontology boundary still validates.
+
+5. **Ontology rename**
+   - Run `rename` on an ontology contribution.
+   - Verify the heading changes and the inherited ontology binding remains valid.
+
+6. **Ontology move**
+   - Run `mv` on an ontology contribution into a new file.
+   - Verify the moved file contains the ontology contribution and the source file no longer does.
+   - Verify the moved contribution keeps its inherited ontology binding.
+
+7. **Ontology merge**
+   - Run `merge` on ontology blocks and verify the target element remains a single ontology element with one `#### Ontology` block.
+   - Verify all source authored Turtle is rewritten to the target ontology boundary before consolidation.
+   - Verify the merged result preserves the target ontology metadata and recalculates inherited prefix bindings, document declarations, `owl:imports`, and reachable SHACL references as needed.
+   - Verify source ontology elements are removed after successful merge and the model still validates.
+
+##### Success Criteria
+- The mutation keeps ontology export valid after each step.
+- Boundary-changing rewrites remain scoped to the affected ontology element.
+- Explicit authored prefixes and imports are rewritten consistently with the resolved ontology base.
+- The suite covers the ontology-specific mutation cases currently exercised by the test file, including a positive ontology merge path.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-ontology-aware-mutations/test.sh)
+  * verify: [CRUD Semantic Contract Mutation Validation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#crud-semantic-contract-mutation-validation)
+  * verify: [Ontology and Shapes Collection](../../../Reports/ModelReports/ReportingRequirements.md#ontology-and-shapes-collection)
+---
+
 ### Relation Consistency Test
 
 The test shall verify that bidirectional relation consistency is maintained when elements are manipulated.
@@ -1264,4 +1236,32 @@ The test shall verify that the `unlink` command removes relations from elements 
   * satisfiedBy: [test.sh](../../../../tests/test-link-unlink/test.sh)
   * verify: [Relation Commands](../../../Interfaces/CLI/Commands.md#relation-commands)
   * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
+---
+
+### Verification Objective Mutation Test
+
+The test shall verify that verification-objective elements participate in verification-family hierarchy mutations while remaining separate from concrete verification evidence and verification semantics.
+
+#### Details
+Test cases:
+1. **Objective hierarchy link**: `link` permits `verification-objective` to derive from another verification-family element and persists the relation.
+2. **Objective hierarchy unlink**: `unlink` removes the objective hierarchy relation and keeps the model valid.
+3. **Concrete verification relink**: `relink` can move a concrete verification from one verification objective parent to another.
+4. **Objective move**: `mv` moves a verification objective to another file and updates incoming concrete verification `derivedFrom` relations.
+5. **Objective merge**: `merge` permits objective-to-objective merge and removes the merged source element.
+6. **Mixed merge rejection**: `merge` rejects verification-objective to concrete-verification merge as a type mismatch.
+7. **Verification relation rejection**: `link` rejects `verify` and `verifiedBy` relations involving verification-objective as the verification endpoint.
+8. **Evidence relation rejection**: `link` rejects `satisfiedBy` evidence relations from verification-objective to internal file targets.
+9. **Dry-run move**: `mv --dry-run` reports the operation without mutating source or target files.
+
+#### Metadata
+  * type: test-verification
+
+#### Relations
+  * satisfiedBy: [test.sh](../../../../tests/test-verification-objective-mutations/test.sh)
+  * verify: [Element Type Relation Compatibility](../../../ModelStructure/ModelManagement.md#element-type-relation-compatibility)
+  * verify: [Relation Management Operations](../../../ModelStructure/ModelManagement.md#relation-management-operations)
+  * verify: [Atomic Relation Relink Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#atomic-relation-relink-operation)
+  * verify: [Merge Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#merge-element-operation)
+  * verify: [Move Element Operation](../../../Operations/ModelOperations/ElementManipulationRequirements.md#move-element-operation)
 ---

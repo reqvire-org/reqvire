@@ -241,8 +241,8 @@ Mutation commands that create or rewrite relations shall enforce the same compat
   * refinedBy: [Supported Element Types Specification](Specifications.md#supported-element-types-specification)
   * satisfiedBy: [graph_registry.rs](../../core/src/graph_registry.rs)
   * satisfiedBy: [relation.rs](../../core/src/relation.rs)
-  * verifiedBy: [Element Type Relation Compatibility Test](../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)
   * verifiedBy: [Verification Objective Mutation Test](../Verifications/Operations/ModelOperations/ElementManipulationVerifications.md#verification-objective-mutation-test)
+  * verifiedBy: [Element Type Relation Compatibility Test](../Verifications/Operations/Validation/ValidationVerifications.md#element-type-relation-compatibility-test)
 ---
 
 ### Refinement Element Structure Constraints

@@ -367,4 +367,3 @@ Implementation details shall follow the associated refinement specifications.
   * verifiedBy: [Invalid Relations Test](../../Verifications/Operations/Validation/ValidationVerifications.md#invalid-relations-test)
   * verifiedBy: [Single Element Refinement Validation Test](../../Verifications/Operations/Validation/ValidationVerifications.md#single-element-refinement-validation-test)
 ---
-

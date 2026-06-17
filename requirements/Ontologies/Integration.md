@@ -170,4 +170,3 @@ reqvire:CommentStyleKindShape
   * constrain: [Code Traceability](../Integration/CodeAlignment/CodeAlignmentRequirements.md#code-traceability)
   * use: [Reqvire Code Traceability Ontology](#reqvire-code-traceability-ontology)
 ---
-

@@ -27,4 +27,3 @@ Change impact uses native Reqvire relations and explicit attachments. Semantic r
 #### Relations
   * specifiedBy: [Tracing Structural Changes](../Reports/ModelReports/ReportingRequirements.md#tracing-structural-changes)
 ---
-

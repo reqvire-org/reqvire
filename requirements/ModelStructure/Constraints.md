@@ -80,4 +80,3 @@ Validation shall enforce those model contracts so that:
 #### Metadata
   * type: constraint
 ---
-

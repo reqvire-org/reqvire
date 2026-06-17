@@ -47,4 +47,3 @@ This determinism ensures that:
 #### Metadata
   * type: specification
 ---
-
